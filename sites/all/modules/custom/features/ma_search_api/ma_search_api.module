@@ -16,6 +16,7 @@ function ma_search_api_node_update($node) {
       'relationships' => array (
         'field_digital_heritage_items',
       ),
+      'triggers' => array(),
     ),
     'digital_heritage' => array (
       'relationships' => array (
@@ -47,7 +48,9 @@ function ma_search_api_node_update($node) {
     ),
   );
 
-  if ($content_type_properties = $relations[$node->type]) {
+  if (isset($relations[$node->type])) {
+
+    $content_type_properties = $relations[$node->type];
 
     // Load both old (if any) and new versions of the node into a EMW
     $wrapper_new = entity_metadata_wrapper('node', $node);
