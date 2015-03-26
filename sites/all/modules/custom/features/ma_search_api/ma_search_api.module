@@ -12,7 +12,7 @@ function ma_search_api_node_update($node) {
   // REINDEX RELATED NODES
 
   $relations = array (
-    'collections' => array (
+    'collection' => array (
       'relationships' => array (
         'field_digital_heritage_items',
       ),
