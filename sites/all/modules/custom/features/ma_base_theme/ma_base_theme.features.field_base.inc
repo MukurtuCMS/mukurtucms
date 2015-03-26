@@ -532,10 +532,12 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        'http://creativecommons.org/licenses/by-nc-nd/3.0' => 'Creative Commons Attribution-NonCommercial-NoDerivs (CC BY-NC-ND)',
-        'http://creativecommons.org/licenses/by-sa/3.0' => 'Creative Commons Attribution-ShareAlike (CC BY-SA)',
-        'http://creativecommons.org/licenses/by/3.0' => 'Creative Commons Attribution',
-        'http://mukurtu.org/copyright' => 'Copyright - All rights reserved',
+        'http://creativecommons.org/licenses/by/4.0' => 'Attribution 4.0 International (CC BY 4.0)',
+        'http://creativecommons.org/licenses/by-nc/4.0' => 'Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)',
+        'http://creativecommons.org/licenses/by-sa/4.0' => 'Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)',
+        'http://creativecommons.org/licenses/by-nc-sa/4.0' => 'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)',
+        'http://creativecommons.org/licenses/by-nd/4.0' => 'Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)',
+        'http://creativecommons.org/licenses/by-nc-nd/4.0' => 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
       ),
       'allowed_values_function' => '',
     ),

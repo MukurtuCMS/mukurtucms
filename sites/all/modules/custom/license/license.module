@@ -6,6 +6,10 @@
  * metadata.
  */
 
+  // Note that since we are using select fields here and not taxonomies, that we can't remove select options if any nodes are already using them.  Presumably there will be such changes from time to time., eg, version updates to the Creative Commons license.
+  // If we want to keep existing nodes' deprecated select values, then we should use a method like in the first answer here: http://drupal.stackexchange.com/questions/112315/how-can-i-remove-items-from-the-allowed-values-list-of-a-select-field-that-has-d
+// Or, if we want to upgrade existing nodes' values to their new-value equivalent, we would first run a drush script to update the values, and then we would change the select options normally.
+
 /**
  * Implements hook_field_formatter_info().
  */
