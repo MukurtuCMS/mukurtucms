@@ -6,10 +6,14 @@
 
 include_once 'ma_search_api.features.inc';
 
+//// REINDEX RELATED NODES
+
+function ma_search_api_node_insert ($node) {
+  ma_search_api_node_update ($node);
+}
 
 function ma_search_api_node_update($node) {
 
-  // REINDEX RELATED NODES
 
   $relations = array (
     'collection' => array (
@@ -123,6 +127,8 @@ function ma_search_api_node_update($node) {
     }
   }
 }
+
+
 
 /**
  * Implements hook_views_pre_view().
