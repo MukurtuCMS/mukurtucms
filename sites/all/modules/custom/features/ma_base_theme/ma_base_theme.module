@@ -1,0 +1,33 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Base Theme feature.
+ */
+
+include_once('ma_base_theme.features.inc');
+
+/**
+ * Implements hook_form_alter().
+ */
+function ma_base_theme_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+
+    case 'user_login_block':
+      $form['name']['#attributes']['placeholder'] = t('Username');
+      $form['pass']['#attributes']['placeholder'] = t('Password');
+      break;
+    case 'comment_node_digital_heritage_form':
+      $form['subject']['#size'] = '10';
+      break;
+  }
+}
+
+function ma_base_theme_css_alter(&$css) {
+/*
+  $colors = $css['sites/all/themes/mukurtu_theme/css/colors.css'];
+  unset($css['sites/all/themes/mukurtu_theme/css/colors.css']);
+  $css['sites/all/themes/mukurtu_theme/css/colors.css'] = $colors;
+  $css['sites/all/themes/mukurtu_theme/css/colors.css']['group'] = 1000;
+  $css['sites/all/themes/mukurtu_theme/css/colors.css']['weight'] = 1000;
+*/
+}

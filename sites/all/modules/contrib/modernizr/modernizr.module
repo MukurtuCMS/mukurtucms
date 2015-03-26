@@ -1,0 +1,178 @@
+<?php
+
+define('MODERNIZR_VERSION_REGEX', '/Modernizr [v]?([\d\.]*)/');
+
+/**
+ * Implements hook_init().
+ */
+function modernizr_init() {
+  $path = FALSE;
+
+  if (version_compare(modernizr_get_version(), '2.0') == -1) {
+    $path = modernizr_get_path();
+  }
+  else {
+    drupal_add_js(modernizr_get_path());
+  }
+
+  $serverside = (bool) variable_get('modernizr_serverside');
+
+  drupal_add_js(array(
+    'modernizrPath' => $path,
+    'modernizrServerside' => $serverside,
+  ), array('type' => 'setting', 'scope' => 'footer'));
+  if ($path || $serverside) {
+    drupal_add_js(drupal_get_path('module', 'modernizr') . '/modernizr_loader.js');
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function modernizr_permission() {
+  return array(
+    'administer modernizr' => array(
+      'title' => t('Administer Modernizr'),
+      'description' => t('Perform administration tasks for Modernizr.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function modernizr_menu() {
+  $items = array();
+
+  $items['admin/config/user-interface/modernizr'] = array(
+    'title' => 'Modernizr settings',
+    'description' => t('Various settings for Modernizr'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('modernizr_admin_form'),
+    'file' => 'modernizr.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('administer modernizr'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_library_info().
+ *
+ * Note: the 'js' array in the 'files' section is intentionally left empty.
+ * The reason is that the modernizr js should not be loaded directly by
+ * Drupal.
+ *
+ * @return array
+ */
+function modernizr_library_info() {
+  $libraries = array();
+
+  $libraries['modernizr'] = array(
+    'title' => t('Modernizr'),
+    'vendor url' => 'http://modernizr.com',
+    'download url' => 'http://modernizr.com',
+    'version arguments' => array(
+      'file' => 'modernizr.min.js',
+      'pattern' => MODERNIZR_VERSION_REGEX,
+    ),
+    'files' => array(
+      'js' => array(
+        // This array is intentionally left blank.
+      ),
+    ),
+    'integraton files' => array(
+      'modernizr' => array(
+        'js' => array(
+          drupal_get_path('module', 'modernizr') . '/modernizr_loader.js',
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Returns the modernizr instance.
+ *
+ * @return Modernizr
+ */
+function modernizr() {
+  return Modernizr::getInstance();
+}
+
+/**
+ * Returns the full path of modernizr, along with the filename.
+ *
+ * @return string
+ */
+function modernizr_get_path() {
+  $path = &drupal_static(__FUNCTION__);
+
+  if ($path === NULL) {
+    $paths = array();
+
+    if (module_exists('libraries')) {
+      $library_path = libraries_get_path('modernizr');
+      if (file_exists($library_path)) {
+        $paths[] = $library_path;
+      }
+    }
+
+    $paths[] = drupal_get_path('module', 'modernizr');
+
+    foreach ($paths as $p) {
+      if ($files = file_scan_directory($p, '/^modernizr[a-z\.-]*\.js$/')) {
+        $path = reset($files)->uri;
+        break;
+      }
+    }
+  }
+
+  return $path;
+}
+
+/**
+ * Guesses the modernizr library version.
+ *
+ * This function is using a regex, which
+ * assumes that the format of the version
+ * string won't change. If it changes,
+ * feel free to submit a bug report.
+ *
+ * @return mixed The version number if
+ * exists, or a boolean FALSE if it can't be
+ * determined.
+ */
+function modernizr_get_version() {
+  $version = &drupal_static(__FUNCTION__);
+
+  if ($version === NULL) {
+    if ($cached = cache_get('modernizr_version')) {
+      $version = $cached->data;
+    }
+    else {
+      $version = FALSE;
+      $modernizr_path = modernizr_get_path();
+      if (file_exists($modernizr_path)) {
+        $modernizr = file_get_contents($modernizr_path);
+
+        $matches = array();
+        preg_match(MODERNIZR_VERSION_REGEX, $modernizr, $matches);
+
+        if (isset($matches[1])) {
+          $version = $matches[1];
+          if ($version) {
+            cache_set('modernizr_version', $version);
+          }
+        }
+
+        unset($modernizr);
+      }
+    }
+  }
+
+  return $version;
+}

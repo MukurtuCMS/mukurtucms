@@ -1,0 +1,26 @@
+diff --git a/theme/system/form-element.func.php b/theme/system/form-element.func.php
+index 6253653..4be1058 100644
+--- a/theme/system/form-element.func.php
++++ b/theme/system/form-element.func.php
+@@ -67,9 +67,20 @@ function bootstrap_form_element(&$variables) {
+   $tooltip = FALSE;
+   // Convert some descriptions to tooltips.
+   // @see bootstrap_tooltip_descriptions setting in _bootstrap_settings_form()
++
++  // Mukurtu patch -- use tooltips for (almost) *all* form field descriptions:
++  // 1. Do not limit to only descriptions under 200 chars
++  // 2. For text area fields, the description is not yet available in $element, so load it from the field instance and use that.
++  // 3. We are still respecting the markup condition (description === strip_tags($description)) because jquery-ui tooltips can't show markup
+   if (!empty($element['#description'])) {
+     $description = $element['#description'];
+-    if (theme_get_setting('bootstrap_tooltip_enabled') && theme_get_setting('bootstrap_tooltip_descriptions') && $description === strip_tags($description) && strlen($description) <= 200) {
++  }
++  elseif ($element['#type'] == 'textarea') {
++    $textfield = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
++    $description = $textfield['description'];
++  }
++  if ($description) {
++    if (theme_get_setting('bootstrap_tooltip_enabled') && theme_get_setting('bootstrap_tooltip_descriptions') && $description === strip_tags($description)) {
+       $tooltip = TRUE;
+       $attributes['data-toggle'] = 'tooltip';
+       $attributes['title'] = $description;

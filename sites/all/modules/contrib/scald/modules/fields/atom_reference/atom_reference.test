@@ -1,0 +1,88 @@
+<?php
+/**
+ * @file
+ * Tests for atom_reference module.
+ */
+
+/**
+ * Test the Atom Reference module.
+ */
+class ScaldAtomRefereneTestCase extends ScaldWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Atom Reference',
+      'description' => 'Test the Atom Reference functionality.',
+      'group' => 'Scald',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setup() {
+    parent::setUp(array('atom_reference', 'field_ui', 'scald_dnd_library'));
+  }
+
+  /**
+   * Test Scald YouTube atom creation via UI.
+   */
+  function testAtomReferenceField() {
+    $web_user = $this->drupalCreateUser(array(
+      'administer content types',
+      'administer site configuration',
+      'administer scald',
+      'view any atom',
+      'create atom of any type',
+    ));
+    $this->drupalLogin($web_user);
+
+    $atom = $this->createAtom();
+
+    $edit = array(
+      'fields[_add_new_field][label]' => 'Media',
+      'fields[_add_new_field][field_name]' => 'media',
+      'fields[_add_new_field][type]' => 'atom_reference',
+      'fields[_add_new_field][widget_type]' => 'atom_reference_textfield',
+    );
+    $this->drupalPost('admin/structure/types/manage/article/fields', $edit, t('Save'));
+
+    $this->drupalGet('admin/structure/types/manage/article/display');
+    $edit = array(
+      'fields[field_media][type]' => 'sdl_editor_representation',
+    );
+    // Submit an image button is quite complex and it is required to send extr
+    // post data, which are the submission coordinates.
+    $this->drupalPost(NULL, $edit, '', array(), array(), NULL, '&field_media_formatter_settings_edit.x=20&field_media_formatter_settings_edit.y=10');
+    $this->assertFieldByName('fields[field_media][settings_edit_form][settings][link]', 0);
+
+    $edit = array(
+      'fields[field_media][settings_edit_form][settings][link]' => 1,
+    );
+    $this->drupalPost(NULL, $edit, t('Update'));
+    $this->assertText('Link to content: Yes');
+    $this->drupalPost(NULL, array(), t('Save'));
+
+    $node = $this->drupalCreateNode(array(
+      'type' => 'article',
+      'field_media' => array(LANGUAGE_NONE => array(array('sid' => $atom->sid))),
+    ));
+
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertText($node->title);
+    // Confirm that the referenced atom is rendered with a link.
+    $xpath = $this->buildXPathQuery(
+      '//div[contains(@class, :field)]//a/img[@alt=:alt]',
+      array(
+        ':field' => 'field-name-field-media',
+        ':alt' => $atom->title,
+      )
+    );
+    $this->assertTrue($this->xpath($xpath), 'Referenced atom is rendered with link.');
+  }
+
+}
+

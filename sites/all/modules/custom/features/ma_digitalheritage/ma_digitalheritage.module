@@ -1,0 +1,273 @@
+<?php
+/**
+ * @file
+ * Code for the Digital Heritage Metadata Import feature.
+ */
+
+include_once('ma_digitalheritage.features.inc');
+
+/**
+ * Implements hook_node_presave().
+ */
+function ma_digitalheritage_node_presave($node) {
+  if ($node->type == 'digital_heritage') {
+
+    // Update the Community field according to the protocols for the DH node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet). It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
+    $communities = array();
+    $dh_emw = entity_metadata_wrapper('node', $node);
+    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+      $p_emw = entity_metadata_wrapper('node', $protocol);
+      foreach ($p_emw->og_group_ref->value() as $community) {
+        $communities[] = $community->nid;
+      }
+    }
+    if (count($communities)) {
+      $dh_emw->field_community_ref->set(array_unique($communities));
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) {
+
+  // Add a button to reset search and filters
+  // Search API provides a button on the view that will reset the search, but not the filters. Leaving that off and creating our own that will reset both.
+  if (strpos($form['#id'], 'views-exposed-form-digital-heritage-grid-list') !== FALSE) {
+    if (count(arg()) > 1 OR count(drupal_get_query_parameters())) {
+      $form['reset'] = array('#markup' => l(t('Reset'),'digital-heritage', array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
+    }
+  }
+
+}
+
+/**
+ * Implements template_preprocess_views_view.
+ */
+function ma_digitalheritage_preprocess_views_view(&$vars) {
+  $view = &$vars['view'];
+
+  // Add JS for grid/list view switcher on DH and Collections views
+  if ($view->name == 'digital_heritage_grid_list' OR $view->name == 'collections_grid_list') {
+    drupal_add_library('system', 'jquery.cookie');
+    drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/grid_list_switcher.js');
+  }
+}
+
+/**
+ * Implements hook_user_logout().
+ */
+// Delete the cookie that holds the DH grid/list view setting
+function ma_digitalheritage_user_logout ($account) {
+  setcookie('grid_list_mode', '', 1, '/');
+}
+
+/**
+ * Implementation of hook_node_view().
+ */
+function ma_digitalheritage_node_view($node, $view_mode) {
+  if ($view_mode == 'search_result') {
+
+    // Tooltip and links on DH grid/list views
+
+
+    // If no media items at all on the DH item and in grid view, put a placeholder image
+    if (!count($node->field_media_asset)) {
+      $node->content['field_media_asset'][0]['#markup'] = '
+      <div class="col-md-4 col-md-push-8 field field-name-field-media-asset field-type-atom-reference field-label-hidden">
+        <div class="field-items">
+            <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
+        </div>
+      </div>';
+    }
+
+  }
+
+  elseif ($view_mode == 'full') {
+
+    // Rewrite the Related DH Items reference field as paged, since there can be hundreds. This is a dupe of the same thing in ma_collection_node_view. See comments there if changing here, should also be changed there.
+
+    $dh_items_per_page = 10;
+
+    // Build the array of all DH items
+    $all_dh_items = array();
+    foreach ($node->field_related_dh_items[LANGUAGE_NONE] as $index => $dh_item) {
+      unset ($node->content['field_related_dh_items'][$index]); // Start rewriting the field by removing the existing DH items
+      if (node_access('view', $dh_item['entity'])) {
+        $all_dh_items[] = drupal_render(node_view($dh_item['entity'], 'search_result')); // Need to render here as opposed to using "rendered entity" in the DS display, as that will attemt to render them *after* this hook runs
+      }
+    }
+
+    // Initialise the pager
+    $current_page = pager_default_initialize(count($all_dh_items), $dh_items_per_page);
+
+    // Split all DH items into pages
+    $pages = array_chunk($all_dh_items, $dh_items_per_page, TRUE);
+
+    // Print the DH items for the current page
+    $output = "";
+    foreach ($pages[$current_page] as $dh_item_to_display) {
+      $output .= $dh_item_to_display;
+    }
+
+    // Print the pager
+    $output .= theme('pager', array('quantity', count($dh_items_per_page)));
+
+    // Rewrite the field output
+    $node->content['field_related_dh_items'][0]['#markup'] = $output;
+
+  }
+}
+
+/**
+ * Implements hook_comment_insert().
+ */
+function ma_digitalheritage_comment_insert($comment) {
+
+  // Notify Protocol Manager(s) when a comment has been posted to one of their Cultural Protocols that requires approval
+  if ($comment->node_type == 'comment_node_digital_heritage') {
+    if ($comment->status) return; // comment is pre-approved (eg. posted by admin)
+    $dh_emw = entity_metadata_wrapper('node', $comment->nid);
+
+    // Build the array of protcol manager emails from the protocol manager(s) of the given protocol(s) for this DH node
+    if ($cps = $dh_emw->og_group_ref->value()) {
+      $protocol_managers_emails = array();
+      foreach ($cps as $cp) {
+        $cp_emw = entity_metadata_wrapper('node', $cp);
+        if ($protocol_managers = ma_core_og_get_users_per_role_and_group ('protocol manager', 'cultural_protocol_group', $cp->nid)) {
+          foreach ($protocol_managers as $protocol_manager) {
+            $protocol_managers_emails[] = $protocol_manager->name . ' <' . $protocol_manager->mail . '>';
+          }
+        }
+      }
+
+      // Send the email (the body and subject get built in ma_digitalheritage_mail)
+      if (count($protocol_managers_emails)) {
+        $params = array (
+          'comment' => $comment,
+          'cp_emw' => $cp_emw,
+          'dh_emw' => $dh_emw,
+          'recipient_count' => count ($protocol_managers_emails),
+        );
+        drupal_mail('ma_digitalheritage', 'dh_comment_notification', implode (', ', $protocol_managers_emails), language_default(), $params);
+      }
+    }
+  }
+}
+
+/*
+ * Implementation of hook_mail().
+*/
+function ma_digitalheritage_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'dh_comment_notification':
+      $comment = $params['comment'];
+      $cp_title = $params['cp_emw']->title->value();
+
+      // Set the email subject
+      $message['subject'] = "A comment in '" . $cp_title . "' requires your approval";
+
+      // Set the email body
+      $email_body  = "A comment has been posted that requires your approval.\n\n";
+      $email_body .= "Cultural Protocol:\n" . $cp_title . "\n\n";
+      $email_body .= "Digital Heritage:\n" . $params['dh_emw']->title->value() . "\n\n";
+      $comment_author = user_load ($comment->uid);
+      $email_body .= "Comment author:\n" . $comment_author->name . "\n\n";
+      if ($comment->subject) {
+        $email_body .= "Comment subject:\n". $comment->subject . "\n\n";
+      }
+      $comment_body = $comment->comment_body[LANGUAGE_NONE][0]['value'];
+      $comment_body = drupal_html_to_text ($comment_body);
+      $email_body  .= "Comment body:\n" . $comment_body . "\n\n";
+      $email_body .= "Click " . l('here', 'node/' . $comment->nid, array('fragment' => 'comment-' . $comment->cid)) . " to approve or delete this comment";
+      if ($params['recipient_count'] > 1) {
+        $email_body .= " (more than one Protocol Managers have received this notification, so the comment may already be approved or deleted at this time)";
+      }
+      $email_body .= ".";
+      $message['body'][] = $email_body;
+
+      break;
+  }
+}
+
+/**
+ * Implements hook_views_pre_build().
+ */
+function ma_digitalheritage_views_pre_build(&$view) {
+
+  // Override the "View All" (DH Items) path to the sapi page
+  if ($view->name == 'community_dh_items') {
+    $view->override_path = 'digital-heritage/' . $view->current_display;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_digitalheritage_menu() {
+    $items = array();
+
+    // Clone Digital Heritage button for
+    $items['node/%node/clone'] = array(
+      'title' => 'Clone Digital Heritage Item',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ma_digitalheritage_clone_dh_form', 1),
+      'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+      'access arguments' => array(1),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 100,
+    );
+    return $items;
+  }
+
+function ma_digitalheritage_clone_dh_button_check($node) {
+  if ($node->type == 'digital_heritage') {
+    $protocol_manager_for_a_group = 0;
+    $dh_emw = entity_metadata_wrapper('node', $node);
+    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+      $p_emw = entity_metadata_wrapper('node', $protocol);
+      $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+      if (array_intersect(array('protocol manager'), $roles_for_user_in_group)) {
+        return TRUE;
+      }
+    }
+  }
+}
+
+function ma_digitalheritage_clone_dh_form($form, $form_state, $node) {
+  $question = "<i>Clone Digital Heritage</i> " . $node->title;
+  $description = "<div>Are you sure?</div>";
+  return confirm_form($form, $question, 'node/' . $node->nid, $description);
+}
+
+function ma_digitalheritage_clone_dh_form_submit($form, $form_state) {
+
+  // Clone the node with a new title
+  $original_nid = arg(1);
+  $cloned = replicate_clone_entity_by_id ('node', $original_nid);
+  $cloned->title = $cloned->title . ' - copy';
+  node_save ($cloned);
+
+  // Unset any CPs that the cloning protocol manager is not a contributor or protocol manager for
+  $protocols_to_set = array();
+  $dh_emw = entity_metadata_wrapper('node', $cloned);
+  foreach ($dh_emw->og_group_ref->value() as $protocol) {
+    $p_emw = entity_metadata_wrapper('node', $protocol);
+    $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+    if (array_intersect(array('protocol manager', 'contributor'), $roles_for_user_in_group)) {
+      $protocols_to_set[] = $protocol;
+    }
+  }
+  $dh_emw->og_group_ref->set ($protocols_to_set);
+
+  // Make a relationship to the original node
+  $dh_emw->field_related_dh_items[] = $original_nid;
+
+  // Save our changes
+  $dh_emw->save();
+
+  // Go to the cloned node
+  drupal_goto ('node/' . $cloned->nid);
+}
+

@@ -1,0 +1,11 @@
+{
+    "repositories": [
+    ],
+    "require": {
+        "excelwebzone/omlex": "dev-master",
+        "embed/embed": "dev-master",
+        "fg/essence": "dev-master",
+        "alb/oembed": "dev-master",
+        "embedly/embedly-php": "dev-master"
+    }
+}

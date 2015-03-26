@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Test case for the Feeds mapping API for the media module using
+ * SimplePieParser and FeedsEncolsure.
+ */
+
+/**
+ * Class for testing the Media Feeds media_internet mapper using
+ * FeedsEnclosure.
+ */
+class MediaFeedsMapperEnclosureTestCase extends FeedsMapperTestCase {
+
+  /**
+   * Add this test case to the Media Feeds group.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Mapper: Media (from FeedsEncolsure)',
+      'description' => 'Test Feeds Mapper support for Media fields using FeedsEnclosure as the source. <strong>Requires SimplePie library</strong>.',
+      'group' => 'Media Feeds',
+      'dependencies' => array('media_feeds'),
+    );
+  }
+
+  /**
+   * Login and set up the required modules.
+   */
+  public function setUp() {
+    // Enable modules.
+    parent::setUp(array('media_feeds', 'feeds_tests'));
+
+    // Login user with appropriate permissions.
+    $this->drupalLogin($this->drupalCreateUser(
+      array(
+        'administer content types',
+        'administer feeds',
+        'access content',
+        'add media from remote sources',
+        'import media',
+        'view media',
+        'edit media',
+        'bypass node access',
+      )
+    ));
+  }
+
+  /**
+   * Test importing.
+   */
+  public function test() {
+    // Create a content type with a media field.
+    $contentType = $this->createContentType(array(), array(
+      'alpha' => array(
+        'type' => 'media',
+        'widget' => 'media_generic',
+      )
+    ));
+
+    // Create a FeedsSimplePieParser configuration.
+    $this->createImporterConfiguration();
+    $this->setPlugin('syndication', 'FeedsSimplePieParser');
+    $this->setSettings('syndication', 'FeedsNodeProcessor', array('content_type' => $contentType));
+    $this->addMappings('syndication', array(
+      array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      array(
+        'source' => 'enclosures',
+        'target' => 'field_alpha',
+      )
+    ));
+
+    // Import.
+    $this->createFeedNode('syndication', url('testing/feeds/flickr.xml', array('absolute' => TRUE)));
+    $this->assertText('Created 4 nodes');
+
+    // Assert: Files imported.
+    $files = array('tubing.jpeg', 'foosball.jpeg', 'attersee.jpeg', 'hstreet.jpeg');
+    $entities = db_select('feeds_item')
+      ->fields('feeds_item', array('entity_id'))
+      ->condition('id', 'syndication')
+      ->execute();
+    foreach ($entities as $entity) {
+      $this->drupalGet('node/' . $entity->entity_id . '/edit');
+      $this->assertRaw(array_shift($files));
+    }
+    $this->assertTrue(count($files) == 0, 'All files found.');
+  }
+}
+

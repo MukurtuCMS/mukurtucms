@@ -1,0 +1,12 @@
+name = FitVids
+description = jQuery plugin for fluid width video embeds.
+core = 7.x
+dependencies[] = libraries
+configure = admin/config/media/fitvids
+
+; Information added by drupal.org packaging script on 2012-08-15
+version = "7.x-1.8"
+core = "7.x"
+project = "fitvids"
+datestamp = "1345026121"
+

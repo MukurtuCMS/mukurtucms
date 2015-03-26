@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the ma_dashboard feature.
+ */
+
+include_once 'ma_dashboard.features.inc';

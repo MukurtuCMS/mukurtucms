@@ -1,0 +1,166 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Search API feature.
+ */
+
+include_once 'ma_search_api.features.inc';
+
+
+function ma_search_api_node_update($node) {
+
+  // REINDEX RELATED NODES
+
+  $relations = array (
+    'collections' => array (
+      'relationships' => array (
+        'field_digital_heritage_items',
+      ),
+    ),
+    'digital_heritage' => array (
+      'relationships' => array (
+        'field_collection',
+        'field_related_dh_items',
+        'og_group_ref',
+      ),
+      'triggers' => array (
+        'field_item_privacy_setting' => 'regular',
+        'og_group_ref' => 'array values comparison',
+      ),
+    ),
+    'community' => array (
+      'relationships' => array (
+        'og_group_ref',
+      ),
+      'triggers' => array (
+        'og_group_ref' => 'array values comparison',
+      ),
+    ),
+    'cultural_protocol_group' => array (
+      'relationships' => array (
+        'og_group_ref',
+      ),
+      'triggers' => array (
+        'group_access' => 'regular',
+        'og_roles_permissions' => 'regular',
+      ),
+    ),
+  );
+
+  if ($content_type_properties = $relations[$node->type]) {
+
+    // Load both old (if any) and new versions of the node into a EMW
+    $wrapper_new = entity_metadata_wrapper('node', $node);
+    if (isset($node->original)) {
+      $wrapper_old = entity_metadata_wrapper('node', $node->original);
+    }
+
+    $items_to_reindex = array();
+
+    // Look for changes in any of the trigger fields. If any, ALL related nodes get reindexed.
+    $reindex_all_relations = 0;
+    foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
+      # dpm ($trigger, 'trigger');
+      $trigger_old_val = "";
+      if (isset($node->original)) {
+        $trigger_old_val = $wrapper_old->{$trigger}->value();
+      }
+      $trigger_new_val = $wrapper_new->{$trigger}->value();
+      if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
+        $trigger_new_val = array_values ($trigger_new_val);
+        $trigger_old_val = array_values ($trigger_old_val);
+      }
+      if ($trigger_old_val <> $trigger_new_val) {
+        # dpm ($trigger_old_val, 'trigger old val');
+        # dpm($trigger_new_val, 'trigger new val');
+        $reindex_all_relations = 1;
+        # dpm ('Trigger field changed. Reindexing ALL relations');
+        continue;
+      }
+    }
+
+    // Look for changes in any of the reference fields.
+    foreach ($content_type_properties['relationships'] as $relationship) {
+      # dpm ($relationship, 'relationship');
+
+      $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+
+      $old_refs = array();
+      if (isset($node->original)) {
+        $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
+      }
+
+      // A trigger field was changed, so reindex all related values, both new and old.
+      if ($reindex_all_relations) {
+        $items_to_reindex = array_merge ($items_to_reindex, $new_refs, $old_refs);
+        # dpm ($items_to_reindex, 'items to reindex after a trigger');
+      }
+
+      // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
+      elseif ($old_refs <> $new_refs) {
+        $refs_added = array_diff ($new_refs, $old_refs);
+        $refs_deleted = array_diff ($old_refs, $new_refs);
+        $items_to_reindex = array_merge ($items_to_reindex, $refs_added, $refs_deleted);
+        # dpm ($items_to_reindex, 'items to reindex after a changed relationship');
+      }
+    }
+
+    // Do the reindexing
+    $items_to_reindex = array_unique ($items_to_reindex);
+    # dpm ($items_to_reindex, 'items_to_reindex final');
+    if (count($items_to_reindex)) {
+      search_api_index_specific_items_delayed (search_api_index_load('default_node_index'), $items_to_reindex);
+    }
+
+    // Although the DH node gets reindexed by virtue of being edited, our use of mukurtu_protocol_field_node_access means that if the DH node is set to ANY, it needs to be reindexed again after search_api node access is rebuilt for the Protocol facet to be accurate (at least. possibly other effects). This does not work if is added here (too soon). So we do it in ma_search_api_views_pre_view, just before the view is loaded.
+    if ($node->type == 'digital_heritage') {
+      $dh_nodes_to_reindex = variable_get('mukurtu_dh_nodes_to_reindex', array());
+      $dh_nodes_to_reindex[] = $node->nid;
+      variable_set('mukurtu_dh_nodes_to_reindex', $dh_nodes_to_reindex);
+    }
+  }
+}
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
+
+  // Reindex any DH nodes that were added to mukurtu_dh_nodes_to_reindex in ma_search_api_node_update, just before the view is rendered.
+  if ($view->name == 'digital_heritage_grid_list') {
+    $dh_nodes_to_reindex = variable_get ('mukurtu_dh_nodes_to_reindex', array());
+    if (count($dh_nodes_to_reindex)) {
+      $dh_nodes_to_reindex = array_unique ($dh_nodes_to_reindex);
+      # dpm ($dh_nodes_to_reindex, 'dh nodes reindexed in view hook');
+      search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_reindex);
+      variable_set ('mukurtu_dh_nodes_to_reindex', array());
+    }
+  }
+}
+
+
+/**
+ * Implements hook_scald_atom_access
+ *
+ * This hook can be used to grant or deny access for a specific atom and
+ * Scald action. It has the following possible return values:
+ *   SCALD_ATOM_ACCESS_ALLOW
+ *   SCALD_ATOM_ACCESS_DENY
+ *   SCALD_ATOM_ACCESS_IGNORE
+ *
+ * Respect the Cultural Protocol setting on scald atoms. This is usually left blank (in which case IGNORE), but if set, if user has access to ANY of the CPs, then they get scald view access (IGNORE, to allow other handling). DENY if groups are set but they have access to none of them.
+ */
+function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
+  $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
+  if (!isset($group_wrapper->og_group_ref)) {
+    return SCALD_ATOM_ACCESS_IGNORE;
+  }
+  if ($groups = $group_wrapper->og_group_ref->value()) {
+    foreach ($groups as $group) {
+      if (node_access('view', $group)) {
+        return SCALD_ATOM_ACCESS_IGNORE;
+      }
+    }
+    return SCALD_ATOM_ACCESS_DENY;
+  }
+}

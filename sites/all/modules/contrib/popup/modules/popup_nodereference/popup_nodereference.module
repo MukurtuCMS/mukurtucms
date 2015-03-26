@@ -1,0 +1,138 @@
+<?php
+
+
+
+/**
+ * Implementation of hook_field_formatter_info
+ */
+function popup_nodereference_field_formatter_info() {
+
+	module_load_include('inc', 'popup_ui', 'includes/popup_ui.admin');
+
+	$formatters = array_keys(_popup_ui_formatter_settings());
+
+  $formatter_info = array(
+  	'popup' => array(
+  		'label' => 'Popup',
+  		'field types' => array(
+  			'node_reference',
+  		),
+	    'settings' => array(
+	    	'popup_format' => array_shift($formatters),
+	    	'popup_grouping' => TRUE,
+	    ),
+  	),
+  );
+
+  return $formatter_info;
+}
+
+
+
+/**
+ * Implementation of hook_field_formatter_settings_form
+ */
+function popup_nodereference_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+
+	module_load_include('inc', 'popup_ui', 'includes/popup_ui.admin');
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+	$formatters = _popup_ui_formatter_settings();
+	$keys = array_keys($formatters);
+	$options = array_combine($keys, $keys);
+
+  $element = array(
+
+  	'popup_format' => array(
+  		'#default_value' => $settings['popup_format'],
+  		'#title' => 'Popup format',
+  		'#type' => 'select',
+  		'#options' => $options,
+  	),
+
+		'popup_grouping' => array(
+  		'#default_value' => $settings['popup_grouping'],
+  		'#title' => 'Group multiple nodes in a single popup.',
+  		'#type' => 'checkbox',
+		),
+
+  );
+
+  return $element;
+
+}
+
+
+
+
+/**
+ * Implementation of hook_field_formatter_settings_summary
+ */
+function popup_nodereference_field_formatter_settings_summary($field, $instance, $view_mode) {
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  return
+  	t('Popup format: ') . '<em>' . $settings['popup_format'] . ', ' .
+  	($settings['popup_grouping'] ? t('grouped nodes') : t('separate nodes')) . '</em>';
+}
+
+
+
+/**
+ * Implementation of hook_field_formatter_view
+ */
+function popup_nodereference_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display){
+
+	module_load_include('inc', 'popup_ui', 'includes/popup_ui.admin');
+  module_load_include('inc', 'popup', 'includes/popup.api');
+
+  $element = array();
+  $settings = $display['settings'];
+  $formatters = _popup_ui_formatter_settings();
+  $attributes = $formatters[$settings['popup_format']];
+
+  if ($settings['popup_grouping'] && count($items)){
+
+		$nids = array();
+		foreach ($items as $item) {
+			if (isset($item['nid'])){
+				$nids[] = $item['nid'];
+			}
+		}
+
+		$attributes['title'] = $instance['label'];
+		$attributes['php'] =
+			"module_load_include('inc', 'popup_nodereference', 'includes/popup_nodereference.util');".
+			"return _popup_nodereference_render_group(" . var_export($nids, TRUE) . ', ' . var_export($attributes, TRUE) . ');';
+
+    $element[0] = array(
+    	'#markup' => popup($attributes),
+    );
+
+
+  } else {
+
+		foreach ($items as $delta => $item) {
+
+			if ($item['nid']){
+
+				$node_attribs = $attributes;
+				$node_attribs['node'] = $item['nid'];
+
+	      $element[$delta] = array(
+	      	'#markup' => popup($node_attribs),
+	      );
+
+			}
+
+    }
+
+  }
+
+	return $element;
+}
+
+

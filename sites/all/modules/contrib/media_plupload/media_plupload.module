@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * Implement hook_field_widget_info().
+ */
+function media_plupload_field_widget_info() {
+  return array(
+    'media_plupload' => array(
+      'label' => t('Media Plupload file selector'),
+      'field types' => array('media', 'file', 'image'),
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+        'allowed_types' => array('image'),
+        'allowed_schemes' => array('public', 'private'),
+      ),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+        'default value' => FIELD_BEHAVIOR_NONE,
+      ),
+    ),
+  );
+}
+
+function media_plupload_field_widget_settings_form($field, $instance) {
+  return media_field_widget_settings_form($field, $instance);
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function media_plupload_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $multiple = $field['cardinality'] > 1 || $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED;
+
+  if ($field['cardinality'] == 1 || isset($field['no_recursion'])) {
+    return media_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $element);
+  }
+  if ($field['cardinality'] != FIELD_CARDINALITY_UNLIMITED) {
+    $field['no_recursion'] = TRUE;
+    return field_multiple_value_form($field, $instance, $langcode, $items, $form, $form_state);
+  }
+  if ($field['cardinality'] = FIELD_CARDINALITY_UNLIMITED) {
+    $field['no_recursion'] = TRUE;
+    $element = field_multiple_value_form($field, $instance, $langcode, $items, $form, $form_state);
+    $element['add_more']['#attributes']['class'][] = 'media_plupload_add_more';
+    $element['#attached']['js'][] = drupal_get_path('module', 'media_plupload') . '/media_plupload.js';
+    $element['add_more']['#submit'][0] = 'media_plupload_field_add_more_submit';
+    return $element;
+  }
+ }
+
+/**
+ *  Rewrite field_add_more_submit function for multiple fields.
+ */
+function media_plupload_field_add_more_submit($form, &$form_state) {
+  $button = $form_state['triggering_element'];
+
+  // Go one level up in the form, to the widgets container.
+  $element = drupal_array_get_nested_value($form, array_slice($button['#array_parents'], 0, -1));
+  $field_name = $element['#field_name'];
+  $langcode = $element['#language'];
+  $parents = $element['#field_parents'];
+
+  // Increment the items count.
+  $field_state = field_form_get_state($parents, $field_name, $langcode, $form_state);
+  // Increment multiple.
+  $field_state['items_count'] = count($form_state['input'][$field_name][$langcode]);
+
+
+  field_form_set_state($parents, $field_name, $langcode, $form_state, $field_state);
+
+  $form_state['rebuild'] = TRUE;
+}
+
+
+/**
+ * Implements hook_field_validate().
+ *
+ */
+function media_plupload_field_validate($obj_type, $object, $field, $instance, $langcode, $items, &$errors) {
+  media_field_validate($obj_type, $object, $field, $instance, $langcode, $items, $errors);
+}
+
+/**
+ * @todo Is this function ever called? If not, remove it. The Field API now
+ *   supports automatic serialization / unserialization, so this should no
+ *   longer be needed. After verifying with a module that uses the 'data'
+ *   column, remove this.
+ *
+ * @see media_field_widget_form()
+ */
+function media_plupload_field_widget_value($element, $input, $form_state) {
+  return media_field_widget_value($element, $input, $form_state);
+}
+

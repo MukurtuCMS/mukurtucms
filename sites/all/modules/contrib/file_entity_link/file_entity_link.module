@@ -1,0 +1,118 @@
+<?php
+define('FILE_ENTITY_LINK_SETTINGS_VAR', 'file_entity_link_settings');
+
+/**
+ * Implements hook_theme
+ * Enter description here ...
+ */
+function file_entity_link_theme($existing, $type, $theme, $path){
+  return array(
+    'file_entity_link_add_link' => array(
+      'arguments' => array('element' => NULL),
+      'render element' => 'element',
+    )
+  );
+}
+
+/**
+ * Theme function
+ * Enter description here ...
+ * @param unknown_type $vars
+ */
+function theme_file_entity_link_add_link($vars){
+//  return drupal_render($vars['element']['lat']) . drupal_render($vars['element']['lon']);
+
+  $element = $vars['element'];
+  $children = drupal_render($element['#contents']);
+  $element['#uri']['options']['html'] = TRUE;
+  return l($children, $element['#uri']['path'], $element['#uri']['options']);
+}
+
+/**
+ * Implements hook_file_view
+ * Enter description here ...
+ * @param unknown_type $file
+ * @param unknown_type $view_mode
+ * @param unknown_type $langcode
+ */
+function file_entity_link_file_view_alter(&$build, $type){
+  $settings = variable_get(FILE_ENTITY_LINK_SETTINGS_VAR, array());
+  $file_type = $build['#file']->type;
+  $view_mode = $build['#view_mode'];
+  if(isset($settings[$file_type][$view_mode]) && $settings[$file_type][$view_mode] && !empty($build['#file']->referencing_entity)){
+    switch ($settings[$file_type][$view_mode]) {
+      case 1:
+
+        if (isset($build['#file']->referencing_entity->nid)) {
+          $uri = entity_uri('node', $build['#file']->referencing_entity);
+        }
+        elseif (isset($build['#file']->referencing_entity->tid)) {
+          $uri = entity_uri('taxonomy_term', $build['#file']->referencing_entity);
+        }
+        break;
+      case 2:
+        $uri = array('path' => 'file/' . $build['#file']->fid, 'options' => array());
+        break;
+    }
+    if(!empty($uri)){
+/*
+      $build['file'] = array(
+     	'#contents' => $build['file'],
+        '#uri' => $uri,
+        '#theme' => 'file_entity_link_add_link'
+      );
+*/
+
+      $build['file']['#uri'] = $uri;
+    }
+  }
+  else {    
+      if(!empty($settings[$file_type][$view_mode])) {
+    switch ($settings[$file_type][$view_mode]) {
+      case 2:
+        $uri = array('path' => 'file/' . $build['#file']->fid, 'options' => array());
+        break;
+      }
+      if(!empty($uri)){
+        $build['file']['#uri'] = $uri;
+      }
+    }
+  }
+
+}
+
+/**
+ * Implements hook_form_alter
+ * Enter description here ...
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ * @param unknown_type $form_id
+ */
+function file_entity_link_form_alter(&$form, &$form_state, $form_id){
+  if($form_id == 'file_entity_file_display_form'){
+    $settings = variable_get(FILE_ENTITY_LINK_SETTINGS_VAR, array());
+    $form['link'] = array(
+      '#type' => 'item',
+      '#title' => 'Link options',
+      'link_file' => array(
+        '#type' => 'select',
+        '#options' => array('0' => 'No link', '1' => 'Link file to referencing entity', '2' => 'Link file to media page'),
+        '#default_value' => (isset($settings[$form['#file_type']][$form['#view_mode']]) ? $settings[$form['#file_type']][$form['#view_mode']] : FALSE),
+      )
+    );
+    $form['#submit'][] = 'file_entity_link_display_form_submit';
+  }
+}
+
+/**
+ * Submit handler for file display form
+ * Enter description here ...
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function file_entity_link_display_form_submit($form, &$form_state){
+  $settings = variable_get(FILE_ENTITY_LINK_SETTINGS_VAR, array());
+  if(!isset($settings[$form['#file_type']])) $settings[$form['#file_type']] = array();
+  $settings[$form['#file_type']][$form['#view_mode']]  = $form_state['values']['link']['link_file'];
+  variable_set(FILE_ENTITY_LINK_SETTINGS_VAR, $settings);
+}

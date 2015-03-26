@@ -1,0 +1,734 @@
+<?php
+/**
+ * @file
+ * Tests for scald.module.
+ */
+
+/**
+ * Defines a base class for testing the Scald module.
+ */
+class ScaldWebTestCase extends DrupalWebTestCase {
+  /**
+   * Sets up a Drupal site for running functional and integration tests.
+   */
+  protected function setUp() {
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    $modules[] = 'scald';
+    parent::setUp($modules);
+
+    // Create Article node type.
+    if ($this->profile != 'standard') {
+      $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+    }
+  }
+
+  /**
+   * Retrieves a sample file of the specified type.
+   */
+  protected function getTestFile($type_name, $size = NULL) {
+    // Get a file to upload.
+    $files = $this->drupalGetTestFiles($type_name, $size);
+    $file = reset($files);
+
+    // Add a filesize property to files as would be read by file_load().
+    $file->filesize = filesize($file->uri);
+
+    return $file;
+  }
+
+  /**
+   * Create a new atom.
+   *
+   * Atom is created via the simple browser, thus the current user must have
+   * "create atom of image type" permission.
+   */
+  protected function createAtom($type = 'image') {
+    module_enable(array('scald_image'));
+
+    $image = $this->getTestFile('image');
+    $edit = array(
+      'files[file]' => drupal_realpath($image->uri),
+    );
+    $this->drupalPost('atom/add/image', $edit, t('Continue'));
+    $this->assertFieldByName('atom0[title]', $image->filename);
+
+    // Change atom title.
+    $title = 'Image ' . $this->randomName(20);
+    $edit = array(
+      'atom0[title]' => $title,
+      'atom0[scald_authors][und]' => $this->randomName(10),
+    );
+    $this->drupalPost(NULL, $edit, t('Finish'));
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'scald_atom');
+    $query->propertyCondition('title', $title);
+    $result = $query->execute();
+    $this->assertEqual(count($result['scald_atom']), 1, 'Image atom has been created.');
+
+    $atom = reset($result['scald_atom']);
+    return scald_fetch($atom->sid, TRUE);
+  }
+
+  /**
+   * Delete an action bit.
+   */
+  protected function deleteAtomAction($atom, $action_name) {
+    $actions = scald_actions();
+    $atom->actions &= ~$actions[$action_name]['bitmask'];
+    scald_atom_save($atom);
+    $atom = scald_fetch($atom->sid, TRUE);
+  }
+
+  /**
+   * Add an action bit.
+   */
+  protected function addAtomAction($atom, $action_name) {
+    $actions = scald_actions();
+    $atom->actions |= $actions[$action_name]['bitmask'];
+    scald_atom_save($atom);
+    $atom = scald_fetch($atom->sid, TRUE);
+  }
+
+  /**
+   * Enable private file system and use it.
+   */
+  public function enablePrivateFileSystem() {
+    module_enable(array('scald_image'));
+    $web_user = $this->drupalcreateuser(array(
+      'administer site configuration',
+      'administer scald',
+    ));
+    $this->drupallogin($web_user);
+
+    $this->drupalPost('admin/config/media/file-system', array('file_private_path' => 'sites/default/files/private'), t('Save configuration'));
+    $this->drupalPost('admin/structure/scald/image/fields/scald_thumbnail', array('field[settings][uri_scheme]' => 'private'), t('Save settings'));
+    $this->assertRaw(t('Saved %label configuration.', array('%label' => 'Image')), 'Use private file for Scald Image.');
+  }
+
+  /**
+   * Make a HTML markup parseable.
+   */
+  public function makeParseable($markup, $atom, $context) {
+    return '<!-- scald=' . $atom->sid . ':' . $context . ' -->' . $markup . '<!-- END scald=' . $atom->sid . ' -->';
+  }
+}
+
+/**
+ * Test the Scald base functionality.
+ */
+class ScaldBaseTestCase extends ScaldWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Scald base',
+      'description' => 'Test the Scald base functionality.',
+      'group' => 'Scald',
+    );
+  }
+
+  /**
+   * Test Scald type defaults.
+   */
+  public function testScaldBaseAtomType() {
+    module_enable(array('scald_audio'));
+    $default = scald_atom_defaults('audio');
+    $this->assertEqual($default->thumbnail_source, 'public://atoms/audio.png', 'Default thumbnail for audios set correctly.');
+    $this->assertTrue(file_exists($default->thumbnail_source), 'Default thumbnail for audios exists.');
+  }
+
+  /**
+   * Test Scald admin.
+   */
+  function testScaldAdmin() {
+    $web_user = $this->drupalCreateUser(array(
+    ));
+    $this->drupalLogin($web_user);
+    $this->drupalGet('admin/structure/scald');
+    $this->assertResponse(403, 'Normal user cannot administer Scald');
+    $this->drupalLogout();
+
+    $admin_user = $this->drupalCreateUser(array(
+      'administer scald',
+    ));
+    $this->drupalLogin($admin_user);
+    $this->drupalGet('admin/structure/scald');
+    $this->assertResponse(200, 'Admin user can administer Scald');
+  }
+
+  /**
+   * Test Scald context.
+   */
+  function testScaldContext() {
+    module_enable(array('scald_image'));
+
+    // Prefix to avoid invalid names.
+    $title = 'context' . $this->randomName(10);
+    $name = strtolower($title);
+    $description = $this->randomName(20);
+
+    $web_user = $this->drupalCreateUser(array(
+      'administer scald',
+      'view any atom',
+      'create atom of any type',
+    ));
+    $this->drupalLogin($web_user);
+
+    $this->drupalGet('admin/structure/scald');
+    $this->clickLink('Add context');
+    $edit = array(
+      'title' => $title,
+      // There is no JavaScript in the SimpleBrowser, thus machine name must be
+      // filled manually.
+      'name' => $name,
+      'description' => $description,
+    );
+    $this->drupalPost(NULL, $edit, t('Add context'));
+
+    $this->assertText($title, 'Context created.');
+    $this->assertText($description, 'Context description is correct.');
+    $this->assertLinkByHref('admin/structure/scald/context/edit/' . $name, 0, 'New context can be edited.');
+
+    $this->clickLink('contexts');
+    $edit = array(
+      'full_trans' => 'style-large',
+      $name . '_trans' => 'style-thumbnail',
+      $name . '_playe' => 'image_figure',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertField('full_trans', 'style-large', 'Context transcoder updated.');
+    $this->assertField($name . '_playe', 'image_figure', 'Context player updated.');
+
+    // Player settings.
+    $this->clickLink('settings');
+    $class = 'class-' . $this->randomName(5);
+    $caption = '//[atom:title]//[atom:author]//';
+    $edit = array(
+      'classes' => $class,
+      'caption' => $caption,
+    );
+    $this->drupalPost(NULL, $edit, t('Update'));
+
+    // We are in another request, static cache is no longer relevant and needs
+    // to be cleared.
+    drupal_static_reset('_scald_get_info');
+
+    // Verify new context settings. There is no easy way to verify a context
+    // other than "full".
+    $atom = $this->createAtom();
+    $content = scald_render($atom, $name);
+    $author = $atom->rendered->authors[0]->link;
+    $this->assertIdentical(1, preg_match('/class="[^"]*' . $class . '[^"]*"/', $content), 'Player class is correct.');
+    $this->assertNotIdentical(FALSE, strpos($content, '<figcaption>//' . $atom->title . '//' . $author . '//</figcaption>'), 'Player caption is correct.');
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertRaw(check_plain(image_style_url('large', $atom->base_entity->uri)), 'Transcoder is correct.');
+  }
+
+  /**
+   * Test the uninstall process.
+   */
+  public function testScaldUninstall() {
+    module_enable(array('scald_audio'));
+    $web_user = $this->drupalcreateuser(array(
+      'administer modules',
+    ));
+    $this->drupallogin($web_user);
+
+    // Disable, then uninstall all Scald modules.
+    $this->drupalPost('admin/modules', array('modules[Scald Providers][scald_audio][enable]' => FALSE), t('Save configuration'));
+    $this->drupalPost(NULL, array('modules[Scald][scald][enable]' => FALSE), t('Save configuration'));
+    $this->clickLink(t('Uninstall'));
+    $this->drupalPost(NULL, array('uninstall[scald_audio]' => 1), t('Uninstall'));
+    $this->drupalPost(NULL, array(), t('Uninstall'));
+    $this->assertText(t('The selected modules have been uninstalled.'), t('Scald Audio has been uninstalled.'));
+  }
+
+  /**
+   * Test Scald caching system.
+   */
+  public function testScaldCache() {
+    global $is_https, $base_url;
+    module_enable(array('scald_image'));
+    $image = $this->getTestFile('image');
+
+    $web_user = $this->drupalCreateUser(array(
+      'view any atom',
+      'fetch any atom',
+      'create atom of any type',
+    ));
+    $this->drupalLogin($web_user);
+
+    $atom = $this->createAtom();
+    $output1 = scald_render($atom->sid, 'full');
+    $is_https = !$is_https;
+    $base_url = str_replace('http://', 'https://', $base_url);
+    $output2 = scald_render($atom->sid, 'full');
+    $is_https = !$is_https;
+    $base_url = str_replace('https://', 'http://', $base_url);
+    $this->assertNotIdentical($output1, $output2, 'Different renders in http and https versions.');
+
+    // Check if cached content is served. Change the atom directly from the
+    // database to avoid cached content being changed.
+    $title = 'Title has been changed';
+    db_query('UPDATE {scald_atoms} SET title = :title WHERE sid = :sid', array(':title' => $title, ':sid' => $atom->sid));
+    $atom = scald_fetch($atom->sid, TRUE);
+    $this->assertIdentical($title, $atom->title);
+    $output3 = scald_render($atom->sid, 'full');
+    $this->assertIdentical($output1, $output3);
+  }
+
+  /**
+   * Test Scald search.
+   */
+  public function testScaldSearch() {
+    module_enable(array('scald_image'));
+    $image = $this->getTestFile('image');
+
+    $web_user = $this->drupalCreateUser(array(
+      'view any atom',
+      'fetch any atom',
+      'create atom of any type',
+    ));
+    $this->drupalLogin($web_user);
+
+    $atom1 = $this->createAtom();
+    $atom2 = $this->createAtom();
+    $this->assertEqual(1, count(scald_search(array('title' => $atom1->title))), 'Search atoms by title.');
+    $this->assertIdentical(FALSE, scald_search(array('title' => substr($atom1->title, 2))), 'Search atoms by partial title.');
+    $this->assertEqual(1, count(scald_search(array('title' => substr($atom1->title, 2)), TRUE)), 'Search atoms by partial title using fuzzy.');
+    $this->assertEqual(2, count(scald_search(array('title' => array($atom1->title, $atom2->title)))), 'Search atoms by multiple titles.');
+    $this->assertIdentical(FALSE, scald_search(array('title' => $this->randomName(10))), 'Search atoms by wrong title.');
+    $this->assertEqual(1, count(scald_search(array('title' => $atom1->title, 'provider' => 'scald_image'))), 'Search atoms by title and provider.');
+    $this->assertIdentical(FALSE, scald_search(array('title' => $atom1->title, 'provider' => 'scald_video')), 'Search atoms by title and wrong provider.');
+  }
+}
+
+/**
+ * Test the Scald atom entities.
+ */
+class ScaldAtomEntityTestCase extends ScaldWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Scald atom entities',
+      'description' => 'Test the Scald atom entities.',
+      'group' => 'Scald',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp('scald_image');
+    $this->web_user = $this->drupalCreateUser(array(
+      'create atom of image type',
+      'view any atom',
+      'fetch any atom',
+      'edit own atom',
+    ));
+    $this->drupalLogin($this->web_user);
+  }
+
+  /**
+   * Create four nodes and ensure they're loaded correctly.
+   */
+  public function testScaldAtomCRUD() {
+    $atom = $this->createAtom();
+    $this->assertTrue($atom->fetched, 'Image atom has been loaded.');
+  }
+
+  /**
+   * Permission tests.
+   */
+  public function testScaldAtomPermissions() {
+    $atom = $this->createAtom();
+    $atom2 = $this->createAtom();
+
+    // Switch user so that we can test directly with scald_render() with the
+    // correct permission.
+    global $user;
+    $user = user_load($this->web_user->uid);
+
+    // Try to view the atom.
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertTitle($atom->title . ' | Drupal', 'Image atom can be accessed.');
+    $this->assertNoLink(t('Edit'), 'User cannot edit own atom.');
+
+    // Enable the edit action bit.
+    $this->addAtomAction($atom, 'edit');
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertLink(t('Edit'), 0, 'User can edit own atom.');
+
+    // Revoke the atom.
+    $this->drupalGet('atom/' . $atom2->sid);
+    $this->assertResponse(200, 'Atom is available.');
+    $this->assertTitle($atom2->title . ' | Drupal', 'Image atom can be accessed.');
+    $this->deleteAtomAction($atom2, 'view');
+    $this->drupalGet('atom/' . $atom2->sid);
+    $this->assertResponse(403);
+    $this->deleteAtomAction($atom2, 'fetch');
+    $this->drupalGet('atom/' . $atom2->sid);
+    $this->assertResponse(404);
+
+    // Now for embedded atoms. Use the easy way.
+    $content = scald_render($atom2, 'full');
+    $this->assertNotIdentical(FALSE, strpos($content, t('You do not have access to view this Atom.')), 'Atom can no longer be viewed.');
+
+    // User without permission.
+    $web_user = $this->drupalCreateUser(array('fetch any atom'));
+    $this->drupalLogin($web_user);
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertResponse(403);
+    $this->drupalLogout();
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertResponse(404);
+  }
+
+  /**
+   * Manual atom CRUD test.
+   */
+  public function testScaldAtomManual() {
+    $image = $this->getTestFile('image');
+    $title = $this->randomName(30);
+    $author = $this->randomName(10);
+
+    $this->drupalLogout();
+    $web_user = $this->drupalCreateUser(array(
+      'view any atom',
+      'fetch any atom',
+      'edit own atom',
+      'create atom of image type',
+      'delete own atom',
+    ));
+    $this->drupalLogin($web_user);
+
+    // Create an image atom.
+    $edit = array(
+      'files[file]' => drupal_realpath($image->uri),
+    );
+    $this->drupalPost('atom/add/image', $edit, t('Continue'));
+    if ($this->xpath('//input[@name="atom0[title]"]')) {
+      $edit = array(
+        'atom0[title]' => $title,
+      );
+      $this->drupalPost(NULL, $edit, t('Finish'));
+    }
+
+    // Check that an image file has been created.
+    $files = file_load_multiple(array(), array('filename' => $image->filename));
+    $file = reset($files);
+    $this->assertTrue($file, t('Image file found in database.'));
+
+    $atom = scald_fetch(1, TRUE);
+    $this->addAtomAction($atom, 'edit');
+
+    // Check that an image atom has been created.
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertTitle($title . ' | Drupal', 'Image atom can be accessed.');
+    $this->assertLink(t('Edit'), 0, 'User can edit atom.');
+
+    // Add an author.
+    $langcode = LANGUAGE_NONE;
+    $edit = array(
+      'atom0[scald_authors][' . $langcode . ']' => $author,
+    );
+    $this->drupalPost('atom/1/edit', $edit, t('Finish'));
+    $this->assertText($author, 'Atom author has been updated.');
+
+    // Delete an atom.
+    $this->addAtomAction($atom, 'delete');
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertLink(t('Delete'), 0, 'User can delete own atom.');
+    $this->clickLink(t('Delete'));
+    $this->drupalPost(NULL, array(), t('Delete'));
+    $this->drupalGet('atom/' . $atom->sid);
+    $this->assertResponse(404);
+
+    // Check that the atom has really gone.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'scald_atom');
+    $query->propertyCondition('sid', $atom->sid);
+    $result = $query->execute();
+    $this->assertIdentical(array(), $result, 'Atom has been deleted.');
+  }
+
+  /**
+   * Test Scald with private file system.
+   */
+  public function testScaldPrivateFileSystem() {
+    $this->enablePrivateFileSystem();
+    $image = $this->getTestFile('image');
+
+    $this->drupalLogout();
+    $web_user = $this->drupalCreateUser(array(
+      'view any atom',
+      'fetch any atom',
+      'create atom of image type',
+    ));
+    $this->drupalLogin($web_user);
+
+    // Create an image atom.
+    $edit = array(
+      'files[file]' => drupal_realpath($image->uri),
+    );
+    $this->drupalPost('atom/add/image', $edit, t('Continue'));
+    $this->drupalPost(NULL, array(), t('Finish'));
+
+    // Check that the image is accessible.
+    $this->assertIdentical(1, preg_match('/scald=1:full --><img.*?src="(.+?)"/', $this->drupalGetContent(), $match), 'Found image in the atom full page.');
+    $url = $match[1];
+    $this->assertNotIdentical(FALSE, strpos($url, 'system/files/'), 'Private file system is used for this atom.');
+    $this->drupalGet($url);
+    $this->assertResponse(200, 'Private image inside the atom is accessible.');
+  }
+
+  /**
+   * Test saving malformed and minimal atoms.
+   */
+  public function testScaldSaveAtom() {
+    $atom = new stdClass();
+    $this->assertFalse(scald_atom_save($atom), 'Cannot save an atom without type.');
+
+    $atom->type = 'blabla';
+    $this->assertFalse(scald_atom_save($atom), 'Cannot save an atom with wrong type.');
+
+    $atom->type = 'image';
+    $atom->provider = 'scald_image';
+    $sid = scald_atom_save($atom);
+    $this->assertTrue(is_numeric($sid), 'Can save an atom with minimal information.');
+
+    scald_atom_save($atom);
+    $this->assertIdentical($sid, $atom->sid, 'Atom sid does not change when being updated.');
+    $this->assertIdentical('image', $atom->type, 'Atom type does not change when being updated.');
+    $this->assertIdentical('scald_image', $atom->provider, 'Atom provider does not change when being updated.');
+  }
+}
+
+/**
+ * Test the Scald DnD functionality.
+ */
+class ScaldDnDTestCase extends ScaldWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Scald DnD',
+      'description' => 'Test the Scald DnD functionality.',
+      'group' => 'Scald',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp(array('scald_image', 'scald_dnd_library'));
+    $this->web_user = $this->drupalCreateUser(array(
+      'create atom of image type',
+      'view any atom',
+      'fetch any atom',
+      'edit own atom',
+    ));
+    $this->drupalLogin($this->web_user);
+  }
+
+  /**
+   * Test Scald DnD Library.
+   */
+  function testScaldDndLibrary() {
+    // I don't know why scald_dnd_library contexts are not avaiable. Try to
+    // clear the cache manually.
+    scald_contexts(TRUE);
+
+    $atom = $this->createAtom();
+    $content = scald_render($atom, 'sdl_editor_representation');
+
+    // Check if the widely used context sdl_editor_representation is correct.
+    $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+    $atom->scald_thumbnail[$langcode][0]['alt'] = $atom->title;
+    $atom->scald_thumbnail[$langcode][0]['title'] = $atom->title;
+    $thumbnail = field_view_value('scald_atom', $atom, 'scald_thumbnail', $atom->scald_thumbnail[$langcode][0]);
+    $expected = $this->makeParseable('<div class=\'image\'>' . drupal_render($thumbnail) . '</div>', $atom, 'sdl_editor_representation');
+    $this->assertEqual($content, $expected, 'Context: sdl_editor_representation works correctly.');
+  }
+}
+/**
+ * Test the Scald localization.
+ */
+class ScaldLocalizeTestCase extends ScaldWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $profile = 'testing';
+
+  /**
+   * The language code used while testing.
+   *
+   * @var string
+   */
+  protected $langcode;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Scald Localize',
+      'description' => 'Test the Scald localization functionality.',
+      'group' => 'Scald',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp(array('scald_image', 'locale', 'i18n', 'i18n_string'));
+    $this->web_user = $this->drupalCreateUser(array(
+      'administer scald',
+      'create atom of image type',
+      'view any atom',
+      'fetch any atom',
+      'delete any atom',
+      'edit own atom',
+      'administer languages',
+      'access administration pages',
+      'translate interface',
+      'translate user-defined strings',
+    ));
+    $this->drupalLogin($this->web_user);
+
+    // Add predefined language.
+    $this->langcode = 'fr';
+    $this->drupalPost('admin/config/regional/language/add', array('langcode' => $this->langcode), t('Add language'));
+
+    // Enable URL language detection and selection.
+    $edit = array('language[enabled][locale-url]' => '1');
+    $this->drupalPost('admin/config/regional/language/configure', $edit, t('Save settings'));
+  }
+
+  /**
+   * Adds a language and tests string translation.
+   */
+  public function testStringTranslation() {
+    // Go to Scald page in another language to add action name into translation
+    // database.
+    $this->drupalGet('fr/admin/structure/scald/image');
+    // Translate an action name.
+    $edit = array(
+      'string' => 'Edit',
+    );
+    $this->drupalPost('admin/config/regional/translate/translate', $edit, t('Filter'));
+    // The first result is an exact match, because we don't surf much.
+    $this->clickLink(t('edit'));
+    $edit = array(
+      "translations[$this->langcode]" => 'Modifier',
+    );
+    $this->drupalPost(NULL, $edit, t('Save translations'));
+
+    cache_clear_all('*', 'cache_scald', TRUE);
+    $this->drupalGet('fr/admin/structure/scald/image');
+    $this->assertFieldByXPath('//label[@for="edit-type-image-actin-edit"]', 'Modifier ', 'Action name is correctly translated.');
+    $this->drupalGet('admin/structure/scald/image');
+    $this->assertFieldByXPath('//label[@for="edit-type-image-actin-edit"]', 'Edit ', 'Action name is correctly cached per language.');
+  }
+
+  /**
+   * Tests if it is possible to translate atom types.
+   */
+  public function testAtomTypeTranslation() {
+    // Check that the "translate" action is shown for types in the overview.
+    $this->drupalGet('admin/structure/scald');
+    $elements = $this->xpath('(//table//td)[6]/a[text() = :text]', array(':text' => t('translate')));
+    $this->assertTrue($elements, 'The "translate" action is shown in the types table.');
+
+    $this->drupalGet('admin/structure/scald/image/translate');
+
+    // Translate the 'Image' type on the translate tab form. Unfortunately this
+    // word is spelled identically in French, so we opt for "L'image".
+    $edit = array(
+      'strings[scald:type:image:title]' => 'L\'image',
+      'strings[scald:type:image:description]' => 'Une représentation visuelle',
+    );
+    $this->drupalPost('admin/structure/scald/image/translate/fr', $edit, t('Save translation'));
+
+    // Check that the type is translated on the overview.
+    $this->drupalGet('fr/admin/structure/scald');
+    $this->assertText(check_plain('L\'image'), 'The type is translated on the overview.');
+
+    // Check that the type is translated on the Add Atom page.
+    $this->drupalGet('fr/atom/add');
+    $this->assertText(check_plain('L\'image'), 'The type is translated on the Add Atom page.');
+
+    // Check that the type is translated on the Add Image page.
+    $this->drupalGet('fr/atom/add/image');
+    $this->assertText(check_plain('L\'image'), 'The type is translated on the Add Image page.');
+
+    // Check that the type is translated in the message that appears when
+    // creating an atom.
+    $atom = $this->createAtom('image', $this->langcode);
+    $message = t('Atom %title, of type %type has been @op.', array('%title' => $atom->title, '%type' => 'L\'image', '@op' => t('created')));
+    $this->assertRaw($message, 'The type is translated in the notification that appears when creating an atom.');
+
+    // Check that the type is translated in the message that appears when
+    // deleting an atom.
+    $this->addAtomAction($atom, 'delete');
+    $this->drupalPost('fr/atom/' . $atom->sid . '/delete', array(), t('Delete'));
+    $message = t('@type %title has been deleted.', array('@type' => 'L\'image', '%title' => $atom->title));
+    $this->assertRaw($message, 'The type is translated in the notification that appears when deleting an atom.');
+  }
+
+  /**
+   * Overrides ScaldWebTestCase::createAtom().
+   *
+   * Adds a parameter to choose the language of the add form.
+   *
+   * @param string $type
+   *   The atom type. Defaults to 'image'.
+   * @param string $langcode
+   *   Optional language of the add form.
+   */
+  protected function createAtom($type = 'image', $langcode = '') {
+    module_enable(array('scald_image'));
+
+    $image = $this->getTestFile('image');
+    $edit = array(
+      'files[file]' => drupal_realpath($image->uri),
+    );
+
+    $prefix = !empty($langcode) ? $langcode . '/' : '';
+    $this->drupalPost($prefix . 'atom/add/image', $edit, t('Continue'));
+    $this->assertFieldByName('atom0[title]', $image->filename);
+
+    // Change atom title.
+    $title = 'Image ' . $this->randomName(20);
+    $edit = array(
+      'atom0[title]' => $title,
+      'atom0[scald_authors][und]' => $this->randomName(10),
+    );
+    $this->drupalPost(NULL, $edit, t('Finish'));
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'scald_atom');
+    $query->propertyCondition('title', $title);
+    $result = $query->execute();
+    $this->assertEqual(count($result['scald_atom']), 1, 'Image atom has been created.');
+
+    $atom = reset($result['scald_atom']);
+    return scald_fetch($atom->sid, TRUE);
+  }
+
+}

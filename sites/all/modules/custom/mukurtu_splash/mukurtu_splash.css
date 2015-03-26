@@ -1,0 +1,85 @@
+body a.Mukurtuvideo span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: 0px 0px;  
+  background-color: transparent;
+  background-image: url(opic-dashboard-sprite.png);
+  background-repeat: no-repeat;
+}
+
+body a.opic-dashboard-design span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: -120px -30px;
+  background-color: transparent;
+  background-image: url(/sites/all/themes/rubik/images/icons.png);
+  background-repeat: no-repeat;
+}
+
+body a.opic-dashboard-content span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: 0 -30px;
+  background-color: transparent;
+  background-image: url(/sites/all/themes/rubik/images/icons.png);
+  background-repeat: no-repeat;
+}
+
+body a.opic-dashboard-site-settings span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: -210px -120px;
+  background-color: transparent;
+  background-image: url(/sites/all/themes/rubik/images/icons.png);
+  background-repeat: no-repeat;
+}
+
+body a.opic-dashboard-demo-content span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: -41px 0;  
+  background-color: transparent;
+  background-image: url(opic-dashboard-sprite.png);
+  background-repeat: no-repeat;
+}
+
+body a.opic-dashboard-roles span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: -210px -90px;
+  background-color: transparent;
+  background-image: url(/sites/all/themes/rubik/images/icons.png);
+  background-repeat: no-repeat;
+}
+
+body a.opic-dashboard-permissions span.icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  background-position: -60px -120px;
+  background-color: transparent;
+  background-image: url(/sites/all/themes/rubik/images/icons.png);
+  background-repeat: no-repeat;
+}
+
+.ui-tooltip {
+
+  width:25em;
+}
+.ui-widget-content {
+
+}
+
+.wizard-tabs iframe {
+  float:right;
+}
+
+.wizard-tabs ul.ui-tabs-nav li {
+  display:inline;
+}

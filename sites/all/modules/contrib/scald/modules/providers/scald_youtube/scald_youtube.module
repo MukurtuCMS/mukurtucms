@@ -1,0 +1,431 @@
+<?php
+/**
+ * @file
+ *   Defines a YouTube provider for Scald.
+ */
+
+define('YOUTUBE_WEB',         'http://www.youtube.com/watch');
+// @deprecated
+define('YOUTUBE_OEMBED',      'http://www.youtube.com/oembed');
+define('YOUTUBE_ID_REGEXP',   '/^[a-zA-Z0-9\-_]+$/');
+define('YOUTUBE_WEB_REGEXP',  '#https?://www\.youtube\.com/\S+[\?&]v=([a-zA-Z0-9\-_]+)#');
+define('YOUTUBE_RSS',         'http://gdata.youtube.com/feeds/api/videos/');
+// @deprecated
+define('YOUTUBE_MEDIA',       'http://search.yahoo.com/mrss/');
+
+/**
+ * Implements hook_scald_atom_providers().
+ * Tell Scald that we'll be providing some video atoms.
+ */
+function scald_youtube_scald_atom_providers() {
+  return array(
+    'video' => 'Video hosted on YouTube'
+  );
+  // This code will never be hit, but is necessary to mark the string
+  // for translation on localize.d.o
+  t('Video hosted on YouTube');
+}
+
+/**
+ * Implements hook_scald_add_form().
+ */
+function scald_youtube_scald_add_form(&$form, &$form_state) {
+  $form['identifier'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube video identifier or URL'),
+    '#element_validate' => array('scald_youtube_validate_id'),
+    '#default_value' => '',
+  );
+}
+
+/**
+ * Implements hook_scald_add_form_fill().
+ */
+function scald_youtube_scald_add_form_fill(&$atom, $form, $form_state) {
+
+  // Get the identifier
+  $identifier = scald_youtube_parse_id($form_state['values']['identifier'], TRUE);
+
+  // Get video info
+  $infos = scald_youtube_video($identifier);
+
+  $atom->base_id = $identifier;
+  $atom->title = $infos->title;
+
+  // Prefill the author
+  $langcode = field_language('scald_atom', $atom, 'scald_authors');
+  $atom->scald_authors[$langcode][0] = array(
+    'tid' => 0,
+    'taxonomy_term' => (object)(array('name' => $infos->author))
+  );
+
+  // Prefill tags
+  $langcode = field_language('scald_atom', $atom, 'scald_tags');
+  foreach ($infos->tags as $index => $tag) {
+    $atom->scald_tags[$langcode][$index] = array(
+      'tid' => $index,  // Beware, this is not a real tid, it's just an index
+      'taxonomy_term' => (object)(array('name' => $tag))
+    );
+  }
+
+  // Save video width and height
+  if (!isset($atom->data)) {
+    $atom->data = array();
+  }
+  $atom->data['video_width'] = $infos->width;
+  $atom->data['video_height'] = $infos->height;
+
+  // Download a copy of the video thumbnail. This makes it possible
+  // to do interesting manipulation with image styles presets.
+  $thumb = drupal_http_request($infos->thumbnail['src']);
+  if ($thumb->code == 200 && $directory = ScaldAtomController::getThumbnailPath('video')) {
+    $dest = $directory . '/youtube-' . $infos->id . '.jpg';
+    $file = file_save_data($thumb->data, $dest);
+
+    if ($file) {
+      // Set the file status to temporary
+      $query = db_update('file_managed')
+        ->condition('fid', $file->fid)
+        ->fields(array('status' => 0))
+        ->execute();
+      $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+      $atom->scald_thumbnail[$langcode][0] = (array) $file;
+    }
+  }
+}
+
+/**
+ * Implements hook_scald_fetch().
+ */
+function scald_youtube_scald_fetch($atom, $type) {
+  $items = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+  if ($items && file_exists($items[0]['uri'])) {
+    $atom->file_source = $atom->thumbnail_source = $items[0]['uri'];
+  }
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function scald_youtube_scald_prerender($atom, $context, $options, $mode) {
+  if ($mode == 'atom') {
+    //load context configuration to retrieve dimension data if present
+    $context_config = scald_context_config_load($context);
+    $video_width = (isset($atom->data['video_width'])) ? $atom->data['video_width'] : 480;
+    $video_height = (isset($atom->data['video_height'])) ? $atom->data['video_height'] : 365;
+    //allow context configuration to override video dimension variables
+    if(isset($context_config->data['width'])){
+      $video_width = $context_config->data['width'];
+    }
+    if(isset($context_config->data['height'])){
+      $video_height = $context_config->data['height'];
+    }
+    $atom->rendered->player = theme('scald_youtube_player',
+      array('vars' =>
+        array(
+          'video_id'      => $atom->base_id,
+          'video_width'   => $video_width,
+          'video_height'  => $video_height,
+          'thumbnail'     => $atom->rendered->thumbnail_source_url,
+        ),
+        'atom' => $atom,
+      )
+    );
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function scald_youtube_theme() {
+  return array(
+    'scald_youtube_player' => array(
+      'variables' => array('vars' => NULL, 'atom' => NULL),
+      'template' => 'scald_youtube_player'
+    ),
+  );
+}
+
+
+/**
+ * Creates an atom based on a YouTube video id or an object
+ * containing the video informations..
+ * @param $video
+ *   Unique identifier of the video on YouTube, or object
+ *   returned by scald_youtube_video.
+ * @return integer
+ *   Unique identifier of the new atom
+ */
+function scald_youtube_register($video) {
+  // Fetch the needed informations from YouTube
+  if (is_object($video)) {
+    $infos = $video;
+  }
+  else {
+    $infos = scald_youtube_video($video);
+  }
+
+  // Check if the video has already been imported to prevent duplicate
+  $old = scald_youtube_already_imported($infos->id);
+  if ($old) {
+    return FALSE;
+  }
+
+  // Download a copy of the video thumbnail. This makes it possible
+  // to do interesting manipulation with image styles presets.
+  $thumb = drupal_http_request($infos->thumbnail['src']);
+  $dir = 'public://youtube';
+  if ($thumb->code == 200 && file_prepare_directory($dir, FILE_CREATE_DIRECTORY)) {
+    $dest = $dir . '/' . $infos->id . '.jpg';
+    $file = file_save_data($thumb->data, $dest);
+  }
+
+  // Create an atom
+  $atom = new ScaldAtom('video', 'scald_youtube', array(
+    'base_id' => $infos->id,
+    'title' => $infos->title,
+  ));
+
+  // Save video width and height
+  if (!isset($atom->data)) {
+    $atom->data = array();
+  }
+  $atom->data['video_width'] = $infos->width;
+  $atom->data['video_height'] = $infos->height;
+
+  // Set file
+  if ($file) {
+    $query = db_update('file_managed')
+      ->condition('fid', $file->fid)
+      ->fields(array('status' => 0))
+      ->execute();
+    $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+    $atom->scald_thumbnail[$langcode][0] = (array) $file;
+  }
+
+  // And save it
+  $atom_sid = scald_atom_save($atom);
+  // Finally, return this id
+  return $atom_sid;
+}
+
+
+/**
+ * Analyze a YouTube RSS feed to extract videos information
+ * @param $type
+ *   RSS Type of the feed. Example, 'user', 'video', 'tag'.
+ * @param $id
+ *   Identifier or string associated with the type. For example, user name, video id or tag
+ * @return array
+ *   An array of object, each one containing an analyzed video.
+ */
+function scald_youtube_feed($type, $id) {
+  if ($type == 'user') {
+    $url = YOUTUBE_RSS . '?author=' . $id;
+  }
+  elseif ($type == 'tag') {
+    $url = YOUTUBE_RSS . '?category=' . $id;
+  }
+  else {
+    $url = YOUTUBE_RSS . $id;
+  }
+  $response = drupal_http_request($url);
+  $items = array();
+  if ($response->code >= 200 && $response->code < 400 && !empty($response->data)) {
+    $dom = new DOMDocument();
+    if ($dom->loadXML($response->data)) {
+      foreach ($dom->getElementsByTagName('entry') as $item) {
+        $items[] = scald_youtube_parse_item($item);
+      }
+    }
+  }
+  return $items;
+}
+
+/**
+ * Analyze the youtube feed for a specific video.
+ */
+function scald_youtube_video($id) {
+  $items = scald_youtube_feed('video', $id);
+  return $items[0];
+}
+
+/**
+ * Analyze a XML DOMElement item to extract interesting info.
+ * @param $item
+ *   An object of classe DOMElement corresponding to an element of the feed.
+ * @return array
+ *   An abject containing various video informations.
+ */
+function scald_youtube_parse_item($item) {
+  $info = new stdClass();
+
+  // Fetch the video ID
+  $api_url_full = $item->getElementsByTagName('id')->item(0)->nodeValue;
+  $api_url_parts = explode('/', $api_url_full);
+  $info->id = array_pop($api_url_parts);
+
+  // Video Title
+  $title = $item->getElementsByTagName('title')->item(0);
+  $info->title = $title->nodeValue;
+
+  // Author
+  $info->author = $item->getElementsByTagName('name')->item(0)->nodeValue;
+
+  // Creation Date
+  $info->pubDate = $item->getElementsByTagName('published')->item(0)->nodeValue;
+
+  $info_extra = scald_youtube_video_get_info($info->id);
+  $info->width = $info_extra->video_width;
+  $info->height = $info_extra->video_height;
+  $info->tags = $info_extra->tags;
+  $info->license = $info_extra->license;
+  $info->thumbnail = array(
+    'src' => $info_extra->thumbnail,
+  );
+
+  return $info;
+}
+
+
+/**
+ * Analyze OEmbed response for a given video ID
+ *
+ * @deprecated
+ * @see scald_youtube_video_get_info().
+ */
+function scald_youtube_video_oembed($id) {
+  return scald_youtube_video_get_info($id);
+}
+
+/**
+ * Returns meta data on a YouTube video that are not found on the Gdata feed.
+ *
+ * Unfortunately the YouTube API doesn't provide original video dimensions
+ * see: http://code.google.com/p/gdata-issues/issues/detail?id=1083
+ * We need both oembed data and parsing the web page to have author information
+ * and video dimensions.
+ */
+function scald_youtube_video_get_info($id) {
+  static $cache = array();
+
+  if (isset($cache[$id])) {
+    return $cache[$id];
+  }
+
+  // Initialize default values.
+  $info = new stdClass();
+  $info->id = $id;
+  $info->license = 'YT';
+  $info->video_width = 480;
+  $info->video_height = 365;
+
+  $url = YOUTUBE_WEB . '?v=' . $id;
+  $response = drupal_http_request($url);
+  if ($response->code >= 200 && $response->code < 400 && !empty($response->data)) {
+    $data = $response->data;
+    // DOMDocument does not work well with UTF-8, we need to use HTML entities
+    // to be safe.
+    if (function_exists('mb_convert_encoding')) {
+      $data = mb_convert_encoding($data, 'HTML-ENTITIES', 'UTF-8');
+    }
+
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = FALSE;
+    @$dom->loadHTML($data);
+
+    foreach ($dom->getElementsByTagName('meta') as $meta) {
+      $content = $meta->getAttribute('content');
+
+      switch ($meta->getAttribute('name')) {
+        case 'keywords':
+          $info->tags = explode(', ', $content);
+          break;
+
+        case 'title':
+          $info->title = $content;
+          break;
+      }
+
+      switch ($meta->getAttribute('property')) {
+        case 'og:image':
+          $info->thumbnail = $content;
+          break;
+
+        case 'og:video:width':
+          $info->video_width = $content;
+          break;
+
+        case 'og:video:height':
+          $info->video_height = $content;
+          break;
+      }
+    }
+  }
+
+  $cache[$id] = $info;
+
+  return $info;
+}
+
+/**
+ * Checks if a video has already been imported, based on its video
+ * id.
+ * @param $id
+ *   The video identifier
+ * @return mixed
+ *   FALSE if the video was never imported, the scald identifier of
+ *   the video otherwise.
+ */
+function scald_youtube_already_imported($id) {
+  $query = array('provider' => 'scald_youtube', 'base_id' => $id);
+  return scald_search($query, FALSE, TRUE);
+}
+
+/**
+ * Form element validation handler for YouTube identifier
+ *
+ */
+function scald_youtube_validate_id($element, &$form_state) {
+  $id = scald_youtube_parse_id($form_state['values']['identifier'], TRUE);
+  if (!$id) {
+    form_error($element, t('Invalid YouTube video identifier.'));
+  }
+  elseif (scald_youtube_already_imported($id)) {
+    form_error($element, t('YouTube video already imported.'));
+  }
+}
+
+/**
+ * Parse a YouTube ID and check validity
+ *
+ */
+function scald_youtube_parse_id($string, $check) {
+  $id = NULL;
+  $string = trim($string);
+  if (!preg_match(YOUTUBE_ID_REGEXP, $string)) {
+    // The string ID is not easy to parse, let's try to analyze it
+    if (preg_match(YOUTUBE_WEB_REGEXP, $string, $m)) {
+      // This string is a full YouTube URL
+      $id = $m[1];
+    }
+    elseif (preg_match("/^http/", $string)) {
+      // This string is a URL, most likely a shortened one. (http://dai.ly, http://bit.ly, etc...)
+      $response = drupal_http_request($string);
+      if ($response->code == 200 && isset($response->redirect_code) && ($response->redirect_code == 301 || $response->redirect_code == 302)) {
+        return scald_youtube_parse_id($response->redirect_url, $check);
+      }
+    }
+  }
+  else {
+    $id = $string;
+  }
+
+  if ($id && $check) {
+    // Last check to confirm this video really exists on YouTube
+    if (!scald_youtube_video($id)) {
+      $id = FALSE;
+    }
+  }
+  return $id;
+}

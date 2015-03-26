@@ -1,0 +1,899 @@
+<?php
+
+/**
+ * @file
+ * Core functionality for oEmbed
+ */
+
+// Load all Field module hooks for oEmbed.
+require_once dirname(__FILE__) . '/oembed.field.inc';
+
+require_once dirname(__FILE__) . '/oembed.filter.inc';
+
+/**
+ * Implements hook_hook_info().
+ */
+function oembed_hook_info() {
+  $hooks = array(
+    'oembed_request_alter',
+    'oembed_response_alter',
+  );
+
+  return array_fill_keys($hooks, array('group' => 'oembed'));
+}
+
+/**
+ * Implements hook_help().
+ */
+function oembed_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#oembed':
+      $output = '<p>'. t('oEmbed module will allow your Drupal site to embed content from <a href="@oembed">oEmbed</a>-providers as well as for the site to become an oEmbed-provider itself so that other oEmbed-enabled websites can easily embed your content.', array('@oembed' => 'http://www.oembed.com/')) .'</p>';
+      $output .= '<p>'. t('Add or enable <a href="@provider">providers</a> to embed content from other sites.', array('@provider' => url('admin/build/oembed/provider'))) .'</p>';
+      $output .= '<p>'. t('Adds an input filter for replacing oEmbed enabled URLs with embedded content') .'</p>';
+      return $output;
+
+    case 'admin/config/media/oembed':
+    case 'admin/config/media/oembed/consumer':
+      $output = '<p>'. t('These settings affect how your site behaves when it makes requests as an oEmbed consumer.') .'</p>';
+      return $output;
+
+    case 'admin/config/media/oembed/provider':
+      $output = '<p>'. t('Providers are other web sites with oEmbed endpoints whose content you can embed on your site.') .'</p>';
+      return $output;
+
+    case 'admin/config/media/oembed/test':
+      $output = '<p>'. t('Use this form to test your configuration of provider plugins and endpoints.') .'</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function oembed_permission() {
+  return array(
+    'administer oembed' => array(
+      'title' => t('Administer oEmbed'),
+      'description' => t('Define providers for oEmbed.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function oembed_flush_caches() {
+  // Because some oEmbed providers (e.g., http://embed.ly) charge per request,
+  // allow cache_oembed to opt out of drupal_flush_all_caches() clearing.
+  if (variable_get('oembed_cache_flush', TRUE)) {
+    return array('cache_oembed');
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function oembed_cron() {
+  // If cache_oembed opts out of oembed_flush_caches(), then system_cron()
+  // doesn't clear its expired records, so do so here.
+  if (!variable_get('oembed_cache_flush', TRUE)) {
+    cache_clear_all(NULL, 'cache_oembed');
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function oembed_menu() {
+  $items['admin/config/media/oembed'] = array(
+    'title' => 'oEmbed',
+    'description' => 'Settings for oEmbed',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oembed_settings'),
+    'file' => 'oembed.admin.inc',
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['admin/config/media/oembed/consumer'] = array(
+    'title' => 'Consumer settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/config/media/oembed/provider'] = array(
+    'title' => 'Provider plugins',
+    'description' => 'Settings for oEmbed provider plugins',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/config/media/oembed/test'] = array(
+    'title' => 'Test',
+    'description' => 'Test URLs for oEmbed',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oembed_test'),
+    'file' => 'oembed.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ *
+ * Instead of rewriting ctools export UI's hook_menu implementations, alter
+ * the callback items to have a common menu item.
+ */
+function oembed_menu_alter(&$items) {
+  // Create a new menu item where all oembed export UIs will be local tasks by
+  // copying the export UI's menu item that will become the default local task.
+  if (!empty($items['admin/config/media/oembed/provider/default'])) {
+    $items['admin/config/media/oembed/provider'] += $items['admin/config/media/oembed/provider/default'];
+    $items['admin/config/media/oembed/provider']['type'] = MENU_LOCAL_TASK;
+
+    $items['admin/config/media/oembed/provider/default']['type'] = MENU_DEFAULT_LOCAL_TASK;
+  }
+}
+
+/**
+ * Implements of hook_theme().
+ */
+function oembed_theme($existing, $type, $theme, $path) {
+  return array(
+    'oembed' => array(
+      'file' => 'oembed.theme.inc',
+      'path' => $path . '/theme',
+      'variables' => array('embed' => NULL),
+    ),
+    'oembed__photo' => array(
+      'variables' => array('embed' => NULL),
+      'base hook' => 'oembed',
+    ),
+    'oembed__rich' => array(
+      'variables' => array('embed' => NULL),
+      'base hook' => 'oembed',
+    ),
+    'oembed__video' => array(
+      'variables' => array('embed' => NULL),
+      'base hook' => 'oembed',
+    ),
+  );
+}
+
+/**
+ * Returns the provider for a url.
+ *
+ * @param string $url
+ *   The url to get the provider for.
+ * @param array $matches
+ *   Array reference for providers that capture arguments from URL.
+ * @param string $role
+ *
+ * @return mixed
+ *  A valid callback or FALSE
+ */
+function oembed_get_provider($url, &$matches, $role = 'consumer') {
+  ctools_include('plugins');
+  $plugins = ctools_get_plugins('oembed', 'providers');
+  uasort($plugins, 'ctools_plugin_sort');
+
+  // This function may need check twice if a provider matches the URL. The first check
+  // is to determine if the plugin's callback can handle the URL. The second check
+  // returns the name of the child plugin that can fulfill the request.
+  foreach ($plugins as $plugin) {
+
+    // A plugin with no schemes is effectively disabled.
+    if ($plugin[$role] && !empty($plugin['scheme'])) {
+
+      // Plugins will only be checked if they are enabled for the role.
+      if (preg_match($plugin['scheme'], $url, $matches)) {
+
+        // A scheme map is used to match a URL to a specific child plugin.
+        if (!empty($plugin['scheme map'])) {
+          foreach ($plugin['scheme map'] as $id => $scheme) {
+            if (preg_match($scheme, $url, $matches)) {
+
+              // This forces the 'get child' callback to the loaded.
+              ctools_plugin_get_function($plugin, 'get child');
+              $plugin = ctools_get_plugins('oembed', 'providers', $id);
+              break;
+            }
+          }
+        }
+
+        return $plugin;
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Reset the registered provider caches.
+ */
+function oembed_providers_reset() {
+  ctools_include('plugins');
+  ctools_get_plugins_reset();
+  $info = ctools_plugin_get_info('oembed', 'providers');
+  cache_clear_all('plugins:oembed:providers', $info['cache table']);
+}
+
+/**
+ * Fetch data for an embeddable URL.
+ *
+ * @param string $url
+ *   An external URL for the content to embed.
+ * @param array $parameters
+ *   An associative array of request parameters, with the following keys:
+ *   - 'maxwidth'
+ *       The maximum width of the embed, in pixels.
+ *   - 'maxheight'
+ *       The maximum height of the embed, in pixels.
+ *   Other keys may be supported by some providers (twitter, youtube, wordpress).
+ * @return bool|array
+ *   False or an array representing the embeddable data of the URL.
+ */
+function oembed_get_data($url, $parameters = array()) {
+  $matches = array();
+  $parameters = array_filter($parameters);
+
+  if ($plugin = oembed_get_provider($url, $matches)) {
+    return oembed_oembed_fetch($plugin, $url, $matches, $parameters);
+  }
+
+  return FALSE;
+}
+
+/**
+ * oEmbed fetcher and parser.
+ *
+ * This handles fetching from remote providers and local registered callbacks.
+ * It does not cache the responses because they are cached when rendered.
+ */
+function oembed_oembed_fetch($plugin, $url, $matches, $parameters = array()) {
+  $embed = FALSE;
+
+  // Normalize the parameters and attributes for better cache performance.
+  ksort($parameters);
+  $parameters = array_filter($parameters);
+
+  if ($plugin['cache']) {
+    $cache_keys = array();
+
+    // Remove trailing slash to normalize URLs.
+    $cache_keys[] = hash('sha256', substr($url, -1) == '/' ? substr($url, 0, -1) : $url);
+
+    // Hash and serialize request parameters and display options.
+    if (!empty($parameters)) {
+      $cache_keys[] = hash('sha256', serialize($parameters));
+    }
+
+    $cache_key = implode(':', $cache_keys);
+    $cache = cache_get($cache_key, 'cache_oembed');
+
+    // Cache hit.
+    if ($cache && isset($cache->data)) {
+      return $cache->data;
+    }
+  }
+
+  // Cache miss.
+  drupal_alter('oembed_request', $parameters, $plugin, $url);
+
+  // Drupal oEmbed provider uses function callbacks for internal requests.
+  $function = ctools_plugin_get_function($plugin, 'callback');
+  if ($function) {
+    $embed = call_user_func($function, $plugin, $url, $matches, $parameters);
+  }
+
+  // Decorate the oEmbed response object with additional properties that are
+  // handy when theming the output.
+  if ($embed) {
+    $embed['original_url'] = $url;
+    $embed['provider'] = $plugin['name'];
+    drupal_alter('oembed_response', $embed);
+  }
+
+  if ($plugin['cache']) {
+
+    // If expire is not set, use default value and adjust for request time.
+    $lifetime = variable_get('oembed_cache_lifetime', 3600);
+
+    // Recalculate cache expire time based on response.
+    if ($embed && $lifetime != CACHE_PERMANENT && isset($embed['cache_age'])) {
+      $lifetime = max($lifetime, intval($embed['cache_age']));
+    }
+    else if (!$embed && $lifetime == CACHE_PERMANENT) {
+      $lifetime = 3600;
+    }
+
+    if ($embed && $lifetime == CACHE_PERMANENT) {
+      $expire = $lifetime;
+    }
+    else {
+      $expire = min($lifetime + REQUEST_TIME, 2147483647);
+    }
+
+    // Twitter returns an unreasonably high cache_age of 31536000000 seconds,
+    // which is longer than the expire column in Drupal cache table supports.
+    cache_set($cache_key, $embed, 'cache_oembed', $expire);
+  }
+
+  return $embed;
+}
+
+/**
+ * Implements hook_element_info().
+ */
+function oembed_element_info() {
+  // Standard oEmbed that changes its theme based on response.
+  $types['oembed'] = array(
+    '#theme' => 'oembed',
+    '#embed' => NULL,
+    '#parameters' => array(),
+    '#attributes' => array(),
+    '#pre_render' => array(
+      'oembed_pre_render_fetch',
+      'oembed_pre_render_retheme',
+    ),
+  );
+
+  // Retrieves an image (photo or thumbnail) or nothing.
+  $types['oembed_thumbnail'] = array(
+    '#theme' => 'image',
+    '#path' => NULL,
+    '#width' => NULL,
+    '#height' => NULL,
+    '#alt' => '',
+    '#title' => NULL,
+    '#attributes' => array(),
+    '#embed' => NULL,
+    '#parameters' => array(),
+    '#pre_render' => array(
+      'oembed_pre_render_fetch',
+      'oembed_pre_render_thumbnail',
+    ),
+  );
+
+  return $types;
+}
+
+/**
+ * Change oEmbed request into a thumbnail.
+ */
+function oembed_pre_render_thumbnail($element) {
+  // Only act when the oEmbed response is true.
+  if (!empty($element['#printed'])) {
+    return $element;
+  }
+
+  $embed = $element['#embed'];
+
+  // Check if the oEmbed response provides a thumbnail image.
+  if (empty($embed['thumbnail_url'])) {
+    $element['#printed'] = TRUE;
+    return $element;
+  }
+
+  oembed_pre_render_image_helper($element, 'thumbnail_');
+
+  return $element;
+}
+
+/**
+ * Set the properties for a themed image.
+ *
+ * This function takes the element by reference because it should never be called as a
+ * pre render function despite appearances.
+ */
+function oembed_pre_render_image_helper(&$element, $prefix = '') {
+  $embed = $element['#embed'];
+
+  $element['#path'] = $embed[$prefix .'url'];
+  $element['#alt'] = oembed_alt_attr($embed);
+  $element['#title'] = $embed['title'];
+  $element['#height'] = isset($embed[$prefix .'height']) ? $embed[$prefix .'height'] : NULL;
+  $element['#width'] = isset($embed[$prefix .'width']) ? $embed[$prefix .'width'] : NULL;
+
+  // theme_image() prefers width, height, alt and title element properties over
+  // attributes so we manually override them if an associated attribute is set.
+  foreach (array('width', 'height', 'alt', 'title') as $key) {
+    if (isset($element['#attributes'][$key])) {
+      $element['#' . $key] = $element['#attributes'][$key];
+    }
+  }
+}
+
+/**
+ * Rewrite the theme parameter based on the response.
+ */
+function oembed_pre_render_retheme($element) {
+  // Only act when the oEmbed response is true.
+  if (!empty($element['#printed'])) {
+    return $element;
+  }
+
+  $embed = $element['#embed'];
+  $element['#theme'] = 'oembed__'. $embed['type'] .'__'. implode('__', explode(':', $embed['provider'], 2));
+
+  return $element;
+}
+
+/**
+ * Pre render fetches the oEmbed data.
+ */
+function oembed_pre_render_fetch($element) {
+  $embed = oembed_get_data($element['#url'], $element['#parameters']);
+
+  // Prevent rendering if the response is bad.
+  if (!$embed) {
+    $element['#printed'] = TRUE;
+    return $element;
+  }
+
+  $element['#embed'] = $embed;
+
+  return $element;
+}
+
+/**
+ * Prepare an element based on a oEmbed request.
+ *
+ * @param $type
+ *   Element type.
+ * @param $url
+ *   URL to embed.
+ * @param $parameters
+ *   oEmbed request parameters.
+ *
+ * @return array
+ *   A renderable array with the following keys and values:
+ *   - #type: The passed-in element $type.
+ *   - #url: The passed-in $url.
+ *   - #parameters: The passed-in $parameters.
+ */
+function oembed_render_element($type, $url, $parameters = array()) {
+  return array(
+    '#type' => $type,
+    '#url' => $url,
+    '#parameters' => $parameters,
+  );
+}
+
+/**
+ * Generate a string for use as ALT attribute.
+ */
+function oembed_alt_attr($embed) {
+  $options = array('@type' => $embed['type']);
+
+  // alt attribute using hopefully available title and provider name.
+  if (isset($embed['title'])) {
+    $string = '@title';
+    $options['@title'] = $embed['title'];
+  }
+  else {
+    $string = 'Embedded @type';
+  }
+
+  if (isset($embed['provider_name'])) {
+    $string .= ' on @provider_name';
+    $options['@provider_name'] = $embed['provider_name'];
+  }
+
+  return t($string, $options);
+}
+
+/**
+ * Implement hook_ctools_plugin_directory().
+ */
+function oembed_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && $plugin == 'export_ui') {
+    return 'plugins/' . $plugin;
+  }
+  if ($module == 'oembed' && $plugin == 'providers') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function oembed_ctools_plugin_api($module, $api) {
+  if ($module == 'oembed' && $api == 'oembed_provider') {
+    return array('version' => 1);
+  }
+  if ($module == 'file_entity' && $api == 'file_type') {
+    return array('version' => 1);
+  }
+  if ($module == 'file_entity' && $api == 'file_default_displays') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function oembed_ctools_plugin_type() {
+  $plugins['providers'] = array(
+    'cache' => TRUE,
+    'child plugins' => TRUE,
+    'process' => array(
+      'file' => 'oembed.oembed.inc',
+      'path' => drupal_get_path('module', 'oembed'),
+      'function' => 'oembed_provider_process',
+    ),
+    'defaults' => array(
+      'capture subpatterns' => FALSE,
+      'cache' => TRUE,
+      'consumer' => FALSE,
+      'provider' => FALSE,
+    ),
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implement hook_preprocess_file_entity().
+ */
+function oembed_preprocess_file_entity(&$vars, $hook) {
+  if (isset($vars['file']->metadata['oembed'])) {
+    $vars['oembed_response'] = $embed = $vars['file']->metadata['oembed'];
+    $vars['classes_array'][] = 'oembed-'. $embed['type'];
+
+    if (strpos($embed['provider'], ':')) {
+      list($parent, $child) = explode(':', $embed['provider'], 2);
+      $vars['classes_array'][] = 'oembed-'. $parent;
+      $vars['classes_array'][] = 'oembed-'. $child;
+    }
+    else {
+      $vars['classes_array'][] = 'oembed-'. $embed['provider'];
+    }
+
+    $vars['title_attributes_array']['class'][] = 'oembed-title';
+
+    // This conflicts with default file_entity.tpl.php which hardcodes a class attribute.
+    $vars['content_attributes_array']['class'][] = 'oembed-content';
+  }
+}
+
+/**
+ *  Create stream wrapper for oEmbed videos.
+ */
+function oembed_stream_wrappers() {
+  return array(
+    'oembed' => array(
+      'name' => t('oEmbed resources'),
+      'class' => 'OEmbedStreamWrapper',
+      'description' => t('Resources provided by oEmbed.'),
+      'type' => STREAM_WRAPPERS_READ_VISIBLE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_view().
+ */
+function oembed_file_formatter_view($file, $display, $langcode) {
+  $scheme = file_uri_scheme($file->uri);
+
+  if ($scheme == 'oembed') {
+    $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+
+    // Build render attributes array. Prefer file-specific overrides to display settings.
+    $attributes = (isset($file->override) ? $file->override : array()) + $display['settings'];
+    unset($attributes['attributes']);
+    unset($attributes['wmode']);
+
+    $parameters = array();
+    if (!empty($display['settings']['wmode'])) {
+      $parameters['mode'] = $display['settings']['wmode'];
+    }
+
+    // The oEmbed spec defines `maxwidth` and `maxheight` parameters, but some providers
+    // support `width` and `height`. Precise dimensions supercede maximums.
+    if ($file->type != 'image' && $display['type'] != 'oembed_thumbnail') {
+      if (isset($attributes['width'])) {
+        $parameters['maxwidth'] = $parameters['width'] = $attributes['width'];
+      }
+      if (isset($attributes['height'])) {
+        $parameters['maxheight'] = $parameters['height'] = $attributes['height'];
+      }
+    }
+
+    $element = oembed_render_element($display['type'], $wrapper->getExternalUrl(), $parameters);
+    $element['#attributes'] = $attributes;
+
+    // Unfortunately, it's necessary to validate the oEmbed response before rendering
+    // so that file_view_file() can continue to the next formatter.
+    $output = drupal_render($element);
+
+    if ($output) {
+      return show($element);
+    }
+  }
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_view().
+ */
+function oembed_remote_file_formatter_view($file, $display, $langcode) {
+  $scheme = file_uri_scheme($file->uri);
+
+  if ($scheme == 'oembed') {
+    // URI of local copy of remote file must be stored because it may be
+    // different from the oEmbed URLs. If the URL does not have a valid
+    // extension, it will redirect to a URL that does.
+    if (!isset($file->metadata['oembed_remote_file_image']) || !file_exists($file->metadata['oembed_remote_file_image'])) {
+      $embed = $file->metadata['oembed'];
+
+      if ($embed['type'] == 'photo' && !empty($embed['url'])) {
+        $url = $embed['url'];
+      }
+      else if (isset($embed['thumbnail_url'])) {
+        $url = $embed['thumbnail_url'];
+      }
+
+      if (isset($url)) {
+        $result = drupal_http_request($url);
+
+        // Using the redirect URL's basename might guarantee a path with an
+        // appropriate file extension.
+        if (isset($result->redirect_url)) {
+
+          // If the redirect and original basenames are identical, do nothing.
+          if (drupal_basename($result->redirect_url) != drupal_basename($url)) {
+            $url .= '/'. drupal_basename($result->redirect_url);
+          }
+        }
+
+        $parsed_url = parse_url($url);
+
+        // Store local copies of images using hostname, path and filename of source.
+        $path = $parsed_url['host'];
+        $path .= drupal_dirname($parsed_url['path']);
+
+        if (substr($path, -1) != '/') {
+          $path .= '/';
+        }
+
+        $filename = drupal_basename($parsed_url['path']);
+
+        if (strpos($filename, '.') !== FALSE) {
+          $filename = file_munge_filename($filename, 'jpg jpeg gif png', FALSE);
+        }
+
+        $path .= $filename;
+        $local_uri = file_stream_wrapper_uri_normalize(file_default_scheme() . '://oembed/'. $path);
+
+        if (!file_exists($local_uri)) {
+          // Drupal dislikes protocol relative URL schemes. Everything should
+          // be accessible without HTTPS.
+          if (strpos($url, '//') === 0) {
+            $url = 'http:'. $url;
+          }
+
+          /// Ensure filesystem has directories for new file.
+          $dirname = drupal_dirname($local_uri);
+          file_prepare_directory($dirname, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
+
+          // Save the file data to the local directory.
+          $files = entity_load('file', FALSE, array('uri' => $local_uri));
+          if (!empty($files)) {
+            file_unmanaged_save_data($result->data, $local_uri);
+          }
+          else {
+            file_save_data($result->data, $local_uri);
+          }
+        }
+
+        $file->metadata['oembed_remote_file_image'] = $local_uri;
+
+        // Redundantish. See file_entity_file_insert and related hooks.
+        foreach (array('oembed_remote_file_image') as $name) {
+          if (!empty($file->metadata[$name])) {
+            $value = $file->metadata[$name];
+            db_merge('file_metadata')
+              ->fields(array(
+                'value' => serialize($value),
+              ))
+              ->key(array(
+                'fid' => $file->fid,
+                'name' => $name,
+              ))
+              ->execute();
+          }
+        }
+      }
+    }
+
+    if (isset($file->metadata['oembed_remote_file_image'])) {
+      $local_uri = $file->metadata['oembed_remote_file_image'];
+
+      $image_file = file_uri_to_object($local_uri);
+      $image_file->metadata = array();
+
+      // Forcing the image file's type is perhaps no longer necessary.
+      if (!isset($image_file->type) || $image_file->type === FILE_TYPE_NONE) {
+        $image_file->type = 'image';
+      }
+
+      if ($image_file->filesize) {
+        $image_file->metadata = image_get_info($image_file->uri);
+        $image_file->filemime = $image_file->metadata['mime_type'];
+
+        return file_entity_file_formatter_file_image_view($image_file, $display, $langcode);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_settings().
+ */
+function oembed_file_formatter_oembed_settings($form, &$form_state, $settings) {
+  $element = array();
+
+  $element['width'] = array(
+    '#title' => t('Width'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['width'],
+  );
+  $element['height'] = array(
+    '#title' => t('Height'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['height'],
+  );
+  $element['wmode'] = array(
+    '#title' => t('Flash window mode (wmode)'),
+    '#type' => 'select',
+    '#empty_option' => t('None (do not request a specific wmode from the provider)'),
+    '#options' => drupal_map_assoc(array('window', 'transparent', 'opaque', 'direct', 'gpu')),
+    '#description' => t('Controls layering, transparency, and playback performance of content rendered by the Flash player. For more information, view <a href="http://kb2.adobe.com/cps/127/tn_12701.html#main_Using_Window_Mode__wmode__values_">Adobe\'s documentation</a>.'),
+    '#default_value' => $settings['wmode'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_file_formatter_FORMATTER_settings().
+ */
+function oembed_file_formatter_oembed_thumbnail_settings($form, &$form_state, $settings) {
+  $element = array();
+
+  $element['width'] = array(
+    '#title' => t('Width'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['width'],
+  );
+  $element['height'] = array(
+    '#title' => t('Height'),
+    '#type' => 'textfield',
+    '#default_value' => $settings['height'],
+  );
+
+  return $element;
+}
+
+/**
+ * Clear the cached oEmbed content for the selected files.
+ */
+function oembed_cache_clear($fids) {
+  $fids = array_keys($fids);
+
+  $query = new EntityFieldQuery();
+  $results = $query
+    ->entityCondition('entity_type', 'file')
+    ->propertyCondition('uri', 'oembed:', 'STARTS_WITH')
+    ->propertyCondition('fid', $fids)
+    ->execute();
+
+  $files = file_load_multiple(array_keys($results['file']));
+
+  foreach ($files as $file) {
+    $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
+    $url = $wrapper->getExternalUrl();
+    $cid = hash('sha256', $url);
+    cache_clear_all($cid, 'cache_oembed', TRUE);
+  }
+}
+
+/**
+ * Checks that the oEmbed response has required standard properties for its type.
+ *
+ * @param \stdClass $file
+ *   A Drupal file object.
+ *
+ * @return array
+ *   If the oEmbed response is invalid, the array will contain at least one error message.
+ */
+function oembed_file_validator_type(stdClass $file) {
+  return oembed_validate_response($file->metadata['oembed']);
+}
+
+/**
+ * Validates oEmbed responses.
+ */
+function oembed_validate_response($embed) {
+  $errors = array();
+
+  if (!$embed) {
+    $errors[] = t('Unable to fetch oEmbed data or it is not a valid URL.');
+  }
+  else if (empty($embed['version']) || empty($embed['type']) || intval($embed['version']) != 1) {
+    $errors[] = t('oEmbed data for is invalid.');
+  }
+
+  // Validate that response has required properties for its type.
+
+  $message = t('oEmbed response is missing required properties for @type.', array('@type' => $embed['type']));
+
+  // Video, rich and photo all must have width and height.
+  // This validation causes lots of legitimate responses to be rejected. To retain access
+  // to Twitter, Scribd and others, we allow responses that do not have height and width.
+  if (in_array($embed['type'], array('video', 'rich', 'photo'))) {
+    if ((!isset($embed['width']) || empty($embed['width'])) || (!isset($embed['height']) || empty($embed['height']))) {
+      //$errors[] = $message;
+    }
+  }
+
+  // Video and rich type must have html content.
+  if (in_array($embed['type'], array('video', 'rich'))) {
+    if (!isset($embed['html']) || empty($embed['html'])) {
+      $errors[] = $message;
+    }
+  }
+
+  // Image type must have a URL.
+  if ($embed['type'] == 'photo') {
+    if (!isset($embed['url']) || empty($embed['url'])) {
+      $errors[] = $message;
+    }
+  }
+
+  return $errors;
+}
+
+/**
+ * Return a file entity for a URL. Create the file if necessary.
+ *
+ * @param string $url
+ *   URL of oEmbed request.
+ * @param boolean $create
+ *   Flag to create the file entity if it does not already exist.
+ *
+ * @return \stdClass
+ */
+function oembed_url_to_file($url, $create = FALSE) {
+  $uri = 'oembed://'. drupal_encode_path($url);
+  $file = file_uri_to_object($uri);
+  $file->metadata = array();
+
+  if (!isset($file->metadata['oembed'])) {
+    $file->metadata['oembed'] = oembed_get_data($url);
+  }
+
+  // New URLs need to be validated before being saved.
+  if ($create && !isset($file->fid)) {
+    // Save the new file.
+    file_save($file);
+  }
+
+  return $file;
+}
+
+/**
+ * Implements hook_system_info_alter().
+ *
+ * Media and File entity are not dependencies, but if they are available, they must
+ * be version 2.
+ */
+function oembed_system_info_alter(&$info, $file, $type) {
+  if ($type == 'module' && $file->name == 'oembed') {
+    if (module_exists('file_entity')) {
+      $info['dependencies'][] = 'file_entity (>1.99)';
+    }
+    if (module_exists('media')) {
+      $info['dependencies'][] = 'media (>1.99)';
+    }
+  }
+}

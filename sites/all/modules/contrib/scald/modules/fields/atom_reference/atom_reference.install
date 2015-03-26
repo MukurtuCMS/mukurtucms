@@ -1,0 +1,23 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the Atom reference module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function atom_reference_field_schema($field) {
+  return array(
+    'columns' => array(
+      'sid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ),
+    ),
+    'indexes' => array(
+      'sid' => array('sid'),
+    ),
+  );
+}

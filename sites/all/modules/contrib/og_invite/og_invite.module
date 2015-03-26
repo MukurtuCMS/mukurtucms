@@ -1,0 +1,357 @@
+<?php
+/**
+ * @file
+ * Allow group members to invite other users to join their group
+ */
+
+/**
+ * The name of the user's invite field in the default group membership type.
+ */
+define('OG_INVITE_MEMBERSHIP_FIELD', 'og_membership_invitation');
+
+/**
+ * Implements hook_permission().
+ */
+function og_invite_permission() {
+  return array(
+    'answer any organic group invitation' => array(
+      'title' => t('Answer any Organic Group invitation'),
+      'description' => t('Bypass the restriction on the user when answering an invitation.'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implement hook_og_permission().
+ */
+function og_invite_og_permission() {
+  $items = array();
+  $items['invite any user'] = array(
+    'title' => t('Invite any user'),
+    'description' => t('Invite any existing user in the group.'),
+    'roles' => array(OG_ANONYMOUS_ROLE, OG_AUTHENTICATED_ROLE),
+    'default role' => array(OG_ADMINISTRATOR_ROLE),
+  );
+  if (module_exists('user_relationships')) {
+    $items['invite related user'] = array(
+      'title' => t('Invite related user'),
+      'description' => t('Invite any existing user the member is related to in the group.'),
+      'roles' => array(OG_ANONYMOUS_ROLE, OG_AUTHENTICATED_ROLE),
+      'default role' => array(OG_ADMINISTRATOR_ROLE),
+    );
+  }
+  return $items;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function og_invite_menu() {
+  $menu = array();
+
+  // group/%/%/admin/people/invite is already taken by OG Invite People.
+  $menu['group/%/%/admin/people/invite-users'] = array(
+    'title'            => 'Invite Users',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('_og_invite_form', 1, 2),
+    'access callback'  => '_og_invite_access',
+    'access arguments' => array(1, 2),
+    'file'             => 'og_invite.pages.inc',
+    'type'             => MENU_LOCAL_TASK,
+    'weight'           => 4,
+  );
+  // URL to invite one people in a group.
+  $menu['group/%/%/admin/people/invite-users/%user'] = array(
+    'title'            => 'Invite User',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('_og_invite_form', 1, 2, 6),
+    'access callback'  => '_og_invite_access',
+    'access arguments' => array(1, 2),
+    'file'             => 'og_invite.pages.inc',
+    'type'             => MENU_CALLBACK,
+  );
+  // Auto-completes available user names & removes duplicates.
+  $menu['group/%/%/admin/people/invite-users/autocomplete'] = array(
+    'page callback'    => '_og_invite_autocomplete',
+    'page arguments'   => array(1, 2),
+    'access callback'  => '_og_invite_access',
+    'access arguments' => array(1, 2),
+    'file'             => 'og_invite.pages.inc',
+    'type'             => MENU_CALLBACK,
+  );
+  // Answer to an invitation.
+  $menu['group/%/%/admin/people/invite-users/answer/%'] =
+  $menu['group/%/%/admin/people/invite-users/approve/%'] =
+  $menu['group/%/%/admin/people/invite-users/decline/%'] =
+  $menu['group/%/%/admin/people/invite-users/always-decline/%'] = array(
+    'title callback'   => '_og_invite_answer_title',
+    'title arguments'  => array(1, 2, 7, 6),
+    'page callback'    => '_og_invite_answer',
+    'page arguments'   => array(1, 2, 7, 6),
+    'access callback'  => 'user_is_logged_in',
+    'file'             => 'og_invite.pages.inc',
+    'type'             => MENU_CALLBACK,
+  );
+
+  // Configuration page.
+  if (module_exists('og_ui')) {
+    $menu['admin/config/group/og_invite'] = array(
+      'title' => 'Organic groups Invite settings',
+      'description' => 'Configure Organic groups Invite settings.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('og_invite_settings_form'),
+      'access arguments' => array('administer group'),
+      'file' => 'og_invite.admin.inc',
+      'type' => MENU_NORMAL_ITEM,
+    );
+  }
+
+  return $menu;
+}
+
+/**
+ * Implements hook_og_ui_get_group_admin().
+ */
+function og_invite_og_ui_get_group_admin($group_type, $gid) {
+  $items = array();
+  if (_og_invite_access($group_type, $gid)) {
+    $items['og_invite'] = array(
+      'title' => t('Invite Users'),
+      'description' => t('Invited users will be added to the group as pending members and will be notified to choose if they accept or not.'),
+      'href' => 'admin/people/invite-users',
+    );
+  }
+  return $items;
+}
+
+/**
+ * Invitation access callback.
+ */
+function _og_invite_access($group_type, $gid) {
+  return og_user_access($group_type, $gid, 'invite any user') || og_user_access($group_type, $gid, 'invite related user');
+}
+
+/**
+ * Implements hook_mail().
+ */
+function og_invite_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'send_invitation':
+      $group_type = $params['group_type'];
+      list($gid, $vid, $bundle) = entity_extract_ids($group_type, $params['group']);
+
+      // Prepare subject
+      $subject_params = array(
+        '@label' => entity_label($group_type, $params['group']),
+      );
+      $message['subject'] .= t('Invitation to join the group @label', $subject_params);
+
+      // Prepare body
+      $body_params = $subject_params + array(
+        '@sitename' => variable_get('site_name', ''),
+        '@inviter' => module_exists('realname') ? $params['inviter']->realname : $params['inviter']->name,
+        '@message' => $params['message'],
+        '!answer_link' => url(og_invite_answer_path_by_hash($group_type, $gid, $params['hash'], 'answer'), array('absolute' => TRUE)),
+      );
+      $message['body'][] = t('You have been invited to join the group @label on the @sitename website by @inviter.
+
+Message:
+@message
+
+To answer to this invitation, click on the link below :
+!answer_link
+
+Best regards,
+The @sitename team.', $body_params);
+      break;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Alter og_ui default behaviors.
+
+/**
+ * Implements hook_views_pre_view().
+ *
+ * Remove invitations from the group members admin view.
+ */
+function og_invite_views_pre_view(&$view, &$display_id, &$args) {
+  list($view_name, $display) = explode(':', variable_get('og_ui_admin_people_view', 'og_members_admin:default'));
+  if ($view->name == $view_name && $view->current_display == $display) {
+    $view->add_item($view->current_display, 'filter', 'field_data_og_membership_invitation', 'og_membership_invitation_value', array(
+      'id' => 'og_membership_invitation_value',
+      'table' => 'field_data_og_membership_invitation',
+      'field' => 'og_membership_invitation_value',
+      'relationship' => 'og_membership_rel',
+      'group_type' => 'group',
+      'group' => 1,
+      'value' => array(1 => 1),
+      'operator' => 'not',
+      'exposed' => FALSE,
+    ));
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Hide the invitation field on OgMembership edit form and disallow the edition
+ * of the membership if it is an invitation.
+ */
+function og_invite_form_og_ui_edit_membership_alter(&$form, &$form_state, $form_id) {
+  $form['membership_fields'][OG_INVITE_MEMBERSHIP_FIELD]['#access'] = FALSE;
+
+  $ogm = $form_state['og_membership'];
+  if (og_invite_is_invitation($ogm)) {
+    drupal_set_message(t('You are not allowed to edit this invitation.'), 'error');
+    drupal_goto('group/node/' . $ogm->gid . '/admin/people');
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter();
+ *
+ * Hide the invitation field on group subscription and use a pending invitation
+ * as the OgMembership object to update if it exists.
+ */
+function og_invite_form_og_ui_confirm_subscribe_alter(&$form, &$form_state, $form_id) {
+  // Hide invite status field.
+  if (!empty($form[OG_INVITE_MEMBERSHIP_FIELD])) {
+    $form[OG_INVITE_MEMBERSHIP_FIELD]['#access'] = FALSE;
+  }
+
+  // Check for an existing invite and use that as the membership record.
+  $ogm = &$form_state['og_membership'];
+  if ($invite = og_get_membership($ogm->group_type, $ogm->gid, $ogm->entity_type, $ogm->etid)) {
+    $ogm->id = $invite->id;
+    $ogm->is_new = FALSE;
+    $ogm->{OG_INVITE_MEMBERSHIP_FIELD}[LANGUAGE_NONE][0]['value'] = 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Helpers.
+
+/**
+ * Send an invitation to an user.
+ */
+function og_invite_invite($group_type, $gid, $field_name, $uid, $message = '', $inviter = NULL) {
+  if (empty($inviter)) {
+    global $user;
+    $inviter = $user;
+  }
+  $invitee = user_load($uid);
+  $group = entity_load_single($group_type, $gid);
+
+  // Force realnames loading.
+  if (module_exists('realname')) {
+    realname_user_load(array(
+      $inviter->uid => $inviter,
+      $invitee->uid => $invitee,
+    ));
+  }
+
+  // Populate values array to say membership was created via invite.
+  $values = array(
+    OG_INVITE_MEMBERSHIP_FIELD => TRUE,
+    OG_MEMBERSHIP_REQUEST_FIELD => t('Invited by @name', array('@name' => format_username($inviter))),
+  );
+
+  // Add group membership form.
+  $og_membership = og_membership_create($group_type, $gid, 'user', $invitee->uid, $field_name, $values);
+  $og_membership->state = OG_STATE_PENDING;
+  $og_membership->save();
+
+  $hash = og_invite_generate_hash($og_membership);
+  $answer_link = url(og_invite_answer_path_by_hash($group_type, $gid, $hash, 'answer'));
+
+  // Send an invitation message.
+  $params = array(
+    'inviter' => $inviter,
+    'invitee' => $invitee,
+    'group_type' => $group_type,
+    'group' => $group,
+    'hash' => $hash,
+    'message' => $message,
+  );
+  // Use Rules if enabled.
+  if (module_exists('rules') && variable_get('og_invite_send_invitation_by_rules', FALSE)) {
+    rules_invoke_event('og_invite_send_invitation', $inviter, $invitee, $og_membership, $message, $hash, $answer_link);
+  }
+  // Else send the invitation by mail.
+  else {
+    drupal_mail('og_invite', 'send_invitation', $invitee->mail, $invitee->language, $params);
+  }
+
+  return TRUE;
+}
+
+/**
+ * Helper to generate the hash of an OgMembership object.
+ */
+function og_invite_generate_hash(OgMembership $og_membership) {
+  $hash = '';
+  $invite_status = field_get_items('og_membership', $og_membership, OG_INVITE_MEMBERSHIP_FIELD);
+  if ($og_membership->state == OG_STATE_PENDING && !empty($invite_status[0]['value'])) {
+    $concat = $og_membership->state . $og_membership->group_type . $og_membership->gid . $og_membership->entity_type . $og_membership->etid . $og_membership->created;
+    $hash = sha1($concat);
+  }
+  return $hash;
+}
+
+/**
+ * Helper to get the OgMembership corresponding ot a hash.
+ */
+function og_invite_get_membership_from_hash($hash) {
+  global $user;
+  $result = FALSE;
+
+  $select = db_select('og_membership', 'ogm')
+    ->fields('ogm', array('id'))
+    ->where('SHA1(CONCAT(state, group_type, gid, entity_type, etid, created)) = :hash', array(':hash' => $hash));
+  if (!user_access('answer any organic group invitation')) {
+    $select
+      ->condition('entity_type', 'user')
+      ->condition('etid', $user->uid);
+  }
+  $ogmid = $select->execute()->fetchField();
+  if (!empty($ogmid)) {
+    $result = og_membership_load($ogmid);
+  }
+
+  return $result;
+}
+
+/**
+ * Helper to generate the path to an answer from the OgMembership object.
+ */
+function og_invite_answer_path_by_membership(OgMembership $og_membership, $op = 'answer') {
+  $hash = og_invite_generate_hash($og_membership);
+  return og_invite_answer_url_by_hash($og_membership->group_type, $og_membership->gid, $hash, $op);
+}
+
+/**
+ * Helper to generate the path to an answer using the group type, the gid and
+ * the hash.
+ */
+function og_invite_answer_path_by_hash($group_type, $gid, $hash, $op = 'answer') {
+  $path = '';
+  if (in_array($op, array('approve', 'decline', 'always-decline', 'answer')) && !empty($hash)) {
+    $path = 'group/' . $group_type . '/' . $gid . '/admin/people/invite-users/' . $op . '/' . $hash;
+  }
+  return $path;
+}
+
+/**
+ * Check if an OgMembership item is a invitation.
+ *
+ * @param OgMembership $ogm
+ *   The OgMembership item.
+ * @return bool
+ *   TRUE if the OgMembership item is an invitation.
+ */
+function og_invite_is_invitation(OgMembership $og_membership) {
+  $items = field_get_items('og_membership', $og_membership, 'og_membership_invitation');
+  return $items[0]['value'] == 1;
+}

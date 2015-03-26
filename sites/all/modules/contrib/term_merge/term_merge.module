@@ -1,0 +1,711 @@
+<?php
+
+/**
+ * @file
+ * Provide functionality for merging taxonomy terms one into another.
+ */
+
+/**
+ * Constant to use in term merge action.
+ *
+ * Constant denotes "do not create HTTP redirect" logic for term merge action.
+ *
+ * @var int
+ */
+define('TERM_MERGE_NO_REDIRECT', -1);
+
+/**
+ * Constant to use in term merge action.
+ *
+ * Constant denotes "Create a new term and use it as the term trunk" logic
+ * for term merge action.
+ *
+ * @var int
+ */
+define('TERM_MERGE_NEW_TERM_TRUNK', -1);
+
+/**
+ * Implements hook_menu().
+ */
+function term_merge_menu() {
+  $items = array();
+
+  $items['admin/structure/taxonomy/%taxonomy_vocabulary_machine_name/merge'] = array(
+    'title' => 'Merge terms',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('term_merge_form', 3),
+    'access callback' => 'term_merge_access',
+    'access arguments' => array(3),
+    'file' => 'term_merge.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['admin/structure/taxonomy/%taxonomy_vocabulary_machine_name/merge/default'] = array(
+    'title' => 'Default',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['admin/structure/taxonomy/%taxonomy_vocabulary_machine_name/merge/duplicates'] = array(
+    'title' => 'Merge Duplicate Terms',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('term_merge_duplicates_form', 3),
+    'access callback' => 'term_merge_access',
+    'access arguments' => array(3),
+    'file' => 'term_merge.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['taxonomy/term/%taxonomy_term/merge'] = array(
+    'title' => 'Merge Terms',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('term_merge_form', NULL, 2),
+    'access callback' => 'term_merge_access',
+    'access arguments' => array(NULL, 2),
+    'file' => 'term_merge.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  $items['taxonomy/term/%taxonomy_term/merge/default'] = array(
+    'title' => 'Default',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['taxonomy/term/%taxonomy_term/merge/duplicates'] = array(
+    'title' => 'Merge Duplicate Terms',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('term_merge_duplicates_form', NULL, 2),
+    'access callback' => 'term_merge_access',
+    'access arguments' => array(NULL, 2),
+    'file' => 'term_merge.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['term-merge/autocomplete/term-trunk/%taxonomy_vocabulary_machine_name'] = array(
+    'title' => 'Autocomplete Term Merge form term trunk',
+    'page callback' => 'term_merge_form_term_trunk_widget_autocomplete_autocomplete',
+    'page arguments' => array(3),
+    'access callback' => 'term_merge_access',
+    'access arguments' => array(3),
+    'file' => 'term_merge.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths().
+ */
+function term_merge_admin_paths() {
+  return array(
+    'taxonomy/term/*/merge' => TRUE,
+    'taxonomy/term/*/merge/*' => TRUE,
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function term_merge_permission() {
+  $permissions = array();
+  $permissions['merge terms'] = array(
+    'title' => t('Merge any terms'),
+    'description' => t('Gives the ability to merge any taxonomy terms.'),
+  );
+  $vocabularies = taxonomy_get_vocabularies();
+  foreach ($vocabularies as $vocabulary) {
+    $permissions['merge ' . $vocabulary->machine_name . ' terms'] = array(
+      'title' => t('Merge %name vocabulary terms', array('%name' => $vocabulary->name)),
+      'description' => t('Gives the ability to merge taxonomy terms that belong to vocabulary %name.', array('%name' => $vocabulary->name)),
+    );
+  }
+  return $permissions;
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function term_merge_action_info() {
+  return array(
+    'term_merge_action' => array(
+      'type' => 'taxonomy',
+      'label' => t('Merge term'),
+      'configurable' => TRUE,
+      'behavior' => array('changes_property'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_help().
+ */
+function term_merge_help($path, $arg) {
+  switch ($path) {
+    // Main module help for the Term Merge module.
+    case 'admin/help#term_merge':
+      return '<p>' . t('Allows you to merge multiple terms into one and and at the same time update all fields referencing to the old ones.') . '</p>';
+      break;
+  }
+}
+
+/**
+ * Access callback for term merge action.
+ *
+ * Decide whether to grant access to an account for an operation of merging
+ * terms in a vocabulary.
+ *
+ * @param object $vocabulary
+ *   Fully loaded vocabulary object inside of which term merge operation is
+ *   requested for access granting
+ * @param object $term
+ *   Fully loaded term object which belongs to the vocabulary inside of which
+ *   term merge operation is requested for access granting. You are supposed
+ *   only to provide either $vocabulary or $term. Depending on your context it
+ *   might be more convenient for you to provide $term, and on other occasions
+ *   it might be $vocabulary of more convenience
+ * @param object $account
+ *   Fully loaded user object who is requesting access granting for the
+ *   operation of term merging. You may provide nothing here, and the currently
+ *   logged in user will be considered
+ *
+ * @return bool
+ *   Whether the access for term merging operation has been granted
+ */
+function term_merge_access($vocabulary = NULL, $term = NULL, $account = NULL) {
+  if (is_null($vocabulary) && is_null($term)) {
+    // This is no go, at least one of these 2 has to be provided.
+    return FALSE;
+  }
+
+  if (is_null($account)) {
+    // Falling back on currently logged in user.
+    $account = $GLOBALS['user'];
+  }
+
+  if (is_null($vocabulary)) {
+    $vocabulary = taxonomy_vocabulary_load($term->vid);
+  }
+
+  return user_access('merge terms', $account) || user_access('merge ' . $vocabulary->machine_name . ' terms', $account);
+}
+
+/**
+ * Generate the configuration form for action "Term merge".
+ */
+function term_merge_action_form($context) {
+  $form = array();
+
+  $form['displaimer'] = array(
+    '#markup' => '<b>' . t('Sorry, currently Term Merge action is not supported via user interface. Please, contact the maintainers at the official website if you need it enabled via user interface.') . '</b>',
+  );
+
+  return $form;
+}
+
+/**
+ * Form submission function.
+ *
+ * Store information about configurable action.
+ */
+function term_merge_action_submit($form, &$form_state) {
+  // We don't have enabled UI for this action. It's just a dummy function.
+  return array();
+}
+
+/**
+ * Action function. Perform action "Term Merge".
+ */
+function term_merge_action($object, $context) {
+  $term_branch = $object;
+  $term_trunk = taxonomy_term_load($context['term_trunk']);
+  $vocabulary = taxonomy_vocabulary_load($term_branch->vid);
+
+  $term_branch_children = array();
+  foreach (taxonomy_get_tree($term_branch->vid, $term_branch->tid) as $term) {
+    $term_branch_children[] = $term->tid;
+  }
+
+  if ($term_branch->vid != $term_trunk->vid) {
+    watchdog('term_merge', 'Trying to merge 2 terms (%term_branch, %term_trunk) from different vocabularies', array(
+      '%term_branch' => $term_branch->name,
+      '%term_trunk' => $term_trunk->name,
+    ), WATCHDOG_WARNING);
+    return;
+  }
+  if ($term_branch->tid == $term_trunk->tid) {
+    watchdog('term_merge', 'Trying to merge a term %term into itself.', array('%term' => $term_branch->name), WATCHDOG_WARNING);
+    return;
+  }
+  if (in_array($term_trunk->tid, $term_branch_children)) {
+    watchdog('term_merge', 'Trying to merge a term %term_branch into its child %term_trunk.', array(
+      '%term_branch' => $term_branch->name,
+      '%term_trunk' => $term_trunk->name,
+    ), WATCHDOG_WARNING);
+    return;
+  }
+
+  // Defining some default values.
+  if (!isset($context['term_branch_keep'])) {
+    // It's easier to manually delete the unwanted terms, rather than
+    // search for your DB back up. So by default we keep the term branch.
+    $context['term_branch_keep'] = TRUE;
+  }
+  if (!isset($context['merge_fields'])) {
+    // Initializing it with an empty array if client of this function forgot to
+    // provide info about what fields to merge.
+    $context['merge_fields'] = array();
+  }
+  if (!isset($context['keep_only_unique'])) {
+    // Seems logical that mostly people will prefer to keep only one value in
+    // term reference field per taxonomy term.
+    $context['keep_only_unique'] = TRUE;
+  }
+  if (!isset($context['redirect']) || !module_exists('redirect')) {
+    // This behavior requires Redirect module installed and enabled.
+    $context['redirect'] = TERM_MERGE_NO_REDIRECT;
+  }
+  if (!isset($context['synonyms']) || !module_exists('synonyms')) {
+    // This behavior requires Synonyms module installed and enabled.
+    $context['synonyms'] = array();
+  }
+
+  // Calling a hook, this way we let whoever else to react and do his own extra
+  // logic when merging of terms occurs. We prefer to call it before we handle
+  // our own logic, because our logic might delete $term_branch and maybe a
+  // module that implements this hook needs this term not deleted yet.
+  module_invoke_all('term_merge', $term_trunk, $term_branch, $context);
+
+  if (!empty($context['merge_fields'])) {
+    // "Merging" the fields from $term_branch into $term_trunk where it is
+    // possible.
+    foreach ($context['merge_fields'] as $field_name) {
+      // Getting the list of available languages for this field.
+      $languages = array();
+      if (isset($term_trunk->$field_name) && is_array($term_trunk->$field_name)) {
+        $languages = array_merge($languages, array_keys($term_trunk->$field_name));
+      }
+      if (isset($term_branch->$field_name) && is_array($term_branch->$field_name)) {
+        $languages = array_merge($languages, array_keys($term_branch->$field_name));
+      }
+      $languages = array_unique($languages);
+      // Merging the data of both terms into $term_trunk.
+      foreach ($languages as $language) {
+        if (!isset($term_trunk->{$field_name}[$language])) {
+          $term_trunk->{$field_name}[$language] = array();
+        }
+        if (!isset($term_branch->{$field_name}[$language])) {
+          $term_branch->{$field_name}[$language] = array();
+        }
+        $term_trunk->{$field_name}[$language] = array_merge($term_trunk->{$field_name}[$language], $term_branch->{$field_name}[$language]);
+      }
+    }
+
+    // And now we can save $term_trunk after shifting all the fields from
+    // $term_branch.
+    taxonomy_term_save($term_trunk);
+  }
+
+  // Updating all the links to $term_branch to point now to $term_trunk
+  // firstly we go through the list of all fields searching for
+  // taxonomy_term_reference field type because potentially some of these fields
+  // values will have to be updated after merging terms.
+  $fields = field_info_field_map();
+  $result = array();
+  foreach ($fields as $field_name => $v) {
+    // Additionally we group by field_name to know what field has to be updated
+    // in each found entity.
+    // @todo: Here would be nice to throw in a hook, allowing other modules to
+    // supply meta data about their field types if they also use taxonomy
+    // references, defining it in their own field types.
+    if ($v['type'] == 'taxonomy_term_reference') {
+      $result[$field_name] = array();
+      $query = new EntityFieldQuery();
+      // Making sure we search in the entire scope of entities.
+      $query->addMetaData('account', user_load(1));
+      $query->fieldCondition($field_name, 'tid', $term_branch->tid);
+      $_result = $query->execute();
+      $result[$field_name] = array_merge_recursive($result[$field_name], $_result);
+    }
+  }
+  // Now we load all entities that have taxonomy_term_reference pointing to
+  // $term_branch.
+  foreach ($result as $field_name => $entity_types) {
+    foreach ($entity_types as $entity_type => $v) {
+      $ids = array_keys($v);
+      $entities = entity_load($entity_type, $ids);
+      // After we have loaded it, we alter the taxonomy_term_reference
+      // to point to $term_trunk.
+      foreach ($entities as $entity) {
+        // What is more, we have to do it for every available language.
+        foreach ($entity->$field_name as $language => $items) {
+          // Keeping track of whether term trunk is already present in this
+          // field in this language. This is useful for the option
+          // 'keep_only_unique'.
+          $is_trunk_added = FALSE;
+          foreach ($entity->{$field_name}[$language] as $delta => $item) {
+            if ($context['keep_only_unique'] && $is_trunk_added && in_array($item['tid'], array($term_trunk->tid, $term_branch->tid))) {
+              // We are instructed to keep only unique references and we already
+              // have term trunk in this field, so we just unset value for this
+              // delta.
+              unset($entity->{$field_name}[$language][$delta]);
+            }
+            else {
+              // Merging term references if necessary, and keep an eye on
+              // whether we already have term trunk among this field values.
+              switch ($item['tid']) {
+                case $term_trunk->tid:
+                  $is_trunk_added = TRUE;
+                  break;
+
+                case $term_branch->tid:
+                  $is_trunk_added = TRUE;
+                  $entity->{$field_name}[$language][$delta]['tid'] = $term_trunk->tid;
+                  break;
+              }
+            }
+          }
+          // Above in the code, while looping through all deltas of this field,
+          // we might have unset some of the deltas to keep term references
+          // unique. We should better keep deltas as a series of consecutive
+          // numbers, because it is what it is supposed to be.
+          $entity->{$field_name}[$language] = array_values($entity->{$field_name}[$language]);
+        }
+        // After updating all the references, save the entity.
+        entity_save($entity_type, $entity);
+      }
+    }
+  }
+
+  // Adding term branch as synonym (Synonyms module integration).
+  foreach ($context['synonyms'] as $synonym_field) {
+    synonyms_add_entity_as_synonym($term_trunk, 'taxonomy_term', $synonym_field, $term_branch, 'taxonomy_term');
+  }
+
+  // It turned out we gotta go tricky with the Redirect module. If we create
+  // redirection before deleting the branch term (if we are instructed to delete
+  // in this action) redirect module will do its "auto-clean up" in
+  // hook_entity_delete() and will delete our just created redirects. But at the
+  // same time we have to get the path alias of the $term_branch before it gets
+  // deleted. Otherwise the path alias will be deleted along with the term
+  // itself. Similarly would be lost all redirects pointing to branch term
+  // paths. We will redirect normal term path and its RSS feed.
+  $redirect_paths = array();
+  if ($context['redirect'] != TERM_MERGE_NO_REDIRECT) {
+    $redirect_paths['taxonomy/term/' . $term_trunk->tid] = array(
+      'taxonomy/term/' . $term_branch->tid,
+    );
+    $redirect_paths['taxonomy/term/' . $term_trunk->tid . '/feed'] = array(
+      'taxonomy/term/' . $term_branch->tid . '/feed',
+    );
+    foreach ($redirect_paths as $redirect_destination => $redirect_sources) {
+      // We create redirect from Drupal normal path, then we try to fetch its
+      // alias. Lastly we collect a set of redirects that point to either of the
+      // 2 former paths. Everything we were able to fetch will be redirecting to
+      // the trunk term.
+      $alias = drupal_get_path_alias($redirect_sources[0]);
+      if ($alias != $redirect_sources[0]) {
+        $redirect_sources[] = $alias;
+      }
+      $existing_redirects = array();
+      foreach ($redirect_sources as $redirect_source) {
+        foreach (redirect_load_multiple(array(), array('redirect' => $redirect_source)) as $v) {
+          $existing_redirects[] = $v->source;
+        }
+      }
+      $redirect_paths[$redirect_destination] = array_unique(array_merge($redirect_sources, $existing_redirects));
+    }
+  }
+
+  if (!$context['term_branch_keep']) {
+    // If we are going to delete branch term, we need firstly to make sure
+    // all its children now have the parent of term_trunk.
+    foreach (taxonomy_get_children($term_branch->tid, $vocabulary->vid) as $child) {
+      $parents = taxonomy_get_parents($child->tid);
+      // Deleting the parental link to the term that is being merged.
+      unset($parents[$term_branch->tid]);
+      // And putting the parental link to the term that we merge into.
+      $parents[$term_trunk->tid] = $term_trunk;
+      $parents = array_unique(array_keys($parents));
+      $child->parent = $parents;
+      taxonomy_term_save($child);
+    }
+
+    // Views module integration. We update all Views taxonomy filter handlers
+    // configured to filter on term branch to filter on term trunk now, since
+    // the former becomes the latter.
+    if (module_exists('views')) {
+      $views = views_get_all_views();
+      foreach ($views as $view) {
+        // For better efficiency, we keep track of whether we have updated
+        // anything in a view, and thus whether we need to save it.
+        $needs_saving = FALSE;
+        // Even worse, we have to go through each display of each view.
+        foreach ($view->display as $display_id => $display) {
+          $view->set_display($display_id);
+          $filters = $view->display_handler->get_handlers('filter');
+          foreach ($filters as $filter_id => $filter_handler) {
+            // Currently we know how to update filters only of this particular
+            // class.
+            if (get_class($filter_handler) == 'views_handler_filter_term_node_tid') {
+              $filter = $view->get_item($display_id, 'filter', $filter_id);
+              if (isset($filter['value'][$term_branch->tid])) {
+                // Substituting term branch with term trunk.
+                unset($filter['value'][$term_branch->tid]);
+                $filter['value'][$term_trunk->tid] = $term_trunk->tid;
+                $view->set_item($display_id, 'filter', $filter_id, $filter);
+                $needs_saving = TRUE;
+              }
+            }
+          }
+        }
+        if ($needs_saving) {
+          $view->save();
+        }
+      }
+    }
+
+    // We are instructed to delete the term branch after the merge,
+    // and so we do.
+    taxonomy_term_delete($term_branch->tid);
+  }
+
+  // Here we do the 2nd part of integration with the Redirect module. Once the
+  // branch term has been deleted (if deleted), we can add the redirects
+  // without being afraid that the redirect module will delete them in its
+  // hook_entity_delete().
+  foreach ($redirect_paths as $redirect_destination => $redirect_sources) {
+    foreach ($redirect_sources as $redirect_source) {
+      $redirect = redirect_load_by_source($redirect_source);
+      if (!$redirect) {
+        // Seems like redirect from such URI does not exist yet, we will create
+        // it.
+        $redirect = new stdClass();
+        redirect_object_prepare($redirect, array(
+          'source' => $redirect_source,
+        ));
+      }
+      $redirect->redirect = $redirect_destination;
+      $redirect->status_code = $context['redirect'];
+
+      redirect_save($redirect);
+    }
+  }
+
+  watchdog('term_merge', 'Successfully merged term %term_branch into term %term_trunk in vocabulary %vocabulary. Context: @context', array(
+    '%term_branch' => $term_branch->name,
+    '%term_trunk' => $term_trunk->name,
+    '%vocabulary' => $vocabulary->name,
+    '@context' => var_export($context, 1),
+  ));
+}
+
+/**
+ * Merge terms one into another using batch API.
+ *
+ * @param array $term_branch
+ *   A single term tid or an array of term tids to be merged, aka term branches
+ * @param int $term_trunk
+ *   The tid of the term to merge term branches into, aka term trunk
+ * @param array $merge_settings
+ *   Array of settings that control how merging should happen. Currently
+ *   supported settings are:
+ *     - term_branch_keep: (bool) Whether the term branches should not be
+ *       deleted, also known as "merge only occurrences" option
+ *     - merge_fields: (array) Array of field names whose values should be
+ *       merged into the values of corresponding fields of term trunk (until
+ *       each field's cardinality limit is reached)
+ *     - keep_only_unique: (bool) Whether after merging within one field only
+ *       unique taxonomy term references should be kept in other entities. If
+ *       before merging your entity had 2 values in its taxonomy term reference
+ *       field and one was pointing to term branch while another was pointing to
+ *       term trunk, after merging you will end up having your entity
+ *       referencing to the same term trunk twice. If you pass TRUE in this
+ *       parameter, only a single reference will be stored in your entity after
+ *       merging
+ *     - redirect: (int) HTTP code for redirect from $term_branch to
+ *       $term_trunk, 0 stands for the default redirect defined in Redirect
+ *       module. Use constant TERM_MERGE_NO_REDIRECT to denote not creating any
+ *       HTTP redirect. Note: this parameter requires Redirect module enabled,
+ *       otherwise it will be disregarded
+ *     - synonyms: (array) Array of field names of trunk term into which branch
+ *       terms should be added as synonyms (until each field's cardinality limit
+ *       is reached). Note: this parameter requires Synonyms module enabled,
+ *       otherwise it will be disregarded
+ *     - step: (int) How many term branches to merge per script run in batch. If
+ *       you are hitting time or memory limits, decrease this parameter
+ */
+function term_merge($term_branch, $term_trunk, $merge_settings = array()) {
+  // Older versions of this module had another interface of this function,
+  // as backward capability we still support the older interface, instead of
+  // supplying a $merge_settings array, it was supplying all the settings as
+  // additional function arguments.
+  // @todo: delete this backward capability at some point.
+  if (!is_array($merge_settings)) {
+    $merge_settings = array(
+      'term_branch_keep' => $merge_settings,
+    );
+  }
+
+  // Create an array of sources if it isn't yet.
+  if (!is_array($term_branch)) {
+    $term_branch = array($term_branch);
+  }
+
+  // Creating a skeleton for the merging batch.
+  $batch = array(
+    'title' => t('Merging terms'),
+    'operations' => array(
+      array('_term_merge_batch_process', array(
+        $term_branch,
+        $term_trunk,
+        $merge_settings,
+      )),
+    ),
+    'finished' => 'term_merge_batch_finished',
+    'file' => drupal_get_path('module', 'term_merge') . '/term_merge.batch.inc',
+  );
+
+  // Initialize the batch process.
+  batch_set($batch);
+}
+
+/**
+ * Generate and return form elements that control behavior of merge action.
+ *
+ * Output of this function should be used in any form that merges terms,
+ * ensuring unified interface. It should be used in conjunction with
+ * term_merge_merge_options_submit(), which will process the submitted values
+ * for you and return an array of merge settings.
+ *
+ * @param object $vocabulary
+ *   Fully loaded taxonomy vocabulary object in which merging occurs
+ *
+ * @return array
+ *   Array of form elements that allow controlling term merge action
+ *
+ * @see term_merge_merge_options_submit()
+ */
+function term_merge_merge_options_elements($vocabulary) {
+  // @todo: it would be nice to provide some ability to supply default values
+  // for each setting.
+  $form = array();
+
+  // Getting bundle name and a list of fields attached to this bundle for
+  // further use down below in the code while generating form elements.
+  $bundle = field_extract_bundle('taxonomy_term', $vocabulary);
+  $instances = field_info_instances('taxonomy_term', $bundle);
+
+  $form['term_branch_keep'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Only merge occurrences'),
+    '#description' => t('Check this if you want to only merge the occurrences of the specified terms, i.e. the terms will not be deleted from your vocabulary.'),
+  );
+
+  if (!empty($instances)) {
+    $options = array();
+    foreach ($instances as $instance) {
+      $options[$instance['field_name']] = $instance['label'];
+    }
+    $form['merge_fields'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Merge Term Fields'),
+      '#description' => t('Check the fields whose values from branch terms you want to add to the values of corresponding fields of the trunk term. <b>Important note:</b> the values will be added until the cardinality limit for the selected fields is reached.'),
+      '#options' => $options,
+    );
+  }
+
+  $form['keep_only_unique'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Keep only unique terms after merging'),
+    '#description' => t('Sometimes after merging you may end up having a node (or any other entity) pointing twice to the same taxonomy term, tick this checkbox if want to keep only unique terms in other entities after merging.'),
+  );
+
+  if (module_exists('redirect')) {
+    $options = array(
+      TERM_MERGE_NO_REDIRECT => t('No redirect'),
+      0 => t('Default (@default)', array(
+        '@default' => variable_get('redirect_default_status_code', 301),
+      )),
+    ) + redirect_status_code_options();
+    $form['redirect'] = array(
+      // We respect access rights defined in redirect.module here.
+      '#access' => user_access('administer redirects'),
+      '#type' => 'select',
+      '#title' => t('Create Redirect'),
+      '#description' => t('If you want to create an HTTP redirect from your branch terms to the trunk term, please, choose the HTTP redirect code here.'),
+      '#required' => TRUE,
+      '#options' => $options,
+      '#default_value' => TERM_MERGE_NO_REDIRECT,
+    );
+  }
+  else {
+    $form['redirect'] = array(
+      '#markup' => t('Enable the module ' . l('Redirect', 'http://drupal.org/project/redirect') . ' if you want to do an HTTP redirect from your term branch to the term trunk.'),
+    );
+  }
+
+  if (module_exists('synonyms')) {
+    $options = array();
+    foreach (synonyms_synonyms_fields($vocabulary) as $field_name) {
+      $options[$field_name] = $instances[$field_name]['label'];
+    }
+    $form['synonyms'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Add as Synonyms'),
+      '#description' => t('Synonyms module allows you to add branch terms as synonyms into any of fields, enabled as sources of synonyms in vocabulary. Check the fields into which you would like to add branch terms as synonyms. <b>Important note:</b> the values will be added until the cardinality limit for the selected fields is reached.'),
+      '#options' => $options,
+    );
+  }
+  else {
+    $form['synonyms'] = array(
+      '#markup' => t('Enable the module ' . l('Synonyms', 'http://drupal.org/project/synonyms') . ' if you want to be able to add branch terms as synonyms into a field of your trunk term.'),
+    );
+  }
+
+  $form['step'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Step'),
+    '#description' => t('Please, specify how many terms to process per script run in batch. If you are hitting time or memory limits in your PHP, decrease this number.'),
+    '#default_value' => 40,
+    '#required' => TRUE,
+    '#element_validate' => array('element_validate_integer_positive'),
+  );
+
+  return $form;
+}
+
+/**
+ * Return merge settings array.
+ *
+ * Output of this function should be used for supplying into term_merge()
+ * function or for triggering actions_do('term_merge_action', ...) action. This
+ * function should be invoked in a form submit handler for a form that used
+ * term_merge_merge_options_elements() for generating merge settings elements.
+ * It will process data and return an array of merge settings, according to the
+ * data user has submitted in your form.
+ *
+ * @param array $merge_settings_element
+ *   That part of form that was generated by term_merge_merge_options_elements()
+ * @param array $form_state
+ *   Form state array of the submitted form
+ * @param array $form
+ *   Form array of the submitted form
+ *
+ * @return array
+ *   Array of merge settings that can be used for calling term_merge() or
+ *   invoking 'term_merge_action' action
+ *
+ * @see term_merge_merge_options_elements()
+ */
+function term_merge_merge_options_submit($merge_settings_element, &$form_state, $form) {
+  $merge_settings = array(
+    'term_branch_keep' => (bool) $merge_settings_element['term_branch_keep']['#value'],
+    'merge_fields' => isset($merge_settings_element['merge_fields']['#value']) ? array_values(array_filter($merge_settings_element['merge_fields']['#value'])) : array(),
+    'keep_only_unique' => (bool) $merge_settings_element['keep_only_unique']['#value'],
+    'redirect' => isset($merge_settings_element['redirect']['#value']) ? $merge_settings_element['redirect']['#value'] : TERM_MERGE_NO_REDIRECT,
+    'synonyms' => isset($merge_settings_element['synonyms']['#value']) ? array_values(array_filter($merge_settings_element['synonyms']['#value'])) : array(),
+    'step' => (int) $merge_settings_element['step']['#value'],
+  );
+  return $merge_settings;
+}

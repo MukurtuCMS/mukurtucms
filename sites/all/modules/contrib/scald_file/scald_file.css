@@ -1,0 +1,22 @@
+.dnd-library-wrapper .editor-item .meta.type-file {
+  background-image: url('icons/file.png');
+}
+
+.scald-menu .add-buttons .add-file {
+  background: url('icons/file-large-inverted.png') 50% 50% no-repeat;
+}
+
+.scald-menu .add-buttons .add-file:hover {
+  background-image: url('icons/file-large-color.png');
+}
+
+.dnd-drop-wrapper img.scald-file-icon,
+img.scald-file-icon {
+  height: 16px;
+  vertical-align: top;
+}
+
+iframe.pdf,
+.dnd-drop-wrapper iframe.pdf {
+  width: 100%;
+}

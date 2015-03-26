@@ -1,0 +1,21 @@
+name = Popup UI
+description = Provides a UI to manage popup formats used within content types, views, menus and blocks 
+package = User interface
+version = "7.0"
+core = 7.x
+
+configure = admin/config/user-interface/popup/formats
+
+dependencies[] = popup
+
+files[] = popup_ui.module
+files[] = includes/popup_ui.admin.inc
+files[] = includes/popup_ui.api.inc
+files[] = includes/popup_ui.features.inc
+
+; Information added by Drupal.org packaging script on 2014-07-06
+version = "7.x-1.4"
+core = "7.x"
+project = "popup"
+datestamp = "1404659328"
+

@@ -1,0 +1,9 @@
+name = ma_dashboard
+description = Dashboard specific
+core = 7.x
+package = Features
+version = 7.x-1.2
+project = ma_dashboard
+dependencies[] = homebox
+features[features_api][] = api:2
+features[homebox][] = Mukurtu Dashboard

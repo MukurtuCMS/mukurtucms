@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+#popup-ui-form-formatters #jump-link{ text-align: right;}
+
+#popup-ui-form-formatters fieldset div.class-popup-confirm{ float: right;}
+
+#popup-ui-form-formatters div.form-type-textfield{ clear: both;}
+
+#popup-ui-form-formatters div.column{ width: 48%;}
+#popup-ui-form-formatters div.meta-column{ float: left;}
+#popup-ui-form-formatters div.content-column{ float: right;}
+
+
+div.section-inner{ border: 1px solid #ddd; margin: 0 15px 15px 0; padding: 10px; width: 90%;}
+div.section-inner:after{ clear: both; content: '.'; display: block; height: 0; visibility: hidden;}
+
+div.section select{ width: 50%;}
+div.section div.form-type-select label{ display: block; float: left; width: 40%;}
+
+div.section-menu div.form-type-select{ float: left; width: 45%; min-width: 200px;}
+div.section-display div.form-item{ float: left; width: 45%; min-width: 200px;}
+
+
+div.popup-element-origin div.popup-element-body div.popup-buttons{ padding-top: 15px;}
+div.popup-element-origin div.popup-element-body div.popup-buttons a{ text-decoration: none;}
+div.popup-element-origin div.popup-element-body div.popup-buttons a:hover{ text-decoration: none;}
+

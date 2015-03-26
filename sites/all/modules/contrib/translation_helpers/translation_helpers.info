@@ -1,0 +1,12 @@
+name = Translation helpers
+description = Provides methods for other modules to use with translated content.
+dependencies[] = translation
+package = Multilanguage
+core = 7.x
+
+; Information added by drupal.org packaging script on 2011-11-30
+version = "7.x-1.0"
+core = "7.x"
+project = "translation_helpers"
+datestamp = "1322669152"
+

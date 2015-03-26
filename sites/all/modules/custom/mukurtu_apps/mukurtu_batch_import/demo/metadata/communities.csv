@@ -1,0 +1,15 @@
+guid,Title,Sharing Protocols Display,Body,Media,Media Internet (Off),uid,Updated date,Type,Sharing Protocols
+mukurtu_demo_community_001,Mukurtu Media,Open,"This is a Media Community. It is set to Open.
+",white.jpg,,1,05/30/2012 - 15:48,Community,0
+mukurtu_demo_community_002,Everyone,Open,"This is a Community for Everyone. It is set to Open.
+",white.jpg,,1,05/30/2012 - 15:48,Community,0
+mukurtu_demo_community_003,Circle,Open,"This is a Circle Community. It is set to Open.
+",white_circle.jpg,,1,05/30/2012 - 15:48,Community,0
+mukurtu_demo_community_004,Triangle,Community,"This is a Triangle Community. It is set to Community.
+",white_triangle.jpg,,1,05/30/2012 - 15:48,Community,1
+mukurtu_demo_community_005,Square,Strict Community,"This is a Square Community. It is set to Strict.
+",white_square.jpg,,1,05/30/2012 - 15:48,Community,2
+mukurtu_demo_community_009,Demo Community,Open,"This is a Demo Community.
+",white.jpg,,1,05/30/2012 - 15:48,Community,0
+mukurtu_demo_community_0010,Demo Strict Community,Strict Community,"This is a Strict Community.
+",white.jpg,,1,05/30/2012 - 15:48,Community,2

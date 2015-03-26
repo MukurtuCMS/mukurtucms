@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the homebox_og module.
+ *
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function homebox_og_uninstall() {
+  // Remove variables
+  variable_del('homebox_og_home');
+  variable_del('homebox_og_tab');
+  variable_del('homebox_og_tab_membersonly');
+}

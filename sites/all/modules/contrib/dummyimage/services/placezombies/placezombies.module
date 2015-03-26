@@ -1,0 +1,55 @@
+<?php
+/**
+ * @file
+ * Integrates the placezombies service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function placezombies_dummyimage_service() {
+  return array(
+    'placezombies' => array(
+      'title' => t('Placezombies'),
+      'url' => 'http://placezombies.com/',
+      'form builder' => placezombies_form(),
+      'options' => placezombies_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the placezombies service.
+ */
+function placezombies_form() {
+  $form = array();
+  $form['placezombies'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Zombies!'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['placezombies']['dummyimage_zombies_color'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('I want Night of the Living Dead zombies (B&W)'),
+    '#description' => t('Will display old timey grayscale zombies'),
+    '#default_value' => variable_get('dummyimage_zombies_color', 0),
+  );
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the placezombies service.
+ */
+function placezombies_options() {
+  global $is_https;
+
+  return array(
+    'pattern' => '%protocol://placezombies.com/%color%dimensions',
+    'separator' => 'x',
+    'replacements' => array(
+      '%color' => (variable_get('dummyimage_zombies_color', 1) == 0) ? '' : 'g/',
+      '%protocol' => ($is_https) ? 'https' : 'http',
+    ),
+  );
+}

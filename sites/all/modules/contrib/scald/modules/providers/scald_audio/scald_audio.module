@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * @file
+ * Scald Audio is a Scald Atom Provider for audio files.
+ */
+
+/*******************************************************************************
+ * SCALD HOOK IMPLEMENTATIONS
+ */
+
+/**
+ * Implements hook_scald_atom_providers().
+ */
+function scald_audio_scald_atom_providers() {
+  return array(
+    'audio' => 'Upload Audio file'
+  );
+}
+
+/**
+ * Implements hook_scald_add_form().
+ */
+function scald_audio_scald_add_form(&$form, &$form_state) {
+  $defaults = scald_atom_defaults('audio');
+  $type = scald_type_load('audio');
+  $form['file'] = array(
+    '#type' => $defaults->upload_type,
+    '#title' => check_plain(scald_type_property_translate($type)),
+    '#upload_location' => 'public://atoms/audio/',
+    '#upload_validators' => array('file_validate_extensions' => array('wav ogg mp3')),
+  );
+}
+
+/**
+ * Implements hook_scald_add_atom_count().
+ */
+function scald_audio_scald_add_atom_count(&$form, &$form_state) {
+  if (is_array($form_state['values']['file'])) {
+    return max(count($form_state['values']['file']), 1);
+  }
+  return 1;
+}
+
+/**
+ * Implements hook_scald_add_form_fill().
+ */
+function scald_audio_scald_add_form_fill(&$atoms, $form, $form_state) {
+  $dir_audio_thumb = ScaldAtomController::getThumbnailPath('audio');
+  foreach ($atoms as $delta => $atom) {
+    if (is_array($form_state['values']['file']) && module_exists('plupload')) {
+      module_load_include('inc', 'scald', 'includes/scald.plupload');
+      $file = scald_plupload_save_file($form_state['values']['file'][$delta]['tmppath'], $form['file']['#upload_location'] . $form_state['values']['file'][$delta]['name']);
+    }
+    else {
+      $file = file_load($form_state['values']['file']);
+    }
+    $atom->base_id = $file->fid;
+    $atom->file_source = $file->uri;
+    $atom->data['audio_file'] = $file->uri;
+    $atom->data['audio_id'] = $file->fid;
+    $atom->title = $file->filename;
+
+    if (file_prepare_directory($dir_audio_thumb, FILE_CREATE_DIRECTORY)) {
+      if (module_exists('waudio_getid3') && $getid3 = _waudio_getid3_load()) {
+        $filepath = drupal_realpath($file->uri);
+        // get all id3 infos
+        $ret = waudio_getid3_ret_infos($filepath, $getid3);
+      }
+      elseif (module_exists('getid3') && ($id3 = getid3_instance())) {
+        $filepath = drupal_realpath($file->uri);
+        $ret = array();
+        // get all id3 infos
+        $info = $id3->analyze($filepath);
+        foreach($info['tags']['id3v2'] as $key => $value) {
+          $ret['tags'][$key] = $value[0];
+        }
+        if (!empty($info['comments']['picture'][0]['data']) && !empty($info['comments']['picture'][0]['image_mime'])) {
+          $ret['images'][0]['data'] = $info['comments']['picture'][0]['data'];
+          $ret['images'][0]['image_mime'] = $info['comments']['picture'][0]['image_mime'];
+        }
+        elseif (!empty($info['id3v2']['APIC'][0]['data']) && !empty($info['id3v2']['APIC'][0]['image_mime'])) {
+          $ret['images'][0]['data'] = $info['id3v2']['APIC'][0]['data'];
+          $ret['images'][0]['image_mime'] = $info['id3v2']['APIC'][0]['image_mime'];
+        }
+      }
+      if (!empty($ret)) {
+        $atom->title = !empty($ret['tags']['title']) ? $ret['tags']['title'] : $file->filename;
+
+        // Prefill the author
+        $langcode = field_language('scald_atom', $atom, 'scald_authors');
+        $atom->scald_authors[$langcode][0] = array(
+          'tid' => 0,
+          'taxonomy_term' => (object)(array('name' => isset($ret['tags']['artist'])?$ret['tags']['artist']:t('Unknown')))
+        );
+
+        // Prefill tags
+        $langcode = field_language('scald_atom', $atom, 'scald_tags');
+        $atom->scald_tags[$langcode][0] = array(
+          'tid' => 0,  // Beware, this is not a real tid, it's just an index
+          'taxonomy_term' => (object)(array('name' => isset($ret['tags']['genre'])?$ret['tags']['genre']:t('Unknown')))
+        );
+
+        $atom->data['artist'] = isset($ret['tags']['artist'])?$ret['tags']['artist']:'';
+        $atom->data['title'] = isset($ret['tags']['title'])?$ret['tags']['title']:'';
+        $atom->data['album'] = isset($ret['tags']['album'])?$ret['tags']['album']:'';
+        $atom->data['track'] = isset($ret['tags']['track'])?$ret['tags']['track']:isset($ret['tags']['track_number'])?$ret['tags']['track_number']:'';
+        $atom->data['year'] = isset($ret['tags']['year'])?$ret['tags']['year']:'';
+        $atom->data['genre'] = isset($ret['tags']['genre'])?$ret['tags']['genre']:'';
+
+        // If the MP3 includes a cover art, use it as the default thumbnail.
+        if (isset($ret['images'][0]['data']) && $ret['images'][0]['data'] != '') {
+          $extension = '.jpg';
+          if ($ret['images'][0]['image_mime'] == 'image/png') {
+            $extension = '.png';
+          }
+          elseif ($ret['images'][0]['image_mime'] == 'image/gif') {
+            $extension = '.gif';
+          }
+          $dest = $dir_audio_thumb . '/' . $file->filename . $extension;
+          $file = file_save_data($ret['images'][0]['data'], $dest);
+
+          if ($file) {
+            // Set the file status to temporary (image thumb)
+            db_update('file_managed')
+              ->condition('fid', $file->fid)
+              ->fields(array('status' => 0))
+              ->execute();
+            $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+            $atom->scald_thumbnail[$langcode][0] = (array) $file;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_scald_fetch().
+ */
+function scald_audio_scald_fetch($atom, $type) {
+  $file_items = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+  if (!empty($file_items)) {
+    $file_item = current($file_items);
+    if (file_exists($file_item['uri'])) {
+      $atom->thumbnail_source = $file_item['uri'];
+    }
+  }
+  $file = file_load($atom->base_id);
+  $atom->base_entity = $file;
+  $atom->file_source = $atom->data['audio_file'];
+}
+
+/**
+ * Implements hook_scald_atom_insert().
+ */
+function scald_audio_scald_atom_insert($atom) {
+  if ($atom->provider == 'scald_audio') {
+    $file = file_load($atom->data['audio_id']);
+    if ($file) {
+      $file->status = FILE_STATUS_PERMANENT;
+      file_save($file);
+      file_usage_add($file, 'scald_audio', 'scald_atom', $atom->sid);
+    }
+  }
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function scald_audio_scald_prerender($atom, $context, $options, $mode) {
+  if ($mode == 'atom') {
+    $atom->rendered->player = theme('scald_audio_player',
+      array('vars' =>
+        array(
+          'atom'          => $atom,
+          'audio_uri'     => $atom->file_source,
+          'thumbnail'     => $atom->thumbnail_source,
+        ),
+      )
+    );
+  }
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function scald_audio_theme() {
+  return array(
+    'scald_audio_player' => array(
+      'variables' => array('vars' => NULL),
+      'template' => 'scald_audio_player'
+    )
+  );
+}
+

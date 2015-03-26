@@ -1,0 +1,23 @@
+.big-picture {
+  float: left;
+  width: 57%;
+}
+
+.small-pictures {
+  float: right;
+  width: 43%;
+}
+
+.small-pictures .field .field-items .field-item a img {
+  margin-right: 20px;
+  float: left;
+}
+
+.small-pictures > .field > .field-items > .field-item {
+  clear: left;
+  padding-top: 20px;
+}
+
+.field-name-field-category {
+  clear: both;
+}

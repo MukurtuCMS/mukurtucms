@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * Scald Quickstart Installation
+ *
+ * Add some basics elements for a first use of ScalD module
+ *
+ * @ingroup scald
+ */
+
+/**
+ * Implements hook_install().
+ */
+function scald_quickstart_install() {
+  // Grant anoymous and authenticated user the rights to see published atoms.
+  $rids = array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID);
+  foreach ($rids as $rid) {
+    user_role_change_permissions($rid,
+      array(
+        'fetch any atom' => TRUE,
+        'view any atom' => TRUE,
+      )
+    );
+    cache_clear_all('scald_actions_bitstring_for_rid_' . $rid, 'cache_scald');
+  }
+}
+
+/**
+ * Grant anonymous and authenticated user the rights to see published atoms.
+ */
+function scald_quickstart_update_7001() {
+  $rids = array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID);
+  foreach ($rids as $rid) {
+    user_role_change_permissions($rid,
+      array(
+        'fetch any atom' => TRUE,
+        'view any atom' => TRUE,
+      )
+    );
+    cache_clear_all('scald_actions_bitstring_for_rid_' . $rid, 'cache_scald');
+  }
+}
+
+/**
+ * Instanciate 'scald_tags' field.
+ */
+function scald_quickstart_update_7002() {
+  foreach (array('image', 'audio', 'video') as $bundle) {
+    $instance = array(
+      'field_name' => 'scald_tags',
+      'entity_type' => 'scald_atom',
+      'bundle' => $bundle,
+      'label' => 'Tags',
+      'required' => FALSE,
+      'widget' => array(
+        'type' => 'taxonomy_autocomplete',
+      ),
+    );
+    if (!field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+      field_create_instance($instance);
+    }
+  }
+}

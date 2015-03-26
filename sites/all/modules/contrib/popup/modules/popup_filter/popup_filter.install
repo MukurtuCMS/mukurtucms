@@ -1,0 +1,34 @@
+<?php
+
+
+
+function popup_filter_install() {
+
+  $format_exists = (bool) db_query_range('SELECT 1 FROM {filter_format} WHERE name = :name', 0, 1, array(':name' => 'Popup tags'))->fetchField();
+
+  if (!$format_exists){
+    $popup_format = array(
+      'format' => 'popup_tags',
+      'name' => 'Popup tags',
+      'module' => 'popup_filter',
+      'filters' => array(
+        'popup_tags' => array(
+          'weight' => 0,
+          'status' => 1,
+        ),
+      ),
+    );
+  }
+
+  $popup_format = (object) $popup_format;
+  filter_format_save($popup_format);
+
+  drupal_set_message(t('A <a href="@popup">Popup tags</a> text format has been created.', array('@popup' => url('admin/config/content/formats/' . $popup_format->format))));
+}
+
+
+
+function popup_filter_uninstall() {
+  db_query("DELETE FROM {filter_format} WHERE name='Popup tags'");
+  db_query("DELETE FROM {filter} WHERE module='popup_filter'");
+}

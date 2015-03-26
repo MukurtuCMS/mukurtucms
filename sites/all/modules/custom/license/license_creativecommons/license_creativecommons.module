@@ -1,0 +1,28 @@
+<?php
+
+function license_creativecommons_license_load($data) {
+  if ($data['host'] == 'creativecommons.org') {
+    $info = explode('/', trim($data['path'], '/'));
+    return array(
+      'key' => $info[1],
+      'version' => $info[2],
+      'uri' => $data['uri'],
+      'name' => $data['name'],
+      'type' => 'creativecommons',
+    );
+  }
+}
+
+function license_creativecommons_license_display($license, $entity) {
+  if ($license['type'] == 'creativecommons') {
+    $image = 'http://i.creativecommons.org/l/' . $license['key'] . '/' . $license['version']. '/88x31.png';
+    return license_basic_display($license['uri'], $license['name'], $image, 'Creative Commons License');
+  }
+}
+
+function license_creativecommons_license_display_export($license, $entity) {
+  if ($license['type'] == 'creativecommons') {
+    $image = 'http://i.creativecommons.org/l/' . $license['key'] . '/' . $license['version']. '/88x31.png';
+    return license_basic_display($license['uri'], $license['name'], $image, 'Creative Commons License');
+  }
+}

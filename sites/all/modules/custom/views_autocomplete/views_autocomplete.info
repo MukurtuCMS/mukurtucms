@@ -1,0 +1,16 @@
+name = Views Autocomplete
+description = Make exposed forms autocomplete from a selected URL
+package = Views
+core = 7.x
+dependencies[] = views
+dependencies[] = views_json
+
+; Handlers
+files[] = handlers/views_handler_filter_string_autocomplete.inc
+
+; Plugins
+files[] = plugins/views_plugin_style_autocomplete.inc
+
+; Theme
+files[] = theme/views_views_autocomplete.theme.inc
+files[] = theme/views-views-autocomplete.tpl.php

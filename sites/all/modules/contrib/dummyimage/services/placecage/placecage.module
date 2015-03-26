@@ -1,0 +1,57 @@
+<?php
+/**
+ * @file
+ * Integrates the placecage service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function placecage_dummyimage_service() {
+  return array(
+    'placecage' => array(
+      'title' => t('Placecage'),
+      'url' => 'http://placecage.com/',
+      'form builder' => placecage_form(),
+      'options' => placecage_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the placecage service.
+ */
+function placecage_form() {
+  $form = array();
+  $form['placecage'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Cage'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['placecage']['dummyimage_cage_style'] = array(
+    '#type' => 'radios',
+    '#title' => t('Style of Cage?'),
+    '#description' => t('Pick your favorite style of Cage (results may vary).'),
+    '#default_value' => variable_get('dummyimage_cage_style', ''),
+    '#options' => array(
+      '' => t('Calm'),
+      'g/' => t('Grey'),
+      'c/' => t('Crazy'),
+    )
+  );
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the placecage service.
+ */
+function placecage_options() {
+  return array(
+    'pattern' => 'http://placecage.com/%style%dimensions?image=' . rand(1, 16),
+    'separator' => '/',
+    'replacements' => array(
+      '%style' => variable_get('dummyimage_cage_style', ''),
+    ),
+  );
+}

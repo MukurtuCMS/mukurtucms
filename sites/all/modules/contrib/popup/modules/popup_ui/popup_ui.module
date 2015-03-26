@@ -1,0 +1,147 @@
+<?php
+// $Id:
+
+
+
+/* ----- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_enable
+ *
+ *    Hooked to alter the system weight of this module so that
+ *    the popup_ui hook_popup_attributes_alter is fired before the popup module.
+ *
+ *    It is important that the format attributes are added to the attributes
+ *    array before default values are added.
+ *
+ */
+function popup_ui_enable(){
+
+	module_load_include('inc', 'popup_ui', 'includes/popup_ui.util');
+
+  // Get the weight of popup
+  $weight = @array_pop(
+    db_select('system', 's')
+      ->fields('s', array('weight'))
+      ->condition('name', 'popup', '=')
+      ->execute()
+      ->fetchAssoc()
+  );
+
+  // Set the weight of popup_ui to one less than popup
+  db_update('system')
+    ->fields(
+        array(
+          'weight' => $weight - 1,
+        )
+      )
+    ->condition('name', 'popup_ui', '=')
+    ->execute();
+
+  _popup_ui_flush_all();
+
+}
+
+
+
+/**
+ * Implementation of hook_menu
+ */
+function popup_ui_menu(){
+
+  return array(
+
+    'admin/config/user-interface/popup/settings' => array(
+      'title' => 'Global settings',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    ),
+
+    'admin/config/user-interface/popup/formats' => array(
+      'access arguments' => array('administer popup elements'),
+      'description' => 'Manage popup formats available to Views and CCK',
+      'file' => 'includes/popup_ui.admin.inc',
+      'page arguments' => array('popup_ui_form_formatters'),
+      'page callback' => 'drupal_get_form',
+      'title' => 'Formats',
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 1,
+    ),
+
+    'admin/config/user-interface/popup/formats/delete' => array(
+      'access arguments' => array('administer popup elements'),
+      'file' => 'includes/popup_ui.admin.inc',
+      'page callback' => 'popup_ui_delete_format',
+      'type' => MENU_CALLBACK,
+    ),
+
+    'admin/config/user-interface/popup/formats/whipe' => array(
+      'access arguments' => array('administer popup elements'),
+      'file' => 'includes/popup_ui.admin.inc',
+      'page callback' => 'popup_ui_whipe_formats',
+      'type' => MENU_CALLBACK,
+    ),
+
+    'admin/config/user-interface/popup/formats/reset' => array(
+      'access arguments' => array('administer popup elements'),
+      'file' => 'includes/popup_ui.admin.inc',
+      'page callback' => 'popup_ui_reset',
+      'type' => MENU_CALLBACK,
+    ),
+
+  );
+
+}
+
+
+
+/**
+ *  Implementation of hook_features_api
+ */
+function popup_ui_features_api() {
+
+  return array(
+    'popupformat' => array(
+      'name' => t('Popup formats'),
+      'default_hook' => 'popupformat_defaults',
+      'default_file' => FEATURES_DEFAULTS_INCLUDED_COMMON,
+      'file' =>
+        drupal_get_path('module', 'popup_ui') .
+        '/includes/popup_ui.features.inc',
+    ),
+	);
+
+}
+
+
+
+/**
+ * Implementation of hook_popup_attributes_alter
+ * Hooked to add format attributes
+ */
+function popup_ui_popup_attributes_alter(&$attributes){
+
+  if (isset($attributes['format'])){
+
+    module_load_include('inc', 'popup_ui', 'includes/popup_ui.admin');
+
+    $format_attributes = FALSE;
+    $formats = _popup_ui_formatter_settings();
+
+    if (isset($formats[$attributes['format']]) && is_array($formats[$attributes['format']])){
+
+      // Attributes must always override format settings
+      $attributes = array_merge(
+        $formats[$attributes['format']],
+        $attributes
+      );
+
+    }
+
+    unset($attributes['format']);
+  }
+
+}
+
+

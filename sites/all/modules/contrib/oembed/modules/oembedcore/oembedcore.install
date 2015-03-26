@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Install file for the oembed core
+ */
+
+/**
+ * Implement hook_update_dependencies().
+ */
+function oembedcore_update_dependencies() {
+  $dependencies['oembed'][7001] = array(
+    'oembedcore' => 7004,
+  );
+  return $dependencies;
+}
+
+/**
+ * Move oEmbed render cache to separate bin.
+ */
+function oembedcore_update_7000(&$sandbox) {
+  $table = drupal_get_schema_unprocessed('system', 'cache');
+  db_create_table('cache_oembed', $table);
+}
+
+/**
+ * Drop vestigial oembedcore_preset table which should have been dropped long ago.
+ */
+function oembedcore_update_7001() {
+  if (db_table_exists('oembedcore_preset')) {
+    db_drop_table('oembedcore_preset');
+  }
+}
+
+/**
+ * Rename oembedcore_provider table.
+ */
+function oembedcore_update_7002() {
+  db_rename_table('oembedcore_provider', 'oembed_provider');
+}
+
+/**
+ * Enable oEmbed module which replaces oEmbed Core, oEmbed Field and Media oEmbed.
+ */
+function oembedcore_update_7003() {
+  if (!module_exists('oembed')) {
+    module_enable(array('oembed'));
+  }
+}
+
+/**
+ * Disable and uninstall oEmbed Field, Media oEmbed modules.
+ */
+function oembedcore_update_7004() {
+  module_disable(array('oembedfield', 'media_oembed'));
+  drupal_uninstall_modules(array('oembedfield', 'media_oembed'));
+}

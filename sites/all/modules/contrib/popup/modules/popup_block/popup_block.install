@@ -1,0 +1,19 @@
+<?php
+//$id:
+
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function popup_block_uninstall() {
+
+  $variables = array(
+    'popup-block-settings',
+  );
+
+  foreach($variables as $variable){
+    variable_del($variable);
+  }
+
+}

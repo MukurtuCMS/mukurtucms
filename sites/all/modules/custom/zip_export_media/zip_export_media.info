@@ -1,0 +1,6 @@
+name = Zip Export Media
+description = Exports nodes with Media fields as a Zip file.
+dependencies[] = media
+package = Media
+core = 7.x
+files[] = views/zip_export_media_plugin_style.inc

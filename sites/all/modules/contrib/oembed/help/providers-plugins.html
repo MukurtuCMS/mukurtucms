@@ -1,0 +1,32 @@
+<p>oEmbed Providers plugin data:</p>
+
+<pre>
+'title' => 'Default provider',
+'description' => 'oEmbed provider for remote endpoints',
+
+'scheme callback' => The scheme callback returns an array of regular expressions keyed by
+child plugin name. The scheme callback is called when the plugin is processed by ctools to
+assemble a regular expression of URLs that can be fulfilled by that plugin.
+
+'get child' => The singular 'get child' callback should be used to limit the number of
+plugin definitions that are loaded and cached.
+
+'capture subpatterns' => Local providers extract arguments from the URL. When converting
+the plugin's schemes to regular expressions, the capture subpatterns determines whether
+the $matches array passed around in the request process contains multiple values.
+
+'callback' => Params ($plugin, $url, $matches, $parameters) This callback should return
+an array that is an oEmbed response for the $url and $parameters. If the provider is
+not local, $plugin contains endpoint details. If the provider is local, $matches contains
+arguments from the URL.
+
+'provider' => Boolean to indicate that this plugin is used as an oEmbed provider. Plugins
+that integrate with the oEmbed endpoint so that Drupal content can have an embeddable
+representation available to third party sites are most likely provider plugins.
+'consumer' => Boolean to indicate that this plugin is used as an oEmbed consumer. Plugins
+that integrate with third party sites are most likely consumer plugins.
+
+// If a plugin doesn't indicate TRUE for provider or consumer, it is effectively disabled
+// and will never be used. Plugins may set both 'provider' and 'consumer' to TRUE.
+
+</pre>

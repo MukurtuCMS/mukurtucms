@@ -1,0 +1,28 @@
+<?php
+/**
+ * @file
+ * Integrates the baconmockup service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function baconmockup_dummyimage_service() {
+  return array(
+    'baconmockup' => array(
+      'title' => t('Baconmockup'),
+      'url' => 'http://baconmockup.com/',
+      'options' => baconmockup_options(),
+    ),
+  );
+}
+
+/**
+ * Provides the generate callback for the baconmockup service.
+ */
+function baconmockup_options() {
+  return array(
+    'pattern' => 'http://baconmockup.com/%dimensions',
+    'separator' => '/',
+  );
+}

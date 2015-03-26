@@ -1,0 +1,93 @@
+
+
+/* ---- Border ---- */
+
+.popup-style-white .popup-element-body table.popup-layout{ border-collapse: collapse; margin: 0; padding: 0; position: relative;}
+.popup-style-white .popup-element-body table.popup-layout tbody{ border: none;}
+.popup-style-white .popup-element-body table.popup-layout td{ margin: 0; padding: 0;}
+
+.popup-style-white .popup-element-body .top .left{ background: url('images/top-left.png') no-repeat; height: 55px; width: 55px; padding-left: 55px;}
+.popup-style-white .popup-element-body .top .right{ background: url('images/top-right.png') no-repeat; height: 55px; width: 55px; padding-right: 55px;}
+.popup-style-white .popup-element-body .top .center{ background: url('images/top.png') repeat-x top; height: 55px;}
+
+.popup-style-white .popup-element-body .center .center{ background: url('images/back.png');}
+.popup-style-white .popup-element-body div.inner{ color: #444; margin: -20px -15px; position: relative;}
+.popup-style-white .popup-element-body div.inner a{ color: #222; text-decoration: none;}
+.popup-style-white .popup-element-body div.inner a:hover{ color: #000; text-decoration: underline;}
+
+.popup-style-white .popup-element-body a.popup-close-button{ background: url('images/close.png') left top; display: block; height: 9px; position: absolute; top: -6px; right: -11px; width: 9px;}
+.popup-style-white .popup-element-body a.popup-close-button:active{ background-position: left 9px;}
+.popup-style-white .popup-element-body a.popup-close-button span{ display: none;}
+
+.popup-style-white .popup-element-body .center .left{ background: url('images/left.png') repeat-y left; width: 55px;}
+.popup-style-white .popup-element-body .center .right{ background: url('images/right.png') repeat-y right; width: 55px;}
+
+.popup-style-white .popup-element-body .bottom .left{ background: url('images/bottom-left.png') no-repeat; height: 55px; width: 55px;}
+.popup-style-white .popup-element-body .bottom .right{ background: url('images/bottom-right.png') no-repeat; height: 55px; width: 55px;}
+.popup-style-white .popup-element-body .bottom .center{ background: url('images/bottom.png') repeat-x bottom;}
+
+
+/* ---- Arrows ---- */
+
+/* -- Top left -- */
+
+.popup-style-white .popup-element-body.origin-top-left.expand-top-left table.popup-layout{ top: 20px; left: 20px;}
+.popup-style-white .popup-element-body.origin-top-left.expand-top-left .bottom .right{ background-image: url('images/otl-etl.png');}
+.popup-style-white .popup-element-body.origin-top-left.expand-top-right table.popup-layout{ top: 10px; left: -20px;}
+.popup-style-white .popup-element-body.origin-top-left.expand-top-right .bottom .left{ background-image: url('images/otl-etr.png');}
+.popup-style-white .popup-element-body.origin-top-left.expand-bottom-left table.popup-layout{ top: -30px; left: 5px;}
+.popup-style-white .popup-element-body.origin-top-left.expand-bottom-left .top .right{ background-image: url('images/otl-ebl.png');}
+
+.popup-style-white .popup-element-body.origin-top-left.expand-bottom-right table.popup-layout{ top: -20px; left: -20px;}
+
+/* -- Top right -- */
+
+.popup-style-white .popup-element-body.origin-top-right.expand-top-left table.popup-layout{ top: 10px; left: 20px;}
+.popup-style-white .popup-element-body.origin-top-right.expand-top-left .bottom .right{ background-image: url('images/otr-etl.png');}
+.popup-style-white .popup-element-body.origin-top-right.expand-top-right table.popup-layout{ top: 20px; left: -20px;}
+.popup-style-white .popup-element-body.origin-top-right.expand-top-right .bottom .left{ background-image: url('images/otr-etr.png');}
+
+.popup-style-white .popup-element-body.origin-top-right.expand-bottom-left table.popup-layout{ top: -20px; left: 20px;}
+
+.popup-style-white .popup-element-body.origin-top-right.expand-bottom-right table.popup-layout{ top: -30px; left: -5px;}
+.popup-style-white .popup-element-body.origin-top-right.expand-bottom-right .top .left{ background-image: url('images/otr-ebr.png');}
+
+/* -- Bottom left -- */
+
+.popup-style-white .popup-element-body.origin-bottom-left.expand-top-left table.popup-layout{ top: 35px; left: 5px;}
+.popup-style-white .popup-element-body.origin-bottom-left.expand-top-left .bottom .right{ background-image: url('images/obl-etl.png');}
+
+.popup-style-white .popup-element-body.origin-bottom-left.expand-top-right table.popup-layout{ top: 20px; left: -20px;}
+
+.popup-style-white .popup-element-body.origin-bottom-left.expand-bottom-left table.popup-layout{ top: -20px; left: 15px;}
+.popup-style-white .popup-element-body.origin-bottom-left.expand-bottom-left .top .right{ background-image: url('images/obl-ebl.png');}
+.popup-style-white .popup-element-body.origin-bottom-left.expand-bottom-right table.popup-layout{ top: -5px; left: -20px;}
+.popup-style-white .popup-element-body.origin-bottom-left.expand-bottom-right .top .left{ background-image: url('images/obl-ebr.png');}
+
+/* -- Bottom right -- */
+
+.popup-style-white .popup-element-body.origin-bottom-right.expand-top-left table.popup-layout{ top: 20px; left: 20px;}
+
+.popup-style-white .popup-element-body.origin-bottom-right.expand-top-right table.popup-layout{ top: 35px; left: -10px;}
+.popup-style-white .popup-element-body.origin-bottom-right.expand-top-right .bottom .left{ background-image: url('images/obr-etr.png');}
+.popup-style-white .popup-element-body.origin-bottom-right.expand-bottom-left table.popup-layout{ top: -5px; left: 20px;}
+.popup-style-white .popup-element-body.origin-bottom-right.expand-bottom-left .top .right{ background-image: url('images/obr-ebl.png');}
+.popup-style-white .popup-element-body.origin-bottom-right.expand-bottom-right table.popup-layout{ top: -20px; left: -20px;}
+.popup-style-white .popup-element-body.origin-bottom-right.expand-bottom-right .top .left{ background-image: url('images/obr-ebr.png');}
+
+
+/* ---- Menus ---- */
+
+.popup-style-white .popup-element-body .popup-menu-branch,
+.popup-style-white .popup-element-body .popup-menu-item{ display: block;}
+
+.popup-style-white .popup-element-body .popup-menu-branch div.inner{ width: 150px;}
+
+.popup-style-white .popup-element-body div.inner .popup-menu-leaf-title,
+.popup-style-white .popup-element-body div.inner .popup-menu-branch-title{ color: #444; margin: 0 0 0 -15px; padding: 0 0 0 15px; text-decoration: none !important;}
+.popup-style-white .popup-element-body .popup-menu-branch-title{ background: url('images/menu-arrow.png') no-repeat right 5px;}
+
+.popup-style-white .popup-element-body div.inner .popup-menu-leaf-title:hover,
+.popup-style-white .popup-element-body div.inner .popup-menu-branch-title.popup-title-active{ color: #fff; background-color: #888; background-position: right -17px;}
+
+

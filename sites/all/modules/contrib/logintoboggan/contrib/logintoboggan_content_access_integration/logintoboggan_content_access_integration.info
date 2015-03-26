@@ -1,0 +1,14 @@
+
+name = "LoginToboggan Content Access Integration"
+description = "Integrates LoginToboggan with Content Access module, so that Non-validated users are handled correctly"
+core = "7.x"
+
+dependencies[] = logintoboggan
+dependencies[] = content_access
+
+; Information added by Drupal.org packaging script on 2014-07-08
+version = "7.x-1.4"
+core = "7.x"
+project = "logintoboggan"
+datestamp = "1404818634"
+

@@ -1,0 +1,39 @@
+oEmbed 6.x-0.9, xxxx-xx-xx
+------------------------------
+#892988 by bangpound: Use ctools export UI for presets, providers.
+#966122 by voxpelli: Cache clearing calls was missing table
+#992124 by voxpelli: Improved the handling of invalid oEmbed responses
+by voxpelli: Flush provider cache on Embed.ly refresh
+
+oEmbed 6.x-0.8, 2010-12-14
+------------------------------
+by voxpelli: Security fix for access bypass
+
+oEmbed 6.x-0.7, 2010-10-20
+------------------------------
+by voxpelli: Disabled providers wasn't really disabled
+by voxpelli: Coding style fix
+by voxpelli: Removed oohEmbed provider
+by voxpelli: Updated scheme for Vimeo
+by voxpelli: Prefixed provider names of Embedly providers
+by voxpelli: Prevented endless recursion in oEmbed Provider
+by voxpelli: Improved responses for failed request to oEmbed Provider
+#890504 by bangpound: Fixed unnecessary saving of provider cache
+#890496 by bangpound: Fixed adding, enabling etc. of a provider not clearing the provider cache
+#890490 by bangpound: Fixed module preprocessors not working with oEmbed Field.
+
+oEmbed 6.x-0.6, 2010-05-28
+------------------------------
+#692392 by Bohman, VoxPelli: Fixed surrounding styles prevent embedding
+by voxpelli: Use drupal_http_request()
+by voxpelli: Add exportable user definable providers
+by voxpelli: Add support for all of Embed.ly:s embeds
+by voxpelli: Fixed bug with default width and height being zero when they shouldn't be set at all
+
+oEmbed 6.x-0.5, 2010-02-21
+------------------------------
+by voxpelli: Added CCK field
+by voxpelli: Added hook for provider definitions
+by voxpelli: Improved theming
+by voxpelli: Added exportable presets/settings for CCK fields (not yet added
+  for the input filters)

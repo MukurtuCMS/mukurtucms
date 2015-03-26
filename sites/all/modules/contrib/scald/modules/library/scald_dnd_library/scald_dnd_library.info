@@ -1,0 +1,18 @@
+name = Scald DnD Library
+description = "Bridge between Scald and DnD"
+package = Scald
+core = 7.x
+dependencies[] = scald
+dependencies[] = dnd
+dependencies[] = views
+
+files[] = includes/scald_dnd_library.views.inc
+files[] = includes/scald_plugin_display_library.inc
+files[] = includes/scald_plugin_style_library.inc
+
+; Information added by Drupal.org packaging script on 2014-12-14
+version = "7.x-1.3"
+core = "7.x"
+project = "scald"
+datestamp = "1418595782"
+

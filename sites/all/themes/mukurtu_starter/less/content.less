@@ -1,0 +1,562 @@
+//// Scald
+@import 'variables.less';
+
+// Scald library (drawer on node view)
+.scald-library {
+  .view-content {
+    li._insert  {
+      display: none;
+    }
+  }
+}
+
+// Reduce the huge file icon size
+.file-icon {
+  width: 20px;
+  height: auto;
+}
+
+// Scald atom add modal
+
+.page-node-edit .ctools-modal-content,.page-node-add .ctools-modal-content {
+
+  // Hide the background box
+  background: none !important;
+  border: none !important;
+  width: auto !important;
+
+  // Video upload source pages (choose between Drupal, Youtube, Vimeo, etc., and the follow-up page where you specify the external URL) is the only modal that needs to be sized. The plupload page of the modal sizes cleanly now that the themes are cleaned up.
+
+  // I am unable to use auto values here; have to use static pixel widths, so these values will need to be adjusted when the font size or other styling changes.
+  #scald-atom-add-form-source,.form-item-identifier {
+    width: 610px;
+    #edit-source,#edit-identifier {
+      width: 400px;
+    }
+  }
+
+}
+
+
+//// Popup API
+
+.popup-element-title {
+  background: none;
+}
+
+
+//// Dashboard video help link
+.video-help-embedded {
+  float: right;
+  width: 400px;
+}
+
+//// All node edits / adds
+
+// Hide the description field on long text fields because we have hacked bootstrap to show them as a tooltip
+.page-node-edit, .page-node-add {
+  .text-format-wrapper .description {
+    display: none;
+  }
+}
+
+//// Collections
+
+#edit-field-digital-heritage-items .field-label {
+  display: none;
+}
+
+//// Collections SAPI page
+// Hide the label on the search box. Not sure what I did on DH to not require this on that sapi page.
+#edit-search-api-views-fulltext-wrapper label {
+  display: none;
+}
+
+//// DH node form
+
+.node-type-digital-heritage, .page-node-add-digital-heritage {
+
+  // The following is taken from former mukurtu_protocol_field.css
+  /* hiding the og ref field for digital heritage items */
+  div.form-item table .form-type-textfield,
+  div.form-item table .form-type-textfield * {
+    display: inline-block;
+  }
+  #edit-og-group-ref {
+    display:none;
+  }
+}
+
+//// Community node form
+
+.node-type-community, .page-node-add-community {
+
+  #edit-group-access {
+    display:none;
+  }
+}
+
+
+//// Digital Heritage grid/list view
+
+// Hide the embededed videos (the thumbnail will display instead)
+.view-id-digital_heritage_grid_list iframe {
+  display: none;
+}
+
+
+//// Grid/List Views (both DH and Collections)
+
+// toggle display via the grid/list clicker
+
+
+.pane-community-dh-items-protocol,
+.pane-community-dh-items-community {
+  .pane-title {
+    font-size:16px;
+    border-top:1px solid #ECEBEB;
+    padding-top:20px;
+    text-transform: uppercase;
+  }
+  .view-community-dh-items {
+    .view-content {
+      .views-row {
+        border-bottom: 1px solid #ECEBEB;
+        margin: 30px 0;
+        padding: 0 0 30px 0;
+        &.views-row-first {
+          margin-top:0;
+        }
+      }
+    }
+  }
+}
+
+.view-digital-heritage-grid-list,
+.view-collections-grid-list {
+  .view-header {
+    float:right;
+    margin-top:-60px;
+    margin-right: 20px;
+
+    a {
+      font-weight: 200;
+      color: @link-color;
+      padding: 2px 8px;
+      &.active {
+        color:white;
+        background: @gray;
+      }
+    }
+  }
+
+  &.list-view {
+    .node-digital-heritage.view-mode-search_result > div {
+      padding:0;
+    }
+    .view-content {
+      .views-row {
+        border-bottom: 1px solid #ECEBEB;
+        margin: 30px 0;
+        padding: 0 0 30px 0;
+        &.views-row-first {
+          margin-top:0;
+        }
+
+        .field-name-field-media-asset,
+        .field-name-field-collection-image {
+
+          right:0;
+        }
+      }
+    }
+  }
+
+  &.grid-view {
+    .view-content {
+      margin-left: -25px;
+      margin-right: -25px;
+
+      .placeholder-image, .field-name-field-collection, .field-name-field-description {
+        display: none;
+      }
+      .views-row {
+        float: left;
+        width: 220px;
+        background: #F8F7F7;
+        margin: 0 25px 20px 25px;
+        padding-bottom: 20px;
+
+
+        .field-name-field-media-asset,
+        .field-name-field-collection-image {
+          width: 100%;
+          padding: 0;
+          left:0;
+        }
+        .group_list_view_fields {
+          right: 0;
+          width: 100%;
+        }
+        .field-name-title h2,
+        .field-name-collections-title-with-count h2 {
+          font-size: 140%;
+        }
+        .label-inline {
+          float:none;
+          font-weight: bold;
+          display:none;
+        }
+      }
+    }
+    .text-center {
+      clear: both;
+    }
+  }
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+// general fields
+
+.field {
+  .label-inline {
+    float:left;
+    font-weight: bold;
+  }
+  .label-above {
+    font-weight:bold;
+  }
+}
+
+.panel-panel .right-pane,
+.pane-block {
+  background: #F8F7F7;
+  border-radius: 5px;
+  h2.pane-title {
+    background: #E3E2E1;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 5px 10px;
+    padding: 10px 20px;
+    font-size: 140%;
+    font-weight: 400;
+  }
+  .pane-content {
+    padding-left:20px;
+    padding-bottom:10px;
+    .view-content {
+      line-height:25px;
+    }
+  }
+}
+
+.management-links {
+  margin-top: 15px;
+  .pane-content {
+    padding-bottom: 0;
+    a.btn:hover {
+      color:@link-hover-color;
+    }
+  }
+}
+
+// facets
+.facetapi-processed {
+  padding-bottom: 10px;
+  padding-left: 0;
+  input[type="radio"], input[type="checkbox"] {
+    margin: 7px 8px 7px 0;
+  }
+}
+
+// Tooltips
+a.tooltips span {
+
+}
+// Show tooltips in grid view only
+.grid-view {
+ .tooltips span {
+    top: 0px;
+    left: 0px;
+    width: 220px;
+    z-index: 999;
+  }
+}
+
+
+//// Banner images (Community and Cultural Protocol nodes)
+
+// Shrink or expand the banner image to full width and then set height to auto to maintain aspect ratio. User is expected to upload an appropriately proportioned image for the banner
+
+.field-name-field-protocol-image, .field-name-field-community-image {
+  .field-name-scald-thumbnail img {
+    width:100%;
+    height:auto;
+  }
+}
+
+//// Organic Groups Add and Manage Members links
+.add-manage-members-links {
+  margin-top: 1em;
+}
+
+.nav-top-wrapper {
+  background: #474440;
+}
+.navbar-top {
+  &.navbar.container {
+    margin-top: 0;
+  }
+  background:none;
+  border:none;
+  border-radius:0;
+  ul.nav {
+    width:100%;
+    li {
+      background: #585551;
+      margin: 8px 2px;
+      &.last {
+        float:right;
+        border-radius: 4px;
+        border: 1px solid #979797;
+        background:none;
+      }
+
+      a {
+        color: #F5F5F5;
+        padding: 6px 10px;
+      }
+      &:hover {
+        background: #F4EADE;
+        a {
+          color: #474440;
+        }
+      }
+    }
+  }
+}
+
+.navbar-bottom {
+  border:none;
+  border-radius:0;
+  background:none;
+  ul.nav {
+    margin-top:10px;
+    li {
+      border:1px solid #E3E2E1;
+      border-radius: 4px;
+      background:white;
+      margin:10px;
+      a {
+        color: #595855;
+        padding: 14px 22px;
+        font-size:20px;
+      }
+      &.active,
+      &:hover {
+        border:1px solid #E4E2E1;
+        background: #E4E2E1;
+        a {
+          color: black;
+        }
+      }
+    }
+  }
+}
+
+#navbar {
+  margin-bottom:0;
+  background:#F8F7F7;
+}
+#page-header .navbar-default {
+  margin:0 0 20px 0;
+
+
+}
+
+.ds-2col > .group-right {
+  background: #F8F7F7;
+  border-radius:4px;
+  padding: 30px;
+  .field {
+    margin-bottom:10px;
+    .label-above {
+      text-transform: uppercase;
+      font-weight: 500;
+      color:black;
+    }
+  }
+}
+.node-type-digital-heritage {
+
+  .group_scald_atom_metadata {
+    .popup-element {
+      width: 100%;
+      text-align: right;
+      height:20px;
+    }
+  }
+  .group_scald_atom_metadata {
+    border-bottom:1px solid #ECEBEB;
+    padding-bottom:10px;
+    margin-bottom:10px;
+  }
+}
+
+// collection node DH list view
+.field-name-field-digital-heritage-items {
+  .group-list-view-fields {
+    padding:0;
+  }
+  .node-digital-heritage {
+    border-bottom: 1px solid #ECEBEB;
+    margin: 30px 0;
+    padding: 0 0 30px 0;
+  }
+  .label-above {
+    margin-bottom: -30px;
+  }
+}
+
+.ds-2col > .group-left {
+  .field {
+    margin-bottom:10px;
+  }
+  .label-above {
+    text-transform: uppercase;
+    color:black;
+    font-size:22px;
+    font-weight: 300;
+  }
+}
+
+@media (max-width: @screen-md-min) {
+  .ds-2col > .group-left {
+    width: auto;
+    float:none;
+  }
+  .ds-2col > .group-right {
+    width: auto;
+    float: none;
+  }
+}
+
+@media (min-width: @screen-md-min) {
+  .navbar .logo {
+    margin: 10px 0 20px;
+  }
+  .ds-2col > .group-left {
+    width: 66%;
+  }
+  .ds-2col > .group-right {
+    width: 30%;
+    float: right;
+  }
+
+  .panel-2col-stacked .panel-col-last {
+    float: right;
+    width: 40%;
+  }
+
+  .panel-2col-stacked {
+    .panel-col-first {
+      float: left;
+      width: 73%;
+    }
+    .panel-col-last {
+      float: right;
+      width: 25%;
+    }
+
+  }
+}
+
+
+/* Dashboard theming **/
+
+#homebox .homebox-portlet {
+  .homebox-portlet-inner {
+    border:none;
+  }
+  h3.portlet-header {
+    background: #E3E2E1;
+    padding: 10px 15px;
+    font-size: 140%;
+    font-weight: 400;
+  }
+  .portlet-content {
+    padding:10px 15px;
+    dd {
+      margin-bottom:10px;
+      color: #666;
+    }
+    .view-content {
+      ul {
+        padding-left: 0px;
+        margin-top:5px;
+        list-style:none;
+        li {
+          margin-bottom:10px;
+        }
+      }
+    }
+  }
+}
+
+// wizard
+#block-mukurtu-splash-mukurtu-wizard {
+  h2.block-title {
+    display:none;
+  }
+  .btn {   margin-bottom: 10px; }
+}
+.wizard-tabs {
+  margin-bottom:10px;
+  .ui-tabs-nav {
+    background:none;
+    border:none;
+    border-radius:0;
+    line-height: 28px;
+    padding:0;
+    li {
+      background: #585551;
+      margin: 0;
+      padding: 0;
+      a {
+        color: #F5F5F5;
+        padding: 6px 10px;
+      }
+      &:hover,
+      &.ui-state-active {
+        background: #e7e7e7;
+        a {
+          color: #474440;
+        }
+      }
+    }
+  }
+  .ui-tabs-panel {
+    padding: 0 20px 20px 20px;
+    border-style: solid none none;
+    border-top-width: 1px;
+    border-top-color: #aaa;
+    a {
+      color:@link-color;
+    }
+  }
+}
+
+.masonry-grid {
+  .masonry-brick {
+    width: 227px;
+
+  }
+}
+
+// dont know why this needs to be added
+.ui-tabs .ui-tabs-hide {
+  display: none !important;
+}

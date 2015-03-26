@@ -1,0 +1,547 @@
+<?php
+/**
+ * @file
+ * Defines a special textarea, with drag and drop media driven by Scald and
+ * dnd.module.
+ */
+
+define('MEE_RENDERED_COPYRIGHT_PATTERN', '/<!--\s*copyright=(\d+)\s*-->(.*)<!--\s*END copyright=\1\s*-->/sU');
+
+/**
+ * Implements hook_theme().
+ */
+function mee_theme($existing, $type, $theme, $path) {
+  return array(
+    'mee_resource_manager' => array(
+      'render element' => 'resource_manager',
+    ),
+  );
+}
+
+/**
+ * Implements hook_library().
+ */
+function mee_library() {
+  $path = drupal_get_path('module', 'mee');
+  $libraries['library'] = array(
+    'title' => 'MEE Library',
+    'website' => 'http://drupal.org/project/scald',
+    'version' => '1.x',
+    'js' => array(
+      $path . '/mee.js' => array(),
+      array(
+        'type' => 'setting',
+        'data' => array(
+          'mee' => array(
+            'sas' => variable_get('mee_store_sas', TRUE),
+            'editors' => array(),
+          ),
+        ),
+      ),
+    ),
+    'css' => array(
+      $path . '/css/mee.css' => array(),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_field_info_alter().
+ */
+function mee_field_info_alter(&$info) {
+  foreach (mee_field_types() as $name) {
+    $info[$name]['instance_settings']['dnd_enabled'] = 0;
+    $info[$name]['instance_settings']['mee_enabled'] = 0;
+    $info[$name]['instance_settings']['context'] = '';
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Normally this should go in a hook_field_instance_settings_form() if the field
+ * belongs to the module. But it is not the case, so we implement in a form
+ * alter.
+ */
+function mee_form_alter(&$form, &$form_state, $form_id) {
+  // Verify if we are in the instance settings form.
+  if ($form_id !== 'field_ui_field_edit_form' || !in_array($form['#field']['type'], mee_field_types())) {
+    return;
+  }
+
+  $settings = $form['#instance']['settings'];
+
+  $context_options = array();
+  foreach (scald_contexts() as $name => $context) {
+    $context_options[$name] = $context['title'];
+  }
+
+  $form['instance']['settings']['dnd_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Drag\'n\'Drop Enabled'),
+    '#description' => t('Enable DnD for this field will show the Atom library and will allow you to drag and drop atoms to this field.'),
+    '#default_value' => $settings['dnd_enabled'],
+  );
+  $form['instance']['settings']['mee_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('MEE Enabled'),
+    '#description' => t('Enable MEE for this field to get access to an advance resource management interface. MEE will automatically detect the resources embedded in this field, and allow you to define a few metadata properties on them, e.g. choose if the node should be unpublished if at some point in the future the resource became unavailable.'),
+    '#default_value' => $settings['mee_enabled'],
+  );
+  $form['instance']['settings']['context_default'] = array(
+    '#type' => 'select',
+    '#title' => t('Scald default context'),
+    '#description' => t('You can customize field level default context for drag and drop atoms.'),
+    '#default_value' => isset($settings['context_default']) ? $settings['context_default'] : variable_get('dnd_context_default', 'sdl_editor_representation'),
+    '#options' => $context_options,
+  );
+  $form['instance']['settings']['context'] = array(
+    '#type' => 'select',
+    '#title' => t('Scald fallback context'),
+    '#description' => t('The fallback context is only used when the specified context for embedded atom is not available (e.g. deleted).'),
+    '#default_value' => $settings['context'],
+    '#options' => $context_options,
+  );
+}
+
+/**
+ * Implements hook_field_presave() on behalf of Text module.
+ *
+ * @todo Find a better approach to avoid possible collision with other "tricky"
+ * modules. However we should be safe with Drupal 7 core.
+ */
+function text_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  // Convert rendered atom back to SAS for on the fly render if required
+  if (!variable_get('mee_store_sas', TRUE)) {
+    return;
+  }
+
+  foreach ($items as $delta => &$item) {
+    if (!empty($item['value'])) {
+      $item['value'] = scald_rendered_to_sas($item['value']);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_insert() on behalf of Text module.
+ *
+ * @see text_field_presave()
+ */
+function text_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if (!_mee_field_instance_enabled($instance, 'mee')) {
+    return;
+  }
+
+  list($id, $revision_id) = _mee_extract_id($entity_type, $entity);
+
+  foreach ($items as $delta => $item) {
+    list($sids, $copyrights) = _mee_process_item_value($item, $entity_type, $entity, $field, $delta);
+
+    // Normalize the weight, putting our separator at 0.
+    $separator = $item['mee']['resource_manager'][0]['weight'];
+
+    foreach ($sids as $sid) {
+      $resource = $item['mee']['resource_manager'][$sid];
+      db_insert('mee_resource')
+          ->fields(array(
+            'entity_type' => $entity_type,
+            'entity_id' => $id,
+            'revision_id' => $revision_id,
+            'atom_sid' => $sid,
+            'field' => $field['field_name'],
+            'delta' => $delta,
+            'weight' => $resource['weight'] - $separator,
+            'required' => (int) $resource['required'],
+            'copyright' => isset($copyrights[$sid]) ? $copyrights[$sid] : '',
+          ))
+          ->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_field_update() on behalf of Text module.
+ *
+ * @see text_field_presave()
+ */
+function text_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if (!_mee_field_instance_enabled($instance, 'mee')) {
+    return;
+  }
+
+  list($id, $revision_id) = _mee_extract_id($entity_type, $entity);
+
+  foreach ($items as $delta => $item) {
+    list($sids, $copyrights) = _mee_process_item_value($item, $entity_type, $entity, $field, $delta);
+
+    // In fact, we'll delete all the associations and recreate afterwards
+    // the needed one, to be sure that new resources are correctly
+    // registered, and that no longer used one are removed.
+    db_delete('mee_resource')
+        ->condition('entity_type', $entity_type)
+        ->condition('entity_id', $id)
+        ->condition('revision_id', $revision_id)
+        ->condition('field', $field['field_name'])
+        ->condition('delta', $delta)
+        ->execute();
+
+    // Normalize the weight, putting our separator at 0.
+    $separator = $item['mee']['resource_manager'][0]['weight'];
+
+    foreach ($sids as $sid) {
+      $resource = $item['mee']['resource_manager'][$sid];
+      db_insert('mee_resource')
+          ->fields(array(
+            'entity_type' => $entity_type,
+            'entity_id' => $id,
+            'revision_id' => $revision_id,
+            'atom_sid' => $sid,
+            'field' => $field['field_name'],
+            'delta' => $delta,
+            'weight' => $resource['weight'] - $separator,
+            'required' => isset($resource['required']) ? (int) $resource['required'] : 0,
+            'copyright' => isset($copyrights[$sid]) ? $copyrights[$sid] : '',
+          ))
+          ->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_field_delete() on behalf of Text module.
+ *
+ * @see text_field_presave()
+ */
+function text_field_delete($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  if (!_mee_field_instance_enabled($instance, 'mee')) {
+    return;
+  }
+
+  list($id, ) = _mee_extract_id($entity_type, $entity);
+
+  // Delete all resource associations for this field
+  db_delete('mee_resource')
+      ->condition('entity_type', $entity_type)
+      ->condition('entity_id', $id)
+      ->condition('field', $field['field_name'])
+      ->execute();
+}
+
+/**
+ * Implements hook_field_attach_view_alter.
+ *
+ * Converts the SAS representation to the rendered representation.
+ */
+function mee_field_attach_view_alter(&$output, $context) {
+  if (variable_get('mee_store_sas', TRUE)) {
+    list($id, $revision_id, $bundle) = entity_extract_ids($context['entity_type'], $context['entity']);
+    $fields = field_info_instances($context['entity_type'], $bundle);
+    foreach ($fields as $name => $field) {
+      if (!empty($field['settings']['dnd_enabled']) && isset($output[$name])) {
+        foreach (element_children($output[$name]) as $key) {
+          $output[$name][$key]['#markup'] = scald_sas_to_rendered($output[$name][$key]['#markup'], $field['settings']['context']);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function mee_field_widget_form_alter(&$element, &$form_state, $context) {
+  $enables = _mee_field_instance_enabled($context['instance']);
+
+  // In any case, convert SAS into rendered for format textarea
+  if (in_array($context['field']['type'], mee_field_types()) && isset($element['#default_value'])) {
+    if (variable_get('mee_store_sas', TRUE)) {
+      $element['#default_value'] = scald_sas_to_rendered($element['#default_value'], $context['instance']['settings']['context']);
+    }
+  }
+
+  // Activate DnD Library for this element if enabled.
+  if (!empty($enables['dnd'])) {
+    // Force an #id so that we can reference to it later
+    $element['#id'] = drupal_html_id('edit-' . $context['field']['field_name']);
+    $element += array(
+      '#dnd-enabled' => TRUE,
+      '#dnd-settings' => array(
+        'drop_selector' => '#' . $element['#id'] . ' .drop',
+      ),
+    );
+  }
+
+  // Add our custom form element into MEE enabled textarea only.
+  if (empty($enables['mee'])) {
+    return;
+  }
+
+  $element['mee'] = array(
+    '#prefix' => '<div class="mee-wrap-editor-library">',
+    '#suffix' => '</div>',
+    '#attached' => array(
+      'library' => array(array('mee', 'library')),
+    ),
+    '#element_validate' => array('mee_field_text_validate'),
+    '#weight' => 0.5,
+    'resource_manager' => array(
+      '#theme' => 'mee_resource_manager',
+    ),
+  );
+
+  $resource_manager = array();
+  // 'input' is used instead of 'values' because we need extra items inserted
+  // using JavaScript on the client side.
+  if (isset($form_state['input'][$context['field']['field_name']][$context['langcode']])) {
+    $resource_manager = $form_state['input'][$context['field']['field_name']][$context['langcode']][$context['delta']]['mee']['resource_manager'];
+  }
+  elseif (isset($element['#entity'])) {
+    $item = array();
+    _mee_load_resources($element['#entity_type'], $element['#entity'], $context['field'], $context['delta'], $item);
+    $resource_manager = $item['mee']['resource_manager'];
+  }
+
+  foreach ($resource_manager as $sid => $item) {
+    $atom = scald_fetch($sid);
+    if (!is_object($atom)) {
+      continue;
+    }
+
+    // Render the atom to get sanitized values.
+    $title = scald_render($atom, 'title');
+
+    $element['mee']['resource_manager'][$sid] = array(
+      'title' => array(
+        '#markup' => $title,
+      ),
+      'required' => array(
+        '#type' => 'select',
+        '#options' => array(t('Optional'), t('Required')),
+        '#default_value' => $item['required'],
+      ),
+      'weight' => array(
+        '#type' => 'weight',
+        '#default_value' => $item['weight'],
+      ),
+      '#weight' => $item['weight'],
+    );
+  }
+
+  // And now we add the separator
+  $element['mee']['resource_manager'][0] = array(
+    'title' => array(
+      '#markup' => t('< Primary / Secondary >'),
+    ),
+    'required' => array(
+      '#markup' => '-',
+    ),
+    'weight' => array(
+      '#type' => 'weight',
+      '#prefix' => '<div class="mee-rm-separator">',
+      '#suffix' => '</div>',
+    ),
+    '#weight' => isset($resource_manager[0]['weight']) ? $resource_manager[0]['weight'] : 0,
+  );
+}
+
+/**
+ * Validate callback for mee_field_widget_form.
+ */
+function mee_field_text_validate($element, &$form_state) {
+  foreach ($form_state['field'] as $field_name => $values) {
+    foreach ($values as $langcode => $data) {
+      if (isset($form_state['values'][$field_name][$langcode]) && is_array($form_state['values'][$field_name][$langcode]) && isset($form_state['values'][$field_name][$langcode][0]['mee']) && isset($form_state['input'][$field_name][$langcode][0]['mee'])) {
+        $form_state['values'][$field_name][$langcode][0]['mee'] = $form_state['input'][$field_name][$langcode][0]['mee'];
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to return a list of supported field.
+ *
+ * Note that only fields defined in the core Text module (text, text_long,
+ * text_with_summary) are eligible due to the actual implementation.
+ */
+function mee_field_types() {
+  return variable_get('mee_field_types', array('text', 'text_long', 'text_with_summary'));
+}
+
+/**
+ * Implements hook_scald_atom_delete().
+ */
+function mee_scald_atom_delete($atom) {
+  // @todo Verify if the deleted atom is required for some nodes, they will be
+  // unpublished.
+
+  // Then delete all links in the Resource manager.
+  db_delete('mee_resource')
+    ->condition('atom_sid', $atom->sid)
+    ->execute();
+}
+
+/**
+ * Implements hook_node_revision_delete().
+ */
+function mee_node_revision_delete($revision) {
+  // Delete all resource associations for this revision
+  db_delete('mee_resource')
+    ->condition('entity_type', 'node')
+    ->condition('entity_id', $revision->nid)
+    ->condition('revision_id', $revision->vid)
+    ->execute();
+}
+
+/**
+ * Implements hook_ckeditor_filter_xss_allowed_tags().
+ */
+function mee_ckeditor_filter_xss_allowed_tags() {
+  // The comment "tag" is used to mark parseable atom. It is currently required
+  // for the dnd plugin to work. Add it to the CKEditor XSS allowed tags.
+  return array('!--');
+}
+
+/**
+ * Returns HTML for the MEE resource list.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - resource_manager: A render element representing the MEE resource list.
+ */
+function theme_mee_resource_manager($variables) {
+  $form = $variables['resource_manager'];
+  static $count = 0;
+  $id = 'mee-resource-manager-' . $count;
+  drupal_add_tabledrag($id, 'order', 'sibling', 'mee-rm-weight');
+
+  $count++;
+  $header = array(t('Title'), t('Required'), t('Weight'));
+  $rows = array();
+  foreach (element_children($form) as $key) {
+    $form[$key]['weight']['#attributes']['class'] = array('mee-rm-weight');
+    $row = array();
+    $row[] = drupal_render($form[$key]['title']);
+    $row[] = drupal_render($form[$key]['required']);
+    $row[] = drupal_render($form[$key]['weight']);
+    $rows[] = array('data' => $row, 'class' => array('draggable'));
+  }
+
+  $output = theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array(
+      'id' => $id,
+      'class' => array('mee-resource-manager'),
+    ),
+    'caption' => t('Resource Manager'),
+  ));
+  $output .= drupal_render_children($form);
+
+  return $output;
+}
+
+/**
+ * Tests if MEE is supported and enabled for this field instance.
+ */
+function _mee_field_instance_enabled($instance, $key = NULL) {
+  $enables = array('mee' => FALSE, 'dnd' => FALSE);
+
+  if (!empty($instance['settings']['mee_enabled'])) {
+    $enables['mee'] = TRUE;
+  }
+  if (!empty($instance['settings']['dnd_enabled'])) {
+    $enables['dnd'] = TRUE;
+  }
+
+  return $key ? $enables[$key] : $enables;
+}
+
+/**
+ * Extract entity id, santizing revision_id if necessary.
+ */
+function _mee_extract_id($entity_type, $entity) {
+  list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
+
+  // The revision_id is part of the primary key, and thus
+  // can't be NULL in some databases. Follow Field SQL Storage
+  // pattern and use the entity_id as a revision_id.
+  if (!isset($revision_id)) {
+    $revision_id = $entity_id;
+  }
+
+  return array($entity_id, $revision_id);
+}
+
+/**
+ * Extracts sids and copyright from $item. Updates $item if necessary.
+ */
+function _mee_process_item_value(&$item, $entity_type, $entity, $field, $delta) {
+  // $sids contients the list of atom sid actually used in the item.
+  $sas = scald_rendered_to_sas($item['value']);
+  $scald_included = scald_included($sas);
+  $sids = array_unique($scald_included);
+
+  // Parse copyright informations
+  $copyrights = mee_extract_copyrights($item['value']);
+
+  // If $item['mee'] does not hold anything, load default data into it.
+  if (empty($item['mee']) || !is_array($item['mee']['resource_manager'])) {
+    _mee_load_resources($entity_type, $entity, $field, $delta, $item);
+  }
+
+  // Finally, if there was unknown client-side problem, we might not have new
+  // inserted resources. We set default value for them.
+  foreach ($sids as $sid) {
+    if (!isset($item['mee']['resource_manager'][$sid])) {
+      $item['mee']['resource_manager'][$sid] = array('required' => FALSE, 'weight' => 0);
+    }
+  }
+
+  return array($sids, $copyrights);
+}
+
+/**
+ * Load used resource in an entity into an array.
+ *
+ * @param $item renderable array to render the field
+ */
+function _mee_load_resources($entity_type, $entity, $field, $delta, &$item) {
+  list($id, $revision_id) = _mee_extract_id($entity_type, $entity);
+  $result = db_select('mee_resource', 'r')
+      ->fields('r', array('atom_sid', 'weight', 'required'))
+      ->condition('entity_type', $entity_type)
+      ->condition('entity_id', $id)
+      ->condition('revision_id', $revision_id)
+      ->condition('field', $field['field_name'])
+      ->condition('delta', $delta)
+      ->execute();
+  $item['mee']['resource_manager'] = array();
+  $item['mee']['resource_manager'] = $result->fetchAllAssoc('atom_sid', PDO::FETCH_ASSOC);
+  $item['mee']['resource_manager'][0] = array('weight' => 0, 'required' => FALSE);
+}
+
+/**
+ * Extract all copyright informations from a string.
+ */
+function mee_extract_copyrights($string) {
+  $copyrights = array();
+  if (preg_match_all(MEE_RENDERED_COPYRIGHT_PATTERN, $string, $matches)) {
+    foreach ($matches[1] as $key => $sid) {
+      $copyrights[$sid] = $matches[2][$key];
+    }
+  }
+  return $copyrights;
+}
+
+/**
+ * Implements hook_wysiwyg_include_directory().
+ */
+function mee_wysiwyg_include_directory($type) {
+  switch ($type) {
+    case 'plugins':
+      return $type;
+  }
+}

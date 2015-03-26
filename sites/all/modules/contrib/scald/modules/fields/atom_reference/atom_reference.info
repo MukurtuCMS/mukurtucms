@@ -1,0 +1,19 @@
+name = Atom Reference
+package = Scald
+core = 7.x
+
+dependencies[] = field
+dependencies[] = scald
+dependencies[] = dnd
+
+files[] = atom_reference.test
+; Migrate handler
+files[] = atom_reference.migrate.inc
+
+
+; Information added by Drupal.org packaging script on 2014-12-14
+version = "7.x-1.3"
+core = "7.x"
+project = "scald"
+datestamp = "1418595782"
+

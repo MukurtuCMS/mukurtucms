@@ -1,0 +1,422 @@
+<?php
+
+/**
+ * @file
+ * Mukurtu customizations.  Creates a new view mode
+ *
+ */
+ 
+/**
+* Implementation of hook_entity_info_alter().
+*/
+
+/*
+function mukurtu_custom_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['grid_teaser'] = array(
+    'label' => t('Grid teaser'),
+    'custom settings' => TRUE,
+  );
+} 
+*/
+
+/**
+* Implementation of hook_preprocess_node().
+*/
+
+/*
+function mukurtu_custom_preprocess_node(&$vars) {
+  if($vars['view_mode'] == 'grid_teaser') {
+    $vars['theme_hook_suggestions'][] = 'node__grid_teaser';
+  }
+} 
+*/
+
+
+function mukurtu_custom_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'mukurtu_custom'),
+  );
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function mukurtu_custom_menu() {
+  $items['admin/batch-node-export/%'] = array(
+    'title' => t('Export Items'),
+    'description' => t('Batch export nodes.'),
+    'page callback' => "drupal_get_form",
+    'page arguments' => array('mukurtu_custom_export_by_field_form', 2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sync/choose-source/%'] = array(
+    'title' => t('Sync Settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mukurtu_custom_sync_form', 2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  ); 
+  
+  $items['admin/export_links/%'] = array(
+    'title' => t('Export Links'),
+    'description' => t('Click the links to generate the corresponding export files'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mukurtu_custom_batch_node_export_form', 2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;	  
+}
+
+function mukurtu_custom_batch_node_export_form($form, $form_state, $args) {
+
+  global $base_url;
+  
+  $args = explode('?', $args);
+  $nids = $args[0];
+  $fields_to_omit = $args[1];
+  
+  
+  $csv_link = $base_url .'/export/'. $nids . '?' . $fields_to_omit;
+  $zip_link = $base_url .'/zip/'. $nids;
+  
+  $form['link_to_zip_file'] = array(
+    '#type' => 'item', 
+    '#markup' => '<a href="'. $csv_link .'" target="_blank">CSV File</a><br /><a href="'. $zip_link .'">Zip File</a><br />',
+    
+  );
+  return $form;
+}
+
+function mukurtu_custom_action_info() {
+  return array(
+    'add_to_my_collection_action' => array(
+      'type' => 'node',
+      'label' => t("Add to 'My Collection'"),
+      'configurable' => FALSE,
+      'triggers' => array(),
+    ),
+    
+    'delete_from_my_collection_action' => array(
+      'type' => 'node',
+      'label' => t("Remove from 'My Collection'"),
+      'configurable' => FALSE,
+      'triggers' => array(),
+    ),
+    
+    'sync_nodes_from_source_action' => array(
+      'type' => 'node',
+      'label' => t("Sync items"),
+      'configurable' => FALSE,
+      'aggregate' => TRUE,
+      'triggers' => array(),
+    ),
+    
+    'export_by_field_action' => array(
+      'type' => 'node',
+      'label' => t("Export items by field"),
+      'configurable' => FALSE,
+      'aggregate' => TRUE,
+      'triggers' => array(),
+    ),
+  );
+}
+
+function add_to_my_collection_action($node) {
+  $my_collection_flag = flag_get_flag('add_to_my_collection') or die('There is no "add_to_my_collection" flag defined');
+  
+  if (!$my_collection_flag->is_flagged($node->nid)) {
+    $my_collection_flag->flag('flag', $node->nid);
+  } 
+}
+
+function delete_from_my_collection_action($node) {
+  $my_collection_flag = flag_get_flag('add_to_my_collection') or die('There is no "add_to_my_collection" flag defined');
+  
+  if ($my_collection_flag->is_flagged($node->nid)) {
+    $my_collection_flag->flag('unflag', $node->nid);
+  }
+}
+
+function sync_nodes_from_source_action(&$nids, $context = array()) {
+  $args = '';
+  
+  foreach($nids as $nid => $node) {
+    $args .= ($args == '') ? $nid : ','. $nid;
+  }
+  
+  drupal_goto('sync/choose-source/'. $args);
+}
+
+function mukurtu_custom_sync_form($form, &$form_state, $arg_str) {
+
+  if(empty($form_state['storage'])) {
+    $form_state['storage'] = array();
+    $form_state['storage']['confirm_flag'] = FALSE;
+  }
+  
+  if($form_state['storage']['confirm_flag'] != TRUE) {
+    $options = array();
+    $nids = explode(",", $arg_str);
+    
+    if (count($nids) <= 1) {
+      drupal_set_message('You must choose at least 2 items in order to run the sync operation.');
+      // @TODO:  Find a way to make this more generalized.  (ie - take out the hardcoded path)
+      drupal_goto('browse');
+    }
+    
+    foreach($nids as $key => $nid) {
+      $node = node_load($nid);
+      $options[$nid] = $node->title;
+    }
+  
+    $form = array();
+    
+    
+    $instances = field_info_instances('node', 'digital_heritage');
+  
+  
+    foreach ($instances as $field_name => $field_data) {
+      // Don't allow users to sync the Media field...
+      // @TODO:  Move this into configuration to make this module more generalized
+      if($field_name != 'field_media') {
+        $fields[$field_name] = $field_data['label'];
+      }
+    }
+  
+    $form['nids'] = array(
+      '#type' => 'hidden',
+      '#value' => $nids,
+    );
+  
+    $form['source'] = array(
+      '#type' => 'select',
+      '#title' => t('Choose the source node to sync from'),
+      '#options' => $options,
+      '#description' => t('The source node to sync from'),
+      '#required' => TRUE,
+    );
+  
+    $form['fields_to_sync'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Choose which fields to sync'),
+      '#options' => $fields,
+      '#description' => t('The fields that will be copied from the source node'),
+      '#required' => TRUE,
+    );
+  
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Continue'),
+    );
+    return $form;
+  }
+  else {
+    $form = array();
+    $form['fields_to_sync']['#value'] = $form_state['storage']['fields_to_sync'];
+    $form['source']['#value'] = $form_state['storage']['source'];
+    $form['nids']['#value'] = $form_state['storage']['nids'];
+
+    
+    $field_list = '';
+    foreach ($form['fields_to_sync']['#value'] as $field_name => $val) {
+      $field_list .= ($field_list == '') ? ($field_name) : (", ". $field_name);
+    }
+    $source = node_load($form['source']['#value']);
+    $source_title = $source->title;
+    
+    $node_list = '';
+    foreach ($form['nids']['#value'] as $key => $nid) {
+      $node = node_load($nid);
+      if ($node->nid != $source->nid) {
+        $node_list .= ($node_list == '') ? ($node->title) : (", ". $node->title);
+      }
+    }
+    $desc = "You have chosen to overwrite the values for <strong>". $field_list ."</strong> in <strong>". $node_list ."</strong> with the corresponding values in <strong>". $source_title ."</strong>.  This operation cannot be undone.";
+    // @TODO:  Find a way to make this more generalized.  (ie - take out the hardcoded path to 'browse')
+    return confirm_form($form, 'Are you sure?', 'browse', $desc, 'Continue', 'Cancel');
+  }
+  
+}
+
+function mukurtu_custom_sync_form_validate($form, &$form_state) {
+  
+}
+
+function mukurtu_custom_sync_form_submit($form, &$form_state) {
+  if ($form_state['storage']['confirm_flag'] != TRUE) {
+    $form_state['rebuild'] = TRUE;
+    $form_state['storage']['confirm_flag'] = TRUE;
+    $form_state['storage']['source'] = $form['source']['#value'];
+    $form_state['storage']['fields_to_sync'] = $form['fields_to_sync']['#value'];
+    $form_state['storage']['nids'] = $form['nids']['#value'];
+  }
+  else {
+    $source_node = node_load($form['source']['#value']);
+    $fields_to_sync = $form['fields_to_sync']['#value'];
+    $nids = $form['nids']['#value'];
+  
+    foreach($nids as $key => $nid) {
+      if ($nid != $source_node->nid) {
+        $node = node_load($nid);
+
+        foreach($fields_to_sync as $field_name => $val) {
+          $node->{$field_name} = $source_node->{$field_name};
+          node_save($node);
+        }
+      }
+    }
+    drupal_set_message('Node sync completed');
+    // @TODO:  Find a way to make this more generalized.  (ie - take out the hardcoded path)
+    drupal_goto('browse');
+  }
+}
+
+// Configure the media field display for all media attached to DH nodes:
+
+/**
+ * Implementation of hook_field_formatter_info()
+ */
+ 
+ /*
+function mukurtu_custom_field_formatter_info() {
+  return array(
+    'mukurtu_custom_media_formatter' => array(
+      'label' => t('Mukurtu media formatter'),
+      'field types' => array('text'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+}
+
+
+
+function mukurtu_custom_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $elements = array();
+
+  foreach ($items as $delta => $item) {
+    $elements[$delta] = array(
+      '#markup' => l($items[0]['value'], 'media/'. $entity->fid),
+    );
+  }
+  return $elements;
+}
+
+function mukurtu_custom_preprocess_node(&$variables) {
+  foreach ($variables['field_media'] as $key => $media) {
+    if ($media['file']->type != 'image') {
+      continue;
+    }
+    if(!isset($variables['big_image'])) {
+      $variables['big_image'] = theme('image_style', array('path' => $media['file']->uri, 'style_name' => 'large'));
+    }
+  }
+}
+*/
+
+function export_by_field_action(&$nids, $context = array()) {
+  $args = '';
+  foreach($nids as $nid => $node) {
+    $args .= ($args == '') ? $nid : ','. $nid;
+  }
+
+  drupal_goto('admin/batch-node-export/'. $args);
+  
+}
+
+function mukurtu_custom_export_by_field_form_submit($form, &$form_state) {
+
+  if ($form_state['storage']['confirm_flag'] != TRUE) {
+    $form_state['rebuild'] = TRUE;
+    $form_state['storage']['confirm_flag'] = TRUE;
+    $form_state['storage']['fields_to_omit'] = $form['fields_to_omit']['#value'];
+    $form_state['storage']['nids'] = $form['nids']['#value'];
+  }
+  else {
+    $fields_to_omit = $form['fields_to_omit']['#value'];
+    $nids = $form['nids']['#value'];
+    $nid_list = '';
+    foreach($nids as $key => $nid) {
+      $nid_list .= ($nid_list == '') ? $nid : '+'. $nid;
+    }
+    
+    $field_str = '?';
+    $n = 1;
+    foreach($fields_to_omit as $key => $field_name) {
+      $field_str .= ($field_str == '?') ? "omit". $n ."=". $field_name : '&omit'. $n .'='. $field_name;
+      $n++;
+    }
+    $arg_str = $nid_list . $field_str;
+    
+    
+    drupal_goto('admin/export_links/'. $arg_str);
+
+  }
+}
+
+function mukurtu_custom_export_by_field_form($form, &$form_state, $arg_str) {
+  $nids = explode(",", $arg_str);
+
+  if(empty($form_state['storage'])) {
+    $form_state['storage'] = array();
+    $form_state['storage']['confirm_flag'] = FALSE;
+  }
+
+  if($form_state['storage']['confirm_flag'] != TRUE) {  
+    $instances = field_info_instances('node', 'digital_heritage');
+
+    foreach ($instances as $field_name => $field_data) {
+      // Don't allow users to have access to the Media field...
+      // @TODO:  Move this into configuration to make this module more generalized
+      if($field_name != 'field_media') {
+        $fields[$field_name] = $field_data['label'];
+      }
+    }
+
+    $form['nids'] = array(
+      '#type' => 'hidden',
+      '#value' => $nids,
+    );
+  
+    $form['fields_to_omit'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Choose which fields (if any) to NOT INCLUDE in this export'),
+      '#options' => $fields,
+      '#description' => t('The fields that will NOT BE POPULATED in the CSV export'),
+      '#required' => FALSE,
+    );
+  
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Continue'),
+    );
+    return $form;
+  }
+  else {
+    $form = array();
+    $form['fields_to_omit']['#value'] = $form_state['storage']['fields_to_omit'];
+    $form['nids']['#value'] = $form_state['storage']['nids'];
+
+    
+    $field_list = '';
+    foreach ($form['fields_to_omit']['#value'] as $field_name => $val) {
+      $field_list .= ($field_list == '') ? ($field_name) : (", ". $field_name);
+    }
+    
+    $node_list = '';
+    foreach ($form['nids']['#value'] as $key => $nid) {
+      $node = node_load($nid);
+
+/*       if ($node->nid != $source->nid) { */
+        $node_list .= ($node_list == '') ? ($node->title) : (", ". $node->title);
+/*       } */
+    }
+    $desc = "You have chosen to export <strong>". $node_list ."</strong> while omitting values for <strong>". $field_list ."</strong>";
+    // @TODO:  Find a way to make this more generalized.  (ie - take out the hardcoded path to 'browse')
+    return confirm_form($form, 'Do you want to proceed?', 'browse', $desc, 'Continue', 'Cancel');
+  }
+}

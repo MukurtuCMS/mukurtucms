@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * @file
+ * Embed.ly support for oEmbed.module
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function oembedembedly_menu() {
+  $items = array();
+
+  $items['admin/config/media/oembed/provider/embedly'] = array(
+    'title'            => 'Embed.ly',
+    'description'      => 'Settings for the Embed.ly provider.',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('oembedembedly_admin'),
+    'file'             => 'oembedembedly.admin.inc',
+    'type'             => MENU_LOCAL_TASK,
+    'access arguments' => array('administer oembed'),
+  );
+
+  return $items;
+}
+
+/**
+ * Calls and caches embed.ly services api.
+ */
+function oembedembedly_providers() {
+
+  $cache = cache_get('oembedly');
+
+  if ($cache && isset($cache->data)) {
+    $providers = $cache->data;
+  }
+  else {
+    $response = drupal_http_request('http://api.embed.ly/1/services');
+
+    if ($response->code == 200) {
+      $json = json_decode($response->data);
+      $providers = array();
+      foreach ($json as $provider) {
+        $providers[$provider->name] = $provider;
+      }
+    }
+    else {
+      $providers = FALSE;
+    }
+
+    cache_set('oembedly', $providers, 'cache', REQUEST_TIME + 3600 * ($providers ? 24 : 6));
+
+    if (variable_get('oembedembedly_default', TRUE)) {
+      oembed_providers_reset();
+    }
+  }
+  return $providers;
+}
+
+/**
+ * Helper function to populate defaults for all providers.
+ */
+function oembedembedly_default_selected() {
+  $providers = oembedembedly_providers();
+  $default = variable_get('oembedembedly_default', TRUE);
+  $defaults = array_combine(array_keys($providers), array_fill(0, count($providers), $default));
+  return array_merge($defaults, variable_get('oembedembedly_providers', array()));
+}
+
+/**
+ * Implement hook_ctools_plugin_directory().
+ */
+function oembedembedly_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'oembed' && $plugin == 'providers') {
+    return 'plugins/' . $plugin;
+  }
+}

@@ -1,0 +1,135 @@
+<?php
+
+/**
+ * @file
+ * Adds a formatter for text fields that creates a licence badge, link and
+ * metadata.
+ */
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function license_field_formatter_info() {
+  return array(
+    'license_formatter' => array(
+      'label' => t('License'),
+      'field types' => array('list_text'),
+    ),
+    'license_formatter_export' => array(
+      'label' => t('License Export'),
+      'field types' => array('list_text'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function license_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $elements = array();
+  switch ($display['type']) {
+    case 'license_formatter':
+      $license_names = list_allowed_values($field);
+      foreach ($items as $delta => $item) {
+        if(!empty($item['value'])){
+          $data = array();
+          $data = parse_url($item['value']);
+          $data['uri'] = $item['value'];
+          $data['name'] = $license_names[$item['value']];
+          $license = module_invoke_all('license_load', $data);
+          drupal_alter('license_load', $license, $data);
+          $element = module_invoke_all('license_display', $license, $entity);
+          drupal_alter('license_display', $element);
+          $elements[$delta] = $element;
+        }
+      }
+      break;
+
+    case 'license_formatter_export':
+      $license_names = list_allowed_values($field);
+      foreach ($items as $delta => $item) {
+        $data = array();
+        $data = parse_url($item['value']);
+        $data['uri'] = $item['value'];
+        $data['name'] = $item['value'];
+        $license = module_invoke_all('license_load', $data);
+        drupal_alter('license_load', $license, $data);
+        $element = module_invoke_all('license_display_export', $license, $entity);
+        drupal_alter('license_display', $element);
+        $elements[$delta] = $element;
+      }
+      break;
+  }
+
+  return $elements;
+}
+
+/**
+ * Helper function for display of typical license badge and link.
+ * 
+ * @param $uri
+ *   Canonical URI of license.
+ * @param $name
+ *   Human readable license name.
+ * @param $image
+ *   License image URI.
+ * @param $alt
+ *   License image alt text.
+  * @param $uri_attributes
+ *   Optional attributes for the URI.
+ * @return array
+ */
+function license_basic_display($uri, $name, $image, $alt, $uri_attributes = array()) {
+  $image = array(
+    'path' => $image,
+    'alt' => $alt,
+  );
+  $attributes = array(
+    'attributes' => array(
+      'rel' => 'license',
+    ),
+  ) + $uri_attributes;
+  return array(
+    'image' => array(
+      '#type' => 'link',
+      '#title' => theme('image', $image),
+      '#href' => $uri,
+      '#options' => array('html' => TRUE) + $attributes,
+      '#suffix' => '<br />',
+    ),
+    'link' => array(
+      '#type' => 'link',
+      '#title' => $name,
+      '#href' => $uri,
+      '#options' => $attributes,
+    ),
+  );
+}
+
+
+function mukurtu_communities($entity) {
+  global $language_content;
+  $communities = array();
+  if(!empty($entity->group_audience[$language_content->language])) {
+    foreach ($entity->group_audience[$language_content->language] as $field) {
+      $group = og_load_entity_from_group($field['gid']);
+      if(!empty($group)){
+        if ($group->type == 'community') {
+          $communities[] = $group->title;
+        }
+      }
+    }
+  }
+  else if(!empty($entity->field_communities[$language_content->language])) {
+    foreach ($entity->field_communities[$language_content->language] as $field) {
+      $group = node_load($field['nid']);
+      if(!empty($group)){
+        if ($group->type == 'community') {
+          $communities[] = $group->title;
+        }
+      }
+    }  
+  }
+
+  return $communities;
+}

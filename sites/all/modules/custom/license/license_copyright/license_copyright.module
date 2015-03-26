@@ -1,0 +1,54 @@
+<?php
+
+function license_copyright_license_load($data) {
+  $info = explode('/', trim($data['path'], '/'));
+  if ($data['host'] == 'mukurtu.org' && $info[0] == 'copyright') {
+    return array(
+      'uri' => $data['uri'],
+      'name' => $data['name'],
+      'type' => 'copyright',
+    );
+  }
+}
+
+function license_copyright_license_display($license, $entity) {
+  if ($license['type'] == 'copyright') {
+    $date = date("Y");
+    // field_date probably uses LANGUAGE_NONE (and not the language, ex. 'en'
+    // leaving as is for now.
+    if (isset($entity->field_date[LANGUAGE_NONE][0]['safe_value'])) {
+      $from_date = $entity->field_date[LANGUAGE_NONE][0]['safe_value'];
+      // Display date range for copyright.
+      if ($from_date < $date) {
+        $date = $from_date . '-' . $date;
+      }
+    }
+    $owner = variable_get('site_name', '');
+    $communities = mukurtu_communities($entity);
+    if (!empty($communities)) {
+      $owner = implode(', ', $communities);
+    }
+    return array('#markup' => 'Copyright © ' . $date . ' ' . $owner . '. All rights reserved.');
+  }
+}
+
+function license_copyright_license_display_export($license, $entity) {
+  if ($license['type'] == 'copyright') {
+    $date = date("Y");
+    if (isset($entity->field_date[LANGUAGE_NONE][0]['safe_value'])) {
+      $from_date = $entity->field_date[LANGUAGE_NONE][0]['safe_value'];
+      if ($from_date < $date) {
+        $date = $from_date . '-' . $date;
+      }
+    }
+    $image = '';
+    $owner = variable_get('site_name', '');
+    $communities = mukurtu_communities($entity);
+    if (!empty($communities)) {
+      $owner = implode(', ', $communities);
+    }
+    // Alt does not do anything right now.
+    $alt = 'Copyright © ' . $date . ' ' . $owner . '. All rights reserved.';
+    return license_basic_display($license['uri'], $license['name'], $image, $alt);
+  }
+}

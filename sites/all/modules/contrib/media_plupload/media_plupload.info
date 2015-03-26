@@ -1,0 +1,6 @@
+name = Media and Plupload connector
+description = Set media module always use plupload
+core = 7.x
+package = Media
+dependencies[] = media
+dependencies[] = plupload

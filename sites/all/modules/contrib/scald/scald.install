@@ -1,0 +1,684 @@
+<?php
+
+/**
+ * @file
+ * Scald Installation
+ *
+ * The database schema is heavily commented; review for details.
+ *
+ * NOTE: For the registries which are essentially the makeup of the Scald
+ *  Configuration Object, no indexes are specified because they are usually
+ *  referenced only to retrieve all the data.  In fact, there should never be a
+ *  situation in which a module is querying directly against those tables.
+ *
+ * @ingroup scald
+ */
+
+require_once 'includes/scald.constants.inc';
+
+/**
+ * Implements hook_schema().
+ */
+function scald_schema() {
+  $schema = array();
+
+  $schema['cache_scald'] = drupal_get_schema_unprocessed('system', 'cache');
+
+  $schema['scald_atoms'] = array(
+    'description' => 'The Scald Atom registry.',
+    'fields'      => array(
+      'sid'       => array(
+        'description' => 'The Scald Identifier, a unique integer ID for a given Scald Atom.',
+        'type'        => 'serial',
+        'size'        => 'big',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ),
+      'provider'  => array(
+        'description' => 'The name of the module which provides this Atom.  The Provider module should implement the Scald Provider API for Atoms.  FK {system}.name',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => 'scald',
+      ),
+      'type'      => array(
+        'description' => 'The Scald Unified Type slug for this Atom\'s type.  FK {scald_types}.type',
+        'type'        => 'varchar',
+        'length'      => SCALD_SLUG_MAX_LENGTH,
+        'not null'    => TRUE,
+      ),
+      'base_id'   => array(
+        'description' => 'The identifier used by the Scald Atom Provider that registered Atom to determine additional properties (e.g. a Drupal NID or a YouTube ID).  FK',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => FALSE,
+        'default'     => NULL,
+      ),
+      'language' => array(
+        'description' => 'The {languages}.language of this atom.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'publisher' => array(
+        'description' => 'The Drupal User ID of the user who *registered* this Atom.  Makes no implications about the Authorship.  FK {users}.uid',
+        'type'        => 'int',
+        'size'        => 'big',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+      'actions'   => array(
+        'description' => 'The Scald Actions bitstring for this Atom.',
+        'type'        => 'int',
+        'size'        => 'big',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+      'title'     => array(
+        'description' => 'The title of this Scald Atom.',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+      'data'      => array(
+        'description' => 'A serialized array of atom and provider specific additionnal data.',
+        'type'        => 'blob',
+        'size'        => 'big',
+        'not null'    => TRUE,
+        'serialize'   => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the atom was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the atom was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('sid'),
+    'indexes'     => array(
+      'i_sid_provider_base_id'  => array(
+        'sid',
+        array('provider', 64),
+        array('base_id', 64),
+      ),
+      'i_sid_actions'           => array('sid', 'actions'),
+      'i_type_sid'              => array('type', 'sid'),
+      'i_publisher_sid'         => array('publisher', 'sid'),
+      'i_base_id'               => array(array('base_id', 64)),
+      'i_provider_type_base_id' => array(
+        array('provider', 64),
+        array('type', 64),
+        array('base_id', 64),
+      ),
+      'atom_changed'        => array('changed'),
+      'atom_created'        => array('created'),
+    ),
+  );
+
+  $schema['scald_types'] = array(
+    'description' => 'The Scald Unified Type registry.',
+    'fields'      => array(
+      'type'         => array(
+        'description' => 'The Scald Unified Type slug, used to uniquely identify the Type',
+        'type'        => 'varchar',
+        'length'      => SCALD_SLUG_MAX_LENGTH,
+        'not null'    => TRUE,
+      ),
+      'provider'         => array(
+        'description' => 'The name of the module which provides this Type.  The Provider module should implement the Scald Provider API for Types.  FK {system}.name',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => 'scald',
+      ),
+      'title'       => array(
+        'description' => 'The human-readable title of this Type.  Publicly Viewable',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+      ),
+      'description' => array(
+        'description' => 'A description of the Type for the benefit of Admins and Devs.',
+        'type'        => 'text',
+        'size'        => 'medium',
+      ),
+    ),
+    'primary key' => array('type'),
+  );
+
+  $schema['scald_context_config'] = array(
+    'description' => 'Context configuration.',
+    'fields' => array(
+      'context' => array(
+        'description' => 'The Scald Context slug for a Scald Context. Fk {scald_contexts}.context',
+        'type' => 'varchar',
+        'length' => SCALD_SLUG_MAX_LENGTH,
+        'not null' => TRUE,
+      ),
+      'transcoder' => array(
+        'description' => 'A serialized array of transcoder per format.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+      'player' => array(
+        'description' => 'A serialized array of player per type.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+      'data' => array(
+        'description' => 'Arbitrary data.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+    ),
+    'primary key' => array('context'),
+    'export' => array(
+      'key' => 'context',
+      'key name' => 'Context',
+      'primary key' => 'context',
+      'identifier' => 'context_config',
+      'export type string' => 'ctools_type',
+      'api' => array(
+        'owner' => 'scald',
+        'api' => 'context_config',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
+  );
+
+  $schema['scald_licenses'] = array(
+    'description' => 'Definitions of Licenses as sets of permitted Scald Actions',
+    'fields'      => array(
+      'lid'         => array(
+        'description' => 'The License ID; an arbitrarily defined identifier for the license.',
+        'type'        => 'serial',
+        'size'        => 'big',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ),
+      'title'       => array(
+        'description' => 'The human-readable name of this License (often presented as an alternative for users).',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => 'Scald License Default Title',
+      ),
+      'description' => array(
+        'description' => 'A description of a given License for public consumption.',
+        'type'        => 'text',
+        'size'        => 'medium',
+      ),
+      'actions'     => array(
+        'description' => 'The Scald Action bitstring for this License.',
+        'type'        => 'int',
+        'size'        => 'big',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+    ),
+    'primary key' => array('lid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ *
+ * Installs the schema and then ensure that the hooks implemented by Scald Core
+ *  will fire before those implemented by any Scald Providers (a direct
+ *  modification of the {system} table is the only way to accomplish this).
+ */
+function scald_install() {
+  // Get Scald hooks to run earlier than other modules.
+  db_query("UPDATE {system} SET weight = -50 WHERE name = 'scald'");
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes the database tables and persistant variables managed through Drupal.
+ *  Anything set in the Scald Admin Interface will be forgotten.
+ *
+ * Uninstall the DB schema and clean up as much as is feasible.
+ */
+function scald_uninstall() {
+  variable_del('scald_always_rebuild');
+  variable_del('scald_config');
+  variable_del('scald_providers');
+  variable_del('scald_atom_defaults');
+  variable_del('scald_context_fallbacks');
+  variable_del('scald_actions_powers');
+  variable_del('scald_actions_publisher');
+  variable_del('scald_custom_contexts');
+  variable_del('scald_author_vocabulary');
+  variable_del('scald_tags_vocabulary');
+}
+
+/**
+ * Implements hook_enable().
+ *
+ * Ensures that various configuration options are set so that Scald Core can
+ *  make certain assumptions about the contents of variables.
+ */
+function scald_enable() {
+  variable_set('scald_context_fallbacks', array('@default' => array('title')));
+
+  _scald_create_thumbnail_field();
+  _scald_create_author_vocabulary();
+  _scald_create_tags_vocabulary();
+}
+
+/**
+ * Implements hook_disable().
+ *
+ * Settings configured in the Scald Admin Interface should remain.  Lower-levl
+ *  configurations, however, are removed as they will need to be rebuilt if the
+ *  Scald Core is re-enabled later.
+ */
+function scald_disable() {
+}
+
+/**
+ * Updates the schema from the 6.x version.
+ */
+function scald_update_7000() {
+  // Drop the table that were just storing the results of info hooks.
+  db_drop_table('scald_actions');
+  db_drop_table('scald_atom_providers');
+  db_drop_table('scald_contexts');
+  db_drop_table('scald_contexts_type_formats');
+  db_drop_table('scald_relationships');
+  db_drop_table('scald_transcoders');
+  db_drop_table('scald_transcoder_formats');
+
+  // Drop the relationships support from Scald Core.
+  // Better solutions for this problems exists in Contrib, now
+  // that we're going for an entity-based solutions.
+  db_drop_table('scald_atom_relationships');
+
+  // Convert the 'scald_atom_types' variable, whose format changed
+  // between 6.x and 7.x.
+  $defaults = variable_get('scald_atom_defaults', NULL);
+  if (!empty($defaults)) {
+    $temp = array();
+    $properties = array('thumbnail_source', 'description', 'actions');
+    foreach ($properties as $property) {
+      foreach ($defaults->{$property} as $name => $value) {
+        $temp[$name][$property] = $source;
+      }
+    }
+    $new_defaults = array();
+    foreach ($temp as $name => $default) {
+      $new_defaults[$name] = (object) $default;
+    }
+    variable_set('scald_atom_defaults', $new_defaults);
+  }
+
+  // TODO: Convert all the authors from the old scald_authors table
+  // to new taxonomy terms of the scald_authors vocabulary.
+  db_drop_table('scald_authors');
+  db_drop_table('scald_atom_authors');
+}
+
+/**
+ * Create a field to store atom thumbnails.
+ */
+function _scald_create_thumbnail_field() {
+  // Create the scald_thumbnail field.
+  if (!field_info_field('scald_thumbnail')) {
+    $field = array(
+      'field_name' => 'scald_thumbnail',
+      'type' => 'image',
+    );
+    field_create_field($field);
+  }
+}
+
+/**
+ * Create a vocabulary for storing Scald Authors, and the matching fields.
+ */
+function _scald_create_author_vocabulary() {
+  field_associate_fields('taxonomy');
+
+  // Create the atom vocabulary if it does not exist.
+  $name = variable_get('scald_author_vocabulary', 'scald_authors');
+  $vocabulary = taxonomy_vocabulary_machine_name_load($name);
+  if (!$vocabulary) {
+    $edit = array(
+      'name' => t('Authors'),
+      'machine_name' => $name,
+      'description' => t('Scald authors vocabulary'),
+      'hierachy' => 0,
+      'module' => 'scald',
+      'weight' => -5,
+    );
+    $vocabulary = (object) $edit;
+    taxonomy_vocabulary_save($vocabulary);
+    variable_set('scald_author_vocabulary', $name);
+
+    // Create a URL field on the taxonomy terms of the Scald Authors
+    // bundle.
+    $field = array(
+      'field_name' => 'scald_author_url',
+      'type' => 'text',
+      'label' => t('URL'),
+      'locked' => TRUE,
+    );
+    field_create_field($field);
+    $instance = array(
+      'field_name' => 'scald_author_url',
+      'label' => t('URL'),
+      'entity_type' => 'taxonomy_term',
+      'bundle' => $name,
+      'required' => FALSE,
+      'description' => 'Homepage of the Author',
+    );
+    field_create_instance($instance);
+  }
+
+  // Create the scald_authors field.
+  if (!field_info_field('scald_authors')) {
+    $field = array(
+      'title' => t('Authors'),
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'field_name' => 'scald_authors',
+      'type' => 'taxonomy_term_reference',
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => $vocabulary->machine_name,
+            'parent' => 0,
+          ),
+        ),
+      ),
+    );
+    field_create_field($field);
+  }
+
+}
+
+/**
+ * Create a vocabulary for storing Scald Tags, and the matching fields.
+ */
+function _scald_create_tags_vocabulary() {
+  field_associate_fields('taxonomy');
+
+  // Create the atom vocabulary if it does not exist.
+  $name = variable_get('scald_tags_vocabulary', 'scald_tags');
+  $vocabulary = taxonomy_vocabulary_machine_name_load($name);
+  if (!$vocabulary) {
+    $edit = array(
+      'name' => t('Scald tags'),
+      'machine_name' => $name,
+      'description' => t('Scald tags vocabulary'),
+      'hierachy' => 0,
+      'module' => 'scald',
+      'weight' => -5,
+    );
+    $vocabulary = (object) $edit;
+    taxonomy_vocabulary_save($vocabulary);
+    variable_set('scald_tags_vocabulary', $vocabulary->machine_name);
+  }
+
+  // Create the scald_tags field.
+  if (!field_info_field('scald_tags')) {
+    $field = array(
+      'title' => t('Scald tags'),
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'field_name' => 'scald_tags',
+      'type' => 'taxonomy_term_reference',
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => $vocabulary->machine_name,
+            'parent' => 0,
+          ),
+        ),
+      ),
+    );
+    field_create_field($field);
+  }
+}
+
+/**
+ * Add the {scald_atoms}.data column.
+ *
+ * "A serialized array of atom and provider specific additionnal data"
+ */
+function scald_update_7001() {
+  $new_field = array(
+    'description' => 'A serialized array of atom and provider specific additionnal data.',
+    'type'        => 'blob',
+    'size'        => 'big',
+    'not null'    => TRUE,
+    'serialize'   => TRUE,
+  );
+  db_add_field('scald_atoms', 'data', $new_field);
+}
+
+/**
+ * Delete {scald_role_actions} table and scald_actions_publisher variable.
+ */
+function scald_update_7002() {
+  db_drop_table('scald_role_actions');
+  variable_del('scald_actions_publisher');
+}
+
+/**
+ * Create Scald_tags vocabulary.
+ */
+function scald_update_7003() {
+  _scald_create_tags_vocabulary();
+}
+
+/**
+ * Ensure that a thumbnail fields exits.
+ */
+function scald_update_7004() {
+  _scald_create_thumbnail_field();
+}
+
+/**
+ * Refresh Scald action lists to include the new 'adjective' attribute.
+ */
+function scald_update_7005() {
+  scald_actions(TRUE);
+}
+
+/**
+ * Migrate {scald_context_type_transcoder} into {scald_context_config}.
+ */
+function scald_update_7006() {
+  drupal_load('module', 'scald');
+  $schema_scald_context_config = array(
+    'description' => 'Context configuration.',
+    'fields' => array(
+      'context' => array(
+        'description' => 'The Scald Context slug for a Scald Context. Fk {scald_contexts}.context',
+        'type' => 'varchar',
+        'length' => SCALD_SLUG_MAX_LENGTH,
+        'not null' => TRUE,
+      ),
+      'transcoder' => array(
+        'description' => 'A serialized array of transcoder per format.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+    ),
+    'primary key' => array('context'),
+    'export' => array(
+      'key' => 'context',
+      'key name' => 'Context',
+      'primary key' => 'context',
+      'identifier' => 'context_config',
+      'export type string' => 'ctools_type',
+      'api' => array(
+        'owner' => 'scald',
+        'api' => 'context_config',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
+  );
+  db_create_table('scald_context_config', $schema_scald_context_config);
+
+  $contexts = array();
+  $result = db_select('scald_context_type_transcoder', 's')
+    ->fields('s')
+    ->execute();
+  while ($row = $result->fetchAssoc()) {
+    // Let's make the update simple: there is no multiple format settings now.
+    $contexts[$row['context']]['transcoder'][$row['type']]['*'] = $row['transcoder'];
+  }
+  foreach ($contexts as $context => $config) {
+    db_insert('scald_context_config')
+      ->fields(array(
+        'context' => $context,
+        'transcoder' => serialize($config['transcoder']),
+      ))
+      ->execute();
+  }
+
+  db_drop_table('scald_context_type_transcoder');
+}
+
+/**
+ * Add a new field 'player' to scald_context_config table.
+ */
+function scald_update_7007() {
+  db_add_field('scald_context_config', 'player', array(
+    'description' => 'A serialized array of player per type.',
+    'type' => 'blob',
+    'size' => 'big',
+    'not null' => TRUE,
+    'serialize' => TRUE,
+    'object default' => array(),
+    'initial' => serialize(array()),
+  ));
+}
+
+/**
+ * Change (provider, type, base_id) from unique to normal key.
+ *
+ * @see https://drupal.org/node/1971710
+ */
+function scald_update_7008() {
+  db_drop_unique_key('scald_atoms', 'u_provider_type_base_id');
+  db_add_index('scald_atoms', 'i_provider_type_base_id', array(
+    array('provider', 64),
+    array('type', 64),
+    array('base_id', 64),
+  ));
+  return array();
+}
+
+/**
+ * Add language property for atoms.
+ */
+function scald_update_7009() {
+  db_add_field('scald_atoms', 'language', array(
+    'description' => 'The {languages}.language of this atom.',
+    'type' => 'varchar',
+    'length' => 12,
+    'not null' => TRUE,
+    'default' => '',
+  ));
+  db_update('scald_atoms')
+    ->fields(array('language' => LANGUAGE_NONE))
+    ->execute();
+  return array();
+}
+
+/**
+ * Update the thumbnail field path to match the old defaults.
+ */
+function scald_update_7010() {
+  $field = field_info_field('scald_thumbnail');
+  if (!empty($field['bundles']['scald_atom'])) {
+    foreach ($field['bundles']['scald_atom'] as $type) {
+      $instance = field_info_instance('scald_atom', 'scald_thumbnail', $type);
+      // Only update the field instance if it is not modified since.
+      if (empty($instance['settings']['file_directory'])) {
+        $instance['settings']['file_directory'] = 'thumbnails/' . $type;
+        field_update_instance($instance);
+      }
+    }
+  }
+}
+
+/**
+ * Update the vocabulary variables to point toward the machine names.
+ */
+function scald_update_7011() {
+  foreach (array('scald_author_vocabulary', 'scald_tags_vocabulary') as $variable) {
+    $vid = variable_get($variable);
+    $vocabulary = taxonomy_vocabulary_load($vid);
+    if ($vocabulary) {
+      variable_set($variable, $vocabulary->machine_name);
+    }
+  }
+}
+
+/**
+ * Add the {scald_atoms}.created and {scald_atoms}.changed column.
+ */
+function scald_update_7012() {
+  $new_field = array(
+    'description' => 'The Unix timestamp when the atom was created.',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('scald_atoms', 'created', $new_field);
+
+  $new_field = array(
+    'description' => 'The Unix timestamp when the atom was most recently saved.',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('scald_atoms', 'changed', $new_field);
+
+  db_add_index('scald_atoms', 'atom_changed', array('changed'));
+  db_add_index('scald_atoms', 'atom_created', array('created'));
+}
+
+/**
+ * Add a new field 'data' to scald_context_config table.
+ */
+function scald_update_7013() {
+  db_add_field('scald_context_config', 'data', array(
+    'description' => 'Arbitrary data.',
+    'type' => 'blob',
+    'size' => 'big',
+    'not null' => TRUE,
+    'serialize' => TRUE,
+    'object default' => array(),
+    'initial' => serialize(array()),
+  ));
+}

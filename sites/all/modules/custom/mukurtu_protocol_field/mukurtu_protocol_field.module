@@ -1,0 +1,336 @@
+<?php
+/**
+ * @file
+ * General structure is drop down of all communities hierarchy the user has permission to which then populates a list of sub-protocols in a second drop down
+ * theme the drop down in chosen
+ *
+ */
+
+
+/**
+ * Node insert hook for creating community to create a matching default protocol
+ * @TODO move to another module later
+ */
+/**
+ * Implements hook_node_insert().
+ */
+function mukurtu_protocol_field_node_insert($node) {
+  if ($node->type == 'community') {
+
+    // create protocol
+    $newnode = new stdClass();
+    $newnode->title = $node->title." Community Only";
+    $newnode->type = 'cultural_protocol_group';
+    node_object_prepare($newnode);
+    $newnode->uid = $node->uid;
+    $newnode->status = $node->status;
+    $newnode->comment = $node->comment;
+    $newnode->promot = 0;
+    $newnode->language = $node->language;
+    $newnode->group_group[LANGUAGE_NONE][0]['value'] = 1;
+    $newnode->group_access[LANGUAGE_NONE][0]['value'] = 2;
+    $newnode->group_register[LANGUAGE_NONE][0]['value'] = 0;
+    $newnode->og_group_ref[LANGUAGE_NONE][0]['target_id'] = $node->nid;
+    $newnode = node_submit($newnode); // Prepare node for saving
+
+    node_save($newnode);
+
+    drupal_set_message(t('Default cultural protocol was created'));
+  }
+}
+
+/**
+ * Implements hook_og_membership_presave().
+ */
+function mukurtu_protocol_field_og_membership_presave(OgMembership $og_membership) {
+
+}
+
+
+/**
+ *  Implements hook_form_alter().
+ *
+ *  Alters the digitial heritage node edit form to replace the og_group_ref with our enhanced protocol selector field
+ */
+function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
+
+  if ($form_id == 'digital_heritage_node_form') {
+
+    // gathering group field info
+    $og_group_parent = $form['#group_children']['og_group_ref'];
+    $form['#group_children']['oggroup_fieldset'] = $og_group_parent;
+
+    $structure = array();
+    if (!$form_state['rebuild'] && !empty($form_state['node']->og_group_ref)) {
+      // it's not a rebuild so parse the current group info for our widget
+      $node_groups = $form_state['node']->og_group_ref['und'];
+      // pack them into parent communities
+      foreach ($node_groups as $node_group) {
+        $node_group = node_load($node_group['target_id']);
+        $parent_nid = $node_group->og_group_ref['und'][0]['target_id'];
+        $structure[$parent_nid][] = $node_group->nid;
+      }
+    }
+
+    // Get the list of options to populate the first dropdown.
+    $options_first = _ajax_get_community_dropdown_options();
+
+    if (!empty($structure)) {
+      $form_state['num_protocols'] = sizeof($structure);
+    } else {
+      $form_state['num_protocols'] =  empty($form_state['num_protocols']) ? 1 : $form_state['num_protocols'];
+    }
+
+    $form['oggroup_fieldset'] = array(
+      '#title' => t('Communities and Protocols *'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+
+    // retrieves defaults from the url (only applies to node creation)
+    $community_first_default = arg(3);
+    $protocol_first_default = arg(4);;
+
+
+    for ($i = 0; $i < $form_state['num_protocols']; $i++) {
+
+      if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_first'])) {
+        $selected = $form_state['values']['oggroup_fieldset'][$i]['dropdown_first'];
+      } else if (isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_first'])) {
+        $selected = $form_state['input']['oggroup_fieldset'][$i]['dropdown_first'];
+      } else {
+        $selected = false;
+      }
+
+      // sets the default of the first item if it's not set and if there's a numeric value in the url
+      if ($i == 0 && !$selected && is_numeric($community_first_default) ) {
+        $selected = $community_first_default;
+      }
+
+      $protocol_options = array();
+
+      if (!empty($structure)) {
+        $keys = array_keys($structure);
+        $selected = $keys[$i];
+        list($protocol_options) = array_slice($structure, $i, 1);
+      }
+
+      $form['oggroup_fieldset'][$i] = array(
+        '#type' => 'fieldset',
+        '#title' => t("Communities and Protocols @num", array('@num' => $i+1)),
+        // Set up the wrapper so that AJAX will be able to replace the fieldset.
+        '#prefix' => '<div id="og_gorup-fieldset-wrapper-'.$i.'">',
+        '#suffix' => '</div>',
+      );
+
+      $form['oggroup_fieldset'][$i]['dropdown_first'] = array(
+        '#type' => 'select',
+        '#title' => 'Community',
+        '#options' => $options_first,
+        '#default_value' => $selected,
+        // Bind an ajax callback to the change event (which is the default for the
+        // select form type) of the first dropdown. It will replace the second
+        // dropdown when rebuilt.
+        '#ajax' => array(
+          // When 'event' occurs, Drupal will perform an ajax request in the
+          // background. Usually the default value is sufficient (eg. change for
+          // select elements), but valid values include any jQuery event,
+          // most notably 'mousedown', 'blur', and 'submit'.
+          // 'event' => 'change',
+          'callback' => 'ajax_mukurtu_protocol_dependent_dropdown_callback',
+          'event' => 'change',
+          'wrapper' => 'dropdown-second-replace-'.$i,
+        ),
+        '#attributes' => array ('class' => array('chosen-enable')),
+      );
+
+
+      if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_second'])) {
+        $protocol_defaults = $form_state['values']['oggroup_fieldset'][$i]['dropdown_second'];
+      } else if(isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_second'])) {
+        $protocol_defaults = $form_state['input']['oggroup_fieldset'][$i]['dropdown_second'];
+      } else {
+        $protocol_defaults = false;
+      }
+
+      // sets the default of the first item if it's not set and if there's a numeric value in the url
+      if ($i == 0 && !$protocol_defaults && is_numeric($protocol_first_default) ) {
+        $protocol_defaults = $protocol_first_default;
+      }
+      if (!empty($protocol_options)) {
+        $protocol_defaults = $protocol_options;
+      }
+      $form['oggroup_fieldset'][$i]['dropdown_second'] = array(
+        '#type' => 'select',
+        '#title' => t('Protocol'),
+        // The entire enclosing div created here gets replaced when dropdown_first
+        // is changed.
+        '#prefix' => '<div id="dropdown-second-replace-'.$i.'">',
+        '#suffix' => '</div>',
+        // When the form is rebuilt during ajax processing, the $selected variable
+        // will now have the new value and so the options will change.
+        '#options' => _ajax_get_protocol_by_community_dropdown_options($selected),
+        '#default_value' => $protocol_defaults,
+        '#multiple' => TRUE,
+        '#attributes' => array ('class' => array('chosen-enable')),
+      );
+      // DH node needs at least one protocol
+      if ($i == 0) {
+        $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
+      }
+    }
+
+    // Adds "Add another name" button.
+    $form['oggroup_fieldset']['add_community'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add another community'),
+      '#submit' => array('form_field_add_communities'),
+    );
+
+
+    $form['#tree'] = TRUE;
+    array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
+    //$form['og_group_ref']['#type'] = 'hidden';
+    $weight = $form['og_group_ref']['#weight'];
+    $form['oggroup_fieldset']['#weight'] = $weight;
+
+
+  }
+}
+
+// fired when the Add Communities button is clicked
+function form_field_add_communities($form, &$form_state) {
+  // Everything in $form_state is persistent, so we'll just use $form_state['num_protocols']
+  $form_state['num_protocols']++;
+
+  // Setting $form_state['rebuild'] = TRUE causes the form to be rebuilt again.
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Validate callback for the protocol select field
+ *
+ * @param $form
+ * @param $form_state
+ * @throws Exception
+ * @throws OgException
+ */
+function mukurtu_protocol_field_form_validate($form, &$form_state) {
+
+  //$form_state['values']['og_group_ref']['und'][0]['target_id'] = $form_state['values']['oggroup_fieldset'][0]['dropdown_second'];
+
+  $newstate = array();
+
+  foreach ($form_state['values']['oggroup_fieldset'] as $key => $sets) {
+    if (is_numeric($key)) {
+      foreach ($sets['dropdown_second'] as $groupid) {
+        $newstate[] = array('target_id'=>$groupid);
+      }
+    }
+  }
+
+  $form_state['values']['og_group_ref']['und'] = $newstate;
+
+}
+
+// Ajax Callback fired when the first community drop down is selected
+function ajax_mukurtu_protocol_dependent_dropdown_callback($form, $form_state) {
+  $delta = $form_state['triggering_element']['#parents'][1];
+  $thing = $form['oggroup_fieldset'][$delta]['dropdown_second'];
+
+  $commands[] = ajax_command_html('#dropdown-second-replace-'.$delta, render($thing));
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+
+/**
+ * Generate a list of communities for a user
+ *
+ * @return array
+ */
+function _ajax_get_community_dropdown_options() {
+  // return the communities this user has access to
+
+
+  $groups = og_get_groups_by_user(null, 'node');
+
+
+  $gids = array(0 => 'Select a community');
+  foreach ($groups as $group) {
+
+    $roles = og_get_user_roles('node', $group);
+
+    // @todo check access with og_user_access_entity ?
+
+    $og_node = node_load($group);
+    if ($og_node->type == 'community') {
+      $gids[$group] = $og_node->title;
+    }
+
+  }
+
+  return $gids;
+}
+
+
+/**
+ * Generate a list of protocols for a community
+ *
+ * @param string $key
+ * @return array
+ */
+function _ajax_get_protocol_by_community_dropdown_options($key = '') {
+
+  if ($key == '') {
+    return array(0 => 'Select a community first');
+  }
+
+  return ma_cultural_protocol_get_cps_user_can_post_to($key);
+
+}
+
+
+
+
+/**
+ * Implements hook_node_access().
+ *
+ * Confirming that an 'ALL' setting on a DH item checks that the user is a member of ALL the groups
+ */
+function mukurtu_protocol_field_node_access($node, $op, $account) {
+  if (is_string($node)) {
+    return NODE_ACCESS_IGNORE;
+  }
+
+  if (($op == 'view' || $op == 'update') && $node->type=='digital_heritage' ) {
+    $privacy_setting = $node->field_item_privacy_setting['und'][0]['value'];  // 'all' or 'any'
+
+    if ($privacy_setting != 'all') {
+      return NODE_ACCESS_IGNORE;
+    }
+
+    if (!$content_groups = og_get_entity_groups('node', $node)) {
+      # drupal_set_message (t('Denied access to DH node @nid -- DH node is set to strict, but NODE is not in any groups', array('@nid' => $node->nid))); // This shouldn't be possible on new DH nodes (old ones might still be as such)
+      return NODE_ACCESS_DENY;
+    }
+    $content_groups = array_values($content_groups['node']);
+
+    foreach ($content_groups as $cgid) {
+      if (!og_is_member('node', $cgid)) { // Pass if user is a member of the group
+        $cp_emw = entity_metadata_wrapper('node', $cgid);
+        if ($cp_emw->group_access->value() <> 0) { // Pass if it's an open group
+          # drupal_set_message(t('DENIED Access for node @nid in group @cgid', array('@nid' => $node->nid, '@cgid' => $cgid)));
+          return NODE_ACCESS_DENY;
+        }
+      }
+    }
+
+    # drupal_set_message(t('Granted'));
+    return NODE_ACCESS_ALLOW;
+
+
+  }
+  return NODE_ACCESS_IGNORE;
+}
+

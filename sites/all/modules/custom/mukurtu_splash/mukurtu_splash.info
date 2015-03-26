@@ -1,0 +1,9 @@
+; $Id$
+name = Mukurtu Splash Page
+description = Adds a splash page for admins to solicit additional configuration such as API keys and site specific settings.
+dependencies[] = colorbox
+dependencies[] = features
+dependencies[] = context
+package = Mukurtu
+core = 7.x
+files[] = mukurtu_splash.module

@@ -1,0 +1,27 @@
+diff --git a/sites/all/modules/contrib/media_browser_plus/media_browser_plus.module b/sites/all/modules/contrib/media_browser_plus/media_browser_plus.module
+index 6ec09ac..a725f07 100644
+--- a/sites/all/modules/contrib/media_browser_plus/media_browser_plus.module
++++ b/sites/all/modules/contrib/media_browser_plus/media_browser_plus.module
+@@ -328,12 +328,20 @@
+   // Grab the fids of the newly created media entities from the redirect query
+   // string that was created by the form's primary submit handler, and load the
+   // corresponding entities.
+-  $fids = $form_state['redirect'][1]['query']['fid'];
++  if ($form_state['files'])   {
++    foreach ($form_state['files'] as $i => $fid)  {
++      $fids[$i] = $fid->fid;
++      $i++;
++    }
++  }
++  else  {
++    $fids = $form_state['file']->fid;
++  }
+   if (!is_array($fids)) {
+     $fids = array($fids);
+   }
+   $media_entities = file_load_multiple($fids);
+-
++  
+   // If tags have been entered, apply them to each new entity.
+   if (!empty($form_state['values']['field_tags'])) {
+     // Create any new taxonomy terms.

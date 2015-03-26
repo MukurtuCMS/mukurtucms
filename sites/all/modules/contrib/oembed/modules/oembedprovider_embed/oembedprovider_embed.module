@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Implements hook_init().
+ */
+function oembedprovider_embed_init() {
+  $loader = drupal_classloader();
+  $map = require drupal_get_path('module', 'oembedprovider_embed') . '/vendor/composer/autoload_namespaces.php';
+  foreach ($map as $namespace => $path) {
+    $loader->registerNamespace(rtrim($namespace, '\\'), $path);
+  }
+}
+
+/**
+ * Implement hook_ctools_plugin_directory().
+ */
+function oembedprovider_embed_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'oembed' && $plugin == 'providers') {
+    return 'plugins/' . $plugin;
+  }
+}

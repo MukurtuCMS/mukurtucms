@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Media: oEmbed module.
+ */
+
+/**
+ * Implement hook_update_dependencies().
+ */
+function media_oembed_update_dependencies() {
+  $dependencies['oembedcore'][7004] = array(
+    'media_oembed' => 7007,
+  );
+  return $dependencies;
+}
+
+/**
+ * Clear style and preset caches.
+ */
+function media_oembed_update_7001() {
+  // We don't do this if we're using version 1 of Styles.
+  if (function_exists('styles_style_flush')) {
+    styles_style_flush();
+  }
+
+  return array();
+}
+
+/**
+ * Add label to Media: oEmbed file style.
+ */
+function media_oembed_update_7003() {
+  return array();
+}
+
+/**
+ * Rebuild themes.
+ */
+function media_oembed_update_7004() {
+  drupal_theme_rebuild();
+  return array();
+}
+
+/**
+ * Add a large video preset and medium thumbnail.
+ */
+function media_oembed_update_7005() {
+  return array();
+}
+
+/**
+ * Add a square thumbnail preset.
+ */
+function media_oembed_update_7006() {
+  return array();
+}
+
+/**
+ * Rename file displays.
+ */
+function media_oembed_update_7007() {
+  ctools_include('export');
+
+  $displays = ctools_export_load_object('file_display');
+  foreach ($displays as $name => $display) {
+    list($file_type, $view_mode, $formatter_name) = explode('__', $name);
+    if (strpos($formatter_name, 'media_oembed') === 0) {
+      $formatter_name = str_replace('media_oembed', 'oembed', $formatter_name);
+      $new_display = array(
+        'api_version' => 1,
+        'name' => implode('__', array($file_type, $view_mode, $formatter_name)),
+        'status' => $display->status,
+        'weight' => $display->weight,
+        'settings' => $display->settings,
+        'export_type' => NULL,
+      );
+
+      file_display_save((object) $new_display);
+
+      if ($display->export_type & EXPORT_IN_DATABASE) {
+        ctools_export_crud_delete('file_display', $name);
+      }
+      if ($display->export_type & EXPORT_IN_CODE) {
+        ctools_export_crud_disable('file_display', $name);
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+diff --git a/modules/providers/scald_vimeo/scald_vimeo.module b/modules/providers/scald_vimeo/scald_vimeo.module
+index 4bdeb57..451df37 100644
+--- a/modules/providers/scald_vimeo/scald_vimeo.module
++++ b/modules/providers/scald_vimeo/scald_vimeo.module
+@@ -101,12 +101,23 @@ function scald_vimeo_scald_fetch($atom, $type) {
+  */
+ function scald_vimeo_scald_prerender($atom, $context, $options, $mode) {
+   if ($mode == 'atom') {
++    //load context configuration to retrieve dimension data if present
++    $context_config = scald_context_config_load($context);
++    $video_width = (isset($atom->data['video_width'])) ? $atom->data['video_width'] : 480;
++    $video_height = (isset($atom->data['video_height'])) ? $atom->data['video_height'] : 365;
++    //allow context configuration to override video dimension variables
++    if(isset($context_config->data['width'])){
++      $video_width = $context_config->data['width'];
++    }
++    if(isset($context_config->data['height'])){
++      $video_height = $context_config->data['height'];
++    }
+     $atom->rendered->player = theme('scald_vimeo_player',
+       array('vars' =>
+         array(
+           'video_id'      => $atom->base_id,
+-          'video_width'   => ($atom->data['video_width'] ? $atom->data['video_width'] : 480),
+-          'video_height'  => ($atom->data['video_height'] ? $atom->data['video_height'] : 365),
++          'video_width'   => $video_width,
++          'video_height'  => $video_height,
+           'thumbnail'     => $atom->thumbnail_source
+         ),
+         'atom' => $atom,

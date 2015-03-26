@@ -1,0 +1,14 @@
+name = Multiform test
+description = Handle module for testing Multiform
+core = 7.x
+
+dependencies[] = multiform
+hidden = TRUE
+
+files[] = multiform_test.module
+; Information added by drupal.org packaging script on 2012-01-29
+version = "7.x-1.0"
+core = "7.x"
+project = "multiform"
+datestamp = "1327823749"
+

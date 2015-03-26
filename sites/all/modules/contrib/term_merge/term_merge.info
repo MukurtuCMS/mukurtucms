@@ -1,0 +1,16 @@
+name = Term Merge
+description = This module allows you to merge multiple terms into one, while updating all fields referring to those terms to refer to the replacement term instead.
+package = Taxonomy
+core = 7.x
+
+files[] = term_merge.test
+
+dependencies[] = taxonomy
+dependencies[] = entity
+
+; Information added by Drupal.org packaging script on 2015-01-14
+version = "7.x-1.2"
+core = "7.x"
+project = "term_merge"
+datestamp = "1421194982"
+

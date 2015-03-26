@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * @file
+ * Module for providing content as defined in the oEmbed specification
+ */
+
+/**
+ * Implements hook_help().
+ */
+function oembedprovider_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/media/oembed/endpoint':
+      $output = '<p>'. t('This site is an oEmbed provider with a public endpoint.') .'</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_hook_info().
+ *
+ * @return string
+ */
+function oembedprovider_hook_info() {
+  $hooks['oembedprovider_formats_alter'] = array(
+    'group' => 'oembed',
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function oembedprovider_menu() {
+  $menu = array();
+
+  $menu['oembed/endpoint'] = array(
+    'type' => MENU_CALLBACK,
+    'file' => 'oembedprovider.inc',
+    'page callback' => '_oembedprovider_handle_request',
+    'access arguments' => array('access content'),
+    'delivery callback' => 'oembedprovider_deliver_response',
+  );
+
+  $menu['admin/config/media/oembed/endpoint'] = array(
+    'title' => 'Public endpoint',
+    'description' => 'Settings for oEmbed endpoint',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oembedprovider_settings'),
+    'file' => 'oembedprovider.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $menu;
+}
+
+/**
+ * Implement hook_ctools_plugin_directory().
+ */
+function oembedprovider_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'oembed' && $plugin == 'providers') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+
+/**
+ * Merges a result with some standard values.
+ *
+ * @param string $type
+ * @param array $result
+ */
+function _oembedprovider_result($type, $props) {
+  $defaults = array(
+    'type' => $type,
+    'version' => '1.0',
+    'provider_name' => variable_get('site_name', ''),
+    'width' => 0,
+    'height' => 0,
+  );
+  $result = array_merge($defaults, $props);
+  return $result;
+}

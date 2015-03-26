@@ -1,0 +1,15 @@
+name = Modernizr
+description = Modernizr integration to Drupal
+core = 7.x
+package = Modernizr
+files[] = modernizr.module
+files[] = modernizr.inc
+files[] = modernizr.install
+files[] = modernizr.admin.inc
+
+; Information added by drupal.org packaging script on 2012-01-18
+version = "7.x-2.1"
+core = "7.x"
+project = "modernizr"
+datestamp = "1326920445"
+

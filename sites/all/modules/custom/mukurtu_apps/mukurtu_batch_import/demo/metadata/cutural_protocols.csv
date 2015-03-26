@@ -1,0 +1,17 @@
+nid,guid,Title,Description,Sharing Protocols Display,Sharing Protocols,Media,Media Internet (Off),uid,Updated date,Type
+,mukurtu_demo_protocol_001,Mukurtu Community Shares,"This is a Media Cultural Protocol. It is set to Open.
+",Community,1,white.jpg,,1,"Tue, 05/15/2012 - 12:07",Cultural Protocols
+,mukurtu_demo_protocol_002,Blue,"This is a Blue Cultural Protocol. It is set to Community.
+",Community,1,blue.jpg,,1,"Tue, 05/15/2012 - 12:06",Cultural Protocols
+,mukurtu_demo_protocol_003,Green,"This is a Green Cultural Protocol. It is set to Open.
+",Open,0,green.jpg,,1,"Tue, 05/15/2012 - 12:07",Cultural Protocols
+,mukurtu_demo_protocol_004,Red,"This is a Red Cultural Protocol. It is set to Strict.
+",Strict Community,2,red.jpg,,1,"Tue, 05/15/2012 - 12:05",Cultural Protocols
+,mukurtu_demo_protocol_007,Unclassified,"Any content that is not declared to belong to a particular protocol is by default 'unclassified'. This group is the default for content, and is marked strictly shared. Content in this group should be reviewed and classified into the appropriate cultural protocols for sharing with and beyond the community.
+",Open,0,white.jpg,,1,"Tue, 05/15/2012 - 12:06",Cultural Protocols
+,mukurtu_demo_protocol_008,Gender: Male,"Male
+",Community,1,white.jpg,,1,"Tue, 05/15/2012 - 12:05",Cultural Protocols
+,mukurtu_demo_protocol_009,Age: Children restricted,"Children Restricted
+",Strict Community,2,white.jpg,,1,"Tue, 05/15/2012 - 12:07",Cultural Protocols
+,mukurtu_demo_protocol_0010,Age: Elder,"Elder
+",Community,1,white.jpg,,1,"Tue, 05/15/2012 - 12:07",Cultural Protocols

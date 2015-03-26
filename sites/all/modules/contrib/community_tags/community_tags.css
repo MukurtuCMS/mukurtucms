@@ -1,0 +1,34 @@
+div.tag-widget {
+}
+
+div.tag-widget ul.inline-tags {
+  list-style-type: none;
+  list-style-image: none;
+  background: url('tag.png') no-repeat 0 3px;
+  margin: 0;
+  padding: 0 0 0 22px;
+}
+div.tag-widget ul.inline-tags li {
+  list-style-type: none;
+  list-style-image: none;
+  background: none;
+  float: left;
+  margin: 0 -12px 0 0;
+  padding: 1px 18px 1px 5px;
+  cursor: pointer;
+  position: relative;
+  display: inline;
+}
+div.tag-widget ul.inline-tags li:hover, div.tag-widget ul.inline-tags li.hover {
+  background: #fdd url('delete.png') no-repeat 100% 50%;
+  z-index: 2;
+}
+div.tag-widget input.form-tags {
+  width: 16em;
+}
+.block div.tag-widget input.form-tags {
+  width: 12em;
+}
+html.js span.no-js, html.js input.form-tags {
+  display: none;
+}

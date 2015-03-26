@@ -1,0 +1,83 @@
+@charset "UTF-8";
+
+
+
+.popup-element{ display: inline-block;}
+.popup-element{ *display: inline;}
+.popup-element-title{ background: url('images/popup-icon.png') no-repeat right top; cursor: pointer; display: inline-block; padding-right: 12px; position: relative;}
+.popup-title-active{ background-image: url('images/popup-icon-active.png');}
+.popup-element-body{ display: none; position: absolute; text-align: left;}
+.popup-element-body a.popup-close-button{ cursor: pointer; float: right;}
+
+#popup-active-overlay{ position: absolute; z-index: 2000; top: 0; left: 0;}
+
+table.popup-layout{ border: none;}
+
+
+/* ---- Overrides ---- */
+
+.popup-element-body table.popup-layout{ background: none; border: none;}
+.popup-element-body table.popup-layout * { border: none;}
+.popup-element-body table.popup-layout tr { background: none;}
+
+
+/* ---- Popup menus ---- */
+
+.popup-element-body .popup-menu-branch,
+.popup-element-body .popup-menu-item,
+div.popup-menu-block .popup-menu-branch,
+div.popup-menu-block .popup-menu-item{ display: block;}
+
+.popup-menu-branch .popup-menu-branch-title{ cursor: default;}
+
+/* ---- Nodes ---- */
+
+.popup-element-body .node{ border-bottom: 0; margin: 0; padding: 0;}
+
+
+/* ---- Ajax ---- */
+
+.popup-ahah-placeholder{ background: url('/misc/throbber.gif') no-repeat right -15px; height: 20px;}
+
+
+/* ---- Script disabled ---- */
+
+.popup-element-noscript a.popup-close-button{ display: none;}
+.popup-element-noscript .popup-element-title{ position: static;}
+.popup-element-noscript:hover{ position: relative;}
+.popup-element-noscript:hover .popup-element-body{ display: block;}
+.popup-element-noscript:hover .popup-element-body .popup-element-body{ display: none;}
+
+.popup-element-noscript .origin-top-left.expand-top-left{ bottom: 100%; right: 100%;}
+.popup-element-noscript .origin-top-left.expand-top-right{ bottom: 100%; left: 0;}
+.popup-element-noscript .origin-top-left.expand-bottom-left{ top: 0; right: 100%;}
+.popup-element-noscript .origin-top-left.expand-bottom-right{ top: 0; left: 0;}
+
+.popup-element-noscript .origin-top-right.expand-top-left{ bottom: 100%; right: 0;}
+.popup-element-noscript .origin-top-right.expand-top-right{ bottom: 100%; left: 100%;}
+.popup-element-noscript .origin-top-right.expand-bottom-left{ right: 0; top: 0;}
+.popup-element-noscript .origin-top-right.expand-bottom-right{ left: 100%; top: 0;}
+
+.popup-element-noscript .origin-bottom-left.expand-top-left{ bottom: 0; right: 100%;}
+.popup-element-noscript .origin-bottom-left.expand-top-right{ bottom: 0; left: 0;}
+.popup-element-noscript .origin-bottom-left.expand-bottom-left{ right: 100%; top: 100%;}
+.popup-element-noscript .origin-bottom-left.expand-bottom-right{ top: 100%; left: 0; }
+
+.popup-element-noscript .origin-bottom-right.expand-top-left{ bottom: 0; right: 0;}
+.popup-element-noscript .origin-bottom-right.expand-top-right{ bottom: 0; left: 100%; }
+.popup-element-noscript .origin-bottom-right.expand-bottom-left{ right: 0; top: 100%; }
+.popup-element-noscript .origin-bottom-right.expand-bottom-right{ top: 100%; left: 100%; }
+
+.popup-element-noscript .width-100 .inner{ width: 100px;}
+.popup-element-noscript .width-150 .inner{ width: 150px;}
+.popup-element-noscript .width-200 .inner{ width: 200px;}
+.popup-element-noscript .width-250 .inner{ width: 250px;}
+.popup-element-noscript .width-300 .inner{ width: 300px;}
+.popup-element-noscript .width-350 .inner{ width: 350px;}
+.popup-element-noscript .width-400 .inner{ width: 400px;}
+.popup-element-noscript .width-450 .inner{ width: 450px;}
+.popup-element-noscript .width-500 .inner{ width: 500px;}
+
+.popup-element-noscript .popup-ahah-placeholder{ display: none;}
+
+

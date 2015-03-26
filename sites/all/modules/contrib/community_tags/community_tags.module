@@ -1,0 +1,1585 @@
+<?php
+
+/**
+ * @file
+ * Implements community tagging of nodes using a specific vocabulary for Drupal v7.x
+ */
+
+/**
+ * Display modes.
+ */
+define('COMMUNITY_TAGS_MODE_BLOCK', 0);
+define('COMMUNITY_TAGS_MODE_TAB', 1);
+define('COMMUNITY_TAGS_MODE_INLINE', 2);
+
+/**
+ * Operation modes.
+ */
+define('COMMUNITY_TAGS_OPMODE_NOSYNC', 0x00);
+define('COMMUNITY_TAGS_OPMODE_SYNC', 0x01);
+define('COMMUNITY_TAGS_OPMODE_DELETE_ORPHAN_TERMS', 0x02);
+
+/**
+ * Implements hook_help().
+ */
+function community_tags_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/content/community-tags':
+      return t('To set up community tagging, first add a term reference field to a content type, then enable community tagging here. Set where the community tags form is displayed (tab, inline, or block) on the content type settings page under "Community tags settings". <strong>Hint:</strong> Be sure to set the "number of values" setting on your term reference fields!');
+      break;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function community_tags_theme() {
+  return array(
+    'community_tags_form' => array(
+      'render element' => 'form',
+      'file' => 'community_tags.pages.inc',
+    ),
+    'community_tags' => array(
+      'variables' => array('tags' => NULL),
+    ),
+    'community_tags_links' => array(
+      'variables' => array('tags' => NULL),
+    ),
+    'community_tags_settings' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function community_tags_menu() {
+  $items = array();
+
+  $items['admin/config/content/community-tags'] = array(
+    'title' => 'Community tags',
+    'description' => 'Configure community tagging.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('community_tags_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'community_tags.admin.inc',
+  );
+  $items['admin/config/content/community-tags/ops/broken'] = array(
+    'title' => 'Delete broken community tags',
+    'description' => 'Delete broken community tags.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('community_tags_delete_broken_tags_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'community_tags.admin.inc',
+  );
+  $items['admin/config/content/community-tags/ops/rebuild/%taxonomy_vocabulary'] = array(
+    'title' => 'Rebuild community tags',
+    'description' => 'Rebuild community tags.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('community_tags_rebuild_form', 6),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'community_tags.admin.inc',
+  );
+  $items['admin/config/content/community-tags/ops/purge/%taxonomy_vocabulary'] = array(
+    'title' => 'Delete community tags',
+    'description' => 'Delete community tags.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('community_tags_delete_all_form', 6),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'community_tags.admin.inc',
+  );
+  $items['community-tags/js/%node'] = array(
+    'page callback' => 'community_tags_from_js',
+    'page arguments' => array(2),
+    'access callback' => '_community_tags_menu_access',
+    'type' => MENU_CALLBACK,
+    'file' => 'community_tags.ajax.inc',
+  );
+
+  $items['community-tags/user'] = array(
+    'page callback' => 'community_tags_by_user',
+    'access callback' => '_community_tags_menu_access',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['node/%node/tag'] = array(
+    'title' => 'Tags',
+    'page callback' => '_community_tags_node_view',
+    'page arguments' => array(1, FALSE),
+    'access callback' => '_community_tags_tab_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+    'file' => 'community_tags.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function community_tags_block_info() {
+  // tagging form block should not be cached as block uses JS settings in community_tags_node_view()
+  $block[0] = array(
+    'info' => t('Community tagging form'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  return $block;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function community_tags_block_view($delta) {
+  if (user_access('access content') && user_access('tag content')) {
+    if (arg(0) == 'node' && is_numeric(arg(1)) && (arg(2) == '' || arg(2) == 'view')) {
+      $node = menu_get_object();
+      if (_community_tags_is_tagging_view_visible($node, COMMUNITY_TAGS_MODE_BLOCK)) {
+        $block['subject'] = t('Tag this');
+        $block['content'] = _community_tags_node_view($node, TRUE);
+        return $block;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function community_tags_permission() {
+  return array(
+    'tag content' => array(
+      'title' => t('tag content'),
+      'description' => t('Tag content'),
+    ),
+    'edit own tags' => array(
+      'title' => t('edit own tags'),
+      'description' => t('Add tags after initial tagging and delete own tags'),
+    ),
+  );
+}
+
+/*****************************************************************************
+ * Community tag node hooks should be called after taxonomy module hooks - see
+ * system weight in community_tags.install.
+ *****************************************************************************/
+
+/**
+ * Implements hook_node_load().
+ */
+function community_tags_node_load($nodes, $types) {
+  foreach($nodes as $node) {
+    $node->community_tags_form = _community_tags_is_tagging_view_visible($node, COMMUNITY_TAGS_MODE_INLINE);
+  }
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function community_tags_node_insert($node) {
+  _community_tags_node_insert($node);
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function community_tags_node_update($node) {
+  if (!isset($node->ct_user_tags)) {
+    // only process if not comming from community_tags_taxonomy_node_save() or batch
+    _community_tags_node_update($node);
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function community_tags_node_delete($node) {
+  _community_tags_node_delete($node);
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function community_tags_node_view($node, $view_mode = 'full') {
+  global $user;
+  // Show quick tag form for this node if we're on a node page view and the
+  // form is enabled for this node and the default quick tag vocab is set and it's not a search build.
+  // NODE_BUILD_SEARCH_INDEX test no longer required - search has view_mode of search_index (or search_result)
+  if ($view_mode == 'full' && isset($node->community_tags_form)) {
+    $node->content['community_tags'] = array(
+      '#markup' => _community_tags_node_view($node, TRUE),
+      '#weight' => 50,
+    );
+  }
+}
+
+/**
+ * Implements hook_taxonomy().
+ * Handle term deletion. No need to handle vocabulary deletion term/delete
+ * hook is called for every term in the vocabulary before vocabulary/delete hook.
+ */
+function community_tags_taxonomy($op = NULL, $type = NULL, $term = NULL) {
+  if ($type == 'term' && $term['tid']) {
+    switch ($op) {
+      case 'delete':
+        // if term is deleted then remove all ctags for the term
+        $term = (object) $term;
+        _community_tags_term_delete($term);
+        break;
+    }
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function community_tags_user_cancel($edit, $account, $method) {
+  // if user is deleted then remove all ctags for the user.
+  // @todo consider option of moving all tags to a "dead" user so tags are not lost
+  // maybe something to add with anonymous user support if method is appropriate.
+  _community_tags_user_delete($user);
+}
+
+/**
+ * Implements hook_user_delete().
+ */
+function community_tags_user_delete($account) {
+  // if user is deleted then remove all ctags for the user.
+  _community_tags_user_delete($user);
+}
+
+/**
+ * Implements hook_content_extra_fields().
+ */
+function community_tags_content_extra_fields($type_name) {
+  $extra = array();
+  if (variable_get('community_tags_display_' . $type_name, COMMUNITY_TAGS_MODE_TAB) == COMMUNITY_TAGS_MODE_INLINE) {
+    $extra['community_tags'] = array(
+      'label' => t('Community Tags'),
+      'description' => t('Community Tags Form'),
+      'weight' => 100,
+    );
+  }
+  return $extra;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function community_tags_form_node_type_form_alter(&$form, $form_state) {
+  // Provide option to enable Community Tags per node type.
+  if (isset($form['#node_type']->type)) {
+    // only show if content type is mapped to tagging vocabulary
+
+    $supported_vmnames = _community_tags_vids_for_node_type($form['#node_type']->type);
+    if (!empty($supported_vmnames)) {
+      $modes = array(
+        COMMUNITY_TAGS_MODE_BLOCK => t('Block'),
+        COMMUNITY_TAGS_MODE_TAB => t('Tab'),
+        COMMUNITY_TAGS_MODE_INLINE => t('Inline'),
+      );
+      $form['community_tags'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Community tags settings'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#group' => 'additional_settings',
+      );
+
+      $form['community_tags']['community_tags_display'] = array(
+        '#type' => 'radios',
+        '#title' => t('Community tagging form'),
+        '#default_value' => variable_get('community_tags_display_' . $form['#node_type']->type, COMMUNITY_TAGS_MODE_TAB),
+        '#options' => $modes,
+        '#description' => t('How should users be allowed to tag content?'),
+      );
+    }
+  }
+}
+
+/**
+ * Save community_tags term associations and counts for a given node.
+ *
+ * Do user ctags processing. If new tags added or tags deleted and synchronisation required,
+ * call node_save() so that other modules get to act including taxonomy.module which will create
+ * or destroy term node records.
+ *
+ * @param $tags_and_terms
+ *  All the users' terms - array('tags' => array(vid1 => array($tagname1, $tagname2...), vid2 => array(...)))
+ *  NB: may have more than 1 vocabulary.
+ *
+ * @todo D7 Make sure we're handling field instances correctly and multiple value behaviour - see devel_generate for examples
+ */
+function community_tags_taxonomy_node_save($node, $tags_and_terms, $is_owner, $uid) {
+  // get permitted CT vocabularies
+  $vids = community_tags_vids_for_node($node);
+
+  // find existing terms and identify new tags
+  $processed_tags_and_terms = _community_tags_node_process_tags_and_terms($tags_and_terms, $vids);
+
+  // create new terms for new tags
+  $processed_terms = _community_tags_convert_new_tags_to_terms($processed_tags_and_terms);
+
+  // flag will be set if new terms for the node are found and sync mode is set
+  $node_save_required = FALSE;
+
+  // keep track of terms that we may remove if tag deleted
+  $possible_redundant_term_tids = array();
+
+  // get the term fields
+  $fields_by_vid = _community_tags_get_term_reference_fields(NULL, $node->type);
+
+  $language = $node->language;
+
+  // for each vocabulary supplied
+  foreach ($processed_terms as $vid => $processed_terms_for_vocabulary) {
+    // fields for this node and vocabulary
+    $fields = $fields_by_vid[$vid];
+
+    // compare existing node terms to processed terms - add or delete as required.
+    $existing_tags = _community_tags_get_node_user_vid_tags($node->nid, $uid, $vid);
+    $new_tags = array_diff_key($processed_terms_for_vocabulary, $existing_tags);
+    $removed_tags = array_diff_key($existing_tags, $processed_terms_for_vocabulary);
+
+    // add new tags attribute to the current user
+    foreach ($new_tags as $tid => $value) {
+      // add new tag
+      _community_tags_add_tag($node->nid, $tid, $uid);
+      // if tags are synched with node terms and this tag isn't a node term - then add it from node terms
+      if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_SYNC, $vid, $node->type)) {
+        // add to all fields that don't already have it
+        if(_community_tags_add_term_to_node($node, $tid, $vid) > 0) {
+          $node_save_required = TRUE;
+        }
+      }
+    }
+
+    // remove old tags for this user
+    foreach ($removed_tags as $tid => $value) {
+      _community_tags_delete_tag($node->nid, $tid, $uid);
+      // if tags are synched with node terms and this tag is a node term and tag count is down to 1 (i.e. last tag)
+      // then remove it from node terms
+      if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_SYNC, $vid, $node->type) && $existing_tags[$tid]->tag_count <= 1) {
+        // remove from all fields that have it
+        if(_community_tags_remove_term_from_node($node, $tid, $vid) > 0) {
+          $node_save_required = TRUE;
+        }
+      }
+      if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_DELETE_ORPHAN_TERMS, $vid, $node->type)) {
+        $possible_redundant_term_tids[] = $tid;
+      }
+    }
+  }
+
+  if ($node_save_required) {
+    // setting this will prevent full CT node update processing
+    $node->ct_user_tags = $tags_and_terms;
+    // invoke full node save pipeline - term nodes will be updated, and good stuff like search (including the Apache SOLR Integration module) will know about it.
+    node_save($node);
+  }
+
+  // still valid to check for orphaned terms
+  // @todo make sure this isn't too onerous - we're probably in an AJAX call here...
+  if (!empty($possible_redundant_term_tids)) {
+    _community_tags_cleanup_orphaned_tags_by_tids($possible_redundant_term_tids);
+  }
+
+  return;
+}
+
+/**
+ * Helper function for retrieving a query result to pass along to the Tagadelic
+ * functions prior to theming.
+ *
+ * @param $type
+ *   The type of query to perform. Possible values:
+ *   - node: get tag count for a given node.
+ *   - type: get tag count for a given node type.
+ *   - user: get tag count for a given user.
+ *   - user_node: get tag count for a given user on a given node.
+ *   - global: get tag count across entire site (default).
+ * @param $args
+ *   An array of arguments that correspond to the result type:
+ *   - If type is 'node', $arg1 is a node ID, $arg2 (optional) is vocabulary ID.
+ *   - If type is 'type', $arg1 is a node type.
+ *   - If type is 'user', $arg1 is a user ID.
+ *   - If type is 'user_node', $arg1 is a user ID, and $arg2 is a node ID.
+ *   - If type is 'global', neither $args are used.
+ * @param $limit
+ *   Only display a certain number of tags.
+ * @return $result
+ *  A database result set.
+ */
+function _community_tags_get_tag_result($type = 'global', $limit = NULL, $arg1 = NULL, $arg2 = NULL) {
+  $query = db_select('taxonomy_term_data', 't');
+
+  // add fields
+  $count_alias = $query->addExpression('COUNT(t.tid)', 'count');
+  $tid_alias = $query->addField('t', 'tid', 'tid');
+  $name_alias = $query->addField('t', 'name', 'name');
+  $vid_alias = $query->addField('t', 'vid', 'vid');
+  $description_alias = $query->addField('t', 'description', 'description');
+
+  // join common to all access types
+  $query->join('community_tags', 'c', 'c.tid = t.tid');
+
+  // common group and order by
+  $query->groupBy($tid_alias)->groupBy($name_alias)->groupBy($vid_alias);
+  $query->orderBy($count_alias, 'DESC');
+
+
+  switch ($type) {
+    case 'node':
+      $query->condition('c.nid', (int) $arg1);
+      if ($arg2) {
+        $query->condition('t.vid', (int) $arg2);
+      }
+      break;
+    case 'type':
+      $query->join('node', 'n', 'n.nid = c.nid AND n.type = :type', array(':type' => (string) $arg1));
+      break;
+    case 'user':
+      $query->condition('c.uid', (int) $arg1);
+      break;
+    case 'user_node':
+      $query->condition('c.nid', (int) $arg1)->condition('c.uid', (int) $arg1);
+    default:
+  }
+
+  if ($limit) {
+    $query->range(0, (int) $limit);
+  }
+  return $query->execute();
+}
+
+function _community_tags_get_display_handlers() {
+  static $handlers;
+
+  if (!$handlers) {
+    $handlers = array(
+      'none' => array(
+        'id' => 'none',
+        'title' => t('None'),
+        'fn' => '_community_tags_display_handler_none',
+      ),
+      'links' => array(
+        'id' => 'links',
+        'title' => t('Links'),
+        'fn' => '_community_tags_display_handler_links',
+      ),
+    );
+
+    if (module_exists('tagadelic')) {
+      $handlers['tagadelic'] = array(
+        'id' => 'tagadelic',
+        'title' => t('Tagadelic'),
+        'fn' => '_community_tags_display_handler_tagadelic',
+      );
+    }
+  }
+
+  return $handlers;
+}
+
+/**
+ * Get handler options for admin form. Interim measure pending pluggable display handlers.
+ */
+function _community_tags_get_display_handler_options() {
+  $options = array();
+  foreach (_community_tags_get_display_handlers() as $key => $handler) {
+    $options[$key] = $handler['title'];
+  }
+
+  return $options;
+}
+
+/**
+ * Perhaps extend with ctools.
+ * Return configured display handler or default to 'links' if configured handler not available.
+ */
+function _community_tags_get_display_handler($vid, $content_type, $inline) {
+  // get settings
+  $settings = _community_tags_get_settings($vid, $content_type);
+
+  // get all handlers
+  $handlers = _community_tags_get_display_handlers();
+
+  return isset($handlers[$settings['display_handler']]) ? $handlers[$settings['display_handler']] : $handlers['links'];
+}
+
+/**
+ * No all tag display.
+ */
+function _community_tags_display_handler_none() {
+  return;
+}
+
+/**
+ * Display all tags as simple links.
+ */
+function _community_tags_display_handler_links($type = 'global', $limit = NULL, $arg1 = NULL, $arg2 = NULL) {
+  $tags = _community_tags_get_tag_result($type, $limit, $arg1, $arg2);
+  $tags = $tags->fetchAllAssoc('tid');
+  return theme('community_tags_links', array('tags' => $tags));
+}
+
+/**
+ * Display all tags using tagadelic. Only called if tagadelic module is enabled. See _community_tags_get_tag_result() for definitions
+ * of $type and the arguments.
+ */
+function _community_tags_display_handler_tagadelic($type = 'global', $limit = NULL, $arg1 = NULL, $arg2 = NULL) {
+  $tags = _community_tags_get_tag_result($type, $limit, $arg1, $arg2);
+  $tags = $tags->fetchAllAssoc('tid');
+  $weighted_tags = tagadelic_build_weighted_tags($tags);
+  $sorted_tags = tagadelic_sort_tags($weighted_tags);
+  return theme('community_tags', array('tags' => $sorted_tags));
+}
+
+/**
+ * Community tags callback for node view.
+ *
+ * chaps2 - implemented multiple vocabularies base on patch at #199936.
+ * @todo refactor to allow use of block cache
+ */
+function _community_tags_node_view($node, $inline = TRUE) {
+  global $user;
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
+
+  if (!$inline) {
+    drupal_set_title($node->title);
+  }
+
+  module_load_include('inc', 'community_tags', 'community_tags.pages');
+
+  $output = '';
+
+  $vids = community_tags_vids_for_node($node);
+  foreach ($vids as $vid) {
+    // get fields for vid/type combination
+    $fields = _community_tags_get_term_reference_fields($vid, $node->type);
+    // if more than 1 doesn't matter which we use
+    $field = reset($fields);
+    $tags = community_tags_get_user_node_tags($user->uid, $node->nid, $vid);
+
+    $display_handler = _community_tags_get_display_handler($vid, $node->type, $inline);
+    $cloud = call_user_func($display_handler['fn'], 'node', NULL, $node->nid, $vid);
+
+
+    if (!count($tags)) {
+      // User has not yet added tags to this node yet. Show form.
+      $form = drupal_get_form('community_tags_form', array('node' => $node, 'cloud' => $cloud, 'nid' => $node->nid, 'vid' => $vid, 'tags' => NULL, 'inline' => $inline, 'field' => $field, 'names' => array(), 'multiple' => count($vids)));
+      $output .= drupal_render($form);
+      // $output .= $form_output;
+    }
+    elseif (user_access('edit own tags')) {
+      // User has already tagged this node, but can edit their tags. Show form
+      // with the user's tags pre-populated.
+      $names = community_tags_flatten($tags);
+      $tags = taxonomy_implode_tags($tags);
+      $form = drupal_get_form('community_tags_form', array('node' => $node, 'cloud' => $cloud, 'nid' => $node->nid, 'vid' => $vid, 'tags' => $tags, 'inline' => $inline, 'field' => $field, 'names' => $names, 'multiple' => count($vids)));
+      $output .= drupal_render($form);
+    }
+    else {
+      // Sorry, no more adding tags for you!
+      $output .= '<p>' . t('You have already tagged this post. Your tags: ') . theme('community_tags', array('tags' => $tags)) . '</p>';
+    }
+
+    // TODO might want to optimise this call
+    // drupal_add_js(array('communityTags' => array('n_' . $node->nid => array('v_' . $vid => array('tags' => $names, 'url' => url('community-tags/js/' . $node->nid . '/' . $vid), 'add' => t('Add'), 'token' => drupal_get_token('community_tags_form'))))), array('type' => 'setting', 'scope' => JS_DEFAULT));
+  }
+
+  return $output;
+}
+
+/**
+ * Theme function to display a list of community tags via tagadelic.
+ *
+ * @ingroup themeable
+ */
+function theme_community_tags($variables) {
+  $tags = $variables['tags'];
+  return '<div class="cloud">' . (count($tags) ? theme('tagadelic_weighted', array('terms' => $tags)) : t('None')) . '</div>';
+}
+
+/**
+ * Theme function to display a list of community tags as simple links.
+ *
+ * @ingroup themeable
+ */
+function theme_community_tags_links($variables) {
+  $tags = $variables['tags'];
+
+  $links = array();
+  $terms = taxonomy_term_load_multiple(array_keys($tags));
+  foreach ($terms as $term) {
+    // $term = taxonomy_get_term($tag->tid);
+    // $uri = entity_uri('taxonomy_term', $term);
+    // dpm($uri);
+    // $variables['term_url']  = url($uri['path'], $uri['options']);
+
+    $link = array(
+      'title' => $term->name,
+      'href' => drupal_get_path_alias('taxonomy/term/' . $term->tid),
+      'attributes' => array(
+        'rel' => 'tag',
+        'title'  => $term->description,
+      ),
+    );
+
+    $links[] = $link;
+  }
+  return theme('links', array('links' => $links, 'attributes' => array('class' => array('links', 'inline'))));
+}
+
+/**
+ * Menu access callback; Common access check for tag operations.
+ */
+function _community_tags_menu_access() {
+  return user_access('access content') && user_access('tag content');
+}
+
+/**
+ * Menu access callback; Check if the user can access the 'Tags' local task on
+ * node pages.
+ */
+function _community_tags_tab_access($node) {
+  return _community_tags_is_tagging_view_visible($node, COMMUNITY_TAGS_MODE_TAB) && _community_tags_menu_access();
+}
+
+/**
+ * Helper function for the JS tagger.
+ */
+function community_tags_flatten($tags) {
+  $names = array();
+  foreach ($tags as $tag) {
+    $names[] = $tag->name;
+  }
+  return $names;
+}
+
+/**
+ * Implements hook_views_api().
+ * See community_tags.views.inc for the actual views integration
+ */
+function community_tags_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+
+/*****************************************************************************
+ * Node (hook_nodeapi) handlers for CT.
+ *
+ * Permissions - user editing a node may cause community tags to be created
+ * or deleted without having explicit permission to do so.
+ *****************************************************************************/
+
+/**
+ * Node has been inserted. All node terms are added to ctags attributed to the node editor.
+ */
+function _community_tags_node_insert($node) {
+  global $user;
+
+  // get CT vocabularies for this node
+  $vids = community_tags_vids_for_node($node);
+
+  // filter out non CT vocabulary terms, convert tag names to terms, and identify new tags
+  $processed_terms = _community_tags_node_process_term_fields($node, $vids);
+
+  // new tags should have been created as new terms by taxonomy.module but in
+  // case system weights have been altered...
+  // $processed_terms = _community_tags_convert_new_tags_to_terms($processed_tags_and_terms);
+
+  // add all to community_tags
+  foreach ($processed_terms as $vid => $terms) {
+    foreach ($terms as $tid => $term) {
+      // add term to community tags for current user (default)
+      _community_tags_add_tag($node->nid, $tid, $user->uid);
+    }
+  }
+}
+
+/**
+ * Node has been updated. All terms that are not ctags are added to ctags attributed to the current user. Removed
+ * terms are removed from ctags either for all users (sync mode) or just the current user.
+ */
+function _community_tags_node_update($node, $vids = NULL) {
+  global $user;
+
+  // get CT vocabularies for this node
+  $vids = $vids ? $vids : community_tags_vids_for_node($node);
+
+  // filter out non CT vocabulary terms, convert tag names to terms, and identify new tags
+  $processed_terms = _community_tags_node_process_term_fields($node, $vids);
+
+  // new tags should have been created as new terms by taxonomy.module but in
+  // case system weights have been altered...
+  // $processed_terms = _community_tags_convert_new_tags_to_terms($processed_tags_and_terms);
+
+  // combine processed terms into 1 array
+  $all_processed_terms = array();
+  foreach ($processed_terms as $vid => $terms) {
+    $all_processed_terms += $terms;
+  }
+
+  // compare existing node terms to processed terms - add or delete as required.
+  $existing_tags = _community_tags_get_node_tags($node->nid, $vids);
+  $new_tags = array_diff_key($all_processed_terms, $existing_tags);
+  $removed_tags = array_diff_key($existing_tags, $all_processed_terms);
+
+  $possible_redundant_term_tids = array();
+
+  // add new tags attribute to the current user
+  // always add irrespective of SYNC mode
+  foreach ($new_tags as $tid => $value) {
+    _community_tags_add_tag($node->nid, $tid, $user->uid);
+  }
+
+  // remove old tags for all users
+  foreach ($removed_tags as $tid => $value) {
+    $removed_node_term = $existing_tags[$tid];
+    if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_SYNC, $removed_node_term->vid, $node->type)) {
+      // if in SYNC mode - delete all ctags for removed node term
+      _community_tags_delete_tags($node->nid, $tid);
+      if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_DELETE_ORPHAN_TERMS, $removed_node_term->vid, $node->type)) {
+        $possible_redundant_term_tids[] = $tid;
+      }
+    }
+    else {
+      // if not in SYNC mode - only delete the current user's tag for the removed node term
+      _community_tags_delete_tag($node->nid, $tid, $user->uid);
+      if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_DELETE_ORPHAN_TERMS, $removed_node_term->vid, $node->type) && $removed_node_term->tag_count <= 1) {
+        $possible_redundant_term_tids[] = $tid;
+      }
+    }
+  }
+
+  _community_tags_cleanup_orphaned_tags_by_tids($possible_redundant_term_tids);
+}
+
+/**
+ * Node has been deleted. Delete all community tags for the deleted node.
+ * Node terms will have been removed. After ctags have been removed check
+ * for redundant terms.
+ */
+function _community_tags_node_delete($node) {
+  // delete all tags for this node
+  $existing_tags = _community_tags_get_node_tags($node->nid);
+  _community_tags_delete_tags_for_node($node->nid);
+
+  $possible_redundant_term_tids = array();
+
+  foreach ($existing_tags as $tid => $tag) {
+    if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_DELETE_ORPHAN_TERMS, $tag->vid, $node->type) && $tag->tag_count <= 1) {
+      $possible_redundant_term_tids[] = $tid;
+    }
+  }
+  _community_tags_cleanup_orphaned_tags_by_tids($possible_redundant_term_tids);
+}
+
+/*****************************************************************************
+ * Taxonomy hook handlers
+ ****************************************************************************/
+/**
+ * Node has been deleted. Delete all community tags for the deleted node. No
+ * Synchronisation issues. When it's gone it's gone.
+ */
+function _community_tags_term_delete($term) {
+  // delete all tags for this term
+  _community_tags_delete_tags_for_term($term->tid);
+}
+
+/*****************************************************************************
+ * Vocabulary hook changes
+ ****************************************************************************/
+/**
+ * Implements hook_taxonomy_vocabulary_update().
+ */
+function community_tags_taxonomy_vocabulary_update($vocabulary) {
+  // Reflect machine name changes in community_tags settings
+  if (!empty($vocabulary->old_machine_name) && $vocabulary->old_machine_name != $vocabulary->machine_name) {
+    $settings = variable_get('community_tags_vocabularies', array());
+    if(!empty($settings[$vocabulary->old_machine_name])) {
+      $settings[$vocabulary->machine_name] = $settings[$vocabulary->old_machine_name];
+      unset($settings[$vocabulary->old_machine_name]);
+      variable_set('community_tags_vocabularies', $settings);
+    }
+  }
+}
+
+/*****************************************************************************
+ * User hook handlers
+ ****************************************************************************/
+/**
+ * User has been deleted. Delete all user tags for the deleted user. Apply node term
+ * deletion logic for all deleted tags.
+ */
+function _community_tags_user_delete($user) {
+  // get all user tags with tag counts (needed for term node deletion logic)
+  $user_tags = _community_tags_get_user_tags($user->uid);
+
+  // delete all tags for this user
+  _community_tags_delete_tags_for_user($user->uid);
+
+  // compile list of node terms to remove from affected nodes
+  $node_terms_to_remove = array();
+  $possible_redundant_term_tids = array();
+
+  foreach ($user_tags as $ctag) {
+    if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_SYNC, $ctag->vid, $ctag->type) && $ctag->tag_count <= 1) {
+      // last tag - need to delete the node term as well
+      $node_terms_to_remove[$ctag->nid][$ctag->tid] = $ctag;
+    }
+
+    if (_community_tags_is_opmode(COMMUNITY_TAGS_OPMODE_DELETE_ORPHAN_TERMS, $ctag->vid, $ctag->type)) {
+      $possible_redundant_term_tids[] = $ctag->tid;
+    }
+  }
+
+  if (!empty($node_terms_to_remove)) {
+    // for all affected nodes - remove node terms
+    foreach ($node_terms_to_remove as $nid => $terms_to_remove) {
+      $node = node_load($nid);
+      if(_community_tags_remove_mixed_terms_from_node($node, $terms_to_remove) > 0) {
+        // identify node_save call as coming from CT processing - not node edit
+        $node->ct_user_tags = array();
+        node_save($node);
+      }
+    }
+  }
+
+  // still valid to check for orphaned terms
+  // @todo make sure this isn't too onerous - we're probably in an AJAX call here...
+  if (!empty($possible_redundant_term_tids)) {
+    _community_tags_cleanup_orphaned_tags_by_tids($possible_redundant_term_tids);
+  }
+}
+
+/*****************************************************************************
+ * Helpers for adding and removing terms from nodes.
+ ****************************************************************************/
+
+/**
+ * Helper to add terms to a node - ready for saving with node_save.
+ *
+ * @param $terms_to_add
+ *  An array of terms to add. Keys must be tids, values must be an 'term' array
+ *  which must include at least the vid - e.g. array(12 => array('vid' => 1),...)
+ */
+function _community_tags_add_mixed_terms_to_node(&$node, $terms_to_add) {
+  $count_of_terms_added = FALSE;
+
+  // add to all fields that don't have it
+  foreach($terms_to_add as $tid => $tag) {
+    $count_of_terms_added += _community_tags_add_term_to_node($node, $tid, $tag['vid']);
+  }
+
+  return $count_of_terms_added;
+}
+
+/**
+ * Helper to add terms to a node - ready for saving with node_save.
+ *
+ * @param $tids_to_add
+ *  An array of tids to add.
+ */
+function _community_tags_add_terms_to_node(&$node, $tids_to_add, $vid) {
+  $count_of_terms_added = 0;
+
+  // add to all fields that don't have it
+  foreach($terms_to_add as $tid) {
+    $count_of_terms_added += _community_tags_add_term_to_node($node, $tid, $vid);
+  }
+
+  return $count_of_terms_added;
+}
+
+/**
+ * Add single term to node. Ready for node_save().
+ */
+function _community_tags_add_term_to_node(&$node, $tid, $vid) {
+  $count_of_terms_added = 0;
+
+  // get the term fields for this node and vid
+  $fields = _community_tags_get_term_reference_fields($vid, $node->type);
+
+  // language doesn't appear to be used for the field
+  // $language = $node->language;
+  $language = 'und';
+
+  // add to all fields that don't have it
+  // only add if node has one or more term reference fields for the term's vocabulary
+  if(!empty($fields)) {
+    // check terms present in each term reference field and add if not already there
+    foreach($fields as $field_name => $field) {
+      $term_field =& $node->$field_name;
+      // if it's the first tag create a new array
+      if (empty($term_field) || !array_key_exists($language, $term_field)) {
+        $term_field[$language] = array(array('tid' => $tid));
+        $count_of_terms_added += 1;
+      }
+      else if (FALSE === $index = _community_tags_term_reference_field_search($term_field, $language, $tid)) {
+        $term_field[$language][] = array('tid' => $tid);
+        $count_of_terms_added += 1;
+      }
+    }
+  }
+
+  return $count_of_terms_added;
+}
+
+/**
+ * Utility to search for tid in term reference field.
+ */
+function _community_tags_term_reference_field_search($term_field, $language, $tid) {
+  foreach($term_field[$language] as $index => $field_term) {
+    if($field_term['tid'] == $tid) {
+      return $index;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Helper to remove terms from a node - ready for saving with node_save.
+ *
+ * @param $terms_to_remove
+ *  An array of terms to remove. Keys must be tids, values must be an 'term' array
+ *  which must include at least the vid - e.g. array(12 => array('vid' => 1),...)
+ */
+function _community_tags_remove_mixed_terms_from_node(&$node, $terms_to_remove) {
+  $count_of_terms_removed = 0;
+
+  // remove from all fields that have it
+  foreach($terms_to_remove as $tid => $tag) {
+    $count_of_terms_removed += _community_tags_remove_term_from_node($node, $tid, $tag['vid']);
+  }
+
+  return $count_of_terms_removed;
+}
+
+/**
+ * Helper to remove terms from a node - ready for saving with node_save.
+ *
+ * @param $tids_to_remove
+ */
+function _community_tags_remove_terms_from_node(&$node, $terms_to_remove, $vid) {
+  $count_of_terms_removed = 0;
+
+  // remove from all fields that have it
+  foreach($terms_to_remove as $tid) {
+    $count_of_terms_removed += _community_tags_remove_term_from_node($node, $tid, $vid);
+  }
+
+  return $count_of_terms_removed;
+}
+
+/**
+ * Helper to remove terms from a node - ready for saving with node_save.
+ *
+ * @param $terms_to_remove
+ *  An array of terms to remove. Keys must be tids, values must be an 'term' array
+ *  which must include at least the vid - e.g. array(12 => array('vid' => 1),...)
+ */
+function _community_tags_remove_term_from_node(&$node, $tid, $vid) {
+  $count_of_terms_removed = 0;
+
+  // get the term fields for this node and vid
+  $fields = _community_tags_get_term_reference_fields($vid, $node->type);
+
+  // $language = $node->language;
+  $language = 'und';
+
+  // remove from all fields that have it
+  if(!empty($fields)) {
+    foreach($fields as $field_name => $field) {
+      $term_field =& $node->$field_name;
+      if (FALSE !== $index = _community_tags_term_reference_field_search($term_field, $language, $tid)) {
+        unset($term_field[$language][$index]);
+        $count_of_terms_removed += 1;
+      }
+    }
+  }
+
+  return $count_of_terms_removed;
+}
+
+/*****************************************************************************
+ * Low level community tag operations. Keep cruft out of these. For an API, wrap
+ * these in higher level functions that can include hook invocation, permission
+ * checking, configuration checks, bulk operations etc.
+ ****************************************************************************/
+
+/**
+ * Add a community tag. Nid and vid and user should be valid
+ */
+function _community_tags_add_tag($nid, $tid, $uid) {
+  $time = REQUEST_TIME;
+  $id = db_insert('community_tags')
+  ->fields(array(
+    'tid' => $tid,
+    'nid' => $nid,
+    'uid' => $uid,
+    'date' => $time,
+  ))
+  ->execute();
+}
+
+/**
+ * Delete a community tag. Nid and vid should be valid. If user is supplied tag is only removed for that user.
+ */
+function _community_tags_delete_tag($nid, $tid, $uid) {
+  db_delete('community_tags')
+  ->condition('nid', $nid)
+  ->condition('tid', $tid)
+  ->condition('uid', $uid)
+  ->execute();
+}
+
+/**
+ * Delete all community tags for given node and term.
+ */
+function _community_tags_delete_tags($nid, $tid) {
+  db_delete('community_tags')
+  ->condition('nid', $nid)
+  ->condition('tid', $tid)
+  ->execute();
+}
+
+/**
+ * Delete all community tags for a given node.
+ */
+function _community_tags_delete_tags_for_node($nid) {
+  db_delete('community_tags')
+  ->condition('nid', $nid)
+  ->execute();
+}
+
+/**
+ * Delete all community tags for a given term.
+ */
+function _community_tags_delete_tags_for_term($tid) {
+  db_delete('community_tags')
+  ->condition('tid', $tid)
+  ->execute();
+}
+
+/**
+ * Delete all community tags for a given user.
+ */
+function _community_tags_delete_tags_for_user($uid) {
+  db_delete('community_tags')
+  ->condition('uid', $uid)
+  ->execute();
+}
+
+/**
+ * Check for orphaned node terms and delete if required - by default doesn't.
+ * Provides fix for [#984462] - "When a tag is no longer attached to any nodes, (provide option to) automatically remove it from its taxonomy vocabulary"
+ *
+ * @param $tids
+ *  Doesn't check settings.
+ */
+function _community_tags_cleanup_orphaned_tags_by_tids($tids) {
+  $count = 0;
+  if (!empty($tids)) {
+    // only delete if not ctag, and has no children
+    // TODO Please convert this statement to the D7 database API syntax.
+    $results = db_query(
+      "SELECT td.* FROM {taxonomy_term_data} td
+       LEFT JOIN {taxonomy_term_hierarchy} th ON th.parent = td.tid
+       LEFT JOIN {community_tags} ct ON ct.tid = td.tid
+       WHERE td.tid IN (:tids)
+       AND ct.tid IS NULL
+       AND th.parent IS NULL", array(':tids' => $tids));
+
+    foreach($results as $row) {
+      _community_tags_delete_redundant_term($row->tid);
+    }
+  }
+  return $count;
+}
+
+/**
+ * @todo set flag to skip tag delete attempt in community_tags_taxonomy() invocation
+ */
+function _community_tags_delete_redundant_term($tid) {
+  // Be careful of other dependencies on taxonomy terms
+  // Hook community_tags_taxonomy() will be invoked which will attempt to delete
+  // tags for the deleted term. There will be none so a pointless step - potential to set a flag to skip.
+  taxonomy_term_delete($tid);
+}
+
+/*****************************************************************************
+ * Visibility and access helpers
+ ****************************************************************************/
+/**
+ * Check that tagging form is configured for display for given node in given context. Does not check user access.
+ *
+ * @param $context
+ *  Either COMMUNITY_TAGS_MODE_BLOCK, COMMUNITY_TAGS_MODE_BLOCK, or COMMUNITY_TAGS_MODE_INLINE.
+ */
+function _community_tags_is_tagging_view_visible($node, $context) {
+  if ($node && variable_get('community_tags_display_' . $node->type, COMMUNITY_TAGS_MODE_TAB) == $context) {
+    $vids = community_tags_vids_for_node($node);
+    if (!empty($vids)) {
+      return TRUE;
+    }
+  }
+}
+
+/**
+ * Check whether a given node has one or more community tagged vocabularies associated with its type.
+ */
+function community_tags_vids_for_node($node) {
+  // Allow both nids and nodes
+  if (is_numeric($node)) {
+    $node = node_load($node);
+  }
+
+  return _community_tags_vids_for_node_type($node->type);
+}
+
+/**
+ * Check whether given node type has one or more community tagged vocabularies associated with it.
+ */
+function _community_tags_vids_for_node_type($type) {
+  return _community_tags_vids($type);
+}
+
+/**
+ * Utility function to get a vocabuary by name.
+ */
+function _community_tags_get_vocabularies_by_name() {
+  static $vocabularies_by_name;
+
+  if(!isset($vocabularies_by_name)) {
+    $vocabularies_by_name = array();
+    foreach(taxonomy_get_vocabularies() as $vid => $vocabulary) {
+      $vocabularies_by_name[$vocabulary->machine_name] = $vocabulary;
+    }
+  }
+
+  return $vocabularies_by_name;
+}
+
+/**
+ * Get term reference fields
+ */
+function _community_tags_get_term_reference_fields($vid = NULL, $type = NULL) {
+  static $fields_by_vid, $fields_by_type;
+
+  if(!isset($fields_by_vid)) {
+    $fields_by_vid = array();
+    $fields_by_type = array();
+    $fields = field_info_fields();
+    $vocabularies = _community_tags_get_vocabularies_by_name();
+
+    foreach ($fields as $field_name => $field) {
+      // $field['bundles'] contains names of bundles and entities associated with this field.
+      // keys are entity types, values are arrays of bundle names.
+      if ($field['type'] == 'taxonomy_term_reference' && !empty($field['bundles']['node'])) {
+        foreach($field['bundles']['node'] as $node_type) {
+          foreach ($field['settings']['allowed_values'] as $allowed_values) {
+            if(isset($vocabularies[$allowed_values['vocabulary']])) {
+              $vocabulary = $vocabularies[$allowed_values['vocabulary']];
+              $fields_by_vid[$vocabulary->vid][$node_type][$field['field_name']] = $field;
+              $fields_by_type[$node_type][$vocabulary->vid][$field['field_name']] = $field;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (isset($vid) && isset($type)) {
+    return !empty($fields_by_vid[$vid][$type]) ? $fields_by_vid[$vid][$type] : array();
+  }
+  elseif (isset($vid)) {
+    return !empty($fields_by_vid[$vid]) ? $fields_by_vid[$vid] : array();
+  }
+  elseif (isset($type)) {
+    return !empty($fields_by_type[$type]) ? $fields_by_type[$type] : array();
+  }
+  else {
+    return $fields_by_vid;
+  }
+}
+
+/**
+ * Check whether given node type has one or more community tagged vocabularies associated with it.
+ * @return
+ *  Array of vocabulary vids.
+ */
+function _community_tags_vids($type = NULL) {
+  $community_tagged = variable_get('community_tags_vocabularies', array('tags' => 'tags'));
+  $term_reference_fields = _community_tags_get_term_reference_fields(NULL, $type);
+
+  // convert vocabulary machine names used in settings and field info to vids.
+  // and get enabled valid vocabularies (for the given type).
+  $vocabularies = taxonomy_get_vocabularies();
+
+  $vids = array();
+  foreach($vocabularies as $vid => $vocabulary) {
+    if(isset($community_tagged[$vocabulary->machine_name]) && isset($term_reference_fields[$vid])) {
+      $vids[$vid] = $vid;
+    }
+  }
+  return $vids;
+}
+
+/**
+ * Determine whether such and such a CT operation mode is set for tagging in given vocabulary. Returns
+ * true if any of the modes is set.
+ *
+ * @param $modes
+ *  A bitwise OR of the operation modes to test.
+ *
+ * @todo Add settings to admin screen. Is it necessary to have settings per vid / per type?
+ */
+function _community_tags_is_opmode($modes, $vid, $content_type) {
+  $settings = _community_tags_get_settings($vid, $content_type);
+  if ($settings) {
+    return $settings['opmode'] & $modes;
+  }
+  // default to keeping node terms and community tags in sync
+  return COMMUNITY_TAGS_OPMODE_SYNC & $modes;
+}
+
+/**
+ * Get CT settings.
+ *
+ * @return
+ *  Array of settings keyed on vid.
+ */
+function _community_tags_get_settings($vid = NULL, $content_type = NULL, $valid = FALSE) {
+  static $settings, $valid_settings;
+
+  $handlers = _community_tags_get_display_handlers();
+  $default_display_handler = isset($handlers['tagadelic']) ? 'tagadelic' : 'links';
+
+  if (!$settings) {
+    // Build list of available free-tagging vocabularies
+    // $valid_CT_vocabularies = _community_tags_vids();
+    $valid_CT_vocabularies = variable_get('community_tags_vocabularies', array());
+
+    // all vocabularies that are assigned to node (entity) types
+    $term_reference_fields_by_vid = _community_tags_get_term_reference_fields();
+
+    $settings = array();
+    $valid_settings = array();
+    foreach(taxonomy_get_vocabularies() as $_vid => $vocabulary) {
+      $vname = $vocabulary->machine_name;
+      $settings[$_vid] = array(
+        'name' => $vocabulary->name,
+        'machine_name' => $vname,
+        'tagging' => TRUE,
+        'types' => array(),
+      );
+
+      $settings[$_vid]['CT_enabled'] = isset($valid_CT_vocabularies[$vname]);
+
+      if(!empty($term_reference_fields_by_vid[$_vid])) {
+        foreach ($term_reference_fields_by_vid[$_vid] as $type => $fields) {
+          if($type_info = node_type_get_type($type)) {
+            // create structure grouped on vocabulary
+            foreach($fields as $field_name => $field) {
+              $settings[$_vid]['types'][$type]['fields'][$field_name] = array(
+                'field_name' => $field_name,
+                'CT_enabled' => FALSE,
+                'opmode' => COMMUNITY_TAGS_OPMODE_SYNC,
+                'display_handler' => $default_display_handler,
+              );
+            }
+            if (isset($valid_CT_vocabularies[$vname]['types'][$type])) {
+              $settings[$_vid]['types'][$type] = $valid_CT_vocabularies[$vname]['types'][$type];
+              $settings[$_vid]['types'][$type]['type_name'] = $type_info->name;
+              $settings[$_vid]['types'][$type]['assigned'] = TRUE;
+            }
+            else {
+              $settings[$_vid]['types'][$type] = array(
+                'type_name' => $type_info->name,
+                'assigned' => TRUE,
+                'opmode' => COMMUNITY_TAGS_OPMODE_SYNC,
+                'display_handler' => $default_display_handler,
+              );
+            }
+
+            if (isset($valid_CT_vocabularies[$vname])) {
+              $valid_settings[$_vid] = $settings[$_vid];
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  // either return from valid settings only or from all settings
+  $rt = $valid ? $valid_settings : $settings;
+
+  if ($vid && $content_type) {
+    $return = !empty($rt[$vid]['types'][$content_type]) ? $rt[$vid]['types'][$content_type] : FALSE;
+    return $return;
+  }
+  elseif ($vid) {
+    return !empty($rt[$vid]) ? $rt[$vid] : FALSE;
+  }
+  else {
+    return $rt;
+  }
+}
+
+/*****************************************************************************
+ * ctag queries
+ ****************************************************************************/
+
+/**
+ * Retrieve list of tags for a given node.
+ *
+ * @return
+ *  Array of objects {tid, name, tag_count} keyed on tid.
+ */
+function _community_tags_get_node_tags($nid, $vids = NULL) {
+  $tags = array();
+  if ($vids) {
+    $result = db_query("SELECT t.tid, t.vid, t.name, count(t.tid) tag_count FROM {taxonomy_term_data} t INNER JOIN {community_tags} c ON c.tid = t.tid WHERE c.nid = :nid AND t.vid IN (:vids) GROUP BY t.tid", array(':nid' => $nid, ':vids' => $vids));
+  }
+  else {
+    $result = db_query("SELECT t.tid, t.vid, t.name, count(t.tid) tag_count FROM {taxonomy_term_data} t INNER JOIN {community_tags} c ON c.tid = t.tid WHERE c.nid = :nid GROUP BY t.tid", array(':nid' => $nid));
+  }
+  foreach ($result as $term) {
+    $tags[$term->tid] = $term;
+  }
+
+  return $tags;
+}
+
+/**
+ * Retrieve list of tags for a given node and user. Includes a count of the number of users who have tagged it.
+ *
+ * @return
+ *  Array of objects {tid, name, tag_count} keyed on tid. The tag_count is the number of users who share the tag.
+ */
+function _community_tags_get_node_user_vid_tags($nid, $uid, $vid) {
+  $tags = array();
+  $result = db_query("SELECT t.tid, t.name, count(ct2.uid) tag_count
+     FROM (SELECT tid, nid FROM {community_tags} WHERE nid = :nid AND uid = :uid) AS ct
+     INNER JOIN {taxonomy_term_data} t ON t.tid = ct.tid
+     INNER JOIN {community_tags} ct2 ON ct2.tid = ct.tid AND ct2.nid = ct.nid
+     WHERE t.vid = :vid
+     GROUP BY t.tid", array(':nid' => $nid, ':uid' => $uid, ':vid' => $vid));
+
+  foreach ($result as $term) {
+    $tags[$term->tid] = $term;
+  }
+
+  return $tags;
+}
+
+/**
+ * Retrieve list of tags for a given user. Includes a count of the number of users who have tagged it.
+ *
+ * @return
+ *  Array of objects {nid, tid, (term)name, vid, tag_count}. The tag_count is the number of users who share the tag.
+ */
+function _community_tags_get_user_tags($uid) {
+  $tags = array();
+  $result = db_query("SELECT ct2.nid, t.tid, t.name, t.vid, n.type, count(ct2.uid) tag_count
+     FROM (SELECT tid, nid FROM {community_tags} WHERE uid = :uid) AS ct
+     INNER JOIN {taxonomy_term_data} t ON t.tid = ct.tid
+     INNER JOIN {node} n ON n.nid = ct.nid
+     INNER JOIN {community_tags} ct2 ON ct2.tid = ct.tid AND ct2.nid = ct.nid
+     GROUP BY ct2.nid, t.tid", array(':uid' => $uid));
+
+  foreach ($result as $term) {
+    $tags[] = $term;
+  }
+
+  return $tags;
+}
+
+/**
+ * If user supplied - assume has permission - otherwise use current user if has permission.
+ *
+ * If the user is anonymous
+ */
+function _community_tags_check_user($user = NULL) {
+  if (!$user) {
+    if (!$GLOBALS['user'] && !variable_get('community_tags_allow_anonymous_attribution', 1)) {
+      return FALSE;
+    }
+    else {
+      $user = $GLOBALS['user'];
+    }
+  }
+
+  return $user;
+}
+
+/**
+ * Retrieve list of tags for a given node that belong to a user.
+ */
+function community_tags_get_user_node_tags($uid, $nid, $vid) {
+  $tags = array();
+  $records = db_query("SELECT t.tid, t.name, c.uid, c.nid FROM {taxonomy_term_data} t INNER JOIN {community_tags} c ON c.tid = t.tid WHERE c.nid = :nid AND c.uid = :uid AND t.vid = :vid ORDER BY t.name", array(':nid' => $nid, ':uid' => $uid, ':vid' => $vid));
+  foreach ($records as $term) {
+    $tags[$term->tid] = $term;
+  }
+
+  return $tags;
+}
+
+/*****************************************************************************
+ * Tag/term input processors.
+ *****************************************************************************/
+
+/**
+ * Process tags and terms - resolve tags (supplied as the tag name) to existing terms and
+ * identify new tags - but don't create.
+ *
+ * Get all terms referenced by term_reference_fields attached to the node
+ * for the given vocabularies.
+ */
+function _community_tags_node_process_term_fields($node, $vids) {
+  $processed_terms = array();
+
+  $fields_by_vid = _community_tags_get_term_reference_fields(NULL, $node->type);
+
+  foreach($fields_by_vid as $vid => $fields) {
+    // only collect terms for selected vocabularies
+    if(isset($vids[$vid])) {
+      foreach($fields as $field_name => $field) {
+        $items = field_get_items('node', $node, $field_name);
+        if(!empty($items)) {
+          foreach($items as $item) {
+            $processed_terms[$vid][$item['tid']] = $item['tid'];
+          }
+        }
+      }
+    }
+  }
+
+  return $processed_terms;
+}
+
+/**
+ * Process tags and terms - resolve tags (supplied as the tag name) to existing terms and
+ * identify new tags - but don't create.
+ *
+ * @param $terms
+ *  A data structure as processed by taxonomy_save_node. Maybe tags, terms, tids etc.
+ *
+ * @param $vids
+ *  The valid vocabulary vids - ignore all other terms and tags
+ *
+ * @return
+ *  An array of terms and new tags grouped by vid. Each element has the following structure:
+ *    'terms' => array of term objects
+ *    'new tags' => array of new tag names
+ */
+function _community_tags_node_process_tags_and_terms($tags_and_terms, $vids) {
+  $processed_terms = array();
+
+  if (is_array($tags_and_terms)) {
+    foreach ($tags_and_terms as $key => $term) {
+      if (!is_numeric($key) && $key == 'tags') {
+
+        // tags are grouped by vid
+        foreach ($term as $vid => $vid_value) {
+          // only process ctag vocabulary tags
+          if (isset($vids[$vid])) {
+            // make sure we pass back at least an empty array for the provided vid
+            $processed_terms[$vid] = array();
+            // handle array of tags or comma seperated list of tags
+            $vid_tags = is_array($vid_value) ? $vid_value : drupal_explode_tags($vid_value);
+
+            foreach ($vid_tags as $tag) {
+              // See if the term exists in the chosen vocabulary
+              // and return the tid, otherwise, add a new record.
+              $matching_terms = taxonomy_get_term_by_name($tag);
+              $match = FALSE; // tid match if any.
+              foreach ($matching_terms as $matching_term) {
+                if ($matching_term->vid == $vid) {
+                  $match = TRUE;
+                  break;
+                }
+              }
+
+              if (!$match) {
+                $processed_terms[$vid]['new tags'][] = $tag;
+              }
+              else {
+                $processed_terms[$vid]['terms'][$matching_term->tid] = $matching_term;
+              }
+            }
+          }
+        }
+      }
+      else if (is_array($term)) {
+        foreach ($term as $tid) {
+          if ($tid) {
+            $term_object = taxonomy_term_load($tid);
+            if ($term_object && isset($vids[$term_object->vid])) {
+              $processed_terms[$term_object->vid]['terms'][$tid] = $term_object;
+            }
+          }
+        }
+      }
+      else if ($term) {
+        $term_object = !is_object($term) ? taxonomy_term_load($term) : $term;
+
+        if ($term_object && isset($vids[$term_object->vid])) {
+          $processed_terms[$term_object->vid]['terms'][$term_object->tid] = $term_object;
+        }
+      }
+    }
+  }
+
+  return $processed_terms;
+}
+
+/**
+ * Create terms for new tags and add return a simpler structure of term arrays
+ * grouped by vid.
+ *
+ * @param $processed_tags
+ *  Data structure as returned by _community_tags_node_process_terms().
+ *
+ * @return
+ *  An array of term arrays keyed on vid.
+ */
+function _community_tags_convert_new_tags_to_terms($processed_tags_and_terms) {
+  $processed_terms = array();
+  foreach ($processed_tags_and_terms as $vid => $tags_and_terms) {
+
+    if (!empty($tags_and_terms['terms'])) {
+      $processed_terms[$vid] = $tags_and_terms['terms'];
+    }
+    else {
+      $processed_terms[$vid] = array();
+    }
+    if (!empty($tags_and_terms['new tags'])) {
+      foreach ($tags_and_terms['new tags'] as $tag_name) {
+        // create term.
+        $new_term = (object) array(
+          'vid' => $vid,
+          'name' => $tag_name,
+        );
+        // the following call may result in contrib hook_invocations
+        $status = taxonomy_term_save($new_term);
+        $new_term = taxonomy_term_load($new_term->tid);
+        $processed_terms[$vid][$new_term->tid] = $new_term;
+      }
+    }
+  }
+
+  return $processed_terms;
+}

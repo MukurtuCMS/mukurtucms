@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Saves Organic Group information about an entity when it is deleted.
+ */
+
+/**
+ * Implements hook_entity_delete_log_post_process().
+ */
+function entity_delete_log_og_entity_delete_log_post_process($entity, $type, $variables) {
+  // If there is a group audience attached to this entity, let's log each group
+  // id that was associated with this entity for the entity delete log id.
+  if ($entity->group_audience) {
+    $gids = array();
+    // For each language code, and then for each gruop, add the group id to the
+    // group ids array.
+    foreach ($entity->group_audience as $language => $group) {
+      if (isset($entity->group_audience[$language]) && !empty($entity->group_audience[$language])) {
+        foreach($entity->group_audience[$language] as $index => $group_data) {
+          $gids[] = $group_data['gid'];
+        }
+      }
+    }
+    // Now for each group id we found, insert a record for it.
+    foreach ($gids as $gid) {
+      db_insert('entity_delete_log_og')->fields(
+        array(
+          'entity_delete_log_id' => $variables['entity_delete_log_id'],
+          'gid' => $gid,
+        )
+      )->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function entity_delete_log_og_views_api() {
+  return array(
+    'api' => 3, 
+    'path' => drupal_get_path('module', 'entity_delete_log_og'), 
+    'template path' => drupal_get_path('module', 'entity_delete_log_og'),
+  );
+}
+

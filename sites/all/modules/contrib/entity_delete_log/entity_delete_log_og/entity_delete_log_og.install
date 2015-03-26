@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function entity_delete_log_og_schema() {
+  $schema['entity_delete_log_og'] = array(
+    'description' => 'The base table for the entity_delete_log module.', 
+    'fields' => array(
+      'entity_delete_log_og_id' => array(
+        'description' => 'The primary identifier for an entity delete log OG entry.', 
+        'type' => 'serial',
+        'unsigned' => TRUE, 
+        'not null' => TRUE,
+      ),
+      'entity_delete_log_id' => array(
+        'description' => 'The entity delete log id.', 
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE,
+      ),
+      'gid' => array(
+        'description' => 'The OG id.', 
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('entity_delete_log_og_id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function entity_delete_log_og_uninstall() {
+  // It appears this empty function must exist so that the default views for
+  // this module will be un-installed properly.
+}
+

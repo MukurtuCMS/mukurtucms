@@ -1,0 +1,226 @@
+#homebox {
+  position: relative;
+}
+#homebox-admin-display-form .roles {
+  font-size: 86%;
+}
+
+/*
+** Columns/regions
+*/
+
+#homebox .homebox-column {
+  margin: 2px;
+  padding: 5px;
+  background: url(images/stripe.png);
+  min-height: 40px;
+}
+
+#homebox .homebox-column-wrapper {
+  float: left;
+}
+#homebox .homebox-maximized {
+  width: 100%;
+}
+/*
+** Portlets/boxes
+*/
+#homebox .homebox-portlet {
+  margin: 2px 0 5px;
+  padding: 0;
+  border: 3px solid #eee;
+  background-color: white;
+}
+#homebox .homebox-portlet .homebox-portlet-inner {
+  border: 1px solid #c0c0c0;
+  overflow: hidden;
+}
+#homebox .portlet-content {
+  padding: 4px;
+}
+#homebox .homebox-portlet-collapsed .portlet-content {
+  display: none;
+}
+#homebox .homebox-portlet .portlet-header {
+  margin: 0;
+  padding: 2px 4px;
+  border-bottom: 1px solid #ddd;
+  background: #e4f0f8; /* matches garland */
+  color: #494949;
+  min-height: 18px;
+  font-size: 1em;
+}
+#homebox .homebox-draggable .portlet-header:hover {
+  cursor: move;
+}
+#homebox .homebox-portlet .portlet-header .portlet-title {
+  display: block;
+  z-index: 9; /* IE is terrible */
+  position: relative; /* IE is terrible */
+}
+#homebox .homebox-portlet .portlet-config {
+  display: none;
+  border-bottom: 1px solid #ddd;
+}
+#homebox .homebox-portlet div.views-exposed-widgets {
+  padding: 0 7px;
+}
+#homebox div.view-header {
+  text-align: right;
+}
+#homebox .portlet-maximized {
+  clear: both;
+}
+
+/*
+** Icons
+*/
+.portlet-icon {
+  float: right;
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  z-index: 10; /* IE is terrible */
+  position: relative; /* IE is terrible */
+}
+.portlet-header .portlet-settings {
+  background: url(images/settings.gif);
+}
+.portlet-plus {
+  background: url(images/plus.gif);
+}
+.portlet-minus {
+  background: url(images/minus.gif);
+}
+.portlet-close {
+  background: url(images/close.gif);
+}
+.portlet-maximize {
+  background: url(images/maximize.gif);
+}
+.portlet-maximized .portlet-minimize {
+  background: url(images/minimize.gif);
+}
+
+/*
+** Closed box/portlet class
+*/
+#homebox .homebox-portlet-closed {
+  display: none;
+}
+
+/*
+** Placeholder
+*/
+#homebox .homebox-placeholder {
+  visibility: visible !important;
+  margin: 5px 0;
+  padding: 0;
+  /*background: #FFFFDD;*/
+  border: 3px dashed #ccc;
+}
+#homebox .homebox-placeholder * {
+  visibility: hidden;
+}
+
+/*
+** Colors
+*/
+div.homebox-colors {
+  float: right;
+  margin: 2px;
+}
+.homebox-color-selector {
+  display: block;
+  float: left;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 1px;
+  border: 1px solid #999;
+}
+.homebox-color-message {
+  font-size: 85%;
+  color: #999;
+  float: left;
+  margin-right: 4px;
+}
+
+/* Page configure UI */
+#homebox-add {
+  margin: 10px 0;
+}
+#homebox-add ul {
+  margin: 0;
+  padding: 0;
+}
+#homebox-add li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+  background: none;
+  float: left;
+  margin: 0 10px 10px 0;
+}
+#homebox-add .last {
+  margin: 0;
+}
+#homebox-add a {
+  display: block;
+  background: #f4f4f4 url("images/stripe.png");
+  padding: 5px;
+  overflow: hidden;
+  border-top: 1px solid transparent;
+  outline: 1px solid transparent;
+}
+#homebox .used {
+  background: #F0F0F0;
+  border-top: 1px solid #FFFFFF;
+  outline: 1px solid #DDDDDD;
+}
+#homebox .restore {
+  background: none;
+  border-top: none;
+  outline: none;
+}
+.homebox-msg {
+  margin-right: 10px;
+}
+#homebox-minimize-to-save {
+  font-size: 90%;
+  color: #999;
+  font-style: italic;
+  display: none;
+  margin-right: 5px;
+}
+#homebox-changes-made {
+  font-size: 80%;
+  color: darkRed;
+  font-style: italic;
+  display: none;
+}
+#homebox-add {
+  display: none;
+}
+#homebox-add a {
+  font-weight: bold;
+}
+#homebox-add a.used,
+#homebox-add a.restore {
+  font-weight: normal;
+}
+#center #homebox-save-form {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+#homebox-buttons .form-submit {
+  margin: 0;
+  cursor: pointer;
+}
+.homebox-auto-save #homebox-save-form {
+  display: none;
+}

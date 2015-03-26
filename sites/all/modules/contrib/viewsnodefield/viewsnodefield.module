@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_views_api().
+ */
+function viewsnodefield_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'viewsnodefield'),
+  );
+}

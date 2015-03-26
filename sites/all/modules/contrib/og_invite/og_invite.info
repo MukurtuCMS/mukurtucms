@@ -1,0 +1,11 @@
+name = Organic groups Invite
+description = Allow group members to invite other users to join their group
+core = 7.x
+dependencies[] = og_ui
+dependencies[] = number
+; Information added by Drupal.org packaging script on 2014-12-18
+version = "7.x-1.0-beta5"
+core = "7.x"
+project = "og_invite"
+datestamp = "1418922185"
+

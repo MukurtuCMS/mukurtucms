@@ -1,0 +1,5 @@
+name = License - Copyright
+description = Provide Copyright (All Rights Reserved) information
+core = 7.x
+package = License
+dependencies[] = license

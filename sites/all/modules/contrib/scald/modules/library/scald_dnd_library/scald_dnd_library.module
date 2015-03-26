@@ -1,0 +1,365 @@
+<?php
+
+/**
+ * @file
+ * Scald DnD Library
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function scald_dnd_library_permission() {
+  return array(
+    'access scald dnd library' => array(
+      'title' => t('Access Scald DnD Library'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function scald_dnd_library_theme() {
+  return array(
+    'sdl_library' => array(
+      'variables' => array('page' => NULL, 'library_items' => NULL),
+      'template' => 'sdl-library',
+    ),
+    'sdl_library_item' => array(
+      'variables' => array('informations' => array(), 'image' => NULL),
+    ),
+    'sdl_editor_item' => array(
+      'variables' => array('informations' => array(), 'image' => NULL),
+    ),
+    'sdl_editor_legend' => array(
+      'variables' => array('atom' => array()),
+    ),
+    'sdl_preview_item' => array(
+      'variables' => array('atom' => array(), 'image' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implements hook_dnd_libraries_info().
+ */
+function scald_dnd_library_dnd_libraries_info() {
+  $libraries = array();
+  $cache = cache_get('views_based_libraries', 'cache_scald');
+  if ($cache && is_array($cache->data)) {
+    $libraries = $cache->data;
+  }
+  else {
+    $views = views_get_all_views();
+    foreach ($views as $view) {
+      // disabled views get nothing.
+      if (!empty($view->disabled)) {
+        continue;
+      }
+
+      $view->init_display();
+      foreach ($view->display as $id => $display) {
+        if (!empty($display->handler->definition['provides dnd library'])) {
+          $libraries[$display->handler->get_option('path')] = $display->handler->get_option('title') . ' (' . $view->name . '-' . $id . ')';
+        }
+      }
+    }
+    cache_set('views_based_libraries', $libraries, 'cache_scald');
+  }
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_views_invalidate_cache().
+ */
+function scald_dnd_library_views_invalidate_cache() {
+  cache_clear_all('views_based_libraries', 'cache_scald');
+}
+
+/**
+ * Adds an item in the library array.
+ */
+function scald_dnd_library_add_item(&$library, $sid) {
+  $atom = scald_fetch($sid);
+  $context = variable_get('dnd_context_default', 'sdl_editor_representation');
+  $library['atoms'][$sid] = array(
+    'meta' => array(
+      'title' => $atom->title,
+      'type' => $atom->type,
+      'legend' => '',
+    ),
+    'sas' =>  '[scald=' . $atom->sid . ':' . $context .']',
+    'editor' => scald_render($atom, $context),
+    'preview' => scald_render($atom, 'sdl_preview'),
+  );
+
+  // theme_sdl_editor_legend() requires a rendered atom. We call it only here to
+  // make sure that $atom is rendered.
+  if (empty($atom->omit_legend)) {
+    $library['atoms'][$sid]['meta']['legend'] = theme('sdl_editor_legend', array('atom' => $atom));
+  }
+
+  // Allow other modules to alter this library item
+  drupal_alter('scald_dnd_library_item', $atom, $library['atoms'][$sid]);
+}
+
+/**
+ * Implements hook_preprocess_sdl_library().
+ */
+function template_preprocess_sdl_library(&$variables) {
+  if (is_object($variables['view'])) {
+    $variables['library_items'] = array();
+    $results = $variables['view']->result;
+    $context = $variables['view']->field['representation']->options['context'];
+    foreach ($results as $result) {
+      $sid = $result->sid;
+      $variables['library_items'][$sid] = scald_render($sid, $context);
+    }
+  }
+  elseif (empty($variables['library_items']) && isset($variables['options'])) {
+    $variables['library_items'] = $variables['options'];
+  }
+}
+
+/**
+ * Implements hook_scald_contexts().
+ */
+function scald_dnd_library_scald_contexts() {
+  return array(
+    'sdl_editor_representation' => array(
+      'title' => t('Editor Representation'),
+      'description' => t('The Editor Rep'),
+      'render_language' => 'XHTML',
+      'parseable'       => TRUE,
+      'formats'    => array(
+        'image' => array('jpeg', 'png', 'passthrough'),
+        'audio' => array('wav', 'ogg', 'mp3', 'passthrough'),
+      ),
+    ),
+    'sdl_preview' => array(
+      'title' => t('Preview Representation'),
+      'description' => t('The Preview Rep'),
+      'render_language' => 'XHTML',
+      'parseable'       => FALSE,
+      'formats'    => array(
+        'image' => array('jpeg', 'png', 'passthrough'),
+        'audio' => array('wav', 'ogg', 'mp3', 'passthrough'),
+      ),
+    ),
+    'sdl_library_item' => array(
+      'title' => t('Library item'),
+      'description' => t('The Library Rep'),
+      'render_language' => 'XHTML',
+      'parseable'       => FALSE,
+      'formats'    => array(
+        'image' => array('jpeg', 'png', 'passthrough'),
+        'audio' => array('wav', 'ogg', 'mp3', 'passthrough'),
+      ),
+    )
+  );
+}
+
+/**
+ * Implements hook_scald_render().
+ */
+function scald_dnd_library_scald_render($atom, $context, $options) {
+  if (!empty($atom->rendered->thumbnail_transcoded_url)) {
+    $path = $atom->rendered->thumbnail_transcoded_url;
+  }
+  else {
+    $path = image_style_url('Library', $atom->thumbnail_source);
+  }
+
+  $attributes = array();
+  if ($context == 'sdl_library_item') {
+    $attributes += array('class' => 'drop', 'draggable' => 'TRUE', 'data-atom-id' => $atom->sid);
+  }
+  elseif ($context == 'sdl_preview') {
+    $attributes += array('class' => 'drop', 'draggable' => 'TRUE', 'data-atom-id' => $atom->sid);
+  }
+  else {
+    $attributes += array('class' => 'dnd-dropped');
+  }
+  $image = "<img src='$path' alt='' " . drupal_attributes($attributes) . ' />';
+  switch ($context) {
+    case 'sdl_preview':
+      $render = theme('sdl_preview_item', array('atom' => $atom, 'image' => $image));
+      break;
+    case 'sdl_library_item':
+      $render = theme('sdl_library_item', array('atom' => $atom, 'image' => $image));
+      break;
+    default:
+      $render = array(
+        '#theme' => 'sdl_editor_item',
+        '#informations' => $atom->rendered,
+        '#image' => $image,
+      );
+  }
+
+  return $render;
+}
+
+/**
+ * Returns HTML for an atom rendered in the "Library Item" context.
+ */
+function theme_sdl_library_item($variables) {
+  $atom = $variables['atom'];
+  $image = $variables['image'];
+  $informations = $atom->rendered;
+
+  // Action links
+  $links = scald_atom_user_build_actions_links($atom, NULL);
+  // Force all links to open in a new window
+  foreach ($links as $action => $link) {
+    $links[$action]['attributes']['target'] = '_blank';
+  }
+  // The Insert link. Use the "_" prefix to avoid collision with possible
+  // "insert" action.
+  $links['_insert'] = array(
+    'title' => t('Insert'),
+    'external' => TRUE,
+    'fragment' => FALSE,
+    'attributes' => array(
+      'data-atom-id' => $atom->sid,
+      'style' => 'display:none',
+    ),
+    'href' => '',
+  );
+
+  $links_element = array(
+    '#theme' => 'links',
+    '#links' => $links,
+    '#attributes' => array('class' => array('links', 'inline')),
+  );
+  $rendered_links = drupal_render($links_element);
+
+  // Authors
+  if (!empty($informations->authors)) {
+    foreach ($informations->authors as $author) {
+      $author_names[] = check_plain($author->name);
+    }
+    $authors = implode(', ', $author_names);
+  }
+  else {
+    $authors = '';
+  }
+
+  $return = "<div class='image'>{$image}</div>
+  <div class='meta type-" . drupal_html_class($atom->type) . " clearfix'>
+    <div class='title'>{$informations->title}</div>
+    <div class='author'>{$authors}</div>
+    {$rendered_links}
+  </div>
+  ";
+  return $return;
+}
+
+/**
+ * Returns HTML for an atom rendered in the "Editor Representation" context.
+ */
+function theme_sdl_editor_item($variables) {
+  if (empty($variables['informations']->player)) {
+    return $variables['image'];
+  }
+  else {
+    $player = $variables['informations']->player;
+    $output = is_array($player) ? $player : array('#markup' => $player);
+    $output += array(
+      '#prefix' => '<div class=\'image\'>',
+      '#suffix' => '</div>',
+    );
+    return drupal_render($output);
+  }
+}
+
+/**
+ * Returns HTML for the legend of an atom.
+ */
+function theme_sdl_editor_legend($variables) {
+  $atom = $variables['atom'];
+
+  if (!empty($atom->rendered->authors)) {
+    foreach ($atom->rendered->authors as $author) {
+      $links[] = $author->link;
+    }
+    $by = implode(', ', $links);
+  }
+  else {
+    $by = $atom->rendered->publisher['link'];
+  }
+  $by = t('by !name', array('!name' => $by));
+  return "
+  <div class='meta'>
+    <!--copyright={$atom->sid}-->{$atom->rendered->title}, {$by}<!--END copyright={$atom->sid}-->
+  </div>
+  ";
+}
+
+/**
+ * Returns HTML for an atom rendered in the "Preview" context.
+ */
+function theme_sdl_preview_item($variables) {
+  $atom = $variables['atom'];
+  $image = $variables['image'];
+  $resource_label = t('Resource');
+  $informations_label = t('Informations');
+  $resource = theme('sdl_editor_item', array('informations' => $atom->rendered, 'image' => $image));
+  $title_label = t('Title');
+  $title_value = $atom->rendered->title;
+  if (!empty($atom->rendered->authors)) {
+    $author_label = t('Author');
+    foreach ($atom->rendered->authors as $author) {
+      $names[] = $author->link;
+    }
+    $author_name = implode(', ', $names);
+    $author = "<dt>$author_label</dt><dd>$author_name</dd>";
+  }
+  else {
+    $author = "";
+  }
+  return "
+<div class='sdl-preview-item'>
+  <h3>$resource_label</h3>
+    $resource
+  <h3>$informations_label</h3>
+  <dl>
+    <dt>$title_label</dt>
+    <dd>$title_value</dd>
+    $author
+  </dl>
+</div>
+  ";
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function scald_dnd_library_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'scald_dnd_library') . '/includes',
+  );
+}
+
+/**
+ * Implements hook_image_default_styles().
+ */
+function scald_dnd_library_image_default_styles() {
+  $presets = array();
+  $presets['Library'] = array(
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array(
+          'width' => '48',
+          'height' => '',
+          'upscale' => 0,
+        ),
+        'weight' => '0',
+      ),
+    ),
+  );
+  return $presets;
+}
+

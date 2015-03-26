@@ -1,0 +1,5 @@
+name = Views arguments in filters
+description = "Allows you to use argument values in filters, thereby leveraging functionality such as operators."
+package = Experimental
+core = 7.x
+dependencies[] = views

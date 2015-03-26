@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the oEmbed module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function oembed_schema() {
+  $schema['oembed_provider'] = array(
+    'export' => array(
+      'identifier' => 'provider',
+      'primary key' => 'pid',
+      'bulk export' => TRUE,
+      'default hook' => 'default_oembed_provider',
+      'api' => array(
+        'owner' => 'oembed',
+        'api' => 'oembed_provider',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'description' => 'Primary ID field for the table. Not used for anything except internal lookups.',
+        'not null' => TRUE,
+        'no export' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'Unique ID for this subtask. Used to identify it programmatically.',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'title' => array(
+        'description' => 'The human-readable title of the provider.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'endpoint' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'The endpoint for this provider.',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'scheme' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Line separated scheme definition.',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => '',
+      ),
+    ),
+    'primary key' => array('pid'),
+    'unique keys' => array(
+      'name' => array('name'),
+    ),
+  );
+  $schema['cache_oembed'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_oembed']['description'] = 'Cache table for the oEmbed module.';
+  return $schema;
+}
+
+/**
+ * Rename extant oembed filters to oembed_legacy.
+ */
+function oembed_update_7000(&$sandbox) {
+  db_update('filter')
+    ->fields(array('name' => 'oembed_legacy'))
+    ->condition('name', 'oembed')
+    ->execute();
+}
+
+/**
+ * Disable and uninstall oEmbed core.
+ */
+function oembed_update_7001() {
+  module_disable(array('oembedcore'));
+  drupal_uninstall_modules(array('oembedcore'));
+}
+
+/**
+ * Rebuild the code registry in order to accommodate moved submodules.
+ */
+function oembed_update_7002() {
+  registry_rebuild();
+}

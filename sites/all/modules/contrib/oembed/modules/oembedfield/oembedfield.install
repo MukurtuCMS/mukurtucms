@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Implement hook_update_dependencies().
+ */
+function oembedfield_update_dependencies() {
+  $dependencies['oembedcore'][7004] = array(
+    'oembedfield' => 7000,
+  );
+  return $dependencies;
+}
+
+/**
+ * Transition field formatters to oEmbed core module.
+ */
+function oembedfield_update_7000() {
+  foreach (field_info_fields() as $field_name => $info) {
+    if ($info['type'] == 'link_field') {
+      foreach ($info['bundles'] as $entity_type => $bundles) {
+        foreach ($bundles as $bundle_name) {
+          $instance = field_read_instance($entity_type, $field_name, $bundle_name);
+          foreach ($instance['display'] as &$display) {
+            if ($display['module'] == 'oembedfield') {
+              $changed = TRUE;
+              $display['module'] = 'oembedcore';
+            }
+          }
+          if ($changed) {
+            field_update_instance($instance);
+          }
+          $changed = FALSE;
+        }
+      }
+    }
+  }
+}

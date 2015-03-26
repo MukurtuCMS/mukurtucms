@@ -1,0 +1,37 @@
+<?php
+
+function license_traditional_license_load($data) {
+  $info = explode('/', trim($data['path'], '/'));
+  if ($data['host'] == 'localcontexts.org' && $info[0] == 'tk') {
+    return array(
+      'key' => $info[1],
+      'version' => $info[2],
+      'uri' => $data['uri'],
+      'name' => $data['name'],
+      'type' => 'traditional',
+    );
+  }
+}
+
+function license_traditional_license_display($license, $entity) {
+  if ($license['type'] == 'traditional') {
+    $uri_attributes = array();
+    $communities = mukurtu_communities($entity);
+    if (!empty($communities)) {
+      $uri_attributes = array('query'=> array('group' => implode(', ', $communities)));
+    }
+    return license_basic_display($license['uri'], $license['name'], $license['uri'] . '/icon/120.png', 'Traditional Knowledge Label', $uri_attributes);
+  }
+}
+
+function license_traditional_license_display_export($license, $entity) {
+  if ($license['type'] == 'traditional') {
+    $uri_attributes = array();
+    $communities = mukurtu_communities($entity);
+    if (!empty($communities)) {
+      $uri_attributes = array('query'=> array('group' => implode(', ', $communities)));
+    }
+    return license_basic_display($license['uri'], $license['name'], $license['uri'] . '/icon/120.png', 'Traditional Knowledge Label', $uri_attributes);
+  }
+}
+

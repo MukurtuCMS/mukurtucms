@@ -1,0 +1,10 @@
+; $Id:$
+name = Mukurtu custom mods
+description = "Mukurtu custom modifications - allows Organic Groups to be selected using two node reference selectors on the Digital Heritage node add form."
+package = "Organic groups"
+dependencies[] = og
+core = 7.x
+files[] = mukurtu_mods.module
+
+; Test files.
+; files[] = mukurtu.test

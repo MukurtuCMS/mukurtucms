@@ -1,0 +1,104 @@
+<?php
+/**
+ * @file
+ *
+ *
+ *
+ * @author Kálmán Hosszu - hosszu.kalman@gmail.com - http://premiumcmsthemes.com http://www.kalman-hosszu.com
+ */
+
+class MultiformTestCase extends DrupalWebTestCase {
+
+  /**
+   * Info method.
+   *
+   * @return array
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Forms functionality',
+      'description' => 'Testing multiform functionality.' ,
+      'group' => 'Multiform',
+    );
+  }
+
+  /**
+   * Overriden setUp function.
+   */
+  public function setUp() {
+    parent::setUp('multiform', 'multiform_test');
+  }
+
+  /**
+   * Check various submit ops.
+   */
+  public function testSubmitHandling() {
+    // Go to the form page.
+    $this->drupalGet('multiform-test/1');
+
+    // Check buttons.
+    $this->assertFieldByName('op', 'save');
+    $this->assertFieldByName('op', 'delete');
+
+    // No more buttons.
+    $submitButtons = $this->xpath('//input[@type="submit" and @name!="op"]');
+    $this->assertEqual(count($submitButtons), 0, t('No more submit button.'));
+
+    // Save button.
+    $this->drupalPost(NULL, array(), 'save');
+    $this->assertText('multiform_test1_1multiform_test1_submit_button', t('First form save message is found.'));
+    $this->assertText('multiform_test1_2multiform_test1_submit_button', t('Second form save message is found.'));
+
+    // Delete button.
+    $this->drupalPost(NULL, array(), 'delete');
+    $this->assertText('multiform_test1_1multiform_test1_delete_button', t('First form delete message is found.'));
+    $this->assertText('multiform_test1_2multiform_test1_delete_button', t('Second form delete message is found.'));
+  }
+
+  /**
+   * Check the merged fields exist.
+   */
+  public function testFieldsAreExist() {
+    // Go to the form page.
+    $this->drupalGet('multiform-test/2');
+
+    // Check textfields.
+    $this->assertFieldByName('multiform[multiform_test2_1_0][required_text_1]');
+    $this->assertFieldByName('multiform[multiform_test2_2_1][required_text_2]');
+
+    // Check button.
+    $this->assertFieldByName('op', 'save');
+  }
+
+  /**
+   * Check required fields.
+   */
+  public function testRequiredFields() {
+    $first_text = array('multiform[multiform_test2_1_0][required_text_1]' => 'test1 value');
+    $second_text = array('multiform[multiform_test2_2_1][required_text_2]' => 'test2 value');
+    // No required fields.
+    $this->drupalPost('multiform-test/2', array(), 'save');
+    $this->assertText('test1 field is required.');
+    $this->assertText('test2 field is required.');
+    $this->assertNoText('multiform_test2_1multiform_test2_submit_button');
+    $this->assertNoText('multiform_test2_2multiform_test2_submit_button');
+
+    // Send all required fields.
+    $this->drupalPost(NULL, array_merge($first_text, $second_text), 'save');
+    $this->assertText('multiform_test2_1multiform_test2_submit_button');
+    $this->assertText('multiform_test2_2multiform_test2_submit_button');
+    $this->assertNoText('test1 field is required.');
+    $this->assertNoText('test2 field is required.');
+
+    // Send first form's required field.
+    $this->drupalPost(NULL, $first_text, 'save');
+    $this->assertNoText('multiform_test2_1multiform_test2_submit_button');
+    $this->assertText('test2 field is required.');
+
+    // Send second form's required field.
+    $this->drupalPost(NULL, $second_text, 'save');
+    $this->assertNoText('multiform_test2_2multiform_test2_submit_button');
+    $this->assertText('test1 field is required.');
+  }
+
+}

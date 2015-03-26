@@ -1,0 +1,189 @@
+<?php
+/**
+ * @file
+ * Code for the Collection feature.
+ */
+
+include_once('ma_collection.features.inc');
+
+function ma_collection_node_view($node, $view_mode) {
+  if ($node->type == 'collection') {
+
+    if ($view_mode == 'full') {
+
+      // Rewrite the DH Items reference field as paged, since there can be hundreds. I could find no way to do this (add a pager to a multivalued field) without custom code. I did try using a custom DS field of a view of referenced DH nodes, thus leveraging the view pager, but I was unable to get the view to sort according to the DH item order (and sort order here matters). This seems efficient enough. The one loss is that the pager isn't AJAX, whereas the views pager is. If we need that, switch back to that method and do a view alter to reorder the items in code.
+
+      $dh_items_per_page = 10;
+
+      // Build the array of all DH items
+      $all_dh_items = array();
+      foreach ($node->field_digital_heritage_items[LANGUAGE_NONE] as $index => $dh_item) {
+        unset ($node->content['field_digital_heritage_items'][$index]); // Start rewriting the field by removing the existing DH items
+        if (node_access('view', $dh_item['entity'])) {
+          $all_dh_items[] = drupal_render(node_view($dh_item['entity'], 'search_result')); // Need to render here as opposed to using "rendered entity" in the DS display, as that will attemt to render them *after* this hook runs
+        }
+      }
+
+      // Initialise the pager
+      $current_page = pager_default_initialize(count($all_dh_items), $dh_items_per_page);
+
+      // Split all DH items into pages
+      $pages = array_chunk($all_dh_items, $dh_items_per_page, TRUE);
+
+      // Print the DH items for the current page
+      $output = "";
+      foreach ($pages[$current_page] as $dh_item_to_display) {
+        $output .= $dh_item_to_display;
+      }
+
+      // Print the pager
+      $output .= theme('pager', array('quantity', count($dh_items_per_page)));
+
+      // Rewrite the field output
+      $node->content['field_digital_heritage_items'][0]['#markup'] = $output;
+
+    }
+
+    elseif ($view_mode == 'search_result') {
+
+      // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use a thumbnail from one of the DH nodes, prioritizing images thumbnails over other types, and also according to the ordering of the DH items (and between those two priorities, choose images over DH ordering)
+
+      if (!count($node->field_collection_image)) {
+        $collection_emw = entity_metadata_wrapper('node', $node);
+
+        $replacement_atom = "";
+        foreach ($collection_emw->field_digital_heritage_items->value() as $dh_item) {
+          $dh_item_emw = entity_metadata_wrapper('node', $dh_item);
+          foreach ($dh_item_emw->field_media_asset->value() as $dh_item_media_index => $dh_item_media) {
+            if ($dh_item_media->provider == 'scald_image') {
+              $replacement_atom = $dh_item_emw->field_media_asset->get($dh_item_media_index)->value();
+              break 2;
+            }
+            elseif (!$replacement_non_image_atom) {
+              $replacement_non_image_atom = $dh_item_emw->field_media_asset->get($dh_item_media_index)->value();
+            }
+          }
+        }
+        if (!$replacement_atom) {
+          $replacement_atom = $replacement_non_image_atom;
+        }
+
+        if ($replacement_atom) {
+          // Rewrite the image field
+          $node->content['field_collection_image'] = array(
+            '#theme' => 'field',
+            '#title' => 'Image',
+            '#access' => true,
+            '#formater' => 'ma_scald_search_results',
+            '#view_mode' => 'search_result',
+            '#label_display' => 'hidden',
+            '#field_name' => 'field_collection_image',
+            '#entity_type' => 'node',
+            '#bundle' => 'collection',
+            '#weight' => 0,
+            '#items' => array(0 => array('sid'=>$replacement_atom->sid)),
+          );
+
+          $node->content['field_collection_image'][0]['#markup'] = scald_render ($replacement_atom, 'ma_scald_search_results');
+        }
+      }
+
+      // Tooltip and links on DH grid/list views
+      foreach ($node->content['field_collection_image'] as $atom_index => $atom) {
+        if (!is_numeric($atom_index)) {
+          continue;
+        }
+
+        // Using CSS for the tooltip (see comments in ma_digitalheritage_node_view for explanation)
+        // Also add link here to parent node
+        $new_markup = '<a class = "tooltips" href=" ' . url("node/" . $node->nid) . '">' . $atom['#markup'] . '</a>';
+
+       $node->content['field_collection_image'][$atom_index]['#markup'] = $new_markup;
+
+      }
+
+    }
+
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_collection_form_views_exposed_form_alter(&$form, &$form_state) {
+
+  // Add a button to reset search and filters
+  // Search API provides a button on the view that will reset the search, but not the filters. Leaving that off and creating our own that will reset both.
+  if (strpos($form['#id'], 'views-exposed-form-collections-grid-list-all') !== FALSE) {
+    if (count(arg()) > 1 OR count(drupal_get_query_parameters())) {
+      $form['reset'] = array('#markup' => l(t('Reset'),'collections', array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
+    }
+  }
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function ma_collection_node_presave($node) {
+
+  // Populate the Digital Heritage Count
+  if ($node->type == 'collection') {
+    $collection_emw = entity_metadata_wrapper('node', $node);
+    $new_count = $collection_emw->field_digital_heritage_items->count();
+    $old_count = $collection_emw->field_digital_heritage_count->value();
+    if ($old_count <> $new_count) {
+      $collection_emw->field_digital_heritage_count->set ($new_count);
+    }
+  }
+
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function ma_collection_node_update($node) {
+
+  // Update the Digital Heritage Count on Collection nodes when a DH node adds or removes a Collection reference
+  if ($node->type == 'digital_heritage') {
+    $wrapper_new = entity_metadata_wrapper('node', $node);
+    $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->field_collection->value());
+    $old_refs = array();
+    if (isset($node->original)) {
+      $wrapper_old = entity_metadata_wrapper('node', $node->original);
+      $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->field_collection->value());
+    }
+    if ($old_refs <> $new_refs) {
+      $refs_added = array_diff ($new_refs, $old_refs);
+      $refs_deleted = array_diff ($old_refs, $new_refs);
+      $collections_to_recount = array_merge ($refs_added, $refs_deleted);
+      foreach ($collections_to_recount as $collection) {
+        $collection_emw = entity_metadata_wrapper('node', $collection);
+        $old_count = $collection_emw->field_digital_heritage_items->count();
+        $query = new EntityFieldQuery();
+        $result = $query
+          ->entityCondition('entity_type', 'node')
+          ->entityCondition('bundle', 'digital_heritage')
+          ->fieldCondition('field_collection', 'target_id', $collection)
+          ->execute();
+        $new_count = count($result['node']);
+        if ($new_count <> $old_count) {
+          $collection_emw->field_digital_heritage_count->set ($new_count);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function ma_collection_form_alter(&$form, $form_state, $form_id) {
+
+  // When deleting a Collection, let the user know on the confirmation message that the DH items will remain
+  if ($form_id == 'node_delete_confirm') {
+    $node = $form['#node'];
+    if ($node->type == 'collection') {
+      $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
+    }
+  }
+}

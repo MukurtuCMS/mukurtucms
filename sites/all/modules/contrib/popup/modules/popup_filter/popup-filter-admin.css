@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+
+div.class-popup-filter-admin-form{ float: right;}
+div.class-popup-filter-admin-form .popup-element-title{ border: none; text-decoration: none;}
+
+div.popup-filter-form-wrapper{ padding: 10px 0 0; text-align: left;}
+div.popup-filter-form-wrapper:after{ clear: both; content: '.'; display: block; height: 0; line-height: 0; visibility: hidden;}
+
+div.class-popup-filter-admin-form div.popup-content,
+div.class-popup-filter-admin-form div.popup-attributes{ width: 285px;}
+div.class-popup-filter-admin-form div.popup-attributes{ float: left;}
+div.class-popup-filter-admin-form div.popup-content{ float: right;}
+
+div.class-popup-filter-admin-form div.form-item-first{ margin-top: 0;}
+div.class-popup-filter-admin-form div.form-item:after{ clear: both; content: '.'; display: block; height: 0; line-height: 0; visibility: hidden;}
+
+div.class-popup-filter-admin-form div.popup-content-section{ position: absolute; width: 285px;}
+
+div.class-popup-filter-admin-form div.left-column{ float: left; font-size: 90%; width: 140px;}
+div.class-popup-filter-admin-form div.right-column{ float: right; font-size: 90%; width: 140px;}
+
+div.class-popup-filter-admin-form label{ clear: left;}
+div.class-popup-filter-admin-form div.inline label{ float: left;}
+div.class-popup-filter-admin-form div.inline input.form-text,
+div.class-popup-filter-admin-form div.inline select{ float: right;}
+
+div.class-popup-filter-admin-form div.form-item{ margin-top: 0;}
+div.class-popup-filter-admin-form div.form-item div.description{ clear: both; font-size: 80%;}
+div.class-popup-filter-admin-form div.section{ clear: both; padding-top: 25px;}
+
+div.class-popup-filter-admin-form select{ width: 50%;}
+div.class-popup-filter-admin-form textarea{ width: 100%;}
+
+div.class-popup-filter-admin-form input.form-text{ border: 1px solid #999; padding: 2px 0; width: 100%;}
+div.class-popup-filter-admin-form div.inline input.form-text{ width: 50%;}
+
+div.class-popup-filter-admin-form div.inline select{ font-size: 90%;;}
+
+div.class-popup-filter-admin-form div.popup-insert{ position: absolute; bottom: 0;}
+div.class-popup-filter-admin-form input#insert-popup-tag{ float: right;}
+
+div.class-popup-filter-admin-form input#popup-close{ margin-left: 0; }
+
+div.class-popup-filter-admin-form .error{ border: 1px solid red !important;}
+
+

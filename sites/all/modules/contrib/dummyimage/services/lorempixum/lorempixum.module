@@ -1,0 +1,85 @@
+<?php
+/**
+ * @file
+ * Integrates the lorempixum service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function lorempixum_dummyimage_service() {
+  return array(
+    'lorempixum' => array(
+      'title' => t('Lorem Pixum'),
+      'url' => 'http://lorempixum.com/',
+      'form builder' => lorempixum_form(),
+      'options' => lorempixum_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the lorempixum service.
+ */
+function lorempixum_form() {
+  $form = array();
+  $form['lorempixum'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Lorem Pixum'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['lorempixum']['lorempixum_color'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Color images?'),
+    '#default_value' => variable_get('lorempixum_color', 0),
+  );
+  $form['lorempixum']['dummyimages_lorempixum_category'] = array(
+    '#type' => 'select',
+    '#title' => t('Category'),
+    '#options' => array(
+      'random' => t('Random'),
+      'abstract' => t('Abstract'),
+      'food' => t('Food'),
+      'people' => t('People'),
+      'technics' => t('Technics'),
+      'animals' => t('Animals'),
+      'nightlife' => t('Nightlife'),
+      'nature' => t('Nature'),
+      'transport' => t('Transport'),
+      'city' => t('City'),
+      'fashion' => t('Fashion'),
+      'sports' => t('Sports'),
+    ),
+    '#default_value' => variable_get('dummyimages_lorempixum_category', 'random'),
+  );
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the lorempixum service.
+ */
+function lorempixum_options() {
+  return array(
+    'pattern' => 'http://lorempixum.com/%color%dimensions/%category',
+    'separator' => '/',
+    'replacements' => array(
+      '%color' => (variable_get('lorempixum_color', 0) == 1) ? '' : 'g/',
+      '%category' => (variable_get('dummyimages_lorempixum_category', 'random') == 'random') ? '' : variable_get('dummyimages_lorempixum_category', 'random'),
+    ),
+  );
+}
+
+/**
+ * Alters the dummyimage options before URL generation occurs.
+ *
+ * Ensures neither dimension is empty as lorempixum can't handle it.
+ */
+function lorempixum_dummyimage_options_alter(&$options) {
+  if (empty($options['dimensions']['width'])) {
+    $options['dimensions']['width'] = $options['dimensions']['height'];
+  }
+  elseif (empty($options['dimensions']['height'])) {
+    $options['dimensions']['height'] = $options['dimensions']['width'];
+  }
+}

@@ -1,0 +1,4 @@
+name = Mukurtu Protocol Field
+description = An implementation of a field to show the Field API
+package = Mukurtu
+core = 7.x

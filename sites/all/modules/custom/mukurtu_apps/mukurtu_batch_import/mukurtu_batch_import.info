@@ -1,0 +1,6 @@
+; $Id:$
+name = Mukurtu Batch Import
+package = Mukurtu
+description = ""
+core = 7.x
+

@@ -1,0 +1,572 @@
+/**
+ * @file
+ *   This file contains a sample library theming,
+ *   mainly trying to reshape Views' exposed filters
+ *   to something more suitable for such a tiny space.
+ */
+.dnd-library-wrapper {
+  float: right;
+  width: 25%;
+}
+
+.dnd-library-wrapper .header,
+.dnd-library-wrapper .view-filters,
+.dnd-library-wrapper .attachment-before {
+  padding: 3px 4px;
+}
+
+.dnd-library-wrapper .attachment-before {
+  border-top-width: 0;
+}
+
+.dnd-library-wrapper .views-savedsearches-container fieldset {
+  margin: 0;
+}
+
+.dnd-library-wrapper .views-exposed-form .form-item {
+  width: auto;
+}
+
+.dnd-library-wrapper .view-filters,
+.dnd-library-wrapper .view-filters input,
+.dnd-library-wrapper .view-filters select
+.dnd-library-wrapper .view-filters textarea {
+  font-size: .875em;
+}
+
+.dnd-library-wrapper .view-filters fieldset {
+  padding: 0;
+  border-width: 1px 0 0;
+}
+
+.dnd-library-wrapper .view-filters .date-views-filter-wrapper {
+  min-width: 160px;
+}
+
+.dnd-library-wrapper .view-filters .views-exposed-widget {
+  margin-right: 5px;
+  float: none;
+}
+
+.dnd-library-wrapper .view-filters .date-month .form-item select {
+  margin-right: 0;
+}
+
+.dnd-library-wrapper .header h3, .mee-ressource-manager caption {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.dnd-library-wrapper .header form {
+  font-size: 10px;
+}
+
+.dnd-library-wrapper .library {
+  border: 1px solid #aaa;
+  float: left;
+}
+
+.dnd-library-wrapper .editor-item {
+  border-bottom: 2px solid #E4E1DD;
+  clear: left;
+  color: #7f7f7f;
+  position: relative;
+  padding: 4px 0;
+}
+
+.dnd-library-wrapper .editor-item:hover {
+  background-color: #e3f4f0;
+}
+
+.dnd-library-wrapper .editor-item.bt-active {
+  background: #eee;
+}
+
+.dnd-library-wrapper .editor-item .image {
+  float: left;
+  width: 52px;
+}
+
+.dnd-library-wrapper .editor-item .image img {
+  width: 48px;
+  height: auto;
+  cursor: move;
+}
+
+.dnd-library-wrapper .editor-item:hover img,
+.dnd-library-wrapper .editor-item.bt-active img {
+  outline: 1px solid #68baf9;
+}
+
+.dnd-library-wrapper .editor-item .meta {
+  margin-left: 0 !important; /* @todo remove - quickfix to override incorrect CSS in theme */
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+}
+
+.dnd-library-wrapper .editor-item .meta.type-audio {
+  background-image: url('../icons/audio.png');
+}
+
+.dnd-library-wrapper .editor-item .meta.type-image {
+  background-image: url('../icons/image.png');
+}
+
+.dnd-library-wrapper .editor-item .meta.type-video {
+  background-image: url('../icons/video.png');
+}
+
+.dnd-library-wrapper .editor-item .meta.type-soundslide {
+  background-image: url('../icons/soundslide.png');
+}
+
+.dnd-library-wrapper .editor-item .title {
+  color: #666;
+  font-weight: bold;
+  font-size: 13px;
+  line-height: 1.3;
+  margin-bottom: 3px;
+  padding-right: 20px;
+}
+
+.dnd-library-wrapper .editor-item .date,
+.dnd-library-wrapper .editor-item .author {
+  font-size: 10px;
+}
+
+.dnd-library-wrapper .author a {
+  color: #7f7f7f;
+}
+
+.dnd-library-wrapper .editor-item .links {
+  float: right;
+  font-size: 11px;
+  line-height: 15px;
+  margin-right: 5px;
+}
+
+.dnd-library-wrapper .editor-item .links li {
+  padding: 0 0 0 10px;
+}
+
+.dnd-library-wrapper .editor-item .sizes {
+  float: left;
+  width: 50px;
+  margin-top: 14px;
+  line-height: 1;
+}
+
+.dnd-library-wrapper .editor-item .sizes ul {
+  list-style-type: none;
+  margin: 0;
+}
+
+.dnd-library-wrapper .editor-item .sizes ul li {
+  background: none;
+  list-style-type: none;
+  display: inline;
+  padding: 0;
+  margin: 0 0 0 2px;
+}
+
+.dnd-library-wrapper .editor-item .sizes a {
+  float: left;
+  display: block;
+  font-size: 9px;
+  line-height: 9px;
+  margin-bottom: 2px;
+  width: 19px;
+  text-align: center;
+}
+
+.dnd-library-wrapper .editor-item .sizes a:link,
+.dnd-library-wrapper .editor-item .sizes a:visited,
+.dnd-library-wrapper .editor-item .sizes a:active {
+  border: 1px solid #888;
+  color: #fff;
+  cursor: move;
+  text-align: center;
+}
+
+.dnd-library-wrapper .editor-item .sizes a:hover,
+.dnd-library-wrapper .editor-item .sizes a.dnd-inserted:link,
+.dnd-library-wrapper .editor-item .sizes a.dnd-inserted:visited,
+.dnd-library-wrapper .editor-item .sizes a.dnd-inserted:active {
+  border: 1px solid #555;
+  color: #fff;
+  text-decoration: none;
+}
+
+.dnd-library-wrapper .editor-item .sizes a:hover span,
+.dnd-library-wrapper .editor-item .sizes a.dnd-inserted span {
+  background-color: #555;
+}
+
+.dnd-library-wrapper .editor-item .sizes a span {
+  display: block;
+  background-color: #888;
+}
+
+.dnd-library-wrapper .editor-item .sizes a.size-S span {
+  margin: 3px;
+  padding: 2px 0;
+}
+
+.dnd-library-wrapper .editor-item .sizes a.size-M span {
+  margin: 2px;
+  padding: 3px 0;
+}
+
+.dnd-library-wrapper .editor-item .sizes a.size-L span {
+  margin: 1px;
+  padding: 4px 0;
+}
+
+.dnd-library-wrapper .editor-item.dnd-child-inserted {
+  background-color: #ccc;
+}
+
+.sdl-preview-item dt {
+  font-weight: bold;
+  float: left;
+  width: 60px;
+}
+
+.sdl-preview-item dd {
+  margin: 0;
+}
+
+/* Fix for Garland */
+#center .dnd-library-wrapper form {
+  margin: 0;
+}
+
+/**
+ * Prototype for an always on right library
+ */
+.dnd-library-wrapper {
+  position: fixed;
+  top: 150px;
+  right: -276px;
+  bottom: 30px;
+  width: 276px !important; /* @todo remove - theme override quickfix */
+  z-index: 999;
+}
+
+.dnd-library-wrapper.library-on {
+  right: 0;
+}
+
+/**
+ * Menu
+ */
+.scald-menu {
+  position: absolute;
+  width: 325px;
+  top: -65px;
+  left: -42px;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Trick to keep the unused space clickabke. */
+  pointer-events: none;
+}
+
+.scald-menu > div {
+  pointer-events: auto;
+}
+
+.scald-menu.search-on {
+  left: -256px;
+}
+
+.scald-menu .summary {
+  background-color: #959896;
+  border-top-left-radius: 5px 4px;
+  border-top-right-radius: 5px 4px;
+  border-bottom: 1px solid #666;
+  box-shadow: 0 1px 0 0 #ccc;
+  color: #fff;
+  height: 70px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: 80%;
+  line-height: 1.4;
+}
+
+.scald-menu .summary .item-list {
+  background-color: transparent;
+  border-width: 0;
+}
+
+.scald-menu .summary .toggle {
+  background: url('../icons/search-off.png') 3px 3px no-repeat;
+  cursor: pointer;
+  float: left;
+  height: 100%;
+  width: 42px;
+}
+
+.scald-menu.search-on .summary .toggle {
+  background: url('../icons/search-on.png') 3px 3px no-repeat;
+}
+
+.scald-menu .summary .title {
+  margin: 3px 0 7px;
+  font-size: 17px;
+  font-weight: normal;
+  line-height: 19px;
+}
+
+.scald-menu .summary .sort {
+  float: right;
+  margin: -20px 7px 0 0;
+}
+
+.scald-menu .summary .label {
+  font-style: italic;
+}
+
+.scald-menu .summary ul {
+  margin: 0;
+}
+
+.scald-menu .summary ul li {
+  display: inline;
+  background: #6f6f6f;
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+
+.scald-menu .filters {
+  background-color: #959896;
+  border-bottom-left-radius: 5px 4px;
+  color: #fff;
+  left: 42px;
+  top: 72px;
+  right: 60px;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 20px;
+  position: absolute;
+}
+
+.scald-menu .filters input[type="text"] {
+  width: 100%;
+}
+
+.scald-menu .filters input[type="submit"] {
+  width: 100%;
+  font-size: 16px;
+}
+
+.scald-menu .filters input[type="reset"] {
+  float: right;
+  margin-top: 5px;
+}
+
+.scald-menu .filters .description {
+  color: #fff;
+}
+
+.scald-menu .add-buttons {
+  background: #a5a9a8 url('../icons/plus-white.png') 14px 44px no-repeat;
+  border-bottom-left-radius: 5px 4px;
+  padding-top: 50px;
+  padding-bottom: 20px;
+  width: 42px;
+}
+
+.scald-menu .add-buttons .item-list {
+  background-color: transparent;
+  border-width: 0;
+}
+
+.scald-menu .add-buttons ul {
+  margin: 0;
+  padding: 0;
+}
+
+.scald-menu .add-buttons ul li {
+  height: 30px;
+  margin: 3px 4px;
+  width: 30px;
+  cursor: pointer;
+  color: #4A68A4;
+  text-indent: -999px;
+  overflow: hidden;
+  padding: 3px 2px;
+  border-bottom: 1px solid #666;
+  box-shadow: 0 1px 0 0 #ccc;
+}
+
+.scald-menu .add-buttons ul li.last {
+  border: 0;
+  box-shadow: none;
+}
+
+.scald-menu .add-buttons a {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+
+.scald-menu .add-buttons .add-audio {
+  background: url('../icons/audio-large-inverted.png') 50% 50% no-repeat;
+}
+
+.scald-menu .add-buttons .add-image {
+  background: url('../icons/image-large-inverted.png') 50% 50% no-repeat;
+}
+
+.scald-menu .add-buttons .add-video {
+  background: url('../icons/video-large-inverted.png') 50% 50% no-repeat;
+}
+
+.scald-menu .add-buttons .add-soundslide {
+  background: url('../icons/soundslide-large-inverted.png') 50% 50% no-repeat;
+}
+
+.scald-menu .add-buttons .add-audio:hover {
+  background-image: url('../icons/audio-large-color.png');
+}
+
+.scald-menu .add-buttons .add-image:hover {
+  background-image: url('../icons/image-large-color.png');
+}
+
+.scald-menu .add-buttons .add-video:hover {
+  background-image: url('../icons/video-large-color.png');
+}
+
+.scald-menu .add-buttons .add-soundslide:hover {
+  background-image: url('../icons/soundslide-large-color.png');
+}
+
+/**
+ * Library: pagination etc.
+ */
+.scald-library {
+  height: 100%;
+  position: absolute;
+  background-color: #fff;
+  border: 4px solid #e4e1dd;
+  border-right: none;
+  border-bottom-left-radius: 4px;
+  box-shadow: 2px 2px 5px 0 #999;
+  padding: 3px;
+  width: 266px;
+  overflow: auto;
+}
+
+.scald-library .summary-filters {
+  background-color: #F5F5F5;
+  height: 50px;
+  position: absolute;
+  top: 40px; /* offsetTop */
+  width: 100%;
+  overflow: auto;
+}
+
+.scald-library .pager,
+.scald-library .pager * {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.scald-library .pager {
+  font-size: 13px;
+  line-height: 15px;
+  margin-top: 15px;
+}
+
+.scald-library .pager-item,
+.scald-library .pager-current {
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  margin: 1px 2px;
+  padding: 3px 8px;
+  display: inline-block;
+  border-top: 1px solid #fff;
+  color: #717171 !important;
+  font-size: smaller !important;
+  text-shadow: white 0 1px 0;
+  background-color: #f5f5f5;
+  background-image: -webkit-linear-gradient(top, #f9f9f9, #eaeaea);
+  background-image: -moz-linear-gradient(top, #f9f9f9, #eaeaea);
+  background-image: -ms-linear-gradient(top, #f9f9f9, #eaeaea);
+  background-image: -o-linear-gradient(top, #f9f9f9, #eaeaea);
+  background-image: linear-gradient(top, #f9f9f9, #eaeaea);
+}
+
+.scald-library .pager-item a {
+  text-decoration: none !important;
+}
+
+.scald-library .pager-item.first {
+  margin-left: 0;
+}
+
+.scald-library .pager-item.last {
+  margin-right: 0;
+}
+
+.scald-library .pager-item:hover {
+  border-color: #fff;
+  background-color: #fdfdfd;
+  background-image: -webkit-linear-gradient(top, #fefefe, #fafafa);
+  background-image: -moz-linear-gradient(top, #fefefe, #fafafa);
+  background-image: -ms-linear-gradient(top, #fefefe, #fafafa);
+  background-image: -o-linear-gradient(top, #fefefe, #fafafa);
+  background-image: linear-gradient(top, #fefefe, #fafafa);
+}
+
+.scald-library .pager-current {
+  box-shadow: inset 0 0 0 0 rgba(0, 0, 0, 0.75);
+  border-color: #505050 !important;
+  color: #f2f2f2 !important;
+  text-shadow: black 0 1px 0;
+  background-color: #b3b1af;
+  background-image: -webkit-linear-gradient(top, #5f5f5f, #5c5c5c);
+  background-image: -moz-linear-gradient(top, #5f5f5f, #5c5c5c);
+  background-image: -ms-linear-gradient(top, #5f5f5f, #5c5c5c);
+  background-image: -o-linear-gradient(top, #5f5f5f, #5c5c5c);
+  background-image: linear-gradient(top, #5f5f5f, #5c5c5c);
+}
+
+.scald-anchor {
+  background: #e4e1dd url("../icons/library-light.png") 50% 50% no-repeat;
+  cursor: pointer;
+  left: -38px;
+  height: 38px;
+  width: 38px;
+  box-shadow: 2px 2px 3px 0 #666;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  position: absolute;
+}
+
+.scald-anchor:hover {
+  background-image: url("../icons/library-dark.png");
+}
+
+/* qTip */
+.ui-tooltip-scald-dnd {
+  max-width: 550px;
+  border-radius: 5px;
+}
+
+.ui-tooltip-scald-dnd .ui-tooltip-content,
+.ui-tooltip-scald-dnd .ui-tooltip-titlebar {
+  background-color: #fff;
+  border-color: #6bf;
+}
+
+/* Override CTools' modal */
+div.ctools-modal-content .field-type-atom-reference .form-item.form-type-textfield:first-child label {
+  /* Don't use a fixed width label for the dropbox */
+  width: auto;
+}

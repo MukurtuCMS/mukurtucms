@@ -1,0 +1,321 @@
+<?php
+
+/**
+ * @file
+ * Scald Image is a Scald Atom Provider for images.
+ */
+
+/*******************************************************************************
+ * SCALD HOOK IMPLEMENTATIONS
+ */
+
+/**
+ * Implements hook_scald_atom_providers().
+ */
+function scald_image_scald_atom_providers() {
+  return array(
+    'image' => 'Image upload'
+  );
+  // This code will never be hit, but is necessary to mark the string
+  // for translation on localize.d.o
+  t('Image upload');
+}
+
+/**
+ * Implements hook_scald_add_form().
+ */
+function scald_image_scald_add_form(&$form, &$form_state) {
+  $defaults = scald_atom_defaults('image');
+  $type = scald_type_load('image');
+  $form['file'] = array(
+    '#type' => $defaults->upload_type,
+    '#title' => check_plain(scald_type_property_translate($type)),
+    '#upload_location' => ScaldAtomController::getThumbnailPath('image'),
+    '#upload_validators' => array('file_validate_extensions' => array('jpg jpeg png gif')),
+  );
+  if ($defaults->upload_type == 'plupload') {
+    $form['scald_authors'] = array(
+      '#type' => 'textfield',
+      '#default_value' => NULL,
+      '#maxlength' => 100,
+      '#autocomplete_path' => 'taxonomy/autocomplete/scald_authors',
+      '#required' => FALSE,
+      '#title' => t('Authors'),
+      '#description' => t('Preset value for %field_name field. If left empty, the default field value will be used.', array('%field_name' => t('Authors'))),
+    );
+    $form['scald_tags'] = array(
+      '#type' => 'textfield',
+      '#default_value' => NULL,
+      '#maxlength' => 100,
+      '#autocomplete_path' => 'taxonomy/autocomplete/scald_tags',
+      '#required' => FALSE,
+      '#title' => t('Tags'),
+      '#description' => t('Preset value for %field_name field. If left empty, the default field value will be used.', array('%field_name' => t('Tags'))),
+    );
+  }
+}
+
+/**
+ * Implements hook_scald_add_atom_count().
+ */
+function scald_image_scald_add_atom_count(&$form, &$form_state) {
+  if (is_array($form_state['values']['file'])) {
+    return max(count($form_state['values']['file']), 1);
+  }
+  return 1;
+}
+
+/**
+ * Implements hook_scald_add_form_fill().
+ */
+function scald_image_scald_add_form_fill(&$atoms, $form, $form_state) {
+  foreach ($atoms as $delta => $atom) {
+    if (is_array($form_state['values']['file']) && module_exists('plupload')) {
+      module_load_include('inc', 'scald', 'includes/scald.plupload');
+      $destination = $form['file']['#upload_location'] . '/' . $form_state['values']['file'][$delta]['name'];
+      $file = scald_plupload_save_file($form_state['values']['file'][$delta]['tmppath'], $destination);
+    }
+    else {
+      $file = file_load($form_state['values']['file']);
+    }
+    $atom->title = $file->filename;
+    $atom->base_id = $file->fid;
+    foreach (array('author', 'tag') as $name) {
+      // hacky, because variable and field name do not really match.
+      $field_name = 'scald_' . $name . 's';
+      $langcode = field_language('scald_atom', $atom, $field_name);
+      if (empty($form_state['values'][$field_name])) {
+        continue;
+      }
+
+      // Borrowed from taxonomy_autocomplete_validate().
+      $typed_terms = drupal_explode_tags($form_state['values'][$field_name]);
+      $vocabulary = taxonomy_vocabulary_machine_name_load(variable_get('scald_' . $name . '_vocabulary', $field_name));
+      foreach ($typed_terms as $typed_term) {
+        if ($possibilities = taxonomy_term_load_multiple(array(), array('name' => trim($typed_term), 'vid' => $vocabulary->vid))) {
+          $term = array_pop($possibilities);
+        }
+        else {
+          $term = (object) array(
+            'vid' => $vocabulary->vid,
+            'name' => $typed_term,
+            'vocabulary_machine_name' => $vocabulary->machine_name,
+          );
+          taxonomy_term_save($term);
+        }
+        $atom->{$field_name}[$langcode][] = array('tid' => $term->tid);
+      }
+    }
+
+    $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+    $atom->scald_thumbnail[$langcode][0] = (array) $file;
+  }
+}
+
+/**
+ * Implements hook_scald_transcoders().
+ */
+function scald_image_scald_transcoders() {
+  $transcoders = array();
+  foreach (image_styles() as $name => $style) {
+    $label = isset($style['label']) ? $style['label'] : $style['name'];
+    $transcoders['style-' . $name] = array(
+      'title' => t('@style (Image style)', array('@style' => $label)),
+      'description' => t('Use the Image style @style to prepare the image', array('@style' => $label)),
+      'formats' => array(
+        'image' => 'passthrough',
+      ),
+    );
+  }
+  if (module_exists('picture')) {
+    foreach (picture_mapping_load_all() as $name => $style) {
+      $transcoders['group-' . $name] = array(
+        'title' => t('@group (Picture group)', array('@group' => $name)),
+        'description' => t('Use the Picture group @group to prepare the image', array('@group' => $name)),
+        'formats' => array(
+          'image' => 'passthrough',
+        ),
+      );
+    }
+  }
+  return $transcoders;
+}
+
+/**
+ * Implements hook_scald_player().
+ */
+function scald_image_scald_player() {
+  return array(
+    'image_figure' => array(
+      'name' => 'HTML5 Image player',
+      'description' => 'The HTML5 player using figure/figcaption for all image atoms.',
+      'type' => array('image'),
+      'settings' => array(
+        'classes' => '',
+        'caption' => '[atom:title], by [atom:author]',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_scald_player_settings_form().
+ */
+function scald_image_scald_player_settings_form($form, &$form_state) {
+  $element = array();
+
+  $element['classes'] = array(
+    '#type' => 'textfield',
+    '#title' => t('CSS classes'),
+    '#size' => 40,
+    '#default_value' => $form['#scald']['player_settings']['classes'],
+  );
+  $element['caption'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text pattern used for caption'),
+    '#size' => 40,
+    '#default_value' => $form['#scald']['player_settings']['caption'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_scald_fetch().
+ */
+function scald_image_scald_fetch($atom, $type) {
+  if ($type == 'atom') {
+    $file = file_load($atom->base_id);
+    $atom->base_entity = $file;
+    $atom->file_source = $file->uri;
+    $atom->thumbnail_source = $file->uri;
+  }
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function scald_image_scald_prerender($atom, $context, $options, $mode) {
+  $config = scald_context_config_load($context);
+
+  // Find out which transcoder is in use, and checks if it's
+  // one of the transcoder provided by Scald Image.
+  $style_name = NULL;
+  if ($transcoder = $config->transcoder[$atom->type]['*']) {
+    // Image style support.
+    if (preg_match('/^style-(.*)$/', $transcoder, $match)) {
+      $style_name = $match[1];
+    }
+    // Picture support.
+    elseif (preg_match('/^group-(.*)$/', $transcoder, $match) && module_exists('picture')) {
+      $mappings = picture_mapping_load($match[1]);
+    }
+  }
+
+  if ($mode == 'transcoder') {
+    // Scald Image can only do 1:1 transcoding. For Picture integration, it is
+    // done in the Atom mode to avoid duplicate code from Picture module.
+    if (empty($style_name)) {
+      return;
+    }
+
+    $preset = image_style_load($style_name);
+
+    if (!empty($atom->file_source)) {
+      $atom->file_transcoded = image_style_path($preset['name'], $atom->file_source);
+      $atom->rendered->file_transcoded_url = image_style_url($preset['name'], $atom->file_source);
+    }
+  }
+  elseif ($mode == 'player') {
+    $settings = $config->player[$atom->type]['settings'];
+    $classes = array_merge(array('scald-atom', 'scald-atom-image'), explode(' ', check_plain($settings['classes'])));
+    $caption = token_replace($settings['caption'], array('atom' => $atom));
+    $atom->rendered->player = '
+      <figure class="' . implode(' ', $classes) . '">
+        ' . $atom->rendered->player . '
+        <figcaption>' . filter_xss_admin($caption) . '</figcaption>
+      </figure>
+    ';
+  }
+  elseif ($mode == 'atom') {
+    // Default attributes, which can be overridden by field settings.
+    $attributes = array(
+      'alt' => $atom->title,
+      'title' => $atom->title,
+    );
+    $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+    foreach (array('alt', 'title', 'width', 'height') as $attribute_name) {
+      if (isset($atom->scald_thumbnail[$langcode][0][$attribute_name]) && $atom->scald_thumbnail[$langcode][0][$attribute_name]) {
+        $attributes[$attribute_name] = $atom->scald_thumbnail[$langcode][0][$attribute_name];
+      }
+    }
+
+    if (!empty($style_name)) {
+      $atom->rendered->player = theme('image_style', array('path' => $atom->file_source, 'style_name' => $style_name) + $attributes);
+    }
+    elseif (isset($mappings)) {
+      foreach ($mappings->mapping as $breakpoint_name => $multipliers) {
+        if (!empty($multipliers)) {
+          foreach ($multipliers as $multiplier => $image_style) {
+            if (!$image_style) {
+              continue;
+            }
+            // $image_style is machine name in Picture 1.x and an array in
+            // Picture 2.x.
+            if (is_array($image_style) && $image_style['mapping_type'] === '_none') {
+              continue;
+            }
+
+            $fallback_image_style = is_array($image_style) ? $image_style['image_style'] : $image_style;
+            break 2;
+          }
+        }
+      }
+      // The fallback_image_style is the first image style we find, and so if it
+      // is empty then we do not have any image style.
+      if (!empty($fallback_image_style)) {
+        $atom->rendered->player = theme('picture', array('uri' => $atom->file_source, 'style_name' => $fallback_image_style, 'breakpoints' => $mappings->mapping) + $attributes);
+      }
+    }
+    else {
+      $path = empty($atom->rendered->file_transcoded_url) ? $atom->file_source : $atom->rendered->file_transcoded_url;
+      $atom->rendered->player = theme('image', array('path' => $path) + $attributes);
+    }
+
+    if (!empty($options['link'])) {
+      $atom->rendered->player = l($atom->rendered->player, $options['link'], array('html' => TRUE));
+    }
+  }
+}
+
+/**
+ * Implements hook_scald_update_atom().
+ */
+function scald_image_scald_update_atom($atom, $mode) {
+  if ($mode == 'atom') {
+    _scald_image_sync_thumbnail($atom);
+  }
+}
+
+/**
+ * Implements hook_scald_register_atom().
+ */
+function scald_image_scald_register_atom($atom, $mode) {
+  if ($mode == 'atom') {
+    _scald_image_sync_thumbnail($atom);
+  }
+}
+
+/**
+ * Synchronisation of thumbnail with base_id.
+ *
+ * The thumbnail field is also the base entity. We keep them in synchronisation
+ * when user update that field.
+ */
+function _scald_image_sync_thumbnail($atom) {
+  if (!empty($atom->scald_thumbnail)) {
+    $items = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+    $atom->base_id = $items[0]['fid'];
+  }
+}
+

@@ -1,0 +1,171 @@
+<?php
+/**
+ * @file
+ * 
+ * 
+ *
+ * @author Kálmán Hosszu - hosszu.kalman@gmail.com - http://premiumcmsthemes.com http://www.kalman-hosszu.com
+ */
+ 
+/* ====================== */
+/* ==== DRUPAL HOOKS ==== */
+/* ====================== */
+
+/**
+ * Implementation of hook_menu().
+ *
+ * @return An array of menu items.
+ */
+function multiform_test_menu() {
+  $items = array();
+
+  $items['multiform-test/1'] = array(
+    'title' => 'Multiform test page 1',
+    'page callback' => 'multiform_get_form',
+    'page arguments' => array(array('multiform_test1_1'), array('multiform_test1_2')),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['multiform-test/2'] = array(
+    'title' => 'Multiform test page 2',
+    'page callback' => 'multiform_get_form',
+    'page arguments' => array(array('multiform_test2_1'), array('multiform_test2_2')),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+
+/* ====================== */
+/* == MODULE FUNCTIONS == */
+/* ====================== */
+
+/* FIRST TEST CASE */
+
+/**
+ * Build multiform_test1_1 form.
+ *
+ * @param type $form
+ * @param type $form_state
+ * @return array 
+ */
+function multiform_test1_1($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'save',
+    '#submit' => array('multiform_test1_submit_button'),
+  );
+  
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => 'delete',
+    '#submit' => array('multiform_test1_delete_button'),
+  );
+  
+  return $form;
+}
+
+/**
+ * Build multiform_test1_2 form.
+ *
+ * @param type $form
+ * @param type $form_state
+ * @return string 
+ */
+function multiform_test1_2($form, $form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'save',
+    '#submit' => array('multiform_test1_submit_button'),
+  );
+  
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => 'delete',
+    '#submit' => array('multiform_test1_delete_button'),
+  );
+  
+  return $form;
+}
+
+/**
+ * Submit handing.
+ *
+ * @param type $form
+ * @param type $form_state 
+ */
+function multiform_test1_submit_button($form, $form_state) {
+  drupal_set_message($form['#form_id'] . 'multiform_test1_submit_button');
+}
+
+/**
+ * Handling delete.
+ *
+ * @param type $form
+ * @param type $form_state 
+ */
+function multiform_test1_delete_button($form, $form_state) {
+  drupal_set_message($form['#form_id'] . 'multiform_test1_delete_button');
+}
+
+
+/* SECOND TEST CASE */
+
+/**
+ * Build multiform_test2_1 form.
+ *
+ * @param type $form
+ * @param type $form_state
+ * @return array 
+ */
+function multiform_test2_1($form, $form_state) {
+  $form['required_text_1'] = array(
+    '#type' => 'textfield',
+    '#title' => 'test1',
+    '#required' => TRUE,
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'save',
+    '#submit' => array('multiform_test2_submit_button'),
+  );
+  
+  return $form;
+}
+
+/**
+ * Build multiform_test2_2 form.
+ *
+ * @param type $form
+ * @param type $form_state
+ * @return array 
+ */
+function multiform_test2_2($form, $form_state) {
+  $form['required_text_2'] = array(
+    '#type' => 'textfield',
+    '#title' => 'test2',
+    '#required' => TRUE,
+  );
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'save',
+    '#submit' => array('multiform_test2_submit_button'),
+  );
+  
+  return $form;
+}
+
+/**
+ * Submit handing.
+ *
+ * @param type $form
+ * @param type $form_state 
+ */
+function multiform_test2_submit_button($form, $form_state) {
+  drupal_set_message($form['#form_id'] . 'multiform_test2_submit_button');
+}

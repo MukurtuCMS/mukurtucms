@@ -1,0 +1,272 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_drush_help().
+ */
+function demo_drush_help($command) {
+  if ($command == 'drush:demo-status') {
+    return dt('Print default dump settings and last reset time.');
+  }
+  elseif ($command == 'drush:demo-create') {
+    return dt('Create a new snapshow with the given file name and description. Dump filename can have alphanumeric characters, dots, dashes, and underscores only. Other characters, including blanks (spaces), are not allowed.');
+  }
+  elseif ($command == 'drush:demo-delete') {
+    return dt('Delete a specified snapshot.');
+  }
+  elseif ($command == 'drush:demo-reset') {
+    return dt('Reset your site using a specified snapshot. DO NOT USE THIS COMMAND ON A PRODUCTION SERVER.');
+  }
+  // For later implementation
+  /**
+  elseif (module_exists('demo_reset') && $command == 'drush:demo-set-default') {
+      return dt('Set default snapshot to reset your site to at regular intervals. This requires drupal cron.');
+  }
+  */
+}
+
+/**
+ * Implementation of hook_drush_command().
+ */
+function demo_drush_command() {
+  /**
+   * command to display status report
+   */
+  $items['demo-status'] = array(
+    'callback'    => 'demo_drush_status',
+    'description' => 'Print default dump settings and last reset time.',
+    'aliases' => array('demo-st'),
+  );
+
+  /**
+   * command to create new snapshot
+   */
+  $items['demo-create'] = array(
+    'callback'    => 'demo_drush_create_snapshot',
+    'description' => dt('Create a new snapshot with the given file name and description.'),
+    'arguments'   => array(
+      'filename'    => 'Required. SQL dump file name.',
+      'description' => 'Optional. Enter a description for this snapshot.',
+    ),
+    'examples' => array('To create a new snapshot' => 'drush demo-create snapshot-v1.0 "First version"'),
+    'aliases' => array('demo-mk'),
+  );
+  // TODO: For demo-create, use default file name when no dump file name is given (@see http://drupal.org/node/754798)
+
+  /**
+   * command to delete snapshot
+   */
+  $items['demo-delete'] = array(
+    'callback'    => 'demo_drush_delete_snapshot',
+    'description' => dt('Delete a snapshot with the given file name.'),
+    'arguments'   => array('filename' => 'Required. SQL dump file name.'),
+    'examples' => array('To delete a snapshot' => 'drush demo-delete snapshot-v1.0'),
+    'aliases' => array('demo-rm'),
+  );
+
+  /**
+   * command to get a list of available snapshots
+   */
+  $items['demo-snapshots'] = array(
+    'callback'    => 'demo_drush_snapshots',
+    'description' => 'Get a list of available snapshots.',
+    'arguments'   => array('filename' => 'Optional. Name of the snapshot.'),
+    'examples' => array(
+      'To get the list' => 'drush demo-snapshots',
+      'To get description about individual snapshot' => 'drush demo-snapshot <snapshot-name>',
+    ),
+    'aliases' => array('demo-ls'),
+  );
+
+  /**
+   * command to reset your site.
+   */
+  $items['demo-reset'] = array(
+    'callback'    => 'demo_drush_reset',
+    'description' => 'Reset your site using a specified snapshot. DO NOT USE THIS COMMAND ON A PRODUCTION SERVER',
+    'arguments'   => array('filename' => 'Required. SQL dump file name.'),
+    'examples' => array('To reset use' => 'drush demo-reset snapshot-v1.0'),
+    'aliases' => array('demo-rs'),
+  );
+
+  // For later implementation
+  // module_exists is unavailable here, may be we need to use demo_reset.drush.inc
+  //if (module_exists('demo_reset')) {
+    /**
+     * command to set default snapshot.
+     * This will be used to reset site automatically after some regular interval during cron run.
+     */
+
+    /**
+      $items['demo-set-default'] = array(
+        'callback'    => 'demo_drush_set_default',
+        'description' => dt('Set default snapshot to reset your site after regular interval.'),
+        'arguments'   => array('filename' => 'Required. SQL dump file name.'),
+        'examples' => array('To reset your site with given' => 'drush demo-delete snapshot-v1.0'),
+      );
+    }
+    */
+  return $items;
+}
+
+/**
+ * Callback for drush command demo-status.
+ */
+function demo_drush_status() {
+  // last reset date
+  $reset_date = (variable_get('demo_reset_last', 0)) ? format_date(variable_get('demo_reset_last', 0)) : dt('Never');
+  drush_print('Last reset: ' . $reset_date);
+
+  // default snapshot name
+  if (module_exists('demo_reset')) {
+    drush_print('Default snapshot to use for reset on cron run: ' . variable_get('demo_dump_cron', dt('None')));
+  }
+
+  // dump path
+  drush_print('Current dump path: ' . variable_get('demo_dump_path', dt('n/a')));
+
+  //TODO add default dump file name and appending date format http://drupal.org/node/754798
+}
+
+/**
+ * Callback for drush command demo-create.
+ */
+function demo_drush_create_snapshot($filename = NULL, $description = NULL) {
+  // filename validation code
+  if (empty($filename)) {
+    drush_set_error('Argument file name is not given. See "drush help demo-create" for usage.');
+    return;
+  }
+
+  if (!preg_match('/^[-_\.a-zA-Z0-9]+$/', $filename)) {
+    drush_set_error(t('Dump filename %title must contain alphanumeric characters, dots, dashes and underscores only. Other characters, including blanks (spaces), are not allowed.', array('%title' => $filename)));
+    return;
+  }
+
+  // invoke _demo_dump() to create snapshot
+  module_load_include('inc', 'demo', 'demo.admin');
+  $options = array(
+    'filename' => $filename,
+    'description' => $description,
+    'tables' => demo_enum_tables(),
+  );
+  if ($fileconfig = _demo_dump($options)) {
+    drush_log('Successfully created snapshot ' . $fileconfig['sqlfile'], 'ok');
+  }
+
+}
+
+/**
+ * Callback for drush command demo-delete.
+ */
+function demo_drush_delete_snapshot($filename = NULL) {
+  if (empty($filename)) {
+    drush_set_error('Argument file name is not given. See "drush help demo-delete" for usage.');
+    return;
+  }
+
+  if (!_demo_drush_is_file_exists($filename)) {
+    drush_set_error('File does not exists. Use "drush demo-snapshots" to get the list of available snapshots.');
+    return;
+  }
+
+  drush_log('This command will delete the snapshot and can not be undone', 'warning');
+  if (!drush_confirm('Are you sure you want to continue?', $indent = 0)) {
+    drush_log('Command Aborted.', 'ok');
+    return;
+  }
+
+  module_load_include('inc', 'demo', 'demo.admin');
+  $file = demo_get_fileconfig($filename);
+  unlink($file['sqlfile']);
+  unlink($file['infofile']);
+  drush_log("Deleted snapshot $filename", 'success');
+}
+
+/**
+ * Callback for drush command demo-snapshot.
+ */
+function demo_drush_snapshots($filename = NULL) {
+  module_load_include('inc', 'demo', 'demo.admin');
+  if (!isset($filename)) {
+    // print table of available snapshots.
+    $rows = array();
+    $fileconfig = demo_get_fileconfig();
+    $files = file_scan_directory($fileconfig['dumppath'], '.info$');
+
+    $rows[time()] = array('File name', 'Date', 'Size', 'Description');
+    foreach ($files as $filename => $file) {
+      // Build basic file info
+      $files[$filename] = (array) $file;
+      $info = demo_get_info($filename);
+      $m_time = filemtime($filename);
+      $rows[$m_time] = array(
+        'name' => check_plain($info['filename']),
+        'date' => format_date($m_time, 'small'),
+        'size' => format_size(filesize(substr($filename, 0, -4) . 'sql')),
+        'desc' => !empty($info['description']) ? $info['description'] : dt('n/a'),
+      );
+
+    }
+    krsort($rows);
+    drush_print_table($rows, TRUE);
+  }
+  else {
+    // is snapshot with given name exists ?
+    if (!_demo_drush_is_file_exists($filename)) {
+      drush_set_error('File does not exist. Use "drush demo-snapshots" to get the list of available snapshots.');
+      return;
+    }
+
+    $file = demo_get_fileconfig($filename);
+    $info = demo_get_info($file['infofile']);
+    if (!empty($info['description'])) {
+      drush_print('Description: '. $info['description']);
+    }
+
+    $modules = array_diff($info['modules'], array('block', 'filter', 'node', 'system', 'user', 'demo'));
+    sort($info['modules']);
+    drush_print('Modules: '. implode(', ', $info['modules']));
+  }
+}
+
+/**
+ * Callback for drush command demo-reset.
+ */
+function demo_drush_reset($filename = NULL) {
+  if (empty($filename)) {
+    drush_set_error('Argument file name is not given. See "drush help demo-reset" for usage.');
+    return;
+  }
+
+  if (!_demo_drush_is_file_exists($filename)) {
+    drush_set_error('File does not exist. Use "drush demo-snapshots" to get the list of available snapshots.');
+    return;
+  }
+
+  drush_log('DO NOT USE THIS COMMAND ON A PRODUCTION SERVER. THIS ACTION WILL RESET YOUR DATABASE AND CAN NOT BE UNDONE. WE RECOMMAND YOU HAVE A BACKUP OF YOUR DATABASE BEFORE YOU PROCEED WIHT THIS COMMAND.', 'warning');
+
+  if (!drush_confirm('Are you sure you want to reset the site?')) {
+    drush_log('Command Aborted.', 'ok');
+    return;
+  }
+
+  drush_print('This command will take a while. Please wait...');
+  if(_demo_reset($filename)) {
+    drush_log('Successfully restored database from snapshot '. $filename, 'ok');
+  }
+  else {
+    drush_set_error('Failed to restore from snapshot.');
+  }
+}
+
+/**
+ * Implements demo_get_fileconfig().
+ *
+ * Returns TRUE if the file with given filename exists FALSE otherwise.
+ */
+function _demo_drush_is_file_exists($filename) {
+  module_load_include('inc', 'demo', 'demo.admin');
+  $files = demo_get_fileconfig($filename);
+  return file_exists($files['infofile']);
+}

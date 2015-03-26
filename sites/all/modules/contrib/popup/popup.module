@@ -1,0 +1,311 @@
+<?php
+
+
+
+/**
+ * Implementation of hook_init
+ *
+ * Adds popup Script, settings and Style
+ *
+ */
+function popup_init(){
+
+  $path = drupal_get_path('module', 'popup');
+
+  drupal_add_js(
+    $path . '/popup.js',
+    array('preprocess' => variable_get('popup-preprocess', FALSE))
+  );
+  drupal_add_css($path . '/popup.css',
+    array('preprocess' => variable_get('popup-preprocess', FALSE))
+  );
+
+  $effects = module_invoke_all('popup_effects');
+  drupal_add_js(
+    array(
+      'popup' => array(
+        'effects' => $effects,
+        'linger' => variable_get('popup-hover-linger', 250),
+        'delay' => variable_get('popup-hover-delay', 0)
+      )
+    ),
+    'setting'
+  );
+
+}
+
+
+
+/**
+ * Implementation of hook_popup_effects
+ *
+ * This hook allows modules to supply Javascript methods for showing/hiding
+ * popups.
+ *
+ * @return a keyed array
+ *
+ * in the form:
+ *
+ * array(
+ *   'show' => array(
+ *     'effect-name' => 'javascript to show the popup',
+ *     ...
+ *   ),
+ *   'hide' => array(
+ *     'effect-name' => 'javascript to hide the popup'
+ *     ...
+ *   ),
+ *  );
+ *
+ * The Javascript is executed within the context of the PopupElement wrapper
+ * ojbect. The following properties are available as JQuery objects:
+ *
+ *  element:  The popup element wrapper
+ *  title:    the title element of the popup
+ *  body:     the body element of the popup. Keep in mind that the body is no
+ *            longer contained within the popup element wrapper, but within its
+ *            own wrapper within the #popup-active-overlay element at the end
+ *            of the HTML body.
+ *  wrapper:  Wrapper of the popup element body. This has the same id as the
+ *            popup element, with "-active" appended.
+ *  origin:   Invisible div element prepended to the element wrapper, to
+ *            establish the popup top/left offset in relation to the document.
+ *
+ */
+function popup_popup_effects(){
+  return array(
+
+    'show' => array(
+
+      'default' => "this.body.show();",
+
+      'fade' => "
+        if (this.opacity){
+          this.body.fadeTo('medium',this.opacity);
+        }else{
+          this.body.fadeIn('medium');
+        }",
+
+      'slide-down' => "this.body.slideDown('medium')",
+
+      'slide-down-fade' => "
+        this.body.animate(
+          {
+            height:'show',
+            opacity:(this.opacity ? this.opacity : 'show')
+          }, 'medium'
+        );",
+
+    ),
+
+    'hide' => array(
+
+      'default' => "this.body.hide();",
+
+      'fade' => "this.body.fadeOut('medium');",
+
+      'slide-down' => "this.body.slideUp('medium');",
+
+      'slide-down-fade' => "
+        this.body.animate(
+          {
+            height:'hide',
+            opacity:'hide'
+          }, 'medium'
+        );",
+
+    ),
+
+  );
+}
+
+
+
+/**
+ * Implementation of hook_menu
+ */
+function popup_menu(){
+
+  $path = drupal_get_path('module', 'popup');
+
+  return array(
+
+    'admin/config/user-interface/popup' => array(
+      'access arguments' => array('administer popup elements'),
+      'description' => t('Configure popup element behavior and default presentation.'),
+      'file' => 'popup.admin.inc',
+      'file path' => $path . '/includes',
+      'page arguments' => array('popup_admin_settings'),
+      'page callback' => 'drupal_get_form',
+      'title' => 'Popup elements',
+      'type' => MENU_NORMAL_ITEM,
+    ),
+
+    'ahah/popup' => array(
+      'access arguments' => array('access content'),
+      'file' => 'popup.util.inc',
+      'file path' => $path . '/includes',
+      'page callback' => 'popup_get_ahah',
+      'type' => MENU_CALLBACK,
+    ),
+
+  );
+}
+
+
+
+/**
+ * Implementation of hook_permission
+ */
+function popup_permission(){
+  return array(
+    'administer popup elements' => array(
+      'title' => t('Administer popup elements'),
+      'description' => t('Configure popup element behavior and default presentation.'),
+    ),
+  );
+}
+
+
+
+/**
+ * Implementation of hook_theme
+ */
+function popup_theme(){
+
+  module_load_include('inc', 'popup', 'includes/popup.theme');
+  module_load_include('inc', 'popup', 'includes/popup.util');
+
+  $styles = _popup_styles();
+  $theme = _popup_theme_array();
+
+  foreach($styles as $style => $path){
+    $theme += _popup_theme_array(_popup_title_to_key($style), $path);
+  }
+
+  $theme += array(
+    'popup_ahah_placeholder' => array(
+      'variables' => array(
+        'type' => '',
+        'attributes' => array(),
+      ),
+      'file' => 'includes/popup.theme.inc',
+    ),
+  );
+
+  return $theme;
+}
+
+
+
+/**
+ * Implementation of hook_popup_styles
+ *
+ * This hook allows modules to provide popup display styles. Note that the
+ * templates of these styles cannot be overridden by the theme.
+ *
+ * @return a keyed array
+ *
+ * in the form:
+ *
+ * array(
+ *  'Style name 1' => 'path/to/style-1',
+ *  'Style label 2' => 'path/to/style-2',
+ *  ...
+ * )
+ *
+ * For style-1 the following files must exist in the path/to/style-1 directory:
+ *
+ *   popup-element-body.tpl.php
+ *   popup-element-title.tpl.php
+ *   popup-element.tpl.php
+ *
+ * For style-1 the following files may exist in the path/to/style-1 directory,
+ * and will be included if present:
+ *
+ *   popup-element.css
+ *   popup-element.js
+ *
+ */
+function popup_popup_styles(){
+
+  $path = drupal_get_path('module', 'popup') . '/styles';
+
+  return array(
+    'McPopup' => $path . '/McPopup',
+    'Bent white' => $path . '/bent_white',
+    'Black' => $path . '/black',
+    'Obsidian' => $path . '/obsidian',
+    'White' => $path . '/white',
+  );
+}
+
+
+
+/**
+ * Implementation of hook_popup_attributes_alter to provide defaults
+ */
+function popup_popup_attributes_alter(&$attributes){
+
+  module_load_include('inc', 'popup', 'includes/popup.util');
+
+  $defaults = _popup_defaults();
+
+  $attributes = array_merge(
+    $defaults,
+    $attributes
+  );
+}
+
+
+
+/* ---- Preprocessors ---- */
+
+
+
+/**
+ * Popup element preprocessor
+ *
+ * Adds CSS of the selected style
+ *
+ */
+function popup_preprocess_popup_element(&$variables){
+
+  module_load_include('inc', 'popup', 'includes/popup.util');
+
+  $styles = _popup_styles();
+  $style = isset($variables['style']) && $variables['style']
+    ? $variables['style']
+    : variable_get('popup-style', 'White');
+  $path = isset($styles[$style]) ? $styles[$style] : NULL;
+
+  $variables['classes_array'] = array();
+  $variables['attributes_array'] = array();
+  $variables['title_attributes_array'] = array();
+  $variables['content_attributes_array'] = array();
+
+  if (isset($path)) {
+    if (file_exists($path . '/popup-element.css')) {
+      drupal_add_css(
+        $path . '/popup-element.css',
+        array(
+          'media' => 'screen, projection',
+          'preprocess' => variable_get('popup-preprocess', FALSE),
+          'basename' => _popup_title_to_key($style) . '.popup-element.css',
+        )
+      );
+    }
+
+    if (file_exists($path . '/popup-element.js')){
+      drupal_add_js(
+        $path . '/popup-element.js',
+        array(
+          'scope' => 'header',
+          'preprocess' => variable_get('popup-preprocess', FALSE),
+        )
+      );
+    }
+  }
+}
+
+

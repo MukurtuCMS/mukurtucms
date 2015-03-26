@@ -1,0 +1,140 @@
+<?php
+
+class OembedProviderTestCase extends OembedTestHelper {
+
+  function setUp() {
+    parent::setUp(array('file_entity', 'oembedprovider'));
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'oEmbed providers',
+      'description' => 'Tests oEmbed providers.',
+      'group' => 'oEmbed',
+    );
+  }
+
+  function testOembedProviders() {
+    ctools_include('plugins');
+
+    $file = current($this->drupalGetTestFiles('image'));
+    $file->uid = 1;
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+    $account = drupal_anonymous_user();
+    $this->assertFileEntityAccess(array('view' => TRUE), $file, $account);
+
+    $url = url('file/'. $file->fid, array('absolute' => TRUE));
+    $plugin = ctools_get_plugins('oembed', 'providers', 'file');
+    $matches = array(1 => $file->fid);
+
+    $embed = oembed_oembed_fetch($plugin, $url, $matches);
+    $errors = oembed_validate_response($embed);
+    $this->assertTrue(empty($errors), 'oEmbed response is valid');
+
+    $output = theme('oembed__photo', array('embed' => $embed));
+    $vars = array(
+      'path' => $file->uri,
+      'alt' => oembed_alt_attr($embed),
+      'width' => $file->image_dimensions['width'],
+      'height' => $file->image_dimensions['height'],
+    );
+    $this->assertEqual($output, theme('image', $vars), t('Expected img tag was found.'));
+
+    $node = $this->drupalCreateNode();
+    $this->assertTrue(node_load($node->nid), t('Node created.'));
+    $url = url('node/'. $node->nid, array('absolute' => TRUE));
+    $plugin = ctools_get_plugins('oembed', 'providers', 'node');
+    $matches = array(1 => $node->nid);
+    $embed = oembed_oembed_fetch($plugin, $url, $matches);
+    $errors = oembed_validate_response($embed);
+    $this->assertTrue(empty($errors), 'oEmbed response is valid');
+
+    $output = theme('oembed__rich', array('embed' => $embed));
+    $node = node_load($node->nid);
+    $compare = node_view($node);
+    $this->assertEqual($output, render($compare), t('oEmbed node matches theme output.'));
+  }
+}
+
+class OembedEndpointTestCase extends OembedTestHelper {
+
+  function setUp() {
+    parent::setUp(array('file_entity', 'oembedprovider'));
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'oEmbed endpoint',
+      'description' => 'Tests oEmbed endpoint.',
+      'group' => 'oEmbed',
+    );
+  }
+
+  function testOembedEndpoint() {
+    $file = current($this->drupalGetTestFiles('image'));
+    $file->uid = 1;
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+
+    $node = $this->drupalCreateNode();
+    $this->assertTrue(node_load($node->nid), t('Node created.'));
+
+    foreach (array('json', 'xml') as $format) {
+      ctools_include('plugins');
+
+      $url = url('file/'. $file->fid, array('absolute' => TRUE));
+      $options = array(
+        'query' => array(
+          'url' => $url,
+          'format' => $format,
+        ),
+      );
+      $this->drupalGet('oembed/endpoint', $options);
+      if ($format == 'json') {
+        $embed = drupal_json_decode($this->drupalGetContent());
+      }
+      else if ($format == 'xml') {
+        $xml = @new SimpleXMLElement($this->drupalGetContent());
+        $embed = array();
+        foreach ($xml as $key => $value) {
+          $embed[$key] = (string) $value;
+        }
+      }
+      $errors = oembed_validate_response($embed);
+      $this->assertTrue(empty($errors), 'oEmbed response is valid');
+      $output = theme('oembed__photo', array('embed' => $embed));
+      $vars = array(
+        'path' => $file->uri,
+        'alt' => oembed_alt_attr($embed),
+        'width' => $file->image_dimensions['width'],
+        'height' => $file->image_dimensions['height'],
+      );
+      $this->assertEqual($output, theme('image', $vars), t('Expected img tag was found.'));
+
+      $url = url('node/'. $node->nid, array('absolute' => TRUE));
+      $options = array(
+        'query' => array(
+          'url' => $url,
+          'format' => $format,
+        ),
+      );
+      $this->drupalGet('oembed/endpoint', $options);
+      if ($format == 'json') {
+        $embed = drupal_json_decode($this->drupalGetContent());
+      }
+      else if ($format == 'xml') {
+        $xml = @new SimpleXMLElement($this->drupalGetContent());
+        $embed = array();
+        foreach ($xml as $key => $value) {
+          $embed[$key] = (string) $value;
+        }
+      }
+      $errors = oembed_validate_response($embed);
+      $this->assertTrue(empty($errors), 'oEmbed response is valid');
+      $output = theme('oembed__rich', array('embed' => $embed));
+      $node = node_load($node->nid);
+      $this->assertRaw($node->title, t('Node title appears in the output.'));
+    }
+  }
+}

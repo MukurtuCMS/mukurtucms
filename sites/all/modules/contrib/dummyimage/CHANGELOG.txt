@@ -1,0 +1,34 @@
+CHANGELOG for Dummyimage for Drupal 7
+Dummyimage 7.x-1.5 (Jan 13, 2014)
+  * Issue 1540168 by danlinn: Add 'only replace default images' option.
+  * Issue #1545674 by jojonaloha | danlinn: Zombies!.
+  * Issue #2120345 by seutje: PlaceCage support.
+  * Issue #1728026 by frjo, naxoc, swentel: The 'For missing images' option will always fail.
+  * Issue #1757334 by naxoc: Support Bacon Mockup.
+  * Fix settings form for services so that services with no settings will not generate a PHP notice.
+  * Capitalize all service names for the dropdown in the settings page.
+
+Dummyimage 7.x-1.4 (Mar 23, 2012)
+	* Issue 1461858 by drupalchick: Only one image is pulled pr. page.
+
+Dummyimage 7.x-1.3 (Jan 8, 2012)
+
+The module got a larger re-write by psynaptic. Each service
+(like placekitten.com) is now a separate module that needs to be enabled in
+order to work.
+
+  New features:
+  * Issue 1361268 By seutje: Support for placedog.com
+
+Dummyimage 7.x-1.2 (May 14, 2011)
+  New features:
+  * Issue 1147392: Support for flickholdr.com
+  * Issue 1121488 by Schnitzel: Support for lorempixum.com
+
+Dummyimage 7.x-1.1 (Apr 5, 2011)
+  Bug fixes:
+ * Issue 1102102 by cotto: There was no implementation of hook_perm.
+New features:
+ * Issue 1113458: Option for color kitten photos.
+ * The kitten admin page now speaks lolspeak. No idea how I missed the fact that it was in english before!
+

@@ -1,0 +1,8 @@
+name = Demonstration site
+description = Create snapshots and reset the site for demonstration or testing purposes.
+package = Development
+core = 7.x
+configure = admin/structure/demo
+files[] = demo.module
+files[] = demo.admin.inc
+files[] = database_mysql_dump.inc

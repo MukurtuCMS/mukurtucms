@@ -1,0 +1,7 @@
+<?php
+
+
+
+function popup_update_1(){
+  variable_del('popup_ajax_cache');
+}

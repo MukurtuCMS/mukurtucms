@@ -1,0 +1,14 @@
+name = Scald Image
+description = Provides Image atoms from image files.
+package = Scald Providers
+core = 7.x
+dependencies[] = scald
+dependencies[] = image
+
+
+; Information added by Drupal.org packaging script on 2014-12-14
+version = "7.x-1.3"
+core = "7.x"
+project = "scald"
+datestamp = "1418595782"
+

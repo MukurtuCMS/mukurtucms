@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Organic groups invite module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function og_invite_install() {
+  // Add "User request" to the default group membership type.
+  $field_name = OG_INVITE_MEMBERSHIP_FIELD;
+  if (!field_info_field($field_name)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'list_boolean',
+      'entity_types' => array('og_membership'),
+      'cardinality' => 1,
+      // Although we would prefer to not allow deleting this field, we can not
+      // lock it, as it will not allow adding it to other bundles.
+      'locked' => FALSE,
+      'settings' => array(
+        'allowed_values' => array(
+          0 => 'Not an invitation',
+          1 => 'Invitation',
+        ),
+      ),
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('og_membership', $field_name, OG_MEMBERSHIP_TYPE_DEFAULT)) {
+    $instance = array(
+      'field_name' => $field_name,
+      'bundle' => OG_MEMBERSHIP_TYPE_DEFAULT,
+      'entity_type' => 'og_membership',
+      'label' => st('Invitation'),
+      'description' => st('This marks the membership as an invitation.'),
+      'required' => FALSE,
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function og_invite_uninstall() {
+  module_load_include('module', 'og_invite');
+
+  // Delete all pending invitations.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'og_membership')
+    ->propertyCondition('state', OG_STATE_PENDING)
+    ->fieldCondition(OG_INVITE_MEMBERSHIP_FIELD, 'value', TRUE);
+  $results = $query->execute();
+  if (!empty($results['og_membership'])) {
+    og_membership_delete_multiple(array_keys($results['og_membership']));
+  }
+
+  // Delete OG Invite field.
+  field_delete_field(OG_INVITE_MEMBERSHIP_FIELD);
+
+  // Delete variables.
+  variable_del('og_invite_send_invitation_by_rules');
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Remove the invitation flag on all active memberships to allow group admins
+ * to see them in the group membership admin view.
+ */
+function og_invite_update_7001(&$sandbox) {
+  $query = db_select('og_membership', 'ogm')
+    ->fields('ogm', array('id'))
+    ->condition('entity_type', 'user')
+    ->condition('state', OG_STATE_ACTIVE);
+  $ogmids = $query->execute()->fetchCol();
+
+  db_update('field_data_og_membership_invitation')
+    ->fields(array('deleted' => 0))
+    ->condition('entity_type', 'og_membership')
+    ->condition('entity_id', $ogmids)
+    ->execute();
+}

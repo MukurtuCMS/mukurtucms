@@ -1,0 +1,9 @@
+.dnd-library-wrapper .editor-item .meta.type-flash {
+  background-image: url('icons/flash-large.png');
+}
+.scald-menu .add-buttons .add-flash {
+  background: url('icons/flash-large-inverted.png') 50% 50% no-repeat;
+}
+.scald-menu .add-buttons .add-flash:hover {
+  background: url('icons/flash-large-color.png') 50% 50% no-repeat;
+}

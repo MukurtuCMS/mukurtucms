@@ -1,0 +1,275 @@
+<?php
+/**
+ * @file
+ * Code for the ma_culturalprotocol feature.
+ */
+
+include_once('ma_culturalprotocol.features.inc');
+
+define('SIGNUP_PERM_FIELD', 'field_protocl_signup_permissions');
+
+/**
+ * Implements hook_user_insert().
+ */
+function ma_culturalprotocol_user_insert(&$edit, $account, $category) {
+  // add the user to any protocols with the 'field_protocol_auto_join' set to 1
+  $userid = $account->uid;
+
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'cultural_protocol_group')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('field_protocol_auto_join', 'value', '1')
+    ->addMetaData('account', user_load(1)); // Run the query as user 1.
+
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    $item_nids = array_keys($result['node']);
+
+    foreach ($item_nids as $protocol_nid) {
+      _add_user_to_group($userid, $protocol_nid);
+    }
+  }
+}
+
+/**
+ * Act on a user being added to a group
+ *
+ * If a user is added to a community, add them to the default protocol
+ *
+ * If the user is added to a protocol, add them to the parent community
+ *
+ * Implements hook_og_membership_presave().
+ */
+function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) {
+//  dpm($og_membership);
+//  dpm('tested');
+
+  // if the membership state is active, check if there's an associated default community
+  if ($og_membership->group_type == 'node' && !empty($og_membership->gid) && $og_membership->state == 1 && !isset($GLOBALS['protocol_runonce'])) {
+    $GLOBALS['protocol_runonce'] = true;
+    $group_node = node_load($og_membership->gid);
+
+    if ($group_node->type == 'community') {
+      // check if there's a default cultural protocol
+      $proto_nid = $og_membership->gid+1;
+      // dpm($proto_nid);
+
+      $protocol_node = node_load($proto_nid);
+//      dpm($protocol_node);
+
+      // add the user to the protocol node as well
+      if ($protocol_node && $protocol_node->type == 'cultural_protocol_group' && !empty($protocol_node->og_group_ref) && $protocol_node->og_group_ref['und'][0]['target_id'] == $og_membership->gid) {
+        _add_user_to_group($og_membership->etid, $proto_nid);
+
+        drupal_set_message(t("Added user to accompanying protocol"));
+      }
+    } else if ($group_node->type == 'cultural_protocol_group') {
+      // find the parent group and add the user to it
+
+      if (isset($group_node->og_group_ref['und'][0]['target_id'])) {
+        $community_node = node_load($group_node->og_group_ref['und'][0]['target_id']);
+        if ($community_node->type == 'community') {
+          _add_user_to_group($og_membership->etid, $community_node->nid);
+          drupal_set_message(t("Added user to parent community"));
+        }
+      }
+    }
+  }
+}
+
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_culturalprotocol_node_insert($node) {
+  if ($node->type == 'cultural_protocol_group') {
+    _process_group_signup_permissions($node);
+
+    $cp_new = entity_metadata_wrapper('node', $node);
+    _process_dh_node_access ($cp_new);
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function ma_culturalprotocol_node_update($node) {
+  if ($node->type == 'cultural_protocol_group') {
+    _process_group_signup_permissions($node);
+
+    $cp_new = entity_metadata_wrapper('node', $node);
+    if ($node->original) { // Even though we are in hook_update, there can be cases where this is empty
+      $cp_old = entity_metadata_wrapper('node', $node->original);
+    }
+    _process_dh_node_access ($cp_new, $cp_old);
+  }
+}
+
+/**
+ * Allows a single field to be used to select the type of non-member signups in a node
+ *
+ * @param $node
+ */
+function _process_group_signup_permissions($node) {
+
+  // ** PART 1 - ensure the node has the permissions defaults set
+
+  $gid = $node->nid;
+  unset($node->is_new);
+  $wrapper = entity_metadata_wrapper('node', $node);
+
+  $signup_perm_value = $node->{SIGNUP_PERM_FIELD}['und'][0]['value'];  // open, private, moderated, default
+  $og_perm_value = $node->og_roles_permissions['und'][0]['value'];
+
+  if ($signup_perm_value == 'default') {
+    if ($og_perm_value != 0) {
+      $wrapper->og_roles_permissions->set(0);
+      $wrapper->save();
+    }
+
+  } else {
+    if ($og_perm_value != 1) {
+      $wrapper->og_roles_permissions->set(1);
+      $wrapper->save();
+    }
+  }
+
+  // ** PART 2 - if defaults overriden then apply appropriate grants
+
+  if (!isset($node->{SIGNUP_PERM_FIELD})) {
+    return;
+  }
+
+  $signup_perm_value = $node->{SIGNUP_PERM_FIELD}['und'][0]['value'];  // open, private, moderated, default
+  $default_access = og_is_group_default_access('node', $gid);
+
+  if ($signup_perm_value != 'default' && !$default_access) {
+
+    $roles = og_roles('node','cultural_protocol_group', $gid);
+    $roles = array_flip($roles);
+
+    switch ($signup_perm_value) {
+      case 'private':
+        // unset subscribe permission for non-member
+        og_role_revoke_permissions($roles['non-member'], array('subscribe without approval'));
+        og_role_revoke_permissions($roles['non-member'], array('subscribe'));
+        break;
+      case 'moderated':
+        og_role_revoke_permissions($roles['non-member'], array('subscribe without approval'));
+        og_role_grant_permissions($roles['non-member'], array('subscribe'));
+        break;
+      case 'open':
+        // set subscribe-without-approval for nonmember
+        og_role_grant_permissions($roles['non-member'], array('subscribe without approval'));
+        break;
+    }
+  }
+}
+
+function _process_dh_node_access ($cp_new, $cp_old = NULL) {
+  if (!is_null($cp_old)) {
+    if ($cp_old->group_access->value() == $cp_new->group_access->value()
+      AND $cp_old->og_roles_permissions->value() == $cp_new->og_roles_permissions->value()
+    ) {
+      return; // No need to reprocess the DH nodes if neither of these fields changed
+    }
+  }
+
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'digital_heritage')
+    ->fieldCondition('og_group_ref', 'target_id', $cp_new->getIdentifier())
+    ->execute();
+  $dh_nids = empty($result['node']) ? array() : array_keys($result['node']);
+  foreach ($dh_nids as $dh_nid) {
+    global $user;
+    mukurtu_protocol_field_node_access(node_load($dh_nid), 'view', $user);
+  }
+}
+
+
+/**
+ * Helper function to add a user to a group
+ *
+ * @param $uid
+ * @param $gid
+ * @throws OgException
+ */
+function _add_user_to_group($uid, $gid) {
+  // Load the user we want to add to the group (ID #2 was my test user)
+  $account = user_load($uid);
+
+  $values = array(
+    'entity_type' => 'user',
+    'entity' => $account,
+    'state' => OG_STATE_ACTIVE,
+  );
+
+  og_group('node', $gid, $values);
+
+  // Changes the users role in the group (1 = non-member, 2 = member, 3 = administrator member)
+//  og_role_grant($group->gid, $account->uid, 3);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_culturalprotocol_form_cultural_protocol_group_node_form_alter(&$form, &$form_state) {
+
+  // Only show the Signup Permissions if the Sharing Protocol is open
+  $form['field_protocl_signup_permissions']['#states'] = array(
+    'visible' => array(
+      ':input[name="group_access[und]"]' => array ('value' => '0'),
+    ),
+  );
+}
+
+
+/**
+ * Helper function used both by for DH custom protocol field and scald protocol field (default OG) to reduce down the available groups the user is a member of to those the user has posting permissions on, because OG on its own is not handling this
+ */
+function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
+  $groups_for_user = og_get_groups_by_user(null, 'node');
+  if (user_access('administer organic groups permissions')) {
+    $allowed_groups_for_user = og_get_all_group();
+  }
+  else {
+    $allowed_groups_for_user[] = array();
+    foreach ($groups_for_user as $group_for_user) {
+      $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
+      if (array_intersect(array('contributor', 'protocol manager'), $roles_for_user_in_group)) {
+        $allowed_groups_for_user[] = $group_for_user;
+      }
+    }
+  }
+
+  // EFQ to get sub protocols for a community (or all if no community specified)
+  $query = new EntityFieldQuery();
+
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'cultural_protocol_group')
+    ->propertyCondition('status', NODE_PUBLISHED);
+  if ($community_nid) {
+    $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
+  }
+
+  $result = $query->execute();
+
+  if (isset($result['node'])) {
+    $protocol_items_nids = array_keys($result['node']);
+    $protocol_items = entity_load('node', $protocol_items_nids);
+
+    $cps = array();
+    foreach ($protocol_items as $protocol_item) {
+      if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
+        $cps[$protocol_item->nid] = $protocol_item->title;
+      }
+    }
+    return $cps;
+  }
+
+}

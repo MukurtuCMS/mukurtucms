@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * @file
+ *   Organic Groups integration for Homebox
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function homebox_og_menu() {
+  $items = array();
+
+  // Admin OG/Homebox settings
+  $items['admin/config/group/homebox'] = array(
+    'title' => 'Organic groups Homebox',
+    'description' => 'Choose a homebox to act as a group home page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('homebox_og_group_settings_page'),
+    'access callback' => '_homebox_og_user_access_group_settings',
+  );
+
+  // Optionally register Homebox page as node tab
+  if ($name = variable_get('homebox_og_tab', '')) {
+    $page = homebox_get_page($name);
+    if ($page) {
+      $items['node/%node/' . $page->settings['path']] = array(
+        'title' => check_plain($page->settings['title']),
+        'page callback' => 'homebox_build',
+        'page arguments' => array($page),
+        'access callback' => '_homebox_og_user_access_view_homebox',
+        'access arguments' => array($page, 1),
+        'weight' => 1,
+        'type' => MENU_LOCAL_TASK,
+      );
+    }
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ *
+ * Give Homebox the opportunity to override group homepage nodes
+ */
+function homebox_og_menu_alter(&$items) {
+  if ($name = variable_get('homebox_og_home', '')) {
+    $items['node/%node']['page callback'] = 'homebox_og_override_group';
+  }
+}
+
+/**
+ * Override a group's homepage with a homebox
+ *
+ * @see homebox_og_menu_alter()
+ */
+function homebox_og_override_group($node) {
+  // Check if this is a group homepage
+  if (og_is_group_type('node', $node->type)) {
+    // Fetch the designated homebox
+    if ($name = variable_get('homebox_og_home', '')) {
+      // Make sure the page exists
+      if ($page = homebox_get_page($name)) {
+        // Make sure the user has permission to view the homebox
+        if (_homebox_user_access_view_homebox($page)) {
+          // Force group name as title
+          drupal_set_title(check_plain($node->title));
+          // Return the designated homebox
+          return homebox_build($page);
+        }
+      }
+    }
+  }
+
+  // Just return the regular node
+  return node_page_view($node);
+}
+
+/**
+ * Determine if a user can access the OG settings page
+ */
+function _homebox_og_user_access_group_settings() {
+  if (user_access('administer homebox')
+    && user_access('administer organic groups')) {
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Determine if a user can access the Homebox
+ */
+function _homebox_og_user_access_view_homebox($page, $node) {
+  // If this a group node?
+  // Can the user access the node?
+  // Can the user view the Homebox?
+  if (og_is_group_type('node', $node->type)
+      && (node_access('view', $node))
+      && _homebox_user_access_view_homebox($page)) {
+    // Check if the group tab is set to members only
+    if (variable_get('homebox_og_tab_membersonly', 0)) {
+      if (og_is_group_member($node->nid)) {
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * OG Homebox settings form
+ */
+function homebox_og_group_settings_page($form, &$form_state) {
+  $form = array();
+
+  // Gather all available pages
+  $pages = homebox_pages();
+
+  // Build form options
+  $options = array();
+  foreach ($pages as $page) {
+    $options[$page->name] = check_plain($page->settings['title'] . ' (' . $page->name . ')');
+  }
+
+  $form['help'] = array(
+    '#type' => 'item',
+    '#value' => t('The permissions set in the chosen Homeboxes will be still be checked. Make sure that the users who are viewing OG components can also view the Homeboxes.'),
+  );
+
+  $form['home'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Homepage'),
+  );
+
+  $form['home']['homebox_og_home'] = array(
+    '#type' => 'select',
+    '#title' => t('Override group homepages'),
+    '#default_value' => variable_get('homebox_og_home', 0),
+    '#options' => array(0 => '- None -') + $options,
+    '#description' => t('
+      If chosen, organic group home pages will be replaced by the specified Homebox.
+      It is recommended that the chosen Homebox does not have a menu entry because
+      user settings will persist, if available.
+    '),
+  );
+
+  $form['tab'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Menu Tab'),
+  );
+
+  $form['tab']['homebox_og_tab'] = array(
+    '#type' => 'select',
+    '#title' => t('Add a group tab'),
+    '#default_value' => variable_get('homebox_og_tab', 0),
+    '#options' => array(0 => '- None -') + $options,
+    '#description' => t('Optionally add a Homebox as a tab to an organic group home page.'),
+  );
+
+  $form['tab']['homebox_og_tab_membersonly'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Group members only'),
+    '#description' => t('If checked, a user can only view this group tab if they are a member of the given group.'),
+    '#default_value' => variable_get('homebox_og_tab_membersonly', 0),
+  );
+
+  $form['#submit'][] = 'homebox_og_group_settings_page_submit';
+
+  return system_settings_form($form);
+}
+
+/**
+ * Act on settings form submission
+ */
+function homebox_og_group_settings_page_submit($form, &$form_state) {
+  // Rebuild the menu
+  menu_rebuild();
+}

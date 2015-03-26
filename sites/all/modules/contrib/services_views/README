@@ -1,0 +1,39 @@
+Views support for the Services module version 3.x and later.
+
+It has currently two features:
+- Execute any view of the system via views resource call
+- Create view based resource creating Services display in a view
+
+Executing view via views resource
+After enabling "views" resource in your services endpoint you can do
+GET request to:
+
+http://example.com/<endpoint path>/views/<view name>
+
+This will execute a view and pass results.
+
+Possible arguments:
+- display_id: views display
+- args: array of view arguments
+- filters: array of view filter values
+- offset: views offset
+- limit: limit views number of results
+- format_output: boolean whether we would like to get themed view or data
+
+Example of calls:
+
+http://example.com/rest/views/articles?limit=5&offset=2&filters[tags]=5
+http://example.com/rest/views/articles?filters[tags]=5&display_id=block_1&format_output=1
+
+Create view based resource creating Services display in a view
+In any view you can create "Services" display. It has only one option setting
+-- path. That will be the name of your resource. After enabling that resource
+you would be able to do call to
+
+http://example.com/<endpoint path>/<resource name>
+
+This will execute a view and output results. You can create exposed filters and
+pass them to your resource. For example if we created exposed filter "tags" call
+will be:
+
+http://example.com/<endpoint path>/<resource name>?tags=7

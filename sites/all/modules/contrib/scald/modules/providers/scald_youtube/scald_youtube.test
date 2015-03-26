@@ -1,0 +1,55 @@
+<?php
+/**
+ * @file
+ * Tests for scald_youtube.module.
+ */
+
+/**
+ * Test the Scald YouTube functionality.
+ */
+class ScaldYouTubeTestCase extends ScaldWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Scald YouTube',
+      'description' => 'Test the Scald YouTube functionality.',
+      'group' => 'Scald',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setup() {
+    parent::setUp(array('scald_youtube'));
+  }
+
+  /**
+   * Test Scald YouTube atom creation via UI.
+   */
+  function testScaldYouTubeAtomCreation() {
+    $web_user = $this->drupalCreateUser(array(
+      'view any atom',
+      'create atom of video type',
+    ));
+    $this->drupalLogin($web_user);
+
+    $edit = array(
+      'identifier' => 'https://www.youtube.com/watch?v=9bZkp7q19f0',
+    );
+    $video_title = 'PSY - GANGNAM STYLE (강남스타일) M/V';
+
+    $this->drupalPost('atom/add/video', $edit, t('Continue'));
+    $this->assertFieldByName('atom0[title]', $video_title);
+    $this->assertFieldByName('atom0[scald_authors][und]', 'officialpsy');
+    $this->assertFieldByName('atom0[scald_tags][und]', 'PSY, 싸이, 강남스타일, 뮤직비디오, Music Video, Gangnam Style, KOREAN SINGER, KPOP, KOERAN WAVE, PSY 6甲, 6th Studio Album, 싸이6집, 육갑, YG Family, YG Entertainment');
+    $this->drupalPost(NULL, array(), t('Finish'));
+
+    $this->assertTitle($video_title . ' | Drupal');
+  }
+
+}
+

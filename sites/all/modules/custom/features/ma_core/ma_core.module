@@ -1,0 +1,86 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Core feature.
+ */
+
+include_once('ma_core.features.inc');
+
+/**
+ * Implementation of hook_init().
+ */
+function ma_core_init() {
+
+  // Add the JS for jquery_ui_tooltips. Simply use the class "jquery_ui_tooltip" on any title attribute to use this
+  drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/jquery_ui_tooltips.js');
+}
+
+/**
+ * Implements hook_user_login
+ */
+function ma_core_user_login(&$edit, $account) {
+  // Redirect user on login
+  global $user;
+  if (!$_GET['profile']) { // Do not redirect when user is logged in during profile installation, as more work needs to complete first
+    if (array_intersect(array('administrator'), $user->roles)) {
+      drupal_goto('dashboard');
+    }
+		else {
+      drupal_goto(); // Non-admin users go to browse page
+    }
+  }
+}
+
+/**
+ * Get NIDs from an array of nodes
+ */
+function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
+  $nids = array();
+  if ($nodes) {
+    foreach ($nodes as $node) {
+      $nids[] = $node->nid;
+    }
+  }
+  return $nids;
+}
+
+/**
+ * Implements hook_views_pre_build().
+ */
+// Add the Add and Manage Members links to the group member list, for users with perm to do so
+// Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
+function ma_core_views_pre_build(&$view) {
+  if ($view->name == 'og_members') {
+    $gid = $view->args[0];
+    if (og_user_access('node', $gid, 'manage members')) {
+      $output = '<div class="add-manage-members-links">';
+      $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
+      $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
+      $output .= '</div>';
+      $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html'));
+    }
+  }
+}
+
+/**
+ * Helper function based on og_extras_get_users_by_roles,
+ * but takes role name instead of ID (thus also requiring group bundle param),
+ * and returns user objects instead of raw query results.
+ */
+function ma_core_og_get_users_per_role_and_group ($role_name, $group_bundle, $gid) {
+  if ($rid = array_search ($role_name, og_roles('node', $group_bundle, $gid))) {
+    $query = db_select('og_users_roles', 'og_users_roles');
+    $query->fields('og_users_roles', array('uid'))
+      ->condition('gid', $gid)
+      ->condition('rid', array ($rid), 'IN')
+    ;
+    if ($results = $query->execute()
+      ->fetchAll()) {
+      $uids = array();
+      foreach ($results as $result) {
+        $uids[] = $result->uid;
+      }
+      return user_load_multiple ($uids);
+    }
+  }
+}

@@ -1,0 +1,15 @@
+name = Feeds Files
+description = Processes feed items into file entities
+package = Feeds
+core = 7.x
+files[] = plugins/FeedsFileProcessor.inc
+dependencies[] = ctools
+dependencies[] = feeds
+dependencies[] = file_entity
+
+; Information added by drupal.org packaging script on 2013-09-30
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "feeds_files"
+datestamp = "1380578331"
+

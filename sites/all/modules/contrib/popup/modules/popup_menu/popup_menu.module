@@ -1,0 +1,141 @@
+<?php
+// $Id:
+
+
+
+/* ---- Hook implementation ---- */
+
+
+
+/**
+ * Implementation of hook_block_info
+ */
+function popup_menu_block_info(){
+
+  $menus = menu_get_menus();
+  $menu_blocks = array();
+
+  foreach($menus as $id => $menu){
+    $menu_blocks[$id]['info'] = 'Popup menu: '.$menu;
+  }
+
+  return $menu_blocks;
+}
+
+
+
+/**
+ * Implementation of hook_block_configure
+ */
+function popup_menu_block_configure($delta = 0){
+  module_load_include('inc', 'popup_menu', 'includes/popup_menu.util');
+  return popup_menu_block_form($delta);
+}
+
+
+
+/**
+ * Implementation of hook_block_save
+ */
+function popup_menu_block_save($delta = 0, $edit = array()){
+  module_load_include('inc', 'popup_menu', 'includes/popup_menu.util');
+  popup_menu_block_form_save($delta, $edit);
+}
+
+
+
+/**
+ * Implementation of hook_block_view
+ */
+function popup_menu_block_view($delta = 0){
+
+  module_load_include('inc', 'popup', 'includes/popup.api');
+  module_load_include('inc', 'popup_menu', 'includes/popup_menu.util');
+
+  $settings = _popup_menu_settings();
+  $settings = isset($settings[$delta])
+    ? $settings[$delta]
+    : _popup_menu_default_settings();
+
+  $attributes = array();
+  $attributes['format'] = $settings['format'];
+  $attributes['menu'] = $delta;
+  $attributes['title'] = isset($settings['override-title']) && $settings['override-title'] != ''
+    ? $settings['override-title']
+    : FALSE;
+
+  return array(
+    'content' => popup($attributes),
+  );
+}
+
+
+
+/**
+ * Implementation of hook_form_alter
+ * Adds UI settings to block configuration
+ */
+function popup_menu_form_alter(&$form, $form_state, $form_id){
+
+//  dpm($form);
+
+  if($form_id == 'block_admin_configure' && $form['module']['#value'] == 'popup_menu'){
+
+    $form['display_title'] = array(
+      '#type' => 'item',
+      '#title' => 'Display settings',
+      '#weight' => 1,
+    );
+
+    $form['regions'] = array(
+      '#type' => 'vertical_tabs',
+      '#weight' => 2,
+      '#attached' => array(
+        'js' => array('modules/block/block.js')
+      ),
+
+      'regions' => $form['regions'],
+
+      'popup' => array(
+        '#type' => 'fieldset',
+        '#title' => t('Popup settings'),
+        '#collapsible' => 0,
+        '#group' => 'Display',
+
+        'popup-format' => $form['settings']['popup-format'],
+        'popup-override-title' => $form['settings']['popup-override-title'],
+
+      ),
+
+    );
+
+    $form['settings']['#weight'] = 0;
+    $form['visibility_title']['#weight'] = 3;
+    $form['visibility']['#weight'] = 4;
+
+    $form['submit']['#weight'] = 10;
+
+    unset($form['settings']['popup-format']);
+    unset($form['settings']['popup-override-title']);
+
+  }
+
+}
+
+
+
+/**
+ *  Implementation of hook_features_api
+ */
+function popup_menu_features_api() {
+  return array(
+    'popupmenu' => array(
+      'name' => t('Popup menus'),
+      'default_hook' => 'popupmenu_defaults',
+      'default_file' => FEATURES_DEFAULTS_INCLUDED_COMMON,
+      'file' => drupal_get_path('module', 'popup_menu') .'/includes/popup_menu.features.inc',
+    ),
+	);
+}
+
+

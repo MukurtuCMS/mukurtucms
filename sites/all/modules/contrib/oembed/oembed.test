@@ -1,0 +1,243 @@
+<?php
+
+/**
+ * @file
+ * Tests for oembed.module.
+ */
+
+class OembedTestHelper extends DrupalWebTestCase {
+
+  protected $profile = 'minimal';
+
+  // One URL for each provider supported by the oEmbed module. The URLs predict the type
+  // of oEmbed response and the viability of a thumbnail.
+  protected $urls = array(
+    'http://www.flickr.com/photos/boris/2351723120/' => array(
+      'type' => 'photo',
+      'thumbnail' => TRUE,
+    ),
+    'http://qik.com/video/7046119' => array(
+      'type' => 'video',
+      'thumbnail' => FALSE,
+    ),
+    'http://revision3.com/hak5/hospital' => array(
+      'type' => 'video',
+      'thumbnail' => FALSE,
+    ),
+    'http://www.scribd.com/doc/3828502/Drupal' => array(
+      'type' => 'rich',
+      'thumbnail' => TRUE,
+    ),
+    'http://www.slideshare.net/eaton/drupal-deployment-presentation' => array(
+      'type' => 'rich',
+      'thumbnail' => TRUE,
+    ),
+    'http://soozphotography.smugmug.com/Events/Drupal-7-Release-Party-at/i-mnVjkZg/1/L/DSC_0555-L.jpg' => array(
+      'type' => 'photo',
+      'thumbnail' => FALSE,
+    ),
+    'http://soundcloud.com/headstart-cms/drupal' => array(
+      'type' => 'rich',
+      'thumbnail' => TRUE,
+    ),
+    'https://twitter.com/drupal/status/266208177161400320' => array(
+      'type' => 'rich',
+      'thumbnail' => FALSE,
+    ),
+    'http://www.viddler.com/v/bdce8c7' => array(
+      'type' => 'video',
+      'thumbnail' => TRUE,
+    ),
+    'https://vimeo.com/18352872' => array(
+      'type' => 'video',
+      'thumbnail' => TRUE,
+    ),
+    'http://www.youtube.com/watch?v=XgYu7-DQjDQ' => array(
+      'type' => 'video',
+      'thumbnail' => TRUE,
+    ),
+  );
+
+  function setUp() {
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    $modules[] = 'oembed';
+    parent::setUp($modules);
+  }
+
+  protected function assertRenderedElement(array $element, $xpath, array $xpath_args = array()) {
+    $original_element = $element;
+    $this->drupalSetContent(drupal_render($element));
+    $this->verbose('<pre>' .  check_plain(var_export($original_element, TRUE)) . '</pre>'
+      . '<pre>' .  check_plain(var_export($element, TRUE)) . '</pre>'
+      . '<hr />' . $this->drupalGetContent()
+    );
+
+    // @see DrupalWebTestCase::xpath()
+    $xpath = $this->buildXPathQuery($xpath, $xpath_args);
+    $element += array('#value' => NULL);
+    $type = isset($element['#type']) ? $element['#type'] : 'markup';
+    $this->assertFieldByXPath($xpath, $element['#value'], t('#type @type was properly rendered.', array(
+      '@type' => var_export($type, TRUE),
+    )));
+  }
+
+  protected function xpathArgsFromAttributes(array $attributes = array()) {
+    $args = array();
+    foreach ($attributes as $key => $value) {
+      $args[':'. $key] = $value;
+    }
+    return $args;
+  }
+
+  /**
+   * Asserts file_entity_access correctly grants or denies access.
+   */
+  function assertFileEntityAccess($ops, $file, $account) {
+    foreach ($ops as $op => $result) {
+      $msg = t("file_entity_access returns @result with operation '@op'.", array('@result' => $result ? 'true' : 'false', '@op' => $op));
+      $this->assertEqual($result, file_entity_access($op, $file, $account), $msg);
+    }
+  }
+}
+
+class OembedTestCase extends OembedTestHelper {
+  public static function getInfo() {
+    return array(
+      'name' => 'oEmbed requests',
+      'description' => 'Tests oEmbed request handling.',
+      'group' => 'oEmbed',
+    );
+  }
+
+  /**
+   * Tests that actual response type matches the expected response type.
+   */
+  function testOembedProviderUrls() {
+    foreach ($this->urls as $url => $info) {
+      foreach (array('json', 'xml') as $format) {
+        $response = oembed_get_data($url, array('format' => $format));
+        $message = t('oEmbed @format response says @url is @type', array('@url' => $url, '@type' => $info['type'], '@format' => $format));
+        $this->assertEqual($response['type'], $info['type'], $message);
+      }
+    }
+  }
+
+  /**
+   * Tests the oembed render element types.
+   */
+  function testOembedRenderElements() {
+    foreach ($this->urls as $url => $info) {
+      $element = oembed_render_element('oembed', $url);
+      $this->assertRenderedElement($element, '//*');
+
+      if (isset($info['thumbnail']) && $info['thumbnail']) {
+        $element = oembed_render_element('oembed_thumbnail', $url);
+        $this->assertRenderedElement($element, '//img');
+      }
+    }
+  }
+}
+
+class OembedFileEntityTestCase extends OembedTestHelper {
+
+  function setUp() {
+    parent::setUp(array('file_entity', 'image'));
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'File entity oEmbed',
+      'description' => 'Tests oEmbed + File entity integration.',
+      'group' => 'oEmbed',
+    );
+  }
+
+  /**
+   * Tests the oembed render element types.
+   */
+  function testOembedFileFormatters() {
+    foreach ($this->urls as $url => $info) {
+
+      // Every URL should render through the oEmbed formatter.
+      $file = oembed_url_to_file($url, TRUE);
+      $displays = array(
+        'oembed' => array(
+          'status' => TRUE,
+          'weight' => 1,
+          'settings' => array(),
+        ),
+      );
+      $element = file_view_file($file, $displays);
+      $this->assertRenderedElement($element, '//*');
+
+      // Only responses with thumbnails will render through the oembed_thumbnail
+      // formatter. Rendered elements are always images.
+      if (isset($info['thumbnail']) && $info['thumbnail']) {
+        $displays = array(
+          'oembed_thumbnail' => array(
+            'status' => TRUE,
+            'weight' => 1,
+            'settings' => array(),
+          ),
+        );
+        $element = file_view_file($file, $displays);
+        $this->assertRenderedElement($element, '//img');
+      }
+
+      // If a response is a photo or has a thumbnail, it should always render
+      // an image here.
+      if ($info['type'] == 'photo' || (isset($info['thumbnail']) && $info['thumbnail'])) {
+        $displays = array(
+          'oembed_thumbnail' => array(
+            'status' => TRUE,
+            'weight' => 1,
+            'settings' => array(),
+          ),
+          'oembed' => array(
+            'status' => TRUE,
+            'weight' => 2,
+            'settings' => array(),
+          ),
+        );
+        $element = file_view_file($file, $displays);
+        $this->assertRenderedElement($element, '//img');
+      }
+    }
+  }
+
+  /**
+   * Tests the oembed render element types.
+   */
+  function testOembedImageFileFormatters() {
+    foreach ($this->urls as $url => $info) {
+
+      // If a response is a photo or has a thumbnail, it should always render
+      // an image here.
+     $file = oembed_url_to_file($url, TRUE);
+     if ($info['type'] == 'photo' || (isset($info['thumbnail']) && $info['thumbnail'])) {
+        foreach (array_keys(image_styles()) as $style_name) {
+          $displays = array(
+            'oembed_image' => array(
+              'status' => TRUE,
+              'weight' => 1,
+              'settings' => array(
+                'image_style' => $style_name,
+                'alt' => '',
+                'title' => ''
+              ),
+            ),
+          );
+          $element = file_view_file($file, $displays);
+          $this->assertRenderedElement($element, '//img');
+
+          $url = image_style_url($style_name, $element['#path']);
+          $this->drupalGet($url);
+          $this->assertResponse(200, t('Image was generated at the URL.'));
+        }
+      }
+    }
+  }
+}

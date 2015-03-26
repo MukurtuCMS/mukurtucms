@@ -1,0 +1,19 @@
+name = Media Feeds
+description = Enable mapping imported sources to media fields.
+core = 7.x
+package = Media
+dependencies[] = feeds
+dependencies[] = media_internet
+files[] = includes/MediaFeedsProvider.inc
+files[] = includes/MediaFeedsInternetProvider.inc
+files[] = includes/MediaFeedsLibraryProvider.inc
+files[] = includes/MediaFeedsRemoteProvider.inc
+files[] = tests/media_feeds_mapper.test
+files[] = tests/media_feeds_mapper_enclosure.test
+
+; Information added by drupal.org packaging script on 2011-09-29
+version = "7.x-1.0-beta2"
+core = "7.x"
+project = "media_feeds"
+datestamp = "1317333707"
+

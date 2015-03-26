@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * @file
+ * Scald Files Installation
+ */
+
+/**
+ * Implements hook_install().
+ */
+function scald_file_install() {
+  ScaldAtomController::addType('file', 'File', 'Resource file');
+  _scald_file_create_file_field();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scald_file_uninstall() {
+  drupal_load('module', 'scald');
+  // If Scald is disabled, its classes are not autoloaded.
+  module_load_include('inc', 'scald', 'includes/ScaldAtomController');
+
+  ScaldAtomController::removeType('file');
+}
+
+/**
+ * Create a file field.
+ */
+function _scald_file_create_file_field() {
+  // Create file field.
+  if (!field_info_field('scald_file')) {
+    $field = array(
+      'field_name' => 'scald_file',
+      'type' => 'file',
+    );
+
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'scald_file',
+      'label' => t('File'),
+      'entity_type' => 'scald_atom',
+      'bundle' => 'file',
+      'required' => TRUE,
+      'settings' => array(
+        'file_extensions' => 'ppt pptx xls xlsx doc docx odt pdf txt csv odg sxw ods rtf zip rar gz 7z tar',
+        'file_directory' => 'atoms/files',
+      ),
+      'widget' => array(
+        'weight' => -4,
+      ),
+    );
+
+    if (!field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+      field_create_instance($instance);
+    }
+  }
+}
+
+/**
+ * Add the file field and update Files to the new scald_file field.
+ */
+function scald_file_update_7001(&$sandbox) {
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['current_sid'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(s.sid) FROM {scald_atoms} s WHERE s.provider='scald_file' AND s.type='file' AND s.base_id IS NOT NULL")->fetchField();
+    $sandbox['affected_rows'] = 0;
+  }
+
+  // First make sure we have the file field.
+  _scald_file_create_file_field();
+
+  $stop_at = time() + 5;
+  // Get all the file atom sids.
+  $sids = db_query("SELECT s.sid FROM {scald_atoms} s WHERE s.provider='scald_file' AND s.type='file' AND s.base_id IS NOT NULL AND s.sid > :sid ORDER BY s.sid", array(':sid' => $sandbox['current_sid']));
+  // Loop them through.
+  while ($sid = $sids->fetchColumn()) {
+    $atom = scald_atom_load($sid);
+    // Make sure we have a base entity.
+    if (isset($atom->base_id)) {
+      $file = file_load($atom->base_id);
+      // Make sure we have something in uri.
+      if (!empty($file->uri)) {
+        // Add the display field.
+        $file->display = TRUE;
+        // Use it for the scald_file field.
+        $atom->scald_file[LANGUAGE_NONE][0] = (array) $file;
+        scald_atom_save($atom);
+        $sandbox['affected_rows']++;
+      }
+    }
+    $sandbox['progress']++;
+    $sandbox['current_sid'] = $sid;
+
+    if (time() > $stop_at) {
+      break;
+    }
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : $sandbox['progress'] / $sandbox['max'];
+
+  if ($sandbox['#finished'] >= 1) {
+    return t('Updated %affected_rows atoms.', array('%affected_rows' => $sandbox['affected_rows']));
+  }
+}

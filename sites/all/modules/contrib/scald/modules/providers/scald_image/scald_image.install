@@ -1,0 +1,50 @@
+<?php
+/**
+ * @file
+ * Scald Images Installation
+ */
+
+/**
+ * Implements hook_install().
+ */
+function scald_image_install() {
+  ScaldAtomController::addType('image', 'Image', 'Image');
+  $instance = field_read_instance('scald_atom', 'scald_thumbnail', 'image');
+  if ($instance) {
+    $instance['label'] = 'Image';
+    foreach ($instance['display'] as $view_mode => $settings) {
+      $instance['display'][$view_mode]['type'] = 'hidden';
+    }
+    field_update_instance($instance);
+  }
+
+  // Associate the image atom type to the "library" image style in the library
+  // context.
+  $context_config = scald_context_config_load('sdl_library_item');
+  $context_config->transcoder['image']['*'] = 'style-Library';
+  scald_context_config_save($context_config);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scald_image_uninstall() {
+  drupal_load('module', 'scald');
+  // If Scald is disabled, its classes are not autoloaded.
+  module_load_include('inc', 'scald', 'includes/ScaldAtomController');
+
+  ScaldAtomController::removeType('image');
+}
+
+/**
+ * Hide the Image field because the image is rendered once in the Atom core.
+ *
+ * This make Scald Image consistent with other atom types.
+ */
+function scald_image_update_7000() {
+  $instance = field_info_instance('scald_atom', 'scald_thumbnail', 'image');
+  foreach ($instance['display'] as $view_mode => $settings) {
+    $instance['display'][$view_mode]['type'] = 'hidden';
+  }
+  field_update_instance($instance);
+}

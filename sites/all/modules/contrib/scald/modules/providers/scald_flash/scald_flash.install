@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @file
+ * Scald Flash Installation
+ */
+
+/**
+ * Implements hook_install().
+ */
+function scald_flash_install() {
+  ScaldAtomController::addType('flash', 'Flash', 'Resource flash');
+
+  // Defines the default thumbnail to use for flash atoms.
+  $default = scald_atom_defaults('flash');
+  $default->thumbnail_source = drupal_get_path('module', 'scald_flash') . '/icons/flash.png';
+
+  $defaults = variable_get('scald_atom_defaults', array());
+  $defaults['flash'] = $default;
+  $defaults = variable_set('scald_atom_defaults', $defaults);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scald_flash_uninstall() {
+  field_delete_field('scald_width');
+  field_delete_field('scald_height');
+
+  $defaults = variable_get('scald_atom_defaults', array());
+  unset($defaults['flash']);
+  $defaults = variable_set('scald_atom_defaults', $defaults);
+
+  drupal_load('module', 'scald');
+  // If Scald is disabled, its classes are not autoloaded.
+  module_load_include('inc', 'scald', 'includes/ScaldAtomController');
+
+  ScaldAtomController::removeType('flash');
+}
+
+/**
+ * Implements hook_enable().
+ *
+ * Ensures that various configuration options are set so that Scald Core can
+ * make certain assumptions about the contents of variables.
+ */
+function scald_flash_enable() {
+  _scald_flash_create_width_field();
+  _scald_flash_create_height_field();
+}
+
+/**
+ * Create a field to store atom width.
+ */
+function _scald_flash_create_width_field() {
+  // Create the scald_width field.
+  if (!field_info_field('scald_width')) {
+    $field = array(
+      'field_name' => 'scald_width',
+      'type' => 'text',
+      'label' => t('Width'),
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'scald_width',
+      'label' => t('Width'),
+      'entity_type' => 'scald_atom',
+      'bundle' => 'flash',
+      'required' => FALSE,
+    );
+
+    if (!field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+      field_create_instance($instance);
+    }
+  }
+}
+
+/**
+ * Create a field to store atom height.
+ */
+function _scald_flash_create_height_field() {
+  // Create the scald_height field.
+  if (!field_info_field('scald_height')) {
+    $field = array(
+      'field_name' => 'scald_height',
+      'type' => 'text',
+      'label' => t('Height'),
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'scald_height',
+      'label' => t('Height'),
+      'entity_type' => 'scald_atom',
+      'bundle' => 'flash',
+      'required' => FALSE,
+    );
+    if (!field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle'])) {
+      field_create_instance($instance);
+    }
+  }
+}

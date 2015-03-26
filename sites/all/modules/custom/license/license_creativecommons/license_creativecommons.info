@@ -1,0 +1,5 @@
+name = License - Creative Commons
+description = Provide Creative Commons License information
+core = 7.x
+package = License
+dependencies[] = license

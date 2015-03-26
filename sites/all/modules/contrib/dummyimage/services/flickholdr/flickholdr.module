@@ -1,0 +1,60 @@
+<?php
+/**
+ * @file
+ * Integrates the flickholdr service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function flickholdr_dummyimage_service() {
+  return array(
+    'flickholdr' => array(
+      'title' => t('Flickholdr'),
+      'url' => 'http://flickholdr.com/',
+      'form builder' => flickholdr_form(),
+      'options' => flickholdr_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the flickholdr service.
+ */
+function flickholdr_form() {
+  $form = array();
+  $form['flickholdr'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Flickholdr'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['flickholdr']['flickholdr_tags'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Flickr tags'),
+    '#description' => t('Enter one or more tags. If you use more than one, separate them with commas.'),
+    '#size' => 40,
+    '#maxlength' => 255,
+    '#default_value' => variable_get('flickholdr_tags', 'tapir'),
+  );
+  $form['flickholdr']['flickholdr_color'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Color images?'),
+    '#default_value' => variable_get('flickholdr_color', 1),
+  );
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the flickholdr service.
+ */
+function flickholdr_options() {
+  return array(
+    'pattern' => 'http://flickholdr.com/%dimensions/%tags%color/' . rand(1, 25),
+    'separator' => '/',
+    'replacements' => array(
+      '%color' => (variable_get('flickholdr_color', 1) == 0) ? '/bw' : '',
+      '%tags' => str_replace(' ', ',', variable_get('flickholdr_tags', 'tapir')),
+    ),
+  );
+}

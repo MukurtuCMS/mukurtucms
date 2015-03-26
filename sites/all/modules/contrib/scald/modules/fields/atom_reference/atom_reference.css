@@ -1,0 +1,9 @@
+/**
+ * @file
+ *   Provides some basic style to make the drag & drop more usable.
+ */
+
+.atom_reference_drop_zone {
+  border: #ccc 2px dashed;
+  padding: 2px;
+}

@@ -1,0 +1,266 @@
+<?php
+/**
+ * @file
+ *  Provides a generic but powerful API for web services.
+ */
+
+/**
+ * Implementation of hook_views_api().
+ */
+function services_views_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+
+/**
+ * Implementation of hook_services_resources().
+ */
+function services_views_services_resources() {
+  $resources['views'] = array();
+
+  $resources['views']['retrieve'] = array(
+    'help' => 'Retrieves a view.',
+    'file' => array(
+      'type' => 'inc',
+      'module' => 'services_views',
+      'name' => 'services_views.resource',
+    ),
+    'callback' => 'services_views_retrieve',
+    'access callback' => 'services_views_access',
+    'access arguments' => array('view'),
+    'access arguments append' => TRUE,
+    'args' => array(
+      'view_name' => array(
+        'name' => 'view_name',
+        'type' => 'string',
+        'description' => 'The name of the view to get.',
+        'source' => array('path' => '0'),
+        'optional' => FALSE,
+      ),
+      'display_id' => array(
+        'name' => 'display_id',
+        'type' => 'string',
+        'description' => 'The display ID of the view to get.',
+        'source' => array('param' => 'display_id'),
+        'optional' => TRUE,
+        'default value' => 'default',
+      ),
+      'args' => array(
+        'name' => 'args',
+        'type' => 'array',
+        'description' => 'A list of arguments to pass to the view.',
+        'source' => array('param' => 'args'),
+        'optional' => TRUE,
+        'default value' => array(),
+      ),
+      'offset' => array(
+        'name' => 'offset',
+        'type' => 'int',
+        'description' => 'The number of the entry for the page begin with.',
+        'source' => array('param' => 'offset'),
+        'optional' => TRUE,
+        'default value' => 0,
+      ),
+      'limit' => array(
+        'name' => 'limit',
+        'type' => 'int',
+        'description' => 'The total number of entries to list.',
+        'source' => array('param' => 'limit'),
+        'optional' => TRUE,
+        'default value' => -1,
+      ),
+      'format_output' => array(
+        'name' => 'format_output',
+        'type' => 'bool',
+        'description' => 'Whether to return the raw data results or style the results.',
+        'source' => array('param' => 'format_output'),
+        'optional' => TRUE,
+        'default value' => FALSE,
+      ),
+      'filters' => array(
+        'name' => 'filters',
+        'type' => 'array',
+        'description' => 'A list of filters to pass to the view.  These are defined by the exposed filters on your view.  Example call: <code>/views/your_view?filters[nid]=12345</code>',
+        'source' => array('param' => 'filters'),
+        'optional' => TRUE,
+        'default value' => array(),
+      ),
+    ),
+  );
+
+  // Retrieve all views that have "services" display.
+  $views = views_get_enabled_views();
+  foreach ($views as $view_name => $view) {
+    foreach ($view->display as $view_display => $display) {
+      if ($display->display_plugin !== 'services') {
+        continue;
+      }
+
+      $path = $display->display_options['path'];
+
+      $resources[$path] = array();
+      $resources[$path]['index'] = array(
+        'view info' => array('view_name' => $view_name, 'display_id' => $view_display),
+        'help' => filter_xss('View: ' . $view->human_name),
+        'file' => array(
+          'type' => 'inc',
+          'module' => 'services_views',
+          'name' => 'services_views.resource',
+        ),
+        'callback' => 'services_views_execute_view',
+          // Reuse services_views_access access callback.
+        'access callback' => 'services_views_access',
+        'access arguments' => array(
+          'view',
+          array(
+            'view_name' => $view_name,
+            'display_id' => $view_display,
+          ),
+        ),
+      );
+    }
+  }
+
+  return $resources;
+}
+
+
+/**
+ * Check the access permission to a given views.
+ *
+ * @param $op
+ *  String. The operation that's going to be performed.
+ * @param $args
+ *  Array. The arguments that will be passed to the callback.
+ * @return
+ *  Boolean. TRUE if the user is allowed to load the given view.
+ */
+function services_views_access($op = 'view', $args = array()) {
+  switch ($op) {
+    case 'view':
+      $view = views_get_view($args['view_name']);
+      if (empty($view)) {
+        return services_error(t('View @view could not be found', array('@view' => $args['view_name'])), 404);
+      }
+      if (!isset($view->display[$args['display_id']])) {
+        return services_error(t('Display @display on view @view could not be found', array(
+          '@display' => $args['display_id'],
+          '@view' => $args['view_name'],
+        )), 404);
+      }
+      return $view->access($args['display_id']);
+  }
+}
+
+/**
+ * Implements hook_views_plugins
+ */
+function services_views_views_plugins() {
+  $plugins = array(
+    'display' => array(
+      'services' => array(
+        'title' => t('Services'),
+        'help' => t('Export view to Services.'),
+        'handler' => 'views_plugin_display_services',
+        'theme' => 'views_view',
+        'use ajax' => FALSE,
+        'use pager' => TRUE,
+        'use more' => TRUE,
+        'admin' => t('Services'),
+      ),
+    ),
+  );
+  return $plugins;
+}
+
+/**
+ * Implements hook_services_request_preprocess_alter().
+ *
+ * Pass "view info" to arguments so view name and display_id can be accessed.
+ */
+function services_views_services_request_preprocess_alter($controller, &$args, $options) {
+  if (isset($controller['view info'])) {
+    array_unshift($args, $controller['view info']);
+  }
+}
+
+/**
+ * Alter form views_ui_config_item_form.
+ *
+ * Form of views field options.
+ */
+function services_views_form_views_ui_config_item_form_alter(&$form, $form_state) {
+  // Make sure this is field options form.
+  if ($form_state['type'] != 'field') {
+    return;
+  }
+
+  // Make sure current display is services display.
+  if (get_class($form_state['view']->display_handler) != 'views_plugin_display_services') {
+    return;
+  }
+
+  // Label checkbox and textfield labels.
+  $form['options']['custom_label']['#title'] = t('Set custom value key');
+  unset($form['options']['custom_label']['#description']);
+  $form['options']['label']['#title'] = t('Custom value key');
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function services_views_field_formatter_info_alter(&$formatters) {
+  $field_types = array();
+  foreach ($formatters as $formatter) {
+    $field_types = array_merge($field_types, $formatter['field types']);
+  }
+  // Remove duplicates.
+  $field_types = array_unique($field_types);
+
+  $formatters['services'] = array(
+    'label' => t('Services Raw'),
+    'description' => t('Formatter for Services to provide value as it is in entity object.'),
+    'field types' => $field_types,
+    'module' => 'services_views',
+    'settings' => array(),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function services_views_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  if ($display['type'] == 'services') {
+    $element['skip_safe'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Skip safe values'),
+      '#default_value' => $settings['skip_safe'],
+    );
+    $element['skip_empty_values'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Skip empty values'),
+      '#default_value' => $settings['skip_empty_values'],
+    );
+  }
+
+  return $element;
+}
+
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function services_views_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if ($display['type'] == 'services') {
+    foreach ($items as $delta => $item) {
+      $element[$delta] = $item;
+    }
+  }
+
+  return $element;
+}

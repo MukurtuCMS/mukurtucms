@@ -1,0 +1,12 @@
+name = Lorem pixum service
+description = Integrates the lorempixum service with the dummyimage module.
+core = 7.x
+package = Dummy image
+dependencies[] = dummyimage
+
+; Information added by Drupal.org packaging script on 2014-01-13
+version = "7.x-1.5"
+core = "7.x"
+project = "dummyimage"
+datestamp = "1389642806"
+

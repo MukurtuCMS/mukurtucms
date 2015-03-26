@@ -1,0 +1,353 @@
+<?php
+
+// A suffix for auto generated IDs
+define('DND_ID_SUFFIX', '-dnd-library');
+
+/**
+ * Implementation of hook_menu().
+ */
+function dnd_menu() {
+  $items = array();
+  $items['admin/config/content/dnd'] = array(
+    'title' => 'Drag and Drop Library',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dnd_admin_form'),
+    'description' => 'Configure the resource library used when creating content.',
+    'access arguments' => array('administer dnd'),
+    'file' => 'dnd.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function dnd_permission() {
+  return array(
+    'administer dnd' => array(
+      'title' => t('Administer DnD'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function dnd_theme() {
+  return array(
+    'dnd_library_wrapper' => array(
+      'variables' => array('settings' => NULL, 'element' => NULL),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_element_info_alter().
+ *
+ * Add a process to all textareas.
+ */
+function dnd_element_info_alter(&$types) {
+  if (isset($types['textarea'])) {
+    $types['textarea']['#process'][] = 'dnd_process_textarea';
+  }
+}
+
+/**
+ * Settings array:
+ * What should it take, if anything?  Probably a source * maybe editor specific configuration shit?
+ *
+ * - source for library json/ajax shit
+ * - target selector
+ * - item selector
+ *
+ * perhaps like so:
+ *
+ * global =>
+ *   droppable targets
+ *   library source for textarea
+ *
+ * tinymce/othereditor =>
+ *   target selector logic
+ *   configuration options
+ *   callback should be smart about attachment and detachment
+ */
+function dnd_process_textarea($element, $form_state) {
+  if (!empty($element['#dnd-enabled'])) {
+    $element['#attached']['library'][] = array('dnd', 'library');
+    $settings = (array) @$form_state['field'][$element['#field_name']][$element['#language']]['instance']['settings'];
+    $context_default = isset($settings['context_default']) ? $settings['context_default'] : variable_get('dnd_context_default', 'sdl_editor_representation');
+    $element['#attributes']['data-dnd-context'][] = $context_default;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_library().
+ */
+function dnd_library() {
+  $path = drupal_get_path('module', 'dnd');
+  $types = scald_types();
+  $contexts = array();
+  foreach (scald_contexts() as $name => $definition) {
+    if (!empty($definition['hidden']) || empty($definition['parseable'])) {
+      continue;
+    }
+
+    // There "formats" is actually used nowhere in Scald. Every context is
+    // available to all atom types.
+    $definition['formats'] = $types;
+
+    foreach ($definition['formats'] as $type => $data) {
+      $contexts[$type][$name] = $definition['title'];
+    }
+  }
+  drupal_alter('scald_wysiwyg_context_list', $contexts);
+  $libraries['library'] = array(
+    'title' => 'DnD Library',
+    'website' => 'http://drupal.org/project/scald',
+    'version' => '1.x',
+    'dependencies' => array(
+      array('system', 'jquery.form'),
+    ),
+    'js' => array(
+      // Drag and drop
+      $path . '/js/dnd-library.js' => array(),
+      // javascript workaround for the continue button
+      $path . '/js/dnd-modal.js' => array(),
+      // This file is included automatically if the CKEditor plugin is enabled.
+      // However we need to load it directly in Drupal so that strings can be
+      // translated.
+      $path . '/plugins/ckeditor/lang/en.js' => array(),
+      // Settings for the library url
+      array(
+        'type' => 'setting',
+        'data' => array(
+          'dnd' => array(
+            'url' => url(dnd_get_library()),
+            'contexts' => $contexts,
+            'contextDefault' => variable_get('dnd_context_default', 'sdl_editor_representation'),
+          ),
+        ),
+      ),
+    ),
+    'css' => array(
+      // Contains the library theming
+      $path . '/css/dnd-library.css' => array(
+        'type' => 'file',
+        'media' => 'screen',
+      ),
+    ),
+  );
+
+  // Add the qTip library as a dependency if it exists
+  if (module_exists('qtip')) {
+    $libraries['library']['dependencies'][] = array('qtip', 'qtip');
+  }
+
+  // Libraries might provide atom quick add links. We add CTools Modal JS so
+  // that libraries can take use of it if they want.
+  dnd_library_add_ctools_modal($libraries);
+  $libraries['library']['dependencies'][] = array('dnd', 'ctools.modal');
+
+  return $libraries;
+}
+
+/**
+ * Handle adding CTools Modal JavaScript files.
+ *
+ * It would be *really* nice if CTools implemented hook_library
+ * and allowed us to simply list ctools.modal as a dependency.
+ *
+ * @see ctools_modal_add_js.
+ */
+function dnd_library_add_ctools_modal(&$libraries) {
+  $ctools_path = drupal_get_path('module', 'ctools');
+  $libraries['ctools.modal'] = array(
+    'title' => 'CTools modal',
+    'version' => '1.x',
+  );
+  $libraries['ctools.modal']['js'][$ctools_path . '/js/modal.js'] = array();
+
+  $settings = array(
+    'CToolsModal' => array(
+      'loadingText' => t('Loading...'),
+      'closeText' => t('Close Window'),
+      'closeImage' => theme('image', array(
+        'path' => ctools_image_path('icon-close-window.png'),
+        'title' => t('Close window'),
+        'alt' => t('Close window'),
+      )),
+      'throbber' => theme('image', array(
+          'path' => ctools_image_path('throbber.gif'),
+          'title' => t('Loading...'),
+          'alt' => t('Loading'),
+      )),
+    ),
+  );
+  $libraries['ctools.modal']['js'][] = array(
+    'type' => 'setting',
+    'data' => $settings,
+  );
+  $modal_width = (float) variable_get('dnd_modal_width', 500);
+  $modal_height = (float) variable_get('dnd_modal_height', 300);
+  // Create our own javascript that will be used to theme a modal.
+  $sample_style = array(
+    'custom-style' => array(
+      'modalSize' => array(
+        'type' => ($modal_width <= 1 ? 'scale' : 'fixed'),
+        'width' => $modal_width,
+        'height' => $modal_height,
+        'addWidth' => 20,
+        'addHeight' => 15,
+      ),
+      'modalOptions' => array(
+        'opacity' => .5,
+        'background-color' => '#000',
+      ),
+      'animation' => 'fadeIn',
+      'modalTheme' => 'CToolsSampleModal',
+      'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+    ),
+  );
+  $libraries['ctools.modal']['js'][] = array(
+    'type' => 'setting',
+    'data' => $sample_style,
+  );
+
+  $libraries['ctools.modal']['css'][$ctools_path . '/css/modal.css'] = array('type' => 'file');
+
+  $libraries['ctools.modal']['dependencies'][] = array('system', 'drupal.progress');
+  $libraries['ctools.modal']['dependencies'][] = array('system', 'drupal.ajax');
+
+  $libraries['ctools.modal']['css'][$ctools_path . '/ctools_ajax_sample/css/ctools-ajax-sample.css'] = array('type' => 'file');
+  $libraries['ctools.modal']['js'][$ctools_path . '/ctools_ajax_sample/js/ctools-ajax-sample.js'] = array();
+}
+
+/**
+ * Implements hook_library_alter().
+ */
+function dnd_library_alter(&$libraries, $module) {
+  if ($module == 'mee' || $module == 'atom_reference') {
+    $libraries['library']['dependencies'][] = array('dnd', 'library');
+  }
+}
+
+/**
+ * Implements hook_edit_editor_attachments_alter().
+ */
+function dnd_edit_editor_attachments_alter(&$attachments, $editor, $metadata) {
+  // When Edit module uses CKEditor editor widget, add DnD library if necessary.
+  if ($editor == 'ckeditor') {
+    // If there is at least one field with CKEditor + DnD enabled, add the DnD
+    // library.
+    foreach ($metadata as $field => $data) {
+      if ($data['editor'] == 'ckeditor') {
+        list($entity_type, $entity_id, $field_name, $language, $view_mode) = explode('/', $field);
+        $entity = entity_load_single($entity_type, $entity_id);
+        list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+        $instance_info = field_info_instance($entity_type, $field_name, $bundle);
+        if (!empty($instance_info['settings']['dnd_enabled'])) {
+          $attachments['library'][] = array('dnd', 'library');
+          return;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Tells DnD that the library shouldn't be displayed on this page.
+ *
+ * This function should be called whenever the library shouldn't be
+ * displayed.
+ *
+ * @param boolean $set
+ *   If FALSE, no change to the suppression status will be done, allowing
+ *   other functions to query the suppression state. Defaults to TRUE.
+ *
+ * @return boolean
+ *   TRUE if the library output has been suppressed, FALSE otherwise.
+ */
+function dnd_suppress_library($set = TRUE) {
+  static $suppress = FALSE;
+  if ($set && !$suppress) {
+    $suppress = TRUE;
+    drupal_add_js(array('dnd' => array('suppress' => 1)), 'setting');
+  }
+  return $suppress;
+}
+
+/**
+ * Implements hook_wywiwyg_plugin().
+ */
+function dnd_wysiwyg_plugin($editor, $version) {
+  $plugins = array();
+  switch ($editor) {
+    case 'ckeditor':
+      $plugins['dnd'] = array(
+        'path' => drupal_get_path('module', 'dnd') . '/plugins/ckeditor',
+        'filename' => 'plugin.js',
+        'buttons' => array(
+          'dnd' => t('Scald DnD integration'),
+        ),
+        'load' => TRUE,
+      );
+      break;
+  }
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ckeditor_plugin().
+ */
+function dnd_ckeditor_plugin() {
+  return array(
+    'dnd' => array(
+      'name' => 'dnd',
+      'desc' => t('Scald Drag and Drop integration'),
+      'path' =>  drupal_get_path('module', 'dnd') . '/plugins/ckeditor/',
+      'buttons' => array(),
+    ),
+  );
+}
+
+/**
+ * Theme the markup that will surround a library loaded via JSON.
+ */
+function theme_dnd_library_wrapper($variables) {
+  return '<div id="'. $variables['settings']['library_id'] .'" class="dnd-library-wrapper"></div>';
+}
+
+/**
+ * Return the list of all the available libraries.
+ * @return array
+ *   An associative array, where the keys are the library paths, and
+ *   the value is an associated label.
+ */
+function dnd_get_libraries() {
+  static $libraries = NULL;
+  if (is_null($libraries)) {
+    $libraries = module_invoke_all('dnd_libraries_info');
+    drupal_alter('dnd_libraries_info', $libraries);
+  }
+  return $libraries;
+}
+
+/**
+ * Return the default library.
+ */
+function dnd_get_library() {
+  $libraries = dnd_get_libraries();
+  $default = variable_get('dnd_callback_url', '');
+  if (isset($libraries[$default])) {
+    $library = $default;
+  }
+  else {
+    reset($libraries);
+    $library = key($libraries);
+  }
+  return $library;
+}
+

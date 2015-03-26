@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @file
+ * Test case for the Feeds mapping API for the media module.
+ */
+
+/**
+ * Class for testing the Media Feeds media_internet mapper.
+ */
+class MediaFeedsMapperMediaTestCase extends FeedsMapperTestCase {
+
+  /**
+   * Add this test case to the Media Feeds group.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Mapper: Media',
+      'description' => 'Test Feeds Mapper support for Media fields.',
+      'group' => 'Media Feeds',
+      'dependencies' => array('media_feeds'),
+    );
+  }
+
+  /**
+   * Set up the required modules.
+   */
+  public function setUp() {
+    // Call parent setup with the required modules.
+    parent::setUp(array('media_feeds', 'media_feeds_test'));
+  }
+
+  /**
+   * Basic test importing a sample feed.
+   */
+  public function test() {
+    // Create a user with the appropriate permissions.
+    $this->drupalLogin($this->drupalCreateUser(
+      array(
+        'administer content types',
+        'administer feeds',
+        'access content',
+        'add media from remote sources',
+        'import media',
+        'view media',
+        'edit media',
+        'bypass node access',
+      )
+    ));
+
+    // Import a sample feed.
+    $this->importSampleFeed();
+
+    // Assert: Media correctly attached.
+    $entities = db_select('feeds_item')
+      ->fields('feeds_item', array('entity_id'))
+      ->condition('id', 'node')
+      ->execute();
+    foreach ($entities as $entity) {
+      $this->drupalGet('node/' . $entity->entity_id . '/edit');
+      $this->assertRaw('sample.png');
+    }
+  }
+
+  /**
+   * Creates a content type with a media field, a feed importer and imports
+   * a sample feed.
+   */
+  public function importSampleFeed() {
+    // Create a content type with a media field.
+    $contentType = $this->createContentType(array(), array(
+      'alpha' => array(
+        'type' => 'media',
+        'widget' => 'media_generic',
+      ),
+    ));
+
+    // Create a CSV importer configuration.
+    $this->createImporterConfiguration('Node import from CVS', 'node');
+    $this->setPlugin('node', 'FeedsCSVParser');
+    $this->setSettings('node', 'FeedsNodeProcessor', array('content_type' => $contentType));
+    $this->addMappings('node', array(
+      array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      array(
+        'source' => 'file',
+        'target' => 'field_alpha',
+      ),
+    ));
+    $edit = array(
+      'content_type' => '',
+    );
+    $this->drupalPost('admin/structure/feeds/edit/node/settings', $edit, 'Save');
+
+    // Import.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => url('testing/media_feeds/feed.csv', array('absolute' => TRUE)),
+    );
+    $this->drupalPost('import/node', $edit, 'Import');
+    $this->assertText('Created 1 node');
+  }
+}

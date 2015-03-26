@@ -1,0 +1,8 @@
+
+Drupal module implementing the oEmbed standard: http://oembed.com/
+
+* Supplies an input filter that replaces URL:s from oEmbed enabled sites with the embeddable data fetched from it
+* Contains a CCK field for exposing oEmbed content
+* Makes it possible for a Drupal site to become an oEmbed provider itself
+* Creates a oEmbed PHP Stream Wrapper for Resource and implements the various
+  formatter and file listing hooks in the File Entity and Media module.

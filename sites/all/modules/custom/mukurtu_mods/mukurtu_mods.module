@@ -1,0 +1,405 @@
+<?php
+
+/**
+ * Implements hook_og_fields_info().
+ */
+function mukurtu_mods_field_widget_info() {
+  return array(
+    'hidden' => array(
+      'label' => t('Hidden'),
+      'field types' => array('group'),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      ),
+      'settings' => array(
+        'opt_group' => 'auto',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ * This just hides the normal widget on the edit page using #access = false.
+ */
+function mukurtu_mods_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $base) {
+  $widget = $instance['widget'];
+  switch ($widget['type']) {
+    case 'hidden':
+      $og_instance = $instance;
+      $og_instance['widget']['type'] = OG_AUDIENCE_WIDGET;
+      $base = og_field_widget_form($form, $form_state, $field, $og_instance, $langcode, $items, $delta, $base);
+      $base['#access'] = FALSE;
+      return $base;
+  }
+}
+
+/**
+ * Retrieve and appropriately key field selection arrays.
+ *
+ * @param $updated_membership
+ *   Passed by reference. This is filled in with an array of selected group
+ *   memberships, keyed by gid.
+ * @param $updated_nids
+ *   Passed by reference. This is filled in with an array of selected node
+ *   references, keyed by nid.
+ * @param $original_nids
+ *   Passed by reference. This is filled in with an array of the original node
+ *   references (from before the entity was edited), keyed by nid.
+ * @param $entity
+ *   The entity in the process of being saved.
+ * @param $fields
+ *   An array of node reference field names that should be tied OG membership.
+ */
+function mukurtu_mods_keyed_fields(&$updated_membership, &$updated_nids, &$original_nids, $entity, $fields) {
+  global $language_content;
+
+
+
+  // Produce a gid keyed lookup table of current group membership.
+  if(isset($entity->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE])) {
+    foreach ($entity->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE] as $item) {
+      $updated_membership[$item['gid']] = $item;
+    }
+  }
+
+  // Retrieve a nid keyed lookup list of currently selected and original node references.
+  foreach ($fields as $field_name) {
+    if (isset($entity->{$field_name})) {
+
+      // @TODO there is still some question about how or when the
+      // language field gets used for Drupal fields
+      // If Drupal field is set to UND
+      if(isset($entity->{$field_name}[LANGUAGE_NONE])){
+        foreach ($entity->{$field_name}[LANGUAGE_NONE] as $item) {
+          if (is_array($item) && !empty($item['nid']) && is_numeric($item['nid'])) {
+            $updated_nids[$item['nid']] = $item['nid'];
+          }
+        }
+      }
+      if(isset($entity->original)){
+        if(isset($entity->original->{$field_name}[LANGUAGE_NONE])) {
+          foreach ($entity->original->{$field_name}[LANGUAGE_NONE] as $item) {
+            if (is_array($item) && !empty($item['nid']) && is_numeric($item['nid'])) {
+              $original_nids[$item['nid']] = $item['nid'];
+            }
+          }
+        }
+      }
+
+      // If Drupal field uses language feature (ex. 'en')
+      if(isset($entity->{$field_name}[$language_content->language])){
+        foreach ($entity->{$field_name}[$language_content->language] as $item) {
+          if (is_array($item) && !empty($item['nid']) && is_numeric($item['nid'])) {
+            $updated_nids[$item['nid']] = $item['nid'];
+          }
+        }
+      }
+      if(isset($entity->original)){
+        if(isset($entity->original->{$field_name}[$language_content->language])) {
+          foreach ($entity->original->{$field_name}[$language_content->language] as $item) {
+            if (is_array($item) && !empty($item['nid']) && is_numeric($item['nid'])) {
+              $original_nids[$item['nid']] = $item['nid'];
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/*
+  // Only save on content types that have group audience.
+  if(!empty($entity->{OG_AUDIENCE_FIELD})) {
+    // Produce a gid keyed lookup table of current group membership.
+    foreach ($entity->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE] as $item) {
+      $updated_membership[$item['gid']] = $item;
+    }
+  }
+
+    // Retrieve a nid keyed lookup list of currently selected and original node references.
+    foreach ($fields as $field_name) {
+      if (isset($entity->{$field_name})) {
+        if(isset($entity->{$field_name}[LANGUAGE_NONE])){
+          foreach ($entity->{$field_name}[LANGUAGE_NONE] as $item) {
+            if (is_array($item) && !empty($item['nid']) && is_numeric($item['nid'])) {
+              $updated_nids[$item['nid']] = $item['nid'];
+            }
+          }
+        }
+        if(isset($entity->original->{$field_name}[LANGUAGE_NONE])) {
+          foreach ($entity->original->{$field_name}[LANGUAGE_NONE] as $item) {
+            if (is_array($item) && !empty($item['nid']) && is_numeric($item['nid'])) {
+              $original_nids[$item['nid']] = $item['nid'];
+            }
+          }
+        }
+      }
+    }
+
+}
+
+*/
+
+/**
+ * Check for and apply changes from node reference to membership.
+ *
+ * The updated node references are compared with the original selection, to
+ * determine new and removed selections, and fetch the gids for those nodes.
+ *
+ * Then the insertions are validated, to ensure the users is allowed to join
+ * (or join content) to those groups, and apply the changes to the membership
+ * array.
+ *
+ * @param $updated_membership
+ *   The membership array being updated.
+ * @param $updated_nids
+ *   The currently selected node references.
+ * @param $original_nids
+ *   The previously selected node references.
+ * @return
+ *   The updated membership array.
+ */
+function mukurtu_mods_update_membership($updated_membership, $updated_nids, $original_nids) {
+  $insert_gid = og_get_group_ids('node', array_unique(array_diff($updated_nids, $original_nids)));
+  $delete_gid = og_get_group_ids('node', array_unique(array_diff($original_nids, $updated_nids)));
+  // List valid gids, so the user can't join groups they don't have access to
+  // even if view is misconfigured to list those in the nodereference.
+  $optgroup = TRUE;
+  $valid_gids_optgroups = og_field_audience_options($optgroup);
+  $valid_gids = $valid_gids_optgroups['content groups'];
+  // Can wrap next line in "if (user_access('administer group'))" to further
+  // restrict to only groups the user is a member of. TODO: use OG field config.
+  $valid_gids += $valid_gids_optgroups['other groups'];
+  $insert_gid = array_intersect($insert_gid, $valid_gids);
+  foreach ($insert_gid as $gid) {
+    $updated_membership[$gid] = array('gid' => $gid);
+  }
+  foreach ($delete_gid as $gid) {
+    unset($updated_membership[$gid]);
+  }
+  return $updated_membership;
+}
+
+/**
+ * Check for and apply group membership changes to node reference.
+ *
+ * We compare the updated node references with the original selection, to
+ * determine new and removed selections, fetch the gids for those nodes,
+ * then apply the changes to the membership array.
+ *
+ * @param $updated_nids
+ *   The currently selected node references to be worked on.
+ * @param $updated_membership
+ *   The membership array being updated.
+ * @param $entity
+ *   The entity in the process of being saved.
+ * @param $entity_type
+ *   The type of entity in the process of being saved.
+ * @return
+ *   The updated node references array.
+ */
+function mukurtu_mods_update_nodereference($updated_nids, $updated_membership, $entity, $entity_type) {
+  $diff_groups = og_entity_presave_group_audience_diff($entity, $entity_type);
+  if ($entity->is_new == TRUE) {
+    $diff_groups['insert'] = $updated_membership;
+  }
+  if(isset($diff_groups['insert'])) {
+    foreach ($diff_groups['insert'] as $group) {
+      if ($node = og_load_entity_from_group($group['gid'])) {
+        $updated_nids[$node->nid] = $node->nid;
+      }
+    }
+  }
+  if(isset($diff_groups['delete'])){
+    foreach ($diff_groups['delete'] as $group) {
+      if ($node = og_load_entity_from_group($group['gid'])) {
+        unset($updated_nids[$node->nid]);
+      }
+    }
+  }
+  return $updated_nids;
+}
+
+
+/*
+function mukurtu_mods_update_nodereference($updated_nids, $updated_membership, $entity, $entity_type) {
+  $diff_groups = og_entity_presave_group_audience_diff($entity, $entity_type);
+
+  if ($entity->is_new == TRUE) {
+    $diff_groups['insert'] = $updated_membership;
+  }
+  if(!empty($diff_groups['insert'])){
+    foreach ($diff_groups['insert'] as $group) {
+      if ($node = og_load_entity_from_group($group['gid'])) {
+        $updated_nids[$node->nid] = $node->nid;
+      }
+    }
+  }
+  if(!empty($diff_groups['delete'])){
+    foreach ($diff_groups['delete'] as $group) {
+      if ($node = og_load_entity_from_group($group['gid'])) {
+        unset($updated_nids[$node->nid]);
+      }
+    }
+  }
+  return $updated_nids;
+}
+*/
+
+/**
+ * Rebuild node reference fields
+ *
+ * Each node reference may only have a subset of the possible memberships
+ * so we check the potential references, and only select the ones appropriate
+ * for each field.
+ *
+ * @param $entity
+ *   Passed by reference. The entity with the node reference fields.
+ * @param $updated_nids
+ *   The updated node references.
+ * @param $fields
+ *   An array of node reference field names that should be tied OG membership.
+ */
+function mukurtu_mods_rebuild_nodereference(&$entity, $updated_nids, $fields) {
+  global $language_content;
+  foreach ($fields as $field_name) {
+    // We don't check the field exists, since it actually doesn't on feed import
+    // yet we still need to fill in the field values.
+    $field = field_info_field($field_name);
+
+    // This will manually set the field to use the language feature.
+    $entity->{$field_name}[$language_content->language] = array();
+    // Retrieve a list of listed (potentially selectable) nids.
+    $potential_nids = node_reference_potential_references($field);
+    foreach ($updated_nids as $nid) {
+      if (isset($potential_nids[$nid])) {
+        // This will manually set the field to use the language feature.
+        $entity->{$field_name}[$language_content->language][] = array('nid' => $nid);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ *
+ * The OG audience field mixes up memberships for multiple group content types,
+ * which can be confusing for users. This function allows multiple node
+ * references to be used, by synchronizing selections (in both directions)
+ * between the OG membership and the node reference fields whenever the entity
+ * is saved.
+ *
+ */
+function mukurtu_mods_entity_presave($entity, $entity_type) {
+  global $language_content;
+
+  // temporarily circumventing this until further development can be done
+  return;
+  
+  // TODO: replace this with a check that the appropriate OG membership and
+  // node reference fields are present.
+  if (!in_array($entity_type, array('node', 'user'))) {
+    return;
+  }
+  // TODO: replace this with a checkbox on the nodereference settings page
+  // so that this module can be renamed and contributed back.
+  $fields = array('field_communities', 'field_culturalprotocol');
+
+  // Retrieve and appropriately key field selection arrays.
+  $updated_membership = $updated_nids = $original_nids = array();
+  mukurtu_mods_keyed_fields($updated_membership, $updated_nids, $original_nids, $entity, $fields);
+
+  // Check for and apply changes from node reference to membership.
+  $updated_membership = mukurtu_mods_update_membership($updated_membership, $updated_nids, $original_nids);
+
+  // Check for and apply group membership changes to node reference.
+  $updated_nids = mukurtu_mods_update_nodereference($updated_nids, $updated_membership, $entity, $entity_type);
+
+  // Rebuild membership field
+  $entity->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE] = array_values($updated_membership);
+
+  // Rebuild node reference fields
+  mukurtu_mods_rebuild_nodereference($entity, $updated_nids, $fields);
+}
+
+// Add a custom reference field for a feed importer
+// http://www.zivtech.com/blog/feed-feeds-importing-referenced-rss-data
+// related: http://drupal.org/files/issues/feeds-nodereference-724536-c54.patch
+
+function mukurtu_mods_feeds_parser_sources_alter(&$sources, $content_type) {
+  $sources['field_reference_digital_heritage'] = array(
+    'name' => t('Digital Heritage NID'),
+    'description' => t('The node ID of a digital heritage item.'),
+/*     'callback' => 'mukurtu_mods_get_digital_heritage_nid', */
+  );
+}
+
+/**
+* Implements hook_feeds_processor_targets_alter().
+*/
+function mukurtu_mods_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+  $targets['field_reference_digital_heritage'] = array(
+    'name' => 'Digital Heritage Reference',
+    'description' => 'the node reference for the digital heritage item',
+    'real_target' => 'field_reference_digital_heritage', // Specify real target field on node. This is on the content type.
+    'callback' => 'mukurtu_mods_feeds_set_target',
+  );
+
+}
+
+function mukurtu_mods_get_digital_heritage_nid(FeedsSource $source) {
+ // This is just a placeholder.
+}
+
+/**
+* Implements hook_feeds_set_target().
+*/
+function mukurtu_mods_feeds_set_target($source, &$entity, $target, $value) {
+ if (empty($value)) {
+    return;
+  }
+  // Handle non-multiple value fields.
+  if (!is_array($value)) {
+    $value = is_string($value) ? drupal_explode_tags($value) : array($value);
+  }
+  
+  $info = field_info_field($target);
+
+  // Iterate over all values.
+  $i = 0;
+  $entity->$target = isset($entity->$target) ? $entity->$target : array();
+  
+  global $language_content;
+  
+  foreach ($value as $nid) {
+    if (!is_array($nid) && !is_object($nid)) {
+      // This will manually set the field data to use the language options.
+      $field[$language_content->language][$i]['nid'] = $nid;
+    }
+    if ($info['cardinality'] == 1) {
+      break;
+    }
+    $i++;
+  }
+  $entity->{$target} = $field;
+}
+
+/**
+ * Invoked after a feed source has been imported.
+ *
+ * @param $source
+ *  FeedsSource object that describes the source that has been imported.
+ */
+function mukurtu_mods_feeds_after_import(FeedsSource $source) {
+  drupal_set_message('You can view and edit your content, categories, users & groups.
+  <ul>
+    <li><a href="/group-list">List of Groups</a></li>
+    <li><a href="/admin/content">Manage Content & Groups</a></li>
+    <li><a href="/admin/structure/taxonomy/category">Manage Categories</a>
+    <li><a href="/admin/people">Manage Users</a></li>
+  </ul>
+  ');
+}
+

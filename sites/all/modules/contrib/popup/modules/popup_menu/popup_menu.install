@@ -1,0 +1,18 @@
+<?php
+// $Id:
+
+
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function popup_menu_uninstall() {
+
+  $variables = array(
+    'popup-menu-settings',
+  );
+
+  foreach($variables as $variable){
+    variable_del($variable);
+  }
+}

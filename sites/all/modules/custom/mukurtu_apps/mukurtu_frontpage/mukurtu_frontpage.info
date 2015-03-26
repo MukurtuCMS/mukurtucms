@@ -1,0 +1,9 @@
+; $Id:$
+name = Mukurtu Front Page App
+package = Mukurtu
+description = ""
+core = 7.x
+dependencies[] = jcarousel
+dependencies[] = jquery_update
+dependencies[] = fitvids
+dependencies[] = ma_services

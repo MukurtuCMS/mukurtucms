@@ -1,0 +1,49 @@
+<?php
+/**
+ * Enable Boostrap Theme, and Mukurtu Starter, and disable all others
+ */
+//function ma_base_theme_install () {
+//  $themes_to_enable = array (
+//    'bootstrap',
+//    'mukurtu_starter'
+//  );
+//  theme_enable ($themes_to_enable);
+//
+//  $themes_to_disable = array (
+//    'bartik',
+//    'seven', // this remains enabled as admin theme
+//  );
+//  theme_disable ($themes_to_disable);
+//}
+//
+///**
+// * Add a module weight to make ma_base_theme heavy.
+// */
+//function ma_base_theme_update_7000() {
+//  db_update('system')
+//    ->fields(array(
+//      'weight' => 5
+//    ))
+//    ->condition('name', 'ma_base_theme', '=')
+//    ->execute();
+//}
+//
+///**
+// * Enable Boostrap Theme, and Mukurtu Starter, and disable all others
+// */
+//function ma_base_theme_update_7001() {
+//
+//  $themes_to_enable = array (
+//    'bootstrap',
+//    'mukurtu_starter'
+//  );
+//  theme_enable ($themes_to_enable);
+//
+//  $themes_to_disable = array (
+//    'bartik',
+//    'seven', // this remains enabled as admin theme
+//    'mukurtu',
+//    'mukurtu_theme'
+//  );
+//  theme_disable ($themes_to_disable);
+//}

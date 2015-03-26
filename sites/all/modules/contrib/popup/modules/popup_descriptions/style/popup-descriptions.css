@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+
+
+.description{ position: relative; padding-right: 32px !important;}
+.description .popup-description-admin{ display: none; position: absolute; right: 0; top: 0;}
+.form-item:hover .description .popup-description-admin,
+.description .popup-element-active{display: inline-block;}
+
+.description .popup-description-admin a.popup-element-title{ background: url('images/popup-icon.png') no-repeat left top; height: 14px; padding-right: 18px; width: 14px;}
+.description .popup-description-admin a.popup-title-active{ background: url('images/popup-icon-active.png') no-repeat left top;}
+.description .popup-description-admin a.popup-element-title span{ display: none;}

@@ -1,0 +1,143 @@
+<?php
+
+/**
+ * @file
+ * Implementation of the Feeds mapping API for the media module.
+ */
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function media_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+  if ($bundle_name === NULL) {
+    return;
+  }
+
+  foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
+    $info = field_info_field($name);
+
+    if ($info['type'] == 'media') {
+      $targets[$name] = array(
+        'name' => t('@label (media_internet)', array('@label' => $instance['label'])),
+        'callback' => 'media_feeds_set_target',
+        'description' => t('The @label field of the node. Value to be claimed by a Media Internet Sources provider. Be careful! The importing user will not need the @permission permission.', array('@label' => $instance['label'], '@permission' => 'add media from remote sources')),
+      );
+
+      $targets[$name . ':MediaFeedsLibraryProvider'] = array(
+        'name' => t('@label (by filename from library)', array('@label' => $instance['label'])),
+        'callback' => 'media_feeds_set_target',
+        'description' => t('The @label field of the node. Value is a filename existing in the Media library. The importing user will not need the permission to access existing files.', array('@label' => $instance['label'])),
+        'summary_callback' => 'MediaFeedsLibraryProvider::summaryCallback',
+        'form_callback' => 'MediaFeedsLibraryProvider::formCallback',
+      );
+
+      if (module_exists('remote_stream_wrapper')) {
+        $targets[$name . ':MediaFeedsRemoteProvider'] = array(
+          'name' => t('@label (remote_stream_wrapper)', array('@label' => $instance['label'])),
+          'callback' => 'media_feeds_set_target',
+          'description' => t('The @label field of the node. Value is a remote URI supported by remote_stream_wrapper. The file will be referenced from a remote server instead of downloading it to the local disc.', array('@label' => $instance['label'])),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * The actual mapping happens here.
+ */
+function media_feeds_set_target($source, $entity, $target, $values, $config = array()) {
+  if (empty($values)) {
+    return;
+  }
+
+  if (!is_array($values)) {
+    $values = array($values);
+  }
+
+  $field_info = field_info_field($target);
+  $field = array(LANGUAGE_NONE => array());
+
+  // Get the provider class name by splitting $target.
+  // MediaFeedsInternetProvider is the default for the secound value.
+  list($target, $provider) = explode(':', $target, 2) + array(1 => 'MediaFeedsInternetProvider');
+
+  foreach ($values as $value) {
+    try {
+      // Find a provider to create a file object.
+      $provider = new $provider($value, $config);
+
+      // Validate and get a file object.
+      $provider->validate();
+      $file = $provider->getFileObject();
+      if (!$file) {
+        drupal_set_message(t('Failed to get the file object for %value.', array('%value' => (string) $value)));
+        continue;
+      }
+
+      // Look for the field instance settings.
+      $instance = field_info_instance($entity->feeds_item->entity_type, $target, $entity->type);
+      $allowed_types = $instance['widget']['settings']['allowed_types'];
+      $allowed_schemes = $instance['widget']['settings']['allowed_schemes'];
+
+      // Validate the type.
+      $errors = media_file_validate_types($file, $allowed_types);
+      if (count($errors)) {
+        foreach ($errors as $error) {
+          drupal_set_message(filter_xss($error), 'error');
+        }
+        continue;
+      }
+
+      // Validate the URI scheme.
+      // If public is allowed, also allow schemes supported by
+      // MediaInternetFileHandler (http, ...).
+      if (in_array('public', $allowed_schemes)) {
+        $fromurlschemes = media_variable_get('fromurl_supported_schemes');
+        foreach ($fromurlschemes as $fromurlscheme) {
+          $allowed_schemes[$fromurlscheme] = $fromurlscheme;
+        }
+      }
+      $scheme = file_uri_scheme($file->uri);
+      if (!in_array($scheme, $allowed_schemes)) {
+        drupal_set_message(t('Scheme %scheme not allowed for %target.', array('%scheme' => $scheme . '://', '%target' => $target)), 'error');
+        continue;
+      }
+
+      // Save file.
+      $file = $provider->save();
+      if (!$file) {
+        drupal_set_message(t('Failed to save the file.'), 'error');
+        continue;
+      }
+
+      // Apply author settings to the file.
+      if ((empty($file->uid) && !empty($entity->uid)) || $file->uid != $entity->uid) {
+        $file->uid = $entity->uid;
+        if (!file_save($file)) {
+          drupal_set_message(t('Failed to apply the author settings to the file.'), 'warning');
+        }
+      }
+
+      // Attach the file to the field.
+      $field[LANGUAGE_NONE][]['fid'] = $file->fid;
+    } catch (MediaInternetNoHandlerException $e) {
+      drupal_set_message($e->getMessage(), 'error');
+    } catch (MediaInternetValidationException $e) {
+      drupal_set_message($e->getMessage(), 'error');
+    }
+  }
+
+  $entity->{$target} = $field;
+}
+
+/**
+ * Implements hook_file_presave().
+ */
+function media_feeds_file_presave($file) {
+  if (class_exists('MediaFeedsInternetProvider', FALSE)) {
+    if (MediaFeedsInternetProvider::$currentExistingFile) {
+      $file->fid = MediaFeedsInternetProvider::$currentExistingFile;
+      $file->is_new = FALSE;
+    }
+  }
+}

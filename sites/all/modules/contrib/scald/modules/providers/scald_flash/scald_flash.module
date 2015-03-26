@@ -1,0 +1,130 @@
+<?php
+/**
+ * @file
+ *   Defines a flash provider for Scald.
+ *
+ */
+
+/**
+ * Implements hook_scald_atom_providers.
+ * Tell Scald that we'll be providing some flash atoms.
+ */
+function scald_flash_scald_atom_providers() {
+  return array(
+    'flash' => 'Embed swf object (Flash)'
+  );
+}
+
+
+function scald_flash_scald_add_form(&$form, &$form_state) {
+  $defaults = scald_atom_defaults('flash');
+  $form['file_swf'] = array(
+    '#type' => $defaults->upload_type,
+    '#title' => t('SWF File'),
+    '#upload_location' => 'public://atoms/swf/',
+    '#upload_validators' => array('file_validate_extensions' => array('swf')),
+  );
+}
+
+/**
+ * Implements hook_scald_add_atom_count().
+ */
+function scald_flash_scald_add_atom_count(&$form, &$form_state) {
+  if (is_array($form_state['values']['file_swf'])) {
+    return max(count($form_state['values']['file_swf']), 1);
+  }
+  return 1;
+}
+
+
+/**
+ * Implements hook_scald_add_form_fill.
+ */
+function scald_flash_scald_add_form_fill(&$atoms, $form, $form_state) {
+  foreach ($atoms as $delta => $atom) {
+    if (is_array($form_state['values']['file_swf']) && module_exists('plupload')) {
+      module_load_include('inc', 'scald', 'includes/scald.plupload');
+      $file = scald_plupload_save_file($form_state['values']['file_swf'][$delta]['tmppath'], $form['file_swf']['#upload_location'] . $form_state['values']['file_swf'][$delta]['name']);
+    }
+    else {
+      $file = file_load($form_state['values']['file_swf']);
+    }
+    $atom->title = $file->filename;
+    $atom->base_id = $file->fid;
+    $size_infos = getimagesize($file->uri);
+    $atom->data['flash_width'] = $size_infos[0];
+    $atom->data['flash_height'] = $size_infos[1];
+    $langcode = field_language('scald_atom', $atom, 'scald_width');
+    $atom->scald_width[$langcode][0]['value'] = $size_infos[0];
+    $atom->scald_height[$langcode][0]['value'] = $size_infos[1];
+  }
+}
+
+/**
+* Implements hook_scald_fetch.
+*/
+function scald_flash_scald_fetch($atom, $type) {
+  // Get the flash thumbnail
+  $file = file_load($atom->base_id);
+  $atom->base_entity = $file;
+  $atom->file_source = $file->uri;
+
+  if ($items = field_get_items('scald_atom', $atom, 'scald_thumbnail')) {
+    $atom->thumbnail_source = $items[0]['uri'];
+  }
+}
+
+/**
+ * Implements hook_scald_atom_insert().
+ */
+function scald_flash_scald_atom_insert($atom) {
+  if ($atom->provider == 'scald_flash') {
+    $file = file_load($atom->base_id);
+    if ($file) {
+      $file->status = FILE_STATUS_PERMANENT;
+      file_save($file);
+      file_usage_add($file, 'scald_flash', 'scald_atom', $atom->sid);
+    }
+  }
+}
+
+/**
+ * Implements hook_scald_prerender.
+ */
+function scald_flash_scald_prerender($atom, $context, $options, $mode) {
+  if ($mode == 'atom') {
+    $langcode = field_language('scald_atom', $atom, 'scald_width');
+    $atom->rendered->player = theme('scald_flash_object',
+      array('vars' =>
+        array(
+          'flash_uri'      => $atom->rendered->file_source_url,
+          'flash_width'   => ($atom->scald_width[$langcode][0]['value'] ? $atom->scald_width[$langcode][0]['value'] : 480),
+          'flash_height'  => ($atom->scald_height[$langcode][0]['value'] ? $atom->scald_height[$langcode][0]['value'] : 365),
+          'thumbnail'     => $atom->thumbnail_source,
+        ),
+      )
+    );
+  }
+}
+
+/**
+ * Preprocess variables for the Scald Flash Object template.
+ */
+function template_preprocess_scald_flash_object(&$vars) {
+  foreach (array('flash_width', 'flash_height') as $attribute) {
+    $vars['vars'][$attribute] = check_plain($vars['vars'][$attribute]);
+  }
+}
+
+/**
+ * Implements hook_theme.
+ */
+function scald_flash_theme() {
+  return array(
+    'scald_flash_object' => array(
+      'variables' => array('vars' => NULL),
+      'template' => 'scald_flash_object'
+    ),
+  );
+}
+

@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * Implements hook_requirements.
+ */
+function modernizr_requirements($phase) {
+  $requirements = array();
+  switch ($phase) {
+    case 'runtime':
+      $version = modernizr_get_version();
+      $requirements[] = array(
+        'title' => t('Modernizr library'),
+        'value' => $version ? $version : t('Not installed'),
+        'description' => $version ?
+          t('Modernizr is installed and ready to use.'):
+          t('Modernizr Javascript Library. Download it from !modernizr-site, copy it to the module directory and rename it to modernizr.min.js.', array(
+            '!modernizr-site' => l(t('here'), 'http://modernizr.com'),
+        )),
+        'severity' => $version ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+      );
+      break;
+  }
+  return $requirements;
+}

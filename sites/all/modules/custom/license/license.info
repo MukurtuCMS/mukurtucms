@@ -1,0 +1,4 @@
+name = License
+description = Field to associate one or more Licences with an entity
+core = 7.x
+package = Fields

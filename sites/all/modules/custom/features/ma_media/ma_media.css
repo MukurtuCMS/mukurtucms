@@ -1,0 +1,8 @@
+body.page-media-browser {
+  overflow-y: scroll;
+}
+
+body.page-media-browser #media_folder_table .media-list-thumbnails{
+  overflow: visible;
+}
+

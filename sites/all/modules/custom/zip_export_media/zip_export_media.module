@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function zip_export_media_menu() {
+  $items = array();
+    $items['node/%/zip-export'] = array(
+      'title' => 'Zip export',
+      'description' => 'Lets you export files attached to nodes as a Zip package.',
+      'page callback' => 'zip_export_media_from_node',
+      'page arguments' => array(1),
+      'access arguments' => array('export media in zip format'),
+      'type' => MENU_CALLBACK,
+    );
+  return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function zip_export_media_permission() {
+  return array(
+    'export media in zip format' => array(
+      'title' => t('Export media in zip format'),
+      'description' => t('Allow users to export media from Digital Heritage nodes in Zip format.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function zip_export_media_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'zip_export_media') .'/views',
+  );
+}
+
+/**
+ * Gets the files from a given node's field_media field and calls zip_export_media_create_zip to 
+ * make and present a Zip file of them.
+ *
+ * Wishlist: Is there a way to do this without a node load and at least one file load per call?
+ *
+ * TODO: This is basically hard coded for Mukurtu now - we would be better off
+ * making a view available with a nid argument, and dropping this function.
+ */
+function zip_export_media_from_node($nid) {
+  // No funny business.
+  if (is_numeric($nid) && $node = node_load($nid)) {
+    // Loop through the node's media fields and load the files into an array.
+    $data = array();
+    //@TODO Double check language support here.
+    foreach ($node->field_media[LANGUAGE_NONE] as $media) {
+      $data[$nid]['field_field_media'][] = file_load($media['fid']);
+    }
+    // Produce the export.
+    if (zip_export_media_create_zip($data, 'media-export-' . $nid . '-' . format_date(mktime(), 'custom', 'Y-m-d-H-i') . '.zip') == FALSE) {
+      // If there was an error, redirect to the node page.
+      drupal_goto('node/' . $nid);
+    }
+  }
+  else {
+    drupal_access_denied();
+  }
+}
+
+/**
+ * Creates a compressed zip file. Hat tip to http://davidwalsh.name/create-zip-php 
+ * and http://www.drupal.org/project/imagefield_archive.
+ *
+ * @param $data
+ *   Array of node IDs, containing an array of fields, containing an array of
+ *   files.
+ * @param $zipname
+ *   The file name to present to the user, including the '.zip' extension.
+ *
+ * @return
+ *   Execution is halted on success. FALSE on failure.
+ */
+function zip_export_media_create_zip($data = array(), $zipname = 'media-export.zip') {
+	if(empty($data)) {
+    drupal_set_message(t('No media items to export.'), 'warning');
+    return FALSE;
+  }
+  if (!function_exists('zip_open')) {
+    drupal_set_message(t('In order to export a Zip file, you must download and enable PHP Zip: http://www.php.net/manual/en/book.zip.php'), 'error');
+    return FALSE;
+  }
+  // Create the Zip archive, using a temporary file.
+  $zipfile = drupal_tempnam('temporary://', 'zip');
+  $zippath = drupal_realpath($zipfile);
+  $zip = new ZipArchive();
+  if (!$zip->open($zippath, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) {
+    drupal_set_message(t('Cannot create Zip archive.'), 'error');
+    return FALSE;
+  }
+  foreach ($data as $nid => $fields) {
+    foreach ($fields as $field_name => $files) {
+      // Add the files to the Zip archive.
+      foreach($files as $file) {
+        $filename = $file->filename;
+        $filepath = drupal_realpath($file->uri);
+        // Check the file exists and is readable.
+        if (is_readable($filepath)) {
+          // Add the file inside the appropriate directory.
+          $zip->addFile($filepath, $nid . '/' . $field_name . '/' . $filename);
+        }
+        else {
+          drupal_set_message(t('Unable to add the file @filepath to archive.', array('@filepath' => $filepath)), 'warning');
+        }
+      }
+    }
+  }
+
+  // Done! Close the Zip archive.
+  $zip->close();
+
+  $headers = array(
+    'Content-Type' => 'application/zip',
+    'Content-Disposition' => 'attachment; filename="'. $zipname . '"',
+    'Content-Transfer-Encoding' => 'binary',
+    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+    'Pragma' => 'public',
+    'Expires' => '0',
+    'Content-Length' => filesize($zipfile),
+  );
+  // This serves the file and ends page execution.
+  file_transfer($zipfile, $headers);
+}

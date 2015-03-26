@@ -1,0 +1,21 @@
+name = Popup descriptions
+description = Enable field descriptions on forms to be popped up
+package = User interface
+version = "7.0"
+core = 7.x
+
+configure = admin/config/user-interface/popup/descriptions
+
+dependencies[] = popup_ui
+
+files[] = popup_descriptions.module
+files[] = includes/popup_descriptions.admin.inc
+files[] = includes/popup_descriptions.util.inc
+
+
+; Information added by Drupal.org packaging script on 2014-07-06
+version = "7.x-1.4"
+core = "7.x"
+project = "popup"
+datestamp = "1404659328"
+

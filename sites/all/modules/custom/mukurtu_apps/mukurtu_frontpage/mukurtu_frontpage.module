@@ -1,0 +1,530 @@
+<?php
+define('MUKURTU_FRONTPAGE', drupal_get_path('module', 'mukurtu_frontpage'));
+
+/**
+ * Implementation of hook_menu()
+ */
+function mukurtu_frontpage_menu() {
+  $items['frontpage_app'] = array(
+    'title' => t('Mukurtu'),
+    'description' => t(''),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'mukurtu_frontpage_content',
+  );
+
+  $items['admin/config/frontpage_app'] = array(
+    'title' => 'Mukurtu FrontPage Settings',
+    'description' => 'Configure front page content.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mukurtu_frontpage_settings'),
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;	  
+}
+
+function mukurtu_frontpage_content_load() {
+
+  global $base_root;
+
+  // @TODO add drupal site path for default.
+  $default_content = array( 
+    'header' => FALSE,
+    'footer' => FALSE,
+    'sections' => array(
+      0 => array(
+        'title' => t(''),
+        'anchor' => 'header',
+        'detail' => '',
+        'jsondata' => '',
+        'display' => TRUE,
+        'blockname' => '',
+        'content_suffix' => '',
+        'content' => '<div class="row">
+<div class="video span7 region oembed-video has-cover-image">
+<img  src="' . $base_root . '/sites/all/modules/custom/mukurtu_apps/mukurtu_frontpage/images/muk_mob_1_0.png"  width="100%" alt="Mukurtu Video"  /> 
+<iframe src="http://player.vimeo.com/video/30167843?title=0&amp;byline=0&amp;portrait=0&amp;color=ff9933" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+</div>
+
+<div class="intro span3">
+<h2>Mukurtu CMS</h2>
+<p>The free, mobile and open source platform built with indigenous communities to manage and share digital cultural heritage. <br />
+<a href="#get-started" class="link link-scroll">GET MUKURTU</a>
+</p>
+</div>
+</div>',
+        ),
+      1 => array(
+        'title' => 'WHY MUKURTU CMS',
+        'anchor' => 'why',
+        'link' => 'about',
+        'detail' => 'our mission',
+        'content_suffix' => '',
+        'content' => '<p>Mukurtu (MOOK-oo-too) is a grassroots project aiming to empower communities to manage, share and exchange their digital heritage in culturally relevant and ethically-minded ways. We are committed to maintaining an open, community-driven approach to Mukurtu\'s continued development. Our first priority is to help build a platform that fosters relationships of respect and trust.</p>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#tab1" data-toggle="tab">What is Mukurtu?</a></li>
+  <li><a href="#tab2" data-toggle="tab">Why Community Development?</a></li>
+</ul>
+<div class="tab-content">
+
+<div class="tab-pane active" id="tab1">
+<h3>What is Mukurtu?</h3>
+<p>Mukurtu is a Warumungu word meaning \'dilly bag.\' Like the dilly bag, Mukurtu CMS is meant to be \'a safe keeping place\' for cultural knowledge and a catalyst for ongoing dialogue about sharing, making and reproducing cultural materials and knowledge. The software project began as a response to the specific archival needs of the Warumungu Aboriginal community in the Central Australian town of Tennant Creek. After the Mukurtu Wumpurrarni-kari archive launched in 2007, communities worldwide shared their desires to have a similar platform for their own cultral heritage management. Mukurtu CMS was born from the expressed needs of these communities as they sought to find a solution for the management and preservation of their cultural materials following their own social and cultural systems.</p>
+</div>
+
+<div class="tab-pane" id="tab2">
+<h3>Why Community Development?</h3>
+<p>Mukurtu CMS is an ambitious project that seeks to fit the needs of a broad base of community users. With a growing international community now measured by hundreds of organizations and contributors, development priorities are set by those actively using Mukurtu for their digital heritage needs.</p>
+
+<p>The best way to assure Mukurtu\'s sustainability is by being responsive to rapidly changing content management trends while also respectfully recognizing that indigenous communities have clear understandings of what it means to manage and care for their cultural materials.</p>
+ 
+<p>Our goal is to couple best practices in digital curation with new innovations in open source content management, blend in responsive workflows from digital archives, libraries and museums, and respond to the sophisticated needs of an engaged, global user base.</p>
+
+<p>Mukurtu CMS is built on top of Drupal to ensure a safe and secure evolving platform. With this as our base Mukurtu has become a community of users who are passionate about caring for digital cultural heritage.</p>
+
+<p>Mukurtu is a free and open source digital archive platform distributed under the terms of a <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">GNU General Public License</a> (or GPL).</p>
+</div>
+</div>',      
+        'jsondata' => '',
+        'display' => TRUE,
+        'blockname' => '',
+        ),
+      2 => array(
+        'title' => 'Features',
+        'anchor' => 'features',
+        'detail' => 'great reasons to Mukurtu',
+        'content_suffix' => '',
+        'content' => '<div class="row"><div class="span7"><p>What makes Mukurtu CMS unique. <a href="#support" class="link-scroll">Get in touch</a> and join the community to help keep development thriving!</p></div><div class="span3"> <a href="content/features" class="link-small">All Features</a></div></div>',
+        'jsondata' => $base_root . '/app/views/ma_browse.json?&display_id=page_app&keys=&label%5BFeatures%5D=Features&promote=All',
+        'display' => TRUE,
+        'blockname' => '',
+        ),  
+      3 => array(
+        'title' => 'Features',
+        'anchor' => 'features',
+        'detail' => 'blasdf asdf asdfasd fasdf a.',
+        'content' => 'content asdf adsf asdf asd fasd.',
+        'jsondata' => $base_root . '/app/views/ma_browse.json?&display_id=page_app&keys=&label[Sample+Cultural+Protocol]=Sample+Cultural+Protocol&promote=All',
+        'display' => TRUE,
+        'content_suffix' => '',
+        'blockname' => '',
+        ),  
+      4 => array(
+        'title' => 'Communities',
+        'anchor' => 'communities',
+        'link' => 'communities',
+        'detail' => 'meet the people that make Mukurtu matter',
+        'content' => '<div class="row"><div class="span7"><p>See how Mukurtu CMS is being used in community-driven development projects worldwide.</div><div class="span3"><a href="content/community" class="link-small">All Communities</a>.</p></div></div>',
+        'jsondata' => $base_root . '/app/views/communities.json?&display_id=communities',
+        'display' => TRUE,
+        'content_suffix' => '',
+        'blockname' => '',
+        ),   
+      5 => array(
+        'title' => 'Contact',
+        'anchor' => 'contact',
+        'link' => 'contact',
+        'detail' => 'contact us',
+        'content' => 'Fill in content here',
+        'display' => TRUE,
+        'jsondata' => '',
+        'content_suffix' => '',
+        'blockname' => '',
+        ),    
+      6 => array(
+        'title' => 'Support',
+        'anchor' => 'support',
+        'link' => 'support',
+        'detail' => 'get support',
+        'content' => 'Fill in support content here',
+        'display' => TRUE,
+        'jsondata' => '',
+        'content_suffix' => '',
+        'blockname' => '',
+        ),
+      7 => array(
+        'title' => '',
+        'anchor' => 'footer',
+        'detail' => '',
+        'content' => '<div class="row-fluid">
+<div class="span6">
+<ul  class="list">
+  <li><a href="#partners" role="button" data-toggle="modal">Partners</a></li>
+  <li><a href="#team" role="button"  data-toggle="modal">Team</a></li>
+  <li><a href="#sponsors" role="button" data-toggle="modal">Sponsors</a></li>
+  <li><a href="#advisors" role="button" data-toggle="modal">Advisors</a></li>
+</ul>
+</div>
+
+<div class="span6">
+<p><img src="' . $base_root .' /sites/default/files/media/twitter-gray.jpg" alt="Twitter"  width="20" /> &nbsp;Follow Us on Twitter <a href="https://twitter.com/mukurtu" target="_blank">@Mukurtu</a>, <a href="https://twitter.com/mukurtusupport" target="_blank">@MukurtuSupport</a></p>
+<p><img src="' . $base_root .'/sites/default/files/media/mailbox-gray2.png" alt="email" width="20" /> &nbsp;Email us <a href="mailto:info@mukurtu.org" target="_blank">info (at) mukurtu.org</a></p>
+<hr>
+<p>Please link back to this site when reproducing any images or text.</p>
+</div>
+</div>
+
+
+
+<!-- Modals -->
+
+<div id="partners" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="partnersLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="partnersLabel">Partners</h3>
+  </div>
+  <div class="modal-body row">
+   <div class="span5">
+<p>Active in the development, research, production, dissemination and sustainability of Mukurtu:<br/><br/>
+  
+<ul>
+<li><a href="http://www.atalm.org/" target="_blank">Association of Tribal Archives, Libraries and Museums</a></li>
+<li><a href="http://codifi.info/" target="_blank">Center for Digital Archaeology, UC Berkeley</a></li>
+<li><a href="http://civicactions.com/" target="_blank">CivicActions</a></li>
+<li><a href="http://transformative.usc.edu/" target="_blank">Center for Transformative Scholarship, USoCal</a></li>
+<li><a href="http://editingmodernism.ca/" target="_blank">Editing Modernism in Canada</a></li>
+<li><a href="http://map2app.com/" target="_blank">Map2App</a></li>
+<li><a href="http://www.wipo.int/tk/en/" target="_blank">World Intellectual Property Organization, Traditional Creativity, Cultural Expressions and Cultural Heritage Section</a></li>
+</ul>
+
+</p>
+ </div>
+</div>
+</div>
+
+<div id="team" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="teamLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="teamLabel">Team</h3>
+  </div>
+  <div class="modal-body row">
+   <div class="span5">
+<p>The core Mukurtu team:</p>
+<ul><li><a href="mailto:kim@mukurtu.org">Kim Christen</a>, Pullman, Washington -  Project Director</li>
+<li><a href="mailto:michael@mukurtu.org">Michael Ashley</a>, Berkeley, California -  Development Director</li>
+<li><a href="mailto:chachasikes@gmail.com">Chach Sikes</a>, Berkeley, California - Lead Engineer</li>
+<li><a href="mailto:connor@mukurtu.org">Connor Rowe</a>, Berkeley, California - Service Manager</li>
+<li><a href="mailto:elena@codifi.info">Elena Toffalori</a>, Bologna, Italy - Mobile and Web Services</li>
+<li><a href="mailto:tyler@codifi.info">Tyler Wilson</a>, Berkeley, California - Content Specialist</li>
+</ul>
+ </div>
+</div>
+</div>
+
+
+
+<div id="sponsors" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sponsorsLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="sponsorsLabel">Sponsors</h3>
+  </div>
+  <div class="modal-body row">
+
+   <div class="span5">
+
+<p>Aid with funding, infrastructure and other capital needs for the ongoing development and sustainability of the platform. Mukurtu is made possible, in part, by development funds and grants from:<br /><br />
+
+<ul>
+<li><a href="content/washington-state-university-foundation" target="_blank">Washington State University Foundation</a></li>
+<li><a href="content/national-endowment-humanities" target="_blank">National Endowment for the Humanities</a></li>
+<li><a href="content/world-intellectual-property-organization" target="_blank">World Intellectual Property Organization</a></li>
+<li><a href="http://dev.mukurtu-088.gotpantheon.com/content/institute-museum-library-services" target="_blank">Institute of Museum and Library Services</a></li>
+</ul>
+
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="advisors" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="advisorsLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="advisorsLabel">Advisors</h3>
+  </div>
+  <div class="modal-body row">
+   <div class="span5">
+<p>Provide practical assistance regarding the development and application of Mukurtu across multiple and diverse stakeholder groups:</p>
+<ul>
+<li>Susan Feller, President, Association of Tribal Archives, Libraries, and Museums</li>
+<li>Cordeillia Hooee, Librarian, Zuni Public Library</li>
+<li>Sandy Littletree, Knowledge River Program Manager, School of Information Resources and Library Science, University of Arizona</li>
+<li>Michael Pahn, Head Archivist, National Museum of the American Indian, Cultural Resource Center, Smithsonian Institution</li>
+<li>Wendy Seltzer, Fellow, Princeton Center for Information Technology Policy and Berkman Center for Internet & Society at Harvard</li>
+<li>Guha Shankar, Folklife Specialist at the American Folklife Center, Library of Congress</li>
+
+</ul>
+ </div>
+</div>
+</div>',
+        'jsondata' => '',
+        'display' => TRUE,
+        'content_suffix' => '',
+        'blockname' => '',
+        ),
+    )
+  );
+
+  // Load content saved in database if it exists.
+  $content = variable_get('mukurtu_frontpage_settings', $default_content);
+  return $content;
+}
+
+/**
+ * General configuration form for controlling the colorbox behaviour.
+ */
+function mukurtu_frontpage_settings() {
+
+  $db_fields = mukurtu_frontpage_content_load();
+  
+  $form['mukurtu_frontpage_settings'] = array(
+    '#type' => 'fieldset',
+/*     '#title' => '<h3>' . t('Configure front page sections') . '</h3>', */
+    '#collapsible' => FALSE,
+    '#description' => t('Add content, menu items and other elements for the frontpage single-page site brochure.'),
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
+  );
+
+  $form['mukurtu_frontpage_settings']['header'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Custom Site Header'),
+    '#description' => l('Edit Custom Site Header', 'admin/structure/block/manage/boxes/ma_site_header/configure') . '. <br />' . t(' Include a site-wide header from the Custom Header Block.') . '</p>',
+    '#default_value' => $db_fields['header'],
+  );
+
+  $form['mukurtu_frontpage_settings']['sections'] = array(
+    '#type' => 'fieldset',
+/*     '#title' => t('Sections'), */
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+
+  for($i=0; $i < count($db_fields['sections']); $i++) {
+
+    $form['mukurtu_frontpage_settings']['sections'][$i] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Section') . ' ' . $db_fields['sections'][$i]['title'],
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#description' => t('Add content for this section.'),
+    );
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['display'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display this section'),
+      '#default_value' => $db_fields['sections'][$i]['display'],
+    );
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title'),
+      '#default_value' => $db_fields['sections'][$i]['title'],
+      '#description' => t('Enter title for this section. Leave blank to exclude the title.'),
+    );
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['anchor'] = array(
+      '#type' => 'textfield',
+      '#title' => t('HTML Anchor'),
+      '#default_value' => $db_fields['sections'][$i]['anchor'],
+      '#description' => t('Short name for the section. Should be all lowercase letters with no spaces. Use an underscore (_) as a spacer.'),
+    );
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['detail'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Description'),
+      '#default_value' => $db_fields['sections'][$i]['detail'],
+      '#description' => t('Short description for this section.'),
+    );
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['content'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Markup'),
+      '#default_value' => $db_fields['sections'][$i]['content'],
+      '#description' => t('<p>Enter HTML markup for this section.</p><ul><li>Use good judgement with your HTML.</li><li>This section works with <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> markup. You can add tabs, content dropdowns and more.'),
+    );
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['jsondata'] = array(
+      '#type' => 'textarea',
+      '#title' => t('JSON Data URL'),
+      '#default_value' => $db_fields['sections'][$i]['jsondata'],
+      '#description' => t('Enter JSON data url. This can come from the Browse view, or Communities or other Services enabled views. Allowed fields are <em>title</em>, <em>description</em>, <em>image</em>, <em>content</em>.'),
+    );      
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['blockname'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Block Name'),
+      '#default_value' => $db_fields['sections'][$i]['blockname'],
+      '#description' => t('Enter the machine name for the block to include'),
+    ); 
+    
+    if ($i == count($db_fields['sections']) - 1) {
+      $form['mukurtu_frontpage_settings']['sections'][$i]['#description'] =
+       t('Final Section. Use title <em>footer</em> to use default styles. Rename footer to use your own markup.');
+    }
+
+    $form['mukurtu_frontpage_settings']['sections'][$i]['content_suffix'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Markup - Suffix'),
+      '#default_value' => $db_fields['sections'][$i]['content_suffix'],
+      '#description' => t('<p>Enter HTML markup for this section.</p><ul><li>Use good judgement with your HTML.</li><li>This section works with <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> markup. You can add tabs, content dropdowns and more.'),
+    );    
+
+  }
+  
+
+  $form['mukurtu_frontpage_settings']['footer'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Custom Site Footer'),
+    '#description' => l('Edit Custom Site Footer', 'admin/structure/block/manage/boxes/ma_site_footer/configure') . '.' . t(' Include a site-wide custom footer from the Custom Footer Block'),
+    '#default_value' => $db_fields['footer'],
+    
+  );
+
+  return system_settings_form($form);
+}
+
+
+// @TODO Add an extra section dynamically.
+// ?? - http://drupal.org/node/331941
+
+/** 
+ * Submit handler for the "Add Tab" button.
+ */ 
+/*
+function mukurtu_frontpage_settings_submit($form, &$form_state) {
+  unset($form_state['submit_handlers']);
+  form_execute_handlers('submit', $form, $form_state);
+  $mukurtu_frontpage_values = $form_state['values'];
+  $form_state['mukurtu_frontpage_settings'] = $mukurtu_frontpage_values;
+  $form_state['rebuild'] = TRUE;
+
+
+  if ($form_state['values']['sections']) {
+    $form_state['section_count'] = count($form_state['values']['mukurtu_frontpage_sections']) + 1;
+  }
+
+  return $mukurtu_frontpage_values;
+}
+*/
+
+/** 
+ * AHAH callback.
+ */ 
+/*
+function mukurtu_frontpage_ahah() {
+  $form_state = array('storage' => NULL, 'rebuild' => TRUE);
+  $form_build_id = $_POST['form_build_id'];
+  $form = form_get_cache($form_build_id, $form_state);
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+  $form['#post'] = $_POST;
+  $form['#redirect'] = FALSE;
+  $form['#programmed'] = FALSE;
+  $form_state['post'] = $_POST;
+  drupal_process_form($form_id, $form, $form_state);
+  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
+  $mukurtu_frontpage_form = $form['mukurtu_frontpage_settings']['mukurtu_frontpage_sections'];
+  unset($mukurtu_frontpage_form['#prefix'], $mukurtu_frontpage_form['#suffix']); // Prevent duplicate wrappers.
+  $javascript = drupal_add_js(NULL, NULL, 'header');
+  drupal_json(array(
+    'status'   => TRUE,
+    'data'     => theme('status_messages') . drupal_render($mukurtu_frontpage_form),
+    'settings' => call_user_func_array('array_merge_recursive', $javascript['setting']),
+  ));
+}
+*/
+
+/**
+ * Cancel out default content.
+ */
+function mukurtu_frontpage_content() {
+
+  global $base_url;
+  $output = ''; //Remove all content to be rewritten through theme and template.
+  
+  return $output;
+}
+
+// A lightweight frontpage singlepage app - with a little bit of database integration for content-editing purposes.
+function mukurtu_frontpage_preprocess_page(&$vars){
+  $current_path = current_path();
+  $site_frontpage = variable_get('site_frontpage');
+
+  if(($vars['is_front'] && $site_frontpage === 'frontpage_app') || ($current_path === 'frontpage_app')) {
+    global $base_path;
+
+/*
+    if (arg(0) != 'admin' || !(arg(1) == 'add' && arg(2) == 'edit') || arg(0) != 'panels' || arg(0) != 'ctools') {
+      $scripts = drupal_add_js();
+      var_export($scripts);
+      $new_jquery = array(drupal_get_path('module', 'jquery_update') . '/replace/jquery/1.8/jquery.min.js' => $scripts['core']['sites/all/modules/contrib-stable/jquery_update/replace/jquery/1.5/jquery.min.js']);
+      $scripts['core'] = array_merge($new_jquery, $scripts['core']);
+      unset($scripts['core']['sites/all/modules/contrib-stable/jquery_update/replace/jquery/1.5/jquery.min.js']);
+      $vars['scripts'] = drupal_get_js('header', $scripts);
+    }
+*/
+
+    drupal_add_js(array('mukurtu_frontpage' => array('menu_element' => variable_get('mukurtu_frontpage_menu', '#main-menu'), 'base_path' => $base_path)), 'setting');
+    drupal_add_js(drupal_get_path('module', 'mukurtu_frontpage') . '/js/mukurtu_frontpage.js');
+
+    if (module_exists('libraries')) {
+      $underscore_path = libraries_get_path('underscore');
+      $bootstrap_path = libraries_get_path('bootstrap');
+      drupal_add_js($underscore_path . '/underscore-min.js');
+      drupal_add_js($bootstrap_path . '/js/bootstrap.js');
+      drupal_add_css($bootstrap_path . '/css/bootstrap.min.css');
+      drupal_add_css($bootstrap_path . '/css/bootstrap-responsive.min.css');
+      drupal_add_css($bootstrap_path . '/css/bootstrap-responsive.min.css');
+      drupal_add_css(drupal_get_path('module', 'mukurtu_frontpage') . '/css/mukurtu_frontpage.css');
+      drupal_add_js(drupal_get_path('module', 'jcarousel') . '/js/jquery.jcarousel.min.js');
+    }
+  
+    $vars['frontpage'] = array();    
+
+    // @TODO these will be linked to a form -- and will be able to add some more as necessary. Hard-coding for now.
+    $vars['frontpage']['page_items'] = mukurtu_frontpage_content_load();
+
+    foreach($vars['frontpage']['page_items']['sections'] as $item) {
+      if($item['jsondata']) {      
+        $json_path = $item['jsondata'];
+        // Load json data.
+        drupal_add_js('mukurtu_frontpage.query("' . $json_path . '", mukurtu_frontpage.loadData, "' . $item['anchor'] .'")',  array('type' => 'inline', 'scope' => 'footer', 'weight' => 5));
+      }
+    }
+
+    // Add frontpage template.
+    if ($suggestions = theme_get_suggestions(arg(), 'page')) {
+      $vars['theme_hook_suggestions'][] =  'page--frontpage_app';
+    } 
+
+
+  }
+}
+
+function mukurtu_frontpage_theme_registry_alter(&$theme_registry) {
+  $theme_registry_copy = $theme_registry;
+  _theme_process_registry($theme_registry_copy, 'phptemplate', 'theme_engine', 'mukurtu_theme', MUKURTU_FRONTPAGE);
+  $theme_registry += array_diff_key($theme_registry_copy, $theme_registry);
+
+  // A list of templates the module will provide templates for
+  $hooks = array('page');
+  foreach ($hooks as $h) {
+    // Add the key 'theme paths' if it doesn't exist in this theme's registry
+    if (!isset($theme_registry[$h]['theme paths'])) {
+      $theme_registry[$h]['theme paths'] = array();
+    }
+
+    //Shift this module's directory to the top of the theme path list 
+    if(is_array($theme_registry[$h]['theme paths'])) {
+      $first_element = array_shift($theme_registry[$h]['theme paths']);
+      if ($first_element) {
+        array_unshift($theme_registry[$h]['theme paths'], $first_element, MUKURTU_FRONTPAGE);
+      } else {
+        array_unshift($theme_registry[$h]['theme paths'], MUKURTU_FRONTPAGE);
+      }
+    }
+  }
+}

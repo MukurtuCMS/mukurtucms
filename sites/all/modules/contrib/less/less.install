@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * Implements HOOK_enable().
+ */
+function less_enable() {
+  drupal_theme_rebuild();
+}
+
+function less_uninstall() {
+  variable_del('less_devel');
+  variable_del('less_dir');
+}
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * @param $phase The phase in which hook_requirements is run: install or runtime.
+ */
+function less_requirements($phase) {
+  $requirements = array();
+  
+  $lessc_exists = FALSE;
+  
+  module_load_include('module', 'less');
+  if (function_exists('_less_inc')) {
+    $lessc_exists = _less_inc();
+  }
+  
+  switch ($phase) {
+    case 'runtime':
+      if ($lessc_exists) {
+        $requirements['less_version'] = array(
+          'title' => t('LESS'),
+          'value' => isset(lessc::$VERSION) ? preg_replace('/([^0-9\.-])+/i', '', lessc::$VERSION) : '(less than v0.3.2)',
+          'description' => t('To check for newer versions of lessphp, go to <a href="!url" target="_blank">http://leafo.net/lessphp/</a>', array("!url" => url('http://leafo.net/lessphp/'))),
+          'severity' => REQUIREMENT_OK,
+        );
+      }
+      if (variable_get('less_devel', FALSE)) {
+        $requirements['less_devel'] = array(
+          'title' => 'LESS developer mode',
+          'value' => t('Enabled'),
+          'description' => t('LESS files are being regenerated on every request. Remember to <a href="!url">turn off</a> this feature on production websites.', array("!url" => url('admin/config/development/less'))),
+          'severity' => REQUIREMENT_WARNING,
+        );
+      }
+      if (!$lessc_exists) {
+        $requirements['less_library'] = array(
+          'title' => 'LESS',
+          'description' => t('The lessphp library was not detected. Please follow the instructions on the <a href="!url" target="_blank">LESS project page</a> to install the lessphp library.', array("!url" => url('http://drupal.org/project/less'))),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
+    default:
+      break;
+  }
+  
+  return $requirements;
+}
+

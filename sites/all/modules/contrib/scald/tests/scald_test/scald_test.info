@@ -1,0 +1,16 @@
+name = Scald Test
+description = Hooks and dependencies for testing Scald
+package = Scald
+core = 7.x
+hidden = TRUE
+
+dependencies[] = i18n
+dependencies[] = i18n_string
+
+
+; Information added by Drupal.org packaging script on 2014-12-14
+version = "7.x-1.3"
+core = "7.x"
+project = "scald"
+datestamp = "1418595782"
+

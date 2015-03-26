@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * The install file for Homebox allows the module to install (and uninstall) itself. This is required as this module uses its own table.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function homebox_schema() {
+  // Schema for homebox pages
+  $schema['homebox_pages'] = array(
+    'fields' => array(
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'settings' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+    ),
+    'primary key' => array('name'),
+  );
+  // Schema for user custom settings
+  $schema['homebox_users'] = array(
+    'fields' => array(
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'settings' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+    ),
+    'primary key' => array('uid', 'name'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function homebox_uninstall() {
+  // Remove variables
+  variable_del('homebox_user_tab');
+  variable_del('homebox_version');
+}

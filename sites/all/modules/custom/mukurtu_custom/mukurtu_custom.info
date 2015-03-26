@@ -1,0 +1,7 @@
+; $Id:$
+name = Mukurtu Custom
+description = "Mukurtu custom modifications - creates a new teaser view mode (browse teaser)"
+package = Mukurtu
+core = 7.x
+files[] = mukurtu_custom.module
+

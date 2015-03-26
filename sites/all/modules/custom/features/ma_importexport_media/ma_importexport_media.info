@@ -1,0 +1,12 @@
+name = Import/Export Media Metadata
+core = 7.x
+package = Features
+dependencies[] = ctools
+dependencies[] = feeds
+dependencies[] = feeds_file
+dependencies[] = views
+features[ctools][] = feeds:feeds_importer_default:1
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:1
+features[feeds_importer][] = media_feed_importer
+features[views_view][] = export_media

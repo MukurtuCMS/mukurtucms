@@ -1,0 +1,52 @@
+<?php
+/**
+ * @file
+ * Integrates the placedog service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function placedog_dummyimage_service() {
+  return array(
+    'placedog' => array(
+      'title' => t('Placedog'),
+      'url' => 'http://placedog.com/',
+      'form builder' => placedog_form(),
+      'options' => placedog_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the placedog service.
+ */
+function placedog_form() {
+  $form = array();
+  $form['placedog'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Puppiez'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['placedog']['dummyimage_puppies_color'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('I can haz puppies wif color?'),
+    '#description' => t('Will use color fotos ov puppies. Otherwize black an white will bees usd'),
+    '#default_value' => variable_get('dummyimage_puppies_color', 0),
+  );
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the placedog service.
+ */
+function placedog_options() {
+  return array(
+    'pattern' => 'http://placedog.com/%color%dimensions?image=' . rand(1, 16),
+    'separator' => '/',
+    'replacements' => array(
+      '%color' => (variable_get('dummyimage_puppies_color', 0) == 1) ? '' : 'g/',
+    ),
+  );
+}

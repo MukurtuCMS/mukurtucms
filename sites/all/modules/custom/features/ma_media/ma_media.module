@@ -1,0 +1,6 @@
+<?php
+/**
+ * @file
+ */
+
+include_once('ma_media.features.inc');

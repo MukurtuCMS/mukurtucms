@@ -1,0 +1,21 @@
+name = Community Tags
+description = "Allows users to 'tag' other users' content. Weighted tag lists or 'tag clouds' are generated for each piece of content to show the popularity of tags."
+dependencies[] = taxonomy
+package = Taxonomy
+configure = admin/config/content/community-tags
+core=7.x
+
+files[] = community_tags.admin.inc
+files[] = community_tags.ajax.inc
+files[] = community_tags.batch.inc
+files[] = community_tags.install
+files[] = community_tags.module
+files[] = community_tags.pages.inc
+files[] = community_tags.views.inc
+
+; Information added by drupal.org packaging script on 2011-05-25
+version = "7.x-1.0"
+core = "7.x"
+project = "community_tags"
+datestamp = "1306330915"
+

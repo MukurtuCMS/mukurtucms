@@ -1,0 +1,275 @@
+<?php
+
+/**
+ * Implementation of hook_menu()
+ */
+function mukurtu_batch_import_menu() {
+
+  $items['admin/mukurtu/batch_import'] = array(
+    'title' => 'Import Batch Content',
+    'description' => 'Import content into Mukurtu',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mukurtu_batch_import_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;	  
+}
+
+
+
+/**
+ * General configuration form for controlling the colorbox behaviour.
+ */
+function mukurtu_batch_import_form() {
+
+  $default_upload = variable_get('mukurtu_batch_import_form', '');
+  $default_upload = isset($default_upload['upload']['folder']) ? $default_upload['upload']['folder'] : NULL;
+
+  $form['mukurtu_batch_import_form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Import Batch Content'),  
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
+  );
+  
+  $form['mukurtu_batch_import_form']['header'] = array(
+    '#type' => 'markup',
+    '#markup' => '<p>' . t('Upload content into Mukurtu by uploading a properly configured file folder.') . '</p>',
+  );
+
+  $form['mukurtu_batch_import_form']['#attributes']['enctype'] = 'multipart/form-data';
+  $form['mukurtu_batch_import_form']['media'] = array(
+    '#type' => 'fieldset',
+    '#title' => '<h3>' . t('1. Gather your files.') . '</h3>',
+    '#collapsible' => FALSE,
+    '#description' => '<p>' . l('Download a sample folder', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('
+You will see all of the media files as well as tabular data (CSV) files that will allow you to bulk import many pieces of content. <br /> This includes Cultural Protocols, Communities, Categories, Users, Digital Heritage content and Glossary items.') . '</p>',
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
+  );
+  
+  $form['mukurtu_batch_import_form']['upload'] = array(
+    '#type' => 'fieldset',
+    '#title' => '<h3>' . t('2. Upload your Content Folder.') . '</h3>',
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
+  );
+
+  $form['mukurtu_batch_import_form']['upload']['folder'] = array(
+    '#type' => 'managed_file',
+    '#title' => empty($default_upload) ? t('File') : NULL,
+    '#description' => empty($default_upload) ? t('Select a file from your local system.') : t('Select a different file from your local system.'),
+    '#size' => 22,
+    '#upload_location' => 'public://mukurtu_batch_import',
+    '#default_value' => $default_upload,
+  );
+
+  if(isset($default_upload)) {
+    $file = file_load($default_upload);
+      if($file) {
+        $form['mukurtu_batch_import_form']['upload']['folder']['#field_suffix'] = '<div class="file-link">' . t("Download File: ") . l($file->filename, $file->uri) . '</div>';
+
+      }
+  }
+
+
+  $form['mukurtu_batch_import_form']['help'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div class="">Manage: ' . l('Files', 'admin/content/file'). " | " . l('Content','admin/content') . " | " . l('Communities','admin/communities') . " | " . l('Cultural Protocols','admin/cultural_protocols') . " | " . l('Users','admin/people') . " | " . l('Categories','admin/structure/taxonomy/category') . '<br />' . l('Back to Dashboard','admin/dashboard') . '<br /><br />' . 'Questions?' . l('Contact Support','http://mukurtu.zendesk.com') . '</div>' ,
+  );
+
+
+  //$form['#submit'][] = 'mukurtu_batch_import_submit';
+  //$form['#validate'][] = 'mukurtu_batch_import_validate';
+  $form = system_settings_form($form);
+
+/*   $form['actions']['import']['#type'] = 'submit'; */
+/*   $form['actions']['import']['#value'] = t('Import'); */
+/*   $form['actions']['import']['#submit'] = array('mukurtu_batch_import_import'); */
+  
+  
+  
+/*
+    $list = _media_browser_plus_folder_list();
+  return array(
+    '#type' => 'select',
+    '#language' => LANGUAGE_NONE,
+    '#title' => t('Media Folder'),
+    '#field_name' => 'field_tags',
+    '#weigth' => -2,
+    '#options' => $list,
+    '#description' => t('Select a folder for the media to be put in'),
+  );
+  
+*/
+  
+  
+  $form['actions']['submit']['#value'] = t("Import");
+/*   array_push($form['actions']['import']['#submit'], 'mukurtu_batch_import_import'); */
+  array_push($form['#submit'], 'mukurtu_batch_import_import');
+
+  drupal_add_js(drupal_get_path('module', 'mukurtu_batch_import') . '/mukurtu_batch_import.js');
+
+  return $form;
+}
+
+function mukurtu_batch_import_import($form, &$form_state) {
+  $fid = $form_state['values']['mukurtu_batch_import_form']['upload']['folder'];  
+  $file = file_load($fid);
+
+  if($file) {
+    mukurtu_batch_import_parse_zip($file); 
+  }
+}
+
+function mukurtu_batch_import_parse_zip($file) {
+ 
+  $file_path = drupal_realpath($file->uri);
+
+  $zip = new ZipArchive;
+  if ($zip->open($file_path) === TRUE) {
+      $zip->extractTo('public://mukurtu_batch_import');
+      $zip->close();
+      dsm('Zip file extracted');      
+  } else {
+      dsm('Zip file not extracted.');
+  }
+
+  $filename_split = explode(".", $file->filename);
+  $foldername = $filename_split[0];
+  
+  $folder_path = drupal_realpath('public://mukurtu_batch_import/' . $foldername);
+  
+  $media_path = $folder_path . '/media';
+  $metadata_path = $folder_path . '/metadata';
+
+  $feedback = array();
+  mukurtu_batch_import_import_media($media_path);
+  mukurtu_batch_import_import_metadata($metadata_path, $file->fid);  
+
+  // Record/store feedback
+  $messages = drupal_get_messages('status');
+  mukurtu_batch_import_feedback($messages);
+}
+
+/**
+ * Display the feedback in a custom output and provide a file of results.
+ */
+function mukurtu_batch_import_feedback($messages) {
+ dpm($messages);
+}
+
+function mukurtu_batch_import_import_media($directory) {
+    if (!is_dir($directory)) {
+      form_set_error('directory', t('The provided directory does not exist.'));
+    }
+
+    $pattern = '*';
+    $files = glob("$directory/$pattern");
+
+    $batch = array(
+      'title' => t('Importing'),
+      'operations' => array(
+        array('mukurtu_batch_import_media_batch', array($files)),
+      ),
+      'finished' => 'media_import_batch_import_complete',
+      'file' => drupal_get_path('module', 'media') . '/includes/media.admin.inc',
+    );
+    batch_set($batch);
+}
+
+$counter = 0;
+
+/**
+ * BatchAPI callback op for media import.
+ */
+function mukurtu_batch_import_media_batch($files, &$context) {
+  if (!isset($context['sandbox']['files'])) {
+    // This runs the first time the batch runs.
+    // This is stupid, but otherwise, I don't think it will work...
+    $context['results'] = array('success' => array(), 'errors' => array());
+    $context['sandbox']['max'] = count($files);
+    $context['sandbox']['files'] = $files;
+  }
+  $files =& $context['sandbox']['files'];
+
+  // Take a cut of files.  Let's do 10 at a time.
+  $length = (count($files) > media_variable_get('import_batch_size')) ? media_variable_get('import_batch_size') : count($files);
+  $to_process = array_splice($files, 0, $length);
+  $image_in_message = '';
+
+  foreach ($to_process as $file) {
+    try {
+      $file_obj = media_parse_to_file($file);
+      $context['results']['success'][] = $file;
+      if (!$image_in_message) {
+        // @todo Is this load step really necessary? When there's time, test
+        //   this, and either remove it, or comment why it's needed.
+        $loaded_file = file_load($file_obj->fid);
+        $image_in_message = file_view_file($loaded_file, 'preview');
+      }
+    }
+    catch (Exception $e) {
+      $context['results']['errors'][] = $file . " Reason: " . $e->getMessage();
+    }
+  }
+
+  $context['message'] = "Importing " . theme('item_list', array('items' => $to_process));
+  $context['message'] .= drupal_render($image_in_message); // Just for kicks, show an image we are importing
+
+  $context['finished'] = ($context['sandbox']['max'] - count($files)) / $context['sandbox']['max'];
+}
+
+
+
+function mukurtu_batch_import_import_metadata($metadata_path, $fid) {
+  module_load_include('inc', 'feeds', 'feeds.pages');
+    
+  $feed_file_names = array(
+    'cutural_protocols.csv' => 'import_cultural_protocols',
+    'communities.csv' => 'import_communities',
+    'categories.csv' => 'import_categories',
+    'users.csv' => 'import_users',
+    'digital_heritage.csv' => 'digital_heritage_metadata',
+  ); 
+
+  foreach($feed_file_names as $filename => $importer_id) {
+
+    //http://nodesforbreakfast.com/article/2012/09/23/programmatically-execute-feeds-importer-drupal-7
+
+    $file_path = $metadata_path . '/' . $filename;
+    
+    // Save as a managed file.
+    $csv = file_get_contents($file_path);
+    $file = file_save_data($csv, 'public://feeds/' . $filename, FILE_EXISTS_RENAME);
+
+    // Load the Feeds Source object.
+    $source = feeds_source($importer_id);
+    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+    $fetcher_config['source'] = $file->uri;
+    $fetcher_config['file'] = $file;
+
+    // Set the source fetcher config.
+    $source->setConfigFor($source->importer->fetcher, $fetcher_config);
+    
+    // Save the source.
+    $source->save();
+    $source->startImport();
+  }  
+}
+
+function mukurtu_batch_import_form_ajax($form, $form_state) {
+  $messages = drupal_get_messages('status');
+
+  $commands = array();
+  $commands[] = ajax_command_replace('.fieldset-description', $messages);
+  
+  // Set message.
+  $commands[] = ajax_command_remove('#messages-wrap');
+  $commands[] = ajax_command_after('#breadcrumb-wrap', '<div id="messages-wrap">' . theme('status_messages') . '</div>');
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}

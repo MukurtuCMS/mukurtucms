@@ -1,0 +1,5 @@
+name = License - Traditional Knowledge
+description = Provide Traditional Knowledge License information
+core = 7.x
+package = License
+dependencies[] = license

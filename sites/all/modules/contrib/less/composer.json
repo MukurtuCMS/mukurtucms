@@ -1,0 +1,10 @@
+{
+  "name": "drupal/less",
+  "type": "drupal-module",
+  "description": "Automatically process any LESS files that are added using drupal_add_css or added through your theme's .info file.",
+  "license": "GPL-2.0",
+  "require": {
+    "leafo/lessphp": "0.3.*"
+  },
+  "minimum-stability": "stable"
+}

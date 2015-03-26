@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Import Media Metadata feature.
+ */
+
+include_once 'ma_importexport_media.features.inc';

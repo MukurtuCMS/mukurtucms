@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Break out for hook_feeds_plugins().
+ */
+function feeds_file_feeds_plugins() {
+  $path = drupal_get_path('module', 'feeds_file') . '/plugins';
+  
+  $info = array();
+  
+	$info['FeedsFileProcessor'] = array(
+    'name' => 'File processor',
+    'description' => 'Create and update file entities.',
+    'help' => 'Create and update file entities from parsed content.',
+    'handler' => array(
+      'parent' => 'FeedsProcessor',
+      'class' => 'FeedsFileProcessor',
+      'file' => 'FeedsFileProcessor.inc',
+      'path' => $path,
+    ),
+  );
+  
+  return $info;
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function feeds_file_ctools_plugin_api($owner, $api) {
+  if ($owner == 'feeds' && $api == 'plugins') {
+    return array('version' => 1);
+  }
+}

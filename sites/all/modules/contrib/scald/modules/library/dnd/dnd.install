@@ -1,0 +1,15 @@
+<?php
+/**
+ * @file
+ * DnD Installation.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function dnd_uninstall() {
+  variable_del('dnd_context_default');
+  variable_del('dnd_modal_width');
+  variable_del('dnd_modal_height');
+}
+

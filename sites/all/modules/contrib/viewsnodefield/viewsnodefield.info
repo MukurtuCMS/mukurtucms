@@ -1,0 +1,17 @@
+name = Views node field
+description = A seemingly useless module, but quite nice what that cool views plugin just doesn't support node row display.  
+package = Views
+core = 7.x
+dependencies[]  = views
+
+
+files[] = views_handler_field_node_field.inc
+files[] = viewsnodefield.module
+files[] = viewsnodefield.views.inc
+
+; Information added by drupal.org packaging script on 2011-10-22
+version = "7.x-1.0"
+core = "7.x"
+project = "viewsnodefield"
+datestamp = "1319326836"
+

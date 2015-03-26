@@ -1,0 +1,11 @@
+
+Media Feeds 1.0 Beta 2
+======================
+
+- Issue #1290762: Add integration with remote_stream_wrapper
+- Issue #1262732: Map to existing media
+
+Media Feeds 1.0 Beta 1
+======================
+
+Initial release that came through the project application review process.

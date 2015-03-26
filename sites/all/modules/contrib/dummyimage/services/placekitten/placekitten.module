@@ -1,0 +1,52 @@
+<?php
+/**
+ * @file
+ * Integrates the placekitten service with the dummyimage module.
+ */
+
+/**
+ * Implements hook_dummyimage_service().
+ */
+function placekitten_dummyimage_service() {
+  return array(
+    'placekitten' => array(
+      'title' => t('Placekitten'),
+      'url' => 'http://placekitten.com/',
+      'form builder' => placekitten_form(),
+      'options' => placekitten_options(),
+    ),
+  );
+}
+
+/**
+ * Form builder function for the placekitten service.
+ */
+function placekitten_form() {
+  $form = array();
+  $form['placekitten'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Kittehs'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['placekitten']['dummyimage_kittens_color'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('I can haz kittehs wif color?'),
+    '#description' => t('Will use color fotos ov kittehs. Otherwize black an white will bees usd'),
+    '#default_value' => variable_get('dummyimage_kittens_color', 0),
+  );
+  return $form;
+}
+
+/**
+ * Provides the generate callback for the placekitten service.
+ */
+function placekitten_options() {
+  return array(
+    'pattern' => 'http://placekitten.com/%color%dimensions?image=' . rand(1, 16),
+    'separator' => '/',
+    'replacements' => array(
+      '%color' => (variable_get('dummyimage_kittens_color', 0) == 1) ? '' : 'g/',
+    ),
+  );
+}

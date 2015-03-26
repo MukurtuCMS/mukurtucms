@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * @file
+ * The install file for the community_tags module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function community_tags_install() {
+  // Install schema
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_install_schema('community_tags')
+
+  // D7 it appears that the weight setting is no longer necessary
+  // Drop module weight so we act after taxonomy.
+  // $weight = (int) db_query("SELECT weight FROM {system} WHERE name = :name", array(':name' => 'taxonomy'))->fetchField();
+  // TODO Please review the conversion of this statement to the D7 database API syntax.
+  /* db_query("UPDATE {system} SET weight = %d WHERE name = 'community_tags'", $weight + 1) */
+  // db_update('system')
+  // ->fields(array(
+  //   'weight' => $weight + 1,
+  // ))
+  // ->condition('name', 'community_tags')
+  // ->execute();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function community_tags_uninstall() {
+  // TODO The drupal_(un)install_schema functions are called automatically in D7.
+  // drupal_uninstall_schema('community_tags')
+}
+
+/**
+ * Implements hook_schema().
+ */
+function community_tags_schema() {
+  $schema['community_tags'] = array(
+    'fields' => array(
+      'tid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'date' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'tid' => array('tid'),
+      'nid' => array('nid'),
+      'uid' => array('uid'),
+      'tid_nid' => array('tid', 'nid'),
+    ),
+    'primary key' => array('tid', 'uid', 'nid'),
+  );
+  return $schema;
+}
+
+/**
+ * Update: Add tid column key.
+ */
+function community_tags_update_1() {
+  $ret = array();
+  db_add_index('community_tags', 'tid', array('tid'));
+  // hook_update_N() no longer returns a $ret array. Instead, return
+  // nothing or a translated string indicating the update ran successfully.
+  // See http://drupal.org/node/224333#update_sql.
+  return t('TODO Add a descriptive string here to show in the UI.') /* $ret */;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function community_tags_enable() { }
+
+/**
+ * Update: Add tid_nid 2 column index.
+ */
+function community_tags_update_6001() {
+  $ret = array();
+  db_add_index('community_tags', 'tid_nid', array('tid', 'nid'));
+  // hook_update_N() no longer returns a $ret array. Instead, return
+  // nothing or a translated string indicating the update ran successfully.
+  // See http://drupal.org/node/224333#update_sql.
+  return t('TODO Add a descriptive string here to show in the UI.') /* $ret */;
+}
+
+/**
+ * Update: convert vids used in CT settings to vocabulary machine names.
+ */
+function community_tags_update_6002() {
+  //
+  // $settings = variable_get('community_tags_vocabularies', array());
+  // foreach($settings as $vid => $vocabulary_settings) {
+  //
+  // }
+}
+

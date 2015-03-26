@@ -1,0 +1,20 @@
+name = Popup block
+description = Enable blocks to be displayed as popups
+package = User interface
+version = "7.0"
+core = 7.x
+
+dependencies[] = popup_ui
+dependencies[] = block
+
+files[] = includes/popup_block.features.inc
+files[] = popup_block.module
+
+
+
+; Information added by Drupal.org packaging script on 2014-07-06
+version = "7.x-1.4"
+core = "7.x"
+project = "popup"
+datestamp = "1404659328"
+
