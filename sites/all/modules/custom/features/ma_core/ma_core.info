@@ -314,6 +314,7 @@ features[variable][] = comment_form_location_page
 features[variable][] = comment_page
 features[variable][] = comment_preview_page
 features[variable][] = comment_subject_field_page
+features[variable][] = cron_safe_threshold
 features[variable][] = entity_delete_log_entity_types
 features[variable][] = field_bundle_settings_node__article
 features[variable][] = field_bundle_settings_node__page
