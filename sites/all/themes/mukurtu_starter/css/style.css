@@ -639,6 +639,15 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .text-format-wrapper .description {
   display: none;
 }
+.view-communities-structure .view-header {
+  margin-bottom: 20px;
+}
+.view-communities-structure .views-table caption {
+  float: left;
+}
+.view-communities-structure .views-table .communities-structure-protocol a {
+  padding-left: 2em;
+}
 #edit-field-digital-heritage-items .field-label {
   display: none;
 }
