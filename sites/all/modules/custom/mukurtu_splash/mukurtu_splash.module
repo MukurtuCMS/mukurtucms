@@ -816,10 +816,10 @@ function mukurtu_splash_block_user() {
 
   if (feeds_access('import','users')) {
     $items[] = array(
-      'title' => 'Import many users',
-      'href' => 'import/import_users',
+      'title' => 'Manage users',
+      'href' => 'admin/people',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Batch import a csv of many users. Note: you cannot send invitations using batch import.'),
+      'description' => t('Manage existing users and allow new users to access your site.'),
     );
   }
 
