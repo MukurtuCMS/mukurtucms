@@ -270,6 +270,7 @@ function ma_digitalheritage_clone_dh_form_submit($form, $form_state) {
   $dh_emw->save();
 
   // Go to the cloned node
+  drupal_set_message(t("Successfully cloned Digital Heritage item"));
   drupal_goto ('node/' . $cloned->nid);
 }
 
