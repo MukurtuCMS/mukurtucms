@@ -767,6 +767,10 @@ table .checkbox input[type="checkbox"] {
   font-weight: bold;
   display: none;
 }
+.view-digital-heritage-grid-list.grid-view .view-content .views-row .col-md-8,
+.view-collections-grid-list.grid-view .view-content .views-row .col-md-8 {
+  position: static;
+}
 .view-digital-heritage-grid-list.grid-view .text-center,
 .view-collections-grid-list.grid-view .text-center {
   clear: both;
