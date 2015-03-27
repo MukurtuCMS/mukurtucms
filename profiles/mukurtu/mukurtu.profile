@@ -17,6 +17,7 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_default_menu_links' => array(),
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
+    'mukurtu_delete_og_roles' => array(),
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -137,6 +138,18 @@ function mukurtu_set_scald_drawer_thumbnails() {
       file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
       file_unmanaged_copy(drupal_get_path('module', 'scald') . '/assets/' . $thumbnail, $thumbnail_target);
     }
+  }
+}
+
+function mukurtu_delete_og_roles() {
+  // The Administrator Member role is created by default by OG, then inherited when our group types are created. Delete it.
+  $group_types = array (
+    'cultural_protocol_group',
+    'community',
+  );
+  foreach ($group_types as $group_type) {
+    $rid = array_search('administrator member', og_roles('node', $group_type));
+    og_role_delete($rid);
   }
 }
 
