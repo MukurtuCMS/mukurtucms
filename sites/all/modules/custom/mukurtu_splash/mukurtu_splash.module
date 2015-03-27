@@ -324,16 +324,6 @@ function mukurtu_splash_block_site_start() {
     );
   }
 
-
-  if (user_access('administer site configuration')) {
-    $items_layout[] = array(
-      'title' => 'Create a single-page frontpage app.',
-      'href' => 'admin/config/frontpage_app',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Lives at /frontpage_app; Set to front page on Site Information to use this page as your frontpage.'),
-    );
-  }
-
   if (user_access('administer boxes')) {
     $items_layout[] = array(
       'title' => 'Edit Custom Site Header',
