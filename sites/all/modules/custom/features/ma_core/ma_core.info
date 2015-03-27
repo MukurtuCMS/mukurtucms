@@ -4,7 +4,6 @@ core = 7.x
 package = Features
 version = 7.x-0.5
 project = ma_core
-dependencies[] = admin_menu
 dependencies[] = advanced_help
 dependencies[] = atom_reference
 dependencies[] = backup_migrate
