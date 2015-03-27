@@ -633,7 +633,7 @@ table .checkbox input[type="checkbox"] {
 }
 .video-help-embedded {
   float: right;
-  width: 300px;
+  width: 400px;
 }
 .page-node-edit .text-format-wrapper .description,
 .page-node-add .text-format-wrapper .description {
@@ -998,6 +998,9 @@ a:hover {
 #homebox .homebox-portlet .portlet-content dd {
   margin-bottom: 10px;
   color: #666;
+}
+#homebox .homebox-portlet .portlet-content dt {
+  font-weight: normal;
 }
 #homebox .homebox-portlet .portlet-content .view-content ul {
   padding-left: 0px;
