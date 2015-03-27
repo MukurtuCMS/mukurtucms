@@ -25,6 +25,7 @@ features[page_manager_pages][] = admin_dashboard_communities
 features[user_permission][] = access rules debug
 features[user_permission][] = administer rules
 features[user_permission][] = bypass rules access
+features[variable][] = language_content_type_community
 features[variable][] = og_invite_send_invitation_by_rules
 features[views_view][] = communities
 features[views_view][] = communities_content

@@ -42,12 +42,6 @@ function ma_community_manage_context_default_contexts() {
           'region' => 'content',
           'weight' => '0',
         ),
-        'views-communities_members-block_1' => array(
-          'module' => 'views',
-          'delta' => 'communities_members-block_1',
-          'region' => 'content',
-          'weight' => '12',
-        ),
       ),
     ),
     'delta' => array(
