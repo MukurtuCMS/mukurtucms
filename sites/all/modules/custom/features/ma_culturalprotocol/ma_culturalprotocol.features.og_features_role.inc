@@ -18,12 +18,12 @@ function ma_culturalprotocol_og_features_default_roles() {
     'name' => 'contributor',
   );
 
-  // Exported OG Role: 'node:cultural_protocol_group:protocol manager'.
-  $roles['node:cultural_protocol_group:protocol manager'] = array(
+  // Exported OG Role: 'node:cultural_protocol_group:protocol steward'.
+  $roles['node:cultural_protocol_group:protocol steward'] = array(
     'gid' => 0,
     'group_type' => 'node',
     'group_bundle' => 'cultural_protocol_group',
-    'name' => 'protocol manager',
+    'name' => 'protocol steward',
   );
 
   return $roles;

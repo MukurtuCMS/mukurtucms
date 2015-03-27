@@ -13,7 +13,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   // Exported og permission: 'node:cultural_protocol_group:add user'
   $permissions['node:cultural_protocol_group:add user'] = array(
     'roles' => array(
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -25,7 +25,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   // Exported og permission: 'node:cultural_protocol_group:approve and deny subscription'
   $permissions['node:cultural_protocol_group:approve and deny subscription'] = array(
     'roles' => array(
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -38,7 +38,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   $permissions['node:cultural_protocol_group:create cultural_protocol_group content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -46,7 +46,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   $permissions['node:cultural_protocol_group:create digital_heritage content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -74,7 +74,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   $permissions['node:cultural_protocol_group:delete own cultural_protocol_group content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -82,7 +82,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   $permissions['node:cultural_protocol_group:delete own digital_heritage content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -94,14 +94,14 @@ function ma_culturalprotocol_og_features_default_permissions() {
   // Exported og permission: 'node:cultural_protocol_group:manage members'
   $permissions['node:cultural_protocol_group:manage members'] = array(
     'roles' => array(
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
   // Exported og permission: 'node:cultural_protocol_group:manage permissions'
   $permissions['node:cultural_protocol_group:manage permissions'] = array(
     'roles' => array(
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -147,7 +147,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   // Exported og permission: 'node:cultural_protocol_group:update group'
   $permissions['node:cultural_protocol_group:update group'] = array(
     'roles' => array(
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -160,7 +160,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   $permissions['node:cultural_protocol_group:update own cultural_protocol_group content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 
@@ -168,7 +168,7 @@ function ma_culturalprotocol_og_features_default_permissions() {
   $permissions['node:cultural_protocol_group:update own digital_heritage content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
-      'protocol manager' => 'protocol manager',
+      'protocol steward' => 'protocol steward',
     ),
   );
 

@@ -247,7 +247,7 @@ function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
     $allowed_groups_for_user[] = array();
     foreach ($groups_for_user as $group_for_user) {
       $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
-      if (array_intersect(array('contributor', 'protocol manager'), $roles_for_user_in_group)) {
+      if (array_intersect(array('contributor', 'protocol steward'), $roles_for_user_in_group)) {
         $allowed_groups_for_user[] = $group_for_user;
       }
     }

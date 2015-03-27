@@ -127,17 +127,17 @@ function ma_digitalheritage_node_view($node, $view_mode) {
  */
 function ma_digitalheritage_comment_insert($comment) {
 
-  // Notify Protocol Manager(s) when a comment has been posted to one of their Cultural Protocols that requires approval
+  // Notify protocol steward(s) when a comment has been posted to one of their Cultural Protocols that requires approval
   if ($comment->node_type == 'comment_node_digital_heritage') {
     if ($comment->status) return; // comment is pre-approved (eg. posted by admin)
     $dh_emw = entity_metadata_wrapper('node', $comment->nid);
 
-    // Build the array of protcol manager emails from the protocol manager(s) of the given protocol(s) for this DH node
+    // Build the array of protcol manager emails from the protocol steward(s) of the given protocol(s) for this DH node
     if ($cps = $dh_emw->og_group_ref->value()) {
       $protocol_managers_emails = array();
       foreach ($cps as $cp) {
         $cp_emw = entity_metadata_wrapper('node', $cp);
-        if ($protocol_managers = ma_core_og_get_users_per_role_and_group ('protocol manager', 'cultural_protocol_group', $cp->nid)) {
+        if ($protocol_managers = ma_core_og_get_users_per_role_and_group ('protocol steward', 'cultural_protocol_group', $cp->nid)) {
           foreach ($protocol_managers as $protocol_manager) {
             $protocol_managers_emails[] = $protocol_manager->name . ' <' . $protocol_manager->mail . '>';
           }
@@ -184,7 +184,7 @@ function ma_digitalheritage_mail($key, &$message, $params) {
       $email_body  .= "Comment body:\n" . $comment_body . "\n\n";
       $email_body .= "Click " . l('here', 'node/' . $comment->nid, array('fragment' => 'comment-' . $comment->cid)) . " to approve or delete this comment";
       if ($params['recipient_count'] > 1) {
-        $email_body .= " (more than one Protocol Managers have received this notification, so the comment may already be approved or deleted at this time)";
+        $email_body .= " (more than one Protocol Stewards have received this notification, so the comment may already be approved or deleted at this time)";
       }
       $email_body .= ".";
       $message['body'][] = $email_body;
@@ -230,7 +230,7 @@ function ma_digitalheritage_clone_dh_button_check($node) {
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
       $p_emw = entity_metadata_wrapper('node', $protocol);
       $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
-      if (array_intersect(array('protocol manager'), $roles_for_user_in_group)) {
+      if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
         return TRUE;
       }
     }
@@ -251,13 +251,13 @@ function ma_digitalheritage_clone_dh_form_submit($form, $form_state) {
   $cloned->title = $cloned->title . ' - copy';
   node_save ($cloned);
 
-  // Unset any CPs that the cloning protocol manager is not a contributor or protocol manager for
+  // Unset any CPs that the cloning protocol steward is not a contributor or protocol steward for
   $protocols_to_set = array();
   $dh_emw = entity_metadata_wrapper('node', $cloned);
   foreach ($dh_emw->og_group_ref->value() as $protocol) {
     $p_emw = entity_metadata_wrapper('node', $protocol);
     $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
-    if (array_intersect(array('protocol manager', 'contributor'), $roles_for_user_in_group)) {
+    if (array_intersect(array('protocol steward', 'contributor'), $roles_for_user_in_group)) {
       $protocols_to_set[] = $protocol;
     }
   }
