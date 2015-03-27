@@ -10,15 +10,6 @@
 function ma_core_user_default_permissions() {
   $permissions = array();
 
-  // Exported permission: 'access administration menu'.
-  $permissions['access administration menu'] = array(
-    'name' => 'access administration menu',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'admin_menu',
-  );
-
   // Exported permission: 'access administration pages'.
   $permissions['access administration pages'] = array(
     'name' => 'access administration pages',
@@ -969,15 +960,6 @@ function ma_core_user_default_permissions() {
     'module' => 'taxonomy',
   );
 
-  // Exported permission: 'display drupal links'.
-  $permissions['display drupal links'] = array(
-    'name' => 'display drupal links',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'admin_menu',
-  );
-
   // Exported permission: 'edit any article content'.
   $permissions['edit any article content'] = array(
     'name' => 'edit any article content',
@@ -1189,15 +1171,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
-  );
-
-  // Exported permission: 'flush caches'.
-  $permissions['flush caches'] = array(
-    'name' => 'flush caches',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'admin_menu',
   );
 
   // Exported permission: 'import import_categories feeds'.
