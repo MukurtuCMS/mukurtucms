@@ -349,7 +349,7 @@ div.password-suggestions ul {
   font-size: 120%;
 }
 .form-autocomplete .glyphicon.glyphicon-spin {
-  color: #236587;
+  color: #428bca;
 }
 .form-autocomplete .input-group-addon {
   background-color: #ffffff;
@@ -702,7 +702,7 @@ table .checkbox input[type="checkbox"] {
 .view-digital-heritage-grid-list .view-header a,
 .view-collections-grid-list .view-header a {
   font-weight: 200;
-  color: #236587;
+  color: #428bca;
   padding: 2px 8px;
 }
 .view-digital-heritage-grid-list .view-header a.active,
@@ -1070,7 +1070,7 @@ a:hover {
   border-top-color: #aaa;
 }
 .wizard-tabs .ui-tabs-panel a {
-  color: #236587;
+  color: #428bca;
 }
 .masonry-grid .masonry-brick {
   width: 227px;
