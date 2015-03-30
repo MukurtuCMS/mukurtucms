@@ -10,7 +10,7 @@ $toggle_link = l('Hide Wizard', 'wizard/toggle', $attribs);
 <div id="tabs" class="wizard-tabs">
   <ul>
     <li><a href="#tabs-1">1. Orientation</a></li>
-    <li><a href="#tabs-2">2. Site Set Up</a></li>
+    <li><a href="#tabs-2">2. Site Setup</a></li>
     <li><a href="#tabs-3">3. Communities</a></li>
     <li><a href="#tabs-4">4. Cultural Protocols</a></li>
     <li><a href="#tabs-5">5. Categories</a></li>
@@ -25,13 +25,13 @@ $toggle_link = l('Hide Wizard', 'wizard/toggle', $attribs);
 
     <p>Notice how the boxes below correspond to different functions you can perform as a site administrator. In the following steps and videos, we will walk through some of these features together.</p>
 
-    <p>To get started, click the '<a href="#tabs-2" class="interlink">Site Set Up</a>' tab and start setting up your Mukurtu Site. To leave this wizard at any time, click 'hide wizard' above.</p>
+    <p>To get started, click the '<a href="#tabs-2" class="interlink">Site Setup</a>' tab and start setting up your Mukurtu Site. To leave this wizard at any time, click 'hide wizard' above.</p>
   </div>
 
 
   <!-- Site Set Up -->
   <div id="tabs-2">
-    <h3>Basic Site Set Up - Adding site info, changing site logos</h3>
+    <h3>Basic Site Setup - Adding site info, changing site logos</h3>
     <p>In the panels below, locate the box labelled 'Set up Site'. Here you can find links to change the look and feel of your site.</p>
 
     <p>Start by clicking 'Change site name, slogan, and email address'. Here you take the first steps to making Mukurtu CMS truly yours. You can visit this page any time to change the default email, however we recommend you set up an email for your site which is connected to your organization, that way it does not fall on one person's shoulders for responsibility.</p>
