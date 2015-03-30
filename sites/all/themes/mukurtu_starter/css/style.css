@@ -1029,6 +1029,13 @@ a:hover {
 #block-mukurtu-splash-mukurtu-wizard .btn {
   margin-bottom: 10px;
 }
+#block-mukurtu-splash-mukurtu-wizard .ui-widget-content {
+  border: 1px solid #aaa;
+}
+#block-mukurtu-splash-mukurtu-wizard .ui-tabs {
+  padding: 0.2em;
+  position: relative;
+}
 .wizard-tabs {
   margin-bottom: 10px;
 }
