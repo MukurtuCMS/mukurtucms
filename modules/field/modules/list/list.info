@@ -6,3 +6,9 @@ core = 7.x
 dependencies[] = field
 dependencies[] = options
 files[] = tests/list.test
+
+; Information added by Drupal.org packaging script on 2015-03-18
+version = "7.35"
+project = "drupal"
+datestamp = "1426707463"
+

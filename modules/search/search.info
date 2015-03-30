@@ -7,3 +7,9 @@ files[] = search.extender.inc
 files[] = search.test
 configure = admin/config/search/settings
 stylesheets[all][] = search.css
+
+; Information added by Drupal.org packaging script on 2015-03-18
+version = "7.35"
+project = "drupal"
+datestamp = "1426707463"
+

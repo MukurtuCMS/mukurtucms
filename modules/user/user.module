@@ -501,12 +501,17 @@ function user_save($account, $edit = array(), $category = 'account') {
         file_usage_delete($account->original->picture, 'user', 'user', $account->uid);
         file_delete($account->original->picture);
       }
+      // Save the picture object, if it is set. drupal_write_record() expects
+      // $account->picture to be a FID.
+      $picture = empty($account->picture) ? NULL : $account->picture;
       $account->picture = empty($account->picture->fid) ? 0 : $account->picture->fid;
 
       // Do not allow 'uid' to be changed.
       $account->uid = $account->original->uid;
       // Save changes to the user table.
       $success = drupal_write_record('users', $account, 'uid');
+      // Restore the picture object.
+      $account->picture = $picture;
       if ($success === FALSE) {
         // The query failed - better to abort the save than risk further
         // data loss.
@@ -589,16 +594,16 @@ function user_save($account, $edit = array(), $category = 'account') {
       user_module_invoke('insert', $edit, $account, $category);
       module_invoke_all('entity_insert', $account, 'user');
 
-      // Save user roles.
-      if (count($account->roles) > 1) {
+      // Save user roles. Skip built-in roles, and ones that were already saved
+      // to the database during hook calls.
+      $rids_to_skip = array_merge(array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID), db_query('SELECT rid FROM {users_roles} WHERE uid = :uid', array(':uid' => $account->uid))->fetchCol());
+      if ($rids_to_save = array_diff(array_keys($account->roles), $rids_to_skip)) {
         $query = db_insert('users_roles')->fields(array('uid', 'rid'));
-        foreach (array_keys($account->roles) as $rid) {
-          if (!in_array($rid, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID))) {
-            $query->values(array(
-              'uid' => $account->uid,
-              'rid' => $rid,
-            ));
-          }
+        foreach ($rids_to_save as $rid) {
+          $query->values(array(
+            'uid' => $account->uid,
+            'rid' => $rid,
+          ));
         }
         $query->execute();
       }
@@ -2330,7 +2335,7 @@ function user_external_login_register($name, $module) {
  */
 function user_pass_reset_url($account) {
   $timestamp = REQUEST_TIME;
-  return url("user/reset/$account->uid/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login), array('absolute' => TRUE));
+  return url("user/reset/$account->uid/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid), array('absolute' => TRUE));
 }
 
 /**
@@ -2352,7 +2357,7 @@ function user_pass_reset_url($account) {
  */
 function user_cancel_url($account) {
   $timestamp = REQUEST_TIME;
-  return url("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login), array('absolute' => TRUE));
+  return url("user/$account->uid/cancel/confirm/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid), array('absolute' => TRUE));
 }
 
 /**
@@ -2372,12 +2377,33 @@ function user_cancel_url($account) {
  *   A UNIX timestamp, typically REQUEST_TIME.
  * @param int $login
  *   The UNIX timestamp of the user's last login.
+ * @param int $uid
+ *   The user ID of the user account.
  *
  * @return
  *   A string that is safe for use in URLs and SQL statements.
  */
-function user_pass_rehash($password, $timestamp, $login) {
-  return drupal_hmac_base64($timestamp . $login, drupal_get_hash_salt() . $password);
+function user_pass_rehash($password, $timestamp, $login, $uid) {
+  // Backwards compatibility: Try to determine a $uid if one was not passed.
+  // (Since $uid is a required parameter to this function, a PHP warning will
+  // be generated if it's not provided, which is an indication that the calling
+  // code should be updated. But the code below will try to generate a correct
+  // hash in the meantime.)
+  if (!isset($uid)) {
+    $uids = db_query_range('SELECT uid FROM {users} WHERE pass = :password AND login = :login AND uid > 0', 0, 2, array(':password' => $password, ':login' => $login))->fetchCol();
+    // If exactly one user account matches the provided password and login
+    // timestamp, proceed with that $uid.
+    if (count($uids) == 1) {
+      $uid = reset($uids);
+    }
+    // Otherwise there is no safe hash to return, so return a random string
+    // that will never be treated as a valid token.
+    else {
+      return drupal_random_key();
+    }
+  }
+
+  return drupal_hmac_base64($timestamp . $login . $uid, drupal_get_hash_salt() . $password);
 }
 
 /**
@@ -2633,12 +2659,7 @@ function user_build_content($account, $view_mode = 'full', $langcode = NULL) {
   $account->content = array();
 
   // Allow modules to change the view mode.
-  $context = array(
-    'entity_type' => 'user',
-    'entity' => $account,
-    'langcode' => $langcode,
-  );
-  drupal_alter('entity_view_mode', $view_mode, $context);
+  $view_mode = key(entity_view_mode_prepare('user', array($account->uid => $account), $view_mode, $langcode));
 
   // Build fields content.
   field_attach_prepare_view('user', array($account->uid => $account), $view_mode, $langcode);
@@ -3773,8 +3794,8 @@ function user_register_form($form, &$form_state) {
   // inside the submit function interferes with form processing and breaks
   // hook_form_alter().
   $form['administer_users'] = array(
-     '#type' => 'value',
-     '#value' => $admin,
+    '#type' => 'value',
+    '#value' => $admin,
   );
 
   // If we aren't admin but already logged on, go to the user page instead.

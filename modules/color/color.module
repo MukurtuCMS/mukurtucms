@@ -88,11 +88,9 @@ function _color_html_alter(&$vars) {
 
   // Override stylesheets.
   $color_paths = variable_get('color_' . $theme_key . '_stylesheets', array());
-
   if (!empty($color_paths)) {
-    
-    foreach ($themes[$theme_key]->stylesheets['all'] as $base_filename => $old_path) {
 
+    foreach ($themes[$theme_key]->stylesheets['all'] as $base_filename => $old_path) {
       // Loop over the path array with recolored CSS files to find matching
       // paths which could replace the non-recolored paths.
       foreach ($color_paths as $color_path) {
@@ -157,8 +155,7 @@ function color_get_palette($theme, $default = FALSE) {
   $palette = $info['schemes']['default']['colors'];
 
   // Load variable.
-//  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette);
-  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette) + $palette;
+  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette);
 }
 
 /**
@@ -436,40 +433,13 @@ function color_scheme_form_submit($form, &$form_state) {
 
   // Save palette and logo location.
   variable_set('color_' . $theme . '_palette', $palette);
-
-  $logo_path = theme_get_setting('logo_path', 'mukurtu_theme');
-  
-  
-  
-  if($logo_path) {
-    variable_set('color_' . $theme . '_logo', $logo_path);  
-  }
-  else {
-    variable_set('color_' . $theme . '_logo', $paths['target'] . 'logo.png');
-  }
-  
+  variable_set('color_' . $theme . '_logo', $paths['target'] . 'logo.png');
 
   // Copy over neutral images.
   foreach ($info['copy'] as $file) {
     $base = drupal_basename($file);
     $source = $paths['source'] . $file;
-    if (file_exists($source)) {
-      $filepath = file_unmanaged_copy($source, $paths['target'] . $base);
-    }
-    else {
-      $source = $file;
-      $file_name_array = explode("/", $file);
-      $file_name = $file_name_array[count($file_name_array) - 1 ];
-
-      $file_temp = file_get_contents($source);
-
-      //Saves a file to the specified destination and creates a database entry.
-      $filepath = file_save_data($file_temp, $paths['target'] . $file_name, FILE_EXISTS_RENAME);
-
-
-      // $filepath = file_unmanaged_copy($source, $paths['target'] . $base);
-    }
-
+    $filepath = file_unmanaged_copy($source, $paths['target'] . $base);
     $paths['map'][$file] = $base;
     $paths['files'][] = $filepath;
   }

@@ -92,7 +92,7 @@ function _lock_id() {
  * Acquire (or renew) a lock, but do not block if it fails.
  *
  * @param $name
- *   The name of the lock.
+ *   The name of the lock. Limit of name's length is 255 characters.
  * @param $timeout
  *   A number of seconds (float) before the lock expires (minimum of 0.001).
  *
@@ -214,7 +214,7 @@ function lock_wait($name, $delay = 30) {
   // $delay is passed in seconds, but we will be using usleep(), which takes
   // microseconds as a parameter. Multiply it by 1 million so that all
   // further numbers are equivalent.
-  $delay = (int) ($delay * 1000000);
+  $delay = (int) $delay * 1000000;
 
   // Begin sleeping at 25ms.
   $sleep = 25000;

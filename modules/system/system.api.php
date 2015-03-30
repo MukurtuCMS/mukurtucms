@@ -247,7 +247,7 @@ function hook_entity_info() {
         'custom settings' => FALSE,
       ),
       'search_result' => array(
-        'label' => t('Search result'),
+        'label' => t('Search result highlighting input'),
         'custom settings' => FALSE,
       ),
     );
@@ -746,26 +746,6 @@ function hook_exit($destination = NULL) {
 function hook_js_alter(&$javascript) {
   // Swap out jQuery to use an updated version of the library.
   $javascript['misc/jquery.js']['data'] = drupal_get_path('module', 'jquery_update') . '/jquery.js';
-}
-
-/**
- * Perform necessary alterations to the concatenated JavaScript before it is
- * presented on the page.
- *
- * @param $contents
- *   A string of the concatenated JavaScript.
- *
- * @see drupal_build_js_cache()
- */
-function hook_js_cache_alter(&$contents) {
-  $header = <<<HEADER
-/**
- * Powered by Pressflow
- * http://pressflow.org
- */
-HEADER;
-
-  $contents = $header . "\n" . $contents;
 }
 
 /**
