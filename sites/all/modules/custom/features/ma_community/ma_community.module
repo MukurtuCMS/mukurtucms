@@ -5,3 +5,18 @@
  */
 
 include_once('ma_community.features.inc');
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_community_node_insert($node) {
+  if ($node->type == 'community') {
+    _set_community_manager_on_community_create ($node);
+  }
+}
+
+function _set_community_manager_on_community_create ($node) {
+  global $user;
+  $rid = array_search ('community manager', og_roles('node', 'community', $node->nid));
+  og_role_grant('node', $node->nid, $user->uid, $rid);
+}

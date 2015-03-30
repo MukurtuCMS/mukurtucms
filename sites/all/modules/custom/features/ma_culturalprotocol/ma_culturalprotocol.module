@@ -93,6 +93,7 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
 function ma_culturalprotocol_node_insert($node) {
   if ($node->type == 'cultural_protocol_group') {
     _process_group_signup_permissions($node);
+    _set_cp_steward_on_cp_create ($node);
 
     $cp_new = entity_metadata_wrapper('node', $node);
     _process_dh_node_access ($cp_new);
@@ -197,6 +198,11 @@ function _process_dh_node_access ($cp_new, $cp_old = NULL) {
   }
 }
 
+function _set_cp_steward_on_cp_create($node) {
+  global $user;
+  $rid = array_search ('protocol steward', og_roles('node', 'cultural_protocol_group', $node->nid));
+  og_role_grant('node', $node->nid, $user->uid, $rid);
+}
 
 /**
  * Helper function to add a user to a group

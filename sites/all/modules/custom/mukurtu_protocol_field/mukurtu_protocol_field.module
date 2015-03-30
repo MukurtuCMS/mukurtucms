@@ -40,14 +40,6 @@ function mukurtu_protocol_field_node_insert($node) {
 }
 
 /**
- * Implements hook_og_membership_presave().
- */
-function mukurtu_protocol_field_og_membership_presave(OgMembership $og_membership) {
-
-}
-
-
-/**
  *  Implements hook_form_alter().
  *
  *  Alters the digitial heritage node edit form to replace the og_group_ref with our enhanced protocol selector field
