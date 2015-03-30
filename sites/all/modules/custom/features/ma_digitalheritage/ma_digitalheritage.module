@@ -274,3 +274,9 @@ function ma_digitalheritage_clone_dh_form_submit($form, $form_state) {
   drupal_goto ('node/' . $cloned->nid);
 }
 
+// When renaming a cloned node, do not create a URL redirect from the old node, because a newly cloned node from the original node might take the original path of 1st cloned node, thus you would always be redirected to the 1st cloned node from the 2nd cloned node. This is not an edge case. It would happen in normal node cloning workflow, as it did during our tests.
+function ma_digitalheritage_redirect_presave($redirect) {
+  if (strpos($redirect->source, '-copy')) {
+    $redirect->source = "dh_clone_redirect"; // cannot simply unset the $redirect here so setting a dummy source instead
+  }
+}
