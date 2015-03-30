@@ -65,7 +65,7 @@ function ma_content_pages_content_defaults() {
 
   $content['ma_access_denied'] = (object) array(
     'exported_path' => 'access-denied',
-    'title' => 'Access Deniedsss',
+    'title' => 'Access Denied',
     'status' => 1,
     'promote' => 0,
     'sticky' => 0,
