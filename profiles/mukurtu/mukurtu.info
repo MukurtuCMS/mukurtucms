@@ -56,7 +56,6 @@ dependencies[] = ma_media
 dependencies[] = ma_digitalheritage
 dependencies[] = ma_community
 dependencies[] = ma_culturalprotocol
-dependencies[] = ma_content_pages
 dependencies[] = ma_importexport_users
 dependencies[] = ma_profile
 dependencies[] = ma_base_theme
