@@ -299,7 +299,7 @@
         //$portletHeader.click(function () {
         //  $('.tipsy').remove();
         //});
-     \ });
+      });
     }
   };
 })(jQuery);
