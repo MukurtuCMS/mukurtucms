@@ -15,6 +15,7 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_rebuild_permissions' => array(),
     'mukurtu_default_tax_terms' => array(),
     'mukurtu_default_menu_links' => array(),
+    'mukurtu_create_default_pages' => array(),
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
@@ -151,6 +152,22 @@ function mukurtu_delete_og_roles() {
     $rid = array_search('administrator member', og_roles('node', $group_type));
     og_role_delete($rid);
   }
+}
+
+function mukurtu_create_default_pages () {
+  $values = array(
+    'type' => 'page',
+    'uid' => 1,
+    'status' => 1,
+    'comment' => 0,
+    'promote' => 0,
+  );
+  $entity = entity_create('node', $values);
+  $ewrapper = entity_metadata_wrapper('node', $entity);
+  $ewrapper->title->set('About');
+  $body = file_get_contents(DRUPAL_ROOT . '/' . drupal_get_path('profile', 'mukurtu') . '/pages/about');
+  $ewrapper->body->set(array('value' => $body, 'format' => 'full_html'));
+  $ewrapper->save();
 }
 
 //function mukurtu_client_form() {
