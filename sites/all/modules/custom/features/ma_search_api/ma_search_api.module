@@ -15,37 +15,37 @@ function ma_search_api_node_insert ($node) {
 function ma_search_api_node_update($node) {
 
 
-  $relations = array (
-    'collection' => array (
-      'relationships' => array (
-        'field_digital_heritage_items',
+  $relations = array(
+    'collection' => array(
+      'relationships' => array(
+        'field_digital_heritage_items' => 'dh',
       ),
       'triggers' => array(),
     ),
-    'digital_heritage' => array (
-      'relationships' => array (
-        'field_collection',
-        'field_related_dh_items',
-        'og_group_ref',
+    'digital_heritage' => array(
+      'relationships' => array(
+        'field_collection' => 'not dh',
+        'field_related_dh_items' => 'dh',
+        'og_group_ref' => 'not dh',
       ),
-      'triggers' => array (
+      'triggers' => array(
         'field_item_privacy_setting' => 'regular',
         'og_group_ref' => 'array values comparison',
       ),
     ),
-    'community' => array (
-      'relationships' => array (
-        'og_group_ref',
+    'community' => array(
+      'relationships' => array(
+        'og_group_ref' => 'not dh',
       ),
-      'triggers' => array (
+      'triggers' => array(
         'og_group_ref' => 'array values comparison',
       ),
     ),
-    'cultural_protocol_group' => array (
-      'relationships' => array (
-        'og_group_ref',
+    'cultural_protocol_group' => array(
+      'relationships' => array(
+        'og_group_ref' => 'not dh',
       ),
-      'triggers' => array (
+      'triggers' => array(
         'group_access' => 'regular',
         'og_roles_permissions' => 'regular',
       ),
@@ -54,6 +54,7 @@ function ma_search_api_node_update($node) {
 
   if (isset($relations[$node->type])) {
 
+    $dh_nodes_to_reindex = variable_get('mukurtu_dh_nodes_to_reindex', array());
     $content_type_properties = $relations[$node->type];
 
     // Load both old (if any) and new versions of the node into a EMW
@@ -87,8 +88,8 @@ function ma_search_api_node_update($node) {
     }
 
     // Look for changes in any of the reference fields.
-    foreach ($content_type_properties['relationships'] as $relationship) {
-      # dpm ($relationship, 'relationship');
+    foreach ($content_type_properties['relationships'] as $relationship => $relationship_node_type) {
+      # dpm ($relationship, 'relationship (' . $relationship_node_type . ')');
 
       $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
 
@@ -99,32 +100,41 @@ function ma_search_api_node_update($node) {
 
       // A trigger field was changed, so reindex all related values, both new and old.
       if ($reindex_all_relations) {
-        $items_to_reindex = array_merge ($items_to_reindex, $new_refs, $old_refs);
-        # dpm ($items_to_reindex, 'items to reindex after a trigger');
+        $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
+        # dpm($items_to_reindex, 'items to reindex after a trigger');
+        if ($relationship_node_type == 'dh') {
+          $dh_nodes_to_reindex = array_merge($dh_nodes_to_reindex, $new_refs, $old_refs);
+        }
       }
 
       // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
       elseif ($old_refs <> $new_refs) {
-        $refs_added = array_diff ($new_refs, $old_refs);
-        $refs_deleted = array_diff ($old_refs, $new_refs);
-        $items_to_reindex = array_merge ($items_to_reindex, $refs_added, $refs_deleted);
-        # dpm ($items_to_reindex, 'items to reindex after a changed relationship');
+        $refs_added = array_diff($new_refs, $old_refs);
+        $refs_deleted = array_diff($old_refs, $new_refs);
+        $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
+        # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+        if ($relationship_node_type == 'dh') {
+          $dh_nodes_to_reindex = array_merge($dh_nodes_to_reindex, $refs_added, $refs_deleted);
+        }
       }
     }
 
     // Do the reindexing
-    $items_to_reindex = array_unique ($items_to_reindex);
-    # dpm ($items_to_reindex, 'items_to_reindex final');
+    $items_to_reindex = array_unique($items_to_reindex);
+    # dpm($items_to_reindex, 'items_to_reindex final');
     if (count($items_to_reindex)) {
-      search_api_index_specific_items_delayed (search_api_index_load('default_node_index'), $items_to_reindex);
+      search_api_index_specific_items_delayed(search_api_index_load('default_node_index'), $items_to_reindex);
     }
 
     // Although the DH node gets reindexed by virtue of being edited, our use of mukurtu_protocol_field_node_access means that if the DH node is set to ANY, it needs to be reindexed again after search_api node access is rebuilt for the Protocol facet to be accurate (at least. possibly other effects). This does not work if is added here (too soon). So we do it in ma_search_api_views_pre_view, just before the view is loaded.
     if ($node->type == 'digital_heritage') {
-      $dh_nodes_to_reindex = variable_get('mukurtu_dh_nodes_to_reindex', array());
       $dh_nodes_to_reindex[] = $node->nid;
-      variable_set('mukurtu_dh_nodes_to_reindex', $dh_nodes_to_reindex);
     }
+
+    // Schedule DH nodes for reindexing on the next /digital-heritage viewing
+    # dpm ($dh_nodes_to_reindex, 'dh nodes to reindex on next /digital-heritage viewing');
+    variable_set('mukurtu_dh_nodes_to_reindex', $dh_nodes_to_reindex);
+
   }
 }
 
