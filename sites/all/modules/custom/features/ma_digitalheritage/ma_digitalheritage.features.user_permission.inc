@@ -14,6 +14,7 @@ function ma_digitalheritage_user_default_permissions() {
   $permissions['create digital_heritage content'] = array(
     'name' => 'create digital_heritage content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -23,6 +24,7 @@ function ma_digitalheritage_user_default_permissions() {
   $permissions['delete any digital_heritage content'] = array(
     'name' => 'delete any digital_heritage content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -62,6 +64,7 @@ function ma_digitalheritage_user_default_permissions() {
     'name' => 'merge category terms',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'term_merge',

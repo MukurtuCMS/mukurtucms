@@ -15,6 +15,7 @@ function ma_collection_user_default_permissions() {
     'name' => 'create collection content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -25,6 +26,7 @@ function ma_collection_user_default_permissions() {
     'name' => 'delete any collection content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -35,6 +37,7 @@ function ma_collection_user_default_permissions() {
     'name' => 'delete own collection content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -45,6 +48,7 @@ function ma_collection_user_default_permissions() {
     'name' => 'edit any collection content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -55,6 +59,7 @@ function ma_collection_user_default_permissions() {
     'name' => 'edit own collection content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',

@@ -14,6 +14,7 @@ function ma_core_user_default_permissions() {
   $permissions['access administration pages'] = array(
     'name' => 'access administration pages',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'system',
@@ -23,6 +24,7 @@ function ma_core_user_default_permissions() {
   $permissions['access all views'] = array(
     'name' => 'access all views',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'views',
@@ -71,6 +73,7 @@ function ma_core_user_default_permissions() {
     'name' => 'access content overview',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -80,6 +83,7 @@ function ma_core_user_default_permissions() {
   $permissions['access contextual links'] = array(
     'name' => 'access contextual links',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'contextual',
@@ -89,6 +93,7 @@ function ma_core_user_default_permissions() {
   $permissions['access mollom statistics'] = array(
     'name' => 'access mollom statistics',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'mollom',
@@ -108,6 +113,7 @@ function ma_core_user_default_permissions() {
   $permissions['access site in maintenance mode'] = array(
     'name' => 'access site in maintenance mode',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'system',
@@ -117,6 +123,7 @@ function ma_core_user_default_permissions() {
   $permissions['access site reports'] = array(
     'name' => 'access site reports',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'system',
@@ -191,6 +198,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer blocks'] = array(
     'name' => 'administer blocks',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'block',
@@ -210,6 +218,7 @@ function ma_core_user_default_permissions() {
     'name' => 'administer category vocabulary terms',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'vppr',
@@ -318,6 +327,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer google analytics'] = array(
     'name' => 'administer google analytics',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'googleanalytics',
@@ -327,6 +337,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer group'] = array(
     'name' => 'administer group',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'og',
@@ -336,6 +347,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer homebox'] = array(
     'name' => 'administer homebox',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'homebox',
@@ -354,6 +366,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer languages'] = array(
     'name' => 'administer languages',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'locale',
@@ -372,6 +385,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer menu'] = array(
     'name' => 'administer menu',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'menu',
@@ -408,6 +422,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer mollom'] = array(
     'name' => 'administer mollom',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'mollom',
@@ -417,6 +432,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer nodes'] = array(
     'name' => 'administer nodes',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -480,6 +496,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer permissions'] = array(
     'name' => 'administer permissions',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'user',
@@ -489,6 +506,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer redirects'] = array(
     'name' => 'administer redirects',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'redirect',
@@ -544,6 +562,7 @@ function ma_core_user_default_permissions() {
     'name' => 'administer tags vocabulary terms',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'vppr',
@@ -562,6 +581,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer themes'] = array(
     'name' => 'administer themes',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'system',
@@ -580,6 +600,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer users'] = array(
     'name' => 'administer users',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'user',
@@ -598,6 +619,7 @@ function ma_core_user_default_permissions() {
   $permissions['block IP addresses'] = array(
     'name' => 'block IP addresses',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'system',
@@ -607,6 +629,7 @@ function ma_core_user_default_permissions() {
   $permissions['bypass mollom protection'] = array(
     'name' => 'bypass mollom protection',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'mollom',
@@ -616,6 +639,7 @@ function ma_core_user_default_permissions() {
   $permissions['bypass node access'] = array(
     'name' => 'bypass node access',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -635,6 +659,7 @@ function ma_core_user_default_permissions() {
     'name' => 'change layouts in place editing',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'panels',
@@ -653,6 +678,7 @@ function ma_core_user_default_permissions() {
   $permissions['clear import_categories feeds'] = array(
     'name' => 'clear import_categories feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -698,6 +724,7 @@ function ma_core_user_default_permissions() {
   $permissions['create article content'] = array(
     'name' => 'create article content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -717,6 +744,7 @@ function ma_core_user_default_permissions() {
     'name' => 'create page content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -726,6 +754,7 @@ function ma_core_user_default_permissions() {
   $permissions['create panel content'] = array(
     'name' => 'create panel content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -762,6 +791,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete any article content'] = array(
     'name' => 'delete any article content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -772,6 +802,7 @@ function ma_core_user_default_permissions() {
     'name' => 'delete any page content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -781,6 +812,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete any panel content'] = array(
     'name' => 'delete any panel content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -817,6 +849,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete own article content'] = array(
     'name' => 'delete own article content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -827,6 +860,7 @@ function ma_core_user_default_permissions() {
     'name' => 'delete own page content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -836,6 +870,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete own panel content'] = array(
     'name' => 'delete own panel content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -854,6 +889,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete revisions'] = array(
     'name' => 'delete revisions',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -864,6 +900,7 @@ function ma_core_user_default_permissions() {
     'name' => 'delete terms in category',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -955,6 +992,7 @@ function ma_core_user_default_permissions() {
     'name' => 'delete terms in tags',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -964,6 +1002,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit any article content'] = array(
     'name' => 'edit any article content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -974,6 +1013,7 @@ function ma_core_user_default_permissions() {
     'name' => 'edit any page content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -983,6 +1023,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit any panel content'] = array(
     'name' => 'edit any panel content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -1019,6 +1060,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit own article content'] = array(
     'name' => 'edit own article content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -1039,6 +1081,7 @@ function ma_core_user_default_permissions() {
     'name' => 'edit own page content',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -1048,6 +1091,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit own panel content'] = array(
     'name' => 'edit own panel content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -1077,6 +1121,7 @@ function ma_core_user_default_permissions() {
     'name' => 'edit terms in category',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1168,6 +1213,7 @@ function ma_core_user_default_permissions() {
     'name' => 'edit terms in tags',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1177,6 +1223,7 @@ function ma_core_user_default_permissions() {
   $permissions['import import_categories feeds'] = array(
     'name' => 'import import_categories feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -1241,6 +1288,7 @@ function ma_core_user_default_permissions() {
     'name' => 'merge tags terms',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'term_merge',
@@ -1250,6 +1298,7 @@ function ma_core_user_default_permissions() {
   $permissions['merge terms'] = array(
     'name' => 'merge terms',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'term_merge',
@@ -1268,6 +1317,7 @@ function ma_core_user_default_permissions() {
   $permissions['opt-in or out of tracking'] = array(
     'name' => 'opt-in or out of tracking',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'googleanalytics',
@@ -1295,6 +1345,7 @@ function ma_core_user_default_permissions() {
   $permissions['revert revisions'] = array(
     'name' => 'revert revisions',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -1314,6 +1365,7 @@ function ma_core_user_default_permissions() {
   $permissions['select account cancellation method'] = array(
     'name' => 'select account cancellation method',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'user',
@@ -1325,6 +1377,7 @@ function ma_core_user_default_permissions() {
     'roles' => array(
       'Community Administrator' => 'Community Administrator',
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'comment',
@@ -1397,6 +1450,7 @@ function ma_core_user_default_permissions() {
   $permissions['translate content'] = array(
     'name' => 'translate content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'translation',
@@ -1406,6 +1460,7 @@ function ma_core_user_default_permissions() {
   $permissions['translate interface'] = array(
     'name' => 'translate interface',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'locale',
@@ -1460,6 +1515,7 @@ function ma_core_user_default_permissions() {
     'name' => 'use panels in place editing',
     'roles' => array(
       'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'panels',
@@ -1478,6 +1534,7 @@ function ma_core_user_default_permissions() {
   $permissions['use text format ds_code'] = array(
     'name' => 'use text format ds_code',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'filter',
@@ -1497,6 +1554,7 @@ function ma_core_user_default_permissions() {
   $permissions['use text format full_html'] = array(
     'name' => 'use text format full_html',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'filter',
@@ -1539,6 +1597,7 @@ function ma_core_user_default_permissions() {
   $permissions['view maillog'] = array(
     'name' => 'view maillog',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'maillog',
@@ -1566,6 +1625,7 @@ function ma_core_user_default_permissions() {
   $permissions['view revisions'] = array(
     'name' => 'view revisions',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',

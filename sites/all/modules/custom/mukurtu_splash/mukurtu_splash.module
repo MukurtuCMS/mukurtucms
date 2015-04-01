@@ -502,7 +502,10 @@ function mukurtu_splash_block_manage_taxonomy() {
 
   $markup = '';
 
-  if (user_access('administer taxonomy')) {
+  global $user;
+
+  $vocabulary = taxonomy_vocabulary_machine_name_load ('category');
+  if (user_access('edit terms in '. $vocabulary->vid)) {
     $items[] = array(
       'title' => 'Add One Category',
       'href' => 'admin/structure/taxonomy/category/add',
@@ -527,7 +530,8 @@ function mukurtu_splash_block_manage_taxonomy() {
     );
   }
 
-  if (user_access('administer taxonomy')) {
+  $vocabulary = taxonomy_vocabulary_machine_name_load ('tags');
+  if (user_access('edit terms in '. $vocabulary->vid)) {
     $items[] = array(
       'title' => 'Add One Keyword',
       'href' => 'admin/structure/taxonomy/tags/add',

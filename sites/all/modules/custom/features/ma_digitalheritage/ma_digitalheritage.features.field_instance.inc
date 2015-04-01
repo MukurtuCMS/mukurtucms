@@ -1233,6 +1233,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 21,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_licence_std_cc',
     'label' => 'Licensing Options',

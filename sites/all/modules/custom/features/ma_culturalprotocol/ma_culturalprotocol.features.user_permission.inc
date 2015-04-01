@@ -14,6 +14,7 @@ function ma_culturalprotocol_user_default_permissions() {
   $permissions['create cultural_protocol_group content'] = array(
     'name' => 'create cultural_protocol_group content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -23,6 +24,7 @@ function ma_culturalprotocol_user_default_permissions() {
   $permissions['delete any cultural_protocol_group content'] = array(
     'name' => 'delete any cultural_protocol_group content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -32,6 +34,7 @@ function ma_culturalprotocol_user_default_permissions() {
   $permissions['delete own cultural_protocol_group content'] = array(
     'name' => 'delete own cultural_protocol_group content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -41,6 +44,7 @@ function ma_culturalprotocol_user_default_permissions() {
   $permissions['edit any cultural_protocol_group content'] = array(
     'name' => 'edit any cultural_protocol_group content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -50,6 +54,7 @@ function ma_culturalprotocol_user_default_permissions() {
   $permissions['edit own cultural_protocol_group content'] = array(
     'name' => 'edit own cultural_protocol_group content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',

@@ -246,7 +246,8 @@ function ma_culturalprotocol_form_cultural_protocol_group_node_form_alter(&$form
  */
 function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
   $groups_for_user = og_get_groups_by_user(null, 'node');
-  if (user_access('administer organic groups permissions')) {
+  global $user;
+  if (array_intersect(array('administrator', 'Mukurtu Administrator'), $user->roles)) {
     $allowed_groups_for_user = og_get_all_group();
   }
   else {

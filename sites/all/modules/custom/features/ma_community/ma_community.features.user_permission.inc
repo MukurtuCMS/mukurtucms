@@ -15,6 +15,7 @@ function ma_community_user_default_permissions() {
     'name' => 'create community content',
     'roles' => array(
       'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -24,6 +25,7 @@ function ma_community_user_default_permissions() {
   $permissions['delete any community content'] = array(
     'name' => 'delete any community content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -34,6 +36,7 @@ function ma_community_user_default_permissions() {
     'name' => 'delete own community content',
     'roles' => array(
       'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -43,6 +46,7 @@ function ma_community_user_default_permissions() {
   $permissions['edit any community content'] = array(
     'name' => 'edit any community content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',
@@ -53,6 +57,7 @@ function ma_community_user_default_permissions() {
     'name' => 'edit own community content',
     'roles' => array(
       'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',

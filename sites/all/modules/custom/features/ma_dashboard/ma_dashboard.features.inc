@@ -139,6 +139,7 @@ function ma_dashboard_homebox() {
     'roles' => array(
       0 => 'administrator',
       1 => 'Curator',
+      2 => 'Mukurtu Administrator',
     ),
   );
 

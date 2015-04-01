@@ -22,7 +22,7 @@ function ma_core_user_login(&$edit, $account) {
   // Redirect user on login
   global $user;
   if (!$_GET['profile']) { // Do not redirect when user is logged in during profile installation, as more work needs to complete first
-    if (array_intersect(array('administrator'), $user->roles)) {
+    if (array_intersect(array('administrator', 'Mukurtu Administrator'), $user->roles)) {
       drupal_goto('dashboard');
     }
 		else {

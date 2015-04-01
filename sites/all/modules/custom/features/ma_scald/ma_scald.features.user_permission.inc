@@ -69,6 +69,7 @@ function ma_scald_user_default_permissions() {
   $permissions['bypass atom access restrictions'] = array(
     'name' => 'bypass atom access restrictions',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -78,6 +79,7 @@ function ma_scald_user_default_permissions() {
   $permissions['bypass file access'] = array(
     'name' => 'bypass file access',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
@@ -134,6 +136,7 @@ function ma_scald_user_default_permissions() {
   $permissions['delete any atom'] = array(
     'name' => 'delete any atom',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -283,6 +286,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit any atom'] = array(
     'name' => 'edit any atom',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -292,6 +296,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit any audio files'] = array(
     'name' => 'edit any audio files',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
@@ -301,6 +306,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit any document files'] = array(
     'name' => 'edit any document files',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
@@ -310,6 +316,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit any image files'] = array(
     'name' => 'edit any image files',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
@@ -319,6 +326,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit any video files'] = array(
     'name' => 'edit any video files',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
