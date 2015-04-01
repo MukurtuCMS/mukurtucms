@@ -370,13 +370,6 @@ function mukurtu_splash_block_site_config() {
   $markup = '';
 
   $items[] = array (
-    'title' => 'Set Private File Path',
-    'href' => 'admin/config/media/file-system',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('Drupal requires you to set the path to the private folder in the file system.'),
-  );
-
-  $items[] = array (
     'title' => 'Configure Google Analytics',
     'href' => 'admin/config/system/googleanalytics',
     'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
@@ -396,15 +389,7 @@ function mukurtu_splash_block_site_config() {
     'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
     'description' => t('If doing a lot of site content editing, you may need to rebuild permissions to make sure that access permissions remain set correctly.'),
   );
-
-  $items[] = array (
-    'title' => 'Make Search Work (Run Cron to build Search Index)',
-    'href' => 'admin/reports/status/run-cron ',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('If you are not getting search results, your site content has probably not been indexed. Search will update if you run cron. See if all content is indexed in search: admin/config/search/settings'),
-  );
-
-
+  
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
 
