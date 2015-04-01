@@ -25,7 +25,7 @@ function ma_core_user_login(&$edit, $account) {
   // Do not redirect when
   // 1. user is logged in during profile installation, as more work needs to complete first
   // 2. User is performing a password reset, as we do not want to override the redirect to password change form
-  if ($_GET['profile'] OR $_GET['pass-reset-token']) {
+  if ($_GET['profile'] OR (arg(0) == 'user' AND arg(1) == 'reset')) {
     return;
   }
 
