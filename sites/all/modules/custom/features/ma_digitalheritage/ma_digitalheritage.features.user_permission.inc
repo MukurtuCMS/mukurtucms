@@ -44,6 +44,7 @@ function ma_digitalheritage_user_default_permissions() {
   $permissions['edit any digital_heritage content'] = array(
     'name' => 'edit any digital_heritage content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'node',

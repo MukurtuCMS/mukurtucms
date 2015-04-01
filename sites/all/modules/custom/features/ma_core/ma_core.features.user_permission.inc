@@ -615,6 +615,17 @@ function ma_core_user_default_permissions() {
     'module' => 'views',
   );
 
+  // Exported permission: 'answer any organic group invitation'.
+  $permissions['answer any organic group invitation'] = array(
+    'name' => 'answer any organic group invitation',
+    'roles' => array(
+      'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'og_invite',
+  );
+
   // Exported permission: 'block IP addresses'.
   $permissions['block IP addresses'] = array(
     'name' => 'block IP addresses',
@@ -1330,6 +1341,16 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'backup_migrate',
+  );
+
+  // Exported permission: 'report to mollom'.
+  $permissions['report to mollom'] = array(
+    'name' => 'report to mollom',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'mollom',
   );
 
   // Exported permission: 'restore from backup'.
