@@ -1,12 +1,12 @@
-This is YOUR about page, to edit the content here, click the edit tab above!
+<p>This is YOUR about page, to edit the content here, click the edit tab above!</p>
 
-Mukurtu CMS provides:
+<p>Mukurtu CMS provides:</p>
+<ul>
+<li>Local cultural protocols to provide granular access parameters for digital heritage content;</li>
+<li>Flexible templates that adapt to various indigenous stakeholder needs;</li>
+<li>Traditional knowledge fields customizable for curating content alongside standard Dublin Core metadata fields;</li>
+<li>An innovative set of Traditional Knowledge licenses that work with traditional copyright and Creative Commons licenses to better serve Indigenous needs; and</li>
+<li>A safe, secure, free and open source platform for managing digital cultural heritage materials online and offline</li>
+</ul>
 
-    Local cultural protocols to provide granular access parameters for digital heritage content;
-    Flexible templates that adapt to various indigenous stakeholder needs;
-    Traditional knowledge fields customizable for curating content alongside standard Dublin Core metadata fields;
-    An innovative set of Traditional Knowledge licenses that work with traditional copyright and Creative Commons licenses to better serve Indigenous needs; and
-    A safe, secure, free and open source platform for managing digital cultural heritage materials online and offline
-
-Mukurtu is distributed under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html"> GNU General Public License (or "GPL")</a>, which means anyone is free to download it and share it with others. This open development model means that people are constantly working to make sure Mukurtu is a cutting-edge platform that supports the unique needs of indigenous libraries, archives and museums as they seek to preserve and share their digital heritage. Mukurtu encourages collaboration and innovation as we seek to offer respectful and responsible models for content management.
-
+<p>Mukurtu is distributed under the terms of the <a href="http://www.gnu.org/copyleft/gpl.html"> GNU General Public License (or "GPL")</a>, which means anyone is free to download it and share it with others. This open development model means that people are constantly working to make sure Mukurtu is a cutting-edge platform that supports the unique needs of indigenous libraries, archives and museums as they seek to preserve and share their digital heritage. Mukurtu encourages collaboration and innovation as we seek to offer respectful and responsible models for content management.</p>
