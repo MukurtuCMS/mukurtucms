@@ -1,0 +1,40 @@
+<?php
+/**
+ * @file
+ * Handling links in Scald-compatible way.
+ */
+
+/**
+ * Implements hook_filter_info().
+ */
+function scald_link_filter_filter_info() {
+  $filters['filter_scald_link_filter'] = array(
+    'title' => t('Convert URLs to links Scald support'),
+    'process callback' => '_filter_scald_link_filter',
+  );
+  return $filters;
+}
+
+/**
+ * Filter process callback.
+ */
+function _filter_scald_link_filter($text) {
+
+  $matches = array();
+  $back = array();
+  preg_match_all(SCALD_SAS_MATCH_PATTERN, $text, $matches);
+  foreach ($matches[0] as $scald_entry) {
+    $id = md5($scald_entry);
+    $back[$id] = $scald_entry;
+    $text = str_replace($scald_entry, $id, $text);
+  }
+  $filter = new stdClass();
+  $filter->callback = '_filter_url';
+  $filter->settings = array(
+    'filter_url_length' => 300,
+  );
+  $text = _filter_url($text, $filter);
+  $text = str_replace(array_keys($back), array_values($back), $text);
+
+  return $text;
+}

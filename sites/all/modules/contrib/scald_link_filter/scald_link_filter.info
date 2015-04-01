@@ -1,0 +1,13 @@
+name = Link Filter Scald
+description = Turns URLs into Links in Scald compatible way.
+package = Scald
+core = 7.x
+dependencies[] = scald
+
+
+; Information added by Drupal.org packaging script on 2015-01-13
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "scald_link_filter"
+datestamp = "1421117584"
+

@@ -18,12 +18,10 @@ function ma_core_filter_default_formats() {
     'status' => 1,
     'weight' => 0,
     'filters' => array(
-      'filter_url' => array(
+      'filter_scald_link_filter' => array(
         'weight' => 0,
         'status' => 1,
-        'settings' => array(
-          'filter_url_length' => 72,
-        ),
+        'settings' => array(),
       ),
       'filter_html' => array(
         'weight' => 1,
@@ -60,13 +58,6 @@ function ma_core_filter_default_formats() {
     'status' => 1,
     'weight' => 0,
     'filters' => array(
-      'filter_url' => array(
-        'weight' => -48,
-        'status' => 1,
-        'settings' => array(
-          'filter_url_length' => 72,
-        ),
-      ),
       'filter_autop' => array(
         'weight' => -47,
         'status' => 1,
@@ -74,6 +65,11 @@ function ma_core_filter_default_formats() {
       ),
       'filter_htmlcorrector' => array(
         'weight' => -46,
+        'status' => 1,
+        'settings' => array(),
+      ),
+      'filter_scald_link_filter' => array(
+        'weight' => 0,
         'status' => 1,
         'settings' => array(),
       ),
@@ -115,12 +111,10 @@ function ma_core_filter_default_formats() {
         'status' => 1,
         'settings' => array(),
       ),
-      'filter_url' => array(
-        'weight' => 1,
+      'filter_scald_link_filter' => array(
+        'weight' => 0,
         'status' => 1,
-        'settings' => array(
-          'filter_url_length' => 72,
-        ),
+        'settings' => array(),
       ),
       'filter_autop' => array(
         'weight' => 2,
