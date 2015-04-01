@@ -75,15 +75,6 @@ function mukurtu_default_tax_terms () {
 function mukurtu_default_menu_links () {
 
   $item = array(
-    'link_path' => 'about',
-    'link_title' => 'About',
-    'menu_name' => 'menu-browse-menu',
-    'weight' => -51,
-    'expanded' => 0,
-  );
-  menu_link_save($item);
-
-  $item = array(
     'link_path' => 'collections',
     'link_title' => 'Browse Collections',
     'menu_name' => 'menu-browse-menu',
@@ -96,7 +87,7 @@ function mukurtu_default_menu_links () {
     'link_path' => 'digital-heritage',
     'link_title' => 'Browse Digital Heritage',
     'menu_name' => 'menu-browse-menu',
-    'weight' => -49,
+    'weight' => -45,
     'expanded' => 0,
   );
   menu_link_save($item);
@@ -155,19 +146,23 @@ function mukurtu_delete_og_roles() {
 }
 
 function mukurtu_create_default_pages () {
-  $values = array(
-    'type' => 'page',
-    'uid' => 1,
-    'status' => 1,
-    'comment' => 0,
-    'promote' => 0,
+  $node = new stdClass();
+  $node->type = 'page';
+  $node->uid = 1;
+  $node->language = LANGUAGE_NONE;
+  $node->title = 'About';
+  $node->body[LANGUAGE_NONE][0] = array (
+    'value' => file_get_contents(DRUPAL_ROOT . '/' . drupal_get_path('profile', 'mukurtu') . '/pages/about'),
+    'format' => 'full_html',
   );
-  $entity = entity_create('node', $values);
-  $ewrapper = entity_metadata_wrapper('node', $entity);
-  $ewrapper->title->set('About');
-  $body = file_get_contents(DRUPAL_ROOT . '/' . drupal_get_path('profile', 'mukurtu') . '/pages/about');
-  $ewrapper->body->set(array('value' => $body, 'format' => 'full_html'));
-  $ewrapper->save();
+  $node->menu = array(
+    'link_title' => 'About',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -55,
+    'plid' => 0,
+    'enabled' => 1,
+  );
+  node_save($node);
 }
 
 //function mukurtu_client_form() {
