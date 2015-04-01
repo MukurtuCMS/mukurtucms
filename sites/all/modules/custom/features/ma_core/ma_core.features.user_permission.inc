@@ -1053,6 +1053,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit boxes'] = array(
     'name' => 'edit boxes',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'boxes',

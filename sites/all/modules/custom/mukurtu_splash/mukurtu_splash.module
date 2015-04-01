@@ -324,7 +324,7 @@ function mukurtu_splash_block_site_start() {
     );
   }
 
-  if (user_access('administer boxes')) {
+  if (user_access('edit boxes')) {
     $items_layout[] = array(
       'title' => 'Edit Custom Site Header',
       'href' => 'admin/structure/block/manage/boxes/ma_site_header/configure',
