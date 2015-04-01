@@ -1,0 +1,98 @@
+diff --git a/includes/scald.atom.inc b/includes/scald.atom.inc
+index cdec48c..1425766 100644
+--- a/includes/scald.atom.inc
++++ b/includes/scald.atom.inc
+@@ -33,6 +33,13 @@ function scald_atom_view($atom, $context = 'full', $langcode = NULL) {
+   // We don't need duplicate rendering info in atom->content.
+   unset($atom->content);
+ 
++  $build += array(
++    '#theme' => 'scald_atom',
++    '#atom' => $atom,
++    '#view_mode' => $context,
++    '#language' => $langcode,
++  );
++
+   // Allow modules to modify the structured atom.
+   $type = 'scald_atom';
+   drupal_alter(array('scald_atom_view', 'entity_view'), $build, $type);
+diff --git a/scald-atom.tpl.php b/scald-atom.tpl.php
+new file mode 100644
+index 0000000..cf74eab
+--- /dev/null
++++ b/scald-atom.tpl.php
+@@ -0,0 +1,19 @@
++<?php
++
++/**
++ * @file
++ * Default theme implementation to display a scald_atom.
++ *
++ * Available variables:
++ * - $content: An array of items for the content of the scald_atom.
++ *
++ * Other variables:
++ * - ?
++ *
++ * @see template_preprocess()
++ * @see template_process()
++ *
++ * @ingroup themeable
++ */
++
++print render($content);
+diff --git a/scald.module b/scald.module
+index cee22c7..09c8f63 100644
+--- a/scald.module
++++ b/scald.module
+@@ -2301,6 +2301,10 @@ function scald_atom_add_access($type = NULL) {
+  */
+ function scald_theme($existing, $type, $theme, $path) {
+   return array(
++    'scald_atom' => array(
++      'render element' => 'elements',
++      'template' => 'scald-atom',
++    ),
+     'scald_render_error' => array(
+       'arguments' => array('type' => NULL, 'message' => NULL, 'atom' => NULL),
+     ),
+@@ -2332,6 +2336,39 @@ function theme_scald_render_error($vars) {
+ }
+ 
+ /**
++ * Processes variables for scald-atom.tpl.php
++ *
++ * The $variables array contains the following arguments:
++ * - $atom
++ * - $view_mode
++ *
++ * @see scald-atom.tpl.php
++ */
++function template_preprocess_scald_atom(&$variables) {
++  $variables['view_mode'] = $variables['elements']['#view_mode'];
++  $variables['atom'] = $variables['elements']['#atom'];
++  // In DS Token support, it requires entity to be accessed by entity name.
++  // Maybe we should get rid of one of these?
++  $variables['scald_atom'] = $variables['elements']['#atom'];
++  $atom = $variables['atom'];
++
++  // Flatten the scald_atom object's member fields.
++  $variables = array_merge((array) $atom, $variables);
++
++  // Helpful $content variable for templates.
++  $variables += array('content' => array());
++  foreach (element_children($variables['elements']) as $key) {
++    $variables['content'][$key] = $variables['elements'][$key];
++  }
++
++  // Make the field variables available with the appropriate language.
++  field_attach_preprocess('scald_atom', $atom, $variables['content'], $variables);
++
++  // Clean up name so there are no underscores.
++  $variables['theme_hook_suggestions'][] = 'scald_atom__' . $atom->type;
++}
++
++/**
+  * Computes actions bitsting for a single role.
+  *
+  * @return int

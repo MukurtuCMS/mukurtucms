@@ -2301,6 +2301,10 @@ function scald_atom_add_access($type = NULL) {
  */
 function scald_theme($existing, $type, $theme, $path) {
   return array(
+    'scald_atom' => array(
+      'render element' => 'elements',
+      'template' => 'scald-atom',
+    ),
     'scald_render_error' => array(
       'arguments' => array('type' => NULL, 'message' => NULL, 'atom' => NULL),
     ),
@@ -2329,6 +2333,39 @@ function scald_flush_caches() {
  */
 function theme_scald_render_error($vars) {
   return '<h3>' . $vars['message'] . '</h3>';
+}
+
+/**
+ * Processes variables for scald-atom.tpl.php
+ *
+ * The $variables array contains the following arguments:
+ * - $atom
+ * - $view_mode
+ *
+ * @see scald-atom.tpl.php
+ */
+function template_preprocess_scald_atom(&$variables) {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['atom'] = $variables['elements']['#atom'];
+  // In DS Token support, it requires entity to be accessed by entity name.
+  // Maybe we should get rid of one of these?
+  $variables['scald_atom'] = $variables['elements']['#atom'];
+  $atom = $variables['atom'];
+
+  // Flatten the scald_atom object's member fields.
+  $variables = array_merge((array) $atom, $variables);
+
+  // Helpful $content variable for templates.
+  $variables += array('content' => array());
+  foreach (element_children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+
+  // Make the field variables available with the appropriate language.
+  field_attach_preprocess('scald_atom', $atom, $variables['content'], $variables);
+
+  // Clean up name so there are no underscores.
+  $variables['theme_hook_suggestions'][] = 'scald_atom__' . $atom->type;
 }
 
 /**

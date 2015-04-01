@@ -33,6 +33,13 @@ function scald_atom_view($atom, $context = 'full', $langcode = NULL) {
   // We don't need duplicate rendering info in atom->content.
   unset($atom->content);
 
+  $build += array(
+    '#theme' => 'scald_atom',
+    '#atom' => $atom,
+    '#view_mode' => $context,
+    '#language' => $langcode,
+  );
+
   // Allow modules to modify the structured atom.
   $type = 'scald_atom';
   drupal_alter(array('scald_atom_view', 'entity_view'), $build, $type);
