@@ -16,5 +16,11 @@ function ma_core_user_default_roles() {
     'weight' => 5,
   );
 
+  // Exported role: Mukurtu Administrator.
+  $roles['Mukurtu Administrator'] = array(
+    'name' => 'Mukurtu Administrator',
+    'weight' => 7,
+  );
+
   return $roles;
 }

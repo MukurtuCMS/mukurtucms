@@ -301,6 +301,7 @@ features[user_permission][] = view pane admin links
 features[user_permission][] = view revisions
 features[user_permission][] = view the administration theme
 features[user_role][] = Curator
+features[user_role][] = Mukurtu Administrator
 features[variable][] = chosen_jquery_selector
 features[variable][] = chosen_minimum_width
 features[variable][] = comment_anonymous_page
