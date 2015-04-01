@@ -19,15 +19,22 @@ function ma_core_init() {
  * Implements hook_user_login
  */
 function ma_core_user_login(&$edit, $account) {
-  // Redirect user on login
+
+  //// Redirect user on login
+
+  // Do not redirect when
+  // 1. user is logged in during profile installation, as more work needs to complete first
+  // 2. User is performing a password reset, as we do not want to override the redirect to password change form
+  if ($_GET['profile'] OR $_GET['pass-reset-token']) {
+    return;
+  }
+
   global $user;
-  if (!$_GET['profile']) { // Do not redirect when user is logged in during profile installation, as more work needs to complete first
-    if (array_intersect(array('administrator', 'Mukurtu Administrator'), $user->roles)) {
-      drupal_goto('dashboard');
-    }
-		else {
-      drupal_goto(); // Non-admin users go to browse page
-    }
+  if (array_intersect(array('administrator', 'Mukurtu Administrator'), $user->roles)) {
+    drupal_goto('dashboard');
+  }
+  else {
+    drupal_goto(); // Non-admin users go to front page
   }
 }
 
