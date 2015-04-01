@@ -21,7 +21,6 @@ dependencies[] = geofield_map
 dependencies[] = image
 dependencies[] = license
 dependencies[] = list
-dependencies[] = logintoboggan
 dependencies[] = ma_core
 dependencies[] = ma_digitalheritage
 dependencies[] = ma_media
