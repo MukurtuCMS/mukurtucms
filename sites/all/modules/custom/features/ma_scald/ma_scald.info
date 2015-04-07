@@ -188,7 +188,6 @@ features[variable][] = field_bundle_settings_scald_atom__file
 features[variable][] = field_bundle_settings_scald_atom__image
 features[variable][] = field_bundle_settings_scald_atom__video
 features[variable][] = file_default_scheme
-features[variable][] = file_private_path
 features[variable][] = file_public_path
 features[variable][] = file_temporary_path
 features[variable][] = scald_actions_powers

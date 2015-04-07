@@ -7,6 +7,7 @@
 function mukurtu_install_tasks($install_state) {
   $tasks = array (
     'mukurtu_set_error_level' => array(),
+    'mukurtu_set_private_files_path' => array(),
     'mukurtu_set_theme' => array(),
     'mukurtu_set_clean_urls' => array(),
     'mukurtu_revert_features' => array(
@@ -33,6 +34,10 @@ function mukurtu_install_tasks($install_state) {
 
 function mukurtu_set_error_level () {
   variable_set ('error_level', ERROR_REPORTING_HIDE);
+}
+
+function mukurtu_set_private_files_path () {
+  variable_set ('file_private_path', 'sites/default/files/private');
 }
 
 function mukurtu_set_theme () {
