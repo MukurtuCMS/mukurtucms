@@ -24,9 +24,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Mukurtu is available through Mukurtu.net’s MAAS (Mukurtu as a service) for an out-of-the-box hosted Mukurtu CMS website that is completely yours. To get in touch with Mukurtu.net and check out our other services, including training and configuration, go to http://mukurtu.net. 
 
 #### Self - Hosted
-Mukurtu CMS is available as an open source distribution through Github.com/mukurtucms/mukurtucms to run on a local server or install on your preferred web platform.
+Mukurtu CMS is available as an open source distribution through https://github.com/mukurtucms/mukurtucms to run on a local server or install on your preferred web platform.
 
-To install on your own server, please find system requirements and installation procedures belo.w
+To install on your own server, please find system requirements and installation procedures below.
+
 ##### System Requirements
 * [Apache 2.0 (or greater)](http://httpd.apache.org)
   * mod_rewrite module enabled
