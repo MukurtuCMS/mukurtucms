@@ -6,10 +6,8 @@
 
 function mukurtu_install_tasks($install_state) {
   $tasks = array (
-    'mukurtu_set_error_level' => array(),
-    'mukurtu_set_private_files_path' => array(),
+    'mukurtu_set_misc_vars' => array(),
     'mukurtu_set_theme' => array(),
-    'mukurtu_set_clean_urls' => array(),
     'mukurtu_revert_features' => array(
       'display_name' => st('Finalize configuration'),
     ),
@@ -32,22 +30,17 @@ function mukurtu_install_tasks($install_state) {
  * hook_install_tasks callbacks
  */
 
-function mukurtu_set_error_level () {
+function mukurtu_set_misc_vars () {
   variable_set ('error_level', ERROR_REPORTING_HIDE);
-}
-
-function mukurtu_set_private_files_path () {
   variable_set ('file_private_path', 'sites/default/files/private');
+  variable_set ('clean_url', 1);
+  variable_set ('cron_safe_threshold', 0);
 }
 
 function mukurtu_set_theme () {
   theme_enable (array('mukurtu_starter'));
   variable_set ('theme_default', 'mukurtu_starter');
   theme_disable (array('bartik', 'seven'));
-}
-
-function mukurtu_set_clean_urls () {
-  variable_set ('clean_url', 1);
 }
 
 function mukurtu_revert_features () {
