@@ -12,26 +12,6 @@ function ma_frontpage_default_fe_block_settings() {
 
   $export['version'] = '2.0';
 
-  $export['boxes-ma_footer'] = array(
-    'cache' => -2,
-    'custom' => 0,
-    'delta' => 'ma_footer',
-    'module' => 'boxes',
-    'node_types' => array(),
-    'pages' => '',
-    'roles' => array(),
-    'themes' => array(
-      'mukurtu_starter' => array(
-        'region' => '',
-        'status' => 0,
-        'theme' => 'mukurtu_starter',
-        'weight' => 0,
-      ),
-    ),
-    'title' => '',
-    'visibility' => 0,
-  );
-
   $export['boxes-ma_site_footer'] = array(
     'cache' => -2,
     'custom' => 0,

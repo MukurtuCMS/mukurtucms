@@ -58,23 +58,6 @@ function ma_core_default_box() {
   $box = new stdClass();
   $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
   $box->api_version = 1;
-  $box->delta = 'ma_footer';
-  $box->plugin_key = 'simple';
-  $box->title = '';
-  $box->description = 'Footer Chiclets and Demo feedback tools';
-  $box->options = array(
-    'body' => array(
-      'value' => '<p><a style="display: block; float: left; margin: 0 10px 0 0;" href="http://civicactions.com/"><img src="/sites/all/modules/custom/mukurtu_custom/files/images/civicactions_80x15.png" alt="CivicActions"></a><a style="display: block; float: left; margin: 0 10px 0 0;" href="http://drupal.org"><img src="/sites/all/modules/custom/mukurtu_custom/files/images/drupal_80x15.png" alt="Drupal"></a><a style="display: block; float: left; margin: 0 10px 0 0;" href="http://openwall.com"><img src="/sites/all/modules/custom/mukurtu_custom/files/images/openwall_80x15.png" alt="Openwall"></a><a style="display: block; float: left; margin: 0 10px 0 0;" href="http://mukurtu.org"><img src="/sites/all/modules/custom/mukurtu_custom/files/images/mukurtu_80x15.png" alt="Mukurtu"></a>
-',
-      'format' => 'full_html',
-    ),
-    'additional_classes' => '',
-  );
-  $export['ma_footer'] = $box;
-
-  $box = new stdClass();
-  $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
-  $box->api_version = 1;
   $box->delta = 'ma_traditional_knowledge';
   $box->plugin_key = 'simple';
   $box->title = 'Traditional Knowledge';
