@@ -168,7 +168,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['nodefield']['build_mode'] = 'browse_teaser';
   $handler->display->display_options['fields']['nodefield']['links'] = 0;
   $handler->display->display_options['fields']['nodefield']['comments'] = 0;
-  /* Field: Content: Description */
+  /* Field: Content: Body */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
@@ -252,6 +252,7 @@ function ma_community_manage_views_default_views() {
 
   /* Display: Defaults */
   $handler = $view->new_display('default', 'Defaults', 'default');
+  $handler->display->display_options['title'] = 'content pane';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'none';
   $handler->display->display_options['cache']['type'] = 'none';
@@ -315,23 +316,14 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['filters']['field_community_image_thumbnail_sid']['field'] = 'field_community_image_thumbnail_sid';
   $handler->display->display_options['filters']['field_community_image_thumbnail_sid']['operator'] = 'not empty';
 
-  /* Display: Content pane */
-  $handler = $view->new_display('panel_pane', 'Content pane', 'panel_pane_1');
-  $handler->display->display_options['allow']['use_pager'] = 0;
-  $handler->display->display_options['allow']['items_per_page'] = 0;
-  $handler->display->display_options['allow']['offset'] = 0;
-  $handler->display->display_options['allow']['link_to_view'] = 0;
-  $handler->display->display_options['allow']['more_link'] = 0;
-  $handler->display->display_options['allow']['path_override'] = 0;
-  $handler->display->display_options['allow']['title_override'] = 'title_override';
-  $handler->display->display_options['allow']['exposed_form'] = 0;
-  $handler->display->display_options['allow']['fields_override'] = 0;
-
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Browse by Community';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $translatables['communities_content'] = array(
     t('Defaults'),
+    t('content pane'),
     t('more'),
     t('Apply'),
     t('Reset'),
@@ -340,9 +332,8 @@ function ma_community_manage_views_default_views() {
     t('Desc'),
     t('There is no content in this group.'),
     t('OG membership from node'),
-    t('Content pane'),
-    t('View panes'),
     t('Block'),
+    t('Browse by Community'),
   );
   $export['communities_content'] = $view;
 

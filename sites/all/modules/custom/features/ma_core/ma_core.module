@@ -91,3 +91,24 @@ function ma_core_og_get_users_per_role_and_group ($role_name, $group_bundle, $gi
     }
   }
 }
+
+/**
+ * Implements hook_menu().
+ */
+function ma_core_menu() {
+  $items = array();
+  // Empty home (front) page, added onto via context
+  $items['home'] = array(
+    'page callback' => 'ma_core_blank_page_callback',
+    'access callback' => TRUE,
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Display the content for your blank page.
+ */
+function ma_core_blank_page_callback() {
+  return ' ';
+}

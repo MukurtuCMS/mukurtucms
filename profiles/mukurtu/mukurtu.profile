@@ -8,6 +8,7 @@ function mukurtu_install_tasks($install_state) {
   $tasks = array (
     'mukurtu_set_misc_vars' => array(),
     'mukurtu_set_theme' => array(),
+    'mukurtu_create_default_boxes' => array(),
     'mukurtu_revert_features' => array(
       'display_name' => st('Finalize configuration'),
     ),
@@ -41,6 +42,40 @@ function mukurtu_set_theme () {
   theme_enable (array('mukurtu_starter'));
   variable_set ('theme_default', 'mukurtu_starter');
   theme_disable (array('bartik', 'seven'));
+}
+
+function mukurtu_create_default_boxes() {
+  // Footer
+  $box = boxes_factory('simple', array(
+    'delta' => 'ma_site_footer',
+    'title' => '',
+    'description' => 'Custom Site Footer',
+    'options' => array(
+      'body' => array(
+        'value' => '<p>Edit Site Footer here.</p>',
+        'format' => 'full_html',
+      ),
+    ),
+  ));
+  $box->save();
+
+  // Header (for frontpage)
+  $box = boxes_factory('simple', array(
+    'delta' => 'ma_site_header',
+    'title' => '',
+    'description' => 'Custom Site Header',
+    'options' => array(
+      'body' => array(
+        'value' => '<p><img src="sites/all/themes/mukurtu_starter/mukurtu_default_banner.jpg" alt="" width="1140" /></p>
+
+<h1> Welcome to Mukurtu CMS </h1>
+<p> Mukurtu (MOOK-oo-too) is a grassroots project aiming to empower communities to manage, share and exchange their digital heritage in culturally relevant and ethically-minded ways. We are committed to maintaining an open, community-driven approach to Mukurtu’s continued development. Our first priority is to help build a platform that fosters relationships of respect and trust. <a href="about"> Learn More >> </a></p>',
+        'format' => 'ds_code',
+      ),
+    ),
+  ));
+  $box->save();
+
 }
 
 function mukurtu_revert_features () {
