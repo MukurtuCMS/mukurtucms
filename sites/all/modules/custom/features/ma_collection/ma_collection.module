@@ -130,27 +130,53 @@ function ma_collection_node_presave($node) {
 
   // Populate the Digital Heritage Count
   if ($node->type == 'collection') {
+    $collection_presave_skip = variable_get('collection_presave_skip', array());
+    if (array_key_exists($node->nid, $collection_presave_skip)) {
+      unset ($collection_presave_skip[$node->nid]);
+      variable_set('collection_presave_skip', $collection_presave_skip);
+      return;
+    }
+
     $collection_emw = entity_metadata_wrapper('node', $node);
     $new_count = $collection_emw->field_digital_heritage_items->count();
-    $old_count = $collection_emw->field_digital_heritage_count->value();
-    if ($old_count <> $new_count) {
-      $collection_emw->field_digital_heritage_count->set ($new_count);
-    }
+    $collection_presave_skip[$node->nid] = $node->nid;
+    variable_set('collection_presave_skip', $collection_presave_skip);
+    $collection_emw->field_digital_heritage_count->set ($new_count);
+    $collection_emw->save();
   }
 
 }
 
 /**
+ * Implements hook_node_insert().
+ */
+function ma_collection_node_insert($node) {
+  if ($node->type == 'digital_heritage') {
+    ma_collection_node_update($node);
+  }
+}
+
+/**
+ * Implements hook_field_attach_delete().
+ */
+// We need to use this hook instead of hook_node_delete because hook_node_delete runs too early
+function ma_collection_field_attach_delete ($entity_type, $entity) {
+  if ($entity->type == 'digital_heritage') {
+    ma_collection_node_update($entity, 1);
+  }
+}
+
+/**
  * Implements hook_node_update().
  */
-function ma_collection_node_update($node) {
+function ma_collection_node_update($node, $deleted = NULL) {
 
-  // Update the Digital Heritage Count on Collection nodes when a DH node adds or removes a Collection reference
+  // Update the Digital Heritage Count on Collection nodes when a DH node adds or removes a Collection reference, or a DH node with a Collection reference is deleted, or a DH node with a Collection reference is cloned
   if ($node->type == 'digital_heritage') {
     $wrapper_new = entity_metadata_wrapper('node', $node);
     $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->field_collection->value());
     $old_refs = array();
-    if (isset($node->original)) {
+    if (!$deleted AND isset($node->original)) {
       $wrapper_old = entity_metadata_wrapper('node', $node->original);
       $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->field_collection->value());
     }
@@ -159,18 +185,20 @@ function ma_collection_node_update($node) {
       $refs_deleted = array_diff ($old_refs, $new_refs);
       $collections_to_recount = array_merge ($refs_added, $refs_deleted);
       foreach ($collections_to_recount as $collection) {
-        $collection_emw = entity_metadata_wrapper('node', $collection);
-        $old_count = $collection_emw->field_digital_heritage_items->count();
         $query = new EntityFieldQuery();
         $result = $query
           ->entityCondition('entity_type', 'node')
           ->entityCondition('bundle', 'digital_heritage')
+          ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
           ->fieldCondition('field_collection', 'target_id', $collection)
           ->execute();
         $new_count = count($result['node']);
-        if ($new_count <> $old_count) {
-          $collection_emw->field_digital_heritage_count->set ($new_count);
-        }
+        $collection_presave_skip = variable_get('collection_presave_skip', array());
+        $collection_presave_skip[$collection] = $collection;
+        variable_set('collection_presave_skip', $collection_presave_skip);
+        $collection_emw = entity_metadata_wrapper('node', $collection);
+        $collection_emw->field_digital_heritage_count->set($new_count);
+        $collection_emw->save();
       }
     }
   }
