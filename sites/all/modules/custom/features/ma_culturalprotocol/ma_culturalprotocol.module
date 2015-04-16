@@ -192,9 +192,10 @@ function _process_dh_node_access ($cp_new, $cp_old = NULL) {
     ->fieldCondition('og_group_ref', 'target_id', $cp_new->getIdentifier())
     ->execute();
   $dh_nids = empty($result['node']) ? array() : array_keys($result['node']);
-  foreach ($dh_nids as $dh_nid) {
-    global $user;
-    mukurtu_protocol_field_node_access(node_load($dh_nid), 'view', $user);
+  if (count($dh_nids)) {
+    $dh_nodes_to_rebuid_and_reindex = variable_get('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
+    $dh_nodes_to_rebuid_and_reindex = array_merge($dh_nodes_to_rebuid_and_reindex, $dh_nids);
+    variable_set('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', $dh_nodes_to_rebuid_and_reindex);
   }
 }
 

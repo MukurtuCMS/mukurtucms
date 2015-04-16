@@ -284,45 +284,112 @@ function _ajax_get_protocol_by_community_dropdown_options($key = '') {
 
 
 
+/**
+ * HOW DIGITAL HERITAGE CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED:
+ *
+ * 1. At the node view level, via hook_node_access
+ *    - mukurtu_protocol_field_node_access is used on node views but not search results. SAPI search uses a list query (from a view), and list queries are, by core implementation, not run through hook_node_access for performance reasons.
+ *    - DH nodes with Item Sharing set to "ANY" are passed if user is a member of any of the CPs or any of the CPs are open groups. This is only partially handled by OG so we need to override here.
+ *    - DH nodes with Item Sharing set to "ALL" are passed if user is a member of all CPs / CP is open group. This is not handled by OG at all so we override here.
+ * 2. In the search results, via the node grants system AND hook_search_api_query_alter
+ *    - the grants system EXPANDS search results for DH nodes with Item Sharing set to "ANY"
+ *      - mukurtu_protocol_field_node_access_records defines a custom grant 'mukurtu_dh_any_public_group' which is set on any DH node with Item Sharing set to "ANY" and also belonging to at least one Open CP
+ *      - mukurtu_protocol_field_node_grants provides the 'mukurtu_dh_any_public_group' to all users
+ *      - the reason we cannot, for the node views, only use the grants system not hook_node_access is because grants are OR'ed, not AND'ed (impossible to override this behaviour) whereas with the DH's set to "ALL", AND'ing is what we need
+ *    - ma_search_api_search_api_query_alter RESTRICTS search results for DH nodes wih Item Sharing set to "ALL"
+ *
+ * To summarize: 1. we need hook_node_access because the grants system cannot AND permissions. 2. We need the grants system because hook_node_access is not respected by search. 3. We need a hook_search_api_query_alter because its cleaner/simpler to restrict (DH = ALL) search results there than in the grants, 4. We cannot use hook_search_api_query_alter to expand (DH = ANY) search results so we use the grant for that.
+ */
 
 /**
  * Implements hook_node_access().
  *
- * Confirming that an 'ALL' setting on a DH item checks that the user is a member of ALL the groups
  */
 function mukurtu_protocol_field_node_access($node, $op, $account) {
+
   if (is_string($node)) {
     return NODE_ACCESS_IGNORE;
   }
 
   if (($op == 'view' || $op == 'update') && $node->type=='digital_heritage' ) {
-    $privacy_setting = $node->field_item_privacy_setting['und'][0]['value'];  // 'all' or 'any'
 
-    if ($privacy_setting != 'all') {
-      return NODE_ACCESS_IGNORE;
-    }
-
-    if (!$content_groups = og_get_entity_groups('node', $node)) {
-      # drupal_set_message (t('Denied access to DH node @nid -- DH node is set to strict, but NODE is not in any groups', array('@nid' => $node->nid))); // This shouldn't be possible on new DH nodes (old ones might still be as such)
+    // Safeguard. This should never happen. All DH items should be in a group.
+    if (!$groups_on_node = og_get_entity_groups('node', $node)) {
       return NODE_ACCESS_DENY;
     }
-    $content_groups = array_values($content_groups['node']);
 
-    foreach ($content_groups as $cgid) {
-      if (!og_is_member('node', $cgid)) { // Pass if user is a member of the group
-        $cp_emw = entity_metadata_wrapper('node', $cgid);
-        if ($cp_emw->group_access->value() <> 0) { // Pass if it's an open group
-          # drupal_set_message(t('DENIED Access for node @nid in group @cgid', array('@nid' => $node->nid, '@cgid' => $cgid)));
-          return NODE_ACCESS_DENY;
+    $groups_on_node = array_values($groups_on_node['node']);
+
+    // DH set to ANY
+    if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
+      foreach ($groups_on_node as $group) {
+        if (og_is_member('node', $group)) {
+          return NODE_ACCESS_ALLOW; // Pass if user is a member of the group
+        }
+        $group_emw = entity_metadata_wrapper('node', $group);
+        if ($group_emw->group_access->value() == 0) {
+          return NODE_ACCESS_ALLOW; // Pass if it's an open group
+        }
+      }
+      return NODE_ACCESS_DENY;
+    }
+
+    // DH set to ALL (default)
+    else {
+      foreach ($groups_on_node as $group) {
+        if (!og_is_member('node', $group)) { // Pass if user is a member of the group
+          $group_emw = entity_metadata_wrapper('node', $group);
+          if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
+            return NODE_ACCESS_DENY;
+          }
+        }
+      }
+      return NODE_ACCESS_ALLOW;
+    }
+  }
+}
+
+/**
+ * Implements hook_node_access_records().
+ */
+function mukurtu_protocol_field_node_access_records($node) {
+
+  if ($node->type == 'digital_heritage') {
+
+    if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
+
+      if (!$cps = og_get_entity_groups('node', $node)) {
+        return; // This should never occur
+      }
+
+      $cp_nids = array_values($cps['node']);
+      foreach ($cp_nids as $cp_nid) {
+        $cp_emw = entity_metadata_wrapper('node', $cp_nid);
+        if ($cp_emw->group_access->value() == 0) { // Open group
+          $grants = array();
+          $grants[] = array(
+            'realm' => 'mukurtu_dh_any_public_group',
+            'gid' => 0,
+            'grant_view' => 1,
+            'grant_update' => 0,
+            'grant_delete' => 0,
+            'priority' => 1, // By setting the priority > 0 we override OG's default handling for this DH node
+          );
+          return $grants;
         }
       }
     }
 
-    # drupal_set_message(t('Granted'));
-    return NODE_ACCESS_ALLOW;
-
-
+    // The DH node is not in any Open groups, so delete existing grant that says otherwise in case it once was
+    node_access_write_grants($node, $grants = array(), 'mukurtu_dh_any_public_group', TRUE);
   }
-  return NODE_ACCESS_IGNORE;
 }
 
+/**
+ * Implements hook_node_grants().
+ */
+function mukurtu_protocol_field_node_grants($account, $op) {
+  // This grant is provided to everyone
+  $grants['mukurtu_dh_any_public_group'][] = 0;
+  return $grants;
+}

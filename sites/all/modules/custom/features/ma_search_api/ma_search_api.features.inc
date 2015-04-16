@@ -138,6 +138,7 @@ function ma_search_api_default_search_api_index() {
         "field_summary" : { "type" : "text" },
         "field_tags" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_tk_body:value" : { "type" : "text" },
+        "nid" : { "type" : "integer" },
         "og_group_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "promote" : { "type" : "boolean" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
@@ -311,6 +312,12 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_search_api_access_node",
             "column" : "value",
             "type" : "list\\u003Cstring\\u003E",
+            "boost" : "1.0"
+          },
+          "nid" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "nid",
+            "type" : "integer",
             "boost" : "1.0"
           }
         }

@@ -14,7 +14,6 @@ function ma_search_api_node_insert ($node) {
 
 function ma_search_api_node_update($node) {
 
-
   $relations = array(
     'collection' => array(
       'relationships' => array(
@@ -54,7 +53,6 @@ function ma_search_api_node_update($node) {
 
   if (isset($relations[$node->type])) {
 
-    $dh_nodes_to_reindex = variable_get('mukurtu_dh_nodes_to_reindex', array());
     $content_type_properties = $relations[$node->type];
 
     // Load both old (if any) and new versions of the node into a EMW
@@ -102,9 +100,6 @@ function ma_search_api_node_update($node) {
       if ($reindex_all_relations) {
         $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
         # dpm($items_to_reindex, 'items to reindex after a trigger');
-        if ($relationship_node_type == 'dh') {
-          $dh_nodes_to_reindex = array_merge($dh_nodes_to_reindex, $new_refs, $old_refs);
-        }
       }
 
       // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
@@ -113,9 +108,6 @@ function ma_search_api_node_update($node) {
         $refs_deleted = array_diff($old_refs, $new_refs);
         $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
         # dpm($items_to_reindex, 'items to reindex after a changed relationship');
-        if ($relationship_node_type == 'dh') {
-          $dh_nodes_to_reindex = array_merge($dh_nodes_to_reindex, $refs_added, $refs_deleted);
-        }
       }
     }
 
@@ -126,37 +118,78 @@ function ma_search_api_node_update($node) {
       search_api_index_specific_items_delayed(search_api_index_load('default_node_index'), $items_to_reindex);
     }
 
-    // Although the DH node gets reindexed by virtue of being edited, our use of mukurtu_protocol_field_node_access means that if the DH node is set to ANY, it needs to be reindexed again after search_api node access is rebuilt for the Protocol facet to be accurate (at least. possibly other effects). This does not work if is added here (too soon). So we do it in ma_search_api_views_pre_view, just before the view is loaded.
-    if ($node->type == 'digital_heritage') {
-      $dh_nodes_to_reindex[] = $node->nid;
-    }
-
-    // Schedule DH nodes for reindexing on the next /digital-heritage viewing
-    # dpm ($dh_nodes_to_reindex, 'dh nodes to reindex on next /digital-heritage viewing');
-    variable_set('mukurtu_dh_nodes_to_reindex', $dh_nodes_to_reindex);
-
   }
 }
-
-
 
 /**
  * Implements hook_views_pre_view().
  */
 function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
 
-  // Reindex any DH nodes that were added to mukurtu_dh_nodes_to_reindex in ma_search_api_node_update, just before the view is rendered.
+  // Rebuild permissions and reindex any DH nodes that were queued up for this op, just before the view is rendered.
   if ($view->name == 'digital_heritage_grid_list') {
-    $dh_nodes_to_reindex = variable_get ('mukurtu_dh_nodes_to_reindex', array());
-    if (count($dh_nodes_to_reindex)) {
-      $dh_nodes_to_reindex = array_unique ($dh_nodes_to_reindex);
-      # dpm ($dh_nodes_to_reindex, 'dh nodes reindexed in view hook');
-      search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_reindex);
-      variable_set ('mukurtu_dh_nodes_to_reindex', array());
+    $dh_nodes_to_rebuid_and_reindex = variable_get ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
+    if (count($dh_nodes_to_rebuid_and_reindex)) {
+      $dh_nodes_to_rebuid_and_reindex = array_unique ($dh_nodes_to_rebuid_and_reindex);
+      # dpm ($dh_nodes_to_rebuid_and_reindex, '$dh_nodes_to_rebuid_and_reindex');
+      // Rebuild perms
+      foreach ($dh_nodes_to_rebuid_and_reindex as $dh_nid) {
+        node_access_acquire_grants(node_load($dh_nid));
+      }
+      // Reindex
+      search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuid_and_reindex);
+      variable_set ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
     }
   }
 }
 
+
+//  See "HOW DIGITAL HERITAGE CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+/**
+ * Implements hook_search_api_query_alter().
+ * Exclude user defined nodes from search index
+ * @param type $query
+ */
+function ma_search_api_search_api_query_alter($sapi_query) {
+
+  if (arg(0) == 'digital-heritage' AND !user_access('bypass content access control')) {
+
+    // Get all STRICT CPs that the user is not a member of
+    $cp_query = new EntityFieldQuery();
+    $cp_query->entityCondition('entity_type', 'node')
+      ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+      ->entityCondition('bundle', 'cultural_protocol_group')
+      ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
+    // Only groups the user is not a member of
+    if ($user_groups = og_get_groups_by_user()) {
+      $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
+    }
+    $result = $cp_query->execute();
+
+    // Of all the CPs that the user cannot access, get all DHs within them that have Item Sharing set to "ALL"
+    if (isset($result['node'])) {
+      $cp_nids = array_keys($result['node']);
+      # dpm($cp_nids, 'cp nids');
+      $dh_query = new EntityFieldQuery();
+      $dh_query->entityCondition('entity_type', 'node')
+        ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+        ->entityCondition('bundle', 'digital_heritage')
+        ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
+        ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
+      $result = $dh_query->execute();
+
+      // Filter our the DH items the user should not see
+      if (isset($result['node'])) {
+        $dh_nids = array_keys($result['node']);
+        # dpm($dh_nids, 'dh nids excluded');
+        $filter = $sapi_query->createFilter('AND');
+        $filter->condition('nid', $dh_nids, 'NOT IN');
+        $sapi_query->filter($filter);
+
+      }
+    }
+  }
+}
 
 /**
  * Implements hook_scald_atom_access
