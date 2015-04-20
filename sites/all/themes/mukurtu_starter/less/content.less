@@ -20,6 +20,7 @@
 
 .page-node-edit .ctools-modal-content,.page-node-add .ctools-modal-content {
 
+
   // Hide the background box
   background: none !important;
   border: none !important;
@@ -35,7 +36,16 @@
     }
   }
 
+  // This is the form that appears after files are uploaded
+  .plupload-form-processed {
+    // Hide the OG Other Groups field that appears for admin users
+    [id^="og-group-ref-values--"], .description, .field-add-more-submit, .tabledrag-toggle-weight-wrapper {
+      display: none;
+    }
+  }
+
 }
+
 
 
 //// Popup API

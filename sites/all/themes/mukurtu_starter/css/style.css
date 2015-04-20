@@ -628,6 +628,16 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .ctools-modal-content .form-item-identifier #edit-identifier {
   width: 400px;
 }
+.page-node-edit .ctools-modal-content .plupload-form-processed [id^="og-group-ref-values--"],
+.page-node-add .ctools-modal-content .plupload-form-processed [id^="og-group-ref-values--"],
+.page-node-edit .ctools-modal-content .plupload-form-processed .description,
+.page-node-add .ctools-modal-content .plupload-form-processed .description,
+.page-node-edit .ctools-modal-content .plupload-form-processed .field-add-more-submit,
+.page-node-add .ctools-modal-content .plupload-form-processed .field-add-more-submit,
+.page-node-edit .ctools-modal-content .plupload-form-processed .tabledrag-toggle-weight-wrapper,
+.page-node-add .ctools-modal-content .plupload-form-processed .tabledrag-toggle-weight-wrapper {
+  display: none;
+}
 .popup-element-title {
   background: none;
 }
