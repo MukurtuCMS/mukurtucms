@@ -90,79 +90,82 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
  */
 function ma_scald_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'scald_atom_add_form_options') {
+    $atom_index = 0;
+    while (isset($form['atom' . $atom_index])) {
+      $entity = $form['atom' . $atom_index]['#entity'];
+      $language = $entity->language;
 
-    $entity = $form['atom0']['#entity'];
-    $language = $entity->language;
+      // Restrict CP nodes the scald item can be placed into according to the user's CP perms (otherwise by default it will allow all CPs the user is a member of)
+      $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
+      $form['atom' . $atom_index]['og_group_ref'][$language][0]['default']['#options'] = $cp_options;
+      $form['atom' . $atom_index]['og_group_ref'][$language][0]['#suffix'] = t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. You can select and deselect multiple Cultural Protocols by holding down the CTRL key while clicking on them.");
 
-    // Restrict CP nodes the scald item can be placed into according to the user's CP perms (otherwise by default it will allow all CPs the user is a member of)
-    $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
-    $form['atom0']['og_group_ref'][$language][0]['default']['#options'] = $cp_options;
-    $form['atom0']['og_group_ref'][$language][0]['#suffix'] = t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. You can select and deselect multiple Cultural Protocols by holding down the CTRL key while clicking on them.");
+      // Do not show the per-scald actions checkboxes (view, edit, fetch, delete). This is TMI in the form. Default values come from per scald type in the atom config.
+      $form['atom' . $atom_index]['scald_actions']['#access'] = false;
 
-    // Do not show the per-scald actions checkboxes (view, edit, fetch, delete). This is TMI in the form. Default values come from per scald type in the atom config.
-    $form['atom0']['scald_actions']['#access'] = false;
+      // Set metadata
+      if (!isset($entity->created)) {
 
-    // Set metadata
-    if (!isset($entity->created)) {
+        // Set scald title according to filename
+        $file = file_load($entity->base_id);
+        $filename = $file->filename;
+        $form['atom' . $atom_index]['title']['#default_value'] = $file->filename;
 
-      // Set scald title according to filename
-      $file = file_load($entity->base_id);
-      $filename = $file->filename;
-      $form['atom0']['title']['#default_value'] = $file->filename;
+        // For images, pre-populate the metadata from exif data (
+        if ($entity->type == 'image') {
 
-      // For images, pre-populate the metadata from exif data (
-      if ($entity->type == 'image') {
+          // exif field => scald field
+          $field_assocs = array(
+            'field_media_description' => 'field_scald_description',
+            //        'field_aperturevalue' => '',
+            'field_iptc_headline' => 'field_scald_headline',
+            'field_iptc_copyright' => 'field_licence_std_cc',
+            'field_xmp_rights' => 'field_rights',
+            'field_iptc_sublocation' => 'field_scald_location',
+            'field_xmp_creator' => 'field_scald_creator',
+            'field_iptc_keywords' => 'field_scald_keywords',
+            //'field_exif_datetime' => 'field_scald_created',
+            //'field_gps_latitude' => '',
+            //'field_gps_longitude' => '',
+          );
 
-        // exif field => scald field
-        $field_assocs = array(
-          'field_media_description' => 'field_scald_description',
-          //        'field_aperturevalue' => '',
-          'field_iptc_headline' => 'field_scald_headline',
-          'field_iptc_copyright' => 'field_licence_std_cc',
-          'field_xmp_rights' => 'field_rights',
-          'field_iptc_sublocation' => 'field_scald_location',
-          'field_xmp_creator' => 'field_scald_creator',
-          'field_iptc_keywords' => 'field_scald_keywords',
-          //'field_exif_datetime' => 'field_scald_created',
-          //'field_gps_latitude' => '',
-          //'field_gps_longitude' => '',
-        );
-
-        foreach ($field_assocs as $exif_field => $scald_field) {
-          if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom0'][$scald_field][$language][0]['value']['#default_value'] == null) {
-            $form['atom0'][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
+          foreach ($field_assocs as $exif_field => $scald_field) {
+            if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] == NULL) {
+              $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
+            }
           }
-        }
 
-        if (isset($file->field_exif_datetime[$language][0]['value'])) {
-          $form['atom0']['field_scald_created'][$language][0]['#default_value']['value'] = $file->field_exif_datetime[$language][0]['value'];
-          $form['atom0']['field_scald_created'][$language][0]['#default_value']['value2'] = $file->field_exif_datetime[$language][0]['value'];
-        }
+          if (isset($file->field_exif_datetime[$language][0]['value'])) {
+            $form['atom' . $atom_index]['field_scald_created'][$language][0]['#default_value']['value'] = $file->field_exif_datetime[$language][0]['value'];
+            $form['atom' . $atom_index]['field_scald_created'][$language][0]['#default_value']['value2'] = $file->field_exif_datetime[$language][0]['value'];
+          }
 
-        // do geolocation fields
-        if (isset($file->field_gps_latitude[$language][0]['value']) && $form['atom0']['field_scald_geo_location'][$language][0]['geom']['#default_value']['lat'] == '') {
-          $form['atom0']['field_scald_geo_location'][$language][0]['geom']['#default_value']['lat'] = $file->field_gps_latitude[$language][0]['value'];
-        }
-        if (isset($file->field_gps_longitude[$language][0]['value']) && $form['atom0']['field_scald_geo_location'][$language][0]['geom']['#default_value']['lon'] == '') {
-          $form['atom0']['field_scald_geo_location'][$language][0]['geom']['#default_value']['lon'] = $file->field_gps_longitude[$language][0]['value'];
-        }
+          // do geolocation fields
+          if (isset($file->field_gps_latitude[$language][0]['value']) && $form['atom' . $atom_index]['field_scald_geo_location'][$language][0]['geom']['#default_value']['lat'] == '') {
+            $form['atom' . $atom_index]['field_scald_geo_location'][$language][0]['geom']['#default_value']['lat'] = $file->field_gps_latitude[$language][0]['value'];
+          }
+          if (isset($file->field_gps_longitude[$language][0]['value']) && $form['atom' . $atom_index]['field_scald_geo_location'][$language][0]['geom']['#default_value']['lon'] == '') {
+            $form['atom' . $atom_index]['field_scald_geo_location'][$language][0]['geom']['#default_value']['lon'] = $file->field_gps_longitude[$language][0]['value'];
+          }
 
-        if ($form['atom0']['field_scald_identifier'][$language][0]['value']['#default_value'] == null) {
-          $form['atom0']['field_scald_identifier'][$language][0]['value']['#default_value'] = $filename;
-        }
+          if ($form['atom' . $atom_index]['field_scald_identifier'][$language][0]['value']['#default_value'] == NULL) {
+            $form['atom' . $atom_index]['field_scald_identifier'][$language][0]['value']['#default_value'] = $filename;
+          }
 
-        // If we have metadata to put into that atom title, do it, otherwise it is already populated with the atom filename
-        if ($exif_title = $file->field_media_title[$language][0]['value']) {
-          $form['atom0']['title']['#default_value'] = $exif_title;
-        }
+          // If we have metadata to put into that atom title, do it, otherwise it is already populated with the atom filename
+          if (isset($file->field_media_title[$language][0]['value'])) {
+            $form['atom' . $atom_index]['title']['#default_value'] = $file->field_media_title[$language][0]['value'];
+          }
 
-        if (isset($file->field_iptc_keywords[$language][0]['value'])) {
-          $keywords = $file->field_iptc_keywords[$language][0]['value'];
-          if (sizeof($keywords)) {
-            $form['atom0']['scald_tags'][$language]['#default_value'] = $keywords;
+          if (isset($file->field_iptc_keywords[$language][0]['value'])) {
+            $keywords = $file->field_iptc_keywords[$language][0]['value'];
+            if (sizeof($keywords)) {
+              $form['atom' . $atom_index]['scald_tags'][$language]['#default_value'] = $keywords;
+            }
           }
         }
       }
+      $atom_index++;
     }
   }
 
