@@ -730,6 +730,10 @@ table .checkbox input[type="checkbox"] {
 .view-collections-grid-list.list-view .view-content .views-row .field-name-field-collection-image {
   right: 0;
 }
+.view-digital-heritage-grid-list.list-view .view-content .views-row .field-name-field-collection-image,
+.view-collections-grid-list.list-view .view-content .views-row .field-name-field-collection-image {
+  float: right;
+}
 .view-digital-heritage-grid-list.grid-view .view-content,
 .view-collections-grid-list.grid-view .view-content {
   margin-left: -25px;

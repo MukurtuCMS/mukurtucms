@@ -39,9 +39,7 @@ function ma_collection_ds_field_settings_info() {
     ),
     'field_collection_image' => array(
       'formatter_settings' => array(
-        'ft' => array(
-          'classes' => 'col-md-4 col-md-push-8',
-        ),
+        'ft' => array(),
       ),
     ),
   );
@@ -185,16 +183,16 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'collections_title_with_count',
-        1 => 'field_collection_image',
+        0 => 'field_collection_image',
+        1 => 'collections_title_with_count',
         2 => 'group_list_view_fields',
         3 => 'field_collection_summary',
         4 => 'field_collection_credit',
       ),
     ),
     'fields' => array(
-      'collections_title_with_count' => 'ds_content',
       'field_collection_image' => 'ds_content',
+      'collections_title_with_count' => 'ds_content',
       'group_list_view_fields' => 'ds_content',
       'field_collection_summary' => 'ds_content',
       'field_collection_credit' => 'ds_content',

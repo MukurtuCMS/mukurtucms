@@ -117,7 +117,8 @@ function ma_collection_field_group_info() {
     'format_settings' => array(
       'label' => 'List View Fields',
       'instance_settings' => array(
-        'classes' => 'col-md-8 col-md-pull-4 ',
+        'id' => '',
+        'classes' => '',
         'description' => '',
         'show_label' => '0',
         'label_element' => 'h3',
