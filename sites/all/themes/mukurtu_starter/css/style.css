@@ -955,6 +955,9 @@ a:hover {
   padding-bottom: 10px;
   margin-bottom: 10px;
 }
+.node-digital-heritage.view-mode-full .scald-atom {
+  margin-bottom: 2.5em;
+}
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
 }
