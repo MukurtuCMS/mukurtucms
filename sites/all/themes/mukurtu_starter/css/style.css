@@ -958,9 +958,6 @@ a:hover {
 .node-digital-heritage.view-mode-full .scald-atom {
   margin-bottom: 2.5em;
 }
-.node-digital-heritage.view-mode-full .scald-atom .scald-file-icon {
-  display: none;
-}
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
 }
