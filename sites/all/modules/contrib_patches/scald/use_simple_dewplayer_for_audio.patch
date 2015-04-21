@@ -1,0 +1,15 @@
+diff --git a/modules/providers/scald_audio/scald_audio_player.tpl.php b/modules/providers/scald_audio/scald_audio_player.tpl.php
+index a28dd1e..84e8b63 100644
+--- a/modules/providers/scald_audio/scald_audio_player.tpl.php
++++ b/modules/providers/scald_audio/scald_audio_player.tpl.php
+@@ -5,8 +5,8 @@
+  * Created by Hervé Tubaldo - herve@webup.fr
+  */
+ ?>
+-<object type="application/x-shockwave-flash" data="<?php echo base_path().drupal_get_path('module','scald_audio'); ?>/libraries/dewplayer/dewplayer-playlist.swf" width="200" height="20" id="dewplayer-<?php echo $vars['atom']->sid ?>" name="dewplayer">
+-  <param name="movie" value="<?php echo base_path().drupal_get_path('module','scald_audio'); ?>/libraries/dewplayer/dewplayer-playlist.swf" />
++<object type="application/x-shockwave-flash" data="<?php echo base_path().drupal_get_path('module','ma_scald'); ?>/players/dewplayer/dewplayer.swf" width="200" height="7" id="dewplayer-<?php echo $vars['atom']->sid ?>" name="dewplayer">
++  <param name="movie" value="<?php echo base_path().drupal_get_path('module','ma_scald'); ?>/players/dewplayer/dewplayer.swf" />
+   <param name="flashvars" value="mp3=<?php echo file_create_url($vars['audio_uri']) ?>" />
+   <param name="wmode" value="transparent" />
+ </object>

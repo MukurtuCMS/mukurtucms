@@ -18,9 +18,14 @@ function ma_scald_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'ma_colorbox';
   $ds_fieldsetting->settings = array(
     'download_atom' => array(
-      'weight' => '1',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
+    ),
+    'scald_thumbnail' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
     ),
   );
   $export['scald_atom|audio|ma_colorbox'] = $ds_fieldsetting;
@@ -89,20 +94,22 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
+        0 => 'scald_thumbnail',
         1 => 'og_group_ref',
-        2 => 'download_atom',
-        3 => 'scald_authors',
+        2 => 'scald_authors',
+        3 => 'atom',
         4 => 'scald_tags',
-        5 => 'group_scald_atom_metadata',
+        5 => 'download_atom',
+        6 => 'group_scald_atom_metadata',
       ),
     ),
     'fields' => array(
-      'atom' => 'ds_content',
+      'scald_thumbnail' => 'ds_content',
       'og_group_ref' => 'ds_content',
-      'download_atom' => 'ds_content',
       'scald_authors' => 'ds_content',
+      'atom' => 'ds_content',
       'scald_tags' => 'ds_content',
+      'download_atom' => 'ds_content',
       'group_scald_atom_metadata' => 'ds_content',
     ),
     'classes' => array(
@@ -159,14 +166,16 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
-        1 => 'group_scald_atom_metadata',
-        2 => 'og_group_ref',
-        3 => 'scald_authors',
-        4 => 'scald_tags',
+        0 => 'scald_thumbnail',
+        1 => 'atom',
+        2 => 'group_scald_atom_metadata',
+        3 => 'og_group_ref',
+        4 => 'scald_authors',
+        5 => 'scald_tags',
       ),
     ),
     'fields' => array(
+      'scald_thumbnail' => 'ds_content',
       'atom' => 'ds_content',
       'group_scald_atom_metadata' => 'ds_content',
       'og_group_ref' => 'ds_content',
