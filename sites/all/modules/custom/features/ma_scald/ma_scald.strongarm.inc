@@ -93,7 +93,7 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_colorbox' => array(
-            'weight' => '0',
+            'weight' => '1',
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
@@ -153,7 +153,7 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_colorbox' => array(
-            'weight' => '0',
+            'weight' => '1',
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(

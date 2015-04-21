@@ -224,10 +224,14 @@ function ma_scald_field_default_field_instances() {
         'weight' => 4,
       ),
       'ma_colorbox' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 5,
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'large',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -396,7 +400,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -486,10 +490,14 @@ function ma_scald_field_default_field_instances() {
         'weight' => 5,
       ),
       'ma_colorbox' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 4,
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'large',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
       'ma_scald_search_results' => array(
         'label' => 'hidden',

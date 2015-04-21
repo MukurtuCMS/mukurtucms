@@ -21,7 +21,7 @@ function ma_scald_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Metadata',
-    'weight' => '2',
+    'weight' => '3',
     'children' => array(
       0 => 'scald_authors',
       1 => 'scald_tags',
@@ -54,7 +54,7 @@ function ma_scald_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Metadata',
-    'weight' => '1',
+    'weight' => '2',
     'children' => array(
       0 => 'scald_authors',
       1 => 'scald_tags',
