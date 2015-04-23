@@ -72,6 +72,7 @@ function bootstrap_form_element(&$variables) {
   // 1. Do not limit to only descriptions under 200 chars
   // 2. For text area fields, the description is not yet available in $element, so load it from the field instance and use that.
   // 3. We are still respecting the markup condition (description === strip_tags($description)) because jquery-ui tooltips can't show markup
+  // 4. Override the default placement of these tooltips from bootstrap's default "auto-left" to "bottom", because auto-left was failing to right (since there is no space at left), but right was very squeezed on smaller screens
   if (!empty($element['#description'])) {
     $description = $element['#description'];
   }
@@ -83,6 +84,7 @@ function bootstrap_form_element(&$variables) {
     if (theme_get_setting('bootstrap_tooltip_enabled') && theme_get_setting('bootstrap_tooltip_descriptions') && $description === strip_tags($description)) {
       $tooltip = TRUE;
       $attributes['data-toggle'] = 'tooltip';
+      $attributes['data-placement'] = 'bottom';
       $attributes['title'] = $description;
     }
   }

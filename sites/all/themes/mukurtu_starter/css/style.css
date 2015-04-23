@@ -649,6 +649,10 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .text-format-wrapper .description {
   display: none;
 }
+.tooltip-inner {
+  max-width: 750px;
+  text-align: left;
+}
 .view-communities-structure .view-header {
   margin-bottom: 20px;
 }
