@@ -331,7 +331,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource.',
+    'description' => 'A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -378,6 +378,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 14,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_contributor',
     'label' => 'Contributor',
@@ -612,7 +613,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one creator can be entered into this field.',
+    'description' => 'A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one creator can be entered into this field. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -659,6 +660,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 15,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_creator',
     'label' => 'Creator',
@@ -2143,8 +2145,8 @@ function ma_digitalheritage_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource.');
-  t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one creator can be entered into this field.');
+  t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"');
+  t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one creator can be entered into this field. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"');
   t('A Publisher can be a person, an organization, or a service responsible for publishing the content. 
 ');
   t('A collection is an aggregation of digital heritage resources. Type the title of an existing collection in your CMS.
