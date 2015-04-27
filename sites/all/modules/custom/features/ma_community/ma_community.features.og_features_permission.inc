@@ -29,63 +29,6 @@ function ma_community_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:community:create community content'
-  $permissions['node:community:create community content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:create cultural_protocol_group content'
-  $permissions['node:community:create cultural_protocol_group content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:create digital_heritage content'
-  $permissions['node:community:create digital_heritage content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:delete any community content'
-  $permissions['node:community:delete any community content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:community:delete any cultural_protocol_group content'
-  $permissions['node:community:delete any cultural_protocol_group content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:community:delete any digital_heritage content'
-  $permissions['node:community:delete any digital_heritage content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:community:delete own community content'
-  $permissions['node:community:delete own community content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:delete own cultural_protocol_group content'
-  $permissions['node:community:delete own cultural_protocol_group content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:delete own digital_heritage content'
-  $permissions['node:community:delete own digital_heritage content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
   // Exported og permission: 'node:community:invite any user'
   $permissions['node:community:invite any user'] = array(
     'roles' => array(),
@@ -130,44 +73,8 @@ function ma_community_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:community:update any community content'
-  $permissions['node:community:update any community content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:community:update any cultural_protocol_group content'
-  $permissions['node:community:update any cultural_protocol_group content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:community:update any digital_heritage content'
-  $permissions['node:community:update any digital_heritage content'] = array(
-    'roles' => array(),
-  );
-
   // Exported og permission: 'node:community:update group'
   $permissions['node:community:update group'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:update own community content'
-  $permissions['node:community:update own community content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:update own cultural_protocol_group content'
-  $permissions['node:community:update own cultural_protocol_group content'] = array(
-    'roles' => array(
-      'community manager' => 'community manager',
-    ),
-  );
-
-  // Exported og permission: 'node:community:update own digital_heritage content'
-  $permissions['node:community:update own digital_heritage content'] = array(
     'roles' => array(
       'community manager' => 'community manager',
     ),

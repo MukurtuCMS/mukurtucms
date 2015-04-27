@@ -20,3 +20,56 @@ function _set_community_manager_on_community_create ($node) {
   $rid = array_search ('community manager', og_roles('node', 'community', $node->nid));
   og_role_grant('node', $node->nid, $user->uid, $rid);
 }
+
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_community_form_community_node_form_alter(&$form, &$form_state) {
+
+  // Populate the options in the Parent Community field
+
+  $all_group_nids = og_get_groups_by_user(null, 'node');
+  $options = array('_none' => '- None -');
+  foreach ($all_group_nids as $group_nid) {
+    $roles = og_get_user_roles('node', $group_nid);
+    if (in_array('community manager', $roles)) {
+      $group = node_load ($group_nid);
+      $options[$group_nid] = $group->title;
+    }
+  }
+  // Do not allow current community to be set as the Parent Community
+  unset ($options[$form['nid']['#value']]);
+  // Set the options
+  $form['field_parent_community'][LANGUAGE_NONE]['#options'] = $options;
+
+}
+
+/**
+ * Implements hook_node_validate().
+ */
+function ma_community_node_validate($node, $form, &$form_state) {
+  if ($node->type == 'community') {
+
+    // Show warning and require confirmation when setting Parent Community
+    $old_parent = "_none";
+    if (isset ($form['field_parent_community'][LANGUAGE_NONE]['#default_value'][0])) {
+      $old_parent = $form['field_parent_community'][LANGUAGE_NONE]['#default_value'][0];
+    }
+    $new_parent = $form_state['input']['field_parent_community'][LANGUAGE_NONE];
+    if ($new_parent<>'_none' && $new_parent <> $old_parent) {
+      // Wanted to use $form['storage'] variable here to set if the warning has already been seen (ie. pass on the second save), but storage vars do not work in the validate/submit context (see: http://drupal.stackexchange.com/questions/18333/storing-permanent-value-in-form-while-in-validation-handler), so we need to use a session var instead that is as specific as possible (node:old_parent:new_parent) to this form.
+      // One catch with this implementation is that if the user cancels the node submit, or just closes the tab, the session var will remain, so if they try to do the same change later (same node:old_parent:new_parent), the session var will have already been set and it will submit without the warning.
+      $warning_key = $form['nid']['#value'] . ":" . $new_parent . ":" . $old_parent;
+      if (!isset($_SESSION['parent_community_change_warning_issued'][$warning_key])) {
+        form_set_error('field_parent_community', 'Setting the Parent Community will add all members of this Community to the Parent Community. This cannot be undone! You can unassign the Parent Community but any members added into the Parent Community will remain added unless manually removed.  Press [Save] again to confirm this change.');
+        $_SESSION['parent_community_change_warning_issued'][$warning_key] = TRUE;
+      }
+      else {
+        unset ($_SESSION['parent_community_change_warning_issued'][$warning_key]);
+      }
+    }
+  }
+}
+
