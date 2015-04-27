@@ -115,6 +115,66 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-community-field_child_communities'
+  $field_instances['node-community-field_child_communities'] = array(
+    'bundle' => 'community',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 21,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_child_communities',
+    'label' => 'Child Communities',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+      ),
+      'type' => 'options_select',
+      'weight' => 35,
+    ),
+  );
+
   // Exported field_instance: 'node-community-field_community_image'
   $field_instances['node-community-field_community_image'] = array(
     'bundle' => 'community',
@@ -503,6 +563,7 @@ Strict - Your community page is invisible to all site users who are not members 
   // Included for use with string extractors like potx.
   t('As this image fills the width of the Community landing page, we recommend your images be at least 1200x480 pixels or larger. Please use a 2.5:1 width to height ratio for your image. We do not crop this image.');
   t('Banner Image');
+  t('Child Communities');
   t('Comment');
   t('Community Parent');
   t('Description');
