@@ -28,21 +28,29 @@ function _set_community_manager_on_community_create ($node) {
  */
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
 
-  // Populate the options in the Parent Community field
-
-  $all_group_nids = og_get_groups_by_user(null, 'node');
-  $options = array('_none' => '- None -');
-  foreach ($all_group_nids as $group_nid) {
-    $roles = og_get_user_roles('node', $group_nid);
-    if (in_array('community manager', $roles)) {
-      $group = node_load ($group_nid);
-      $options[$group_nid] = $group->title;
-    }
+  // Hide the Parent Community field unless you are a Community Manager of the current community
+  $current_nid = $form['nid']['#value'];
+  $roles = og_get_user_roles('node', $current_nid);
+  if (!in_array('community manager', $roles)) {
+    $form['field_parent_community']['#access'] = FALSE;
   }
-  // Do not allow current community to be set as the Parent Community
-  unset ($options[$form['nid']['#value']]);
-  // Set the options
-  $form['field_parent_community'][LANGUAGE_NONE]['#options'] = $options;
+
+  // Populate the options in the Parent Community field
+  else {
+    $all_group_nids = og_get_groups_by_user(NULL, 'node');
+    $options = array('_none' => '- None -');
+    foreach ($all_group_nids as $group_nid) {
+      $roles = og_get_user_roles('node', $group_nid);
+      if (in_array('community manager', $roles)) {
+        $group = node_load($group_nid);
+        $options[$group_nid] = $group->title;
+      }
+    }
+    // Do not allow current community to be set as the Parent Community
+    unset ($options[$current_nid]);
+    // Set the options
+    $form['field_parent_community'][LANGUAGE_NONE]['#options'] = $options;
+  }
 
 }
 
