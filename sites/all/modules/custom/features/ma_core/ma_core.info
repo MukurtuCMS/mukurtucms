@@ -67,7 +67,6 @@ dependencies[] = og_invite
 dependencies[] = og_register
 dependencies[] = og_ui
 dependencies[] = omega_tools
-dependencies[] = overlay
 dependencies[] = page_manager
 dependencies[] = panels
 dependencies[] = panels_ipe
