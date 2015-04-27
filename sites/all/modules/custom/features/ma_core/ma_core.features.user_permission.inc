@@ -99,16 +99,6 @@ function ma_core_user_default_permissions() {
     'module' => 'mollom',
   );
 
-  // Exported permission: 'access overlay'.
-  $permissions['access overlay'] = array(
-    'name' => 'access overlay',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'overlay',
-  );
-
   // Exported permission: 'access site in maintenance mode'.
   $permissions['access site in maintenance mode'] = array(
     'name' => 'access site in maintenance mode',
