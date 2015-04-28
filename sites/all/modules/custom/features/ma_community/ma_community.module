@@ -81,3 +81,32 @@ function ma_community_node_validate($node, $form, &$form_state) {
   }
 }
 
+/**
+ * Implements hook_node_presave().
+ */
+
+function ma_community_node_presave($node) {
+
+  // Add members from child community into parent community when parent community is set
+  if ($node->type == 'community') {
+    $wrapper_new = entity_metadata_wrapper('node', $node);
+    $new_parent = $wrapper_new->field_parent_community->getIdentifier();
+    $old_parent = "";
+    if ($new_parent) {
+      if (isset($node->original)) {
+        $wrapper_old = entity_metadata_wrapper('node', $node->original);
+        $old_parent = $wrapper_old->field_parent_community->getIdentifier();
+      }
+      if ($new_parent <> $old_parent) {
+        $child_users = ma_core_og_get_users_in_group ($node->nid);
+        foreach ($child_users as $child_user) {
+          $values = array(
+            'entity' => $child_user,
+            'state' => OG_STATE_ACTIVE,
+          );
+          og_group('node', $new_parent, $values);
+        }
+      }
+    }
+  }
+}
