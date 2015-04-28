@@ -29,14 +29,16 @@ function _set_community_manager_on_community_create ($node) {
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
 
   // Hide the Parent Community field unless you are a Community Manager of the current community
-  $current_nid = $form['nid']['#value'];
-  $roles = og_get_user_roles('node', $current_nid);
-  if (!in_array('community manager', $roles)) {
-    $form['field_parent_community']['#access'] = FALSE;
+  if ($current_nid = $form['nid']['#value']) {
+    $roles = og_get_user_roles('node', $current_nid);
+    if (!in_array('community manager', $roles)) {
+      $form['field_parent_community']['#access'] = FALSE;
+      $do_not_populate = 1;
+    }
   }
 
   // Populate the options in the Parent Community field
-  else {
+  if (!isset($do_not_populate)) {
     $all_group_nids = og_get_groups_by_user(NULL, 'node');
     $options = array('_none' => '- None -');
     foreach ($all_group_nids as $group_nid) {
@@ -98,13 +100,14 @@ function ma_community_node_presave($node) {
         $old_parent = $wrapper_old->field_parent_community->getIdentifier();
       }
       if ($new_parent <> $old_parent) {
-        $child_users = ma_core_og_get_users_in_group ($node->nid);
-        foreach ($child_users as $child_user) {
-          $values = array(
-            'entity' => $child_user,
-            'state' => OG_STATE_ACTIVE,
-          );
-          og_group('node', $new_parent, $values);
+        if ($child_users = ma_core_og_get_users_in_group ($node->nid)) {
+          foreach ($child_users as $child_user) {
+            $values = array(
+              'entity' => $child_user,
+              'state' => OG_STATE_ACTIVE,
+            );
+            og_group('node', $new_parent, $values);
+          }
         }
       }
     }
