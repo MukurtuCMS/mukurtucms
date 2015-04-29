@@ -126,6 +126,7 @@ function ma_search_api_default_search_api_index() {
         "changed" : { "type" : "date" },
         "comment_count" : { "type" : "integer" },
         "created" : { "type" : "date" },
+        "field_category" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_category:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_collection" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_collection_credit" : { "type" : "text" },
@@ -145,6 +146,7 @@ function ma_search_api_default_search_api_index() {
         "field_source" : { "type" : "text" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
+        "field_tags" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
         "language" : { "type" : "string" },
@@ -379,6 +381,18 @@ function ma_search_api_default_search_api_server() {
           "field_contributor:name" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_category" : {
+            "table" : "search_api_db_default_node_index_field_category",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_tags" : {
+            "table" : "search_api_db_default_node_index_field_tags",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }
