@@ -685,7 +685,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Date refers to the date of creation of the content, when it was written, filmed, recorded or made. Use international standard date format (YY-MM-DD) for a specific date. YYYY is the minimal level of information preferred for this field. ',
+    'description' => 'Date refers to the date of creation of the content, when it was written, filmed, recorded or made. This is an open text field, but for consistency and searchability use YYYY-MM-DD for a specific date. YYYY is the minimal level of information preferred for this field. ',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -732,6 +732,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 22,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_date',
     'label' => 'Original Date',
@@ -2161,7 +2162,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Contributor');
   t('Creator');
   t('Cultural Narrative');
-  t('Date refers to the date of creation of the content, when it was written, filmed, recorded or made. Use international standard date format (YY-MM-DD) for a specific date. YYYY is the minimal level of information preferred for this field. ');
+  t('Date refers to the date of creation of the content, when it was written, filmed, recorded or made. This is an open text field, but for consistency and searchability use YYYY-MM-DD for a specific date. YYYY is the minimal level of information preferred for this field. ');
   t('Describe the location of this resource. If it was an event, where did it take place? If it is a document or physical object, where was it created or where can it be located now?');
   t('Description');
   t('Format');
