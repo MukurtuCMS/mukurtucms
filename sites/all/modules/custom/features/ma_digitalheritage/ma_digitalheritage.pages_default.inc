@@ -192,12 +192,12 @@ function ma_digitalheritage_default_page_manager_pages() {
     $pane->pid = 'new-4';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-djs1o6VrivuNykMYeYyvXVKT480Y01tL';
+    $pane->subtype = 'facetapi-B9Y1914fi53ViZQDzGYKMTOLNRa91P6M';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Cultural Protocol',
+      'override_title_text' => 'Collection',
     );
     $pane->cache = array();
     $pane->style = array(
@@ -213,12 +213,12 @@ function ma_digitalheritage_default_page_manager_pages() {
     $pane->pid = 'new-5';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-B9Y1914fi53ViZQDzGYKMTOLNRa91P6M';
+    $pane->subtype = 'facetapi-W6Y01TnXzLiqUKc7f9pIbDZKgyVZ0i1g';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Collection',
+      'override_title_text' => 'Category',
     );
     $pane->cache = array();
     $pane->style = array(
@@ -234,12 +234,12 @@ function ma_digitalheritage_default_page_manager_pages() {
     $pane->pid = 'new-6';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-W6Y01TnXzLiqUKc7f9pIbDZKgyVZ0i1g';
+    $pane->subtype = 'facetapi-6Ldp5zx9fAnaRtQHglU51ONNmrHP2CtK';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Category',
+      'override_title_text' => 'Media Type',
     );
     $pane->cache = array();
     $pane->style = array(
@@ -255,27 +255,6 @@ function ma_digitalheritage_default_page_manager_pages() {
     $pane->pid = 'new-7';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-6Ldp5zx9fAnaRtQHglU51ONNmrHP2CtK';
-    $pane->shown = TRUE;
-    $pane->access = array();
-    $pane->configuration = array(
-      'override_title' => 1,
-      'override_title_text' => 'Media Type',
-    );
-    $pane->cache = array();
-    $pane->style = array(
-      'settings' => NULL,
-    );
-    $pane->css = array();
-    $pane->extras = array();
-    $pane->position = 5;
-    $pane->locks = array();
-    $display->content['new-7'] = $pane;
-    $display->panels['right'][5] = 'new-7';
-    $pane = new stdClass();
-    $pane->pid = 'new-8';
-    $pane->panel = 'right';
-    $pane->type = 'block';
     $pane->subtype = 'facetapi-IPaCM7H1dF7Clj1WBtiZQw516MCvTYka';
     $pane->shown = TRUE;
     $pane->access = array();
@@ -289,10 +268,10 @@ function ma_digitalheritage_default_page_manager_pages() {
     );
     $pane->css = array();
     $pane->extras = array();
-    $pane->position = 6;
+    $pane->position = 5;
     $pane->locks = array();
-    $display->content['new-8'] = $pane;
-    $display->panels['right'][6] = 'new-8';
+    $display->content['new-7'] = $pane;
+    $display->panels['right'][5] = 'new-7';
   $display->hide_title = PANELS_TITLE_FIXED;
   $display->title_pane = '0';
   $handler->conf['display'] = $display;
