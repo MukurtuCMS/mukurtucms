@@ -16,7 +16,7 @@ function ma_profile_form_user_register_form_alter(&$form, &$form_state, $form_id
   if(!in_array('administrator', $user->roles)) {
     foreach($form['account']['roles']['#options'] as $rid => $role_name) {
       if($role_name === 'administrator') {
-	unset($form['account']['roles']['#options'][$rid]);
+	      unset($form['account']['roles']['#options'][$rid]);
       }
     }
   }
@@ -32,7 +32,7 @@ function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id)
   if(!in_array('administrator', $user->roles)) {
     foreach($form['account']['roles']['#options'] as $rid => $role_name) {
       if($role_name === 'administrator') {
-	$form['account']['roles'][$rid]['#disabled'] = TRUE;
+	      $form['account']['roles'][$rid]['#disabled'] = TRUE;
       }
     }
   }
