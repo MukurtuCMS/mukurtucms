@@ -98,7 +98,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       // Restrict CP nodes the scald item can be placed into according to the user's CP perms (otherwise by default it will allow all CPs the user is a member of)
       $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
       $form['atom' . $atom_index]['og_group_ref'][$language][0]['default']['#options'] = $cp_options;
-      $form['atom' . $atom_index]['og_group_ref'][$language][0]['#suffix'] = t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. You can select and deselect multiple Cultural Protocols by holding down the CTRL key (Command key on Mac) while clicking on them.");
+      $form['atom' . $atom_index]['og_group_ref'][$language][0]['#suffix'] = t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. You can select and deselect multiple Cultural Protocols by holding down the CTRL key (Command key on Mac) while clicking on them. Users with access to ANY of the Protocols you select will be able to see this item.");
 
       // Do not show the per-scald actions checkboxes (view, edit, fetch, delete). This is TMI in the form. Default values come from per scald type in the atom config.
       $form['atom' . $atom_index]['scald_actions']['#access'] = false;
