@@ -64,6 +64,8 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
       if ($protocol_node && $protocol_node->type == 'cultural_protocol_group' && !empty($protocol_node->og_group_ref) && $protocol_node->og_group_ref['und'][0]['target_id'] == $og_membership->gid) {
         $user = user_load($og_membership->etid);
         if (!og_is_member('node', $proto_nid, 'user', $user)) {
+          watchdog ('mukurtu', 'adding user from member presave hook protocol');
+
           _add_user_to_group($og_membership->etid, $proto_nid);
           drupal_set_message(t("Added user to accompanying protocol"));
         }
@@ -77,7 +79,9 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
         $user = user_load ($og_membership->etid);
         if (!og_is_member ('node', $community_node->nid, 'user', $user)) {
           if ($community_node->type == 'community') {
-    _add_user_to_group($og_membership->etid, $community_node->nid);
+            watchdog ('mukurtu', 'adding user from member presave hook community');
+
+            _add_user_to_group($og_membership->etid, $community_node->nid);
     drupal_set_message(t("Added user to parent community"));
           }
         }
@@ -213,6 +217,8 @@ function _set_cp_steward_on_cp_create($node) {
  * @throws OgException
  */
 function _add_user_to_group($uid, $gid) {
+
+  watchdog ('mukurtu', 'adding user ' . $uid . ' to group ' . $gid);
   // Load the user we want to add to the group (ID #2 was my test user)
   $account = user_load($uid);
 
