@@ -108,6 +108,7 @@ function ma_community_node_presave($node) {
             );
             og_group('node', $new_parent, $values);
           }
+          drupal_set_message (t('Members of <i>' . $node->title . '</i> have been added to the Parent Community <i>' . $wrapper_new->field_parent_community->label() . '</i>'));
         }
       }
     }

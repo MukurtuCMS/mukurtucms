@@ -53,24 +53,34 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
     $group_node = node_load($og_membership->gid);
 
     if ($group_node->type == 'community') {
-      // check if there's a default cultural protocol
+
+      // add the user to the community's default protocol
       $proto_nid = $og_membership->gid+1;
-      // dpm($proto_nid);
-
       $protocol_node = node_load($proto_nid);
-//      dpm($protocol_node);
 
-      // add the user to the protocol node as well
       if ($protocol_node && $protocol_node->type == 'cultural_protocol_group' && !empty($protocol_node->og_group_ref) && $protocol_node->og_group_ref['und'][0]['target_id'] == $og_membership->gid) {
         $user = user_load($og_membership->etid);
         if (!og_is_member('node', $proto_nid, 'user', $user)) {
           _add_user_to_group($og_membership->etid, $proto_nid);
         }
       }
-    }
-    else if ($group_node->type == 'cultural_protocol_group') {
-      // find the parent group and add the user to it
 
+      // if this is a child community, add the user to the parent community
+      if (isset($group_node->field_parent_community['und'][0]['target_id'])) {
+        $parent_community_node = node_load($group_node->field_parent_community['und'][0]['target_id']);
+        $user = user_load ($og_membership->etid);
+        if (!og_is_member ('node', $parent_community_node->nid, 'user', $user)) {
+          if ($parent_community_node->type == 'community') {
+            _add_user_to_group($og_membership->etid, $parent_community_node->nid);
+            drupal_set_message (t('<i>' . $user->name . '</i> has been added to the Parent Community <i>' . $parent_community_node->title . '</i>'));
+          }
+        }
+      }
+    }
+
+    else if ($group_node->type == 'cultural_protocol_group') {
+
+      // add the user to the cultural protocol's parent community
       if (isset($group_node->og_group_ref['und'][0]['target_id'])) {
         $community_node = node_load($group_node->og_group_ref['und'][0]['target_id']);
         $user = user_load ($og_membership->etid);
@@ -81,6 +91,7 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
         }
       }
     }
+
   }
 }
 
