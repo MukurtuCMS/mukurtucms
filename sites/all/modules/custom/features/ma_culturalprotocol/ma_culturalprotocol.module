@@ -60,7 +60,9 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
           if (!og_is_member('node', $proto_nid, 'user', $user)) {
             $_SESSION['member_add_prevent_infinite_loop']['community_' . $group_node->nid . ':protocol_' . $proto_nid] = TRUE;
             _add_user_to_group($og_membership->etid, $proto_nid);
-            drupal_set_message(t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s default Cultural Protocol <i>" . $protocol_node->title . '</i>'));
+            if (!$_SESSION['repress_user_add_messages']) {
+              drupal_set_message(t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s default Cultural Protocol <i>" . $protocol_node->title . '</i>'));
+            }
           }
         }
         else {
@@ -75,7 +77,9 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
         if (!og_is_member ('node', $parent_community_node->nid, 'user', $user)) {
           if ($parent_community_node->type == 'community') {
             _add_user_to_group($og_membership->etid, $parent_community_node->nid);
-            drupal_set_message (t('<i>' . $user->name . '</i> has been added to the Parent Community <i>' . $parent_community_node->title . '</i>'));
+            if (!$_SESSION['repress_user_add_messages']) {
+              drupal_set_message(t('<i>' . $user->name . '</i> has been added to the Parent Community <i>' . $parent_community_node->title . '</i>'));
+            }
           }
         }
       }
@@ -93,7 +97,9 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
             if ($community_node->type == 'community') {
               $_SESSION['member_add_prevent_infinite_loop']['community_' . $community_node->nid . ':protocol_' . $group_node->nid] = TRUE;
               _add_user_to_group($og_membership->etid, $community_node->nid);
-              drupal_set_message(t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s Community <i>" . $community_node->title . '</i>'));
+              if (!$_SESSION['repress_user_add_messages']) {
+                drupal_set_message(t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s Community <i>" . $community_node->title . '</i>'));
+              }
             }
           }
         }

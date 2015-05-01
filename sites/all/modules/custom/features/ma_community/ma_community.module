@@ -101,6 +101,7 @@ function ma_community_node_presave($node) {
       }
       if ($new_parent <> $old_parent) {
         if ($child_users = ma_core_og_get_users_in_group ($node->nid)) {
+          $_SESSION['repress_user_add_messages'] = 1;
           foreach ($child_users as $child_user) {
             $values = array(
               'entity' => $child_user,
@@ -108,6 +109,7 @@ function ma_community_node_presave($node) {
             );
             og_group('node', $new_parent, $values);
           }
+          unset ($_SESSION['repress_user_add_messages']);
           drupal_set_message (t('Members of <i>' . $node->title . '</i> have been added to the Parent Community <i>' . $wrapper_new->field_parent_community->label() . '</i>'));
         }
       }
