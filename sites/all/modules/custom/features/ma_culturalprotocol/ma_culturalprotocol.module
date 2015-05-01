@@ -46,8 +46,7 @@ function ma_culturalprotocol_user_insert(&$edit, $account, $category) {
 function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) {
 
   // if the membership state is active, check if there's an associated default community
-  if ($og_membership->group_type == 'node' && !empty($og_membership->gid) && $og_membership->state == 1 && !isset($GLOBALS['protocol_runonce'])) {
-    $GLOBALS['protocol_runonce'] = true;
+  if ($og_membership->group_type == 'node' && !empty($og_membership->gid) && $og_membership->state == 1) {
     $group_node = node_load($og_membership->gid);
 
     if ($group_node->type == 'community') {
@@ -55,12 +54,14 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
       // add the user to the community's default protocol
       $proto_nid = $og_membership->gid+1;
       $protocol_node = node_load($proto_nid);
-
       if ($protocol_node && $protocol_node->type == 'cultural_protocol_group' && !empty($protocol_node->og_group_ref) && $protocol_node->og_group_ref['und'][0]['target_id'] == $og_membership->gid) {
-        $user = user_load($og_membership->etid);
-        if (!og_is_member('node', $proto_nid, 'user', $user)) {
-          _add_user_to_group($og_membership->etid, $proto_nid);
-          drupal_set_message (t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s default Cultural Protocol <i>" . $protocol_node->title . '</i>'));
+        if (!isset($GLOBALS['member_add_prevent_infinite_loop']['community_' . $group_node->nid . ':protocol_' . $proto_nid])) {
+          $user = user_load($og_membership->etid);
+          if (!og_is_member('node', $proto_nid, 'user', $user)) {
+            $GLOBALS['member_add_prevent_infinite_loop']['community_' . $group_node->nid . ':protocol_' . $proto_nid] = TRUE;
+            _add_user_to_group($og_membership->etid, $proto_nid);
+            drupal_set_message(t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s default Cultural Protocol <i>" . $protocol_node->title . '</i>'));
+          }
         }
       }
 
@@ -75,6 +76,7 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
           }
         }
       }
+
     }
 
     else if ($group_node->type == 'cultural_protocol_group') {
@@ -82,11 +84,14 @@ function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) 
       // add the user to the cultural protocol's parent community
       if (isset($group_node->og_group_ref['und'][0]['target_id'])) {
         $community_node = node_load($group_node->og_group_ref['und'][0]['target_id']);
-        $user = user_load ($og_membership->etid);
-        if (!og_is_member ('node', $community_node->nid, 'user', $user)) {
-          if ($community_node->type == 'community') {
-            _add_user_to_group($og_membership->etid, $community_node->nid);
-            drupal_set_message (t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s Community <i>" . $community_node->title . '</i>'));
+        if (!isset($GLOBALS['member_add_prevent_infinite_loop']['community_' . $community_node->nid . ':protocol_' . $group_node->nid])) {
+          $user = user_load($og_membership->etid);
+          if (!og_is_member('node', $community_node->nid, 'user', $user)) {
+            if ($community_node->type == 'community') {
+              $GLOBALS['member_add_prevent_infinite_loop']['community_' . $community_node->nid . ':protocol_' . $group_node->nid] = TRUE;
+              _add_user_to_group($og_membership->etid, $community_node->nid);
+              drupal_set_message(t('<i>' . $user->name . "</i> has been added to <i>" . $group_node->title . "</i>'s Community <i>" . $community_node->title . '</i>'));
+            }
           }
         }
       }
