@@ -208,20 +208,32 @@ function ma_digitalheritage_views_pre_build(&$view) {
  * Implements hook_menu().
  */
 function ma_digitalheritage_menu() {
-    $items = array();
+  $items = array();
 
-    // Duplicate Item button for DH node
-    $items['node/%node/duplicate-item'] = array(
-      'title' => 'Duplicate Item',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('ma_digitalheritage_clone_dh_form', 1),
-      'access callback' => 'ma_digitalheritage_clone_dh_button_check',
-      'access arguments' => array(1),
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 100,
-    );
-    return $items;
-  }
+  // "Duplicate Item" button for DH node
+  $items['node/%node/duplicate-item'] = array(
+    'title' => 'Duplicate Item',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_digitalheritage_clone_dh_form', 1),
+    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  // "Add Community Record" button for DH node
+  $items['node/%node/add-community-record'] = array(
+    'title' => 'Add Community Record',
+    'page callback' => 'ma_digital_heritage_add_community_record',
+    'page arguments' => array(1),
+    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  return $items;
+}
 
 function ma_digitalheritage_clone_dh_button_check($node) {
   if ($node->type == 'digital_heritage') {
@@ -279,4 +291,61 @@ function ma_digitalheritage_redirect_presave($redirect) {
   if (strpos($redirect->source, '-copy')) {
     $redirect->source = "dh_clone_redirect"; // cannot simply unset the $redirect here so setting a dummy source instead
   }
+}
+
+
+// "Add Community Record" button redirect to node edit form with add-community-record param
+function ma_digital_heritage_add_community_record ($node) {
+  drupal_goto ('node/add/digital-heritage/community-record/' . $node->nid);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form_state) {
+
+  // Grab Community Record parent on node edit and set page title
+  if (isset($form['field_community_record_parent'][LANGUAGE_NONE]['#default_value'][0])) {
+    $community_record_parent_wrapper = entity_metadata_wrapper('node', $form['field_community_record_parent'][LANGUAGE_NONE]['#default_value'][0]);
+
+    // Set the page title
+    drupal_set_title ("<i>Edit Community Record</i> " . $form['#node']->title . " <i>in</i> " . $community_record_parent_wrapper->title->value(),  PASS_THROUGH);
+  }
+
+  // On Community Record add, ensure the user actually has permission to create a community record on this node, in case they hacked NID in the url, and then set the community record parent and page title
+  elseif (arg(3) == 'community-record') {
+    $parent_dh_wrapper = entity_metadata_wrapper('node', arg(4));
+    foreach ($parent_dh_wrapper->og_group_ref->value() as $protocol) {
+      $p_emw = entity_metadata_wrapper('node', $protocol);
+      $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+      if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+
+        $form['field_community_record_parent'][LANGUAGE_NONE]['#value'][0] = arg(4);
+
+        // Set the parent
+        $community_record_parent_wrapper = $parent_dh_wrapper;
+
+        // Set the page title
+        drupal_set_title ("<i>Create Community Record in</i> " . $community_record_parent_wrapper->title->value(),  PASS_THROUGH);
+
+        break;
+      }
+    }
+  }
+
+  // Customizations to Community Record DH nodes
+  if (isset($community_record_parent_wrapper)) {
+
+    // Hide some fields
+    $hide_fields = array(
+      'field_media_asset',
+      'field_collection',
+      'field_related_dh_items',
+    );
+    foreach ($hide_fields as $hide_field) {
+      $form[$hide_field]['#access'] = FALSE;
+    }
+
+  }
+
 }

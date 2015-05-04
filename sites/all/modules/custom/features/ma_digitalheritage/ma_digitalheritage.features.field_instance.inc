@@ -193,7 +193,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 9,
+      'weight' => 57,
     ),
   );
 
@@ -265,6 +265,75 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-digital_heritage-field_community_record_parent'
+  $field_instances['node-digital_heritage-field_community_record_parent'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => array(),
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 38,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_record_parent',
+    'label' => 'Community Record Parent',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
   // Exported field_instance: 'node-digital_heritage-field_community_ref'
   $field_instances['node-digital_heritage-field_community_ref'] = array(
     'bundle' => 'digital_heritage',
@@ -322,7 +391,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 7,
+      'weight' => 3,
     ),
   );
 
@@ -394,7 +463,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 11,
+      'weight' => 59,
     ),
   );
 
@@ -676,7 +745,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 10,
+      'weight' => 58,
     ),
   );
 
@@ -752,7 +821,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 12,
       ),
       'type' => 'text_textfield',
-      'weight' => 12,
+      'weight' => 60,
     ),
   );
 
@@ -1111,7 +1180,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 8,
+      'weight' => 56,
     ),
   );
 
@@ -1406,7 +1475,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'context' => 'sdl_editor_representation',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 6,
+      'weight' => 54,
     ),
   );
 
@@ -1840,7 +1909,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 5,
+      'weight' => 53,
     ),
   );
 
@@ -2085,7 +2154,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 7,
+      'weight' => 55,
     ),
   );
 
@@ -2159,6 +2228,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Collection');
   t('Comment');
   t('Community');
+  t('Community Record Parent');
   t('Contributor');
   t('Creator');
   t('Cultural Narrative');
