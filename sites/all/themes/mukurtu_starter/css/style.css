@@ -758,7 +758,11 @@ table .checkbox input[type="checkbox"] {
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-collection,
 .view-collections-grid-list.grid-view .view-content .field-name-field-collection,
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-description,
-.view-collections-grid-list.grid-view .view-content .field-name-field-description {
+.view-collections-grid-list.grid-view .view-content .field-name-field-description,
+.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-community-ref,
+.view-collections-grid-list.grid-view .view-content .field-name-field-community-ref,
+.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-category,
+.view-collections-grid-list.grid-view .view-content .field-name-field-category {
   display: none;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row,
