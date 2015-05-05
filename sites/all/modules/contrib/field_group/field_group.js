@@ -41,9 +41,17 @@ Drupal.FieldGroup.Effects.processAccordion = {
     $('div.field-group-accordion-wrapper', context).once('fieldgroup-effects', function () {
       var wrapper = $(this);
 
+      // Get the index to set active.
+      var active_index = false;
+      wrapper.find('.accordion-item').each(function(i) {
+        if ($(this).hasClass('field-group-accordion-active')) {
+          active_index = i;
+        }
+      });
+
       wrapper.accordion({
-        autoHeight: false,
-        active: '.field-group-accordion-active',
+        heightStyle: "content",
+        active: active_index,
         collapsible: true,
         changestart: function(event, ui) {
           if ($(this).hasClass('effect-none')) {
@@ -111,6 +119,9 @@ Drupal.FieldGroup.Effects.processHtabs = {
 Drupal.FieldGroup.Effects.processTabs = {
   execute: function (context, settings, type) {
     if (type == 'form') {
+
+      var errorFocussed = false;
+
       // Add required fields mark to any fieldsets containing required fields
       $('fieldset.vertical-tabs-pane', context).once('fieldgroup-effects', function(i) {
         if ($(this).is('.required-fields') && $(this).find('.form-required').length > 0) {
@@ -118,8 +129,12 @@ Drupal.FieldGroup.Effects.processTabs = {
         }
         if ($('.error', $(this)).length) {
           $(this).data('verticalTab').link.parent().addClass('error');
-          Drupal.FieldGroup.setGroupWithfocus($(this));
-          $(this).data('verticalTab').focus();
+          // Focus the first tab with error.
+          if (!errorFocussed) {
+            Drupal.FieldGroup.setGroupWithfocus($(this));
+            $(this).data('verticalTab').focus();
+            errorFocussed = true;
+          }
         }
       });
     }
