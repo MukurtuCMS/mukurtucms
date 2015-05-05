@@ -358,6 +358,31 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 
 }
 
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_digitalheritage_node_insert($node) {
+  if ($node->type == 'digital_heritage') {
+
+    // Create redirects on Community Record nodes to their parent
+    if (isset($node->field_community_record_parent[LANGUAGE_NONE])) {
+      $redirect = new stdClass();
+      redirect_object_prepare(
+        $redirect,
+        array(
+          'source' => 'node/' . $node->nid,
+          'source_options' => array(),
+          'redirect' => 'node/' . $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'],
+          'redirect_options' => array(),
+          'language' => LANGUAGE_NONE,
+        )
+      );
+      redirect_save($redirect);
+    }
+  }
+}
+
 /**
  * Implements hook_search_api_index_items_alter().
  *
