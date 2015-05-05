@@ -126,6 +126,12 @@ function ma_digitalheritage_node_view($node, $view_mode) {
       // Rewrite the field output
       $node->content['field_related_dh_items'][0]['#markup'] = $output;
     }
+
+  }
+
+  // Rename the Community Record accordion label to the node title of the Community Record
+  elseif ($view_mode == 'community_record') {
+    $node->content['#groups']['group_community_record']->label = strtoupper ($node->title);
   }
 }
 
@@ -357,7 +363,6 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
   }
 
 }
-
 
 /**
  * Implements hook_node_insert().
