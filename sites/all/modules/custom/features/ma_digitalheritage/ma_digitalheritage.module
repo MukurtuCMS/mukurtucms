@@ -24,6 +24,13 @@ function ma_digitalheritage_node_presave($node) {
     if (count($communities)) {
       $dh_emw->field_community_ref->set(array_unique($communities));
     }
+
+    // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
+    if (isset ($_SESSION['community_record_parent'])) {
+      $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $_SESSION['community_record_parent'];
+      unset ($_SESSION['community_record_parent']);
+    }
+
   }
 }
 
@@ -312,7 +319,7 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
     drupal_set_title ("<i>Edit Community Record</i> " . $form['#node']->title . " <i>in</i> " . $community_record_parent_wrapper->title->value(),  PASS_THROUGH);
   }
 
-  // On Community Record add, ensure the user actually has permission to create a community record on this node, in case they hacked NID in the url, and then set the community record parent and page title
+  // On Community Record add, ensure the user actually has permission to create a community record on this node, in case they hacked NID in the url, and then set the community record parent wrapper and page title, and then set the session var for community record parent.
   elseif (arg(3) == 'community-record') {
     $parent_dh_wrapper = entity_metadata_wrapper('node', arg(4));
     foreach ($parent_dh_wrapper->og_group_ref->value() as $protocol) {
@@ -320,13 +327,14 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
       if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
 
-        $form['field_community_record_parent'][LANGUAGE_NONE]['#value'][0] = arg(4);
-
-        // Set the parent
+        // Set the parent wrapper
         $community_record_parent_wrapper = $parent_dh_wrapper;
 
         // Set the page title
         drupal_set_title ("<i>Create Community Record in</i> " . $community_record_parent_wrapper->title->value(),  PASS_THROUGH);
+
+        // Use a session var to set the parent community record nid. This then gets set in the child in ma_digitalheritage_node_presave. (we cannot set the field value here because it is a hidden form element)
+        $_SESSION['community_record_parent'] = arg(4);
 
         break;
       }
