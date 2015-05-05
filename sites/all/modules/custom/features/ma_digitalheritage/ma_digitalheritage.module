@@ -349,3 +349,16 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
   }
 
 }
+
+/**
+ * Implements hook_search_api_index_items_alter().
+ *
+ * Exclude Community Record DH nodes from being indexed
+ */
+function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchApiIndex $index) {
+  foreach($items as $id => $item){
+    if (isset($item->field_community_record_parent[LANGUAGE_NONE])) {
+     unset($items[$id]);
+    }
+  }
+}
