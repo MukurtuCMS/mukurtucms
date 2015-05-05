@@ -132,7 +132,7 @@ function ma_digitalheritage_ds_custom_fields_info() {
   $ds_field->properties = array(
     'code' => array(
       'value' => '<?php
-if (node_access (\'update\', $entity)) print l(\'EDIT COMMUNITY RECORD\', \'node/\' . $entity->nid . \'/edit\');
+if (node_access (\'update\', $entity)) print l(\'<br/><b>EDIT COMMUNITY RECORD</b>\', \'node/\' . $entity->nid . \'/edit\', array (\'html\' => TRUE));
 ?>
 ',
       'format' => 'ds_code',
