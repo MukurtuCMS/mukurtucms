@@ -458,6 +458,6 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
 // Rename the Community Record accordion label to the node title of the Community Record
 function ma_digitalheritage_field_group_pre_render (&$element, $group, &$form) {
   if ($group->group_name == 'group_community_record') {
-    $group->label = $form['#node']->title;
+    $group->label = strtoupper($form['#node']->title);
   }
 }
