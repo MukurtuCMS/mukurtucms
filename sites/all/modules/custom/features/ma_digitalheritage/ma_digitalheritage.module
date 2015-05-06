@@ -367,9 +367,33 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
  */
 function ma_digitalheritage_node_validate($node, $form, &$form_state) {
   if ($node->type == 'digital_heritage') {
-    dpm ($node, 'node');
-    dpm ($form, 'form');
-    dpm ($form_state, 'form_state');
+
+    // Do not allow adding, changing, or removing of Community Records in the DH node form. The field is there only to allow users to reorder the Community Records.
+    $original_community_records = array();
+    foreach ($form['field_community_record_children'][LANGUAGE_NONE] as $original_child) {
+      if (isset($original_child['target_id'])) {
+        $original_child_text = $original_child['target_id']['#default_value'];
+        $original_child_numeric = substr(substr(strstr($original_child_text, '('), 0, -1), 1);
+        if (is_numeric($original_child_numeric)) {
+          $original_community_records[] = $original_child_numeric;
+        }
+      }
+    }
+    $new_community_records = array();
+    foreach ($form_state['values']['field_community_record_children'][LANGUAGE_NONE] as $new_child) {
+      if (isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
+        $new_community_records[] = $new_child['target_id'];
+        if (!in_array($new_child['target_id'], $original_community_records)) {
+          form_set_error('field_community_record_children', t('Do not add Community Records here. Use the "Add Community Record" button instead.'));
+        }
+      }
+    }
+    foreach ($original_community_records as $original_child) {
+      if (!in_array($original_child, $new_community_records)) {
+        form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, use the "Edit Community Record" link when viewing the record then press "Delete". Note, only the creator of the Community Record can delete it.'));
+      }
+
+    }
   }
 }
 

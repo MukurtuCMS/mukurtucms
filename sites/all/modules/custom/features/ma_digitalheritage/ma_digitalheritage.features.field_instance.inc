@@ -297,7 +297,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2700,6 +2700,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Traditional Knowledge');
   t('Traditional Knowledge Labels');
   t('Type');
+  t('Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.');
   t('Who holds the rights to the content and who should be contacted for permission to reproduce the content. You may want to add and email address or other contact information if you\'d like people to contact you for permission to use, reproduce, circulate and or cite your materials.');
 
   return $field_instances;
