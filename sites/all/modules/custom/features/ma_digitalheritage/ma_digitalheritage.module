@@ -352,6 +352,7 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       'field_media_asset',
       'field_collection',
       'field_related_dh_items',
+      'field_community_record_children',
     );
     foreach ($hide_fields as $hide_field) {
       $form[$hide_field]['#access'] = FALSE;
@@ -362,6 +363,18 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 }
 
 /**
+ * Implements hook_node_validate().
+ */
+function ma_digitalheritage_node_validate($node, $form, &$form_state) {
+  if ($node->type == 'digital_heritage') {
+    dpm ($node, 'node');
+    dpm ($form, 'form');
+    dpm ($form_state, 'form_state');
+  }
+}
+
+
+    /**
  * Implements hook_node_insert().
  */
 function ma_digitalheritage_node_insert($node) {
