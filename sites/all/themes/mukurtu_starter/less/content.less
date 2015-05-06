@@ -419,18 +419,40 @@ a.tooltips span {
 
 }
 
-.ds-2col > .group-right {
-  background: #F8F7F7;
-  border-radius:4px;
-  padding: 30px;
-  .field {
-    margin-bottom:10px;
-    .label-above {
-      text-transform: uppercase;
-      font-weight: 500;
-      color:black;
-    }
+// Accordion in right column of DH node
+.ds-2col > .group-right
+
+  .field-group-accordion {
+    margin-bottom: 1em;
   }
+  .ui-accordion {
+    .field {
+      margin-bottom:10px;
+      a {
+        color: #428bca;
+      }
+      .label-above, .field-label {
+        text-transform: uppercase;
+        font-weight: normal;
+      }
+    }
+    .ui-accordion-icons {
+      padding-left: 1.7em;
+    }
+    .ui-accordion-content {
+      padding: 1em 1.7em;
+      font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+      background: none repeat scroll 0 0 #f8f7f7;
+    }
+    .ui-widget-content {
+      background: none repeat scroll 0 0 #f8f7f7;
+      border: 1px solid #aaa;
+      border-top: none;
+    }
+    .ui-accordion-header-active {
+      background: url("/sites/all/modules/contrib/jquery_update/replace/ui/themes/base/minified/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #e6e6e6;
+    }
+
 }
 
 .node-type-digital-heritage {

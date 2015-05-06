@@ -24,6 +24,13 @@ function ma_digitalheritage_node_presave($node) {
     if (count($communities)) {
       $dh_emw->field_community_ref->set(array_unique($communities));
     }
+
+    // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
+    if (isset ($_SESSION['community_record_parent'])) {
+      $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $_SESSION['community_record_parent'];
+      unset ($_SESSION['community_record_parent']);
+    }
+
   }
 }
 
@@ -119,7 +126,10 @@ function ma_digitalheritage_node_view($node, $view_mode) {
       // Rewrite the field output
       $node->content['field_related_dh_items'][0]['#markup'] = $output;
     }
+
   }
+
+
 }
 
 /**
@@ -208,20 +218,32 @@ function ma_digitalheritage_views_pre_build(&$view) {
  * Implements hook_menu().
  */
 function ma_digitalheritage_menu() {
-    $items = array();
+  $items = array();
 
-    // Duplicate Item button for DH node
-    $items['node/%node/duplicate-item'] = array(
-      'title' => 'Duplicate Item',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('ma_digitalheritage_clone_dh_form', 1),
-      'access callback' => 'ma_digitalheritage_clone_dh_button_check',
-      'access arguments' => array(1),
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 100,
-    );
-    return $items;
-  }
+  // "Duplicate Item" button for DH node
+  $items['node/%node/duplicate-item'] = array(
+    'title' => 'Duplicate Item',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_digitalheritage_clone_dh_form', 1),
+    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  // "Add Community Record" button for DH node
+  $items['node/%node/add-community-record'] = array(
+    'title' => 'Add Community Record',
+    'page callback' => 'ma_digital_heritage_add_community_record',
+    'page arguments' => array(1),
+    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  return $items;
+}
 
 function ma_digitalheritage_clone_dh_button_check($node) {
   if ($node->type == 'digital_heritage') {
@@ -278,5 +300,164 @@ function ma_digitalheritage_clone_dh_form_submit($form, $form_state) {
 function ma_digitalheritage_redirect_presave($redirect) {
   if (strpos($redirect->source, '-copy')) {
     $redirect->source = "dh_clone_redirect"; // cannot simply unset the $redirect here so setting a dummy source instead
+  }
+}
+
+
+// "Add Community Record" button redirect to node edit form with add-community-record param
+function ma_digital_heritage_add_community_record ($node) {
+  drupal_goto ('node/add/digital-heritage/community-record/' . $node->nid);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form_state) {
+
+  // Grab Community Record parent on node edit and set page title
+  if (isset($form['field_community_record_parent'][LANGUAGE_NONE]['#default_value'][0])) {
+    $community_record_parent_wrapper = entity_metadata_wrapper('node', $form['field_community_record_parent'][LANGUAGE_NONE]['#default_value'][0]);
+
+    // Set the page title
+    drupal_set_title ("<i>Edit Community Record</i> " . $form['#node']->title . " <i>in</i> " . $community_record_parent_wrapper->title->value(),  PASS_THROUGH);
+  }
+
+  // On Community Record add, ensure the user actually has permission to create a community record on this node, in case they hacked NID in the url, and then set the community record parent wrapper and page title, and then set the session var for community record parent.
+  elseif (arg(3) == 'community-record') {
+    $parent_dh_wrapper = entity_metadata_wrapper('node', arg(4));
+    foreach ($parent_dh_wrapper->og_group_ref->value() as $protocol) {
+      $p_emw = entity_metadata_wrapper('node', $protocol);
+      $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+      if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+
+        // Set the parent wrapper
+        $community_record_parent_wrapper = $parent_dh_wrapper;
+
+        // Set the page title
+        drupal_set_title ("<i>Create Community Record in</i> " . $community_record_parent_wrapper->title->value(),  PASS_THROUGH);
+
+        // Use a session var to set the parent community record nid. This then gets set in the child in ma_digitalheritage_node_presave. (we cannot set the field value here because it is a hidden form element)
+        $_SESSION['community_record_parent'] = arg(4);
+
+        break;
+      }
+    }
+  }
+
+  // Customizations to Community Record DH nodes
+  if (isset($community_record_parent_wrapper)) {
+
+    // Hide some fields
+    $hide_fields = array(
+      'field_media_asset',
+      'field_collection',
+      'field_related_dh_items',
+      'field_community_record_children',
+    );
+    foreach ($hide_fields as $hide_field) {
+      $form[$hide_field]['#access'] = FALSE;
+    }
+
+  }
+
+}
+
+/**
+ * Implements hook_node_validate().
+ */
+function ma_digitalheritage_node_validate($node, $form, &$form_state) {
+  if ($node->type == 'digital_heritage') {
+
+    // Do not allow adding, changing, or removing of Community Records in the DH node form. The field is there only to allow users to reorder the Community Records.
+    $original_community_records = array();
+    foreach ($form['field_community_record_children'][LANGUAGE_NONE] as $original_child) {
+      if (isset($original_child['target_id'])) {
+        $original_child_text = $original_child['target_id']['#default_value'];
+        $original_child_numeric = substr(substr(strstr($original_child_text, '('), 0, -1), 1);
+        if (is_numeric($original_child_numeric)) {
+          $original_community_records[] = $original_child_numeric;
+        }
+      }
+    }
+    $new_community_records = array();
+    foreach ($form_state['values']['field_community_record_children'][LANGUAGE_NONE] as $new_child) {
+      if (isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
+        $new_community_records[] = $new_child['target_id'];
+        if (!in_array($new_child['target_id'], $original_community_records)) {
+          form_set_error('field_community_record_children', t('Do not add Community Records here. Use the "Add Community Record" button instead.'));
+        }
+      }
+    }
+    foreach ($original_community_records as $original_child) {
+      if (!in_array($original_child, $new_community_records)) {
+        form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, use the "Edit Community Record" link when viewing the record then press "Delete". Note, only the creator of the Community Record can delete it.'));
+      }
+
+    }
+  }
+}
+
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_digitalheritage_node_insert($node) {
+  if ($node->type == 'digital_heritage') {
+
+    // Create redirects on Community Record nodes to their parent
+    if (isset($node->field_community_record_parent[LANGUAGE_NONE])) {
+      $redirect = new stdClass();
+      redirect_object_prepare(
+        $redirect,
+        array(
+          'source' => 'node/' . $node->nid,
+          'source_options' => array(),
+          'redirect' => 'node/' . $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'],
+          'redirect_options' => array(),
+          'language' => LANGUAGE_NONE,
+        )
+      );
+      redirect_save($redirect);
+    }
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function ma_digitalheritage_node_delete($node) {
+  if ($node->type == 'digital_heritage') {
+    $dh_emw = entity_metadata_wrapper('node', $node);
+
+    // Delete the Community Records of a parent DH if the parent is deleted
+    foreach ($dh_emw->field_community_record_children->value() as $child) {
+      if (isset($child->nid)) {
+        node_delete ($child->nid);
+      }
+    }
+
+  }
+}
+
+/**
+ * Implements hook_search_api_index_items_alter().
+ *
+ * Exclude Community Record DH nodes from being indexed
+ */
+function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchApiIndex $index) {
+  foreach($items as $id => $item){
+    if (isset($item->field_community_record_parent[LANGUAGE_NONE])) {
+     unset($items[$id]);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_group_pre_render().
+ */
+// Rename the Community Record accordion label to the node title of the Community Record
+function ma_digitalheritage_field_group_pre_render (&$element, $group, &$form) {
+  if ($group->group_name == 'group_community_record') {
+    $group->label = $form['#node']->title;
   }
 }
