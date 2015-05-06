@@ -405,7 +405,7 @@ function ma_digitalheritage_node_insert($node) {
   if ($node->type == 'digital_heritage') {
 
     // Create redirects on Community Record nodes to their parent
-    if (isset($node->field_community_record_parent[LANGUAGE_NONE])) {
+    if (isset($node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
       $redirect = new stdClass();
       redirect_object_prepare(
         $redirect,
@@ -458,6 +458,6 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
 // Rename the Community Record accordion label to the node title of the Community Record
 function ma_digitalheritage_field_group_pre_render (&$element, $group, &$form) {
   if ($group->group_name == 'group_community_record') {
-    $group->label = $form['#node']->title;
+    $group->label = strtoupper($form['#node']->title);
   }
 }

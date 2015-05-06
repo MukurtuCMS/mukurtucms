@@ -169,6 +169,7 @@ features[variable][] = ds_extras_switch_field
 features[variable][] = ds_extras_switch_view_mode
 features[variable][] = ds_extras_vd
 features[variable][] = enable_revisions_page_digital_heritage
+features[variable][] = field_bundle_settings_node__digital_heritage
 features[variable][] = ft-default
 features[variable][] = ft-kill-colon
 features[variable][] = language_content_type_digital_heritage
