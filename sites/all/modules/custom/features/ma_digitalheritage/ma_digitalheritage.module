@@ -129,10 +129,7 @@ function ma_digitalheritage_node_view($node, $view_mode) {
 
   }
 
-  // Rename the Community Record accordion label to the node title of the Community Record
-  elseif ($view_mode == 'community_record') {
-    $node->content['#groups']['group_community_record']->label = strtoupper ($node->title);
-  }
+
 }
 
 /**
@@ -398,5 +395,15 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
     if (isset($item->field_community_record_parent[LANGUAGE_NONE])) {
      unset($items[$id]);
     }
+  }
+}
+
+/**
+ * Implements hook_field_group_pre_render().
+ */
+// Rename the Community Record accordion label to the node title of the Community Record
+function ma_digitalheritage_field_group_pre_render (&$element, $group, &$form) {
+  if ($group->group_name == 'group_community_record') {
+    $group->label = $form['#node']->title;
   }
 }
