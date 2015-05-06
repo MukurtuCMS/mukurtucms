@@ -405,7 +405,7 @@ function ma_digitalheritage_node_insert($node) {
   if ($node->type == 'digital_heritage') {
 
     // Create redirects on Community Record nodes to their parent
-    if (isset($node->field_community_record_parent[LANGUAGE_NONE])) {
+    if (isset($node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
       $redirect = new stdClass();
       redirect_object_prepare(
         $redirect,
