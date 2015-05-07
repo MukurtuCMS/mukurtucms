@@ -70,6 +70,11 @@ function taxonomy_feeds_processor_targets_alter(&$targets, $entity_type, $bundle
       );
     }
   }
+  if ($entity_type == 'taxonomy_term') {
+    $targets['tid']['name'] = t('Term id');
+    $targets['tid']['description'] = t('The tid of the taxonomy term. NOTE: use this feature with care, node ids are usually assigned by Drupal.');
+    unset($targets['vocabulary']);
+  }
 }
 
 /**
@@ -77,18 +82,7 @@ function taxonomy_feeds_processor_targets_alter(&$targets, $entity_type, $bundle
  *
  * @todo Do not create new terms for non-autotag fields.
  */
-function taxonomy_feeds_set_target($source, $entity, $target, $terms, $mapping = array()) {
-
-  // Allow mapping the string '0' to a term name.
-  if (empty($terms) && $terms != 0) {
-    return;
-  }
-
-  // Handle non-multiple values.
-  if (!is_array($terms)) {
-    $terms = array($terms);
-  }
-
+function taxonomy_feeds_set_target($source, $entity, $target, array $terms, $mapping = array()) {
   // Add in default values.
   $mapping += array(
     'term_search' => FEEDS_TAXONOMY_SEARCH_TERM_NAME,
@@ -139,13 +133,21 @@ function taxonomy_feeds_set_target($source, $entity, $target, $terms, $mapping =
 
         // Lookup by name.
         case FEEDS_TAXONOMY_SEARCH_TERM_NAME:
+          $term = trim($term);
           $name_query = clone $query;
-          if ($tids = $name_query->propertyCondition('name', $term)->execute()) {
-            $tid = key($tids['taxonomy_term']);
+          if (strlen($term) && $tids = $name_query->propertyCondition('name', $term)->execute()) {
+
+            // Find the first allowed term.
+            foreach ($tids['taxonomy_term'] as $possible_term) {
+              if (isset($cache['allowed_values'][$target][$possible_term->tid])) {
+                $tid = $possible_term->tid;
+                break;
+              }
+            }
           }
-          elseif ($mapping['autocreate']) {
+          elseif ($mapping['autocreate'] && strlen($term)) {
             $term = (object) array(
-              'name' => $term,
+              'name' => drupal_substr($term, 0, 255),
               'vid' => key($cache['allowed_vocabularies'][$target]),
               'vocabulary_machine_name' => reset($cache['allowed_vocabularies'][$target]),
             );
@@ -159,7 +161,7 @@ function taxonomy_feeds_set_target($source, $entity, $target, $terms, $mapping =
         // Lookup by tid.
         case FEEDS_TAXONOMY_SEARCH_TERM_ID:
           if (is_numeric($term)) {
-            $tid = $term;
+            $tid = (int) $term;
           }
           break;
 
@@ -171,7 +173,7 @@ function taxonomy_feeds_set_target($source, $entity, $target, $terms, $mapping =
     }
 
     if ($tid && isset($cache['allowed_values'][$target][$tid])) {
-      $field['und'][$delta]['tid'] = $tid;
+      $field['und'][] = array('tid' => $tid);
       $delta++;
     }
   }
