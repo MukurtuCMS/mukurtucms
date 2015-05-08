@@ -801,6 +801,7 @@ table .checkbox input[type="checkbox"] {
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .col-md-8,
 .view-collections-grid-list.grid-view .view-content .views-row .col-md-8 {
   position: static;
+  width: 100%;
 }
 .view-digital-heritage-grid-list.grid-view .text-center,
 .view-collections-grid-list.grid-view .text-center {
