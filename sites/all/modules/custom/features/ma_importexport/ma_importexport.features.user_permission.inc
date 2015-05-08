@@ -59,6 +59,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['import digital_heritage_metadata feeds'] = array(
     'name' => 'import digital_heritage_metadata feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',

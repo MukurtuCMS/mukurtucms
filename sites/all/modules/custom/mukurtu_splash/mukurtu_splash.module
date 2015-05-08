@@ -810,7 +810,7 @@ function mukurtu_splash_block_user() {
     );
   }
 
-  if (feeds_access('import','users')) {
+  if (user_access('administer users')) {
     $items[] = array(
       'title' => 'Manage users',
       'href' => 'admin/people',

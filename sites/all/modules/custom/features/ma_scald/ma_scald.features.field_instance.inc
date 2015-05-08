@@ -270,7 +270,7 @@ function ma_scald_field_default_field_instances() {
   // Exported field_instance: 'scald_atom-file-og_group_ref'
   $field_instances['scald_atom-file-og_group_ref'] = array(
     'bundle' => 'file',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
