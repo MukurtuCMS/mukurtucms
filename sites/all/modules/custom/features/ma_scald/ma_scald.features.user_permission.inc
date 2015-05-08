@@ -60,6 +60,7 @@ function ma_scald_user_default_permissions() {
   $permissions['administer scald atoms'] = array(
     'name' => 'administer scald atoms',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
