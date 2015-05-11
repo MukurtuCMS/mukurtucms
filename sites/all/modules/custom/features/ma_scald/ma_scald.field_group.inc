@@ -25,7 +25,7 @@ function ma_scald_field_group_info() {
     'children' => array(
       0 => 'scald_authors',
       1 => 'scald_tags',
-      2 => 'og_group_ref',
+      2 => 'field_scald_protocol',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -58,7 +58,7 @@ function ma_scald_field_group_info() {
     'children' => array(
       0 => 'scald_authors',
       1 => 'scald_tags',
-      2 => 'og_group_ref',
+      2 => 'field_scald_protocol',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -96,15 +96,15 @@ function ma_scald_field_group_info() {
       4 => 'field_original_dng',
       5 => 'field_scald_created',
       6 => 'field_scald_creator',
-      7 => 'field_scald_geo_location',
-      8 => 'field_scald_headline',
-      9 => 'field_scald_identifier',
-      10 => 'field_scald_location',
-      11 => 'field_category',
-      12 => 'field_licence_std_cc',
-      13 => 'field_rights',
-      14 => 'og_group_ref',
-      15 => 'field_scald_description',
+      7 => 'field_scald_description',
+      8 => 'field_scald_geo_location',
+      9 => 'field_scald_headline',
+      10 => 'field_scald_identifier',
+      11 => 'field_scald_location',
+      12 => 'field_category',
+      13 => 'field_licence_std_cc',
+      14 => 'field_rights',
+      15 => 'field_scald_protocol',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -137,7 +137,7 @@ function ma_scald_field_group_info() {
     'children' => array(
       0 => 'scald_authors',
       1 => 'scald_tags',
-      2 => 'og_group_ref',
+      2 => 'field_scald_protocol',
     ),
     'format_type' => 'div',
     'format_settings' => array(

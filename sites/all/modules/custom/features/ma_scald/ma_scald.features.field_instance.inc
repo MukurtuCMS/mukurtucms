@@ -44,6 +44,7 @@ function ma_scald_field_default_field_instances() {
   $field_instances['scald_atom-audio-og_group_ref'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -56,12 +57,9 @@ function ma_scald_field_default_field_instances() {
       ),
       'ma_colorbox' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => 1,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 0,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -73,7 +71,7 @@ function ma_scald_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'scald_atom',
     'field_name' => 'og_group_ref',
-    'label' => 'Protocol',
+    'label' => 'Protocol (old)',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -86,6 +84,9 @@ function ma_scald_field_default_field_instances() {
             'widget_type' => 'options_select',
           ),
           'status' => TRUE,
+        ),
+        'prepopulate' => array(
+          'status' => 0,
         ),
       ),
       'user_register_form' => FALSE,
@@ -107,7 +108,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -130,7 +131,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -153,7 +154,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -176,7 +177,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -199,7 +200,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -263,14 +264,14 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'image_image',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
   // Exported field_instance: 'scald_atom-file-og_group_ref'
   $field_instances['scald_atom-file-og_group_ref'] = array(
     'bundle' => 'file',
-    'default_value' => array(),
+    'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
@@ -283,10 +284,9 @@ function ma_scald_field_default_field_instances() {
       ),
       'ma_colorbox' => array(
         'label' => 'above',
-        'module' => 'og_ui',
         'settings' => array(),
-        'type' => 'og_list_default',
-        'weight' => 6,
+        'type' => 'hidden',
+        'weight' => 1,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -298,7 +298,7 @@ function ma_scald_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'scald_atom',
     'field_name' => 'og_group_ref',
-    'label' => 'Protocol',
+    'label' => 'Protocol (old)',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -335,7 +335,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -357,7 +357,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 7,
+        'weight' => 2,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -380,7 +380,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -450,7 +450,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 8,
+        'weight' => 3,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -473,7 +473,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -532,7 +532,7 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'image_image',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -553,7 +553,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 7,
+        'weight' => 4,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -610,7 +610,7 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -632,7 +632,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 19,
+        'weight' => 16,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -665,7 +665,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 17,
+      'weight' => 18,
     ),
   );
 
@@ -686,7 +686,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 8,
+        'weight' => 5,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -725,7 +725,7 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -747,7 +747,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 18,
+        'weight' => 15,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -782,7 +782,7 @@ function ma_scald_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 16,
+      'weight' => 17,
     ),
   );
 
@@ -803,7 +803,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'file',
         'settings' => array(),
         'type' => 'file_default',
-        'weight' => 6,
+        'weight' => 3,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -860,7 +860,7 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'file_generic',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -882,7 +882,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 17,
+        'weight' => 14,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -922,7 +922,7 @@ function ma_scald_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -949,7 +949,7 @@ function ma_scald_field_default_field_instances() {
           'multiple_to' => '',
         ),
         'type' => 'date_default',
-        'weight' => 9,
+        'weight' => 6,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -994,7 +994,7 @@ function ma_scald_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -1016,7 +1016,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 10,
+        'weight' => 7,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1058,7 +1058,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -1081,7 +1081,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 13,
+        'weight' => 10,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1122,7 +1122,7 @@ function ma_scald_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -1146,7 +1146,7 @@ function ma_scald_field_default_field_instances() {
           'data' => 'full',
         ),
         'type' => 'geofield_wkt',
-        'weight' => 15,
+        'weight' => 12,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1184,7 +1184,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'geofield',
       'settings' => array(),
       'type' => 'geofield_latlon',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -1206,7 +1206,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 12,
+        'weight' => 9,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1248,7 +1248,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -1270,7 +1270,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 2,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1310,7 +1310,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -1332,7 +1332,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 16,
+        'weight' => 13,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1374,7 +1374,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 14,
+      'weight' => 15,
     ),
   );
 
@@ -1382,6 +1382,7 @@ function ma_scald_field_default_field_instances() {
   $field_instances['scald_atom-image-og_group_ref'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1393,12 +1394,9 @@ function ma_scald_field_default_field_instances() {
       ),
       'ma_colorbox' => array(
         'label' => 'inline',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => 1,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1422,7 +1420,7 @@ function ma_scald_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'scald_atom',
     'field_name' => 'og_group_ref',
-    'label' => 'Protocol',
+    'label' => 'Protocol (old)',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -1435,6 +1433,9 @@ function ma_scald_field_default_field_instances() {
             'widget_type' => 'options_select',
           ),
           'status' => TRUE,
+        ),
+        'prepopulate' => array(
+          'status' => 0,
         ),
       ),
       'user_register_form' => FALSE,
@@ -1456,7 +1457,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -1479,7 +1480,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 11,
+        'weight' => 8,
       ),
       'ma_dh_assets' => array(
         'label' => 'above',
@@ -1521,7 +1522,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -1544,7 +1545,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 14,
+        'weight' => 11,
       ),
       'ma_dh_assets' => array(
         'label' => 'above',
@@ -1587,7 +1588,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -1681,7 +1682,7 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'image_image',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -1689,6 +1690,7 @@ function ma_scald_field_default_field_instances() {
   $field_instances['scald_atom-video-og_group_ref'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1701,12 +1703,9 @@ function ma_scald_field_default_field_instances() {
       ),
       'ma_colorbox' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => 1,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 0,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1718,7 +1717,7 @@ function ma_scald_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'scald_atom',
     'field_name' => 'og_group_ref',
-    'label' => 'Protocol',
+    'label' => 'Protocol (old)',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -1731,6 +1730,9 @@ function ma_scald_field_default_field_instances() {
             'widget_type' => 'options_select',
           ),
           'status' => TRUE,
+        ),
+        'prepopulate' => array(
+          'status' => 0,
         ),
       ),
       'user_register_form' => FALSE,
@@ -1752,7 +1754,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -1774,7 +1776,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1797,7 +1799,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -1819,7 +1821,7 @@ function ma_scald_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_plain',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -1842,7 +1844,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -1862,7 +1864,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'ma_scald_search_results' => array(
         'label' => 'hidden',
@@ -1898,7 +1900,7 @@ function ma_scald_field_default_field_instances() {
         'progress_indicator' => 'throbber',
       ),
       'type' => 'image_image',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -1957,7 +1959,7 @@ function ma_scald_field_default_field_instances() {
   t('Keywords');
   t('Location');
   t('Original DNG');
-  t('Protocol');
+  t('Protocol (old)');
   t('Rights');
   t('Standard and Creative Commons Licensing');
   t('Tags');

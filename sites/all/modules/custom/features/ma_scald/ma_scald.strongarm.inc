@@ -83,7 +83,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '5',
+          'weight' => '6',
         ),
       ),
       'display' => array(
@@ -143,7 +143,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '6',
+          'weight' => '7',
         ),
       ),
       'display' => array(
@@ -206,7 +206,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '18',
+          'weight' => '19',
         ),
       ),
       'display' => array(
@@ -275,7 +275,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '5',
+          'weight' => '6',
         ),
       ),
       'display' => array(
