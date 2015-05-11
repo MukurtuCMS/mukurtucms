@@ -628,15 +628,9 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .ctools-modal-content .form-item-identifier #edit-identifier {
   width: 400px;
 }
-.page-node-edit .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex [id^="og-group-ref-values--"],
-.page-node-add .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex [id^="og-group-ref-values--"],
-.page-node-edit .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex .description,
-.page-node-add .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex .description,
-.page-node-edit .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex .field-add-more-submit,
-.page-node-add .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex .field-add-more-submit,
-.page-node-edit .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex .tabledrag-toggle-weight-wrapper,
-.page-node-add .ctools-modal-content #scald-atom-add-form-options .field-widget-og-complex .tabledrag-toggle-weight-wrapper {
-  display: none;
+.page-node-edit .ctools-modal-content #scald-atom-add-form-options .atom-protocol-desc,
+.page-node-add .ctools-modal-content #scald-atom-add-form-options .atom-protocol-desc {
+  margin-bottom: 1em;
 }
 .popup-element-title {
   background: none;

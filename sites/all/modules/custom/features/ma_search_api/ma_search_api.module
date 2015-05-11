@@ -204,11 +204,11 @@ function ma_search_api_search_api_query_alter($sapi_query) {
  */
 function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
   $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-  if (!isset($group_wrapper->og_group_ref)) {
+  if (!isset($group_wrapper->field_scald_protocol)) {
     return SCALD_ATOM_ACCESS_IGNORE;
   }
-  if ($groups = $group_wrapper->og_group_ref->value()) {
-    foreach ($groups as $group) {
+  if ($groups = $group_wrapper->field_scald_protocol->value()) {
+    foreach ($groups as $group) { 
       if (node_access('view', $group)) {
         return SCALD_ATOM_ACCESS_IGNORE;
       }
