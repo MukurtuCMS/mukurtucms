@@ -44,45 +44,50 @@ function ma_culturalprotocol_user_insert(&$edit, $account, $category) {
  * Implements hook_og_membership_presave().
  */
 function ma_culturalprotocol_og_membership_presave(OgMembership $og_membership) {
-//  dpm($og_membership);
-//  dpm('tested');
+  # dpm($og_membership);
+  # dpm('tested');
 
-  // if the membership state is active, check if there's an associated default community
-  if ($og_membership->group_type == 'node' && !empty($og_membership->gid) && $og_membership->state == 1 && !isset($GLOBALS['protocol_runonce'])) {
-    $GLOBALS['protocol_runonce'] = true;
-    $group_node = node_load($og_membership->gid);
+  if ($og_membership->entity_type == 'user') {
 
-    if ($group_node->type == 'community') {
-      // check if there's a default cultural protocol
-      $proto_nid = $og_membership->gid+1;
-      // dpm($proto_nid);
+    // if the membership state is active, check if there's an associated default community
+    if ($og_membership->group_type == 'node' && !empty($og_membership->gid) && $og_membership->state == 1 && !isset($GLOBALS['protocol_runonce'])) {
+      $GLOBALS['protocol_runonce'] = TRUE;
+      $group_node = node_load($og_membership->gid);
 
-      $protocol_node = node_load($proto_nid);
-//      dpm($protocol_node);
+      if ($group_node->type == 'community') {
+        // check if there's a default cultural protocol
+        $proto_nid = $og_membership->gid + 1;
+        // dpm($proto_nid);
 
-      // add the user to the protocol node as well
-      if ($protocol_node && $protocol_node->type == 'cultural_protocol_group' && !empty($protocol_node->og_group_ref) && $protocol_node->og_group_ref['und'][0]['target_id'] == $og_membership->gid) {
-        $user = user_load($og_membership->etid);
-        if (!og_is_member('node', $proto_nid, 'user', $user)) {
-          watchdog ('mukurtu', 'adding user from member presave hook protocol');
+        $protocol_node = node_load($proto_nid);
+        //      dpm($protocol_node);
 
-          _add_user_to_group($og_membership->etid, $proto_nid);
-          drupal_set_message(t("Added user to accompanying protocol"));
+        // add the user to the protocol node as well
+        if ($protocol_node && $protocol_node->type == 'cultural_protocol_group' && !empty($protocol_node->og_group_ref) && $protocol_node->og_group_ref['und'][0]['target_id'] == $og_membership->gid) {
+          $user = user_load($og_membership->etid);
+          if (!og_is_member('node', $proto_nid, 'user', $user)) {
+            watchdog('mukurtu', 'adding user from member presave hook protocol');
+
+            _add_user_to_group($og_membership->etid, $proto_nid);
+            drupal_set_message(t("Added user to accompanying protocol"));
+          }
         }
       }
-    }
-    else if ($group_node->type == 'cultural_protocol_group') {
-      // find the parent group and add the user to it
+      else {
+        if ($group_node->type == 'cultural_protocol_group') {
+          // find the parent group and add the user to it
 
-      if (isset($group_node->og_group_ref['und'][0]['target_id'])) {
-        $community_node = node_load($group_node->og_group_ref['und'][0]['target_id']);
-        $user = user_load ($og_membership->etid);
-        if (!og_is_member ('node', $community_node->nid, 'user', $user)) {
-          if ($community_node->type == 'community') {
-            watchdog ('mukurtu', 'adding user from member presave hook community');
+          if (isset($group_node->og_group_ref['und'][0]['target_id'])) {
+            $community_node = node_load($group_node->og_group_ref['und'][0]['target_id']);
+            $user = user_load($og_membership->etid);
+            if (!og_is_member('node', $community_node->nid, 'user', $user)) {
+              if ($community_node->type == 'community') {
+                watchdog('mukurtu', 'adding user from member presave hook community');
 
-            _add_user_to_group($og_membership->etid, $community_node->nid);
-    drupal_set_message(t("Added user to parent community"));
+                _add_user_to_group($og_membership->etid, $community_node->nid);
+                drupal_set_message(t("Added user to parent community"));
+              }
+            }
           }
         }
       }
