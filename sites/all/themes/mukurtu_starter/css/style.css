@@ -656,6 +656,18 @@ table .checkbox input[type="checkbox"] {
 .view-communities-structure .views-table .communities-structure-protocol a {
   padding-left: 2em;
 }
+.field .label-inline {
+  float: left;
+  font-weight: bold;
+}
+.field .label-above {
+  font-weight: bold;
+}
+.field ul {
+  list-style-type: none;
+  padding-left: 1.5em;
+  margin: 0;
+}
 #edit-field-digital-heritage-items .field-label {
   display: none;
 }
@@ -803,13 +815,6 @@ table .checkbox input[type="checkbox"] {
 }
 a:hover {
   text-decoration: none;
-}
-.field .label-inline {
-  float: left;
-  font-weight: bold;
-}
-.field .label-above {
-  font-weight: bold;
 }
 .panel-panel .right-pane,
 .pane-block {
