@@ -660,13 +660,21 @@ table .checkbox input[type="checkbox"] {
   float: left;
   font-weight: bold;
 }
-.field .label-above {
+.field .label-above,
+.field .field-label {
   font-weight: bold;
+  text-transform: uppercase;
 }
 .field ul {
   list-style-type: none;
-  padding-left: 1.5em;
+  padding-left: 0;
   margin: 0;
+}
+.ds-2col .field {
+  margin-bottom: 10px;
+}
+.ds-2col .group-left .label-above {
+  font-size: 22px;
 }
 #edit-field-digital-heritage-items .field-label {
   display: none;
@@ -940,36 +948,6 @@ a:hover {
 #page-header .navbar-default {
   margin: 0 0 20px 0;
 }
-.ds-2col > .group-right .field-group-accordion {
-  margin-bottom: 1em;
-}
-.ui-accordion .field {
-  margin-bottom: 10px;
-}
-.ui-accordion .field a {
-  color: #428bca;
-}
-.ui-accordion .field .label-above,
-.ui-accordion .field .field-label {
-  text-transform: uppercase;
-  font-weight: normal;
-}
-.ui-accordion .ui-accordion-icons {
-  padding-left: 1.7em;
-}
-.ui-accordion .ui-accordion-content {
-  padding: 1em 1.7em;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: none repeat scroll 0 0 #f8f7f7;
-}
-.ui-accordion .ui-widget-content {
-  background: none repeat scroll 0 0 #f8f7f7;
-  border: 1px solid #aaa;
-  border-top: none;
-}
-.ui-accordion .ui-accordion-header-active {
-  background: url("/sites/all/modules/contrib/jquery_update/replace/ui/themes/base/minified/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #e6e6e6;
-}
 .node-type-digital-heritage .group_scald_atom_metadata .popup-element {
   width: 100%;
   text-align: right;
@@ -980,7 +958,11 @@ a:hover {
   padding-bottom: 10px;
   margin-bottom: 10px;
 }
-.node-digital-heritage.view-mode-full .scald-atom {
+.node-type-digital-heritage .view-mode-search_result .field {
+  margin-bottom: 0;
+}
+.node-digital-heritage.view-mode-full .scald-atom,
+.node-digital-heritage.view-mode-community_record .scald-atom {
   margin-bottom: 2.5em;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
@@ -993,15 +975,6 @@ a:hover {
 }
 .field-name-field-digital-heritage-items .label-above {
   margin-bottom: -30px;
-}
-.ds-2col > .group-left .field {
-  margin-bottom: 10px;
-}
-.ds-2col > .group-left .label-above {
-  text-transform: uppercase;
-  color: black;
-  font-size: 22px;
-  font-weight: 300;
 }
 @media (max-width: 992px) {
   .ds-2col > .group-left {

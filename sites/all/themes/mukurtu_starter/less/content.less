@@ -101,15 +101,29 @@
     float:left;
     font-weight: bold;
   }
-  .label-above {
+  .label-above, .field-label {
     font-weight:bold;
+    text-transform: uppercase;
   }
   ul {
     list-style-type: none;
-    padding-left: 1.5em;
+    padding-left: 0;
     margin: 0;
   }
 }
+
+.ds-2col {
+  .field {
+    margin-bottom: 10px;
+  }
+  .group-left {
+    .label-above {
+      font-size: 22px;
+    }
+  }
+}
+
+
 
 //// Collections
 
@@ -424,41 +438,6 @@ a.tooltips span {
 
 }
 
-// Accordion in right column of DH node
-.ds-2col > .group-right
-
-  .field-group-accordion {
-    margin-bottom: 1em;
-  }
-  .ui-accordion {
-    .field {
-      margin-bottom:10px;
-      a {
-        color: #428bca;
-      }
-      .label-above, .field-label {
-        text-transform: uppercase;
-        font-weight: normal;
-      }
-    }
-    .ui-accordion-icons {
-      padding-left: 1.7em;
-    }
-    .ui-accordion-content {
-      padding: 1em 1.7em;
-      font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-      background: none repeat scroll 0 0 #f8f7f7;
-    }
-    .ui-widget-content {
-      background: none repeat scroll 0 0 #f8f7f7;
-      border: 1px solid #aaa;
-      border-top: none;
-    }
-    .ui-accordion-header-active {
-      background: url("/sites/all/modules/contrib/jquery_update/replace/ui/themes/base/minified/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #e6e6e6;
-    }
-
-}
 
 .node-type-digital-heritage {
 
@@ -474,10 +453,17 @@ a.tooltips span {
     padding-bottom:10px;
     margin-bottom:10px;
   }
+  .view-mode-search_result {
+    .field {
+      margin-bottom: 0;
+    }
+    
+
+  }
 }
 
-// DH full node view
-.node-digital-heritage.view-mode-full {
+// DH full node and Community Record views
+.node-digital-heritage.view-mode-full, .node-digital-heritage.view-mode-community_record {
   .scald-atom {
     margin-bottom: 2.5em;
     .scald-file-icon {
@@ -501,17 +487,7 @@ a.tooltips span {
   }
 }
 
-.ds-2col > .group-left {
-  .field {
-    margin-bottom:10px;
-  }
-  .label-above {
-    text-transform: uppercase;
-    color:black;
-    font-size:22px;
-    font-weight: 300;
-  }
-}
+
 
 @media (max-width: @screen-md-min) {
   .ds-2col > .group-left {
