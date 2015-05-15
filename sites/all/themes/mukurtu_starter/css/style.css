@@ -965,6 +965,12 @@ a:hover {
 .node-digital-heritage.view-mode-community_record .scald-atom {
   margin-bottom: 2.5em;
 }
+.node-digital-heritage.view-mode-full .group-right,
+.node-digital-heritage.view-mode-community_record .group-right {
+  background: #f8f7f7 none repeat scroll 0 0;
+  border-radius: 4px;
+  padding: 30px;
+}
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
 }
