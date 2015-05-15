@@ -482,56 +482,61 @@ function ma_digitalheritage_node_load($nodes, $types) {
  */
 function ma_digitalheritage_page_alter(&$data) {
 
+
   // If there are Child Records for a DH node, show the parent and child records in quicktabs
   if (isset($data['content']['system_main']['nodes'])) {
-    $nids = element_children($data['content']['system_main']['nodes']);
-    $nid = $nids[0];
-    $parent_dh = entity_metadata_wrapper('node', $nid);
-    if ($community_records = $parent_dh->field_community_record_children->value()) {
+    $array_keys = array_keys($data['content']['system_main']['nodes']);
+    $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
+    if ($node->type == 'digital_heritage') {
+      $nids = element_children($data['content']['system_main']['nodes']);
+      $nid = $nids[0];
+      $parent_dh = entity_metadata_wrapper('node', $nid);
+      if ($community_records = $parent_dh->field_community_record_children->value()) {
 
-      $tab_settings = array(
-        'ajax' => 0,
-        'default_tab' => 0,
-        'title' => 'DH Tabs',
-        'renderer' => 'quicktabs',
-        'style' => 'Excel',
-      );
+        $tab_settings = array(
+          'ajax' => 0,
+          'default_tab' => 0,
+          'title' => 'DH Tabs',
+          'renderer' => 'quicktabs',
+          'style' => 'Excel',
+        );
 
-      $dh_tabs[] = array(
-        'type' => 'node',
-        'nid' => $nid,
-        'view_mode' => 'full',
-        'title' => 'Institutional Record',
-        'hide_title' => 0,
-        #'weight' => 0,
-      );
-
-      foreach ($community_records as $community_record) {
-
-        // Tab title
-        $community_record_parent_communities = array();
-        foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
-          $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
-          $community_record_parent_communities[] = $community_record_parent_community_node->title;
-        }
-        $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Community Record';
-
-        // Create the tab
         $dh_tabs[] = array(
           'type' => 'node',
-          'nid' => $community_record->nid,
-          'view_mode' => 'community_record',
-          'title' => $community_record_tab_title,
+          'nid' => $nid,
+          'view_mode' => 'full',
+          'title' => 'Institutional Record',
           'hide_title' => 0,
           #'weight' => 0,
         );
 
-      }
+        foreach ($community_records as $community_record) {
 
-      $data['content']['system_main'] = array(
-        'content' => quicktabs_build_quicktabs("dh_tabs", $tab_settings, $dh_tabs),
-        '#weight' => 99,
-      );
+          // Tab title
+          $community_record_parent_communities = array();
+          foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
+            $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
+            $community_record_parent_communities[] = $community_record_parent_community_node->title;
+          }
+          $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Community Record';
+
+          // Create the tab
+          $dh_tabs[] = array(
+            'type' => 'node',
+            'nid' => $community_record->nid,
+            'view_mode' => 'community_record',
+            'title' => $community_record_tab_title,
+            'hide_title' => 0,
+            #'weight' => 0,
+          );
+
+        }
+
+        $data['content']['system_main'] = array(
+          'content' => quicktabs_build_quicktabs("dh_tabs", $tab_settings, $dh_tabs),
+          '#weight' => 99,
+        );
+      }
     }
   }
 }
