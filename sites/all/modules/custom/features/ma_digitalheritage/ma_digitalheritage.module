@@ -127,6 +127,12 @@ function ma_digitalheritage_node_view($node, $view_mode) {
       $node->content['field_related_dh_items'][0]['#markup'] = $output;
     }
 
+
+  }
+  elseif ($view_mode == 'community_record') {
+
+    // Add an edit link to community record after its title
+    $node->content['title'][0]['#markup'] = $node->title . l (' (edit)', 'node/' . $node->nid . '/edit');
   }
 
 
@@ -390,7 +396,7 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
     }
     foreach ($original_community_records as $original_child) {
       if (!in_array($original_child, $new_community_records)) {
-        form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, use the "Edit Community Record" link when viewing the record then press "Delete". Note, only the creator of the Community Record can delete it.'));
+        form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, edit the Community Record, then press "Delete". Note, only the creator of the Community Record can delete it.'));
       }
 
     }
@@ -452,12 +458,87 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
   }
 }
 
+
 /**
- * Implements hook_field_group_pre_render().
+ * Implements hook_node_load().
  */
-// Rename the Community Record accordion label to the node title of the Community Record
-function ma_digitalheritage_field_group_pre_render (&$element, $group, &$form) {
-  if ($group->group_name == 'group_community_record') {
-    $group->label = strtoupper($form['#node']->title);
+function ma_digitalheritage_node_load($nodes, $types) {
+
+  // For Community Records, show the parent record's atoms
+  if (in_array('digital_heritage', $types)) {
+    foreach ($nodes as $node) {
+      if (isset($node->field_community_record_parent[LANGUAGE_NONE])) {
+        $parent_node = node_load ($node->field_community_record_parent[LANGUAGE_NONE][0]['target_id']);
+        if (isset($parent_node->field_media_asset[LANGUAGE_NONE])) {
+          $node->field_media_asset = $parent_node->field_media_asset;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_page_alter().
+ */
+function ma_digitalheritage_page_alter(&$data) {
+
+
+  // If there are Child Records for a DH node, show the parent and child records in quicktabs
+  if (isset($data['content']['system_main']['nodes'])) {
+    $array_keys = array_keys($data['content']['system_main']['nodes']);
+    $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
+    if ($node->type == 'digital_heritage') {
+      $nids = element_children($data['content']['system_main']['nodes']);
+      $nid = $nids[0];
+      $parent_dh = entity_metadata_wrapper('node', $nid);
+      if ($community_records = $parent_dh->field_community_record_children->value()) {
+
+        $tab_settings = array(
+          'ajax' => 0,
+          'default_tab' => 0,
+          'title' => 'DH Tabs',
+          'renderer' => 'quicktabs',
+          'style' => 'Excel',
+        );
+
+        // Parent tab
+        $parent_parent_community = node_load($node->field_community_ref[LANGUAGE_NONE][0]['nid']);
+        $dh_tabs[] = array(
+          'type' => 'node',
+          'nid' => $nid,
+          'view_mode' => 'full',
+          'title' => $parent_parent_community->title . ' Record',
+          'hide_title' => 0,
+          #'weight' => 0,
+        );
+
+        foreach ($community_records as $community_record) {
+
+          // Tab title
+          $community_record_parent_communities = array();
+          foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
+            $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
+            $community_record_parent_communities[] = $community_record_parent_community_node->title;
+          }
+          $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
+
+          // Create the tab
+          $dh_tabs[] = array(
+            'type' => 'node',
+            'nid' => $community_record->nid,
+            'view_mode' => 'community_record',
+            'title' => $community_record_tab_title,
+            'hide_title' => 0,
+            #'weight' => 0,
+          );
+
+        }
+
+        $data['content']['system_main'] = array(
+          'content' => quicktabs_build_quicktabs("dh_tabs", $tab_settings, $dh_tabs),
+          '#weight' => 99,
+        );
+      }
+    }
   }
 }
