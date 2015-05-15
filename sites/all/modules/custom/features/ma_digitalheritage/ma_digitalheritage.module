@@ -494,7 +494,7 @@ function ma_digitalheritage_page_alter(&$data) {
         'default_tab' => 0,
         'title' => 'DH Tabs',
         'renderer' => 'quicktabs',
-        'style' => 'Zen',
+        'style' => 'Excel',
       );
 
       $dh_tabs[] = array(
