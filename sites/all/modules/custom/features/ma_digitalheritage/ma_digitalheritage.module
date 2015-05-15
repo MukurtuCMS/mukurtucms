@@ -518,7 +518,7 @@ function ma_digitalheritage_page_alter(&$data) {
             $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
             $community_record_parent_communities[] = $community_record_parent_community_node->title;
           }
-          $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Community Record';
+          $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
 
           // Create the tab
           $dh_tabs[] = array(
