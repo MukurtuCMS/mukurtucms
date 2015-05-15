@@ -501,11 +501,13 @@ function ma_digitalheritage_page_alter(&$data) {
           'style' => 'Excel',
         );
 
+        // Parent tab
+        $parent_parent_community = node_load($node->field_community_ref[LANGUAGE_NONE][0]['nid']);
         $dh_tabs[] = array(
           'type' => 'node',
           'nid' => $nid,
           'view_mode' => 'full',
-          'title' => 'Institutional Record',
+          'title' => $parent_parent_community->title . ' Record',
           'hide_title' => 0,
           #'weight' => 0,
         );
