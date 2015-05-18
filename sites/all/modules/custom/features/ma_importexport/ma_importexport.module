@@ -5,3 +5,33 @@
  */
 
 include_once('ma_importexport.features.inc');
+
+
+/**
+ * Implements hook_feeds_presave().
+ */
+function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
+  if($entity->feeds_item->entity_type == 'scald_atom') {   
+    if($entity->feeds_item->id == 'import_media_audio') {
+      $type = 'audio';
+    } elseif($entity->feeds_item->id == 'import_media_video') {
+      $type = 'video';
+    } else {
+      return;
+    }
+
+    $path = ScaldAtomController::getThumbnailPath($type);
+    try {
+      $data = file_get_contents($entity->{'Temporary target 1'});
+      $destination = (substr($path, -1) === '/' ? $path : $path . '/') . basename(urldecode($entity->{'Temporary target 1'}));
+      $file = file_save_data($data, $destination, FILE_EXISTS_RENAME);
+    } catch (Exception $e) {
+      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
+    }
+
+    $entity->base_id = $file->fid;
+    $entity->file_source = $file->uri;
+    $entity->data[$type . '_file'] = $file->uri;
+    $entity->data[$type . '_id'] = $file->fid;
+  }
+}
