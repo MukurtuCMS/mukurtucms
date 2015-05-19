@@ -753,6 +753,14 @@ function mukurtu_splash_block_support() {
 
   $markup = '';
 
+  $version = ma_core_get_version();
+  $items[] = array (
+    'title' => t($version . ' Release Notes'),
+    'href' => 'release-notes',
+    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+    'description' => t('Mukurtu Release Notes'),
+  );
+
   $items[] = array (
     'title' => 'Mukurtu Support',
     'href' => 'http://support.mukurtu.org',
