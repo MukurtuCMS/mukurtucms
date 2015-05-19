@@ -135,7 +135,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
   }
 
   // The user enters a comma-separated list of tags. We only autocomplete the last tag.
-  $tags_typed = drupal_explode_tags($tags_typed);
+  $tags_typed = ma_core_taxonomy_explode_tags($tags_typed);
   $tag_last = drupal_strtolower(array_pop($tags_typed));
 
   $term_matches = array();

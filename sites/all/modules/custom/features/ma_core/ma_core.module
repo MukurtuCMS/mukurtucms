@@ -126,3 +126,23 @@ function ma_core_menu() {
 function ma_core_blank_page_callback() {
   return ' ';
 }
+
+/**
+ * Explodes a string of tags into an array.
+ * Tweaked drupal_explode_tags that a) uses semicolon instead of comma as delimter, and b) no special handling (ie. not an escape) for quotes
+ **/
+function ma_core_taxonomy_explode_tags($tags) {
+  $regexp = '%(?:^|;\ *)("(?>[^"]*)(?>""[^"]* )*"|(?: [^;]*))%x';
+  preg_match_all($regexp, $tags, $matches);
+  $typed_tags = array_unique($matches[1]);
+
+  $tags = array();
+  foreach ($typed_tags as $tag) {
+    $tag = trim($tag);
+    if ($tag != "") {
+      $tags[] = $tag;
+    }
+  }
+
+  return $tags;
+}
