@@ -555,7 +555,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"',
+    'description' => 'A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. More than one Contributor may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -906,7 +906,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one creator can be entered into this field. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"',
+    'description' => 'A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1180,7 +1180,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc.',
+    'description' => 'The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -1228,6 +1228,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_dh_type',
     'label' => 'Type',
@@ -1252,7 +1253,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource.',
+    'description' => 'The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. You may enter multiple formats, separated by semicolons.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1305,6 +1306,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 29,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_format',
     'label' => 'Format',
@@ -1488,7 +1490,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The language or languages used in the piece of content. This includes text, audio, video. Your content may include multiple languages, you can list each separated by a comma.
+    'description' => 'The language or languages used in the piece of content. This includes text, audio, video. You may enter multiple languages, separated by semicolons. 
 ',
     'display' => array(
       'browse_teaser' => array(
@@ -1549,6 +1551,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 23,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_language',
     'label' => 'Language',
@@ -1819,7 +1822,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Publisher can be a person, an organization, or a service responsible for publishing the content. 
+    'description' => 'A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
 ',
     'display' => array(
       'browse_teaser' => array(
@@ -1880,6 +1883,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 13,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_publisher',
     'label' => 'Publisher',
@@ -2137,7 +2141,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. 
+    'description' => 'The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
 ',
     'display' => array(
       'browse_teaser' => array(
@@ -2198,6 +2202,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 17,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_subject',
     'label' => 'Subject',
@@ -2306,7 +2311,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. We suggest adding 3-5 keywords.',
+    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. We suggest adding 3-5 keywords. Separate multiple keywords with semicolons.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -2367,6 +2372,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 24,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_tags',
     'label' => 'Keywords',
@@ -2653,9 +2659,9 @@ function ma_digitalheritage_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"');
-  t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one creator can be entered into this field. Use commas to separate multiple values. If you want to use a comma in a name, use quotes around the name. eg. "Doe, Jane", "Doe, John"');
-  t('A Publisher can be a person, an organization, or a service responsible for publishing the content. 
+  t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. More than one Contributor may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
+  t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
+  t('A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
 ');
   t('A collection is an aggregation of digital heritage resources. Type the title of an existing collection in your CMS.
 ');
@@ -2679,7 +2685,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Identifier');
   t('Item Sharing Settings');
   t('Keywords');
-  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. We suggest adding 3-5 keywords.');
+  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. We suggest adding 3-5 keywords. Separate multiple keywords with semicolons.');
   t('Language');
   t('Licensing Options');
   t('Location');
@@ -2698,12 +2704,12 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Subject');
   t('Summary');
   t('TK labels allow you to provide added context to materials which are in the public domain or for which you may not hold copyright. The labels provide added information to those outside your community who may want to reuse the materials. Find out more about TK Labels at: www.localcontexts.org');
-  t('The language or languages used in the piece of content. This includes text, audio, video. Your content may include multiple languages, you can list each separated by a comma.
+  t('The language or languages used in the piece of content. This includes text, audio, video. You may enter multiple languages, separated by semicolons. 
 ');
-  t('The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. 
+  t('The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
 ');
-  t('The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc.');
-  t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource.');
+  t('The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.');
+  t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. You may enter multiple formats, separated by semicolons.');
   t('There are different licensing options available to you for your content if you have copyright of the materials. ');
   t('This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details.');
   t('This is the primary field for providing in-depth knowledge about this piece of content. This field is an open field to provide you with maximum flexibility to express your knowledge in the most appropriate way.');
