@@ -256,10 +256,12 @@ function ma_digitalheritage_clone_dh_button_check($node) {
     $protocol_manager_for_a_group = 0;
     $dh_emw = entity_metadata_wrapper('node', $node);
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
-      $p_emw = entity_metadata_wrapper('node', $protocol);
-      $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
-      if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
-        return TRUE;
+      if (isset ($protocol)) {
+        $p_emw = entity_metadata_wrapper('node', $protocol);
+        $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+        if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+          return TRUE;
+        }
       }
     }
   }
