@@ -110,12 +110,24 @@ function ma_core_og_get_users_in_group($gid) {
  * Implements hook_menu().
  */
 function ma_core_menu() {
+
   $items = array();
   // Empty home (front) page, added onto via context
   $items['home'] = array(
     'page callback' => 'ma_core_blank_page_callback',
     'access callback' => TRUE,
     'type' => MENU_SUGGESTED_ITEM,
+  );
+
+  // Release Notes page
+  $version = ma_core_get_version();
+  $items['release-notes'] = array(
+    'title' => t($version . ' Release Notes'),
+    'description' => 'Mukurtu Release Notes',
+    'page callback' => 'ma_core_release_notes',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 20,
   );
   return $items;
 }
@@ -126,6 +138,14 @@ function ma_core_menu() {
 function ma_core_blank_page_callback() {
   return ' ';
 }
+
+/**
+ * Menu callback; Mukurtu Release Notes
+ */
+function ma_core_release_notes () {
+  return nl2br(file_get_contents('VERSION.txt'));
+}
+
 
 /**
  * Explodes a string of tags into an array.
@@ -146,3 +166,20 @@ function ma_core_taxonomy_explode_tags($tags) {
 
   return $tags;
 }
+
+/**
+ * Get the version from first line of version.txt
+ */
+function ma_core_get_version() {
+
+  $version_path = DRUPAL_ROOT . '/VERSION.txt';
+  if (file_exists($version_path)) {
+    if ($version_file = fopen($version_path, 'r')) {
+      $version = trim(fgets($version_file));
+      if ($version = strstr ($version, 'Mukurtu ')) {
+        return $version;
+      }
+    }
+  }
+}
+
