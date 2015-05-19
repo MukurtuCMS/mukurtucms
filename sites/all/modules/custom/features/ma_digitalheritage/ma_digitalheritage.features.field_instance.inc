@@ -172,7 +172,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -1203,7 +1203,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -1253,7 +1253,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. You may enter multiple formats, separated by semicolons.',
+    'description' => 'The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. ',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1284,7 +1284,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_plain',
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 26,
       ),
       'search_index' => array(
@@ -1526,7 +1526,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -1858,7 +1858,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -2177,7 +2177,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -2346,7 +2346,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -2709,7 +2709,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
 ');
   t('The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.');
-  t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. You may enter multiple formats, separated by semicolons.');
+  t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. ');
   t('There are different licensing options available to you for your content if you have copyright of the materials. ');
   t('This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details.');
   t('This is the primary field for providing in-depth knowledge about this piece of content. This field is an open field to provide you with maximum flexibility to express your knowledge in the most appropriate way.');

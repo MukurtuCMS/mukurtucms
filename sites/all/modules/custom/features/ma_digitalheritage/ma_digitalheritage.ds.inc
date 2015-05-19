@@ -51,7 +51,7 @@ function ma_digitalheritage_ds_field_settings_info() {
     'author' => array(
       'weight' => '27',
       'label' => 'above',
-      'format' => 'author',
+      'format' => 'author_linked',
     ),
     'field_collection' => array(
       'formatter_settings' => array(
