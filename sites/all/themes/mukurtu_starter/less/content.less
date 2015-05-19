@@ -635,3 +635,21 @@ a.tooltips span {
 .ui-tabs .ui-tabs-hide {
   display: none !important;
 }
+
+// Fix Google map display inside of quicktabs (eg. for Community Records) (taken from https://www.drupal.org/node/352247#comment-9592623)
+.quicktabs_main {
+  position: relative;
+}
+.quicktabs-tabpage {
+  display: block;
+  visibility: visible;
+  width: 100%;
+}
+.quicktabs-tabpage.quicktabs-hide {
+  display: block;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  z-index: -1;
+}
