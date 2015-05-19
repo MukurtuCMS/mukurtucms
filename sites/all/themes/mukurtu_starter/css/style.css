@@ -1100,3 +1100,19 @@ a:hover {
 .ui-tabs .ui-tabs-hide {
   display: none !important;
 }
+.quicktabs_main {
+  position: relative;
+}
+.quicktabs-tabpage {
+  display: block;
+  visibility: visible;
+  width: 100%;
+}
+.quicktabs-tabpage.quicktabs-hide {
+  display: block;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  z-index: -1;
+}
