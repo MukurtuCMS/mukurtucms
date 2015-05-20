@@ -1,5 +1,5 @@
-Mukurtu 2.01
-------------
+### Mukurtu 2.01
+
 - Community Records. Protocol Stewards may create community-specific "Community Records" within Digital Heritage items that share the media assets but otherwise have custom information
 - Parent Communities. Communities can now be placed within Parent Communities. Explanation is provided within the field's help text.
 - added "Mukurtu Administrator" role, which is the default user role for the primary user on new deployments. It has less than full Administrator permissions.

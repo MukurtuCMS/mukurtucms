@@ -1,5 +1,5 @@
 # Mukurtu CMS 2.0.1
-### [Release Notes] (VERSION.txt)
+### [Release Notes] (VERSION.md)
 
 ## Contents
 * [What is Mukurtu?] (#whatis)
