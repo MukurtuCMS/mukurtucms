@@ -57,7 +57,7 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 // Add the Add and Manage Members links to the group member list, for users with perm to do so
 // Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
 function ma_core_views_pre_build(&$view) {
-  if ($view->name == 'og_members') {
+  if ($view->name == 'group_members') {
     $gid = $view->args[0];
     if (og_user_access('node', $gid, 'manage members')) {
       $output = '<div class="add-manage-members-links">';
