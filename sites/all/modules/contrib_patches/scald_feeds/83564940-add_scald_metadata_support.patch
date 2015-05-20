@@ -1,5 +1,5 @@
 diff --git a/sites/all/modules/contrib/scald_feeds/scald_feeds.module b/sites/all/modules/contrib/scald_feeds/scald_feeds.module
-index 13f1780..b66d160 100644
+index 13f1780..830d9d0 100644
 --- a/sites/all/modules/contrib/scald_feeds/scald_feeds.module
 +++ b/sites/all/modules/contrib/scald_feeds/scald_feeds.module
 @@ -21,7 +21,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
@@ -18,7 +18,7 @@ index 13f1780..b66d160 100644
    if (empty($value)) {
      return;
    }
-@@ -65,36 +65,217 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
+@@ -65,36 +65,221 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
      $data[$entity_type] = $entity;
    }
  
@@ -74,6 +74,7 @@ index 13f1780..b66d160 100644
 +      if ($file) {
 +        $file = (array) $file;
 +        $sid = _scald_feeds_save_atom($file, $type, basename($v->getValue()));
++
 +        $field[LANGUAGE_NONE][$i] = array(
 +          'sid' => $sid,
 +        );
@@ -199,7 +200,9 @@ index 13f1780..b66d160 100644
 +			);
 +
 +  foreach($field_assocs as $exif_field => $scald_field) {
-+    $atom_wrapper->{$scald_field} = $file[$exif_field][$langcode][0]['value'];
++    if(isset($file[$exif_field][$langcode][0])) {
++      $atom_wrapper->{$scald_field} = $file[$exif_field][$langcode][0]['value'];
++    }
 +  }
 +
 +  foreach($file['field_iptc_keywords'][$langcode] as $index => $tag) {
@@ -235,9 +238,10 @@ index 13f1780..b66d160 100644
 +}
 +
 +function _scald_feeds_save_file_atom($file, &$atom) {
++  $file['display'] = TRUE;
 +  $atom->base_id = $file['fid'];
 +  $atom->scald_file[LANGUAGE_NONE][0] = (array) $file;
-+  
++
 +  return scald_atom_save($atom);
 +}
 +
@@ -250,7 +254,7 @@ index 13f1780..b66d160 100644
    if (is_numeric($file)) {
      $file = (array) file_load($file);
    }
-@@ -107,48 +288,129 @@ function _scald_feeds_save_atom($file, $title = NULL) {
+@@ -107,48 +292,122 @@ function _scald_feeds_save_atom($file, $title = NULL) {
      $file = file_load($file_array['fid']);
      $file_array = (array) $file;
    }
@@ -365,21 +369,13 @@ index 13f1780..b66d160 100644
 +			'publisher' => $user->uid);
 +  $sids = scald_search($scald_query, FALSE);
 +      
++  if(!$sids) {
++    return FALSE;
++  }
++
 +  foreach ($sids as $sid) {
-+
-+    $previously_imported = db_select('feeds_item')
-+      ->fields('feeds_item', array('entity_id'))
-+      ->condition('entity_type', 'scald_atom')
-+      ->condition('entity_id', $sid)
-+      ->execute()
-+      ->fetchField();
-+
-+    if(!$previously_imported) {
-+      continue;
-+    }
-+
 +    $atom = scald_atom_load($sid);
-+       
++
 +    switch ($type) {
 +    case 'file':
 +      scald_file_scald_fetch($atom, 'atom');
@@ -401,6 +397,7 @@ index 13f1780..b66d160 100644
 +      return $sid;
 +    }
 +  }
++
 +  return FALSE;
 +}
 \ No newline at end of file
