@@ -22,6 +22,11 @@ function ma_profile_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'ds_picture_large',
     ),
+    'og_user_node' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['user|user|default'] = $ds_fieldsetting;
 
@@ -46,11 +51,13 @@ function ma_profile_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'summary',
         1 => 'ds_user_picture',
+        2 => 'og_user_node',
       ),
     ),
     'fields' => array(
       'summary' => 'ds_content',
       'ds_user_picture' => 'ds_content',
+      'og_user_node' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -85,10 +92,10 @@ function ma_profile_ds_layout_settings_info() {
         4 => 'wysiwyg',
         5 => 'picture',
         6 => 'timezone',
-        7 => 'redirect',
+        7 => 'og_user_node',
+        8 => 'redirect',
       ),
       'hidden' => array(
-        8 => 'og_user_node',
         9 => '_add_existing_field',
       ),
     ),
@@ -100,8 +107,8 @@ function ma_profile_ds_layout_settings_info() {
       'wysiwyg' => 'ds_content',
       'picture' => 'ds_content',
       'timezone' => 'ds_content',
+      'og_user_node' => 'ds_content',
       'redirect' => 'ds_content',
-      'og_user_node' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(

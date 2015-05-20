@@ -120,7 +120,6 @@ features[field_instance][] = node-digital_heritage-field_summary
 features[field_instance][] = node-digital_heritage-field_tags
 features[field_instance][] = node-digital_heritage-field_tk_body
 features[field_instance][] = node-digital_heritage-og_group_ref
-features[field_instance][] = user-user-og_user_node
 features[menu_links][] = main-menu_-category:admin/structure/taxonomy/category/add
 features[menu_links][] = main-menu_-digital-heritage:node/add/digital-heritage
 features[node][] = digital_heritage

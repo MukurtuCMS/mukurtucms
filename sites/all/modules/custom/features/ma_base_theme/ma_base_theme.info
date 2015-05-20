@@ -76,7 +76,6 @@ features[field_base][] = group_group
 features[field_base][] = group_register
 features[field_base][] = og_group_ref
 features[field_base][] = og_roles_permissions
-features[field_base][] = og_user_node
 features[file_display][] = application__component_media_item__file_field_file_default
 features[file_display][] = application__component_media_item__file_field_file_rendered
 features[file_display][] = application__component_media_item__file_field_file_table
