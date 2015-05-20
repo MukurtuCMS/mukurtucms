@@ -466,7 +466,7 @@ function mukurtu_splash_block_manage_content() {
   if (user_access('access administration pages')) {
     $items[] = array(
       'title' => 'List of Indexed Fields',
-      'href' => 'indexed_fields',
+      'href' => 'indexed-fields',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
       'description' => t('List of fields that will return results if their contents match user searches.'),
     );
