@@ -230,7 +230,9 @@ function _scald_feeds_save_image_atom($file, &$atom) {
 			);
 
   foreach($field_assocs as $exif_field => $scald_field) {
-    $atom_wrapper->{$scald_field} = $file[$exif_field][$langcode][0]['value'];
+    if(isset($file[$exif_field][$langcode][0])) {
+      $atom_wrapper->{$scald_field} = $file[$exif_field][$langcode][0]['value'];
+    }
   }
 
   foreach($file['field_iptc_keywords'][$langcode] as $index => $tag) {
