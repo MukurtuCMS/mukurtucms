@@ -49,7 +49,8 @@ function ma_profile_field_default_field_instances() {
   // Exported field_instance: 'user-user-og_user_node'
   $field_instances['user-user-og_user_node'] = array(
     'bundle' => 'user',
-    'default_value' => array(),
+    'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -75,21 +76,15 @@ function ma_profile_field_default_field_instances() {
         'weight' => 3,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'user',
     'field_name' => 'og_user_node',
-    'label' => 'Group membership',
+    'label' => 'Communities',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
-        'og_widget' => array(
-          'access_override' => 0,
-          'admin' => array(
-            'widget_type' => 'entityreference_autocomplete',
-          ),
-          'default' => array(
-            'widget_type' => 'entityreference_autocomplete_tags',
-          ),
-          'status' => TRUE,
+        'prepopulate' => array(
+          'status' => 0,
         ),
       ),
       'user_register_form' => 1,
@@ -107,10 +102,10 @@ function ma_profile_field_default_field_instances() {
       ),
     ),
     'widget' => array(
-      'active' => 0,
+      'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => '',
+        'apply_chosen' => 1,
       ),
       'type' => 'options_select',
       'weight' => 7,
@@ -119,7 +114,7 @@ function ma_profile_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Group membership');
+  t('Communities');
   t('Request message');
   t('This is the text a user may send to the group administrators.');
 
