@@ -141,7 +141,7 @@ function ma_search_api_default_search_api_index() {
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
-        "field_identifier" : { "type" : "string" },
+        "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_source" : { "type" : "text" },
@@ -332,8 +332,8 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0"
           },
           "field_identifier" : {
-            "table" : "search_api_db_default_node_index",
-            "type" : "string",
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
             "boost" : "1.0",
             "column" : "field_identifier"
           },
