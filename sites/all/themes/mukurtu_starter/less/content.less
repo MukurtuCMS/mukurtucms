@@ -36,15 +36,18 @@
     }
   }
 
-  // This is the form that appears after files are uploaded
-  .plupload-form-processed {
-    // Hide the OG Other Groups field that appears for admin users
-    [id^="og-group-ref-values--"], .description, .field-add-more-submit, .tabledrag-toggle-weight-wrapper {
-      display: none;
+  // This is the form that appears after files are uploaded or when editing an existing atom
+  #scald-atom-add-form-options {
+
+    .atom-protocol-desc {
+      margin-bottom: 1em;
     }
+
   }
 
 }
+
+
 
 
 
@@ -70,6 +73,11 @@
   }
 }
 
+// Description (field help text) tooltips
+.tooltip-inner {
+  max-width: 750px;
+  text-align:left;
+}
 
 //// Communities Structure view
 .view-communities-structure {
@@ -85,6 +93,36 @@
     }
   }
 }
+
+// general fields
+
+.field {
+  .label-inline {
+    float:left;
+    font-weight: bold;
+  }
+  .label-above, .field-label {
+    font-weight:bold;
+    text-transform: uppercase;
+  }
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+}
+
+.ds-2col {
+  .field {
+    margin-bottom: 10px;
+  }
+  .group-left {
+    .label-above {
+      font-size: 22px;
+    }
+  }
+}
+
 
 
 //// Collections
@@ -206,7 +244,7 @@
       margin-left: -25px;
       margin-right: -25px;
 
-      .placeholder-image, .field-name-field-collection, .field-name-field-description {
+      .placeholder-image, .field-name-field-collection, .field-name-field-description, .field-name-field-community-ref, .field-name-field-category {
         display: none;
       }
       .views-row {
@@ -238,6 +276,7 @@
         }
         .col-md-8 {
           position: static;
+          width: 100%;
         }
       }
     }
@@ -251,17 +290,7 @@ a:hover {
   text-decoration: none;
 }
 
-// general fields
 
-.field {
-  .label-inline {
-    float:left;
-    font-weight: bold;
-  }
-  .label-above {
-    font-weight:bold;
-  }
-}
 
 .panel-panel .right-pane,
 .pane-block {
@@ -409,19 +438,7 @@ a.tooltips span {
 
 }
 
-.ds-2col > .group-right {
-  background: #F8F7F7;
-  border-radius:4px;
-  padding: 30px;
-  .field {
-    margin-bottom:10px;
-    .label-above {
-      text-transform: uppercase;
-      font-weight: 500;
-      color:black;
-    }
-  }
-}
+
 .node-type-digital-heritage {
 
   .group_scald_atom_metadata {
@@ -435,6 +452,28 @@ a.tooltips span {
     border-bottom:1px solid #ECEBEB;
     padding-bottom:10px;
     margin-bottom:10px;
+  }
+  .view-mode-search_result {
+    .field {
+      margin-bottom: 0;
+    }
+    
+
+  }
+}
+
+// DH full node and Community Record views
+.node-digital-heritage.view-mode-full, .node-digital-heritage.view-mode-community_record {
+  .scald-atom {
+    margin-bottom: 2.5em;
+    .scald-file-icon {
+    //  display: none;
+    }
+  }
+  .group-right {
+    background: #f8f7f7 none repeat scroll 0 0;
+    border-radius: 4px;
+    padding: 30px;
   }
 }
 
@@ -453,17 +492,7 @@ a.tooltips span {
   }
 }
 
-.ds-2col > .group-left {
-  .field {
-    margin-bottom:10px;
-  }
-  .label-above {
-    text-transform: uppercase;
-    color:black;
-    font-size:22px;
-    font-weight: 300;
-  }
-}
+
 
 @media (max-width: @screen-md-min) {
   .ds-2col > .group-left {
@@ -482,6 +511,7 @@ a.tooltips span {
   }
   .ds-2col > .group-left {
     width: 66%;
+    float: left;
   }
   .ds-2col > .group-right {
     width: 30%;
@@ -604,4 +634,22 @@ a.tooltips span {
 // dont know why this needs to be added
 .ui-tabs .ui-tabs-hide {
   display: none !important;
+}
+
+// Fix Google map display inside of quicktabs (eg. for Community Records) (taken from https://www.drupal.org/node/352247#comment-9592623)
+.quicktabs_main {
+  position: relative;
+}
+.quicktabs-tabpage {
+  display: block;
+  visibility: visible;
+  width: 100%;
+}
+.quicktabs-tabpage.quicktabs-hide {
+  display: block;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  z-index: -1;
 }

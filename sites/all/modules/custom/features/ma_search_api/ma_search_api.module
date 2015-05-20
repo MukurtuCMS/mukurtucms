@@ -204,15 +204,96 @@ function ma_search_api_search_api_query_alter($sapi_query) {
  */
 function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
   $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-  if (!isset($group_wrapper->og_group_ref)) {
+  if (!isset($group_wrapper->field_scald_protocol)) {
     return SCALD_ATOM_ACCESS_IGNORE;
   }
-  if ($groups = $group_wrapper->og_group_ref->value()) {
-    foreach ($groups as $group) {
+  if ($groups = $group_wrapper->field_scald_protocol->value()) {
+    foreach ($groups as $group) { 
       if (node_access('view', $group)) {
         return SCALD_ATOM_ACCESS_IGNORE;
       }
     }
     return SCALD_ATOM_ACCESS_DENY;
   }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_search_api_menu() {
+  $items = array();
+
+  // Indexed Fields page for admins (linked from dashboard)
+  $items['indexed_fields'] = array(
+    'title' => 'Indexed Fields',
+    'page callback' => 'ma_search_api_list_of_indexed_fields',
+    'access callback' => 'user_access',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Display indexed fields
+ */
+function ma_search_api_list_of_indexed_fields() {
+
+  // Load the list of indexed fields
+  $index = search_api_index_load('default_node_index');
+  $indexed_fields = $index->options['fields'];
+
+  // Remove the index field property from the field name if there is one
+  foreach ($indexed_fields as $indexed_field_name => $indexed_field_values) {
+    if ($before_colon = strstr($indexed_field_name, ':', TRUE)) {
+      $indexed_fields_field_name_only[] = $before_colon;
+    }
+    else {
+      $indexed_fields_field_name_only[] = $indexed_field_name;
+    }
+  }
+
+  // Reduce duplicates created because sometimes we index a field in two different ways but are now shown as one since we removed their property
+  $indexed_fields_field_name_only = array_unique($indexed_fields_field_name_only);
+
+  // Remove these fields from the list (usually because they are used for facets and aren't intended for searching)
+  #dpm ($indexed_fields_field_name_only);
+  $fields_to_skip = array (
+    'field_media_asset',
+    'field_digital_heritage_count',
+    'field_digital_heritage_items',
+  );
+
+  // Build array of fields keyed by content type then field name
+  $field_info = field_info_field_map();
+  foreach ($indexed_fields_field_name_only as $indexed_field_name) {
+    if (!in_array($indexed_field_name, $fields_to_skip)) {
+      if (isset ($field_info[$indexed_field_name]['bundles']['node'])) {
+        foreach ($field_info[$indexed_field_name]['bundles']['node'] as $content_type) {
+          $indexed_fields_per_content_type[$content_type][] = $indexed_field_name;
+        }
+      }
+    }
+  }
+
+  // Build the output
+  $output = '<p>The following fields will return results if their contents match searches made at ' . l("Browse Digital Heritage", 'digital-heritage') . ' or ' . l("Browse Collections", 'collections') . '.<p>';
+  $content_types_to_show = array ( // Limit the list to just the content types that have search pages
+    'digital_heritage',
+    'collection',
+  );
+  $types = node_type_get_types();
+  foreach ($indexed_fields_per_content_type as $content_type => $indexed_fields) {
+    if (in_array($content_type, $content_types_to_show)) {
+      $output .= '<h3>' . node_type_get_name($content_type) . '</h3><ul>'; // content type as header
+      $output .= '<li>' . $types[$content_type]->title_label . '</li>'; // node title label is the sole node property (ie. not a field) that we want to show here
+      foreach ($indexed_fields as $indexed_field) {
+        $field_info = field_info_instance('node', $indexed_field, $content_type);
+        $output .= '<li>' . $field_info['label'] . '</li>';
+      }
+      $output .= '</ul>';
+    }
+  }
+  return $output;
+
 }

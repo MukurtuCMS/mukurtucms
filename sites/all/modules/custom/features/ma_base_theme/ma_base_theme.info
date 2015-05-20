@@ -259,7 +259,6 @@ features[image][] = digital_heritage_full_content
 features[image][] = full
 features[variable][] = admin_theme
 features[variable][] = ds_styles_regions
-features[variable][] = field_bundle_settings_node__digital_heritage
 features[variable][] = node_admin_theme
 features[variable][] = theme_bootstrap_settings
 features[variable][] = theme_default

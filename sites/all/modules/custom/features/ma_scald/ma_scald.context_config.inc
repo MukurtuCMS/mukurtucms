@@ -31,6 +31,7 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
@@ -196,6 +197,7 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
@@ -237,6 +239,7 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',

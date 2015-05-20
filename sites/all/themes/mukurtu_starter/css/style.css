@@ -628,15 +628,9 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .ctools-modal-content .form-item-identifier #edit-identifier {
   width: 400px;
 }
-.page-node-edit .ctools-modal-content .plupload-form-processed [id^="og-group-ref-values--"],
-.page-node-add .ctools-modal-content .plupload-form-processed [id^="og-group-ref-values--"],
-.page-node-edit .ctools-modal-content .plupload-form-processed .description,
-.page-node-add .ctools-modal-content .plupload-form-processed .description,
-.page-node-edit .ctools-modal-content .plupload-form-processed .field-add-more-submit,
-.page-node-add .ctools-modal-content .plupload-form-processed .field-add-more-submit,
-.page-node-edit .ctools-modal-content .plupload-form-processed .tabledrag-toggle-weight-wrapper,
-.page-node-add .ctools-modal-content .plupload-form-processed .tabledrag-toggle-weight-wrapper {
-  display: none;
+.page-node-edit .ctools-modal-content #scald-atom-add-form-options .atom-protocol-desc,
+.page-node-add .ctools-modal-content #scald-atom-add-form-options .atom-protocol-desc {
+  margin-bottom: 1em;
 }
 .popup-element-title {
   background: none;
@@ -649,6 +643,10 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .text-format-wrapper .description {
   display: none;
 }
+.tooltip-inner {
+  max-width: 750px;
+  text-align: left;
+}
 .view-communities-structure .view-header {
   margin-bottom: 20px;
 }
@@ -657,6 +655,26 @@ table .checkbox input[type="checkbox"] {
 }
 .view-communities-structure .views-table .communities-structure-protocol a {
   padding-left: 2em;
+}
+.field .label-inline {
+  float: left;
+  font-weight: bold;
+}
+.field .label-above,
+.field .field-label {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.field ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+.ds-2col .field {
+  margin-bottom: 10px;
+}
+.ds-2col .group-left .label-above {
+  font-size: 22px;
 }
 #edit-field-digital-heritage-items .field-label {
   display: none;
@@ -754,7 +772,11 @@ table .checkbox input[type="checkbox"] {
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-collection,
 .view-collections-grid-list.grid-view .view-content .field-name-field-collection,
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-description,
-.view-collections-grid-list.grid-view .view-content .field-name-field-description {
+.view-collections-grid-list.grid-view .view-content .field-name-field-description,
+.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-community-ref,
+.view-collections-grid-list.grid-view .view-content .field-name-field-community-ref,
+.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-category,
+.view-collections-grid-list.grid-view .view-content .field-name-field-category {
   display: none;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row,
@@ -793,6 +815,7 @@ table .checkbox input[type="checkbox"] {
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .col-md-8,
 .view-collections-grid-list.grid-view .view-content .views-row .col-md-8 {
   position: static;
+  width: 100%;
 }
 .view-digital-heritage-grid-list.grid-view .text-center,
 .view-collections-grid-list.grid-view .text-center {
@@ -800,13 +823,6 @@ table .checkbox input[type="checkbox"] {
 }
 a:hover {
   text-decoration: none;
-}
-.field .label-inline {
-  float: left;
-  font-weight: bold;
-}
-.field .label-above {
-  font-weight: bold;
 }
 .panel-panel .right-pane,
 .pane-block {
@@ -932,19 +948,6 @@ a:hover {
 #page-header .navbar-default {
   margin: 0 0 20px 0;
 }
-.ds-2col > .group-right {
-  background: #F8F7F7;
-  border-radius: 4px;
-  padding: 30px;
-}
-.ds-2col > .group-right .field {
-  margin-bottom: 10px;
-}
-.ds-2col > .group-right .field .label-above {
-  text-transform: uppercase;
-  font-weight: 500;
-  color: black;
-}
 .node-type-digital-heritage .group_scald_atom_metadata .popup-element {
   width: 100%;
   text-align: right;
@@ -954,6 +957,19 @@ a:hover {
   border-bottom: 1px solid #ECEBEB;
   padding-bottom: 10px;
   margin-bottom: 10px;
+}
+.node-type-digital-heritage .view-mode-search_result .field {
+  margin-bottom: 0;
+}
+.node-digital-heritage.view-mode-full .scald-atom,
+.node-digital-heritage.view-mode-community_record .scald-atom {
+  margin-bottom: 2.5em;
+}
+.node-digital-heritage.view-mode-full .group-right,
+.node-digital-heritage.view-mode-community_record .group-right {
+  background: #f8f7f7 none repeat scroll 0 0;
+  border-radius: 4px;
+  padding: 30px;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
@@ -965,15 +981,6 @@ a:hover {
 }
 .field-name-field-digital-heritage-items .label-above {
   margin-bottom: -30px;
-}
-.ds-2col > .group-left .field {
-  margin-bottom: 10px;
-}
-.ds-2col > .group-left .label-above {
-  text-transform: uppercase;
-  color: black;
-  font-size: 22px;
-  font-weight: 300;
 }
 @media (max-width: 992px) {
   .ds-2col > .group-left {
@@ -991,6 +998,7 @@ a:hover {
   }
   .ds-2col > .group-left {
     width: 66%;
+    float: left;
   }
   .ds-2col > .group-right {
     width: 30%;
@@ -1091,4 +1099,20 @@ a:hover {
 }
 .ui-tabs .ui-tabs-hide {
   display: none !important;
+}
+.quicktabs_main {
+  position: relative;
+}
+.quicktabs-tabpage {
+  display: block;
+  visibility: visible;
+  width: 100%;
+}
+.quicktabs-tabpage.quicktabs-hide {
+  display: block;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  z-index: -1;
 }

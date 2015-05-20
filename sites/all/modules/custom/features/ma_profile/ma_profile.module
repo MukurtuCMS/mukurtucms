@@ -5,8 +5,35 @@
  */
 
 include_once 'ma_profile.features.inc';
-/**
- * @file
- */
 
-// Drupal needs this blank file.
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_profile_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
+
+  // Remove the "administator" role option from the user registration form to discourage Mukurtu Admins from creating new administrators
+  if(!in_array('administrator', $user->roles)) {
+    foreach($form['account']['roles']['#options'] as $rid => $role_name) {
+      if($role_name === 'administrator') {
+	      unset($form['account']['roles']['#options'][$rid]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
+
+  // Disable the "administator" role option from the edit user profile form to discourage Mukurtu Admins from granting/revoking administrator privileges
+  if(!in_array('administrator', $user->roles)) {
+    foreach($form['account']['roles']['#options'] as $rid => $role_name) {
+      if($role_name === 'administrator') {
+	      $form['account']['roles'][$rid]['#disabled'] = TRUE;
+      }
+    }
+  }
+}

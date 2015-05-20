@@ -127,19 +127,30 @@ function ma_search_api_default_search_api_index() {
         "comment_count" : { "type" : "integer" },
         "created" : { "type" : "date" },
         "field_category" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_category:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_collection" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_collection_credit" : { "type" : "text" },
         "field_collection_summary" : { "type" : "text" },
         "field_community_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_contributor:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_coverage_description" : { "type" : "text" },
+        "field_creator:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_date" : { "type" : "text" },
         "field_description:value" : { "type" : "text" },
+        "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_format:name" : { "type" : "text" },
+        "field_identifier" : { "type" : "string" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
+        "field_source" : { "type" : "text" },
+        "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
         "field_tags" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
+        "language" : { "type" : "string" },
         "nid" : { "type" : "integer" },
-        "og_group_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "promote" : { "type" : "boolean" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
         "search_api_language" : { "type" : "string" },
@@ -229,24 +240,6 @@ function ma_search_api_default_search_api_server() {
             "type" : "text",
             "boost" : "1.0"
           },
-          "field_category" : {
-            "table" : "search_api_db_default_node_index_field_category",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
-          "field_tags" : {
-            "table" : "search_api_db_default_node_index_field_tags",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
-          "og_group_ref" : {
-            "table" : "search_api_db_default_node_index_og_group_ref",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
           "field_media_asset:type" : {
             "table" : "search_api_db_default_node_index_field_media_asset_type",
             "column" : "value",
@@ -318,6 +311,81 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "nid",
             "type" : "integer",
+            "boost" : "1.0"
+          },
+          "language" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "language",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_coverage_description" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_date" : {
+            "table" : "search_api_db_default_node_index_text",
+            "column" : "field_date",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_identifier" : {
+            "table" : "search_api_db_default_node_index",
+            "type" : "string",
+            "boost" : "1.0",
+            "column" : "field_identifier"
+          },
+          "field_source" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_dh_type:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_creator:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_format:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_subject:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_tags:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_category:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_contributor:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_category" : {
+            "table" : "search_api_db_default_node_index_field_category",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_tags" : {
+            "table" : "search_api_db_default_node_index_field_tags",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }

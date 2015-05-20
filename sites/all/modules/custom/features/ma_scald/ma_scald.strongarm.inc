@@ -83,7 +83,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '5',
+          'weight' => '6',
         ),
       ),
       'display' => array(
@@ -93,7 +93,7 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_colorbox' => array(
-            'weight' => '0',
+            'weight' => '1',
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
@@ -143,7 +143,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '6',
+          'weight' => '7',
         ),
       ),
       'display' => array(
@@ -153,7 +153,7 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_colorbox' => array(
-            'weight' => '0',
+            'weight' => '1',
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
@@ -206,7 +206,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '18',
+          'weight' => '19',
         ),
       ),
       'display' => array(
@@ -275,7 +275,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '5',
+          'weight' => '6',
         ),
       ),
       'display' => array(

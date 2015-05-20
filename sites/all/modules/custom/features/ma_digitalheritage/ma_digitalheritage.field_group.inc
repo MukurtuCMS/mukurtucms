@@ -149,12 +149,10 @@ function ma_digitalheritage_field_group_info() {
     'label' => 'List View Fields',
     'weight' => '2',
     'children' => array(
-      0 => 'field_category',
-      1 => 'field_description',
-      2 => 'field_summary',
-      3 => 'field_community_ref',
-      4 => 'field_collection',
-      5 => 'title',
+      0 => 'field_community_ref',
+      1 => 'field_summary',
+      2 => 'field_category',
+      3 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -218,6 +216,7 @@ function ma_digitalheritage_field_group_info() {
     'children' => array(
       0 => 'field_collection',
       1 => 'field_related_dh_items',
+      2 => 'field_community_record_children',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
