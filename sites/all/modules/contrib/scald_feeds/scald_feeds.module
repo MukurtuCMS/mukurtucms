@@ -104,6 +104,7 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
       if ($file) {
         $file = (array) $file;
         $sid = _scald_feeds_save_atom($file, $type, basename($v->getValue()));
+
         $field[LANGUAGE_NONE][$i] = array(
           'sid' => $sid,
         );
@@ -265,9 +266,10 @@ function _scald_feeds_save_image_atom($file, &$atom) {
 }
 
 function _scald_feeds_save_file_atom($file, &$atom) {
+  $file['display'] = TRUE;
   $atom->base_id = $file['fid'];
   $atom->scald_file[LANGUAGE_NONE][0] = (array) $file;
-  
+
   return scald_atom_save($atom);
 }
 
@@ -376,21 +378,13 @@ function scald_feeds_fetch_matching_atom($filename, $type) {
 			'publisher' => $user->uid);
   $sids = scald_search($scald_query, FALSE);
       
+  if(!$sids) {
+    return FALSE;
+  }
+
   foreach ($sids as $sid) {
-
-    $previously_imported = db_select('feeds_item')
-      ->fields('feeds_item', array('entity_id'))
-      ->condition('entity_type', 'scald_atom')
-      ->condition('entity_id', $sid)
-      ->execute()
-      ->fetchField();
-
-    if(!$previously_imported) {
-      continue;
-    }
-
     $atom = scald_atom_load($sid);
-       
+
     switch ($type) {
     case 'file':
       scald_file_scald_fetch($atom, 'atom');
@@ -412,5 +406,6 @@ function scald_feeds_fetch_matching_atom($filename, $type) {
       return $sid;
     }
   }
+
   return FALSE;
 }
