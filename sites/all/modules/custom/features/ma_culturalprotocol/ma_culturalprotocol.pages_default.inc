@@ -134,7 +134,7 @@ function ma_culturalprotocol_default_page_manager_handlers() {
     $pane->pid = 'new-4';
     $pane->panel = 'right';
     $pane->type = 'views_panes';
-    $pane->subtype = 'og_members-panel_pane_1';
+    $pane->subtype = 'group_members-panel_pane_1';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(

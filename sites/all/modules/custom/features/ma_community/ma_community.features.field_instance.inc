@@ -487,7 +487,7 @@ Strict - Your community page is invisible to all site users who are not members 
   // Exported field_instance: 'node-community-og_group_ref'
   $field_instances['node-community-og_group_ref'] = array(
     'bundle' => 'community',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
