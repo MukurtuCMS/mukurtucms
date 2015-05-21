@@ -79,9 +79,7 @@ function ma_profile_field_default_field_bases() {
           'property' => 'title',
           'type' => 'property',
         ),
-        'target_bundles' => array(
-          'community' => 'community',
-        ),
+        'target_bundles' => array(),
       ),
       'handler_submit' => 'Change handler',
       'target_type' => 'node',
