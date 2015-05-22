@@ -159,6 +159,52 @@ function ma_culturalprotocol_default_page_manager_handlers() {
     $display->panels['right'][0] = 'new-4';
     $pane = new stdClass();
     $pane->pid = 'new-5';
+    $pane->panel = 'right';
+    $pane->type = 'entity_field';
+    $pane->subtype = 'node:og_group_ref';
+    $pane->shown = TRUE;
+    $pane->access = array();
+    $pane->configuration = array(
+      'label' => 'title',
+      'formatter' => 'textformatter_list',
+      'delta_limit' => '0',
+      'delta_offset' => '0',
+      'delta_reversed' => 0,
+      'formatter_settings' => array(
+        'textformatter_type' => 'ul',
+        'textformatter_class' => 'textformatter-list',
+        'textformatter_comma_full_stop' => 0,
+        'textformatter_comma_and' => 0,
+        'textformatter_comma_tag' => 'div',
+        'textformatter_comma_override' => 0,
+        'textformatter_separator_custom' => '',
+        'textformatter_separator_custom_tag' => 'span',
+        'textformatter_separator_custom_class' => 'textformatter-separator',
+        'textformatter_contrib' => array(
+          'entityreference_link' => 1,
+        ),
+      ),
+      'context' => 'argument_entity_id:node_1',
+      'override_title' => 0,
+      'override_title_text' => '',
+      'override_title_heading' => 'h2',
+    );
+    $pane->cache = array();
+    $pane->style = array(
+      'settings' => NULL,
+      'style' => 'default',
+    );
+    $pane->css = array(
+      'css_id' => '',
+      'css_class' => ' right-pane',
+    );
+    $pane->extras = array();
+    $pane->position = 1;
+    $pane->locks = array();
+    $display->content['new-5'] = $pane;
+    $display->panels['right'][1] = 'new-5';
+    $pane = new stdClass();
+    $pane->pid = 'new-6';
     $pane->panel = 'top';
     $pane->type = 'entity_field';
     $pane->subtype = 'node:field_protocol_image';
@@ -185,10 +231,10 @@ function ma_culturalprotocol_default_page_manager_handlers() {
     $pane->extras = array();
     $pane->position = 0;
     $pane->locks = array();
-    $display->content['new-5'] = $pane;
-    $display->panels['top'][0] = 'new-5';
+    $display->content['new-6'] = $pane;
+    $display->panels['top'][0] = 'new-6';
     $pane = new stdClass();
-    $pane->pid = 'new-6';
+    $pane->pid = 'new-7';
     $pane->panel = 'top';
     $pane->type = 'entity_field';
     $pane->subtype = 'node:group_group';
@@ -215,10 +261,10 @@ function ma_culturalprotocol_default_page_manager_handlers() {
     $pane->extras = array();
     $pane->position = 1;
     $pane->locks = array();
-    $display->content['new-6'] = $pane;
-    $display->panels['top'][1] = 'new-6';
+    $display->content['new-7'] = $pane;
+    $display->panels['top'][1] = 'new-7';
     $pane = new stdClass();
-    $pane->pid = 'new-7';
+    $pane->pid = 'new-8';
     $pane->panel = 'top';
     $pane->type = 'node_title';
     $pane->subtype = 'node_title';
@@ -241,8 +287,8 @@ function ma_culturalprotocol_default_page_manager_handlers() {
     $pane->extras = array();
     $pane->position = 2;
     $pane->locks = array();
-    $display->content['new-7'] = $pane;
-    $display->panels['top'][2] = 'new-7';
+    $display->content['new-8'] = $pane;
+    $display->panels['top'][2] = 'new-8';
   $display->hide_title = PANELS_TITLE_NONE;
   $display->title_pane = 'new-2';
   $handler->conf['display'] = $display;

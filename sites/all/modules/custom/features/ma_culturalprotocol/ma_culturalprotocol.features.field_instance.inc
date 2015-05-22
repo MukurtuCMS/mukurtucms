@@ -506,10 +506,10 @@ Strict - This cultural protocol and the digital heritage items within are shared
   // Exported field_instance: 'node-cultural_protocol_group-og_group_ref'
   $field_instances['node-cultural_protocol_group-og_group_ref'] = array(
     'bundle' => 'cultural_protocol_group',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => 'entityreference_prepopulate_field_default_value',
     'deleted' => 0,
-    'description' => 'Please select a community to which this cultural protocol belongs.
+    'description' => 'Please select the Community to which this Cultural Protocol belongs. You may select multiple Communities. You may only select or deselect Parent Communities for which you are a Community Manager.
 ',
     'display' => array(
       'browse_teaser' => array(
@@ -541,21 +541,19 @@ Strict - This cultural protocol and the digital heritage items within are shared
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'og_group_ref',
-    'label' => 'Parent Community *',
+    'label' => 'Parent Community',
     'required' => 1,
     'settings' => array(
       'behaviors' => array(
-        'og_widget' => array(
-          'access_override' => 0,
-          'admin' => array(
-            'widget_type' => 'entityreference_autocomplete',
-          ),
-          'default' => array(
-            'widget_type' => 'entityreference_autocomplete',
-          ),
-          'status' => TRUE,
-        ),
         'prepopulate' => array(
+          'action' => 'none',
+          'action_on_edit' => 0,
+          'fallback' => 'none',
+          'providers' => array(
+            'og_context' => 0,
+            'url' => 1,
+          ),
+          'skip_perm' => 0,
           'status' => 1,
         ),
       ),
@@ -574,10 +572,12 @@ Strict - This cultural protocol and the digital heritage items within are shared
       ),
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'og',
-      'settings' => array(),
-      'type' => 'og_complex',
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+      ),
+      'type' => 'options_select',
       'weight' => 3,
     ),
   );
@@ -660,8 +660,8 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Group type');
   t('Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
 Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ');
-  t('Parent Community *');
-  t('Please select a community to which this cultural protocol belongs.
+  t('Parent Community');
+  t('Please select the Community to which this Cultural Protocol belongs. You may select multiple Communities. You may only select or deselect Parent Communities for which you are a Community Manager.
 ');
   t('Select Group if you want this content type to be a group that can be associated to users, content and used for access settings.');
   t('Sharing Protocol');
