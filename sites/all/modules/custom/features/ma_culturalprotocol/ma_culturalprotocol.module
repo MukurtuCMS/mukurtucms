@@ -270,6 +270,38 @@ function ma_culturalprotocol_form_cultural_protocol_group_node_form_alter(&$form
       ':input[name="group_access[und]"]' => array ('value' => '0'),
     ),
   );
+
+  // 1, Only show communities for the group ref field
+  // 2. Only show communities that the user is a Community Manager of OR that are already set on the field (eg. by a previous Protocol steward that is a Community Manager of a Community that the current Protocol Manager is not, so that it does not get unset)
+  $communities_only = $form['og_group_ref'][LANGUAGE_NONE]['#options']['Community'];
+  $default_values = $form['og_group_ref'][LANGUAGE_NONE]['#default_value'];
+  foreach ($communities_only as $community_nid => $community_name) {
+    $roles = og_get_user_roles('node', $community_nid);
+    if (!in_array('community manager', $roles) && !in_array($community_nid, $default_values)) {
+      unset ($communities_only[$community_nid]);
+    }
+  }
+  $form['og_group_ref'][LANGUAGE_NONE]['#options'] = $communities_only;
+}
+
+/**
+ * Implements hook_node_validate().
+ */
+function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
+  if ($node->type == 'cultural_protocol_group') {
+
+    // Do not allow unsetting Parent Community for Communities that the user is not a Community Manager of
+    $default_values = $form['og_group_ref'][LANGUAGE_NONE]['#default_value'];
+    foreach ($default_values as $community_nid) {
+      if (!in_array ($community_nid, $form['og_group_ref'][LANGUAGE_NONE]['#value'])) {
+        $roles = og_get_user_roles('node', $community_nid);
+        if (!in_array('community manager', $roles)) {
+          $community = node_load ($community_nid);
+          form_set_error ('og_group_ref', 'You can unset <i>' . $community->title . '</i> as a Parent Community because you are not one its Community Managers.');
+        }
+      }
+    }
+  }
 }
 
 
