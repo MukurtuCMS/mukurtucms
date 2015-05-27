@@ -297,7 +297,7 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
         $roles = og_get_user_roles('node', $community_nid);
         if (!in_array('community manager', $roles)) {
           $community = node_load ($community_nid);
-          form_set_error ('og_group_ref', 'You can unset <i>' . $community->title . '</i> as a Parent Community because you are not one its Community Managers.');
+          form_set_error ('og_group_ref', 'You cannot unset <i>' . $community->title . '</i> as a Parent Community because you are not one its Community Managers.');
         }
       }
     }
