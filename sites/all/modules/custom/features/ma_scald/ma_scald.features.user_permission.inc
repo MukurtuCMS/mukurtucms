@@ -423,7 +423,7 @@ function ma_scald_user_default_permissions() {
   $permissions['restrict atom access'] = array(
     'name' => 'restrict atom access',
     'roles' => array(
-      'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'scald',
   );
