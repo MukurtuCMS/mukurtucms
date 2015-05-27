@@ -113,7 +113,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       $form['atom' . $atom_index]['og_group_ref']['#access'] = FALSE;
 
       // Do not show the per-scald actions checkboxes (view, edit, fetch, delete). This is TMI in the form. Default values come from per scald type in the atom config.
-      $form['atom' . $atom_index]['scald_actions']['#access'] = false;
+      #$form['atom' . $atom_index]['scald_actions']['#access'] = false;
 
       // Set metadata
       $entity = $form['atom' . $atom_index]['#entity'];
