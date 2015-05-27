@@ -971,6 +971,16 @@ a:hover {
   border-radius: 4px;
   padding: 30px;
 }
+.node-digital-heritage.view-mode-full .view-mode-search_result,
+.node-digital-heritage.view-mode-community_record .view-mode-search_result {
+  border-bottom: 1px solid #ecebeb;
+  margin-bottom: 2em;
+  padding-bottom: 2em;
+}
+.node-digital-heritage.view-mode-full .view-mode-search_result .scald-atom,
+.node-digital-heritage.view-mode-community_record .view-mode-search_result .scald-atom {
+  margin-bottom: 0;
+}
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
 }
