@@ -91,11 +91,22 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
 function ma_scald_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'scald_atom_add_form_options') {
     $atom_index = 0;
+
+    // Add a custom validation handler so that the user cannot unset a CP if they are not allowed to post to it
+    $form['#validate'][] = 'ma_scald_prevent_unsetting_cp_when_no_permission';
+    $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
+
     while (isset($form['atom' . $atom_index])) {
 
-      // Restrict CP nodes the scald item can be placed into according to the user's CP perms (otherwise by default it will allow all CPs the user is a member of)
-      $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
-      $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'] = $cp_options;
+      // Restrict CP nodes the scald item can be placed into according to the user's CP perms (otherwise by default it will show all CPs), but do also show CP nodes that are already set regardless of permission
+      $default_values = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#default_value'];
+      $initial_options = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'];
+      foreach ($initial_options as $gid => $cp_title) {
+        if (!array_key_exists ($gid, $cp_options) && !in_array($gid, $default_values)) {
+          unset ($form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#options'][$gid]);
+        }
+      }
+
       // Provide a description that's NOT a popup for the protocol field
       $form['atom' . $atom_index]['field_scald_protocol']['#suffix'] = '<div class = "atom-protocol-desc">' . t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. If you select multiple Protocols, users with access to ANY of the Protocols will be able to see this item.") . '</div>';
       // Hide the old protocol field
@@ -175,4 +186,22 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 
+}
+
+// Validation handler for scald atoms to prevent unsetting a CP if user is not a Contributor or Protocol Steward of that CP
+function ma_scald_prevent_unsetting_cp_when_no_permission(&$form, &$form_state) {
+  $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
+  $atom_index = 0;
+  while (isset($form['atom' . $atom_index])) {
+    $default_values = $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#default_value'];
+    foreach ($default_values as $gid) {
+      if (!in_array ($gid, $form['atom' . $atom_index]['field_scald_protocol'][LANGUAGE_NONE]['#value'])) {
+        if (!array_key_exists ($gid, $cp_options)) {
+          $cp = node_load ($gid);
+          form_set_error ('field_scald_protocol', 'You cannot unset <i>' . $cp->title . '</i> as a Cultural Protocol because you are not one its Contributors or Protocol Stewards.');
+        }
+      }
+    }
+    $atom_index++;
+  }
 }

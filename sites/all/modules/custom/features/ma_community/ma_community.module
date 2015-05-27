@@ -28,10 +28,13 @@ function _set_community_manager_on_community_create ($node) {
  */
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
 
-  // Hide the Parent Community field unless you are a Community Manager of the current community
+  // Hide the Parent Community field if the user is not a Community Manager of the current community, OR of an already-set Parent Community
   if ($current_nid = $form['nid']['#value']) {
     $roles = og_get_user_roles('node', $current_nid);
-    if (!in_array('community manager', $roles)) {
+    if ($current_parent = $form['field_parent_community'][LANGUAGE_NONE]['#default_value'][0]) {
+      $parent_roles = og_get_user_roles('node', $current_parent);
+    }
+    if (!in_array('community manager', $roles) OR !in_array('community manager', $parent_roles)) {
       $form['field_parent_community']['#access'] = FALSE;
       $do_not_populate = 1;
     }
