@@ -318,7 +318,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 37,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -392,7 +392,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 38,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -771,7 +771,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -856,7 +856,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1448,7 +1448,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 39,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1930,7 +1930,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'entityreference',
         'settings' => array(),
         'type' => 'entityreference_entity_id',
-        'weight' => 5,
+        'weight' => 7,
       ),
       'search_index' => array(
         'label' => 'above',
