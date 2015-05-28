@@ -90,20 +90,7 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
       $i++;
     }
     else {
-      $destination = ScaldAtomController::getThumbnailPath($type);
-      if($destination === '') {
-	$destination = 'public://';
-      }
-
-      try {
-	$file = file_copy(file_uri_to_object($v->getValue()), $destination, FILE_EXISTS_RENAME);
-      }
-      catch (Exception $e) {
-        watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
-      }
-      if ($file) {
-        $file = (array) $file;
-        $sid = _scald_feeds_save_atom($file, $type, basename($v->getValue()));
+      $sid = _scald_feeds_save_atom($v->getValue(), $type, basename($v->getValue()));
 
         $field[LANGUAGE_NONE][$i] = array(
           'sid' => $sid,
@@ -112,213 +99,117 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
           break;
         }
         $i++;
-      }
     }
   }  
 
   $entity->{$target} = $field;
 }
 
-/**
- * The following _scald_feeds_save_[type]_atom functions borrow heavily from the type providers 
- * specific hook_scald_add_form_fill() functions.
- */
-function _scald_feeds_save_audio_atom($file, &$atom) {
-  $dir_audio_thumb = ScaldAtomController::getThumbnailPath('audio');
-  $atom->base_id = $file['fid'];
-  $atom->file_source = $file['uri'];
-  $atom->data['audio_file'] = $file['uri'];
-  $atom->data['audio_id'] = $file['fid'];
-  
-  if (module_exists('waudio_getid3') && $getid3 = _waudio_getid3_load()) {
-    $filepath = drupal_realpath($file['uri']);
-    // get all id3 infos
-    $ret = waudio_getid3_ret_infos($filepath, $getid3);
-  }
-  elseif (module_exists('getid3') && ($id3 = getid3_instance())) {
-    $filepath = drupal_realpath($file['uri']);
-    $ret = array();
-    // get all id3 infos
-    $info = $id3->analyze($filepath);
-    foreach($info['tags']['id3v2'] as $key => $value) {
-      $ret['tags'][$key] = $value[0];
-    }
-    if (!empty($info['comments']['picture'][0]['data']) && !empty($info['comments']['picture'][0]['image_mime'])) {
-      $ret['images'][0]['data'] = $info['comments']['picture'][0]['data'];
-      $ret['images'][0]['image_mime'] = $info['comments']['picture'][0]['image_mime'];
-    }
-    elseif (!empty($info['id3v2']['APIC'][0]['data']) && !empty($info['id3v2']['APIC'][0]['image_mime'])) {
-      $ret['images'][0]['data'] = $info['id3v2']['APIC'][0]['data'];
-      $ret['images'][0]['image_mime'] = $info['id3v2']['APIC'][0]['image_mime'];
-    }
-  }
-  if (!empty($ret)) {
-    $atom->title = !empty($ret['tags']['title']) ? $ret['tags']['title'] : $file['filename'];
-
-    // Prefill the author
-    $langcode = field_language('scald_atom', $atom, 'scald_authors');
-    $atom->scald_authors[$langcode][0] = array(
-					       'tid' => 0,
-					       'taxonomy_term' => (object)(array('name' => isset($ret['tags']['artist'])?$ret['tags']['artist']:t('Unknown')))
-					       );
-
-    // Prefill tags
-    $langcode = field_language('scald_atom', $atom, 'scald_tags');
-    $atom->scald_tags[$langcode][0] = array(
-					    'tid' => 0,  // Beware, this is not a real tid, it's just an index
-					    'taxonomy_term' => (object)(array('name' => isset($ret['tags']['genre'])?$ret['tags']['genre']:t('Unknown')))
-					    );
-
-    $atom->data['artist'] = isset($ret['tags']['artist'])?$ret['tags']['artist']:'';
-    $atom->data['title'] = isset($ret['tags']['title'])?$ret['tags']['title']:'';
-    $atom->data['album'] = isset($ret['tags']['album'])?$ret['tags']['album']:'';
-    $atom->data['track'] = isset($ret['tags']['track'])?$ret['tags']['track']:isset($ret['tags']['track_number'])?$ret['tags']['track_number']:'';
-    $atom->data['year'] = isset($ret['tags']['year'])?$ret['tags']['year']:'';
-    $atom->data['genre'] = isset($ret['tags']['genre'])?$ret['tags']['genre']:'';
-
-    // If the MP3 includes a cover art, use it as the default thumbnail.
-    if (isset($ret['images'][0]['data']) && $ret['images'][0]['data'] != '') {
-      $extension = '.jpg';
-      if ($ret['images'][0]['image_mime'] == 'image/png') {
-	$extension = '.png';
-      }
-      elseif ($ret['images'][0]['image_mime'] == 'image/gif') {
-	$extension = '.gif';
-      }
-      $dest = $dir_audio_thumb . '/' . $file['filename'] . $extension;
-      $file = file_save_data($ret['images'][0]['data'], $dest);
-
-      if ($file) {
-	// Set the file status to temporary (image thumb)
-	db_update('file_managed')
-	  ->condition('fid', $file->fid)
-	  ->fields(array('status' => 0))
-	  ->execute();
-	$langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
-	$atom->scald_thumbnail[$langcode][0] = (array) $file;
-      }
-    }
-  }
-  
-  return scald_atom_save($atom);
-}
-
-function _scald_feeds_save_video_atom($file, &$atom) {
-  $atom->base_id = $file['fid'];
-  $atom->file_source = $file['uri'];
-  $atom->data['video_file'] = $file['uri'];
-  $atom->data['video_id'] = $file['fid'];
-
-  return scald_atom_save($atom);
-}
-
-function _scald_feeds_save_image_atom($file, &$atom) {
-  $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
-
-  $atom->base_id = $file['fid'];
-
-  // Load any exif metadata
-  $atom_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-
-  $field_assocs = array(
-			'field_media_description' => 'field_scald_description',
-			'field_iptc_headline' => 'field_scald_headline',
-			'field_iptc_copyright' => 'field_licence_std_cc',
-			'field_xmp_rights' => 'field_rights',
-			'field_iptc_sublocation' => 'field_scald_location',
-			'field_xmp_creator' => 'field_scald_creator'
+function _scald_feeds_copy_fields($form, &$atom) {
+  $basic_fields = array(
+			'field_scald_description',
+			'field_scald_headline',
+			'field_licence_std_cc',
+			'field_rights',
+			'field_scald_location',
+			'field_scald_creator'
 			);
 
-  foreach($field_assocs as $exif_field => $scald_field) {
-    if(isset($file[$exif_field][$langcode][0])) {
-      $atom_wrapper->{$scald_field} = $file[$exif_field][$langcode][0]['value'];
+  foreach($basic_fields as $field) {
+    if(isset($form[$field])){
+      $atom->{$field} = $form[$field];
     }
   }
 
-  foreach($file['field_iptc_keywords'][$langcode] as $index => $tag) {
-    $scald_tags = taxonomy_get_term_by_name($tag['value'], 'scald_tags');
+  if(isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat']) && isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'])) {
+    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['input_format'] = 'lat/lon';
+    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lat'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat'];
+    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lon'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon']; 
+  }
 
-    if(empty($scald_tags)) {
-      $scald_tag_vocab = taxonomy_vocabulary_machine_name_load('scald_tags');
+  if (isset($form['field_scald_created'][LANGUAGE_NONE][0]['#default_value'])) {	
+    $value1 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value']);
+    $value2 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value2']);
+    $atom->field_scald_created[LANGUAGE_NONE] = array(array('value' => $value1, 'value2' => $value2));
+  }
 
-      if($scald_tag_vocab != FALSE) {
-	$new_scald_tag = new stdClass();
-	$new_scald_tag->name = $tag['value'];
-	$new_scald_tag->vid = $scald_tag_vocab->vid;
-	taxonomy_term_save($new_scald_tag);
-	$atom_wrapper->scald_tags[] = entity_metadata_wrapper('taxonomy_term', $new_scald_tag->tid);
+  if(isset($form['scald_tags'])) {
+    foreach($form['scald_tags'][LANGUAGE_NONE] as $index => $tag) {
+      $scald_tags = taxonomy_get_term_by_name($tag, 'scald_tags');
+
+      if(!isset($atom->scald_tags[LANGUAGE_NONE])) {
+	$atom->scald_tags[LANGUAGE_NONE] = array();
       }
-    } else {
-      $atom_wrapper->scald_tags[] = entity_metadata_wrapper('taxonomy_term', $scald_tags[key($scald_tags)]->tid);
+
+      if(empty($scald_tags)) {
+	$scald_tag_vocab = taxonomy_vocabulary_machine_name_load('scald_tags');
+
+	if($scald_tag_vocab != FALSE) {
+	  $new_scald_tag = new stdClass();
+	  $new_scald_tag->name = $tag;
+	  $new_scald_tag->vid = $scald_tag_vocab->vid;
+	  taxonomy_term_save($new_scald_tag);
+	  $atom->scald_tags[LANGUAGE_NONE][] = json_decode(json_encode($new_scald_tag), true);
+	}
+      } else {
+	foreach($scald_tags as $tag) {
+	  $atom->scald_tags[LANGUAGE_NONE][] = json_decode(json_encode($tag), true);
+	}
+      }
     }
   }
-
-  if (isset($file['field_exif_datetime'][$langcode][0]['value'])) {	
-    $exif_date = date_create($file['field_exif_datetime'][$langcode][0]['value']);
-    $atom_wrapper->field_scald_created->set(date_timestamp_get($exif_date));
-  }
-	
-  if (isset($file['field_gps_latitude'][$langcode][0]['value']) && isset($file['field_gps_longitude'][$langcode][0]['value'])) {
-    $atom_wrapper->field_scald_geo_location = array('lat' => $file['field_gps_latitude'][$langcode][0]['value'], 'lon' => $file['field_gps_longitude'][$langcode][0]['value']);
-  }
-  
-  $atom->scald_thumbnail[$langcode][0] = (array) $file;
-
-  return scald_atom_save($atom);
 }
-
-function _scald_feeds_save_file_atom($file, &$atom) {
-  $file['display'] = TRUE;
-  $atom->base_id = $file['fid'];
-  $atom->scald_file[LANGUAGE_NONE][0] = (array) $file;
-
-  return scald_atom_save($atom);
-}
-
 
 /**
  * Saves a Scald Atom programmatically from a file.
  */
 function _scald_feeds_save_atom($file, $type, $title = NULL) {
-  if (is_numeric($file)) {
-    $file = (array) file_load($file);
-  }
-  elseif (!is_object($file) && !is_array($file)) {
-    return FALSE;
-  }
+  $file['display'] = TRUE;
 
-  $file_array = (array) $file;
-  if (!isset($file_array['filename'])) {
-    $file = file_load($file_array['fid']);
-    $file_array = (array) $file;
-  }
+  $atoms = array(new ScaldAtom($type, 'scald_' . $type));
 
-  $atom = new ScaldAtom($type, 'scald_' . $type);
   // Skip atom type the user isn't allowed to create.
-  if (!scald_action_permitted($atom, 'create')) {
+  if (!scald_action_permitted($atoms[0], 'create')) {
     return FALSE;
   }
 
-  $atom_wrapper = entity_metadata_wrapper('scald_atom', $atom);
+  $temp_file = file_unmanaged_copy($file);
 
-  $language = entity_language('scald_atom', $atom_wrapper);
-  if(is_null($language)) {
-    $language = LANGUAGE_NONE;
+  $providers = scald_atom_providers();
+  $sources = $providers[$type];
+  $source = key($sources);
+
+  $form_state = array(
+			   'values' =>  array(
+					      'file' => array( array ('name' => $title, 'tmppath' => $temp_file))
+					      ),
+			   'scald' => array( 'type' => $type, 'source' => isset($source) ? $source : NULL, 'atoms' => array($atoms[0])),
+			   'ajax' => 0
+			   );
+  $form = array('atom0' => array('#entity' =>  $atoms[0], '#parents' => array('atom0')));
+  $form['#entity_type'] = 'scald_atom';
+  $form_id = 'scald_atom_add_form_options';
+
+  $add_form_function = 'scald_' . $type . '_scald_add_form';
+  if(function_exists($add_form_function)) {
+    $add_form_function($form, $form_state);
+  } else {
+    return FALSE;
   }
 
-  $atom->title = !empty($title) ? $title : $file_array['filename'];
-  $atom->language = $language;
-
-  switch ($type) {
-    case 'file':
-      return _scald_feeds_save_file_atom($file, $atom);
-    case 'image':
-      return _scald_feeds_save_image_atom($file, $atom);
-    case 'audio':
-      return _scald_feeds_save_audio_atom($file, $atom);
-    case 'video':
-      return _scald_feeds_save_video_atom($file, $atom);
+  $fill_form_function = 'scald_' . $type . '_scald_add_form_fill';
+  if(function_exists($fill_form_function)) {
+    $fill_form_function($atoms, $form, $form_state);
+  } else {
+    return FALSE;
   }
+
+  drupal_alter('form', $form, $form_state, $form_id);
+
+  // The atom should really be built using entity_form_submit_build_entity...
+  _scald_feeds_copy_fields($form['atom0'], $atoms[0]);
+
+   return scald_atom_save($atoms[0]);
 }
 
 
