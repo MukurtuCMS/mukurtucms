@@ -241,7 +241,7 @@ function ma_collection_field_default_field_instances() {
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
