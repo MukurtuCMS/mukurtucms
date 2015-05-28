@@ -1,0 +1,15 @@
+name = Scald Feeds
+description = "Feeds mapper for Atoms"
+package = Scald
+core = "7.x"
+
+dependencies[] = scald
+dependencies[] = feeds
+
+
+; Information added by Drupal.org packaging script on 2014-05-15
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "scald_feeds"
+datestamp = "1400160528"
+

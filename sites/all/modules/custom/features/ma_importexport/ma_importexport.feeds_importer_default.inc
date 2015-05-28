@@ -48,149 +48,154 @@ function ma_importexport_feeds_importer_default() {
             'unique' => 0,
           ),
           1 => array(
+            'source' => 'Media Assets',
+            'target' => 'field_media_asset',
+            'unique' => FALSE,
+          ),
+          2 => array(
             'source' => 'published',
             'target' => 'created',
             'unique' => FALSE,
           ),
-          2 => array(
+          3 => array(
             'source' => 'guid',
             'target' => 'guid',
             'unique' => 1,
           ),
-          3 => array(
+          4 => array(
             'source' => 'Category',
             'target' => 'field_category',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          4 => array(
+          5 => array(
             'source' => 'Keywords',
             'target' => 'field_tags',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          5 => array(
+          6 => array(
             'source' => 'Creator',
             'target' => 'field_creator',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          6 => array(
+          7 => array(
             'source' => 'Contributor',
             'target' => 'field_contributor',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          7 => array(
+          8 => array(
             'source' => 'Date',
             'target' => 'field_date',
             'unique' => FALSE,
           ),
-          8 => array(
+          9 => array(
             'source' => 'Description',
             'target' => 'field_description',
             'unique' => FALSE,
           ),
-          9 => array(
+          10 => array(
             'source' => 'Format',
             'target' => 'field_format',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          10 => array(
+          11 => array(
             'source' => 'Identifier',
             'target' => 'field_identifier',
             'unique' => FALSE,
           ),
-          11 => array(
+          12 => array(
             'source' => 'Language',
             'target' => 'field_language',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          12 => array(
+          13 => array(
             'source' => 'Publisher',
             'target' => 'field_publisher',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          13 => array(
+          14 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          14 => array(
+          15 => array(
             'source' => 'Source',
             'target' => 'field_source',
             'unique' => FALSE,
           ),
-          15 => array(
+          16 => array(
             'source' => 'Subject',
             'target' => 'field_subject',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          16 => array(
+          17 => array(
             'source' => 'Traditional Knowledge',
             'target' => 'field_tk_body',
             'unique' => FALSE,
           ),
-          17 => array(
+          18 => array(
             'source' => 'Cultural Narrative',
             'target' => 'body',
             'unique' => FALSE,
           ),
-          18 => array(
+          19 => array(
             'source' => 'Latitude',
             'target' => 'field_coverage:lat',
             'unique' => FALSE,
           ),
-          19 => array(
+          20 => array(
             'source' => 'Longitude',
             'target' => 'field_coverage:lon',
             'unique' => FALSE,
           ),
-          20 => array(
+          21 => array(
             'source' => 'Location Description',
             'target' => 'field_coverage_description',
             'unique' => FALSE,
           ),
-          21 => array(
+          22 => array(
             'source' => 'nid',
             'target' => 'nid',
             'unique' => 1,
           ),
-          22 => array(
+          23 => array(
             'source' => 'Traditional Licensing URL',
             'target' => 'field_licence_trad',
             'unique' => FALSE,
           ),
-          23 => array(
+          24 => array(
             'source' => 'Standard and Creative Commons Licensing URL',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
           ),
-          24 => array(
+          25 => array(
             'source' => 'Collections',
             'target' => 'field_collection:etid',
             'unique' => FALSE,
           ),
-          25 => array(
+          26 => array(
             'source' => 'Summary',
             'target' => 'field_summary',
             'unique' => FALSE,
           ),
-          26 => array(
+          27 => array(
             'source' => 'Related Items',
             'target' => 'field_related_dh_items:etid',
             'unique' => FALSE,
           ),
-          27 => array(
+          28 => array(
             'source' => 'Sharing Settings',
             'target' => 'field_item_privacy_setting',
             'unique' => FALSE,
           ),
-          28 => array(
+          29 => array(
             'source' => 'Sharing Protocols',
             'target' => 'og_group_ref:etid',
             'unique' => FALSE,
@@ -421,6 +426,439 @@ function ma_importexport_feeds_importer_default() {
     'process_in_background' => 0,
   );
   $export['import_digital_heritage_metadata_xml'] = $feeds_importer;
+
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_media_audio';
+  $feeds_importer->config = array(
+    'name' => 'Import Media: Audio',
+    'description' => 'Import audio files with metadata into the Scald Atom Library',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'txt csv tsv xml opml',
+        'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'no_headers' => 0,
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsEntityProcessorScald_atom',
+      'config' => array(
+        'mappings' => array(
+          0 => array(
+            'source' => 'GUID',
+            'target' => 'guid',
+            'unique' => 1,
+          ),
+          1 => array(
+            'source' => 'Title',
+            'target' => 'title',
+            'unique' => FALSE,
+          ),
+          2 => array(
+            'source' => 'File',
+            'target' => 'Temporary target 1',
+            'unique' => FALSE,
+          ),
+          3 => array(
+            'source' => 'Thumbnail',
+            'target' => 'scald_thumbnail:uri',
+            'unique' => FALSE,
+          ),
+          4 => array(
+            'source' => 'Protocol',
+            'target' => 'og_group_ref:etid',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'Authors',
+            'target' => 'scald_authors',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          6 => array(
+            'source' => 'Tags',
+            'target' => 'scald_tags',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+        ),
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'input_format' => 'full_html',
+        'skip_hash_check' => 0,
+        'bundle' => 'audio',
+        'values' => array(
+          'provider' => 'scald_audio',
+          'base_id' => '0',
+          'title' => 'Default Title',
+          'actions' => '7',
+          'publisher' => '0',
+          'created' => '0',
+          'changed' => '0',
+        ),
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_media_audio'] = $feeds_importer;
+
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_media_files';
+  $feeds_importer->config = array(
+    'name' => 'Import Media: Files',
+    'description' => 'Import files with metadata into the Scald Atom Library',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'txt csv tsv xml opml',
+        'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'no_headers' => 0,
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsEntityProcessorScald_atom',
+      'config' => array(
+        'mappings' => array(
+          0 => array(
+            'source' => 'GUID',
+            'target' => 'guid',
+            'unique' => 1,
+          ),
+          1 => array(
+            'source' => 'Title',
+            'target' => 'title',
+            'unique' => FALSE,
+          ),
+          2 => array(
+            'source' => 'File',
+            'target' => 'scald_file:uri',
+            'unique' => FALSE,
+          ),
+          3 => array(
+            'source' => 'Protocol',
+            'target' => 'og_group_ref:etid',
+            'unique' => FALSE,
+          ),
+          4 => array(
+            'source' => 'Thumbnail',
+            'target' => 'scald_thumbnail:uri',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'Authors',
+            'target' => 'scald_authors',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          6 => array(
+            'source' => 'Tags',
+            'target' => 'scald_tags',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+        ),
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'input_format' => 'full_html',
+        'skip_hash_check' => 0,
+        'bundle' => 'file',
+        'values' => array(
+          'provider' => 'scald_file',
+          'base_id' => '0',
+          'title' => 'Default Title',
+          'actions' => '7',
+          'publisher' => '0',
+          'created' => '0',
+          'changed' => '0',
+        ),
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_media_files'] = $feeds_importer;
+
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_media_images';
+  $feeds_importer->config = array(
+    'name' => 'Import Media: Images',
+    'description' => 'Import images with metadata into the Scald Atom Library',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'txt csv tsv xml opml',
+        'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'no_headers' => 0,
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsEntityProcessorScald_atom',
+      'config' => array(
+        'mappings' => array(
+          0 => array(
+            'source' => 'GUID',
+            'target' => 'guid',
+            'unique' => 1,
+          ),
+          1 => array(
+            'source' => 'Title',
+            'target' => 'title',
+            'unique' => FALSE,
+          ),
+          2 => array(
+            'source' => 'Protocol',
+            'target' => 'og_group_ref:etid',
+            'unique' => FALSE,
+          ),
+          3 => array(
+            'source' => 'Identifier',
+            'target' => 'field_scald_identifier',
+            'unique' => FALSE,
+          ),
+          4 => array(
+            'source' => 'Image',
+            'target' => 'scald_thumbnail:uri',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'Original DNG',
+            'target' => 'field_original_dng:uri',
+            'unique' => FALSE,
+          ),
+          6 => array(
+            'source' => 'Archival TIFF',
+            'target' => 'field_archival_tiff:uri',
+            'unique' => FALSE,
+          ),
+          7 => array(
+            'source' => 'Full-Size JPEG',
+            'target' => 'field_full_size_jpeg:uri',
+            'unique' => FALSE,
+          ),
+          8 => array(
+            'source' => 'Created',
+            'target' => 'created',
+            'unique' => FALSE,
+          ),
+          9 => array(
+            'source' => 'Creator',
+            'target' => 'field_scald_creator',
+            'unique' => FALSE,
+          ),
+          10 => array(
+            'source' => 'Authors',
+            'target' => 'scald_authors',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          11 => array(
+            'source' => 'Description',
+            'target' => 'field_scald_description',
+            'unique' => FALSE,
+          ),
+          12 => array(
+            'source' => 'Keywords',
+            'target' => 'scald_tags',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          13 => array(
+            'source' => 'Latitude',
+            'target' => 'field_scald_geo_location:lat',
+            'unique' => FALSE,
+          ),
+          14 => array(
+            'source' => 'Longitude',
+            'target' => 'field_scald_geo_location:lon',
+            'unique' => FALSE,
+          ),
+          15 => array(
+            'source' => 'Location',
+            'target' => 'field_scald_location',
+            'unique' => FALSE,
+          ),
+          16 => array(
+            'source' => 'Rights',
+            'target' => 'field_rights',
+            'unique' => FALSE,
+          ),
+          17 => array(
+            'source' => 'Licensing',
+            'target' => 'field_licence_std_cc',
+            'unique' => FALSE,
+          ),
+          18 => array(
+            'source' => 'Categories',
+            'target' => 'field_category',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+        ),
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'input_format' => 'full_html',
+        'skip_hash_check' => 0,
+        'bundle' => 'image',
+        'values' => array(
+          'provider' => 'scald_image',
+          'base_id' => '0',
+          'title' => 'Default Title',
+          'actions' => '7',
+          'publisher' => '0',
+          'created' => '0',
+          'changed' => '0',
+        ),
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_media_images'] = $feeds_importer;
+
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_media_video';
+  $feeds_importer->config = array(
+    'name' => 'Import Media: Video',
+    'description' => 'Import videos and metadata into the Scald Atom Library',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'txt csv tsv xml opml',
+        'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'no_headers' => 0,
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsEntityProcessorScald_atom',
+      'config' => array(
+        'mappings' => array(
+          0 => array(
+            'source' => 'GUID',
+            'target' => 'guid',
+            'unique' => 1,
+          ),
+          1 => array(
+            'source' => 'Title',
+            'target' => 'title',
+            'unique' => FALSE,
+          ),
+          2 => array(
+            'source' => 'File',
+            'target' => 'Temporary target 1',
+            'unique' => FALSE,
+          ),
+          3 => array(
+            'source' => 'Protocol',
+            'target' => 'og_group_ref:etid',
+            'unique' => FALSE,
+          ),
+          4 => array(
+            'source' => 'Thumbnail',
+            'target' => 'scald_thumbnail:uri',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'Authors',
+            'target' => 'scald_authors',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          6 => array(
+            'source' => 'Tags',
+            'target' => 'scald_tags',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+        ),
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'input_format' => 'full_html',
+        'skip_hash_check' => 0,
+        'bundle' => 'video',
+        'values' => array(
+          'provider' => 'scald_video',
+          'base_id' => '0',
+          'title' => 'Default Title',
+          'actions' => '7',
+          'publisher' => '0',
+          'created' => '0',
+          'changed' => '0',
+        ),
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_media_video'] = $feeds_importer;
 
   return $export;
 }

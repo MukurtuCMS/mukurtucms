@@ -76,6 +76,7 @@ dependencies[] = path
 dependencies[] = pathauto
 dependencies[] = popup
 dependencies[] = redirect
+dependencies[] = scald_feeds
 dependencies[] = scald_link_filter
 dependencies[] = search
 dependencies[] = shortcut
