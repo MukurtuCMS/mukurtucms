@@ -51,7 +51,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories?',
+    'description' => 'Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'inline',
@@ -653,7 +653,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Automatically add new users to this protocol');
   t('Banner Image');
   t('Comment');
-  t('Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories?');
+  t('Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Description');
   t('Group register');
   t('Group roles and permissions');

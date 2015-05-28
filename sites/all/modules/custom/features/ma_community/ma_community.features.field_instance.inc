@@ -51,7 +51,7 @@ function ma_community_field_default_field_instances() {
     'bundle' => 'community',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -576,6 +576,7 @@ Strict - Your community page is invisible to all site users who are not members 
 ');
   t('Thumbnail Image');
   t('Use this field with caution! If you assign the current Community to a Parent Community, all members of the current Community will be added as members on the Parent Community. If you subsequently unassign the current Community from the Parent Community, the members will remain added to the Parent Community.');
+  t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 
   return $field_instances;
 }
