@@ -12,15 +12,15 @@
  */
 Drupal.wysiwyg.editor.init.tinymce = function(settings) {
   // Fix Drupal toolbar obscuring editor toolbar in fullscreen mode.
-  var $drupalToolbar = $('#toolbar', Drupal.overlayChild ? window.parent.document : document);
+  var $drupalToolbars = $('#toolbar, #admin-menu', Drupal.overlayChild ? window.parent.document : document);
   tinyMCE.onAddEditor.add(function (mgr, ed) {
     if (ed.id == 'mce_fullscreen') {
-      $drupalToolbar.hide();
+      $drupalToolbars.hide();
     }
   });
   tinyMCE.onRemoveEditor.add(function (mgr, ed) {
     if (ed.id == 'mce_fullscreen') {
-      $drupalToolbar.show();
+      $drupalToolbars.show();
     }
   });
 
@@ -71,11 +71,18 @@ Drupal.wysiwyg.editor.attach.tinymce = function(context, params, settings) {
   // it prior to attaching the editor. This is done on the client-side instead
   // of the server-side, as Wysiwyg has no way to figure out where content is
   // stored, and the class only affects editing.
-  $field = $('#' + params.field);
+  var $field = $('#' + params.field);
   $field.val($field.val().replace(/(<.+?\s+class=['"][\w\s]*?)\bmceItem\b([\w\s]*?['"].*?>)/ig, '$1$2'));
 
   // Attach editor.
   ed.render();
+  if (tinymce.minorVersion == '5.7') {
+    // Work around a TinyMCE bug hiding new instances when switching to them.
+    // @see http://www.tinymce.com/develop/bugtracker_view.php?id=5510
+    setTimeout(function () {
+      tinymce.DOM.show(ed.editorContainer);
+    }, 1);
+  }
 };
 
 /**

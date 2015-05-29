@@ -58,7 +58,7 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 // Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
 function ma_core_views_pre_build(&$view) {
   if ($view->name == 'group_members') {
-    $gid = $view->args[0];
+    $gid = arg(1);
     if (og_user_access('node', $gid, 'manage members')) {
       $output = '<div class="add-manage-members-links">';
       $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';

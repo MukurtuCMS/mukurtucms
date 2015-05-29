@@ -11,3 +11,10 @@ function ma_profile_update_7001() {
   field_delete_field('og_user_node1');
 
 }
+
+/**
+ * Disable the WYSIWYG module
+ */
+function ma_profile_update_7002() {
+  module_disable (array ('wysiwyg'));
+}

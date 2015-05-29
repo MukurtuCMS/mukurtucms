@@ -11,8 +11,10 @@ Drupal.wysiwyg.editor.attach.yui = function(context, params, settings) {
   $('#' + params.field).parent().addClass('yui-skin-' + settings.theme);
 
   // Load plugins stylesheet.
-  for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
-    settings.extracss += settings.extracss+' @import "'+Drupal.settings.wysiwyg.plugins[params.format].drupal[plugin].css+'"; ';
+  if (Drupal.settings.wysiwyg.plugins[params.format]) {
+    for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
+      settings.extracss += settings.extracss+' @import "'+Drupal.settings.wysiwyg.plugins[params.format].drupal[plugin].css+'"; ';
+    }
   }
 
   // Attach editor.
@@ -20,19 +22,23 @@ Drupal.wysiwyg.editor.attach.yui = function(context, params, settings) {
 
   editor.on('toolbarLoaded', function() {
     // Load Drupal plugins.
-    for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
-      Drupal.wysiwyg.instances[params.field].addPlugin(plugin, Drupal.settings.wysiwyg.plugins[params.format].drupal[plugin], Drupal.settings.wysiwyg.plugins.drupal[plugin]);
+    if (Drupal.settings.wysiwyg.plugins[params.format]) {
+      for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
+        Drupal.wysiwyg.instances[params.field].addPlugin(plugin, Drupal.settings.wysiwyg.plugins[params.format].drupal[plugin], Drupal.settings.wysiwyg.plugins.drupal[plugin]);
+      }
     }
   });
 
   // Allow plugins to act on setEditorHTML.
   var oldSetEditorHTML = editor.setEditorHTML;
   editor.setEditorHTML = function (content) {
-    for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
-      var pluginSettings = Drupal.settings.wysiwyg.plugins.drupal[plugin];
-      if (typeof Drupal.wysiwyg.plugins[plugin].attach == 'function') {
-        content = Drupal.wysiwyg.plugins[plugin].attach(content, pluginSettings, params.field);
-        content = Drupal.wysiwyg.instances[params.field].prepareContent(content);
+    if (Drupal.settings.wysiwyg.plugins[params.format]) {
+      for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
+        var pluginSettings = Drupal.settings.wysiwyg.plugins.drupal[plugin];
+        if (typeof Drupal.wysiwyg.plugins[plugin].attach == 'function') {
+          content = Drupal.wysiwyg.plugins[plugin].attach(content, pluginSettings, params.field);
+          content = Drupal.wysiwyg.instances[params.field].prepareContent(content);
+        }
       }
     }
     oldSetEditorHTML.call(this, content);
@@ -42,10 +48,12 @@ Drupal.wysiwyg.editor.attach.yui = function(context, params, settings) {
   var oldGetEditorHTML = editor.getEditorHTML;
   editor.getEditorHTML = function () {
     var content = oldGetEditorHTML.call(this);
-    for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
-      var pluginSettings = Drupal.settings.wysiwyg.plugins.drupal[plugin];
-      if (typeof Drupal.wysiwyg.plugins[plugin].detach == 'function') {
-        content = Drupal.wysiwyg.plugins[plugin].detach(content, pluginSettings, params.field);
+    if (Drupal.settings.wysiwyg.plugins[params.format]) {
+      for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
+        var pluginSettings = Drupal.settings.wysiwyg.plugins.drupal[plugin];
+        if (typeof Drupal.wysiwyg.plugins[plugin].detach == 'function') {
+          content = Drupal.wysiwyg.plugins[plugin].detach(content, pluginSettings, params.field);
+        }
       }
     }
     return content;
@@ -57,10 +65,12 @@ Drupal.wysiwyg.editor.attach.yui = function(context, params, settings) {
   });
 
   editor.on('afterNodeChange', function (e) {
-    for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
-      if (typeof Drupal.wysiwyg.plugins[plugin].isNode == 'function') {
-        if (Drupal.wysiwyg.plugins[plugin].isNode(e.target._getSelectedElement())) {
-          this.toolbar.selectButton(plugin);
+    if (Drupal.settings.wysiwyg.plugins[params.format]) {
+      for (var plugin in Drupal.settings.wysiwyg.plugins[params.format].drupal) {
+        if (typeof Drupal.wysiwyg.plugins[plugin].isNode == 'function') {
+          if (Drupal.wysiwyg.plugins[plugin].isNode(e.target._getSelectedElement())) {
+            this.toolbar.selectButton(plugin);
+          }
         }
       }
     }
@@ -129,7 +139,7 @@ Drupal.wysiwyg.editor.instance.yui = {
   },
 
   insert: function (content) {
-    YAHOO.widget.EditorInfo.getEditorById(this.field).cmd_inserthtml(content);
+    YAHOO.widget.EditorInfo.getEditorById(this.field).execCommand('inserthtml', content);
   },
 
   setContent: function (content) {

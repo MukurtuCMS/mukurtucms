@@ -670,10 +670,12 @@ table .checkbox input[type="checkbox"] {
   padding-left: 0;
   margin: 0;
 }
-.ds-2col .field {
+.ds-2col .field,
+.ds-2col-stacked .field {
   margin-bottom: 10px;
 }
-.ds-2col .group-left .label-above {
+.ds-2col .group-left .label-above,
+.ds-2col-stacked .group-left .label-above {
   font-size: 22px;
 }
 #edit-field-digital-heritage-items .field-label {
@@ -704,21 +706,20 @@ table .checkbox input[type="checkbox"] {
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
-.pane-community-dh-items-protocol .pane-title,
-.pane-community-dh-items-community .pane-title {
-  font-size: 16px;
-  border-top: 1px solid #ECEBEB;
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
   padding-top: 20px;
-  text-transform: uppercase;
+  border-top: 1px solid #ECEBEB;
 }
-.pane-community-dh-items-protocol .view-community-dh-items .view-content .views-row,
-.pane-community-dh-items-community .view-community-dh-items .view-content .views-row {
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row {
+  line-height: 0.7em;
   border-bottom: 1px solid #ECEBEB;
   margin: 30px 0;
   padding: 0 0 30px 0;
 }
-.pane-community-dh-items-protocol .view-community-dh-items .view-content .views-row.views-row-first,
-.pane-community-dh-items-community .view-community-dh-items .view-content .views-row.views-row-first {
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row.views-row-first,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row.views-row-first {
   margin-top: 0;
 }
 .view-digital-heritage-grid-list .view-header,
@@ -823,6 +824,67 @@ table .checkbox input[type="checkbox"] {
 }
 a:hover {
   text-decoration: none;
+}
+.node-community .group-left,
+.node-cultural-protocol-group .group-left {
+  width: 66%;
+  float: left;
+}
+.node-community .group-right,
+.node-cultural-protocol-group .group-right {
+  width: 30%;
+  float: right;
+}
+.node-community .field-name-group-management-links,
+.node-cultural-protocol-group .field-name-group-management-links {
+  background: #f8f7f7 none repeat scroll 0 0;
+  border-radius: 5px;
+}
+.node-community .group-right .block-views,
+.node-cultural-protocol-group .group-right .block-views,
+.node-community .group-right .field,
+.node-cultural-protocol-group .group-right .field {
+  background: #F8F7F7;
+  border-radius: 5px;
+  margin-bottom: 2em;
+}
+.node-community .group-right .block-views h2.block-title,
+.node-cultural-protocol-group .group-right .block-views h2.block-title,
+.node-community .group-right .field h2.block-title,
+.node-cultural-protocol-group .group-right .field h2.block-title,
+.node-community .group-right .block-views .label-above,
+.node-cultural-protocol-group .group-right .block-views .label-above,
+.node-community .group-right .field .label-above,
+.node-cultural-protocol-group .group-right .field .label-above {
+  background: #E3E2E1;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 5px 10px;
+  padding: 10px 20px;
+  font-size: 140%;
+  font-weight: 400;
+  text-transform: none;
+}
+.node-community .group-right .block-views .view-content,
+.node-cultural-protocol-group .group-right .block-views .view-content,
+.node-community .group-right .field .view-content,
+.node-cultural-protocol-group .group-right .field .view-content,
+.node-community .group-right .block-views .view-footer,
+.node-cultural-protocol-group .group-right .block-views .view-footer,
+.node-community .group-right .field .view-footer,
+.node-cultural-protocol-group .group-right .field .view-footer,
+.node-community .group-right .block-views ul,
+.node-cultural-protocol-group .group-right .block-views ul,
+.node-community .group-right .field ul,
+.node-cultural-protocol-group .group-right .field ul {
+  padding-left: 20px;
+  padding-bottom: 10px;
+}
+.node-community .group-right .block-views ul,
+.node-cultural-protocol-group .group-right .block-views ul,
+.node-community .group-right .field ul,
+.node-cultural-protocol-group .group-right .field ul {
+  padding-top: 10px;
 }
 .panel-panel .right-pane,
 .pane-block {
