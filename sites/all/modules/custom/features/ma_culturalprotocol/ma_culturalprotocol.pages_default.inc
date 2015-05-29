@@ -29,18 +29,7 @@ function ma_culturalprotocol_default_page_manager_handlers() {
     'contexts' => array(),
     'relationships' => array(),
     'access' => array(
-      'plugins' => array(
-        0 => array(
-          'name' => 'node_type',
-          'settings' => array(
-            'type' => array(
-              'cultural_protocol_group' => 'cultural_protocol_group',
-            ),
-          ),
-          'context' => 'argument_entity_id:node_1',
-          'not' => FALSE,
-        ),
-      ),
+      'plugins' => array(),
       'logic' => 'and',
     ),
   );

@@ -36,12 +36,9 @@ function ma_community_manage_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'og_ui',
-        'settings' => array(
-          'field_name' => 'og_user_node',
-        ),
-        'type' => 'og_group_subscribe',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -109,7 +106,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 13,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
