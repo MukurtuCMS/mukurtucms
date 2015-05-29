@@ -71,7 +71,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -128,7 +128,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -178,7 +178,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -227,7 +227,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'settings' => array(
           'link' => 0,
         ),
-        'type' => 'title',
+        'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
       ),
       'teaser' => array(
@@ -281,7 +281,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -337,7 +337,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -402,7 +402,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -470,7 +470,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -528,7 +528,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'weight' => 14,
       ),
       'full' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'textformatter',
         'settings' => array(
           'textformatter_class' => 'textformatter-list',
@@ -546,7 +546,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -626,7 +626,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',

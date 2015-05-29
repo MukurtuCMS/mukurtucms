@@ -112,7 +112,7 @@
   }
 }
 
-.ds-2col {
+.ds-2col, .ds-2col-stacked {
   .field {
     margin-bottom: 10px;
   }
@@ -175,17 +175,16 @@
 // toggle display via the grid/list clicker
 
 
-.pane-community-dh-items-protocol,
-.pane-community-dh-items-community {
-  .pane-title {
-    font-size:16px;
-    border-top:1px solid #ECEBEB;
-    padding-top:20px;
-    text-transform: uppercase;
-  }
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
+  padding-top:20px;
+  border-top:1px solid #ECEBEB;
+
   .view-community-dh-items {
+
     .view-content {
       .views-row {
+        line-height: 0.7em;
         border-bottom: 1px solid #ECEBEB;
         margin: 30px 0;
         padding: 0 0 30px 0;
@@ -290,8 +289,51 @@ a:hover {
   text-decoration: none;
 }
 
+// Shared styling for CP and Community nodes
+
+.node-community, .node-cultural-protocol-group {
+  .group-left {
+    width: 66%;
+    float: left;
+  }
+  .group-right {
+    width: 30%;
+    float: right;
+  }
+
+  .field-name-group-management-links {
+    background: #f8f7f7 none repeat scroll 0 0;
+    border-radius: 5px;
+  }
+
+  // Blocks in right column
+  .group-right .block-views, .group-right .field {
+    background: #F8F7F7;
+    border-radius: 5px;
+    h2.block-title, .label-above {
+      background: #E3E2E1;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      padding: 5px 10px;
+      padding: 10px 20px;
+      font-size: 140%;
+      font-weight: 400;
+      text-transform: none;
+    }
+    .view-content, .view-footer, ul {
+      padding-left: 20px;
+      padding-bottom: 10px;
+    }
+    ul {
+      padding-top: 10px;
+    }
+    margin-bottom: 2em;
+  }
+}
 
 
+
+// This can probably be removed:
 .panel-panel .right-pane,
 .pane-block {
   background: #F8F7F7;
@@ -314,6 +356,7 @@ a:hover {
   }
 }
 
+// Can this go?
 .management-links {
   margin-top: 15px;
   .pane-content {

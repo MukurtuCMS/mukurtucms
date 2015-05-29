@@ -63,24 +63,48 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
     'community_dh_items' => array(
-      'weight' => '5',
-      'label' => 'hidden',
+      'weight' => '4',
+      'label' => 'above',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
     'community_protocol_items' => array(
-      'weight' => '7',
+      'weight' => '6',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'group_management_links' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'group_members' => array(
+      'weight' => '5',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
       'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'og_members' => array(
-      'weight' => '6',
-      'label' => 'hidden',
-      'format' => 'default',
+    'field_parent_community' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_child_communities' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
   );
   $export['node|community|full'] = $ds_fieldsetting;
@@ -118,7 +142,7 @@ function ma_community_ds_custom_fields_info() {
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
   $ds_field->field = 'community_dh_items';
-  $ds_field->label = 'Community DH Items';
+  $ds_field->label = 'Recent DH Items';
   $ds_field->field_type = 6;
   $ds_field->entities = array(
     'node' => 'node',
@@ -126,7 +150,7 @@ function ma_community_ds_custom_fields_info() {
   $ds_field->ui_limit = 'community|full';
   $ds_field->properties = array(
     'block' => 'views|community_dh_items-block_1',
-    'block_render' => '1',
+    'block_render' => '3',
   );
   $export['community_dh_items'] = $ds_field;
 
@@ -328,31 +352,35 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'community';
   $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_2col';
+  $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
+      'header' => array(
         0 => 'field_community_image',
-        1 => 'group_management_links',
-        2 => 'body',
-        3 => 'field_parent_community',
-        4 => 'field_child_communities',
-        5 => 'community_dh_items',
+        1 => 'title',
+      ),
+      'left' => array(
+        2 => 'group_management_links',
+        3 => 'body',
+        4 => 'community_dh_items',
       ),
       'right' => array(
-        6 => 'og_members',
-        7 => 'community_protocol_items',
+        5 => 'group_members',
+        6 => 'community_protocol_items',
+        7 => 'field_parent_community',
+        8 => 'field_child_communities',
       ),
     ),
     'fields' => array(
-      'field_community_image' => 'left',
+      'field_community_image' => 'header',
+      'title' => 'header',
       'group_management_links' => 'left',
       'body' => 'left',
-      'field_parent_community' => 'left',
-      'field_child_communities' => 'left',
       'community_dh_items' => 'left',
-      'og_members' => 'right',
+      'group_members' => 'right',
       'community_protocol_items' => 'right',
+      'field_parent_community' => 'right',
+      'field_child_communities' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -360,8 +388,10 @@ function ma_community_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
+      'header' => 'div',
       'left' => 'div',
       'right' => 'div',
+      'footer' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

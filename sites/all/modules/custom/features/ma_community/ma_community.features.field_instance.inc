@@ -71,7 +71,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -133,7 +133,7 @@ function ma_community_field_default_field_instances() {
         'weight' => 21,
       ),
       'full' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'textformatter',
         'settings' => array(
           'textformatter_class' => 'textformatter-list',
@@ -148,10 +148,10 @@ function ma_community_field_default_field_instances() {
           'textformatter_separator_custom_class' => 'textformatter-separator',
           'textformatter_separator_custom_tag' => 'span',
           'textformatter_term_plain' => 0,
-          'textformatter_type' => 'comma',
+          'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 4,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -266,7 +266,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -325,13 +325,25 @@ function ma_community_field_default_field_instances() {
         'weight' => 20,
       ),
       'full' => array(
-        'label' => 'inline',
-        'module' => 'entityreference',
+        'label' => 'above',
+        'module' => 'textformatter',
         'settings' => array(
-          'link' => 1,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 3,
+        'type' => 'textformatter_list',
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -398,7 +410,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -459,7 +471,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -526,7 +538,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
