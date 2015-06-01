@@ -70,6 +70,7 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
   $field = isset($entity->$target) ? $entity->$target : array();
 
   foreach ($value as $v) {
+
     // Check if using a GUID for an existing scald atom previously imported by feeds
     $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
 
@@ -90,10 +91,10 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
       $i++;
     }
     else {
-      $sid = _scald_feeds_save_atom($v->getValue(), $type, basename($v->getValue()));
+      $sid = _scald_feeds_save_atom($v->getValue(), $type, urldecode(basename($v->getValue())));
 
-        $field[LANGUAGE_NONE][$i] = array(
-          'sid' => $sid,
+      $field[LANGUAGE_NONE][$i] = array(
+					'sid' => $sid,
         );
         if ($info['cardinality'] == 1) {
           break;
@@ -164,8 +165,6 @@ function _scald_feeds_copy_fields($form, &$atom) {
  * Saves a Scald Atom programmatically from a file.
  */
 function _scald_feeds_save_atom($file, $type, $title = NULL) {
-  $file['display'] = TRUE;
-
   $atoms = array(new ScaldAtom($type, 'scald_' . $type));
 
   // Skip atom type the user isn't allowed to create.
@@ -173,7 +172,16 @@ function _scald_feeds_save_atom($file, $type, $title = NULL) {
     return FALSE;
   }
 
-  $temp_file = file_unmanaged_copy($file);
+  if(valid_url($file, TRUE)) {
+    $data = drupal_http_request($file);
+    $temp_file = file_unmanaged_save_data($data->data);
+  } else {
+    $temp_file = file_unmanaged_copy($file);
+  }
+
+  if($temp_file === FALSE) {
+    return FALSE;
+  }
 
   $providers = scald_atom_providers();
   $sources = $providers[$type];
@@ -209,7 +217,9 @@ function _scald_feeds_save_atom($file, $type, $title = NULL) {
   // The atom should really be built using entity_form_submit_build_entity...
   _scald_feeds_copy_fields($form['atom0'], $atoms[0]);
 
-   return scald_atom_save($atoms[0]);
+  $atoms[0]->scald_file[LANGUAGE_NONE][0]['display'] = TRUE;
+
+  return scald_atom_save($atoms[0]);
 }
 
 
