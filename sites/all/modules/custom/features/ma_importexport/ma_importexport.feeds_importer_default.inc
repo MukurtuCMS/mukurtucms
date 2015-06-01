@@ -136,66 +136,71 @@ function ma_importexport_feeds_importer_default() {
             'autocreate' => 1,
           ),
           17 => array(
+            'source' => 'Transcription',
+            'target' => 'field_transcription',
+            'unique' => FALSE,
+          ),
+          18 => array(
             'source' => 'Traditional Knowledge',
             'target' => 'field_tk_body',
             'unique' => FALSE,
           ),
-          18 => array(
+          19 => array(
             'source' => 'Cultural Narrative',
             'target' => 'body',
             'unique' => FALSE,
           ),
-          19 => array(
+          20 => array(
             'source' => 'Latitude',
             'target' => 'field_coverage:lat',
             'unique' => FALSE,
           ),
-          20 => array(
+          21 => array(
             'source' => 'Longitude',
             'target' => 'field_coverage:lon',
             'unique' => FALSE,
           ),
-          21 => array(
+          22 => array(
             'source' => 'Location Description',
             'target' => 'field_coverage_description',
             'unique' => FALSE,
           ),
-          22 => array(
+          23 => array(
             'source' => 'nid',
             'target' => 'nid',
             'unique' => 1,
           ),
-          23 => array(
+          24 => array(
             'source' => 'Traditional Licensing URL',
             'target' => 'field_licence_trad',
             'unique' => FALSE,
           ),
-          24 => array(
+          25 => array(
             'source' => 'Standard and Creative Commons Licensing URL',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
           ),
-          25 => array(
+          26 => array(
             'source' => 'Collections',
             'target' => 'field_collection:etid',
             'unique' => FALSE,
           ),
-          26 => array(
+          27 => array(
             'source' => 'Summary',
             'target' => 'field_summary',
             'unique' => FALSE,
           ),
-          27 => array(
+          28 => array(
             'source' => 'Related Items',
             'target' => 'field_related_dh_items:etid',
             'unique' => FALSE,
           ),
-          28 => array(
+          29 => array(
             'source' => 'Sharing Settings',
             'target' => 'field_item_privacy_setting',
             'unique' => FALSE,
           ),
-          29 => array(
+          30 => array(
             'source' => 'Sharing Protocols',
             'target' => 'og_group_ref:etid',
             'unique' => FALSE,
@@ -206,6 +211,7 @@ function ma_importexport_feeds_importer_default() {
         'authorize' => 1,
         'skip_hash_check' => 0,
         'bundle' => 'digital_heritage',
+        'update_non_existent' => 'skip',
       ),
     ),
     'content_type' => '',
