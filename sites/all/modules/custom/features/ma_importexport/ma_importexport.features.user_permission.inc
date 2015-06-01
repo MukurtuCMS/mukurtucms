@@ -32,6 +32,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['clear digital_heritage_metadata feeds'] = array(
     'name' => 'clear digital_heritage_metadata feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -50,6 +51,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['clear import_media_audio feeds'] = array(
     'name' => 'clear import_media_audio feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -59,6 +61,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['clear import_media_files feeds'] = array(
     'name' => 'clear import_media_files feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -68,6 +71,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['clear import_media_images feeds'] = array(
     'name' => 'clear import_media_images feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -77,6 +81,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['clear import_media_video feeds'] = array(
     'name' => 'clear import_media_video feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -114,6 +119,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['import import_media_audio feeds'] = array(
     'name' => 'import import_media_audio feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -123,6 +129,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['import import_media_files feeds'] = array(
     'name' => 'import import_media_files feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -132,6 +139,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['import import_media_images feeds'] = array(
     'name' => 'import import_media_images feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -141,6 +149,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['import import_media_video feeds'] = array(
     'name' => 'import import_media_video feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
