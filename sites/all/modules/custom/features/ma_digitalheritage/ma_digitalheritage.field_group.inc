@@ -55,6 +55,7 @@ function ma_digitalheritage_field_group_info() {
       5 => 'field_language',
       6 => 'field_source',
       7 => 'field_subject',
+      8 => 'field_transcription',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -187,7 +188,6 @@ function ma_digitalheritage_field_group_info() {
       1 => 'field_description',
       2 => 'field_tags',
       3 => 'field_tk_body',
-      4 => 'field_transcription',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
