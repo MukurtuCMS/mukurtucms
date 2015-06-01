@@ -150,6 +150,7 @@ function ma_search_api_default_search_api_index() {
         "field_tags" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
+        "field_transcription" : { "type" : "text" },
         "language" : { "type" : "string" },
         "nid" : { "type" : "integer" },
         "promote" : { "type" : "boolean" },
@@ -390,6 +391,11 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0"
           },
           "field_coverage_description:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_transcription" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "text",
             "boost" : "1.0"
