@@ -1,5 +1,5 @@
 diff --git a/sites/all/modules/contrib/scald_feeds/scald_feeds.module b/sites/all/modules/contrib/scald_feeds/scald_feeds.module
-index 13f1780..3def7fa 100644
+index 13f1780..c41cfce 100644
 --- a/sites/all/modules/contrib/scald_feeds/scald_feeds.module
 +++ b/sites/all/modules/contrib/scald_feeds/scald_feeds.module
 @@ -21,7 +21,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
@@ -18,7 +18,7 @@ index 13f1780..3def7fa 100644
    if (empty($value)) {
      return;
    }
-@@ -65,90 +65,240 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
+@@ -65,90 +65,250 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
      $data[$entity_type] = $entity;
    }
  
@@ -34,6 +34,7 @@ index 13f1780..3def7fa 100644
 -    }
 -    catch (Exception $e) {
 -      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
++
 +    // Check if using a GUID for an existing scald atom previously imported by feeds
 +    $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
 +
@@ -60,10 +61,10 @@ index 13f1780..3def7fa 100644
      }
 -  }
 +    else {
-+      $sid = _scald_feeds_save_atom($v->getValue(), $type, basename($v->getValue()));
++      $sid = _scald_feeds_save_atom($v->getValue(), $type, urldecode(basename($v->getValue())));
 +
-+        $field[LANGUAGE_NONE][$i] = array(
-+          'sid' => $sid,
++      $field[LANGUAGE_NONE][$i] = array(
++					'sid' => $sid,
 +        );
 +        if ($info['cardinality'] == 1) {
 +          break;
@@ -136,15 +137,23 @@ index 13f1780..3def7fa 100644
 -function _scald_feeds_save_atom($file, $title = NULL) {
 -  if (is_numeric($file)) {
 -    $file = (array) file_load($file);
--  }
--  elseif (!is_object($file) && !is_array($file)) {
 +function _scald_feeds_save_atom($file, $type, $title = NULL) {
-+  $file['display'] = TRUE;
-+
 +  $atoms = array(new ScaldAtom($type, 'scald_' . $type));
 +
 +  // Skip atom type the user isn't allowed to create.
 +  if (!scald_action_permitted($atoms[0], 'create')) {
++    return FALSE;
+   }
+-  elseif (!is_object($file) && !is_array($file)) {
++
++  if(valid_url($file, TRUE)) {
++    $data = drupal_http_request($file);
++    $temp_file = file_unmanaged_save_data($data->data);
++  } else {
++    $temp_file = file_unmanaged_copy($file);
++  }
++
++  if($temp_file === FALSE) {
      return FALSE;
    }
  
@@ -152,8 +161,6 @@ index 13f1780..3def7fa 100644
 -  if (!isset($file_array['filename'])) {
 -    $file = file_load($file_array['fid']);
 -    $file_array = (array) $file;
-+  $temp_file = file_unmanaged_copy($file);
-+
 +  $providers = scald_atom_providers();
 +  $sources = $providers[$type];
 +  $source = key($sources);
@@ -208,7 +215,9 @@ index 13f1780..3def7fa 100644
 +  // The atom should really be built using entity_form_submit_build_entity...
 +  _scald_feeds_copy_fields($form['atom0'], $atoms[0]);
 +
-+   return scald_atom_save($atoms[0]);
++  $atoms[0]->scald_file[LANGUAGE_NONE][0]['display'] = TRUE;
++
++  return scald_atom_save($atoms[0]);
  }
  
 +
