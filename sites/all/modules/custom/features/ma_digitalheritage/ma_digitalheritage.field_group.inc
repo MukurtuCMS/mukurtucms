@@ -55,7 +55,6 @@ function ma_digitalheritage_field_group_info() {
       5 => 'field_language',
       6 => 'field_source',
       7 => 'field_subject',
-      8 => 'field_transcription',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -188,6 +187,7 @@ function ma_digitalheritage_field_group_info() {
       1 => 'field_description',
       2 => 'field_tags',
       3 => 'field_tk_body',
+      4 => 'field_transcription',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -272,6 +272,70 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = '';
   $export['group_tabs|taxonomy_term|category|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_transcription_cr|node|digital_heritage|community_record';
+  $field_group->group_name = 'group_transcription_cr';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'digital_heritage';
+  $field_group->mode = 'community_record';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Transcription:',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_transcription',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Transcription:',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-transcription-cr field-group-div mukurtu-collapsed-fieldset-div',
+        'description' => '',
+        'show_label' => '1',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'fast',
+      ),
+      'formatter' => 'collapsed',
+    ),
+  );
+  $export['group_transcription_cr|node|digital_heritage|community_record'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_transcription|node|digital_heritage|full';
+  $field_group->group_name = 'group_transcription';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'digital_heritage';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Transcription:',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_transcription',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Transcription:',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-transcription field-group-div mukurtu-collapsed-fieldset-div',
+        'description' => '',
+        'show_label' => '1',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'fast',
+      ),
+      'formatter' => 'collapsed',
+    ),
+  );
+  $export['group_transcription|node|digital_heritage|full'] = $field_group;
 
   return $export;
 }

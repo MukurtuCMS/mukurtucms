@@ -123,194 +123,239 @@
   }
 }
 
-
-
-//// Collections
-
-#edit-field-digital-heritage-items .field-label {
-  display: none;
-}
-
-//// Collections SAPI page
-// Hide the label on the search box. Not sure what I did on DH to not require this on that sapi page.
-#edit-search-api-views-fulltext-wrapper label {
-  display: none;
-}
-
-//// DH node form
-
-.node-type-digital-heritage, .page-node-add-digital-heritage {
-
-  // The following is taken from former mukurtu_protocol_field.css
-  /* hiding the og ref field for digital heritage items */
-  div.form-item table .form-type-textfield,
-  div.form-item table .form-type-textfield * {
-    display: inline-block;
+// Custom Mukurtu Collapsed/Collapsible div -- looks just like the other fields but collapsible with a dynamic arrow
+.mukurtu-collapsed-fieldset-div {
+  h3 {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 22px;
   }
-  #edit-og-group-ref {
-    display:none;
+  .field-group-format-toggler a {
+    background: url(../grey-down-arrow.png) no-repeat left center;
+    color: #333;
+    padding-left: 15px;
+    text-decoration: none;
   }
-}
-
-//// Community node form
-
-.node-type-community, .page-node-add-community {
-
-  #edit-group-access {
-    display:none;
+  &.collapsed .field-group-format-toggler a {
+    background-image: url(../grey-right-arrow.png);
   }
 }
 
 
-//// Digital Heritage grid/list view
+  //// Collections
 
-// Hide the embededed videos (the thumbnail will display instead)
-.view-id-digital_heritage_grid_list iframe {
-  display: none;
-}
+  #edit-field-digital-heritage-items .field-label {
+    display: none;
+  }
 
+  //// Collections SAPI page
+  // Hide the label on the search box. Not sure what I did on DH to not require this on that sapi page.
+  #edit-search-api-views-fulltext-wrapper label {
+    display: none;
+  }
 
-//// Grid/List Views (both DH and Collections)
+  //// DH node form
 
-// toggle display via the grid/list clicker
+  .node-type-digital-heritage, .page-node-add-digital-heritage {
 
-
-.field-name-protocol-dh-items,
-.field-name-community-dh-items {
-  padding-top:20px;
-  border-top:1px solid #ECEBEB;
-
-  .view-community-dh-items {
-
-    .view-content {
-      .views-row {
-        line-height: 0.7em;
-        border-bottom: 1px solid #ECEBEB;
-        margin: 30px 0;
-        padding: 0 0 30px 0;
-        &.views-row-first {
-          margin-top:0;
-        }
-      }
+    // The following is taken from former mukurtu_protocol_field.css
+    /* hiding the og ref field for digital heritage items */
+    div.form-item table .form-type-textfield,
+    div.form-item table .form-type-textfield * {
+      display: inline-block;
     }
-  }
-}
-
-.view-digital-heritage-grid-list,
-.view-collections-grid-list {
-  .view-header {
-    float:right;
-    margin-top:-60px;
-    margin-right: 20px;
-
-    a {
-      font-weight: 200;
-      color: @link-color;
-      padding: 2px 8px;
-      &.active {
-        color:white;
-        background: @gray;
-      }
+    #edit-og-group-ref {
+      display:none;
     }
   }
 
-  &.list-view {
-    .node-digital-heritage.view-mode-search_result > div {
-      padding:0;
-    }
-    .view-content {
-      .views-row {
-        border-bottom: 1px solid #ECEBEB;
-        margin: 30px 0;
-        padding: 0 0 30px 0;
-        &.views-row-first {
-          margin-top:0;
-        }
+  //// Community node form
 
-        .field-name-field-media-asset,
-        .field-name-field-collection-image {
-          right:0;
-        }
-        .field-name-field-collection-image {
-          float: right;
+  .node-type-community, .page-node-add-community {
+
+    #edit-group-access {
+      display:none;
+    }
+  }
+
+
+  //// Digital Heritage grid/list view
+
+  // Hide the embededed videos (the thumbnail will display instead)
+  .view-id-digital_heritage_grid_list iframe {
+    display: none;
+  }
+
+
+  //// Grid/List Views (both DH and Collections)
+
+  // toggle display via the grid/list clicker
+
+
+  .field-name-protocol-dh-items,
+  .field-name-community-dh-items {
+    padding-top:20px;
+    border-top:1px solid #ECEBEB;
+
+    .view-community-dh-items {
+
+      .view-content {
+        .views-row {
+          line-height: 0.7em;
+          border-bottom: 1px solid #ECEBEB;
+          margin: 30px 0;
+          padding: 0 0 30px 0;
+          &.views-row-first {
+            margin-top:0;
+          }
         }
       }
     }
   }
 
-  &.grid-view {
-    .view-content {
-      margin-left: -25px;
-      margin-right: -25px;
+  .view-digital-heritage-grid-list,
+  .view-collections-grid-list {
+    .view-header {
+      float:right;
+      margin-top:-60px;
+      margin-right: 20px;
 
-      .placeholder-image, .field-name-field-collection, .field-name-field-description, .field-name-field-community-ref, .field-name-field-category {
-        display: none;
-      }
-      .views-row {
-        float: left;
-        width: 220px;
-        background: #F8F7F7;
-        margin: 0 25px 20px 25px;
-        padding-bottom: 20px;
-
-
-        .field-name-field-media-asset,
-        .field-name-field-collection-image {
-          width: 100%;
-          padding: 0;
-          left:0;
-        }
-        .group_list_view_fields {
-          right: 0;
-          width: 100%;
-        }
-        .field-name-title h2,
-        .field-name-collections-title-with-count h2 {
-          font-size: 140%;
-        }
-        .label-inline {
-          float:none;
-          font-weight: bold;
-          display:none;
-        }
-        .col-md-8 {
-          position: static;
-          width: 100%;
+      a {
+        font-weight: 200;
+        color: @link-color;
+        padding: 2px 8px;
+        &.active {
+          color:white;
+          background: @gray;
         }
       }
     }
-    .text-center {
-      clear: both;
+
+    &.list-view {
+      .node-digital-heritage.view-mode-search_result > div {
+        padding:0;
+      }
+      .view-content {
+        .views-row {
+          border-bottom: 1px solid #ECEBEB;
+          margin: 30px 0;
+          padding: 0 0 30px 0;
+          &.views-row-first {
+            margin-top:0;
+          }
+
+          .field-name-field-media-asset,
+          .field-name-field-collection-image {
+            right:0;
+          }
+          .field-name-field-collection-image {
+            float: right;
+          }
+        }
+      }
+    }
+
+    &.grid-view {
+      .view-content {
+        margin-left: -25px;
+        margin-right: -25px;
+
+        .placeholder-image, .field-name-field-collection, .field-name-field-description, .field-name-field-community-ref, .field-name-field-category {
+          display: none;
+        }
+        .views-row {
+          float: left;
+          width: 220px;
+          background: #F8F7F7;
+          margin: 0 25px 20px 25px;
+          padding-bottom: 20px;
+
+
+          .field-name-field-media-asset,
+          .field-name-field-collection-image {
+            width: 100%;
+            padding: 0;
+            left:0;
+          }
+          .group_list_view_fields {
+            right: 0;
+            width: 100%;
+          }
+          .field-name-title h2,
+          .field-name-collections-title-with-count h2 {
+            font-size: 140%;
+          }
+          .label-inline {
+            float:none;
+            font-weight: bold;
+            display:none;
+          }
+          .col-md-8 {
+            position: static;
+            width: 100%;
+          }
+        }
+      }
+      .text-center {
+        clear: both;
+      }
     }
   }
-}
 
-a:hover {
-  text-decoration: none;
-}
-
-// Shared styling for CP and Community nodes
-
-.node-community, .node-cultural-protocol-group {
-  .group-left {
-    width: 66%;
-    float: left;
-  }
-  .group-right {
-    width: 30%;
-    float: right;
+  a:hover {
+    text-decoration: none;
   }
 
-  .field-name-group-management-links {
-    background: #f8f7f7 none repeat scroll 0 0;
-    border-radius: 5px;
+  // Shared styling for CP and Community nodes
+
+  .node-community, .node-cultural-protocol-group {
+    .group-left {
+      width: 66%;
+      float: left;
+    }
+    .group-right {
+      width: 30%;
+      float: right;
+    }
+
+    .field-name-group-management-links {
+      background: #f8f7f7 none repeat scroll 0 0;
+      border-radius: 5px;
+    }
+
+    // Blocks in right column
+    .group-right .block-views, .group-right .field {
+      background: #F8F7F7;
+      border-radius: 5px;
+      h2.block-title, .label-above {
+        background: #E3E2E1;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        padding: 5px 10px;
+        padding: 10px 20px;
+        font-size: 140%;
+        font-weight: 400;
+        text-transform: none;
+      }
+      .view-content, .view-footer, ul {
+        padding-left: 20px;
+        padding-bottom: 10px;
+      }
+      ul {
+        padding-top: 10px;
+      }
+      margin-bottom: 2em;
+    }
   }
 
-  // Blocks in right column
-  .group-right .block-views, .group-right .field {
+
+
+  // This can probably be removed:
+  .panel-panel .right-pane,
+  .pane-block {
     background: #F8F7F7;
     border-radius: 5px;
-    h2.block-title, .label-above {
+    h2.pane-title {
       background: #E3E2E1;
       border-top-left-radius: 5px;
       border-top-right-radius: 5px;
@@ -318,390 +363,363 @@ a:hover {
       padding: 10px 20px;
       font-size: 140%;
       font-weight: 400;
-      text-transform: none;
     }
-    .view-content, .view-footer, ul {
-      padding-left: 20px;
-      padding-bottom: 10px;
-    }
-    ul {
-      padding-top: 10px;
-    }
-    margin-bottom: 2em;
-  }
-}
-
-
-
-// This can probably be removed:
-.panel-panel .right-pane,
-.pane-block {
-  background: #F8F7F7;
-  border-radius: 5px;
-  h2.pane-title {
-    background: #E3E2E1;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    padding: 5px 10px;
-    padding: 10px 20px;
-    font-size: 140%;
-    font-weight: 400;
-  }
-  .pane-content {
-    padding-left:20px;
-    padding-bottom:10px;
-    .view-content {
-      line-height:25px;
-    }
-  }
-}
-
-// Can this go?
-.management-links {
-  margin-top: 15px;
-  .pane-content {
-    padding-bottom: 0;
-    a.btn:hover {
-      color:@link-hover-color;
-    }
-  }
-}
-
-// facets
-.facetapi-processed {
-  padding-bottom: 10px;
-  padding-left: 0;
-  input[type="radio"], input[type="checkbox"] {
-    margin: 7px 8px 7px 0;
-  }
-}
-
-// Tooltips
-a.tooltips span {
-
-}
-// Show tooltips in grid view only
-.grid-view {
- .tooltips span {
-    top: 0px;
-    left: 0px;
-    width: 220px;
-    z-index: 999;
-  }
-}
-
-
-//// Banner images (Community and Cultural Protocol nodes)
-
-// Shrink or expand the banner image to full width and then set height to auto to maintain aspect ratio. User is expected to upload an appropriately proportioned image for the banner
-
-.field-name-field-protocol-image, .field-name-field-community-image {
-  .field-name-scald-thumbnail img {
-    width:100%;
-    height:auto;
-  }
-}
-
-//// Organic Groups Add and Manage Members links
-.add-manage-members-links {
-  margin-top: 1em;
-}
-
-.nav-top-wrapper {
-  background: #474440;
-}
-.navbar-top {
-  &.navbar.container {
-    margin-top: 0;
-  }
-  background:none;
-  border:none;
-  border-radius:0;
-  ul.nav {
-    width:100%;
-    li {
-      background: #585551;
-      margin: 8px 2px;
-      &.last {
-        float:right;
-        border-radius: 4px;
-        border: 1px solid #979797;
-        background:none;
-      }
-
-      a {
-        color: #F5F5F5;
-        padding: 6px 10px;
-      }
-      &:hover {
-        background: #F4EADE;
-        a {
-          color: #474440;
-        }
+    .pane-content {
+      padding-left:20px;
+      padding-bottom:10px;
+      .view-content {
+        line-height:25px;
       }
     }
   }
-}
 
-.navbar-bottom {
-  border:none;
-  border-radius:0;
-  background:none;
-  ul.nav {
-    margin-top:10px;
-    li {
-      border:1px solid #E3E2E1;
-      border-radius: 4px;
-      background:white;
-      margin:10px;
-      a {
-        color: #595855;
-        padding: 14px 22px;
-        font-size:20px;
-      }
-      &.active,
-      &:hover {
-        border:1px solid #E4E2E1;
-        background: #E4E2E1;
-        a {
-          color: black;
-        }
+  // Can this go?
+  .management-links {
+    margin-top: 15px;
+    .pane-content {
+      padding-bottom: 0;
+      a.btn:hover {
+        color:@link-hover-color;
       }
     }
   }
-}
 
-#navbar {
-  margin-bottom:0;
-  background:#F8F7F7;
-}
-#page-header .navbar-default {
-  margin:0 0 20px 0;
-
-
-}
-
-
-.node-type-digital-heritage {
-
-  .group_scald_atom_metadata {
-    .popup-element {
-      width: 100%;
-      text-align: right;
-      height:20px;
+  // facets
+  .facetapi-processed {
+    padding-bottom: 10px;
+    padding-left: 0;
+    input[type="radio"], input[type="checkbox"] {
+      margin: 7px 8px 7px 0;
     }
   }
-  .group_scald_atom_metadata {
-    border-bottom:1px solid #ECEBEB;
-    padding-bottom:10px;
-    margin-bottom:10px;
-  }
-  .view-mode-search_result {
-    .field {
-      margin-bottom: 0;
-    }
-    
+
+  // Tooltips
+  a.tooltips span {
 
   }
-}
-
-// DH full node and Community Record views
-.node-digital-heritage.view-mode-full, .node-digital-heritage.view-mode-community_record {
-  .scald-atom {
-    margin-bottom: 2.5em;
-    .scald-file-icon {
-    //  display: none;
+  // Show tooltips in grid view only
+  .grid-view {
+    .tooltips span {
+      top: 0px;
+      left: 0px;
+      width: 220px;
+      z-index: 999;
     }
   }
-  .group-right {
-    background: #f8f7f7 none repeat scroll 0 0;
-    border-radius: 4px;
-    padding: 30px;
-  }
-  // Related DH nodes
-  .view-mode-search_result {
-    border-bottom: 1px solid #ecebeb;
-    margin-bottom: 2em;
-    padding-bottom: 2em;
-    .scald-atom {
-      margin-bottom: 0;
+
+
+  //// Banner images (Community and Cultural Protocol nodes)
+
+  // Shrink or expand the banner image to full width and then set height to auto to maintain aspect ratio. User is expected to upload an appropriately proportioned image for the banner
+
+  .field-name-field-protocol-image, .field-name-field-community-image {
+    .field-name-scald-thumbnail img {
+      width:100%;
+      height:auto;
     }
   }
-}
 
-// collection node DH list view
-.field-name-field-digital-heritage-items {
-  .group-list-view-fields {
-    padding:0;
-  }
-  .node-digital-heritage {
-    border-bottom: 1px solid #ECEBEB;
-    margin: 30px 0;
-    padding: 0 0 30px 0;
-  }
-  .label-above {
-    margin-bottom: -30px;
-  }
-}
-
-
-
-@media (max-width: @screen-md-min) {
-  .ds-2col > .group-left {
-    width: auto;
-    float:none;
-  }
-  .ds-2col > .group-right {
-    width: auto;
-    float: none;
-  }
-}
-
-@media (min-width: @screen-md-min) {
-  .navbar .logo {
-    margin: 10px 0 20px;
-  }
-  .ds-2col > .group-left {
-    width: 66%;
-    float: left;
-  }
-  .ds-2col > .group-right {
-    width: 30%;
-    float: right;
+  //// Organic Groups Add and Manage Members links
+  .add-manage-members-links {
+    margin-top: 1em;
   }
 
-  .panel-2col-stacked .panel-col-last {
-    float: right;
-    width: 40%;
+  .nav-top-wrapper {
+    background: #474440;
   }
-
-  .panel-2col-stacked {
-    .panel-col-first {
-      float: left;
-      width: 73%;
+  .navbar-top {
+    &.navbar.container {
+      margin-top: 0;
     }
-    .panel-col-last {
-      float: right;
-      width: 25%;
-    }
-
-  }
-}
-
-
-/* Dashboard theming **/
-
-
-#homebox .homebox-portlet {
-  .homebox-portlet-inner {
-    border:none;
-  }
-  h3.portlet-header {
-    background: #E3E2E1;
-    padding: 10px 15px;
-    font-size: 140%;
-    font-weight: 400;
-  }
-  .portlet-content {
-    padding:10px 15px;
-    dd {
-      margin-bottom:10px;
-      color: #666;
-    }
-    dt {
-      font-weight: normal;
-    }
-    .view-content {
-      ul {
-        padding-left: 0px;
-        margin-top:5px;
-        list-style:none;
-        li {
-          margin-bottom:10px;
-        }
-      }
-    }
-  }
-}
-
-// wizard
-#block-mukurtu-splash-mukurtu-wizard {
-  h2.block-title {
-    display:none;
-  }
-  .btn {
-    margin-bottom: 10px;
-  }
-  .ui-widget-content {
-    border: 1px solid #aaa;
-  }
-  .ui-tabs {
-    padding: 0.2em;
-    position: relative;
-  }
-}
-.wizard-tabs {
-  margin-bottom:10px;
-  .ui-tabs-nav {
     background:none;
     border:none;
     border-radius:0;
-    line-height: 28px;
-    padding:0;
-    li {
-      background: #585551;
-      margin: 0;
-      padding: 0;
-      a {
-        color: #F5F5F5;
-        padding: 6px 10px;
-      }
-      &:hover,
-      &.ui-state-active {
-        background: #e7e7e7;
+    ul.nav {
+      width:100%;
+      li {
+        background: #585551;
+        margin: 8px 2px;
+        &.last {
+          float:right;
+          border-radius: 4px;
+          border: 1px solid #979797;
+          background:none;
+        }
+
         a {
-          color: #474440;
+          color: #F5F5F5;
+          padding: 6px 10px;
+        }
+        &:hover {
+          background: #F4EADE;
+          a {
+            color: #474440;
+          }
         }
       }
     }
   }
-  .ui-tabs-panel {
-    padding: 0 20px 20px 20px;
-    border-style: solid none none;
-    border-top-width: 1px;
-    border-top-color: #aaa;
-    a {
-      color:@link-color;
+
+  .navbar-bottom {
+    border:none;
+    border-radius:0;
+    background:none;
+    ul.nav {
+      margin-top:10px;
+      li {
+        border:1px solid #E3E2E1;
+        border-radius: 4px;
+        background:white;
+        margin:10px;
+        a {
+          color: #595855;
+          padding: 14px 22px;
+          font-size:20px;
+        }
+        &.active,
+        &:hover {
+          border:1px solid #E4E2E1;
+          background: #E4E2E1;
+          a {
+            color: black;
+          }
+        }
+      }
     }
   }
-}
 
-.masonry-grid {
-  .masonry-brick {
-    width: 227px;
+  #navbar {
+    margin-bottom:0;
+    background:#F8F7F7;
+  }
+  #page-header .navbar-default {
+    margin:0 0 20px 0;
+
 
   }
-}
 
-// dont know why this needs to be added
-.ui-tabs .ui-tabs-hide {
-  display: none !important;
-}
 
-// Fix Google map display inside of quicktabs (eg. for Community Records) (taken from https://www.drupal.org/node/352247#comment-9592623)
-.quicktabs_main {
-  position: relative;
-}
-.quicktabs-tabpage {
-  display: block;
-  visibility: visible;
-  width: 100%;
-}
-.quicktabs-tabpage.quicktabs-hide {
-  display: block;
-  visibility: hidden;
-  top: 0px;
-  left: 0px;
-  position: absolute;
-  z-index: -1;
+  .node-type-digital-heritage {
+
+    .group_scald_atom_metadata {
+      .popup-element {
+        width: 100%;
+        text-align: right;
+        height:20px;
+      }
+    }
+    .group_scald_atom_metadata {
+      border-bottom:1px solid #ECEBEB;
+      padding-bottom:10px;
+      margin-bottom:10px;
+    }
+    .view-mode-search_result {
+      .field {
+        margin-bottom: 0;
+      }
+
+
+    }
+  }
+
+  // DH full node and Community Record views
+  .node-digital-heritage.view-mode-full, .node-digital-heritage.view-mode-community_record {
+    .scald-atom {
+      margin-bottom: 2.5em;
+      .scald-file-icon {
+        //  display: none;
+      }
+    }
+    .group-right {
+      background: #f8f7f7 none repeat scroll 0 0;
+      border-radius: 4px;
+      padding: 30px;
+    }
+    // Related DH nodes
+    .view-mode-search_result {
+      border-bottom: 1px solid #ecebeb;
+      margin-bottom: 2em;
+      padding-bottom: 2em;
+      .scald-atom {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // collection node DH list view
+  .field-name-field-digital-heritage-items {
+    .group-list-view-fields {
+      padding:0;
+    }
+    .node-digital-heritage {
+      border-bottom: 1px solid #ECEBEB;
+      margin: 30px 0;
+      padding: 0 0 30px 0;
+    }
+    .label-above {
+      margin-bottom: -30px;
+    }
+  }
+
+
+
+  @media (max-width: @screen-md-min) {
+    .ds-2col > .group-left {
+      width: auto;
+      float:none;
+    }
+    .ds-2col > .group-right {
+      width: auto;
+      float: none;
+    }
+  }
+
+  @media (min-width: @screen-md-min) {
+    .navbar .logo {
+      margin: 10px 0 20px;
+    }
+    .ds-2col > .group-left {
+      width: 66%;
+      float: left;
+    }
+    .ds-2col > .group-right {
+      width: 30%;
+      float: right;
+    }
+
+    .panel-2col-stacked .panel-col-last {
+      float: right;
+      width: 40%;
+    }
+
+    .panel-2col-stacked {
+      .panel-col-first {
+        float: left;
+        width: 73%;
+      }
+      .panel-col-last {
+        float: right;
+        width: 25%;
+      }
+
+    }
+  }
+
+
+  /* Dashboard theming **/
+
+
+  #homebox .homebox-portlet {
+    .homebox-portlet-inner {
+      border:none;
+    }
+    h3.portlet-header {
+      background: #E3E2E1;
+      padding: 10px 15px;
+      font-size: 140%;
+      font-weight: 400;
+    }
+    .portlet-content {
+      padding:10px 15px;
+      dd {
+        margin-bottom:10px;
+        color: #666;
+      }
+      dt {
+        font-weight: normal;
+      }
+      .view-content {
+        ul {
+          padding-left: 0px;
+          margin-top:5px;
+          list-style:none;
+          li {
+            margin-bottom:10px;
+          }
+        }
+      }
+    }
+  }
+
+  // wizard
+  #block-mukurtu-splash-mukurtu-wizard {
+    h2.block-title {
+      display:none;
+    }
+    .btn {
+      margin-bottom: 10px;
+    }
+    .ui-widget-content {
+      border: 1px solid #aaa;
+    }
+    .ui-tabs {
+      padding: 0.2em;
+      position: relative;
+    }
+  }
+  .wizard-tabs {
+    margin-bottom:10px;
+    .ui-tabs-nav {
+      background:none;
+      border:none;
+      border-radius:0;
+      line-height: 28px;
+      padding:0;
+      li {
+        background: #585551;
+        margin: 0;
+        padding: 0;
+        a {
+          color: #F5F5F5;
+          padding: 6px 10px;
+        }
+        &:hover,
+        &.ui-state-active {
+          background: #e7e7e7;
+          a {
+            color: #474440;
+          }
+        }
+      }
+    }
+    .ui-tabs-panel {
+      padding: 0 20px 20px 20px;
+      border-style: solid none none;
+      border-top-width: 1px;
+      border-top-color: #aaa;
+      a {
+        color:@link-color;
+      }
+    }
+  }
+
+  .masonry-grid {
+    .masonry-brick {
+      width: 227px;
+
+    }
+  }
+
+  // dont know why this needs to be added
+  .ui-tabs .ui-tabs-hide {
+    display: none !important;
+  }
+
+  // Fix Google map display inside of quicktabs (eg. for Community Records) (taken from https://www.drupal.org/node/352247#comment-9592623)
+  .quicktabs_main {
+    position: relative;
+  }
+  .quicktabs-tabpage {
+    display: block;
+    visibility: visible;
+    width: 100%;
+  }
+  .quicktabs-tabpage.quicktabs-hide {
+    display: block;
+    visibility: hidden;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    z-index: -1;
+  }
 }
