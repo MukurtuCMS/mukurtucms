@@ -187,19 +187,18 @@ cultural_protocol_group|full';
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
-  $ds_field->field = 'og_members';
-  $ds_field->label = 'OG Members';
+  $ds_field->field = 'group_members';
+  $ds_field->label = 'Group Members';
   $ds_field->field_type = 6;
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'community|full
-cultural_protocol_group|full';
+  $ds_field->ui_limit = '';
   $ds_field->properties = array(
-    'block' => 'views|og_members-block_1',
+    'block' => 'views|group_members-block_1',
     'block_render' => '1',
   );
-  $export['og_members'] = $ds_field;
+  $export['group_members'] = $ds_field;
 
   return $export;
 }
