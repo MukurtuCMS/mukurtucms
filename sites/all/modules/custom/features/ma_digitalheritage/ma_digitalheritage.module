@@ -12,9 +12,35 @@ include_once('ma_digitalheritage.features.inc');
 function ma_digitalheritage_node_presave($node) {
   if ($node->type == 'digital_heritage') {
 
+    $dh_emw = entity_metadata_wrapper('node', $node);
+
+    // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
+    if (isset ($_SESSION['community_record_parent'])) {
+      $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $_SESSION['community_record_parent'];
+      unset ($_SESSION['community_record_parent']);
+    }
+
+    // Set the book parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
+    if (isset ($_SESSION['book_parent'])) {
+
+      $book_parent_nid = $_SESSION['book_parent'];
+      unset ($_SESSION['book_parent']);
+      $node->field_book_parent[LANGUAGE_NONE][0]['target_id'] = $book_parent_nid;
+
+      // Also set the privacy setting and protocol(s) to that of the book parent (and its communities will get set as well below)
+      $parent_protocols = array();
+      $book_parent_wrapper = entity_metadata_wrapper('node', $book_parent_nid);
+      $dh_emw->field_item_privacy_setting->set($book_parent_wrapper->field_item_privacy_setting->value());
+      foreach ($book_parent_wrapper->og_group_ref->value() as $protocol) {
+        $parent_protocols[] = $protocol->nid;
+      }
+      if (count($parent_protocols)) {
+        $dh_emw->og_group_ref->set(array_unique($parent_protocols));
+      }
+    }
+
     // Update the Community field according to the protocols for the DH node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet). It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
     $communities = array();
-    $dh_emw = entity_metadata_wrapper('node', $node);
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
       $p_emw = entity_metadata_wrapper('node', $protocol);
       foreach ($p_emw->og_group_ref->value() as $community) {
@@ -23,12 +49,6 @@ function ma_digitalheritage_node_presave($node) {
     }
     if (count($communities)) {
       $dh_emw->field_community_ref->set(array_unique($communities));
-    }
-
-    // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
-    if (isset ($_SESSION['community_record_parent'])) {
-      $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $_SESSION['community_record_parent'];
-      unset ($_SESSION['community_record_parent']);
     }
 
   }
@@ -240,9 +260,20 @@ function ma_digitalheritage_menu() {
   // "Add Community Record" button for DH node
   $items['node/%node/add-community-record'] = array(
     'title' => 'Add Community Record',
-    'page callback' => 'ma_digital_heritage_add_community_record',
+    'page callback' => 'ma_digitalheritage_add_community_record',
     'page arguments' => array(1),
     'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  // "Add a Book Page" button for DH node
+  $items['node/%node/add-book-page'] = array(
+    'title' => 'Add a Book Page',
+    'page callback' => 'ma_digitalheritage_add_book_page',
+    'page arguments' => array(1),
+    'access callback' => 'ma_digitalheritage_add_book_page_check',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 100,
@@ -263,6 +294,15 @@ function ma_digitalheritage_clone_dh_button_check($node) {
           return TRUE;
         }
       }
+    }
+  }
+}
+
+function ma_digitalheritage_add_book_page_check($node) {
+  if ($node->type == 'digital_heritage') {
+    global $user;
+    if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
+      return TRUE;
     }
   }
 }
@@ -312,9 +352,14 @@ function ma_digitalheritage_redirect_presave($redirect) {
 }
 
 
-// "Add Community Record" button redirect to node edit form with add-community-record param
-function ma_digital_heritage_add_community_record ($node) {
+// "Add Community Record" button redirect to node edit form with community-record param
+function ma_digitalheritage_add_community_record ($node) {
   drupal_goto ('node/add/digital-heritage/community-record/' . $node->nid);
+}
+
+// "Add a Book Page" button redirect to node edit form with book-page param
+function ma_digitalheritage_add_book_page ($node) {
+  drupal_goto ('node/add/digital-heritage/book-page/' . $node->nid);
 }
 
 /**
@@ -361,6 +406,51 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       'field_collection',
       'field_related_dh_items',
       'field_community_record_children',
+    );
+    foreach ($hide_fields as $hide_field) {
+      $form[$hide_field]['#access'] = FALSE;
+    }
+
+  }
+
+  // Grab Book Page parent on node edit and set page title
+  if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value']) {
+    $book_child_page = 1;
+
+    // Set the page title
+    drupal_set_title ("<i>Edit Book Page</i> " . $form['#node']->title . " <i>in</i> " . $form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#title'],  PASS_THROUGH);
+  }
+
+  // On Book Page add, ensure the user actually has permission to create a Book Page on this node, in case they hacked NID in the url, and then set the page title, and then set the session var for book page parent.
+  elseif (arg(3) == 'book-page') {
+    $referring_node = node_load (arg(4));
+    global $user;
+    if ($referring_node->uid == $user->uid) { // The permission check
+      $book_child_page = 1;
+      if (isset ($referring_node->field_book_parent[LANGUAGE_NONE][0]['target_id'])) { // This book child page is being added from another book child page
+        $book_parent = node_load ($referring_node->field_book_parent[LANGUAGE_NONE][0]['target_id']);
+      }
+      else {
+        $book_parent = $referring_node; // This book child page is being added from the parent book page
+      }
+      // Set the page title
+      drupal_set_title ("<i>Create Book Page in</i> " . $book_parent->title,  PASS_THROUGH);
+
+      // Use a session var to set the book parent nid. This then gets set in the child in ma_digitalheritage_node_presave, along with the parent protocol (we cannot set the field value here because it is a hidden form element)
+      $_SESSION['book_parent'] = $book_parent->nid;
+
+    }
+  }
+
+  // Customizations to Book Child Page
+  if (isset($book_child_page)) {
+    $hide_fields = array(
+      'og_group_ref', // The custom protocol fieldset for this is hidden within mukurtu_protocol_field.module
+      'field_item_privacy_setting',
+      'field_book_children',
+      'field_community_record_children',
+      'field_related_dh_items',
+      'field_collection',
     );
     foreach ($hide_fields as $hide_field) {
       $form[$hide_field]['#access'] = FALSE;
