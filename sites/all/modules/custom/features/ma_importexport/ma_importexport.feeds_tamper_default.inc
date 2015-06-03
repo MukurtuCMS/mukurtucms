@@ -29,6 +29,18 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-category-required';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Category';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array();
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Required field';
+  $export['digital_heritage_metadata-category-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-category-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Category';
@@ -370,6 +382,18 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-sharing_protocols-required';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Sharing Protocols';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array();
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Required field';
+  $export['digital_heritage_metadata-sharing_protocols-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-sharing_protocols-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Sharing Protocols';
@@ -381,6 +405,30 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Trim';
   $export['digital_heritage_metadata-sharing_protocols-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-sharing_settings-required';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Sharing Settings';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array();
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Required field';
+  $export['digital_heritage_metadata-sharing_settings-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-title-required';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'title';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array();
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Required field';
+  $export['digital_heritage_metadata-title-required'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
