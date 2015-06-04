@@ -490,8 +490,34 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
       if (!in_array($original_child, $new_community_records)) {
         form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, edit the Community Record, then press "Delete". Note, only the creator of the Community Record can delete it.'));
       }
-
     }
+
+    // Do not allow adding, changing, or removing of Book Pages in the DH node form. The field is there only to allow users to reorder the Book Pages.
+    $original_book_pages = array();
+    foreach ($form['field_book_children'][LANGUAGE_NONE] as $original_child) {
+      if (isset($original_child['target_id'])) {
+        $original_child_text = $original_child['target_id']['#default_value'];
+        $original_child_numeric = substr(substr(strstr($original_child_text, '('), 0, -1), 1);
+        if (is_numeric($original_child_numeric)) {
+          $original_book_pages[] = $original_child_numeric;
+        }
+      }
+    }
+    $new_book_pages = array();
+    foreach ($form_state['values']['field_book_children'][LANGUAGE_NONE] as $new_child) {
+      if (isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
+        $new_book_pages[] = $new_child['target_id'];
+        if (!in_array($new_child['target_id'], $original_book_pages)) {
+          form_set_error('field_book_children', t('Do not add Book Pages here. Use the "Add a Book Page" button instead.'));
+        }
+      }
+    }
+    foreach ($original_book_pages as $original_child) {
+      if (!in_array($original_child, $new_book_pages)) {
+        form_set_error('field_book_children', t('Do not remove Book Pages here. Instead, edit the Book Page, then press "Delete".'));
+      }
+    }
+
   }
 }
 

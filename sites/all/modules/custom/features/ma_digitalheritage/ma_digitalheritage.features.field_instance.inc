@@ -138,7 +138,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -183,7 +183,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_book_children',
-    'label' => 'Book Children',
+    'label' => 'Book Pages',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -2840,7 +2840,7 @@ function ma_digitalheritage_field_default_field_instances() {
 ');
   t('A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.');
   t('An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.');
-  t('Book Children');
+  t('Book Pages');
   t('Book Parent');
   t('Category');
   t('Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.');
@@ -2891,6 +2891,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Traditional Knowledge Labels');
   t('Transcription');
   t('Type');
+  t('Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.');
   t('Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.');
   t('Who holds the rights to the content and who should be contacted for permission to reproduce the content. You may want to add and email address or other contact information if you\'d like people to contact you for permission to use, reproduce, circulate and or cite your materials.');
 
