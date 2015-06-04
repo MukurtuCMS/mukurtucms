@@ -23,10 +23,10 @@ function ma_collection_field_group_info() {
     'label' => 'Basic',
     'weight' => '1',
     'children' => array(
-      0 => 'field_description',
-      1 => 'field_collection_credit',
-      2 => 'field_collection_image',
-      3 => 'field_collection_summary',
+      0 => 'field_collection_credit',
+      1 => 'field_collection_image',
+      2 => 'field_collection_summary',
+      3 => 'field_description',
       4 => 'title',
     ),
     'format_type' => 'htab',
@@ -69,32 +69,6 @@ function ma_collection_field_group_info() {
     ),
   );
   $export['group_digital_heritage_items|node|collection|form'] = $field_group;
-
-  $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
-  $field_group->api_version = 1;
-  $field_group->identifier = 'group_digital_heritage|node|collection|form';
-  $field_group->group_name = 'group_digital_heritage';
-  $field_group->entity_type = 'node';
-  $field_group->bundle = 'collection';
-  $field_group->mode = 'form';
-  $field_group->parent_name = 'group_tabs';
-  $field_group->data = array(
-    'label' => '2. Digital Heritage',
-    'weight' => '1',
-    'children' => array(
-      0 => 'field_reference_digital_heritage',
-    ),
-    'format_type' => 'htab',
-    'format_settings' => array(
-      'formatter' => 'closed',
-      'instance_settings' => array(
-        'classes' => '',
-        'required_fields' => 1,
-      ),
-    ),
-  );
-  $export['group_digital_heritage|node|collection|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -143,8 +117,8 @@ function ma_collection_field_group_info() {
     'label' => 'Tabs',
     'weight' => '0',
     'children' => array(
-      0 => 'group_digital_heritage_items',
-      1 => 'group_basic',
+      0 => 'group_basic',
+      1 => 'group_digital_heritage_items',
     ),
     'format_type' => 'htabs',
     'format_settings' => array(
