@@ -53,6 +53,48 @@ function ma_digitalheritage_node_presave($node) {
 
   }
 }
+/**
+ * Implements hook_node_update().
+ */
+function ma_digitalheritage_node_update($node) {
+  if ($node->type == 'digital_heritage') {
+
+    $dh_emw = entity_metadata_wrapper('node', $node);
+    $dh_emw_old = entity_metadata_wrapper('node', $node->original);
+
+    // If this is a Book Parent, replicate some field values to its book children
+    $book_children = $dh_emw->field_book_children->value();
+    if (count($book_children)) {
+
+      // Replicate the Protocols (if changed) (their Communities will get set in their own wrapper save below)
+      if (array_values($dh_emw->og_group_ref->value()) <> array_values($dh_emw_old->og_group_ref->value())) {
+        foreach ($book_children as $child_page) {
+          foreach ($dh_emw->og_group_ref->value() as $protocol) {
+            $parent_protocols[] = $protocol->nid;
+          }
+          if (count($parent_protocols)) {
+            $book_child_wrapper = entity_metadata_wrapper('node', $child_page);
+            $book_child_wrapper->og_group_ref->set(array_unique($parent_protocols));
+            $book_child_wrapper->save();
+          }
+        }
+        #dpm ('groups changed on children');
+      }
+
+      // Replicate the privacy setting (if changed)
+      if ($dh_emw->field_item_privacy_setting->value() <> $dh_emw_old->field_item_privacy_setting->value()) {
+        foreach ($book_children as $child_page) {
+          $book_child_wrapper = entity_metadata_wrapper('node', $child_page);
+          $book_child_wrapper->field_item_privacy_setting->set($dh_emw->field_item_privacy_setting->value());
+          $book_child_wrapper->save();
+        }
+        #dpm ('privacy setting changed on children');
+      }
+
+    }
+  }
+}
+
 
 /**
  * Implements hook_form_FORM_ID_alter().
