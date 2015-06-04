@@ -460,7 +460,8 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
     $book_child_page = 1;
 
     // Set the page title
-    drupal_set_title ("<i>Edit Book Page</i> " . $form['#node']->title . " <i>in</i> " . $form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#title'],  PASS_THROUGH);
+    $book_parent = $form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#entity'];
+    drupal_set_title ("<i>Edit Book Page</i> " . $form['#node']->title . " <i>in</i> " . $book_parent->title,  PASS_THROUGH);
   }
 
   // On Book Page add, ensure the user actually has permission to create a Book Page on this node, in case they hacked NID in the url, and then set the page title, and then set the session var for book page parent.
