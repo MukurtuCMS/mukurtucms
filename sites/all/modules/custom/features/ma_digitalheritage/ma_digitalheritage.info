@@ -187,6 +187,7 @@ features[variable][] = pathauto_node_digital_heritage_pattern
 features[variable][] = save_continue_digital_heritage
 features[variable][] = show_diff_inline_digital_heritage
 features[variable][] = show_preview_changes_digital_heritage
+features[views_view][] = dh_nodes_available_to_dh
 features[views_view][] = digital_heritage_grid_list
 features_exclude[dependencies][context] = context
 features_exclude[dependencies][search] = search

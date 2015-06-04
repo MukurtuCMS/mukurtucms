@@ -2057,6 +2057,7 @@ function ma_digitalheritage_field_default_field_instances() {
   $field_instances['node-digital_heritage-field_related_dh_items'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => 'A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.',
     'display' => array(
@@ -2101,11 +2102,17 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_dh_items',
     'label' => 'Related Items',
     'required' => 0,
     'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
