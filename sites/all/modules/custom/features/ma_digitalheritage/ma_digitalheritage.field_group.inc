@@ -317,7 +317,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Transcription:',
-    'weight' => '5',
+    'weight' => '6',
     'children' => array(
       0 => 'field_transcription',
     ),

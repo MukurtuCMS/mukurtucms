@@ -602,6 +602,8 @@ function ma_digitalheritage_node_delete($node) {
       }
     }
 
+    // TODO: should DH Child Pages get deleted if we delete the parent?
+
   }
 }
 
@@ -712,4 +714,96 @@ function ma_digitalheritage_page_alter(&$data) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_ds_fields_info().
+ */
+function ma_digitalheritage_ds_fields_info($entity_type) {
+  $fields = array();
+
+  $fields['book_page_navigation'] = array(
+    'title' => t('Book Page Navigation'),
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'ui_limit' => array('digital_heritage|full'),
+    'function' => 'ma_digital_heritage_book_page_navigation_field'
+  );
+
+  return array('node' => $fields);
+}
+
+function ma_digital_heritage_book_page_navigation_field ($field) {
+  $node = $field['entity'];
+
+  $output = "";
+
+  // Parent pages show a table of contents, plus the right arrow
+  if ($node->field_book_children) {
+    $toc = '<ol><li>' . $node->title .'</li>';
+    $parent_emw = entity_metadata_wrapper('node', $node);
+    $children = $parent_emw->field_book_children->value();
+    foreach ($children as $child) {
+      $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
+    }
+    $toc .= '</ol>';
+    $right = $children[0];
+  }
+
+  // Child pages show arrows left, right, and up arrows
+  elseif ($node->field_book_parent) {
+    $child_emw = entity_metadata_wrapper('node', $node);
+    $parent_node = $child_emw->field_book_parent->value();
+    $up = $parent_node;
+    $parent_emw = entity_metadata_wrapper('node', $parent_node);
+    $children = $parent_emw->field_book_children->value();
+    foreach ($children as $child_index => $child) {
+      if ($child->nid == $node->nid) {
+        if (isset ($children[$child_index -1])) {
+          $left = $children[$child_index -1];
+        }
+        if (isset ($children[$child_index +1])) {
+          $right = $children[$child_index +1];
+        }
+        break;
+      }
+    }
+  }
+
+  // Render the navigation for all parent and child pages
+  if (isset($children)) {
+    global $base_url;
+    $icon_path = $base_url . '/' . path_to_theme() . '/';
+    $output .= '<div class = "dh-book-nav">';
+
+    // Up arrow
+    if (isset($up)) {
+      $output .= '<div class = "dh-book-nav-top">' . l('<img src = "' . $icon_path . 'dh-nav-arrow-up.png">', 'node/' . $up->nid, array('html' => TRUE)) . '</div>';
+    }
+
+    // Middle arrows
+    $output .= '<div class = "dh-book-nav-middle">';
+    if (isset($left)) {
+      $output .= '<span class = "dh-book-nav-left">' . l('<img src = "' . $icon_path . 'dh-nav-arrow-left.png">', 'node/' . $left->nid, array('html' => TRUE)) . '</span>';
+    }
+
+    if (isset($right)) {
+      $output .= '<span class = "dh-book-nav-right">' . l('<img src = "' . $icon_path . 'dh-nav-arrow-right.png">', 'node/' . $right->nid, array('html' => TRUE)) . '</span>';
+    }
+    $output .= '</div>';
+
+    // Plus button to add a child page if user is the node owner
+    global $user;
+    if ($node->uid == $user->uid) {
+      $output .= '<div class = "dh-book-nav-bottom">' . l('<img src = "' . $icon_path . 'dh-nav-plus.png">', 'node/add/digital-heritage/book-page/' . $node->nid, array('html' => TRUE)) . '</div>';
+    }
+
+    // Table of contents (shows on first page only)
+    if (isset ($toc)) {
+      $output .= '<div class = "dh-book-nav-toc">' . $toc . '</div>';
+    }
+
+    $output .= '</div>';
+    return $output;
+  }
+
 }

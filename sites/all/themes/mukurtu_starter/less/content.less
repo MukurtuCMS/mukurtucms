@@ -544,6 +544,30 @@ a.tooltips span {
       margin-bottom: 0;
     }
   }
+
+  // DH Book Pages Navigation
+  .dh-book-nav {
+    .dh-book-nav-middle, .dh-book-nav-bottom, .dh-book-nav-top {
+      text-align: center;
+      margin: 0 auto;
+      width: 100px;
+    }
+    .dh-book-nav-left {
+      float: left;
+    }
+    .dh-book-nav-right {
+      float: right;
+    }
+    .dh-book-nav-bottom {
+      clear: both;
+    }
+    .dh-book-nav-toc {
+      ol {
+        padding-left: 1.2em; // I don't know why I can't just set this to 0 (it goes too far left)
+      }
+    }
+  }
+
 }
 
 // collection node DH list view
