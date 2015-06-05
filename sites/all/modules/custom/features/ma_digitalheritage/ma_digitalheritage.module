@@ -783,6 +783,9 @@ function ma_digital_heritage_book_page_navigation_field ($field) {
         if (isset ($children[$child_index -1])) {
           $left = $children[$child_index -1];
         }
+        else {
+          $left = $parent_node;
+        }
         if (isset ($children[$child_index +1])) {
           $right = $children[$child_index +1];
         }
