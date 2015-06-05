@@ -43,6 +43,12 @@ function ma_digitalheritage_node_update($node) {
     $dh_emw = entity_metadata_wrapper('node', $node);
     $dh_emw_old = entity_metadata_wrapper('node', $node->original);
 
+    // If this is a Book Child, reindex the parent
+    $book_parent = $dh_emw->field_book_parent->value();
+    if (count($book_parent)) {
+      search_api_index_specific_items_delayed (search_api_index_load('default_node_index'), array($book_parent->nid));
+    }
+
     // If this is a Book Parent, replicate some field values to its book children
     $book_children = $dh_emw->field_book_children->value();
     if (count($book_children)) {
@@ -574,6 +580,14 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
  */
 function ma_digitalheritage_node_insert($node) {
   if ($node->type == 'digital_heritage') {
+
+    $dh_emw = entity_metadata_wrapper('node', $node);
+
+    // If this is a Book Child, reindex the parent
+    $book_parent = $dh_emw->field_book_parent->value();
+    if (count($book_parent)) {
+      search_api_index_specific_items_delayed (search_api_index_load('default_node_index'), array($book_parent->nid));
+    }
 
     // Create redirects on Community Record nodes to their parent
     if (isset($node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
