@@ -846,3 +846,21 @@ function ma_digital_heritage_book_page_navigation_field ($field) {
   }
 
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_digitalheritage_form_node_delete_confirm_alter(&$form, &$form_state) {
+
+  // Extra confirmation text when deleting a book parent
+  if (count($form['#node']->field_book_children )) {
+    $form['description']['#markup'] = "<p><b>This will delete ALL the pages in this book.</b></p>" . $form['description']['#markup'];
+    drupal_set_title ("Are you sure you want to delete the entire book for <i>" . $form['#node']->title . "</i>?",  PASS_THROUGH);
+  }
+
+  // Extra confirmation text when deleting a community record parent
+  if (count($form['#node']->field_community_record_children )) {
+    $form['description']['#markup'] = "<p><b>This will delete all of its Community Records.</b></p>" . $form['description']['#markup'];
+    drupal_set_title ("Are you sure you want to delete <i>" . $form['#node']->title . "</i> and all of its Community Records?",  PASS_THROUGH);
+  }
+}
