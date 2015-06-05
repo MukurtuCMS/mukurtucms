@@ -307,8 +307,10 @@ function ma_digitalheritage_menu() {
 
 function ma_digitalheritage_clone_dh_button_check($node) {
   if ($node->type == 'digital_heritage') {
-    $protocol_manager_for_a_group = 0;
     $dh_emw = entity_metadata_wrapper('node', $node);
+    if ($dh_emw->field_book_parent->value() OR $dh_emw->field_book_children->value()) { // Do not allow cloning or creating community records on book pages, whether child or parent
+      return FALSE;
+    }
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
       if (isset ($protocol)) {
         $p_emw = entity_metadata_wrapper('node', $protocol);
@@ -323,6 +325,10 @@ function ma_digitalheritage_clone_dh_button_check($node) {
 
 function ma_digitalheritage_add_book_page_check($node) {
   if ($node->type == 'digital_heritage') {
+    $dh_emw = entity_metadata_wrapper('node', $node);
+    if ($dh_emw->field_community_record_parent->value() OR $dh_emw->field_community_record_children->value()) { // Do not allow creating book pages on community records
+      return FALSE;
+    }
     global $user;
     if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
       return TRUE;
@@ -452,7 +458,7 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
   elseif (arg(3) == 'book-page') {
     $referring_node = node_load (arg(4));
     global $user;
-    if ($referring_node->uid == $user->uid) { // The permission check
+    if (ma_digitalheritage_add_book_page_check($referring_node)) { // The permission check
       $book_child_page = 1;
       if (isset ($referring_node->field_book_parent[LANGUAGE_NONE][0]['target_id'])) { // This book child page is being added from another book child page
         $book_parent = node_load ($referring_node->field_book_parent[LANGUAGE_NONE][0]['target_id']);
