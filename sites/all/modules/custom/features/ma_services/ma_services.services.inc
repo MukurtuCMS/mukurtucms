@@ -23,10 +23,9 @@ function ma_services_default_services_endpoint() {
     'formatters' => array(
       'json' => TRUE,
       'jsonp' => TRUE,
-      'xml' => TRUE,
       'bencode' => FALSE,
       'php' => FALSE,
-      'rss' => FALSE,
+      'xml' => FALSE,
     ),
     'parsers' => array(
       'application/json' => TRUE,
@@ -41,6 +40,9 @@ function ma_services_default_services_endpoint() {
     'file' => array(
       'operations' => array(
         'create' => array(
+          'enabled' => '1',
+        ),
+        'retrieve' => array(
           'enabled' => '1',
         ),
       ),
@@ -103,6 +105,9 @@ function ma_services_default_services_endpoint() {
         'retrieve' => array(
           'enabled' => '1',
         ),
+        'create' => array(
+          'enabled' => '1',
+        ),
       ),
       'actions' => array(
         'login' => array(
@@ -110,11 +115,6 @@ function ma_services_default_services_endpoint() {
         ),
         'logout' => array(
           'enabled' => '1',
-          'settings' => array(
-            'services' => array(
-              'resource_api_version' => '1.0',
-            ),
-          ),
         ),
         'register' => array(
           'enabled' => '1',
