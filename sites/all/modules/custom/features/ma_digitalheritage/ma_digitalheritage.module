@@ -594,14 +594,25 @@ function ma_digitalheritage_node_delete($node) {
   if ($node->type == 'digital_heritage') {
     $dh_emw = entity_metadata_wrapper('node', $node);
 
+    // TODO: add a confirmation step
     // Delete the Community Records of a parent DH if the parent is deleted
     foreach ($dh_emw->field_community_record_children->value() as $child) {
       if (isset($child->nid)) {
-        node_delete ($child->nid);
+        if ($child->nid <> $node->nid) { // In case a Community Record is a child of itself (which shouldn't happen but just in case to prevent infinite loop)
+          node_delete($child->nid);
+        }
       }
     }
 
-    // TODO: should DH Child Pages get deleted if we delete the parent?
+    // TODO: add a confirmation step
+    // Delete the child pages of a book if the parent is deleted
+    foreach ($dh_emw->field_book_children->value() as $child) {
+      if (isset($child->nid)) {
+        if ($child->nid <> $node->nid) { // In case a book page is a child of itself (which shouldn't happen but just in case to prevent infinite loop)
+          node_delete($child->nid);
+        }
+      }
+    }
 
   }
 }
