@@ -218,6 +218,8 @@ function ma_digitalheritage_field_group_info() {
       0 => 'field_collection',
       1 => 'field_related_dh_items',
       2 => 'field_community_record_children',
+      3 => 'field_book_parent',
+      4 => 'field_book_children',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -316,7 +318,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Transcription:',
-    'weight' => '5',
+    'weight' => '6',
     'children' => array(
       0 => 'field_transcription',
     ),

@@ -128,18 +128,17 @@ function ma_collection_field_default_field_bases() {
     'module' => 'entityreference',
     'settings' => array(
       'duplicates' => 1,
-      'handler' => 'base',
+      'handler' => 'views',
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
             'status' => 0,
           ),
         ),
-        'sort' => array(
-          'type' => 'none',
-        ),
-        'target_bundles' => array(
-          'digital_heritage' => 'digital_heritage',
+        'view' => array(
+          'args' => array(),
+          'display_name' => 'entityreference_1',
+          'view_name' => 'dh_nodes_available_to_collection',
         ),
       ),
       'target_type' => 'node',

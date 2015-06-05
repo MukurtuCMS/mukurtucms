@@ -48,6 +48,11 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
   if ($form_id == 'digital_heritage_node_form') {
 
+    // Do not create this custom field for Book Pages
+    if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
+      return;
+    }
+
     // gathering group field info
     $og_group_parent = $form['#group_children']['og_group_ref'];
     $form['#group_children']['oggroup_fieldset'] = $og_group_parent;

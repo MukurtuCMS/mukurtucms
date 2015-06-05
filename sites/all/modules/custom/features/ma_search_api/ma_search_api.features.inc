@@ -126,6 +126,39 @@ function ma_search_api_default_search_api_index() {
         "changed" : { "type" : "date" },
         "comment_count" : { "type" : "integer" },
         "created" : { "type" : "date" },
+        "field_book_children:author" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "user" },
+        "field_book_children:body:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_category" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "taxonomy_term"
+        },
+        "field_book_children:field_category:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_collection_credit" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_collection_summary" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_community_ref" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "node"
+        },
+        "field_book_children:field_contributor:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_coverage_description:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_creator:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_date" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_description:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_dh_type:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_identifier" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_language:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_source" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_subject:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_summary" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_tags" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "taxonomy_term"
+        },
+        "field_book_children:field_tags:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_tk_body:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_transcription" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:title" : { "type" : "list\\u003Ctext\\u003E" },
         "field_category" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_category:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_collection" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
@@ -398,6 +431,130 @@ function ma_search_api_default_search_api_server() {
           "field_transcription" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_book_children:title" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:author" : {
+            "table" : "search_api_db_default_node_index_field_book_children_author",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_community_ref" : {
+            "table" : "search_api_db_default_node_index_field_book_children_field_com",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_summary" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_category" : {
+            "table" : "search_api_db_default_node_index_field_book_children_field_cat",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_date" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_identifier" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_source" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_tags" : {
+            "table" : "search_api_db_default_node_index_field_book_children_field_tag",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_transcription" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_collection_credit" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_collection_summary" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:body:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_dh_type:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_category:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_contributor:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_coverage_description:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_creator:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_description:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_format:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_language:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_subject:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_tags:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_tk_body:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           }
         }

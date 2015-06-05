@@ -312,6 +312,7 @@ function ma_collection_field_default_field_instances() {
   $field_instances['node-collection-field_digital_heritage_items'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -335,11 +336,17 @@ function ma_collection_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_digital_heritage_items',
     'label' => 'Digital Heritage Items',
     'required' => 0,
     'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(

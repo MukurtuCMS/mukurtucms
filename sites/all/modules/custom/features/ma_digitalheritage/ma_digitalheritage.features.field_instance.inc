@@ -84,7 +84,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -129,6 +129,154 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'type' => 'text_textarea_with_summary',
       'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_book_children'
+  $field_instances['node-digital_heritage-field_book_children'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 42,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_book_children',
+    'label' => 'Book Pages',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 29,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_book_parent'
+  $field_instances['node-digital_heritage-field_book_parent'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 41,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_book_parent',
+    'label' => 'Book Parent',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 30,
     ),
   );
 
@@ -318,7 +466,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 42,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -392,7 +540,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 43,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -436,7 +584,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -546,7 +694,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -771,7 +919,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -856,7 +1004,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1126,7 +1274,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1448,7 +1596,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 42,
+        'weight' => 44,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1771,7 +1919,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1909,6 +2057,7 @@ function ma_digitalheritage_field_default_field_instances() {
   $field_instances['node-digital_heritage-field_related_dh_items'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => 'A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.',
     'display' => array(
@@ -1932,7 +2081,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'entityreference',
         'settings' => array(),
         'type' => 'entityreference_entity_id',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1953,11 +2102,17 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_dh_items',
     'label' => 'Related Items',
     'required' => 0,
     'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2262,7 +2417,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2432,7 +2587,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2685,6 +2840,8 @@ function ma_digitalheritage_field_default_field_instances() {
 ');
   t('A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.');
   t('An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.');
+  t('Book Pages');
+  t('Book Parent');
   t('Category');
   t('Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.');
   t('Collection');
@@ -2734,6 +2891,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Traditional Knowledge Labels');
   t('Transcription');
   t('Type');
+  t('Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.');
   t('Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.');
   t('Who holds the rights to the content and who should be contacted for permission to reproduce the content. You may want to add and email address or other contact information if you\'d like people to contact you for permission to use, reproduce, circulate and or cite your materials.');
 
