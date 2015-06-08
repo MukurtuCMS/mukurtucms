@@ -196,7 +196,7 @@ function feeds_tamper_load_by_importer($importer, $disabled = FALSE) {
  */
 function feeds_tamper_get_unique_source_list($importer, $lower = TRUE) {
   $sources = array();
-  $is_csv = $lower && get_class($importer->parser) == 'FeedsCSVParser';
+  $is_csv = $lower && ($importer->parser instanceof FeedsCSVParser);
 
   foreach ($importer->processor->getMappings() as $mapping) {
     if ($is_csv) {
