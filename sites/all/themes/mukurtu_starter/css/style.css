@@ -1057,31 +1057,15 @@ a:hover {
 .node-digital-heritage.view-mode-community_record .view-mode-search_result .scald-atom {
   margin-bottom: 0;
 }
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-middle,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-middle,
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-bottom,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-bottom,
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-top,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-top {
+.node-digital-heritage.view-mode-full .dh-book-nav,
+.node-digital-heritage.view-mode-community_record .dh-book-nav {
   text-align: center;
-  margin: 0 auto;
-  width: 100px;
+  font-size: 20px;
+  font-weight: bold;
 }
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-left,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-left {
-  float: left;
-}
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-right,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-right {
-  float: right;
-}
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-bottom,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-bottom {
-  clear: both;
-}
-.node-digital-heritage.view-mode-full .dh-book-nav .dh-book-nav-toc ol,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .dh-book-nav-toc ol {
-  padding-left: 1.2em;
+.node-digital-heritage.view-mode-full .dh-book-nav .nav-button,
+.node-digital-heritage.view-mode-community_record .dh-book-nav .nav-button {
+  padding-right: 20px;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
