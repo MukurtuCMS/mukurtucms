@@ -123,10 +123,12 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
 
       if (!isset($entity->created)) {
 
-        // Set scald title according to filename
-        $file = file_load($entity->base_id);
-        $filename = $file->filename;
-        $form['atom' . $atom_index]['title']['#default_value'] = $file->filename;
+        // Set scald title according to filename, if the title isn't aleady set by the provider (eg. Youtube)
+        if (!isset($entity->title)) {
+          $file = file_load($entity->base_id);
+          $filename = $file->filename;
+          $form['atom' . $atom_index]['title']['#default_value'] = $file->filename;
+        }
 
         // For images, pre-populate the metadata from exif data (
         if ($entity->type == 'image') {
@@ -169,7 +171,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
             $form['atom' . $atom_index]['field_scald_identifier'][$language][0]['value']['#default_value'] = $filename;
           }
 
-          // If we have metadata to put into that atom title, do it, otherwise it is already populated with the atom filename
+          // If we have metadata to put into that atom title, do it, otherwise it is already populated with the filename or pre-set title
           if (isset($file->field_media_title[$language][0]['value'])) {
             $form['atom' . $atom_index]['title']['#default_value'] = $file->field_media_title[$language][0]['value'];
           }
