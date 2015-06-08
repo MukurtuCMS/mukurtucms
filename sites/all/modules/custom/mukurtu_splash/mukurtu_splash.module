@@ -380,7 +380,7 @@ function mukurtu_splash_block_site_config() {
     'title' => 'Configure Mollom',
     'href' => 'admin/config/content/mollom/settings',
     'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('Mollom is a content moderation web service used to filter out spam and malicious content.  Requires a Mollom subscription.'),
+    'description' => t('Mollom is a content moderation web service used to filter out spam and malicious content.  Requires a Mollom account.'),
   );
 
   $items[] = array (
