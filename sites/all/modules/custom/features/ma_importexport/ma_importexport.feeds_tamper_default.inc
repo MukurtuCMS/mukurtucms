@@ -33,7 +33,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Category';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 2;
   $feeds_tamper->description = 'Required field';
   $export['digital_heritage_metadata-category-required'] = $feeds_tamper;
@@ -375,7 +378,7 @@ function ma_importexport_feeds_tamper_default() {
     'limit' => '',
     'real_separator' => ',',
   );
-  $feeds_tamper->weight = 0;
+  $feeds_tamper->weight = 3;
   $feeds_tamper->description = 'Explode';
   $export['digital_heritage_metadata-sharing_protocols-explode'] = $feeds_tamper;
 
@@ -386,7 +389,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Sharing Protocols';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 2;
   $feeds_tamper->description = 'Required field';
   $export['digital_heritage_metadata-sharing_protocols-required'] = $feeds_tamper;
@@ -402,7 +408,7 @@ function ma_importexport_feeds_tamper_default() {
     'mask' => '',
     'side' => 'trim',
   );
-  $feeds_tamper->weight = 1;
+  $feeds_tamper->weight = 4;
   $feeds_tamper->description = 'Trim';
   $export['digital_heritage_metadata-sharing_protocols-trim'] = $feeds_tamper;
 
@@ -413,7 +419,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Sharing Settings';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Required field';
   $export['digital_heritage_metadata-sharing_settings-required'] = $feeds_tamper;
@@ -425,7 +434,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'title';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Required field';
   $export['digital_heritage_metadata-title-required'] = $feeds_tamper;
@@ -468,7 +480,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'import_media_audio';
   $feeds_tamper->source = 'File';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Required field';
   $export['import_media_audio-file-required'] = $feeds_tamper;
@@ -588,7 +603,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'import_media_files';
   $feeds_tamper->source = 'File';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Required field';
   $export['import_media_files-file-required'] = $feeds_tamper;
@@ -724,7 +742,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'import_media_images';
   $feeds_tamper->source = 'Image';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Required field';
   $export['import_media_images-image-required'] = $feeds_tamper;
@@ -829,7 +850,10 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->importer = 'import_media_video';
   $feeds_tamper->source = 'File';
   $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array();
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Required field';
   $export['import_media_video-file-required'] = $feeds_tamper;
