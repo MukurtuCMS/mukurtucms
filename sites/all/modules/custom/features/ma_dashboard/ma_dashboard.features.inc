@@ -78,6 +78,17 @@ function ma_dashboard_homebox() {
         'title' => '',
         'weight' => -36,
       ),
+      'mukurtu_splash_batch_import' => array(
+        'module' => 'mukurtu_splash',
+        'delta' => 'batch_import',
+        'region' => 4,
+        'movable' => 1,
+        'status' => 1,
+        'open' => 1,
+        'closable' => 1,
+        'title' => '',
+        'weight' => -38,
+      ),
       'mukurtu_splash_manage_taxonomy' => array(
         'module' => 'mukurtu_splash',
         'delta' => 'manage_taxonomy',
