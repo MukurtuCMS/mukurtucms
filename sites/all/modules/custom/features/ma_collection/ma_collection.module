@@ -48,29 +48,36 @@ function ma_collection_node_view($node, $view_mode) {
 
     elseif ($view_mode == 'search_result') {
 
-      // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use a thumbnail from one of the DH nodes, prioritizing images thumbnails over other types, and also according to the ordering of the DH items (and between those two priorities, choose images over DH ordering)
+      // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use the first available image atom from the Digital Heritage items in that Collection. If none of the DH items have an image atom, use the thumbnail from the first available non-image atom from the DH items in that Collection. If that atom does not have an uploaded thumbnail, use the default thumbnail for that atom type.
 
       if (!count($node->field_collection_image)) {
         $collection_emw = entity_metadata_wrapper('node', $node);
 
-        $replacement_atom = "";
+        $replacement_image = "";
         foreach ($collection_emw->field_digital_heritage_items->value() as $dh_item) {
           $dh_item_emw = entity_metadata_wrapper('node', $dh_item);
           foreach ($dh_item_emw->field_media_asset->value() as $dh_item_media_index => $dh_item_media) {
             if ($dh_item_media->provider == 'scald_image') {
-              $replacement_atom = $dh_item_emw->field_media_asset->get($dh_item_media_index)->value();
+              $replacement_image = scald_render ($dh_item_emw->field_media_asset->get($dh_item_media_index)->value(), 'ma_scald_search_results');
               break 2;
             }
-            elseif (!$replacement_non_image_atom) {
-              $replacement_non_image_atom = $dh_item_emw->field_media_asset->get($dh_item_media_index)->value();
+            elseif (!$replacement_image) {
+              // Use the atom thumbnail if there is one
+              if (count($dh_item_media->scald_thumbnail)) {
+                $replacement_image = theme_image_style (array (
+                  'style_name' => 'medium',
+                  'path' => $dh_item_media->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
+                ));
+              }
+              // If no atom thumbnail, use our default thumbnails
+              else {
+                $replacement_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $dh_item_media->type . '_thumbnail.jpg">';
+              }
             }
           }
         }
-        if (!$replacement_atom) {
-          $replacement_atom = $replacement_non_image_atom;
-        }
 
-        if ($replacement_atom) {
+        if (isset($replacement_image)) {
           // Rewrite the image field
           $node->content['field_collection_image'] = array(
             '#theme' => 'field',
@@ -83,25 +90,27 @@ function ma_collection_node_view($node, $view_mode) {
             '#entity_type' => 'node',
             '#bundle' => 'collection',
             '#weight' => 0,
-            '#items' => array(0 => array('sid'=>$replacement_atom->sid)),
+            '#items' => array(0 => 1), // this just needs at least one value in it
           );
 
-          $node->content['field_collection_image'][0]['#markup'] = scald_render ($replacement_atom, 'ma_scald_search_results');
+          $node->content['field_collection_image'][0]['#markup'] = $replacement_image;
         }
       }
 
       // Tooltip and links on DH grid/list views
-      foreach ($node->content['field_collection_image'] as $atom_index => $atom) {
-        if (!is_numeric($atom_index)) {
-          continue;
+      if (isset($node->content['field_collection_image'])) {
+        foreach ($node->content['field_collection_image'] as $atom_index => $atom) {
+          if (!is_numeric($atom_index)) {
+            continue;
+          }
+
+          // Using CSS for the tooltip (see comments in ma_digitalheritage_node_view for explanation)
+          // Also add link here to parent node
+          $new_markup = '<a class = "tooltips" href=" ' . url("node/" . $node->nid) . '">' . $atom['#markup'] . '</a>';
+
+          $node->content['field_collection_image'][$atom_index]['#markup'] = $new_markup;
+
         }
-
-        // Using CSS for the tooltip (see comments in ma_digitalheritage_node_view for explanation)
-        // Also add link here to parent node
-        $new_markup = '<a class = "tooltips" href=" ' . url("node/" . $node->nid) . '">' . $atom['#markup'] . '</a>';
-
-       $node->content['field_collection_image'][$atom_index]['#markup'] = $new_markup;
-
       }
 
     }
