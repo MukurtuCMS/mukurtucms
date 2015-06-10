@@ -186,7 +186,7 @@ function ma_community_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 35,
+      'weight' => 5,
     ),
   );
 
@@ -513,7 +513,7 @@ Strict - Your community page is invisible to all site users who are not members 
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 3,
+      'weight' => 4,
     ),
     'widget_type' => 'options_select',
   );
@@ -589,7 +589,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 5,
     ),
   );
 

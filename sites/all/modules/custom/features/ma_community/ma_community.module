@@ -28,6 +28,9 @@ function _set_community_manager_on_community_create ($node) {
  */
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
 
+  // Hide the Child Communities field in all cases
+  $form['field_child_communities']['#access'] = FALSE;
+
   if ($current_nid = $form['nid']['#value']) {
     // Hide the Parent Community field if the user is not a Community Manager of the current community
     $roles = og_get_user_roles('node', $current_nid);
