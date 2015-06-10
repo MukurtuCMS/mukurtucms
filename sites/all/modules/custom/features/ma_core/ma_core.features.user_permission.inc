@@ -1568,10 +1568,7 @@ function ma_core_user_default_permissions() {
   // Exported permission: 'use text format full_html'.
   $permissions['use text format full_html'] = array(
     'name' => 'use text format full_html',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
+    'roles' => array(),
     'module' => 'filter',
   );
 
