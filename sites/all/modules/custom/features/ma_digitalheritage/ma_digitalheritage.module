@@ -814,7 +814,7 @@ function ma_digital_heritage_book_page_navigation_field ($field) {
   }
 
   // Render the navigation for all parent and child pages
-  if (isset($children)) {
+  if (count($children)) {
     $last = end ($children);
     $output .= '<div class = "dh-book-nav">';
     $output .= '<span class = "nav-button">' . l('<<', 'node/' . $first->nid) . '</span>';
