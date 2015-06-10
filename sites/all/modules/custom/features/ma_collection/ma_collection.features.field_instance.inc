@@ -129,6 +129,7 @@ function ma_collection_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_collection_image',
     'label' => 'Image',
@@ -136,6 +137,7 @@ function ma_collection_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -145,7 +147,7 @@ function ma_collection_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 4,

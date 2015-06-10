@@ -1944,6 +1944,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_media_asset',
     'label' => 'Media Assets',
@@ -1951,6 +1952,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 0,
         'video' => 0,
       ),
@@ -1960,7 +1962,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 54,
