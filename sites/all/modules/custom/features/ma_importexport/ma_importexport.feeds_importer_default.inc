@@ -680,58 +680,63 @@ function ma_importexport_feeds_importer_default() {
             'unique' => FALSE,
           ),
           8 => array(
-            'source' => 'Created',
-            'target' => 'created',
+            'source' => 'Caption',
+            'target' => 'field_scald_headline',
             'unique' => FALSE,
           ),
           9 => array(
+            'source' => 'Created',
+            'target' => 'field_scald_created:start',
+            'unique' => FALSE,
+          ),
+          10 => array(
             'source' => 'Creator',
             'target' => 'field_scald_creator',
             'unique' => FALSE,
           ),
-          10 => array(
+          11 => array(
             'source' => 'Authors',
             'target' => 'scald_authors',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          11 => array(
+          12 => array(
             'source' => 'Description',
             'target' => 'field_scald_description',
             'unique' => FALSE,
           ),
-          12 => array(
+          13 => array(
             'source' => 'Keywords',
             'target' => 'scald_tags',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          13 => array(
+          14 => array(
             'source' => 'Latitude',
             'target' => 'field_scald_geo_location:lat',
             'unique' => FALSE,
           ),
-          14 => array(
+          15 => array(
             'source' => 'Longitude',
             'target' => 'field_scald_geo_location:lon',
             'unique' => FALSE,
           ),
-          15 => array(
+          16 => array(
             'source' => 'Location',
             'target' => 'field_scald_location',
             'unique' => FALSE,
           ),
-          16 => array(
+          17 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          17 => array(
+          18 => array(
             'source' => 'Licensing',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
           ),
-          18 => array(
+          19 => array(
             'source' => 'Categories',
             'target' => 'field_category',
             'term_search' => '0',
