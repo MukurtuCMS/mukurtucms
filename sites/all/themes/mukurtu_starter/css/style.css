@@ -670,6 +670,10 @@ table .checkbox input[type="checkbox"] {
   padding-left: 0;
   margin: 0;
 }
+.dnd-atom-wrapper.type-audio.context-sdl_editor_representation .fluid-width-video-wrapper {
+  height: 18px;
+  width: 100%;
+}
 .ds-2col .field,
 .ds-2col-stacked .field {
   margin-bottom: 10px;

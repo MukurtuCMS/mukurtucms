@@ -427,6 +427,14 @@ function ma_scald_strongarm() {
       'parseable' => TRUE,
       'formats' => array(),
     ),
+    'mukurtu_scald_media_assets_edit_' => array(
+      'name' => 'mukurtu_scald_media_assets_edit_',
+      'title' => 'Mukurtu Scald Media Assets Edit Field',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
   );
   $export['scald_custom_contexts'] = $strongarm;
 

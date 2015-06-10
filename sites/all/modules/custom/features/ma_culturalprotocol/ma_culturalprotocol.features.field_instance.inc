@@ -237,6 +237,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_protocol_image',
     'label' => 'Banner Image',
@@ -244,6 +245,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -253,7 +255,7 @@ function ma_culturalprotocol_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 5,
@@ -290,6 +292,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_protocol_image_thumbnail',
     'label' => 'Thumbnail Image',
@@ -297,6 +300,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -306,7 +310,7 @@ function ma_culturalprotocol_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 6,
