@@ -240,6 +240,7 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
@@ -337,8 +338,8 @@ function ma_scald_default_scald_context_config() {
     ),
   );
   $context_config->data = array(
-    'width' => '100%',
-    'height' => '100%',
+    'width' => '750',
+    'height' => '560',
   );
   $export['sdl_editor_representation'] = $context_config;
 
