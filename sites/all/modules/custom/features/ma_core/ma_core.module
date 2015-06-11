@@ -22,10 +22,16 @@ function ma_core_user_login(&$edit, $account) {
 
   //// Redirect user on login
 
-  // Do not redirect when
-  // 1. user is logged in during profile installation, as more work needs to complete first
-  // 2. User is performing a password reset, as we do not want to override the redirect to password change form
-  if ($_GET['profile'] OR (arg(0) == 'user' AND arg(1) == 'reset')) {
+  $current_path = current_path();
+
+  // Do not redirect when user is logged in during profile installation, as more work needs to complete first
+  if ($_GET['profile']) {
+    return;
+  }
+  // Do not redirect when not coming from the login page, eg.
+  // 1. if path is user/redirect, user is performing a password reset, as we do not want to override the redirect to password change form
+  // 2. if this is a Mukurtu Mobile login to the services endpoint (see https://www.drupal.org/node/2394235)
+  elseif ($current_path <> 'user' AND $current_path <> 'user/login') {
     return;
   }
 
