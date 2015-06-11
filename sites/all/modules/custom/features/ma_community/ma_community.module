@@ -28,6 +28,9 @@ function _set_community_manager_on_community_create ($node) {
  */
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
 
+  // Hide the Child Communities field in all cases
+  $form['field_child_communities']['#access'] = FALSE;
+
   if ($current_nid = $form['nid']['#value']) {
     // Hide the Parent Community field if the user is not a Community Manager of the current community
     $roles = og_get_user_roles('node', $current_nid);
@@ -77,7 +80,7 @@ function ma_community_node_validate($node, $form, &$form_state) {
       $old_parent = $form['field_parent_community'][LANGUAGE_NONE]['#default_value'][0];
     }
     $new_parent = $form_state['input']['field_parent_community'][LANGUAGE_NONE];
-    if ($new_parent<>'_none' && $new_parent <> $old_parent) {
+    if (isset ($new_parent) && $new_parent<>'_none' && $new_parent <> $old_parent) {
       // Wanted to use $form['storage'] variable here to set if the warning has already been seen (ie. pass on the second save), but storage vars do not work in the validate/submit context (see: http://drupal.stackexchange.com/questions/18333/storing-permanent-value-in-form-while-in-validation-handler), so we need to use a session var instead that is as specific as possible (node:old_parent:new_parent) to this form.
       // One catch with this implementation is that if the user cancels the node submit, or just closes the tab, the session var will remain, so if they try to do the same change later (same node:old_parent:new_parent), the session var will have already been set and it will submit without the warning.
       $warning_key = $form['nid']['#value'] . ":" . $new_parent . ":" . $old_parent;
