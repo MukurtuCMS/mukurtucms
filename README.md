@@ -1,15 +1,18 @@
-# Mukurtu CMS 2.0.0
+# Mukurtu CMS 2.0.1
 
-###Mukurtu CMS provides:
+## Contents
+* [What is Mukurtu?] (#whatis)
+* [License](#license)
+* [Availability]
+
+### <a name="whatis"></a>What is Mukurtu?
+##### Mukurtu CMS Provides:
 
 * Local cultural protocols to provide granular access parameters for digital heritage content;
 * Flexible templates that adapt to various indigenous stakeholder needs;
 * Traditional knowledge fields customizable for curating content alongside standard Dublin Core metadata fields;
 * An innovative set of Traditional Knowledge Labels that work with traditional copyright and Creative Commons licenses to better serve Indigenous needs; and
 * A safe, secure, free and open source platform for managing digital cultural heritage materials online and offline
-
-## Contents
-* [License](#license)
 
 ### <a name="license"></a>License
 
@@ -21,24 +24,24 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Availability
+### <a name="availability"></a>Availability
 
-#### Hosted through Mukurtu.net
+#### <a name="mukurtu-hosted">Hosted through Mukurtu.net
 Mukurtu is available through Mukurtu.net’s MAAS (Mukurtu as a service) for an out-of-the-box hosted Mukurtu CMS website that is completely yours. To get in touch with Mukurtu.net and check out our other services, including training and configuration, go to http://mukurtu.net. 
 
-#### Self - Hosted
+#### <a name="self-hosted"></a>Self - Hosted
 Mukurtu CMS is available as an open source distribution through https://github.com/mukurtucms/mukurtucms to run on a local server or install on your preferred web platform.
 
 To install on your own server, please find system requirements and installation procedures below.
 
-##### System Requirements
+##### <a name="system-requirements"></a>System Requirements
 * [Apache 2.0 (or greater)](http://httpd.apache.org)
   * mod_rewrite module enabled
   * the ability to use local .htaccess files
 * [PHP 5.2.4 (or greater)](http://www.php.net/)
 * [MySQL 5.0.15 (or greater)](http://www.mysql.com/)
 
-##### Installation 
+##### <a name="installation"></a>Installation
 Mukurtu CMS is built on Drupal. More detailed installation information can be found in INSTALL.txt in the same directory as this document.
 
 1. Create an Apache vhost for your domain
@@ -70,11 +73,16 @@ Mukurtu CMS is built on Drupal. More detailed installation information can be fo
     * Go to http://{your_domain}/admin/appearance/settings/mukurtu_starter
     * Click on "Logo Image Settings", and upload your logo in the field "Upload logo image", then click on "Save configuration"
 
-### Developers
+##### <a name="upgrades"></a>Upgrades
 
+### <a name="developers"></a>Developers
+
+#### <a name="becoming-developer"></a>Becoming a Mukurtu Developer
 Mukurtu CMS is a distribution of Drupal. You can join Mukurtu’s developer community by [forking Mukurtu CMS](https://github.com/mukurtucms/mukurtucms) on GitHub.
 Mukurtu Core is co-maintained by the [Center for Digital Scholarship and Curation (CDSC)](http://libraries.wsu.edu/cdsc) at Washington State University and the [Center for Digital Archaeology (CoDA)](http://codifi.org/). Any pull requests will be reviewed and tested before acceptance by a core committer.
 
-### Bug Reports and Feature Requests
+#### <a name="code-organization"></a>Code Organization
+
+### <a name="bug-reports"></a>Bug Reports and Feature Requests
 Please use the GitHub [issue tracker](https://github.com/MukurtuCMS/mukurtucms/issues) for reporting all bugs and features.
 
