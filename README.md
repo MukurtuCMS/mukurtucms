@@ -85,6 +85,21 @@ Mukurtu CMS is built on Drupal. More detailed installation information can be fo
 
 ##### <a name="upgrading"></a>Upgrading
 
+Mukurtu upgrades are done via its Github repository. Knowing that important security updates are pushed to the Github repository in a timely manner, do not attempt to update either Drupal core or Drupal contributed modules internally -- they could cause system breakage. Upgrades should be done as follows:
+
+1. Login to your server and navigate to your site root mukurtu htdocs directory.
+1. Update your repository:
+        git pull
+1. Ensure that Drush installed. See http://docs.drush.org/en/master/install/
+1. Run the database updates:
+        drush updb -y
+1. Revert all features, then clear the cache, and revert again:
+        drush fra -y && drush cc all && drush fra -y
+   Check for feature overrides (there should not be any):
+        drush fd
+1. Determine your site's current version by looking at the VERSION.md file in the site root, or within the Support block of the Dashboard when logged into your site as a Mukurtu Administrator. In the [release notes] (VERSION.md), check for a subsection named "Manual Upgrade Steps" for each version newer than what your site is running. If there are any, run these steps now. All command line steps should be run from the site root.
+  * Steps within each release should be run in the order listed, but steps for older releases should be done prior to steps for newer releases. If the step appears more than once (eg. in different release versions), it only needs to be completed once, at its newest release point (ie. ignore it in the older release(s)).
+
 ### <a name="developers"></a>Developers
 
 #### <a name="code-contributing"></a>Contributing Code to Mukurtu
