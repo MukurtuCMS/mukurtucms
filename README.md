@@ -55,20 +55,16 @@ To install on your own server, please find system requirements and installation 
 Mukurtu CMS is built on Drupal. More detailed installation information can be found in INSTALL.txt in the same directory as this document.
 
 1. Create an Apache vhost for your domain
-1. Clone the Mukurtu CMS Github repository
-        git clone git@github.com:MukurtuCMS/mukurtucms.git
+1. Clone the Mukurtu CMS Github repository: `git clone git@github.com:MukurtuCMS/mukurtucms.git`
 1. Rename the created mukurtucms directory to the path you set for your vhost (or set your vhost path to this directory)
-1. Navigate into your vhost directory, eg.
-        cd mukurtucms
+1. Navigate into your vhost directory, eg.: `cd mukurtucms`
 1. Files permissions
  * Public files
-    * This directory is already created at sites/default/files. However, you need to make sure it is writable by the Apache user. One way of doing this would be:
-            chmod a+w sites/default/files
+    * This directory is already created at sites/default/files. However, you need to make sure it is writable by the Apache user. One way of doing this would be: `chmod a+w sites/default/files`
  * Private files
     * This directory does not yet exist. By default, Mukurtu CMS will look for the private files directory at `sites/default/files/private`. So you can create that directory. However, this is insecure (publicly-accessible) unless special measures are taken to secure it (beyond the scope of this document). A simpler method is to create a private files directory anywhere outside of your web root, and ensure it is readable and writable by the Apache user. Take note of this path as you will need it later.
 1. Create an empty MySQL database
-1. Create the settings.php file
-        cp sites/default/default.settings.php sites/default/settings.php
+1. Create the settings.php file: `cp sites/default/default.settings.php sites/default/settings.php`
 1. Edit the settings file you just created with a text editor. Near the bottom is the $databases array. At minimum, you will need to fill out 'database', 'username', and 'password' to connect to the database you just created.
 1. Run the installation profile
  * Assuming your vhost and database are configured correctly, you can now launch the installation profile. Visit http://{your_domain}/install.php
@@ -88,15 +84,11 @@ Mukurtu CMS is built on Drupal. More detailed installation information can be fo
 Mukurtu upgrades are done via its Github repository. Knowing that important security updates are pushed to the Github repository in a timely manner, do not attempt to update either Drupal core or Drupal contributed modules internally -- they could cause system breakage. Upgrades should be done as follows:
 
 1. Login to your server and navigate to your site root mukurtu htdocs directory.
-1. Update your repository:
-        git pull
+1. Update your repository: `git pull`
 1. Ensure that Drush installed. See http://docs.drush.org/en/master/install/
-1. Run the database updates:
-        drush updb -y
-1. Revert all features, then clear the cache, and revert again:
-        drush fra -y && drush cc all && drush fra -y
-   Check for feature overrides (there should not be any):
-        drush fd
+1. Run the database updates: `drush updb -y`
+1. Revert all features, then clear the cache, and revert again: `drush fra -y && drush cc all && drush fra -y`
+1. Check for feature overrides (there should not be any): `drush fd`
 1. Determine your site's current version by looking at the VERSION.md file in the site root, or within the Support block of the Dashboard when logged into your site as a Mukurtu Administrator. In the [release notes] (VERSION.md), check for a subsection named "Manual Upgrade Steps" for each version newer than what your site is running. If there are any, run these steps now. All command line steps should be run from the site root.
   * Steps within each release should be run in the order listed, but steps for older releases should be done prior to steps for newer releases. If the step appears more than once (eg. in different release versions), it only needs to be completed once, at its newest release point (ie. ignore it in the older release(s)).
 
