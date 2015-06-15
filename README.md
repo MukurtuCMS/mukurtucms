@@ -8,7 +8,10 @@
 * An innovative set of Traditional Knowledge Labels that work with traditional copyright and Creative Commons licenses to better serve Indigenous needs; and
 * A safe, secure, free and open source platform for managing digital cultural heritage materials online and offline
 
-### License
+## Contents
+* [License](#license)
+
+### <a name="license"></a>License
 
 Mukurtu is distributed under the terms of the GNU General Public License (or "GPL"), which means anyone is free to download it and share it with others. This open development model means that people are constantly working to make sure Mukurtu is a cutting-edge platform that supports the unique needs of indigenous libraries, archives and museums as they seek to preserve and share their digital heritage. Mukurtu encourages collaboration and innovation as we seek to offer respectful and responsible models for content management.
 
