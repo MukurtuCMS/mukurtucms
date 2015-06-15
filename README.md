@@ -1,9 +1,20 @@
 # Mukurtu CMS 2.0.1
+### Release Notes (VERSION.txt)
 
 ## Contents
 * [What is Mukurtu?] (#whatis)
 * [License](#license)
-* [Availability]
+* [Availability](#availability)
+  * [Hosted through Mukurtu.net] (#mukurtu-hosted)
+  * [Hosted through Mukurtu.net] (#mukurtu-hosted)
+  * [Self-Hosted] (#self-hosted)
+    * [System Requirements] (#system-requirements)
+    * [Installation] (#installation)
+    * [Upgrading] (#upgrading)
+* [Developers] (#developers)
+  * [Contributing Code to Mukurtu] (#code-contributing)
+  * [Code Documentation] (#code-documentation)
+* [Bug Reports] (#bug-reports)
 
 ### <a name="whatis"></a>What is Mukurtu?
 ##### Mukurtu CMS Provides:
@@ -29,7 +40,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #### <a name="mukurtu-hosted">Hosted through Mukurtu.net
 Mukurtu is available through Mukurtu.net’s MAAS (Mukurtu as a service) for an out-of-the-box hosted Mukurtu CMS website that is completely yours. To get in touch with Mukurtu.net and check out our other services, including training and configuration, go to http://mukurtu.net. 
 
-#### <a name="self-hosted"></a>Self - Hosted
+#### <a name="self-hosted"></a>Self-Hosted
 Mukurtu CMS is available as an open source distribution through https://github.com/mukurtucms/mukurtucms to run on a local server or install on your preferred web platform.
 
 To install on your own server, please find system requirements and installation procedures below.
@@ -73,15 +84,15 @@ Mukurtu CMS is built on Drupal. More detailed installation information can be fo
     * Go to http://{your_domain}/admin/appearance/settings/mukurtu_starter
     * Click on "Logo Image Settings", and upload your logo in the field "Upload logo image", then click on "Save configuration"
 
-##### <a name="upgrades"></a>Upgrades
+##### <a name="upgrading"></a>Upgrading
 
 ### <a name="developers"></a>Developers
 
-#### <a name="becoming-developer"></a>Becoming a Mukurtu Developer
+#### <a name="code-contributing"></a>Contributing Code to Mukurtu
 Mukurtu CMS is a distribution of Drupal. You can join Mukurtu’s developer community by [forking Mukurtu CMS](https://github.com/mukurtucms/mukurtucms) on GitHub.
 Mukurtu Core is co-maintained by the [Center for Digital Scholarship and Curation (CDSC)](http://libraries.wsu.edu/cdsc) at Washington State University and the [Center for Digital Archaeology (CoDA)](http://codifi.org/). Any pull requests will be reviewed and tested before acceptance by a core committer.
 
-#### <a name="code-organization"></a>Code Organization
+#### <a name="code-documentation"></a>Code Documentation
 
 ### <a name="bug-reports"></a>Bug Reports and Feature Requests
 Please use the GitHub [issue tracker](https://github.com/MukurtuCMS/mukurtucms/issues) for reporting all bugs and features.
