@@ -1,11 +1,10 @@
 # Mukurtu CMS 2.0.1
-### Release Notes (VERSION.txt)
+### [Release Notes] (VERSION.txt)
 
 ## Contents
 * [What is Mukurtu?] (#whatis)
 * [License](#license)
 * [Availability](#availability)
-  * [Hosted through Mukurtu.net] (#mukurtu-hosted)
   * [Hosted through Mukurtu.net] (#mukurtu-hosted)
   * [Self-Hosted] (#self-hosted)
     * [System Requirements] (#system-requirements)
