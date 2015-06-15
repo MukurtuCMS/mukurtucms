@@ -1,4 +1,4 @@
-### Mukurtu 2.01
+## Mukurtu 2.01
 
 - Community Records. Protocol Stewards may create community-specific "Community Records" within Digital Heritage items that share the media assets but otherwise have custom information
 - Parent Communities. Communities can now be placed within Parent Communities. Explanation is provided within the field's help text.
@@ -43,3 +43,6 @@
 - remove various pieces of deprecated (Mukurtu 1.0 and 1.5) code
 - remove OG role "Administrator Member"
 - disable Admin Menu toolbar by default
+
+#### Manual Upgrade Steps
+- search reindexing: `drush sapi-r && drush sapi-i`
