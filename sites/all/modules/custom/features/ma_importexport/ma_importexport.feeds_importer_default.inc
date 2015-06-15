@@ -53,83 +53,78 @@ function ma_importexport_feeds_importer_default() {
             'unique' => FALSE,
           ),
           2 => array(
-            'source' => 'published',
-            'target' => 'created',
-            'unique' => FALSE,
-          ),
-          3 => array(
             'source' => 'guid',
             'target' => 'guid',
             'unique' => 1,
           ),
-          4 => array(
+          3 => array(
             'source' => 'Category',
             'target' => 'field_category',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          5 => array(
+          4 => array(
             'source' => 'Keywords',
             'target' => 'field_tags',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          6 => array(
+          5 => array(
             'source' => 'Creator',
             'target' => 'field_creator',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          7 => array(
+          6 => array(
             'source' => 'Contributor',
             'target' => 'field_contributor',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          8 => array(
+          7 => array(
             'source' => 'Date',
             'target' => 'field_date',
             'unique' => FALSE,
           ),
-          9 => array(
+          8 => array(
             'source' => 'Description',
             'target' => 'field_description',
             'unique' => FALSE,
           ),
-          10 => array(
+          9 => array(
             'source' => 'Format',
             'target' => 'field_format',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          11 => array(
+          10 => array(
             'source' => 'Identifier',
             'target' => 'field_identifier',
             'unique' => FALSE,
           ),
-          12 => array(
+          11 => array(
             'source' => 'Language',
             'target' => 'field_language',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          13 => array(
+          12 => array(
             'source' => 'Publisher',
             'target' => 'field_publisher',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          14 => array(
+          13 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          15 => array(
+          14 => array(
             'source' => 'Source',
             'target' => 'field_source',
             'unique' => FALSE,
           ),
-          16 => array(
+          15 => array(
             'source' => 'Subject',
             'target' => 'field_subject',
             'term_search' => '0',
@@ -690,58 +685,63 @@ function ma_importexport_feeds_importer_default() {
             'unique' => FALSE,
           ),
           8 => array(
-            'source' => 'Created',
-            'target' => 'created',
+            'source' => 'Caption',
+            'target' => 'field_scald_headline',
             'unique' => FALSE,
           ),
           9 => array(
+            'source' => 'Created',
+            'target' => 'field_scald_created:start',
+            'unique' => FALSE,
+          ),
+          10 => array(
             'source' => 'Creator',
             'target' => 'field_scald_creator',
             'unique' => FALSE,
           ),
-          10 => array(
+          11 => array(
             'source' => 'Authors',
             'target' => 'scald_authors',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          11 => array(
+          12 => array(
             'source' => 'Description',
             'target' => 'field_scald_description',
             'unique' => FALSE,
           ),
-          12 => array(
+          13 => array(
             'source' => 'Keywords',
             'target' => 'scald_tags',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          13 => array(
+          14 => array(
             'source' => 'Latitude',
             'target' => 'field_scald_geo_location:lat',
             'unique' => FALSE,
           ),
-          14 => array(
+          15 => array(
             'source' => 'Longitude',
             'target' => 'field_scald_geo_location:lon',
             'unique' => FALSE,
           ),
-          15 => array(
+          16 => array(
             'source' => 'Location',
             'target' => 'field_scald_location',
             'unique' => FALSE,
           ),
-          16 => array(
+          17 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          17 => array(
+          18 => array(
             'source' => 'Licensing',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
           ),
-          18 => array(
+          19 => array(
             'source' => 'Categories',
             'target' => 'field_category',
             'term_search' => '0',

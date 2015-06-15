@@ -157,6 +157,9 @@ function mukurtu_splash_block_info() {
   $blocks['site_config'] = array(
     'info' => t('Mukurtu Dashboard: Configure Mukurtu'),
   );
+  $blocks['batch_import'] = array(
+    'info' => t('Mukurtu Dashboard: Import Content'),
+  );
   $blocks['manage_content'] = array(
     'info' => t('Mukurtu Dashboard: Manage Content'),
   );
@@ -209,6 +212,10 @@ function mukurtu_splash_block_view($delta = '') {
     case 'site_config':
       $block['subject'] = t('Mukurtu Configuration');
       $block['content'] = mukurtu_splash_block_site_config();
+      break;
+    case 'batch_import':
+      $block['subject'] = t('Batch Import Content');
+      $block['content'] = mukurtu_splash_block_batch_import();
       break;
     case 'manage_content':
       $block['subject'] = t('Content and Collections');
@@ -417,15 +424,6 @@ function mukurtu_splash_block_manage_content() {
     );
   }
 
-  if (feeds_access('import','digital_heritage_metadata')) {
-    $items[] = array(
-      'title' => 'Import Digital Heritage Metadata',
-      'href' => 'import/digital_heritage_metadata',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Batch import many digital heritage items from CSV file. Import Media first.'),
-    );
-  }
-
   if (node_access('create','collection')) {
     $items[] = array(
       'title' => 'Create a Collection',
@@ -459,7 +457,7 @@ function mukurtu_splash_block_manage_content() {
       'title' => 'Add Media',
       'href' => 'atom/add',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Batch add media files.'),
+      'description' => t('Add new media files.'),
     );
   }
 
@@ -476,6 +474,70 @@ function mukurtu_splash_block_manage_content() {
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
 
+  $block = array(
+    '#markup' => $markup,
+  );
+  return $block;
+}
+
+
+/**
+ * Helper function to assemble the initial site configuration block.
+ */
+function mukurtu_splash_block_batch_import() {
+
+  $items = array();
+
+  $markup = '';
+
+  if (feeds_access('import','digital_heritage_metadata')) {
+    $items[] = array(
+      'title' => 'Import Digital Heritage Metadata',
+      'href' => 'import/digital_heritage_metadata',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import many digital heritage items from CSV file. If the media assets have associated metadata, import the media files first using the media importers.'),
+    );
+  }
+
+  if (feeds_access('import','import_media_images')) {
+    $items[] = array(
+      'title' => 'Import Images',
+      'href' => 'import/import_media_images',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import images and associated metadata from CSV file.'),
+    );
+  }
+
+  if (feeds_access('import','import_media_audio')) {
+    $items[] = array(
+      'title' => 'Import Audio',
+      'href' => 'import/import_media_audio',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import audio files and associated metadata from CSV file.'),
+    );
+  }
+
+  if (feeds_access('import','import_media_video')) {
+    $items[] = array(
+      'title' => 'Import Video',
+      'href' => 'import/import_media_video',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import video files and associated metadata from CSV file.'),
+    );
+  }
+
+  if (feeds_access('import','import_media_files')) {
+    $items[] = array(
+      'title' => 'Import Files',
+      'href' => 'import/import_media_files',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import files and associated metadata from CSV file.'),
+    );
+  }
+
+  $content = array ('content' => $items);
+  $markup = theme('admin_block_content', $content);
+  
   $block = array(
     '#markup' => $markup,
   );
