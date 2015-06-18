@@ -80,6 +80,14 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'scald' => array(
+      'alias' => 'scald',
+      'operations' => array(
+        'create' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'system' => array(
       'actions' => array(
         'connect' => array(
