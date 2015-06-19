@@ -1,3 +1,29 @@
+## Mukurtu 2.02
+- Hierarchical Digital Heritage items.  Digital Heritage items now support hierarchical relationships to better represent multi-page content.  Ordering is changed by editing the parent node
+- add a new 'Transcription' field to the Digital Heritage 'Additional Metadata' section
+- fix bug where child communities could be dropped when the parent community was altered
+- change default thumbnail handling for Collections view.  If no Collection thumbnail is provided, the view will try to use one of the member's image atoms
+- add media specific feed importers for Scald atoms
+- update Scald YouTube provider to reflect YouTube API changes
+- improve Scald rendering when drag and dropping Scald atoms into multi-line text fields
+- set static width and height for in-line Scald audio player during atom edit to fix display issues
+- add 'Media Assets' field to Digital Heritage importer that will automatically create or use previously imported Scald atoms
+- remove 'published' column from the Digital Heritage importer, as that field is set automatically by feeds
+- make some fields required on Digital Heritage import to avoid creating items with no Cultural Protocols
+- move Community and Cultural Protocol node views off panels to display suite
+- update WYSIWYG to ckeditor and restrict to only editor buttons that work
+- allow only protocol stewards to set or unset Parent Communities that they are Community managers of
+- change widget for Parent Community field on Protocol nodes
+- fine tune search indexing on Digital Heritage nodes and their relations
+- stop redirecting users if logging in via services
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`.
+
+
 ## Mukurtu 2.01
 
 - Community Records. Protocol Stewards may create community-specific "Community Records" within Digital Heritage items that share the media assets but otherwise have custom information
