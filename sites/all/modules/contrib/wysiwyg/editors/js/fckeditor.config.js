@@ -42,14 +42,14 @@ for (var setting in wysiwygSettings) {
 
 // Fix Drupal toolbar obscuring editor toolbar in fullscreen mode.
 var oldFitWindowExecute = FCKFitWindow.prototype.Execute;
-var $drupalToolbar = window.parent.jQuery('#toolbar', Drupal.overlayChild ? window.parent.window.parent.document : window.parent.document);
+var $drupalToolbars = window.parent.jQuery('#toolbar, #admin-menu', Drupal.overlayChild ? window.parent.window.parent.document : window.parent.document);
 FCKFitWindow.prototype.Execute = function() {
   oldFitWindowExecute.apply(this, arguments);
   if (this.IsMaximized) {
-    $drupalToolbar.hide();
+    $drupalToolbars.hide();
   }
   else {
-    $drupalToolbar.show();
+    $drupalToolbars.show();
   }
 }
 

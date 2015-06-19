@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implements hook_update().
+ */
+
+/**
+ * Delete the field og_user_node1
+ */
+function ma_profile_update_7001() {
+  field_delete_field('og_user_node1');
+
+}
+
+/**
+ * Disable the WYSIWYG module
+ */
+function ma_profile_update_7101() {
+  module_disable (array ('wysiwyg'));
+}

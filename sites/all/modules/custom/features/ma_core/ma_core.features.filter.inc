@@ -16,7 +16,7 @@ function ma_core_filter_default_formats() {
     'name' => 'Filtered HTML',
     'cache' => 1,
     'status' => 1,
-    'weight' => 0,
+    'weight' => -10,
     'filters' => array(
       'filter_scald_link_filter' => array(
         'weight' => 0,
@@ -56,7 +56,7 @@ function ma_core_filter_default_formats() {
     'name' => 'Full HTML',
     'cache' => 1,
     'status' => 1,
-    'weight' => 0,
+    'weight' => -7,
     'filters' => array(
       'filter_autop' => array(
         'weight' => -47,
@@ -98,13 +98,29 @@ function ma_core_filter_default_formats() {
     ),
   );
 
+  // Exported format: Markdown.
+  $formats['markdown'] = array(
+    'format' => 'markdown',
+    'name' => 'Markdown',
+    'cache' => 1,
+    'status' => 1,
+    'weight' => 0,
+    'filters' => array(
+      'filter_markdown' => array(
+        'weight' => 0,
+        'status' => 1,
+        'settings' => array(),
+      ),
+    ),
+  );
+
   // Exported format: Plain text.
   $formats['plain_text'] = array(
     'format' => 'plain_text',
     'name' => 'Plain text',
     'cache' => 1,
     'status' => 1,
-    'weight' => 10,
+    'weight' => -9,
     'filters' => array(
       'filter_html_escape' => array(
         'weight' => 0,

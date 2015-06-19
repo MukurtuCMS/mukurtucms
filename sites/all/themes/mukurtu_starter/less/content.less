@@ -112,7 +112,14 @@
   }
 }
 
-.ds-2col {
+.dnd-atom-wrapper.type-audio.context-sdl_editor_representation {
+  .fluid-width-video-wrapper {
+    height: 18px;
+    width: 180px
+  }
+}
+
+.ds-2col, .ds-2col-stacked {
   .field {
     margin-bottom: 10px;
   }
@@ -123,6 +130,23 @@
   }
 }
 
+// Custom Mukurtu Collapsed/Collapsible div -- looks just like the other fields but collapsible with a dynamic arrow
+.mukurtu-collapsed-fieldset-div {
+  h3 {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 22px;
+  }
+  .field-group-format-toggler a {
+    background: url(../grey-down-arrow.png) no-repeat left center;
+    color: #333;
+    padding-left: 15px;
+    text-decoration: none;
+  }
+  &.collapsed .field-group-format-toggler a {
+    background-image: url(../grey-right-arrow.png);
+  }
+}
 
 
 //// Collections
@@ -175,17 +199,16 @@
 // toggle display via the grid/list clicker
 
 
-.pane-community-dh-items-protocol,
-.pane-community-dh-items-community {
-  .pane-title {
-    font-size:16px;
-    border-top:1px solid #ECEBEB;
-    padding-top:20px;
-    text-transform: uppercase;
-  }
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
+  padding-top:20px;
+  border-top:1px solid #ECEBEB;
+
   .view-community-dh-items {
+
     .view-content {
       .views-row {
+        line-height: 0.7em;
         border-bottom: 1px solid #ECEBEB;
         margin: 30px 0;
         padding: 0 0 30px 0;
@@ -290,8 +313,51 @@ a:hover {
   text-decoration: none;
 }
 
+// Shared styling for CP and Community nodes
+
+.node-community, .node-cultural-protocol-group {
+  .group-left {
+    width: 66%;
+    float: left;
+  }
+  .group-right {
+    width: 30%;
+    float: right;
+  }
+
+  .field-name-group-management-links {
+    background: #f8f7f7 none repeat scroll 0 0;
+    border-radius: 5px;
+  }
+
+  // Blocks in right column
+  .group-right .block-views, .group-right .field {
+    background: #F8F7F7;
+    border-radius: 5px;
+    h2.block-title, .label-above {
+      background: #E3E2E1;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      padding: 5px 10px;
+      padding: 10px 20px;
+      font-size: 140%;
+      font-weight: 400;
+      text-transform: none;
+    }
+    .view-content, .view-footer, ul {
+      padding-left: 20px;
+      padding-bottom: 10px;
+    }
+    ul {
+      padding-top: 10px;
+    }
+    margin-bottom: 2em;
+  }
+}
 
 
+
+// This can probably be removed:
 .panel-panel .right-pane,
 .pane-block {
   background: #F8F7F7;
@@ -314,6 +380,7 @@ a:hover {
   }
 }
 
+// Can this go?
 .management-links {
   margin-top: 15px;
   .pane-content {
@@ -339,7 +406,7 @@ a.tooltips span {
 }
 // Show tooltips in grid view only
 .grid-view {
- .tooltips span {
+  .tooltips span {
     top: 0px;
     left: 0px;
     width: 220px;
@@ -457,7 +524,7 @@ a.tooltips span {
     .field {
       margin-bottom: 0;
     }
-    
+
 
   }
 }
@@ -467,7 +534,7 @@ a.tooltips span {
   .scald-atom {
     margin-bottom: 2.5em;
     .scald-file-icon {
-    //  display: none;
+      //  display: none;
     }
   }
   .group-right {
@@ -475,6 +542,26 @@ a.tooltips span {
     border-radius: 4px;
     padding: 30px;
   }
+  // Related DH nodes
+  .view-mode-search_result {
+    border-bottom: 1px solid #ecebeb;
+    margin-bottom: 2em;
+    padding-bottom: 2em;
+    .scald-atom {
+      margin-bottom: 0;
+    }
+  }
+
+  // DH Book Pages Navigation
+  .dh-book-nav {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    .nav-button {
+      padding-right: 20px;
+    }
+  }
+
 }
 
 // collection node DH list view

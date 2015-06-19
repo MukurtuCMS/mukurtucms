@@ -57,7 +57,8 @@ function ma_community_field_group_info() {
       1 => 'field_community_image',
       2 => 'field_community_image_thumbnail',
       3 => 'field_parent_community',
-      4 => 'title',
+      4 => 'field_child_communities',
+      5 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

@@ -51,7 +51,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories?',
+    'description' => 'Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'inline',
@@ -71,7 +71,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -128,7 +128,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -178,7 +178,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -222,9 +222,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 16,
       ),
       'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+        ),
+        'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
       ),
       'teaser' => array(
@@ -234,6 +237,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_protocol_image',
     'label' => 'Banner Image',
@@ -241,6 +245,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -250,7 +255,7 @@ function ma_culturalprotocol_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 5,
@@ -278,7 +283,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -287,6 +292,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_protocol_image_thumbnail',
     'label' => 'Thumbnail Image',
@@ -294,6 +300,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -303,7 +310,7 @@ function ma_culturalprotocol_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 6,
@@ -332,10 +339,9 @@ Strict - This cultural protocol and the digital heritage items within are shared
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 2,
+        'type' => 'hidden',
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -400,7 +406,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 13,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -468,7 +474,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -506,10 +512,10 @@ Strict - This cultural protocol and the digital heritage items within are shared
   // Exported field_instance: 'node-cultural_protocol_group-og_group_ref'
   $field_instances['node-cultural_protocol_group-og_group_ref'] = array(
     'bundle' => 'cultural_protocol_group',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => 'entityreference_prepopulate_field_default_value',
     'deleted' => 0,
-    'description' => 'Please select a community to which this cultural protocol belongs.
+    'description' => 'Please select the Community to which this Cultural Protocol belongs. You may select multiple Communities. You may only select or deselect Parent Communities for which you are a Community Manager.
 ',
     'display' => array(
       'browse_teaser' => array(
@@ -527,9 +533,24 @@ Strict - This cultural protocol and the digital heritage items within are shared
       ),
       'full' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -541,21 +562,19 @@ Strict - This cultural protocol and the digital heritage items within are shared
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'og_group_ref',
-    'label' => 'Parent Community *',
+    'label' => 'Parent Community',
     'required' => 1,
     'settings' => array(
       'behaviors' => array(
-        'og_widget' => array(
-          'access_override' => 0,
-          'admin' => array(
-            'widget_type' => 'entityreference_autocomplete',
-          ),
-          'default' => array(
-            'widget_type' => 'entityreference_autocomplete',
-          ),
-          'status' => TRUE,
-        ),
         'prepopulate' => array(
+          'action' => 'none',
+          'action_on_edit' => 0,
+          'fallback' => 'none',
+          'providers' => array(
+            'og_context' => 0,
+            'url' => 1,
+          ),
+          'skip_perm' => 0,
           'status' => 1,
         ),
       ),
@@ -574,10 +593,12 @@ Strict - This cultural protocol and the digital heritage items within are shared
       ),
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'og',
-      'settings' => array(),
-      'type' => 'og_complex',
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+      ),
+      'type' => 'options_select',
       'weight' => 3,
     ),
   );
@@ -609,7 +630,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 12,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -653,15 +674,15 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Automatically add new users to this protocol');
   t('Banner Image');
   t('Comment');
-  t('Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories?');
+  t('Describe this cultural protocol group within the larger context of the site and other groups. Is membership in this group based on age, gender, or other social categories? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Description');
   t('Group register');
   t('Group roles and permissions');
   t('Group type');
   t('Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
 Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ');
-  t('Parent Community *');
-  t('Please select a community to which this cultural protocol belongs.
+  t('Parent Community');
+  t('Please select the Community to which this Cultural Protocol belongs. You may select multiple Communities. You may only select or deselect Parent Communities for which you are a Community Manager.
 ');
   t('Select Group if you want this content type to be a group that can be associated to users, content and used for access settings.');
   t('Sharing Protocol');

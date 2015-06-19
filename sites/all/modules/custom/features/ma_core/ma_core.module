@@ -22,10 +22,16 @@ function ma_core_user_login(&$edit, $account) {
 
   //// Redirect user on login
 
-  // Do not redirect when
-  // 1. user is logged in during profile installation, as more work needs to complete first
-  // 2. User is performing a password reset, as we do not want to override the redirect to password change form
-  if ($_GET['profile'] OR (arg(0) == 'user' AND arg(1) == 'reset')) {
+  $current_path = current_path();
+
+  // Do not redirect when user is logged in during profile installation, as more work needs to complete first
+  if ($_GET['profile']) {
+    return;
+  }
+  // Do not redirect when not coming from the login page, eg.
+  // 1. if path is user/redirect, user is performing a password reset, as we do not want to override the redirect to password change form
+  // 2. if this is a Mukurtu Mobile login to the services endpoint (see https://www.drupal.org/node/2394235)
+  elseif ($current_path <> 'user' AND $current_path <> 'user/login') {
     return;
   }
 
@@ -57,8 +63,8 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 // Add the Add and Manage Members links to the group member list, for users with perm to do so
 // Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
 function ma_core_views_pre_build(&$view) {
-  if ($view->name == 'og_members') {
-    $gid = $view->args[0];
+  if ($view->name == 'group_members') {
+    $gid = arg(1);
     if (og_user_access('node', $gid, 'manage members')) {
       $output = '<div class="add-manage-members-links">';
       $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
@@ -143,7 +149,9 @@ function ma_core_blank_page_callback() {
  * Menu callback; Mukurtu Release Notes
  */
 function ma_core_release_notes () {
-  return nl2br(file_get_contents('VERSION.txt'));
+
+  $file = nl2br(file_get_contents('VERSION.md'));
+  return check_markup($file, 'markdown');
 }
 
 
@@ -168,11 +176,11 @@ function ma_core_taxonomy_explode_tags($tags) {
 }
 
 /**
- * Get the version from first line of version.txt
+ * Get the version from first line of version.md
  */
 function ma_core_get_version() {
 
-  $version_path = DRUPAL_ROOT . '/VERSION.txt';
+  $version_path = DRUPAL_ROOT . '/VERSION.md';
   if (file_exists($version_path)) {
     if ($version_file = fopen($version_path, 'r')) {
       $version = trim(fgets($version_file));

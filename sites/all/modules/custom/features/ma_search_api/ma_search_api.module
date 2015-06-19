@@ -224,7 +224,7 @@ function ma_search_api_menu() {
   $items = array();
 
   // Indexed Fields page for admins (linked from dashboard)
-  $items['indexed_fields'] = array(
+  $items['indexed-fields'] = array(
     'title' => 'Indexed Fields',
     'page callback' => 'ma_search_api_list_of_indexed_fields',
     'access callback' => 'user_access',

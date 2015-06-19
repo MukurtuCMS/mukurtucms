@@ -51,7 +51,7 @@ function ma_community_field_default_field_instances() {
     'bundle' => 'community',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -71,7 +71,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -134,9 +134,24 @@ function ma_community_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -171,7 +186,7 @@ function ma_community_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 35,
+      'weight' => 5,
     ),
   );
 
@@ -189,10 +204,13 @@ function ma_community_field_default_field_instances() {
         'weight' => 18,
       ),
       'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 14,
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+        ),
+        'type' => 'mukurtu_scald_banner_image',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -207,6 +225,7 @@ function ma_community_field_default_field_instances() {
         'weight' => 17,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_image',
     'label' => 'Banner Image',
@@ -214,6 +233,7 @@ function ma_community_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -223,7 +243,7 @@ function ma_community_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 2,
@@ -248,7 +268,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -266,6 +286,7 @@ function ma_community_field_default_field_instances() {
         'weight' => 1,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_image_thumbnail',
     'label' => 'Thumbnail Image',
@@ -273,6 +294,7 @@ function ma_community_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -282,7 +304,7 @@ function ma_community_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 3,
@@ -308,9 +330,24 @@ function ma_community_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -377,7 +414,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -436,12 +473,9 @@ Strict - Your community page is invisible to all site users who are not members 
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'og_ui',
-        'settings' => array(
-          'field_name' => 'og_user_node',
-        ),
-        'type' => 'og_group_subscribe',
-        'weight' => 2,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -479,7 +513,7 @@ Strict - Your community page is invisible to all site users who are not members 
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 3,
+      'weight' => 4,
     ),
     'widget_type' => 'options_select',
   );
@@ -487,7 +521,7 @@ Strict - Your community page is invisible to all site users who are not members 
   // Exported field_instance: 'node-community-og_group_ref'
   $field_instances['node-community-og_group_ref'] = array(
     'bundle' => 'community',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
@@ -508,7 +542,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -555,7 +589,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 5,
     ),
   );
 
@@ -576,6 +610,7 @@ Strict - Your community page is invisible to all site users who are not members 
 ');
   t('Thumbnail Image');
   t('Use this field with caution! If you assign the current Community to a Parent Community, all members of the current Community will be added as members on the Parent Community. If you subsequently unassign the current Community from the Parent Community, the members will remain added to the Parent Community.');
+  t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 
   return $field_instances;
 }

@@ -29,18 +29,7 @@ function ma_community_manage_default_page_manager_handlers() {
     'contexts' => array(),
     'relationships' => array(),
     'access' => array(
-      'plugins' => array(
-        0 => array(
-          'name' => 'node_type',
-          'settings' => array(
-            'type' => array(
-              'community' => 'community',
-            ),
-          ),
-          'context' => 'argument_entity_id:node_1',
-          'not' => FALSE,
-        ),
-      ),
+      'plugins' => array(),
       'logic' => 'and',
     ),
   );
@@ -208,7 +197,7 @@ function ma_community_manage_default_page_manager_handlers() {
     $pane->pid = 'new-6';
     $pane->panel = 'right';
     $pane->type = 'views_panes';
-    $pane->subtype = 'og_members-panel_pane_1';
+    $pane->subtype = 'group_members-panel_pane_1';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(

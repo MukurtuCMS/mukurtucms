@@ -168,7 +168,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['nodefield']['build_mode'] = 'browse_teaser';
   $handler->display->display_options['fields']['nodefield']['links'] = 0;
   $handler->display->display_options['fields']['nodefield']['comments'] = 0;
-  /* Field: Content: Description */
+  /* Field: Content: Body */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
@@ -650,10 +650,6 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'No recent Digital Heritage items were found in this community.';
   $handler->display->display_options['empty']['area']['format'] = 'full_html';
-  /* Relationship: OG membership: OG membership from Node */
-  $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
-  $handler->display->display_options['relationships']['og_membership_rel']['table'] = 'node';
-  $handler->display->display_options['relationships']['og_membership_rel']['field'] = 'og_membership_rel';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -672,15 +668,13 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Contextual filter: Content: Community (field_community_ref) */
-  $handler->display->display_options['arguments']['field_community_ref_nid']['id'] = 'field_community_ref_nid';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['table'] = 'field_data_field_community_ref';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['field'] = 'field_community_ref_nid';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['default_action'] = 'empty';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['default_argument_type'] = 'og_context';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['field_community_ref_nid']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Field: Protocol (old) (og_group_ref) */
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['table'] = 'og_membership';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['relationship'] = 'og_membership_rel';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['summary']['format'] = 'default_summary';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -695,41 +689,27 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
+  /* Filter criterion: Content: Book Parent (field_book_parent) */
+  $handler->display->display_options['filters']['field_book_parent_target_id']['id'] = 'field_book_parent_target_id';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['table'] = 'field_data_field_book_parent';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['field'] = 'field_book_parent_target_id';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['operator'] = 'empty';
 
   /* Display: Community */
-  $handler = $view->new_display('panel_pane', 'Community', 'community');
-  $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['area']['id'] = 'area';
-  $handler->display->display_options['empty']['area']['table'] = 'views';
-  $handler->display->display_options['empty']['area']['field'] = 'area';
-  $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no Digital Heritage items in this Community.';
-  $handler->display->display_options['empty']['area']['format'] = 'full_html';
-  $handler->display->display_options['defaults']['relationships'] = FALSE;
-  $handler->display->display_options['argument_input'] = array(
-    'field_community_ref_nid' => array(
-      'type' => 'user',
-      'context' => 'entity:scald_atom.scald_authors',
-      'context_optional' => 0,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'Content: Community hidden ref (field_community_ref)',
-    ),
-  );
-  $handler->display->display_options['inherit_panels_path'] = '0';
+  $handler = $view->new_display('block', 'Community', 'block_1');
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Content: Community (field_community_ref) */
+  $handler->display->display_options['arguments']['field_community_ref_nid']['id'] = 'field_community_ref_nid';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['table'] = 'field_data_field_community_ref';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['field'] = 'field_community_ref_nid';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['default_argument_type'] = 'node';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_community_ref_nid']['summary_options']['items_per_page'] = '25';
 
   /* Display: Protocol */
-  $handler = $view->new_display('panel_pane', 'Protocol', 'protocol');
-  $handler->display->display_options['defaults']['header'] = FALSE;
-  $handler->display->display_options['defaults']['empty'] = FALSE;
-  /* No results behavior: Global: Text area */
-  $handler->display->display_options['empty']['area']['id'] = 'area';
-  $handler->display->display_options['empty']['area']['table'] = 'views';
-  $handler->display->display_options['empty']['area']['field'] = 'area';
-  $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no Digital Heritage items in this Cultural Protocol.';
-  $handler->display->display_options['empty']['area']['format'] = 'full_html';
+  $handler = $view->new_display('block', 'Protocol', 'block_2');
   $handler->display->display_options['defaults']['relationships'] = FALSE;
   /* Relationship: OG membership: OG membership from Node */
   $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
@@ -737,28 +717,16 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['relationships']['og_membership_rel']['field'] = 'og_membership_rel';
   $handler->display->display_options['relationships']['og_membership_rel']['required'] = TRUE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Field: Protocol (og_group_ref) */
+  /* Contextual filter: Field: Protocol (old) (og_group_ref) */
   $handler->display->display_options['arguments']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['table'] = 'og_membership';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['relationship'] = 'og_membership_rel';
-  $handler->display->display_options['arguments']['og_group_ref_target_id']['default_action'] = 'empty';
-  $handler->display->display_options['arguments']['og_group_ref_target_id']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['og_group_ref_target_id']['default_argument_type'] = 'node';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['summary_options']['items_per_page'] = '25';
-  $handler->display->display_options['argument_input'] = array(
-    'og_group_ref_target_id' => array(
-      'type' => 'user',
-      'context' => 'entity:scald_atom.scald-authors',
-      'context_optional' => 0,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'Content: Parent community (og_group_ref)',
-    ),
-  );
-  $handler->display->display_options['link_to_view'] = '0';
-  $handler->display->display_options['inherit_panels_path'] = '0';
   $translatables['community_dh_items'] = array(
     t('Master'),
     t('Recent DH Items'),
@@ -769,14 +737,11 @@ function ma_community_manage_views_default_views() {
     t('Asc'),
     t('Desc'),
     t('No recent Digital Heritage items were found in this community.'),
-    t('OG membership from node'),
     t('Community'),
     t('All'),
     t('more'),
-    t('There are no Digital Heritage items in this Community.'),
-    t('View panes'),
     t('Protocol'),
-    t('There are no Digital Heritage items in this Cultural Protocol.'),
+    t('OG membership from node'),
   );
   $export['community_dh_items'] = $view;
 
@@ -798,9 +763,11 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '8';
   $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
   /* No results behavior: Global: Text area */
@@ -808,7 +775,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'No recent Digital Heritage items were found in this community.';
+  $handler->display->display_options['empty']['area']['content'] = 'There are no Cultural Protocols in this Community.';
   $handler->display->display_options['empty']['area']['format'] = 'full_html';
   /* Relationship: OG membership: OG membership from Node */
   $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
@@ -831,8 +798,8 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['arguments']['gid']['table'] = 'og_membership';
   $handler->display->display_options['arguments']['gid']['field'] = 'gid';
   $handler->display->display_options['arguments']['gid']['relationship'] = 'og_membership_rel';
-  $handler->display->display_options['arguments']['gid']['default_action'] = 'empty';
-  $handler->display->display_options['arguments']['gid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['gid']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['gid']['default_argument_type'] = 'node';
   $handler->display->display_options['arguments']['gid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['gid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['gid']['summary_options']['items_per_page'] = '25';
@@ -844,18 +811,8 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
 
-  /* Display: Content pane */
-  $handler = $view->new_display('panel_pane', 'Content pane', 'panel_pane_1');
-  $handler->display->display_options['argument_input'] = array(
-    'gid' => array(
-      'type' => 'user',
-      'context' => 'entity:scald_atom.og-membership--1',
-      'context_optional' => 0,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'OG membership: Group ID',
-    ),
-  );
+  /* Display: Block */
+  $handler = $view->new_display('block', 'Block', 'block_1');
   $translatables['community_protocol_items'] = array(
     t('Master'),
     t('Protocols'),
@@ -865,11 +822,17 @@ function ma_community_manage_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
-    t('No recent Digital Heritage items were found in this community.'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('There are no Cultural Protocols in this Community.'),
     t('OG membership from node'),
     t('All'),
-    t('Content pane'),
-    t('View panes'),
+    t('Block'),
   );
   $export['community_protocol_items'] = $view;
 

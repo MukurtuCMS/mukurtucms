@@ -670,11 +670,31 @@ table .checkbox input[type="checkbox"] {
   padding-left: 0;
   margin: 0;
 }
-.ds-2col .field {
+.dnd-atom-wrapper.type-audio.context-sdl_editor_representation .fluid-width-video-wrapper {
+  height: 18px;
+  width: 100%;
+}
+.ds-2col .field,
+.ds-2col-stacked .field {
   margin-bottom: 10px;
 }
-.ds-2col .group-left .label-above {
+.ds-2col .group-left .label-above,
+.ds-2col-stacked .group-left .label-above {
   font-size: 22px;
+}
+.mukurtu-collapsed-fieldset-div h3 {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 22px;
+}
+.mukurtu-collapsed-fieldset-div .field-group-format-toggler a {
+  background: url(../grey-down-arrow.png) no-repeat left center;
+  color: #333;
+  padding-left: 15px;
+  text-decoration: none;
+}
+.mukurtu-collapsed-fieldset-div.collapsed .field-group-format-toggler a {
+  background-image: url(../grey-right-arrow.png);
 }
 #edit-field-digital-heritage-items .field-label {
   display: none;
@@ -704,21 +724,20 @@ table .checkbox input[type="checkbox"] {
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
-.pane-community-dh-items-protocol .pane-title,
-.pane-community-dh-items-community .pane-title {
-  font-size: 16px;
-  border-top: 1px solid #ECEBEB;
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
   padding-top: 20px;
-  text-transform: uppercase;
+  border-top: 1px solid #ECEBEB;
 }
-.pane-community-dh-items-protocol .view-community-dh-items .view-content .views-row,
-.pane-community-dh-items-community .view-community-dh-items .view-content .views-row {
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row {
+  line-height: 0.7em;
   border-bottom: 1px solid #ECEBEB;
   margin: 30px 0;
   padding: 0 0 30px 0;
 }
-.pane-community-dh-items-protocol .view-community-dh-items .view-content .views-row.views-row-first,
-.pane-community-dh-items-community .view-community-dh-items .view-content .views-row.views-row-first {
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row.views-row-first,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row.views-row-first {
   margin-top: 0;
 }
 .view-digital-heritage-grid-list .view-header,
@@ -823,6 +842,67 @@ table .checkbox input[type="checkbox"] {
 }
 a:hover {
   text-decoration: none;
+}
+.node-community .group-left,
+.node-cultural-protocol-group .group-left {
+  width: 66%;
+  float: left;
+}
+.node-community .group-right,
+.node-cultural-protocol-group .group-right {
+  width: 30%;
+  float: right;
+}
+.node-community .field-name-group-management-links,
+.node-cultural-protocol-group .field-name-group-management-links {
+  background: #f8f7f7 none repeat scroll 0 0;
+  border-radius: 5px;
+}
+.node-community .group-right .block-views,
+.node-cultural-protocol-group .group-right .block-views,
+.node-community .group-right .field,
+.node-cultural-protocol-group .group-right .field {
+  background: #F8F7F7;
+  border-radius: 5px;
+  margin-bottom: 2em;
+}
+.node-community .group-right .block-views h2.block-title,
+.node-cultural-protocol-group .group-right .block-views h2.block-title,
+.node-community .group-right .field h2.block-title,
+.node-cultural-protocol-group .group-right .field h2.block-title,
+.node-community .group-right .block-views .label-above,
+.node-cultural-protocol-group .group-right .block-views .label-above,
+.node-community .group-right .field .label-above,
+.node-cultural-protocol-group .group-right .field .label-above {
+  background: #E3E2E1;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 5px 10px;
+  padding: 10px 20px;
+  font-size: 140%;
+  font-weight: 400;
+  text-transform: none;
+}
+.node-community .group-right .block-views .view-content,
+.node-cultural-protocol-group .group-right .block-views .view-content,
+.node-community .group-right .field .view-content,
+.node-cultural-protocol-group .group-right .field .view-content,
+.node-community .group-right .block-views .view-footer,
+.node-cultural-protocol-group .group-right .block-views .view-footer,
+.node-community .group-right .field .view-footer,
+.node-cultural-protocol-group .group-right .field .view-footer,
+.node-community .group-right .block-views ul,
+.node-cultural-protocol-group .group-right .block-views ul,
+.node-community .group-right .field ul,
+.node-cultural-protocol-group .group-right .field ul {
+  padding-left: 20px;
+  padding-bottom: 10px;
+}
+.node-community .group-right .block-views ul,
+.node-cultural-protocol-group .group-right .block-views ul,
+.node-community .group-right .field ul,
+.node-cultural-protocol-group .group-right .field ul {
+  padding-top: 10px;
 }
 .panel-panel .right-pane,
 .pane-block {
@@ -970,6 +1050,26 @@ a:hover {
   background: #f8f7f7 none repeat scroll 0 0;
   border-radius: 4px;
   padding: 30px;
+}
+.node-digital-heritage.view-mode-full .view-mode-search_result,
+.node-digital-heritage.view-mode-community_record .view-mode-search_result {
+  border-bottom: 1px solid #ecebeb;
+  margin-bottom: 2em;
+  padding-bottom: 2em;
+}
+.node-digital-heritage.view-mode-full .view-mode-search_result .scald-atom,
+.node-digital-heritage.view-mode-community_record .view-mode-search_result .scald-atom {
+  margin-bottom: 0;
+}
+.node-digital-heritage.view-mode-full .dh-book-nav,
+.node-digital-heritage.view-mode-community_record .dh-book-nav {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+.node-digital-heritage.view-mode-full .dh-book-nav .nav-button,
+.node-digital-heritage.view-mode-community_record .dh-book-nav .nav-button {
+  padding-right: 20px;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;

@@ -252,10 +252,10 @@ col-md-4 col-md-push-8';
           'weight' => '2',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '4',
+          'weight' => '5',
         ),
       ),
       'display' => array(),

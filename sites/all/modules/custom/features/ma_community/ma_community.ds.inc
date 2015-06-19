@@ -62,15 +62,49 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'admin_actions' => array(
-      'weight' => '3',
+    'community_dh_items' => array(
+      'weight' => '4',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'community_protocol_items' => array(
+      'weight' => '6',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'links' => array(
-      'weight' => '0',
+    'group_management_links' => array(
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
+    ),
+    'group_members' => array(
+      'weight' => '5',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_parent_community' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_child_communities' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
   );
   $export['node|community|full'] = $ds_fieldsetting;
@@ -95,6 +129,76 @@ function ma_community_ds_field_settings_info() {
     ),
   );
   $export['node|community|thumbed'] = $ds_fieldsetting;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_community_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'community_dh_items';
+  $ds_field->label = 'Recent DH Items';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'community|full';
+  $ds_field->properties = array(
+    'block' => 'views|community_dh_items-block_1',
+    'block_render' => '3',
+  );
+  $export['community_dh_items'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'community_protocol_items';
+  $ds_field->label = 'Community Protocol Items';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'community|full';
+  $ds_field->properties = array(
+    'block' => 'views|bef69c525c1512e210af0dfe32448806',
+    'block_render' => '1',
+  );
+  $export['community_protocol_items'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'group_management_links';
+  $ds_field->label = 'Group Management Links';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'community|full
+cultural_protocol_group|full';
+  $ds_field->properties = array(
+    'block' => 'mukurtu_splash|mukurtu_group_management',
+    'block_render' => '3',
+  );
+  $export['group_management_links'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'group_members';
+  $ds_field->label = 'Group Members';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'block' => 'views|group_members-block_1',
+    'block_render' => '1',
+  );
+  $export['group_members'] = $ds_field;
 
   return $export;
 }
@@ -186,43 +290,43 @@ function ma_community_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'title',
-        1 => 'group_tabs',
-        2 => 'group_basic',
-        3 => 'redirect',
-        4 => 'body',
+        1 => 'group_basic',
+        2 => 'group_tabs',
+        3 => 'body',
+        4 => 'redirect',
         5 => 'group_advanced',
         6 => 'field_community_image',
         7 => 'path',
         8 => 'field_community_image_thumbnail',
-        10 => 'field_parent_community',
-        11 => 'group_access',
-        13 => 'group_register',
-        14 => 'og_roles_permissions',
+        9 => 'field_parent_community',
+        10 => 'group_access',
+        12 => 'field_child_communities',
+        14 => 'group_register',
+        15 => 'og_roles_permissions',
       ),
       'hidden' => array(
-        9 => 'group_group',
-        12 => 'og_group_ref',
-        15 => 'field_child_communities',
+        11 => 'group_group',
+        13 => 'og_group_ref',
         16 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'title' => 'ds_content',
-      'group_tabs' => 'ds_content',
       'group_basic' => 'ds_content',
-      'redirect' => 'ds_content',
+      'group_tabs' => 'ds_content',
       'body' => 'ds_content',
+      'redirect' => 'ds_content',
       'group_advanced' => 'ds_content',
       'field_community_image' => 'ds_content',
       'path' => 'ds_content',
       'field_community_image_thumbnail' => 'ds_content',
-      'group_group' => 'hidden',
       'field_parent_community' => 'ds_content',
       'group_access' => 'ds_content',
+      'group_group' => 'hidden',
+      'field_child_communities' => 'ds_content',
       'og_group_ref' => 'hidden',
       'group_register' => 'ds_content',
       'og_roles_permissions' => 'ds_content',
-      'field_child_communities' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -251,23 +355,31 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'header' => array(
-        0 => 'links',
+        0 => 'field_community_image',
+        1 => 'title',
       ),
       'left' => array(
-        1 => 'body',
+        2 => 'group_management_links',
+        3 => 'body',
+        4 => 'community_dh_items',
       ),
       'right' => array(
-        2 => 'group_group',
-        3 => 'admin_actions',
-        4 => 'group_register',
+        5 => 'group_members',
+        6 => 'community_protocol_items',
+        7 => 'field_parent_community',
+        8 => 'field_child_communities',
       ),
     ),
     'fields' => array(
-      'links' => 'header',
+      'field_community_image' => 'header',
+      'title' => 'header',
+      'group_management_links' => 'left',
       'body' => 'left',
-      'group_group' => 'right',
-      'admin_actions' => 'right',
-      'group_register' => 'right',
+      'community_dh_items' => 'left',
+      'group_members' => 'right',
+      'community_protocol_items' => 'right',
+      'field_parent_community' => 'right',
+      'field_child_communities' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(

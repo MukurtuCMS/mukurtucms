@@ -129,6 +129,7 @@ function ma_collection_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_collection_image',
     'label' => 'Image',
@@ -136,6 +137,7 @@ function ma_collection_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 0,
+        'file' => 0,
         'image' => 'image',
         'video' => 0,
       ),
@@ -145,7 +147,7 @@ function ma_collection_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 4,
@@ -208,7 +210,7 @@ function ma_collection_field_default_field_instances() {
     'bundle' => 'collection',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -241,7 +243,7 @@ function ma_collection_field_default_field_instances() {
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -312,6 +314,7 @@ function ma_collection_field_default_field_instances() {
   $field_instances['node-collection-field_digital_heritage_items'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -335,11 +338,17 @@ function ma_collection_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_digital_heritage_items',
     'label' => 'Digital Heritage Items',
     'required' => 0,
     'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -365,6 +374,7 @@ function ma_collection_field_default_field_instances() {
   t('Digital Heritage Items');
   t('Image');
   t('Summary');
+  t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 
   return $field_instances;
 }

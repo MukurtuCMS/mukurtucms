@@ -260,7 +260,9 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
     }
     else {
       foreach ($items as $item) {
-        $values['default'][] = $item['target_id'];
+        if (!entityreference_field_is_empty($item, $field) && $item['target_id'] !== NULL) {
+          $values['default'][] = $item['target_id'];
+        }
       }
     }
 

@@ -239,7 +239,7 @@ function ma_core_field_default_field_instances() {
     'bundle' => 'page',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
@@ -320,6 +320,7 @@ function ma_core_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_media_asset',
     'label' => 'Media Asset',
@@ -327,6 +328,7 @@ function ma_core_field_default_field_instances() {
     'settings' => array(
       'referencable_types' => array(
         'audio' => 'audio',
+        'file' => 0,
         'image' => 'image',
         'video' => 'video',
       ),
@@ -336,7 +338,7 @@ function ma_core_field_default_field_instances() {
       'active' => 1,
       'module' => 'atom_reference',
       'settings' => array(
-        'context' => 'sdl_editor_representation',
+        'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 32,
@@ -352,6 +354,7 @@ function ma_core_field_default_field_instances() {
   t('Tags');
   t('Test Assets');
   t('Upload an image to go with this article.');
+  t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 
   return $field_instances;
 }
