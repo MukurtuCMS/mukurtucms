@@ -203,6 +203,59 @@ function _ma_services_create_atom ($fn, $id, $external, $title) {
 
   // Atom does not exist already, needs to be created
   if ($sid = _scald_feeds_save_atom($file->uri, $type, $title)) {
+
+    $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
+
+    // For images, populate metadata from exif/xmp/iptc fields
+    if ($type == 'image') {
+
+      // Direct metadata population
+      $field_assocs = array(
+        'field_media_description' => 'field_scald_description',
+        'field_iptc_headline' => 'field_scald_headline',
+        'field_iptc_copyright' => 'field_licence_std_cc',
+        'field_xmp_rights' => 'field_rights',
+        'field_iptc_sublocation' => 'field_scald_location',
+        'field_xmp_creator' => 'field_scald_creator',
+      );
+
+      foreach ($field_assocs as $exif_field => $scald_field) {
+        if (isset($file->{$exif_field}[LANGUAGE_NONE][0]['value'])) {
+          $atom_wrapper->$scald_field = $file->{$exif_field}[LANGUAGE_NONE][0]['value'];
+        }
+      }
+
+      /// Non-direct metadata population
+
+      // Created date
+      if (isset($file->field_exif_datetime[LANGUAGE_NONE][0]['value'])) {
+        $atom_wrapper->field_scald_created->set(strtotime ($file->field_exif_datetime[LANGUAGE_NONE][0]['value']));
+      }
+
+      // Geolocation
+      if (isset($file->field_gps_latitude[LANGUAGE_NONE][0]['value']) && isset($file->field_gps_longitude[LANGUAGE_NONE][0]['value'])) {
+        $atom_wrapper->field_scald_geo_location->set (array(
+          'lat' => $file->field_gps_latitude[LANGUAGE_NONE][0]['value'],
+          'lon' => -$file->field_gps_longitude[LANGUAGE_NONE][0]['value']
+        ));
+      }
+
+      // Keywords
+      if (isset($file->field_iptc_keywords[LANGUAGE_NONE][0]['value'])) {
+        $keywords = $file->field_iptc_keywords[LANGUAGE_NONE][0]['value'];
+        if (count($keywords)) {
+          $atom_wrapper->scald_tags->save($keywords);
+        }
+      }
+
+      // Identifier
+      $atom_wrapper->field_scald_identifier = $title;
+
+      // Resave the atom
+      $atom_wrapper->save();
+
+    }
+
     return array (
       'status' => 'atom created',
       'sid' => $sid,
