@@ -48,6 +48,20 @@ function ma_services_services_resources() {
               'source' => array('param' => 'title'),
               'optional' => TRUE,
             ),
+            array(
+              'name' => 'author',
+              'type' => 'string',
+              'description' => 'author',
+              'source' => array('param' => 'author'),
+              'optional' => TRUE,
+            ),
+            array(
+              'name' => 'category',
+              'type' => 'string',
+              'description' => 'category',
+              'source' => array('param' => 'category'),
+              'optional' => TRUE,
+            ),
           ),
         ),
       ),
@@ -58,7 +72,9 @@ function ma_services_services_resources() {
     $api;
 }
 
-function _ma_services_create_atom ($fn, $id, $external, $title) {
+function _ma_services_create_atom ($fn, $id, $external, $title, $author, $category) {
+
+  $resave_atom = 0;
 
   if ($external) {
     switch ($external) {
@@ -134,11 +150,7 @@ function _ma_services_create_atom ($fn, $id, $external, $title) {
           }
         }
 
-        if ($sid = scald_atom_save ($atom)) {
-          return array (
-            'status' => 'atom created',
-            'sid' => $sid,
-          );
+        if ($sid = scald_atom_save($atom)) {
         }
         else {
           return services_error('unable to save external atom', 406);
@@ -153,116 +165,142 @@ function _ma_services_create_atom ($fn, $id, $external, $title) {
   }
 
   // Regular file upload
-  $id = intval ($id);
-  if (!$file = file_load ($id)) {
-    return services_error('id does not match a file ID', 406);
-  }
+  else {
+    $id = intval($id);
+    if (!$file = file_load($id)) {
+      return services_error('id does not match a file ID', 406);
+    }
 
-  // If the client set a title, use that, otherwise, use the filename.
-  // Usually best here to set the title by the client
-  if (!$title) {
-    $title = $file->filename;
-  }
+    // If the client set a title, use that, otherwise, use the filename.
+    // Usually best here to set the title by the client
+    if (!$title) {
+      $title = $file->filename;
+    }
 
-  $type = _scald_feeds_get_provider_by_mime_type($file->filemime);
+    $type = _scald_feeds_get_provider_by_mime_type($file->filemime);
 
-  // Search for a previously imported matching scald atom and use that if found (slight adaptation from scald_feeds_fetch_matching_atom)
+    // Search for a previously imported matching scald atom and use that if found (slight adaptation from scald_feeds_fetch_matching_atom)
 
-  // Check for matching atom title and atom type
-  $scald_query = array( 'title' => $title, 'type' => $type);
-  $sids = scald_search($scald_query, FALSE);
-  if(count ($sids)) {
-    foreach ($sids as $sid) {
+    // Check for matching atom title and atom type
+    $scald_query = array('title' => $title, 'type' => $type);
+    $sids = scald_search($scald_query, FALSE);
+    if (count($sids)) {
+      foreach ($sids as $sid) {
 
-      $atom = scald_atom_load($sid);
-      switch ($type) {
-        case 'file':
-          scald_file_scald_fetch($atom, 'atom');
+        $atom = scald_atom_load($sid);
+        switch ($type) {
+          case 'file':
+            scald_file_scald_fetch($atom, 'atom');
+            break;
+          case 'image':
+            scald_image_scald_fetch($atom, 'atom');
+            break;
+          case 'audio':
+            scald_audio_scald_fetch($atom, 'atom');
+            break;
+          case 'video':
+            scald_video_scald_fetch($atom, 'atom');
+            break;
+        }
+
+        // Check for matching filesize and md5
+        if (filesize($atom->file_source) == filesize($file->uri) &&
+          md5_file($atom->file_source) == md5_file($file->uri)) {
+          return array(
+            'status' => 'atom exists',
+            'sid' => $sid,
+          );
           break;
-        case 'image':
-          scald_image_scald_fetch($atom, 'atom');
-          break;
-        case 'audio':
-          scald_audio_scald_fetch($atom, 'atom');
-          break;
-        case 'video':
-          scald_video_scald_fetch($atom, 'atom');
-          break;
+        }
       }
+    }
 
-      // Check for matching filesize and md5
-      if (filesize($atom->file_source) == filesize($file->uri) &&
-        md5_file($atom->file_source) == md5_file($file->uri)) {
-        return array (
-          'status' => 'atom exists',
-          'sid' => $sid,
+    // Atom does not exist already, needs to be created
+    if ($sid = _scald_feeds_save_atom($file->uri, $type, $title)) {
+
+      $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
+
+      // For images, populate metadata from exif/xmp/iptc fields
+      if ($type == 'image') {
+
+        $resave_atom = 1;
+
+        // Identifier
+        $atom_wrapper->field_scald_identifier = $title;
+
+        // Direct metadata population
+        $field_assocs = array(
+          'field_media_description' => 'field_scald_description',
+          'field_iptc_headline' => 'field_scald_headline',
+          'field_iptc_copyright' => 'field_licence_std_cc',
+          'field_xmp_rights' => 'field_rights',
+          'field_iptc_sublocation' => 'field_scald_location',
+          'field_xmp_creator' => 'field_scald_creator',
         );
+
+        foreach ($field_assocs as $exif_field => $scald_field) {
+          if (isset($file->{$exif_field}[LANGUAGE_NONE][0]['value'])) {
+            $atom_wrapper->$scald_field = $file->{$exif_field}[LANGUAGE_NONE][0]['value'];
+          }
+        }
+
+        /// Non-direct metadata population
+
+        // Created date
+        if (isset($file->field_exif_datetime[LANGUAGE_NONE][0]['value'])) {
+          $atom_wrapper->field_scald_created->set(strtotime($file->field_exif_datetime[LANGUAGE_NONE][0]['value']));
+        }
+
+        // Geolocation
+        if (isset($file->field_gps_latitude[LANGUAGE_NONE][0]['value']) && isset($file->field_gps_longitude[LANGUAGE_NONE][0]['value'])) {
+          $atom_wrapper->field_scald_geo_location->set(array(
+            'lat' => $file->field_gps_latitude[LANGUAGE_NONE][0]['value'],
+            'lon' => $file->field_gps_longitude[LANGUAGE_NONE][0]['value']
+          ));
+        }
+
+        // Keywords (Scald tags)
+        // TODO: exif is currently only extracting the first keyword. Make it extract multiple keywords.
+        if (isset($file->field_iptc_keywords[LANGUAGE_NONE][0]['value'])) {
+          $keyword = $file->field_iptc_keywords[LANGUAGE_NONE][0]['value'];
+          $term = ma_core_get_create_tax_term($keyword, 'scald_tags');
+          $atom_wrapper->scald_tags = array($term->tid);
+
+        }
+
       }
+
+    }
+    else {
+      return services_error('unable to create atom', 406);
     }
   }
 
-  // Atom does not exist already, needs to be created
-  if ($sid = _scald_feeds_save_atom($file->uri, $type, $title)) {
+  if ($sid) {
 
+    // POST-passed metadata fields
+    // TODO: make these fields accept multiple values. Will probably need to pass via json-encoded content as opposed to URL parameters
     $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
-
-    // For images, populate metadata from exif/xmp/iptc fields
-    if ($type == 'image') {
-
-      // Direct metadata population
-      $field_assocs = array(
-        'field_media_description' => 'field_scald_description',
-        'field_iptc_headline' => 'field_scald_headline',
-        'field_iptc_copyright' => 'field_licence_std_cc',
-        'field_xmp_rights' => 'field_rights',
-        'field_iptc_sublocation' => 'field_scald_location',
-        'field_xmp_creator' => 'field_scald_creator',
-      );
-
-      foreach ($field_assocs as $exif_field => $scald_field) {
-        if (isset($file->{$exif_field}[LANGUAGE_NONE][0]['value'])) {
-          $atom_wrapper->$scald_field = $file->{$exif_field}[LANGUAGE_NONE][0]['value'];
-        }
-      }
-
-      /// Non-direct metadata population
-
-      // Created date
-      if (isset($file->field_exif_datetime[LANGUAGE_NONE][0]['value'])) {
-        $atom_wrapper->field_scald_created->set(strtotime ($file->field_exif_datetime[LANGUAGE_NONE][0]['value']));
-      }
-
-      // Geolocation
-      if (isset($file->field_gps_latitude[LANGUAGE_NONE][0]['value']) && isset($file->field_gps_longitude[LANGUAGE_NONE][0]['value'])) {
-        $atom_wrapper->field_scald_geo_location->set (array(
-          'lat' => $file->field_gps_latitude[LANGUAGE_NONE][0]['value'],
-          'lon' => -$file->field_gps_longitude[LANGUAGE_NONE][0]['value']
-        ));
-      }
-
-      // Keywords
-      if (isset($file->field_iptc_keywords[LANGUAGE_NONE][0]['value'])) {
-        $keywords = $file->field_iptc_keywords[LANGUAGE_NONE][0]['value'];
-        if (count($keywords)) {
-          $atom_wrapper->scald_tags->save($keywords);
-        }
-      }
-
-      // Identifier
-      $atom_wrapper->field_scald_identifier = $title;
-
-      // Resave the atom
+    if ($author) {
+      $term = ma_core_get_create_tax_term ($author, 'scald_authors');
+      $atom_wrapper->scald_authors->set(array($term->tid));
+      $resave_atom = 1;
+    }
+    if ($category) {
+      $term = ma_core_get_create_tax_term($category, 'category');
+      // Cannot set this field with an entity wrapper, so setting directly on the atom instead
+      $atom = scald_atom_load($sid);
+      $atom->field_category['en'][0]['tid'] = $term->tid;
+      scald_atom_save($atom);
+    }
+    if ($resave_atom) {
       $atom_wrapper->save();
-
     }
 
+    // Return the SID
     return array (
       'status' => 'atom created',
       'sid' => $sid,
     );
   }
-  else {
-    return services_error('unable to create atom', 406);
-  }
-
 }
