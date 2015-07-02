@@ -156,6 +156,7 @@ function ma_search_api_default_search_api_index() {
           "entity_type" : "taxonomy_term"
         },
         "field_book_children:field_tags:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_tags:tid" : { "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E" },
         "field_book_children:field_tk_body:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_transcription" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:title" : { "type" : "list\\u003Ctext\\u003E" },
@@ -555,6 +556,12 @@ function ma_search_api_default_search_api_server() {
           "field_book_children:field_tk_body:value" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_tags:tid" : {
+            "table" : "search_api_db_default_node_index_field_book_children_field_t_1",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
             "boost" : "1.0"
           }
         }
