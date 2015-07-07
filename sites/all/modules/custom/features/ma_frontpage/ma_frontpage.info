@@ -14,7 +14,6 @@ dependencies[] = mukurtu_splash
 dependencies[] = page_manager
 dependencies[] = views
 dependencies[] = views_slideshow
-features[context][] = frontpage
 features[ctools][] = context:context:3
 features[ctools][] = views:views_default:3.0
 features[fe_block_settings][] = mukurtu_splash-mukurtu_wizard
