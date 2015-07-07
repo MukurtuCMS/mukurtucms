@@ -201,7 +201,7 @@ function ma_importexport_feeds_importer_default() {
             'unique' => FALSE,
           ),
         ),
-        'input_format' => 'full_html',
+        'input_format' => 'filtered_html',
         'author' => '1',
         'authorize' => 1,
         'skip_hash_check' => 0,
@@ -415,7 +415,7 @@ function ma_importexport_feeds_importer_default() {
             'unique' => FALSE,
           ),
         ),
-        'input_format' => 'full_html',
+        'input_format' => 'filtered_html',
         'author' => 0,
       ),
     ),
@@ -498,7 +498,7 @@ function ma_importexport_feeds_importer_default() {
         ),
         'update_existing' => '2',
         'update_non_existent' => 'skip',
-        'input_format' => 'full_html',
+        'input_format' => 'filtered_html',
         'skip_hash_check' => 0,
         'bundle' => 'audio',
         'values' => array(
@@ -591,7 +591,7 @@ function ma_importexport_feeds_importer_default() {
         ),
         'update_existing' => '2',
         'update_non_existent' => 'skip',
-        'input_format' => 'full_html',
+        'input_format' => 'filtered_html',
         'skip_hash_check' => 0,
         'bundle' => 'file',
         'values' => array(
@@ -750,7 +750,7 @@ function ma_importexport_feeds_importer_default() {
         ),
         'update_existing' => '2',
         'update_non_existent' => 'skip',
-        'input_format' => 'full_html',
+        'input_format' => 'filtered_html',
         'skip_hash_check' => 0,
         'bundle' => 'image',
         'values' => array(
@@ -843,7 +843,7 @@ function ma_importexport_feeds_importer_default() {
         ),
         'update_existing' => '2',
         'update_non_existent' => 'skip',
-        'input_format' => 'full_html',
+        'input_format' => 'filtered_html',
         'skip_hash_check' => 0,
         'bundle' => 'video',
         'values' => array(
