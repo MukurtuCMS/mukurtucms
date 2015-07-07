@@ -16,6 +16,7 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_default_tax_terms' => array(),
     'mukurtu_default_menu_links' => array(),
     'mukurtu_create_default_pages' => array(),
+    'mukurtu_create_default_contexts' => array(),
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
@@ -198,6 +199,44 @@ function mukurtu_create_default_pages () {
   node_save($node);
 }
 
+function mukurtu_create_default_contexts () {
+
+  // frontpage context
+  $context = new stdClass();
+  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->api_version = 3;
+  $context->name = 'front_page';
+  $context->description = '';
+  $context->tag = '';
+  $context->conditions = array(
+    'path' => array(
+      'values' => array(
+        '<front>' => '<front>',
+      ),
+    ),
+  );
+  $context->reactions = array(
+    'block' => array(
+      'blocks' => array(
+        'boxes-ma_site_header' => array(
+          'module' => 'boxes',
+          'delta' => 'ma_site_header',
+          'region' => 'content',
+          'weight' => '-10',
+        ),
+        'views-communities_content-block_1' => array(
+          'module' => 'views',
+          'delta' => 'communities_content-block_1',
+          'region' => 'content',
+          'weight' => '-9',
+        ),
+      ),
+    ),
+  );
+  $context->condition_mode = 0;
+  context_save ($context);
+}
+
 //function mukurtu_client_form() {
 //  $form = array();
 //  $form['intro'] = array(
@@ -266,3 +305,4 @@ function mukurtu_form_install_configure_form_alter(&$form, &$form_state) {
   # $form['server_settings']['date_default_timezone']['#default_value'] = "Australia/Perth"; # this isn't working. Probably form alter is populating this with browser or server timezone.
 
 }
+
