@@ -118,8 +118,6 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       // Set metadata
       $entity = $form['atom' . $atom_index]['#entity'];
       $language = $entity->language;
-      #dpm ($entity, 'entity');
-      #dpm ($language, 'language');
 
       if (!isset($entity->created)) {
 
@@ -147,7 +145,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
             //'field_gps_latitude' => '',
             //'field_gps_longitude' => '',
           );
-
+	  
           foreach ($field_assocs as $exif_field => $scald_field) {
             if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] == NULL) {
               $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
