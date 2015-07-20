@@ -91,7 +91,7 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
 function ma_scald_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'scald_atom_add_form_options') {
     $atom_index = 0;
-
+    
     // Add a custom validation handler so that the user cannot unset a CP if they are not allowed to post to it
     $form['#validate'][] = 'ma_scald_prevent_unsetting_cp_when_no_permission';
     $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
@@ -117,15 +117,16 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
 
       // Set metadata
       $entity = $form['atom' . $atom_index]['#entity'];
+      if(isset($entity->base_id)) {
+	$file = file_load($entity->base_id);
+      }
+      
       $language = $entity->language;
-      #dpm ($entity, 'entity');
-      #dpm ($language, 'language');
 
       if (!isset($entity->created)) {
 
         // Set scald title according to filename, if the title isn't aleady set by the provider (eg. Youtube)
         if (!isset($entity->title)) {
-          $file = file_load($entity->base_id);
           $filename = $file->filename;
           $form['atom' . $atom_index]['title']['#default_value'] = $file->filename;
         }
@@ -147,7 +148,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
             //'field_gps_latitude' => '',
             //'field_gps_longitude' => '',
           );
-
+	  
           foreach ($field_assocs as $exif_field => $scald_field) {
             if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] == NULL) {
               $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
