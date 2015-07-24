@@ -6,6 +6,26 @@
 
 include_once('ma_importexport.features.inc');
 
+/**
+ * Implements hook_menu().
+ */
+function ma_importexport_menu() {
+  $items = array();
+  
+  // "Export Item" button for DH node
+  $items['node/%node/export-item'] = array(
+    'title' => 'Export Item',
+    'page callback' => 'ma_importexport_export_gui',
+    'page arguments' => array(1),
+    'access callback' => 'ma_importexport_access_export',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 105,
+  );
+
+  return $items;
+}
+
 
 /**
  * Implements hook_feeds_presave().
@@ -132,5 +152,94 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
     $entity->data[$type . '_file'] = $file->uri;
     $entity->data[$type . '_id'] = $file->fid;
   }
+}
 
+function ma_importexport_export_form_submit($form, &$form_state)
+{
+  dpm($form['dh_export']['items']['#value']);
+  dpm($form['dh_export']['export_format']['#value']);
+}
+
+function ma_importexport_export_form($form, &$form_state, $items, $format) {
+  $form = array();
+
+  $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
+  $form['dh_export']['export_format'] = array( '#type' => 'hidden', '#value' => 0);
+  $options = array(0 => t('CSV'), 1 => t('XML'), 2=> t('JSON'));
+  $form['dh_export']['format'] = array( '#type' => 'radios',
+					'#title' => t('Export Format'),
+					'#default_value' => 0,
+					'#options' => $options,
+					);
+  
+  $form['dh_export']['export'] = array( '#type' => 'submit',
+					'#value' => t('Export'),
+					);
+					
+
+  return $form;
+}
+
+function ma_importexport_export_gui($items = NULL, $format = NULL, $delivery = NULL) {
+  if (is_int($items)) {
+    $items = array($items);
+  }
+  elseif (is_object($items)) {
+    $items = array($items->nid);
+  }					
+
+  return drupal_get_form('ma_importexport_export_form', $items, $format);
+}
+
+function ma_importexport_access_export($node) {
+  global $user;
+  if (is_int($node)) {
+    $node = node_load($node);
+  }
+
+  if (function_exists('drush_main')) {
+    // Always allow drush to export nodes.
+    $access = TRUE;
+  }
+  else {
+    // Check basic role permissions first.
+    $access = TRUE;
+    //    $access = (user_access('export nodes') || ($user->uid && ($node->uid == $user->uid) && user_access('export own nodes')));
+    // Make sure the user can view the original node content.
+    $access = $access && node_access('view', $node);
+  }
+
+  // Let other modules alter this - for example to only allow some users
+  // to export specific nodes or types.
+  //  drupal_alter("node_export_access_export", $access, $node);
+  return $access;
+}
+
+
+function ma_importexport_digital_heritage_node_export($items, $format = NULL, $msg_t = 't') {
+  global $user;
+
+  if (is_int($items)) {
+    $items = array($items);
+  }
+  elseif (is_object($items)) {
+    $items = array($items->nid);
+  }
+
+  $nodes = array();
+  foreach ($items as $item) {
+    $original_node = node_load($item);
+
+    if (!ma_importexport_access_export($original_node)) {
+      $error = $msg_t("You do not have permission to export one or more of these items.  No items exported.");
+      return array(
+        'success' => FALSE,
+        'output' => array($error),
+      );
+    }
+
+    //    $node = node_export_prepare_node($original_node);
+
+    $nodes[] = $node;
+  }
 }
