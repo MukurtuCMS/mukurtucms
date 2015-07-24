@@ -191,3 +191,20 @@ function ma_core_get_version() {
   }
 }
 
+
+/**
+ * Get a taxonomy term object from a term name in a vocab. Create one if the term doesn't yet exist.
+ */
+function ma_core_get_create_tax_term ($term_name, $vocab_name) {
+  if ($term = taxonomy_get_term_by_name($term_name, $vocab_name)) {
+    return current($term);
+  }
+  else {
+    $term = new StdClass();
+    $vocab = taxonomy_vocabulary_machine_name_load($vocab_name);
+    $term->vid = $vocab->vid;
+    $term->name = $term_name;
+    taxonomy_term_save($term);
+    return $term;
+  }
+}

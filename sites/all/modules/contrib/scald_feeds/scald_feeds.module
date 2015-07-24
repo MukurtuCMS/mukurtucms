@@ -31,7 +31,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
  * element the user has picked as a source.
  */
 function scald_feeds_set_target($source, $entity, $target, $value) {
-
   if (empty($value)) {
     return;
   }
@@ -40,16 +39,22 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
   if (!is_array($value)) {
     $value = array($value);
   }
+  
   foreach ($value as $k => $v) {
-    if (!($v instanceof FeedsEnclosure)) {
-      if (is_string($v)) {
-        $value[$k] = new FeedsEnclosure($v, file_get_mimetype($v));
+    if(!empty($value[$k])) {
+      if (!($v instanceof FeedsEnclosure)) {
+	if (is_string($v)) {
+	  $value[$k] = new FeedsEnclosure($v, file_get_mimetype($v));
+	}
+	else {
+	  unset($value[$k]);
+	}
       }
-      else {
-        unset($value[$k]);
-      }
+    } else {
+      unset($value[$k]);
     }
   }
+
   if (empty($value)) {
     return;
   }
