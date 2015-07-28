@@ -156,19 +156,23 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
 function ma_importexport_export_form_submit($form, &$form_state)
 {
-  dpm($form['dh_export']['items']['#value']);
-  dpm($form['dh_export']['export_format']['#value']);
+  //  dpm($form['dh_export']['items']['#value']);
+  //  dpm($form['dh_export']['format']['#value']);
+
+  ma_importexport_digital_heritage_node_export($form['dh_export']['items']['#value'],$form['dh_export']['format']['#value']);
 }
 
-function ma_importexport_export_form($form, &$form_state, $items, $format) {
+function ma_importexport_export_form($form, &$form_state, $items, $format="csv") {
   $form = array();
 
   $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
-  $form['dh_export']['export_format'] = array( '#type' => 'hidden', '#value' => 0);
-  $options = array(0 => t('CSV'), 1 => t('XML'), 2=> t('JSON'));
+  //  $form['dh_export']['export_format'] = array( '#type' => 'hidden', '#value' => 'csv');
+
+  // Export Format
+  $options = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
   $form['dh_export']['format'] = array( '#type' => 'radios',
 					'#title' => t('Export Format'),
-					'#default_value' => 0,
+					'#default_value' => $format,
 					'#options' => $options,
 					);
   
@@ -180,7 +184,7 @@ function ma_importexport_export_form($form, &$form_state, $items, $format) {
   return $form;
 }
 
-function ma_importexport_export_gui($items = NULL, $format = NULL, $delivery = NULL) {
+function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = NULL) {
   if (is_int($items)) {
     $items = array($items);
   }
@@ -215,8 +219,69 @@ function ma_importexport_access_export($node) {
   return $access;
 }
 
+function ma_importexport_digital_heritage_field_export($item, $field_name) {
+  //  dpm($field_name);
+  $result = array();
+  
+  switch($field_name) {
+  case 'body':
+    foreach($item->{$field_name}[$item->language] as $field_value) {
+      $result[] = $field_value['value']; 
+    }
+    break;
+  case 'field_media_asset':
+    foreach($item->{$field_name}[LANGUAGE_NONE] as $field_value) {
+      $result[] = $field_value['sid']; 
+    }
+    break;
+  case 'field_category':
+  case 'field_tags':
+    foreach($item->{$field_name}[$item->language] as $term) {
+      $result[] = taxonomy_term_load($term['tid'])->name;
+    }
+    break;
+  case 'field_creator':
+  case 'field_contributor':
+  case 'field_dh_type':
+  case 'field_format':
+  case 'field_language':
+  case 'field_publisher':
+  case 'field_subject':
+    foreach($item->{$field_name}[LANGUAGE_NONE] as $term) {
+      $result[] = taxonomy_term_load($term['tid'])->name;
+    }
+    break;
+  case 'field_book_children':
+  case 'field_book_parent':
+  case 'field_collection':
+  case 'field_community_record_children':
+  case 'field_community_record_parent':
+  case 'field_related_dh_items':
+  case 'og_group_ref':
+    foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['target_id'];
+    }
+    break;
+  case 'field_community_ref':
+    foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['nid'];
+    }
+    break;
+  case 'field_coverage':
+    foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['geom'];
+    }
+    break;
+  default:
+    foreach($item->{$field_name}[LANGUAGE_NONE] as $field_value) {
+      $result[] = $field_value['value']; 
+    }
+  }
 
-function ma_importexport_digital_heritage_node_export($items, $format = NULL, $msg_t = 't') {
+  return $result;
+}
+
+function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $msg_t = 't') {
   global $user;
 
   if (is_int($items)) {
@@ -226,8 +291,51 @@ function ma_importexport_digital_heritage_node_export($items, $format = NULL, $m
     $items = array($items->nid);
   }
 
-  $nodes = array();
-  foreach ($items as $item) {
+  // Add any related items we need to export as well
+  // TODO: restructure this to avoid looping over and loading all nodes twice
+  $related_items = array();
+  foreach($items as $item) {    
+    $original_node = node_load($item);
+    if(!empty($original_node->field_community_record_children)) {
+      $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_community_record_children'));
+    }
+    if(!empty($original_node->field_community_record_parent)) {
+      $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_community_record_parent'));
+    }
+    if(!empty($original_node->field_book_children)) {
+      $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_book_children'));
+    }
+    if(!empty($original_node->field_book_parent)) {
+      $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_book_parent'));
+    }
+  }
+
+  // Merge and dedup list of top level items and related items
+  $dh_items = array_merge($items, $related_items);
+  $dh_items = array_unique($dh_items);
+
+  // Get list of DH field names
+  $dhfields = field_info_instances('node', 'digital_heritage');
+
+  // Load mapping from Digial Heritage Metadata importer to look up header names
+  ctools_include('export');
+  $mapping = array();
+  if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => 'digital_heritage_metadata'))) {
+    $config = array_shift($config);
+    foreach($config->config['processor']['config']['mappings'] as $map) {
+      $mapping[$map['target']] = $map['source'];
+    }
+  }
+
+  $export_items = array();
+  
+  // Add headers
+  foreach($dhfields as $dhfield) {
+      $export_items['headers'][$dhfield['field_name']] = $mapping[$dhfield['field_name']];
+  }
+  
+  // Process Items
+  foreach ($dh_items as $item) {
     $original_node = node_load($item);
 
     if (!ma_importexport_access_export($original_node)) {
@@ -238,8 +346,69 @@ function ma_importexport_digital_heritage_node_export($items, $format = NULL, $m
       );
     }
 
-    //    $node = node_export_prepare_node($original_node);
+    $export_item = array();
 
-    $nodes[] = $node;
+    // nid
+    $export_item['nid'] = array($original_node->nid);
+    
+    // Title
+    $export_item['title'] = array($original_node->title);
+
+    // Loop through DH specific fields
+    foreach($dhfields as $dhfield) {
+      $field_export = NULL;
+      if(!empty($original_node->{$dhfield['field_name']})) {
+	$field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield['field_name']);
+      }
+      $export_item[$dhfield['field_name']] = $field_export;
+    }
+
+    $export_items['items'][] = $export_item;
   }
+
+  dpm($original_node);
+
+  //  dpm($export_items);
+  ma_importexport_export_csv($export_items);
+  
+
+  drupal_set_message(t('Exported ') . $original_node->title);
+}
+
+function ma_importexport_export_csv($export_items, $delimiter='||') {
+  //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
+  //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
+
+  // Prevent Devel from messing us up.
+  $GLOBALS['devel_shutdown'] = TRUE;
+  
+  // Set the headers to indicate this is a CSV file.
+  header('Content-type: text/csv; charset=UTF-8');
+  header('Content-Disposition: attachment; filename=item_export.csv');
+  header('Pragma: no-cache');
+  header('Expires: 0');
+  
+  $output = fopen('php://output', 'w');
+
+  // Write headers
+  $headers = array();
+  foreach($export_items['items'][0] as $key => $name) {
+    $headers[] = $export_items['headers'][$key] ? $export_items['headers'][$key] : $key;
+  }
+
+  //  dpm($headers);
+  fputcsv($output, $headers);
+
+  // Write items
+  foreach($export_items['items'] as $item) {
+    $item_array = array();
+    foreach($item as $field => $value) {
+      $item_array[] = implode($delimiter, $value);
+    }
+    //  dpm($item_array);
+    fputcsv($output, $item_array);
+  }
+  
+  fclose($output);
+  drupal_exit();
 }
