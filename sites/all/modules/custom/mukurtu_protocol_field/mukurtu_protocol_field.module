@@ -74,8 +74,16 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
     if (!empty($structure)) {
       $form_state['num_protocols'] = sizeof($structure);
-    } else {
-      $form_state['num_protocols'] =  empty($form_state['num_protocols']) ? 1 : $form_state['num_protocols'];
+    }
+    elseif (empty($form_state['num_protocols'])) {
+      // DH node is being added via Services. Set num_protocols according to the number of communities set in the service request.
+      if (isset($form_state['values']['oggroup_fieldset'])) {
+        $form_state['num_protocols'] = count($form_state['values']['oggroup_fieldset']);
+      }
+      // DH node is being added from the UI
+      else {
+        $form_state['num_protocols'] = 1;
+      }
     }
 
     $form['oggroup_fieldset'] = array(
