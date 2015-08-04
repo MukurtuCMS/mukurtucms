@@ -492,18 +492,6 @@ function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = 
   return $result;
 }
 
-function ma_importexport_write_image_atom_csv($csv_file, $atom = NULL, $delimiter='||') {
-  $fields = field_info_instances('scald_atom','image');
-  $mapping = ma_importexport_get_atom_field_mapping('image');
-
-  $row = array();
-  foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_image_atom_field_export($atom, $field_name, $mapping));
-  }
-
-  fputcsv($csv_file, $row);
-}
-
 function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter='||') {
   $fields = field_info_instances('scald_atom',$type);
   $mapping = ma_importexport_get_atom_field_mapping($type);
@@ -567,7 +555,7 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
   $scald_file_count = 0;
 
   // Write headers
-  ma_importexport_write_image_atom_csv($scald_image_output);
+  ma_importexport_write_atom_csv($scald_image_output, 'image');
   ma_importexport_write_atom_csv($scald_audio_output, 'audio');
   ma_importexport_write_atom_csv($scald_video_output, 'video');
   ma_importexport_write_atom_csv($scald_file_output, 'file');
@@ -576,7 +564,7 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
     dpm($atom);
     switch($atom->type) {
     case 'image':
-      ma_importexport_write_image_atom_csv($scald_image_output, $atom);
+      ma_importexport_write_atom_csv($scald_image_output, 'image', $atom);
       $scald_image_count++;
       break;
     case 'audio':
