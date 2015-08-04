@@ -518,7 +518,7 @@ function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = 
   }
 
   $result = array();
-  //  dpm($field_name);
+   dpm($field_name);
   switch($field_name) {
   case 'sid':
     $result[] = $atom->sid;
@@ -574,9 +574,9 @@ function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = 
     }
     break;
   case 'Temporary target 1':
+  case 'scald_file:uri':
     $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
     $result[] = $media_dir . $atom->base_entity->filename;
-    break;
   default:
     foreach($atom->{$field_name}[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['value']; 
@@ -662,6 +662,8 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
   // Write headers
   ma_importexport_write_image_atom_csv($scald_image_output);
   ma_importexport_write_atom_csv($scald_audio_output, 'audio');
+  ma_importexport_write_atom_csv($scald_video_output, 'video');
+  ma_importexport_write_atom_csv($scald_file_output, 'file');
   
   foreach($media_items['items'] as $atom) {
     dpm($atom);
@@ -675,9 +677,11 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
       $scald_audio_count++;
       break;
     case 'video':
+      ma_importexport_write_atom_csv($scald_video_output, 'video', $atom);
       $scald_video_count++;      
       break;
     case 'file':
+      ma_importexport_write_atom_csv($scald_file_output, 'file', $atom);
       $scald_file_count++;      
       break;
     default:
