@@ -58,25 +58,37 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
 function ma_importexport_export_form_submit($form, &$form_state)
 {
-  //  dpm($form['dh_export']['items']['#value']);
-  //  dpm($form['dh_export']['format']['#value']);
-
-  ma_importexport_digital_heritage_node_export($form['dh_export']['items']['#value'],$form['dh_export']['format']['#value']);
+  $items = $form['dh_export']['items']['#value'];
+  $format = $form['dh_export']['format']['#value'];
+  $options = array();
+  if($format = 'csv') {
+    $options['multivalue_delimiter'] = $form['dh_export']['csvdelimiter']['#value'];
+  }
+  ma_importexport_digital_heritage_node_export($items, $format, $options);
 }
 
 function ma_importexport_export_form($form, &$form_state, $items, $format="csv") {
   $form = array();
 
   $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
-  //  $form['dh_export']['export_format'] = array( '#type' => 'hidden', '#value' => 'csv');
 
   // Export Format
   $options = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
+
   $form['dh_export']['format'] = array( '#type' => 'radios',
-					'#title' => t('Export Format'),
-					'#default_value' => $format,
-					'#options' => $options,
-					);
+  					'#title' => t('Export Format'),
+  					'#default_value' => $format,
+  					'#options' => $options,
+  					);
+
+  $form['dh_export']['format']['xml']['#attributes']['disabled'] = 'disabled';
+  $form['dh_export']['format']['json']['#attributes']['disabled'] = 'disabled';
+
+  $form['dh_export']['csvdelimiter'] = array('#type' => 'textfield',
+					     '#title' => t('CSV column multi-value delimiter'),
+					     '#default_value' => '||',
+					     '#size' => 4,
+					     '#maxlength' => 10);					     
   
   $form['dh_export']['export'] = array( '#type' => 'submit',
 					'#value' => t('Export'),
@@ -122,10 +134,18 @@ function ma_importexport_access_export($node) {
 }
 
 function ma_importexport_digital_heritage_field_export($item, $field_name) {
-  //  dpm($field_name);
   $result = array();
+
+  // Strip off ':etid' suffix that Entity Reference puts on the field name to make things easier
+  $field_name = str_replace(':etid', '', $field_name);
   
   switch($field_name) {
+  case 'title':
+    $result[] = $item->title;
+    break;
+  case 'nid':
+    $result[] = $item->nid;
+    break;
   case 'body':
     foreach($item->{$field_name}[$item->language] as $field_value) {
       $result[] = $field_value['value']; 
@@ -174,6 +194,16 @@ function ma_importexport_digital_heritage_field_export($item, $field_name) {
       $result[] = $ref['geom'];
     }
     break;
+  case 'field_coverage:lat':
+    foreach($item->field_coverage[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['lat'];
+    }
+    break;
+  case 'field_coverage:lon':
+    foreach($item->field_coverage[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['lon'];
+    }
+    break;    
   default:
     foreach($item->{$field_name}[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['value']; 
@@ -183,9 +213,20 @@ function ma_importexport_digital_heritage_field_export($item, $field_name) {
   return $result;
 }
 
-function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $msg_t = 't') {
+/**
+ * Takes an array of items (nids) and exports them to the desired format
+ */
+function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $options = NULL, $msg_t = 't') {
   global $user;
 
+  if($format == 'csv') {
+    if(isset($options['multivalue_delimiter'])) {
+      $multivalue_delimiter = $options['multivalue_delimiter'];
+    } else {
+      $multivalue_delimiter = '||';
+    }
+  }
+  
   if (is_int($items)) {
     $items = array($items);
   }
@@ -218,28 +259,19 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 
   // Get list of DH field names
   $dhfields = field_info_instances('node', 'digital_heritage');
-
-  // Load mapping from Digial Heritage Metadata importer to look up header names
-  ctools_include('export');
-  $mapping = array();
-  if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => 'digital_heritage_metadata'))) {
-    $config = array_shift($config);
-    foreach($config->config['processor']['config']['mappings'] as $map) {
-      $mapping[$map['target']] = $map['source'];
-    }
-  }
-
+  
+  $mapping = ma_importexport_get_digital_heritage_mapping();
   $export_items = array();
   
   // Add headers
-  foreach($dhfields as $dhfield) {
-      $export_items['headers'][$dhfield['field_name']] = $mapping[$dhfield['field_name']];
+  foreach($mapping as $f => $h) {
+    $export_items['headers'][$f] = $h;
   }
   
   // Process Items
   foreach ($dh_items as $item) {
     $original_node = node_load($item);
-
+    
     if (!ma_importexport_access_export($original_node)) {
       $error = $msg_t("You do not have permission to export one or more of these items.  No items exported.");
       return array(
@@ -250,19 +282,11 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 
     $export_item = array();
 
-    // nid
-    $export_item['nid'] = array($original_node->nid);
-    
-    // Title
-    $export_item['title'] = array($original_node->title);
-
-    // Loop through DH specific fields
-    foreach($dhfields as $dhfield) {
+    // Loop through the fields we want to export
+    foreach($mapping as $dhfield => $dhmap) {
       $field_export = NULL;
-      if(!empty($original_node->{$dhfield['field_name']})) {
-	$field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield['field_name']);
-      }
-      $export_item[$dhfield['field_name']] = $field_export;
+      $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield);
+      $export_item[$dhfield] = $field_export;
     }
 
     $export_items['items'][] = $export_item;
@@ -278,19 +302,24 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     }
   }
   
-  $exported_media = ma_importexport_export_scald_media($media_sids);
+  $exported_media = ma_importexport_load_scald_atoms($media_sids);
   
-  //  dpm($exported_media);
-  //  dpm($original_node);
-
-  //  dpm($export_items);
-  ma_importexport_export_csv($export_items, $exported_media);
+  ma_importexport_export_csv($export_items, $exported_media, $multivalue_delimiter);
   
-
   drupal_set_message(t('Exported ') . $original_node->title);
 }
 
-function ma_importexport_export_scald_media($sids) {
+
+/**
+ * Take an array of scald sids and return an array of loaded scald atoms
+ *
+ * @param array $sids
+ *    The array of scald sids
+ *
+ * @return
+ *  An array of loaded scald atoms
+ */
+function ma_importexport_load_scald_atoms($sids) {
   if (is_int($sids)) {
     $sids = array($sids);
   }
@@ -301,7 +330,7 @@ function ma_importexport_export_scald_media($sids) {
   $exported_media = array();
   foreach($sids as $sid) {
     $atom = scald_atom_load($sid);
-    $exported_media['items'][] = $atom;
+    $exported_media[] = $atom;
   }
 
   return $exported_media;
@@ -330,7 +359,6 @@ function ma_importexport_export_csv_old($export_items, $delimiter='||') {
     $headers[] = $export_items['headers'][$key] ? $export_items['headers'][$key] : $key;
   }
 
-  //  dpm($headers);
   fputcsv($output, $headers);
 
   // Write items
@@ -339,12 +367,27 @@ function ma_importexport_export_csv_old($export_items, $delimiter='||') {
     foreach($item as $field => $value) {
       $item_array[] = implode($delimiter, $value);
     }
-    //  dpm($item_array);
     fputcsv($output, $item_array);
   }
   
   fclose($output);
   drupal_exit();
+}
+
+function ma_importexport_get_digital_heritage_mapping() {
+  ctools_include('export');
+
+  // Load mapping from Digial Heritage Metadata importer to look up header names
+  $mapping = array();
+  if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => 'digital_heritage_metadata'))) {
+    $config = array_shift($config);
+    foreach($config->config['processor']['config']['mappings'] as $map) {
+      $mapping[$map['target']] = $map['source'];
+    }
+  }
+
+  $mapping['nid'] = 'nid';
+  return $mapping;
 }
 
 function ma_importexport_get_atom_field_mapping($type) {
@@ -399,20 +442,17 @@ function ma_importexport_get_atom_field_mapping($type) {
     unset($mapping['field_full_size_jpeg:uri']);
     break;
   case 'audio':
-
     break;
   case 'video':
-
     break;
-  case 'file':
-    
+  case 'file':    
     break;
   }
   
   return $mapping;
 }
 
-function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = array()) {
+function ma_importexport_atom_field_export($atom, $field_name, $mapping = array()) {
   global $language;
 
   if(is_null($atom)) {
@@ -420,7 +460,7 @@ function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = 
   }
 
   $result = array();
-  //   dpm($field_name);
+
   switch($field_name) {
   case 'sid':
     $result[] = $atom->sid;
@@ -498,12 +538,24 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_image_atom_field_export($atom, $field_name, $mapping));
+    $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping));
   }
 
   fputcsv($csv_file, $row);
 }
 
+/**
+ * Exports a set of digital heritage items and scald atoms to CSV
+ *
+ * @param array $export_items
+ *   The array of Digtal Heritage items to export to CSV
+ *
+ * @param array $media_items
+ *   The array of Scald atoms (sids) to export to CSV
+ *
+ * @param string $delimiter
+ *   The glue string to use as a delimiter between multivalue terms
+ */
 function ma_importexport_export_csv($export_items, $media_items, $delimiter='||') {
   //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
   //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
@@ -528,7 +580,6 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
     foreach($item as $field => $value) {
       $item_array[] = implode($delimiter, $value);
     }
-    //  dpm($item_array);
     fputcsv($output, $item_array);
   }
   
@@ -560,8 +611,7 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
   ma_importexport_write_atom_csv($scald_video_output, 'video');
   ma_importexport_write_atom_csv($scald_file_output, 'file');
   
-  foreach($media_items['items'] as $atom) {
-    dpm($atom);
+  foreach($media_items as $atom) {
     switch($atom->type) {
     case 'image':
       ma_importexport_write_atom_csv($scald_image_output, 'image', $atom);
