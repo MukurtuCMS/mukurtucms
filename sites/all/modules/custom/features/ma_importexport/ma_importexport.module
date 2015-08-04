@@ -420,7 +420,7 @@ function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = 
   }
 
   $result = array();
-   dpm($field_name);
+  //   dpm($field_name);
   switch($field_name) {
   case 'sid':
     $result[] = $atom->sid;
@@ -478,7 +478,12 @@ function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = 
   case 'Temporary target 1':
   case 'scald_file:uri':
     $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
-    $result[] = $media_dir . $atom->base_entity->filename;
+    if($atom->type == 'video') {
+      $result[] = $media_dir . basename($atom->data['video_file']);
+    } else {
+      $result[] = $media_dir . $atom->base_entity->filename;
+    }
+    break;
   default:
     foreach($atom->{$field_name}[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['value']; 
@@ -600,13 +605,26 @@ function ma_importexport_export_csv($export_items, $media_items, $delimiter='||'
     }
 
     // Copy base entity file
-    $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
-    $tempmedia = file_unmanaged_copy($atom->base_entity->uri, $tempmedia, FILE_EXISTS_REPLACE);
-    if($tempmedia) {
-      $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
-      //      $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->scald_thumbnail[LANGUAGE_NONE][0]['filename']);
-      $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->base_entity->filename);
+    if(isset($atom->base_entity)) {
+      $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+      $tempmedia = file_unmanaged_copy($atom->base_entity->uri, $tempmedia, FILE_EXISTS_REPLACE);
+      if($tempmedia) {
+	$media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+	$export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->base_entity->filename);
+      }
     }
+
+    // Copy video
+    if(isset($atom->data['video_file'])) {
+      $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+      $tempmedia = file_unmanaged_copy($atom->data['video_file'], $tempmedia, FILE_EXISTS_REPLACE);
+      if($tempmedia) {
+	$media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+	$export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. basename($atom->data['video_file']));
+      }
+    }
+    
+
   }
 
   fclose($scald_image_output);
