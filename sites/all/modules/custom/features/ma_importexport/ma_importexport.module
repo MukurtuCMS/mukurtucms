@@ -268,16 +268,48 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     $export_items['items'][] = $export_item;
   }
 
-  dpm($original_node);
+  // Export all media
+  $media_sids = array();
+  foreach($export_items['items'] as $export_item) {
+    foreach($export_item['field_media_asset'] as $media) {
+      if(!in_array($media, $media_sids)) {
+	$media_sids[] = $media;
+      }
+    }
+  }
+  
+  $exported_media = ma_importexport_export_scald_media($media_sids);
+  
+  //  dpm($exported_media);
+  //  dpm($original_node);
 
   //  dpm($export_items);
-  ma_importexport_export_csv($export_items);
+  ma_importexport_export_csv($export_items, $exported_media);
   
 
   drupal_set_message(t('Exported ') . $original_node->title);
 }
 
-function ma_importexport_export_csv($export_items, $delimiter='||') {
+function ma_importexport_export_scald_media($sids) {
+  if (is_int($sids)) {
+    $sids = array($sids);
+  }
+  elseif (is_object($sids)) {
+    $sids = array($sids->sid);
+  }
+
+  $exported_media = array();
+  foreach($sids as $sid) {
+    $atom = scald_atom_load($sid);
+    $exported_media['items'][] = $atom;
+  }
+
+  return $exported_media;
+}
+
+
+// SCT: delete this
+function ma_importexport_export_csv_old($export_items, $delimiter='||') {
   //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
   //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
 
@@ -313,4 +345,307 @@ function ma_importexport_export_csv($export_items, $delimiter='||') {
   
   fclose($output);
   drupal_exit();
+}
+
+function ma_importexport_get_atom_field_mapping($type) {
+  ctools_include('export');
+
+  switch($type) {
+    case 'image':
+      $importer_id = 'import_media_images';
+      break;
+    case 'audio':
+      $importer_id = 'import_media_audio';
+      break;
+    case 'video':
+      $importer_id = 'import_media_video';
+      break;
+    case 'file':
+      $importer_id = 'import_media_files';
+      break;
+    default:
+      $importer_id = '';
+    }
+  
+  $mapping = array();
+
+  // Force some fields
+  $mapping['sid'] = 'sid';
+
+  
+  if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => $importer_id))) {
+    $config = array_shift($config);
+    foreach($config->config['processor']['config']['mappings'] as $map) {
+      $mapping[$map['target']] = $map['source'];
+    }
+  }
+
+  if(isset($mapping['field_scald_created:start'])) {
+    unset($mapping['field_scald_created:start']);
+  }
+
+  // Force bundle specific field changes
+  switch($type) {
+  case 'image':
+    $mapping['field_scald_protocol'] = $mapping['og_group_ref:etid'];
+    unset($mapping['og_group_ref:etid']);
+    $mapping['scald_thumbnail'] = $mapping['scald_thumbnail:uri'];
+    unset($mapping['scald_thumbnail:uri']);
+    $mapping['field_original_dng'] = $mapping['field_original_dng:uri'];
+    unset($mapping['field_original_dng:uri']);
+    $mapping['field_archival_tiff'] = $mapping['field_archival_tiff:uri'];
+    unset($mapping['field_archival_tiff:uri']);
+    $mapping['field_full_size_jpeg'] = $mapping['field_full_size_jpeg:uri'];
+    unset($mapping['field_full_size_jpeg:uri']);
+    break;
+  case 'audio':
+
+    break;
+  case 'video':
+
+    break;
+  case 'file':
+    
+    break;
+  }
+  
+  return $mapping;
+}
+
+function ma_importexport_image_atom_field_export($atom, $field_name, $mapping = array()) {
+  global $language;
+
+  if(is_null($atom)) {
+    return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
+  }
+
+  $result = array();
+  //  dpm($field_name);
+  switch($field_name) {
+  case 'sid':
+    $result[] = $atom->sid;
+    break;
+  case 'title':
+    $result[] = $atom->{$field_name};
+    break;
+  case 'scald_thumbnail':
+  case 'field_original_dng':
+  case 'field_archival_tiff':
+  case 'field_full_size_jpeg':
+    if(isset($atom->{$field_name}[LANGUAGE_NONE])) {
+      $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+      $result[] = $media_dir . $atom->{$field_name}[LANGUAGE_NONE][0]['filename'];
+    }
+    break;
+  case 'scald_thumbnail:uri':
+    if(isset($atom->scald_thumbnail[LANGUAGE_NONE])) {
+      $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+      $result[] = $media_dir . $atom->scald_thumbnail[LANGUAGE_NONE][0]['filename'];
+    }
+    break;
+  case 'field_scald_geo_location:lat':
+    foreach($atom->field_scald_geo_location[LANGUAGE_NONE] as $field_value) {
+      $result[] = $field_value['lat'];
+    }
+    break;
+  case 'field_scald_geo_location:lon':
+    foreach($atom->field_scald_geo_location[LANGUAGE_NONE] as $field_value) {
+      $result[] = $field_value['lon'];
+    }
+    break;    
+  case 'field_scald_protocol':
+  case 'og_group_ref':
+    foreach($atom->{$field_name}[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['target_id'];
+    }    
+    break;
+  case 'og_group_ref:etid':
+    foreach($atom->field_scald_protocol[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['target_id'];
+    }    
+    break;
+  case 'field_category':
+    foreach($atom->{$field_name}[$language->language] as $term) {
+      $result[] = taxonomy_term_load($term['tid'])->name;
+    }
+    break;
+  case 'scald_tags':
+  case 'scald_authors':
+    foreach($atom->{$field_name}[LANGUAGE_NONE] as $term) {
+      $result[] = taxonomy_term_load($term['tid'])->name;
+    }
+    break;
+  case 'Temporary target 1':
+    $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+    $result[] = $media_dir . $atom->base_entity->filename;
+    break;
+  default:
+    foreach($atom->{$field_name}[LANGUAGE_NONE] as $field_value) {
+      $result[] = $field_value['value']; 
+    }
+  }
+  return $result;
+}
+
+function ma_importexport_write_image_atom_csv($csv_file, $atom = NULL, $delimiter='||') {
+  $fields = field_info_instances('scald_atom','image');
+  $mapping = ma_importexport_get_atom_field_mapping('image');
+
+  $row = array();
+  foreach($mapping as $field_name => $field) {
+    $row[] = implode($delimiter, ma_importexport_image_atom_field_export($atom, $field_name, $mapping));
+  }
+
+  fputcsv($csv_file, $row);
+}
+
+function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter='||') {
+  $fields = field_info_instances('scald_atom',$type);
+  $mapping = ma_importexport_get_atom_field_mapping($type);
+
+  $row = array();
+  foreach($mapping as $field_name => $field) {
+    $row[] = implode($delimiter, ma_importexport_image_atom_field_export($atom, $field_name, $mapping));
+  }
+
+  fputcsv($csv_file, $row);
+}
+
+function ma_importexport_export_csv($export_items, $media_items, $delimiter='||') {
+  //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
+  //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
+
+  // Prevent Devel from messing us up.
+  $GLOBALS['devel_shutdown'] = TRUE;
+
+  // Write DH CSV
+  $dh_temp_file = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+  $output = fopen($dh_temp_file, 'w');
+
+  // Write column headers
+  $headers = array();
+  foreach($export_items['items'][0] as $key => $name) {
+    $headers[] = $export_items['headers'][$key] ? $export_items['headers'][$key] : $key;
+  }
+  fputcsv($output, $headers);
+
+  // Write items to rows
+  foreach($export_items['items'] as $item) {
+    $item_array = array();
+    foreach($item as $field => $value) {
+      $item_array[] = implode($delimiter, $value);
+    }
+    //  dpm($item_array);
+    fputcsv($output, $item_array);
+  }
+  
+  fclose($output);
+
+  $export_files = array(array('filename' => $dh_temp_file, 'localname' => 'digitalheritage.csv'));
+
+  // media
+  $scald_image_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+  $scald_image_output = fopen($scald_image_temp, 'w');
+  
+  $scald_audio_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+  $scald_audio_output = fopen($scald_audio_temp, 'w');
+  
+  $scald_video_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+  $scald_video_output = fopen($scald_video_temp, 'w');
+  
+  $scald_file_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+  $scald_file_output = fopen($scald_file_temp, 'w');
+  
+  $scald_image_count = 0;
+  $scald_audio_count = 0;
+  $scald_video_count = 0;
+  $scald_file_count = 0;
+
+  // Write headers
+  ma_importexport_write_image_atom_csv($scald_image_output);
+  ma_importexport_write_atom_csv($scald_audio_output, 'audio');
+  
+  foreach($media_items['items'] as $atom) {
+    dpm($atom);
+    switch($atom->type) {
+    case 'image':
+      ma_importexport_write_image_atom_csv($scald_image_output, $atom);
+      $scald_image_count++;
+      break;
+    case 'audio':
+      ma_importexport_write_atom_csv($scald_audio_output, 'audio', $atom);
+      $scald_audio_count++;
+      break;
+    case 'video':
+      $scald_video_count++;      
+      break;
+    case 'file':
+      $scald_file_count++;      
+      break;
+    default:
+    }
+
+    // Copy Thumbnails
+    foreach($atom->scald_thumbnail[LANGUAGE_NONE] as $thumbnail) {
+      $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+      $tempmedia = file_unmanaged_copy($thumbnail['uri'], $tempmedia, FILE_EXISTS_REPLACE);
+      if($tempmedia) {
+	$media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+	$export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $thumbnail['filename']); 
+      }
+    }
+
+    // Copy base entity file
+    $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+    $tempmedia = file_unmanaged_copy($atom->base_entity->uri, $tempmedia, FILE_EXISTS_REPLACE);
+    if($tempmedia) {
+      $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+      //      $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->scald_thumbnail[LANGUAGE_NONE][0]['filename']);
+      $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->base_entity->filename);
+    }
+  }
+
+  fclose($scald_image_output);
+  fclose($scald_audio_output);
+  fclose($scald_video_output);
+  fclose($scald_file_output);
+  
+  if($scald_image_count > 0) {
+    $export_files[] = array('filename' => $scald_image_temp, 'localname' => 'media_images.csv'); 
+  }
+  if($scald_audio_count > 0) {
+    $export_files[] = array('filename' => $scald_audio_temp, 'localname' => 'media_audio.csv');
+  }
+  if($scald_video_count > 0) {
+    $export_files[] = array('filename' => $scald_video_temp, 'localname' => 'media_video.csv');
+  }
+  if($scald_file_count > 0) {
+    $export_files[] = array('filename' => $scald_file_temp, 'localname' => 'media_files.csv'); 
+  }
+  
+  ma_importexport_download_zip($export_files);
+  //drupal_exit();
+}
+
+function ma_importexport_download_zip($files) {
+    $zip = new ZipArchive();
+
+    $tempfile = tempnam(sys_get_temp_dir(),'MUKURTUZIP');
+    $zip->open($tempfile, ZipArchive::CREATE);
+
+    foreach($files as $file) {
+      $export_file = file_get_contents($file);
+      $zip->addFile($file['filename'], $file['localname']);
+    }
+
+    $zip->close();
+    header('Content-disposition: attachment; filename=export.zip');
+    header('Content-type: application/zip');
+    readfile($tempfile);
+
+    // Delete tempfiles
+    foreach($files as $file) {
+      unlink($file['filename']);
+    }
+    drupal_exit();
 }
