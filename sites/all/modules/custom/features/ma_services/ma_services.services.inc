@@ -88,6 +88,14 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'groups' => array(
+      'alias' => 'groups',
+      'operations' => array(
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'system' => array(
       'actions' => array(
         'connect' => array(

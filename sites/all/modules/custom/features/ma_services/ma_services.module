@@ -66,10 +66,29 @@ function ma_services_services_resources() {
         ),
       ),
     ),
+    'groups' => array(
+      'operations' => array(
+        'index' => array(
+          'help' => 'Retrieve all groups that current user can post content to',
+          'callback' => '_ma_services_user_groups',
+          'access callback' => 'user_access',
+          'access arguments' => array('edit own digital_heritage content'),
+          'access arguments append' => FALSE,
+          'args' => array(
+            array(
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 
-  return
-    $api;
+  return $api;
 }
 
 function _ma_services_create_atom ($fn, $id, $external, $title, $author, $category) {
@@ -303,4 +322,31 @@ function _ma_services_create_atom ($fn, $id, $external, $title, $author, $catego
       'sid' => $sid,
     );
   }
+}
+
+// Return the communities and protocols the current user has posting access to
+function _ma_services_user_groups ($fn) {
+  $groups_list = array();
+
+  $groups = og_get_groups_by_user(null, 'node');
+  foreach ($groups as $group) {
+    $og_node = node_load($group);
+    if ($og_node->type == 'community') {
+      $groups_list[] = array (
+        'nid' => $og_node->nid,
+        'title' => $og_node->title,
+        'type' => 'community',
+      );
+      $cultural_protocols = ma_cultural_protocol_get_cps_user_can_post_to($og_node->nid);
+      foreach ($cultural_protocols as $group_nid => $group_title) {
+        $groups_list[] = array(
+          'nid' => $group_nid,
+          'title' => $group_title,
+          'type' => 'cultural_protocol',
+        );
+      }
+    }
+  }
+  
+  return $groups_list;
 }
