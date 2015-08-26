@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install/update hooks for feeds_entity_processor.module.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function feeds_entity_processor_enable() {
+  cache_clear_all('plugins:feeds:plugins', 'cache');
+}

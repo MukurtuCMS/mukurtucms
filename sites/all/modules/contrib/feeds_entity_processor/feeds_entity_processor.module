@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * @file
+ * Provides a generic entity processor for Feeds.
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function node_form_feedsentityprocessor_feeds_form_alter(&$form, &$form_state) {
+  if ($form['#configurable']->entityType() == 'node') {
+    unset($form['values']['title']);
+    $form['values']['author']['#required'] = FALSE;
+    $form['values']['author']['#autocomplete_path'] = 'user/autocomplete';
+    array_unshift($form['#validate'], 'node_form_feedsentityprocessor_feeds_form_validate');
+    if (is_numeric($form['values']['author']['#default_value']) &&
+      $account = user_load($form['values']['author']['#default_value'])) {
+      $form['values']['author']['#default_value'] = $account->name;
+    }
+  }
+}
+
+/**
+ * Validation callback for node_form_feedsentityprocessor_feeds_form_alter().
+ */
+function node_form_feedsentityprocessor_feeds_form_validate(&$form, &$form_state) {
+  if (empty($form_state['values']['values']['author'])) {
+    form_set_value($form['values']['author'], 0, $form_state);
+  }
+  else {
+    $account = user_load_by_name($form_state['values']['values']['author']);
+    if ($account) {
+      form_set_value($form['values']['author'], $account->uid, $form_state);
+    }
+  }
+}
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function node_feeds_processor_targets_alter(&$targets, $entity_type, $bundle) {
+  if ($entity_type == 'node') {
+    $targets['nid']['name'] = t('Node id');
+    $targets['nid']['description'] = t('The nid of the node. NOTE: use this feature with care, node ids are usually assigned by Drupal.');
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function user_form_feedsentityprocessor_feeds_form_alter(&$form, &$form_state) {
+  if ($form['#configurable']->entityType() == 'user') {
+    unset($form['values']['name']);
+    $form['values']['mail']['#required'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function taxonomy_form_feedsentityprocessor_feeds_form_alter(&$form, &$form_state) {
+  if ($form['#configurable']->entityType() == 'taxonomy_term') {
+    unset($form['values']['name']);
+    if (empty($form['values']['weight']['#default_value'])) {
+      $form['values']['weight']['#default_value']= '';
+    }
+    array_unshift($form['#validate'], 'taxonomy_form_feedsentityprocessor_feeds_form_validate');
+    unset($form['values']['parent']);
+    $form['values']['machine_name'] = $form['values']['vocabulary'];
+    $form['values']['vocabulary']['#access'] = FALSE;
+  }
+  elseif ($form['#configurable']->entityType() == 'taxonomy_vocabulary') {
+    unset($form['values']['name']);
+    unset($form['values']['machine_name']);
+    unset($form['values']['vid']);
+  }
+}
+
+/**
+ * Validation callback for taxonomy_form_feedsentityprocessor_feeds_form_alter().
+ */
+function taxonomy_form_feedsentityprocessor_feeds_form_validate(&$form, &$form_state) {
+  if (empty($form_state['values']['values']['weight'])) {
+    form_set_value($form['values']['weight'], 0, $form_state);
+  }
+  form_set_value($form['values']['vocabulary'], $form_state['values']['values']['machine_name'], $form_state);
+}
