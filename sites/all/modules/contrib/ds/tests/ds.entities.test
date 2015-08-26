@@ -521,6 +521,7 @@ class dsNodeTests extends dsBaseTest {
       'fields[body][settings_edit_form][settings][ft][fi-el]' => 'span',
       'fields[body][settings_edit_form][settings][ft][fi-cl]' => 'fi-class',
       'fields[body][settings_edit_form][settings][ft][fi-odd-even]' => '1',
+      'fields[body][settings_edit_form][settings][ft][fi-first-last]' => '1',
     );
     $this->dsEditFormatterSettings($edit);
     $this->drupalGet('node/' . $node->nid);
@@ -537,6 +538,7 @@ class dsNodeTests extends dsBaseTest {
       'fields[body][settings_edit_form][settings][ft][fi-el]' => 'div',
       'fields[body][settings_edit_form][settings][ft][fi-cl]' => 'fi-class',
       'fields[body][settings_edit_form][settings][ft][fi-odd-even]' => '1',
+      'fields[body][settings_edit_form][settings][ft][fi-first-last]' => '1',
     );
     $this->dsEditFormatterSettings($edit);
     $this->drupalGet('node/' . $node->nid);
@@ -555,6 +557,7 @@ class dsNodeTests extends dsBaseTest {
       'fields[body][settings_edit_form][settings][ft][fi-el]' => 'span',
       'fields[body][settings_edit_form][settings][ft][fi-cl]' => 'fi-class',
       'fields[body][settings_edit_form][settings][ft][fi-odd-even]' => '1',
+      'fields[body][settings_edit_form][settings][ft][fi-first-last]' => '1',
     );
     $this->dsEditFormatterSettings($edit);
     $this->drupalGet('node/' . $node->nid);
