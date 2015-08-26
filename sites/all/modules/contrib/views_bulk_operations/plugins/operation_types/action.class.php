@@ -7,6 +7,7 @@
  */
 
 class ViewsBulkOperationsAction extends ViewsBulkOperationsBaseOperation {
+
   /**
    * Contains the options provided by the user in the configuration form.
    *
@@ -19,7 +20,7 @@ class ViewsBulkOperationsAction extends ViewsBulkOperationsBaseOperation {
    */
   public function getAccessMask() {
     // Assume edit by default.
-    if (!isset($this->operationInfo['behavior'])) {
+    if (empty($this->operationInfo['behavior'])) {
       $this->operationInfo['behavior'] = array('changes_property');
     }
 
@@ -140,9 +141,11 @@ class ViewsBulkOperationsAction extends ViewsBulkOperationsBaseOperation {
    * @param $dom_id
    *   The dom path to the level where the admin options form is embedded.
    *   Needed for #dependency.
+   * @param $field_handler
+   *   The Views field handler object for the VBO field.
    */
-  public function adminOptionsForm($dom_id) {
-    $form = parent::adminOptionsForm($dom_id);
+  public function adminOptionsForm($dom_id, $field_handler) {
+    $form = parent::adminOptionsForm($dom_id, $field_handler);
 
     $settings_form_callback = $this->operationInfo['callback'] . '_views_bulk_operations_form';
     if (function_exists($settings_form_callback)) {
@@ -156,7 +159,8 @@ class ViewsBulkOperationsAction extends ViewsBulkOperationsBaseOperation {
           $dom_id . '-selected' => array(1),
         ),
       );
-      $form['settings'] += $settings_form_callback($settings, $this->entityType);
+      $settings_dom_id = $dom_id . '-settings';
+      $form['settings'] += $settings_form_callback($settings, $this->entityType, $settings_dom_id);
     }
 
     return $form;
