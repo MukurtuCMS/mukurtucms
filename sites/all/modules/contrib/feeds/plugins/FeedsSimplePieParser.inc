@@ -52,6 +52,7 @@ class FeedsSimplePieEnclosure extends FeedsEnclosure {
   public function getMIMEType() {
     return $this->simplepie_enclosure->get_real_type();
   }
+
 }
 
 /**
@@ -232,4 +233,5 @@ class FeedsSimplePieParser extends FeedsParser {
     $words = array_slice($words, 0, 3);
     return implode(' ', $words);
   }
+
 }

@@ -9,6 +9,7 @@
  * Test single feeds.
  */
 class FeedsSyndicationParserTestCase extends FeedsWebTestCase {
+
   public static function getInfo() {
     return array(
       'name' => 'Syndication parsers',
@@ -39,6 +40,15 @@ class FeedsSyndicationParserTestCase extends FeedsWebTestCase {
         $this->assertText('Created ' . $assertions['item_count'] . ' nodes');
       }
     }
+
+    feeds_include_simplepie();
+    variable_set('feeds_never_use_curl', TRUE);
+
+    $link = $GLOBALS['base_url'] . '/testing/feeds/flickr.xml';
+    $enclosure = new FeedsSimplePieEnclosure(new SimplePie_Enclosure($link));
+
+    $enclosure->setAllowedExtensions('xml');
+    $this->assertEqual(1, $enclosure->getFile('public://')->fid);
   }
 
   /**
@@ -55,4 +65,5 @@ class FeedsSyndicationParserTestCase extends FeedsWebTestCase {
       ),
     );
   }
+
 }

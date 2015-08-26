@@ -7,9 +7,9 @@ configure = admin/structure/feeds
 
 files[] = feeds_ui.test
 
-; Information added by Drupal.org packaging script on 2015-04-23
-version = "7.x-2.0-alpha8+85-dev"
+; Information added by Drupal.org packaging script on 2015-08-06
+version = "7.x-2.0-beta1+6-dev"
 core = "7.x"
 project = "feeds"
-datestamp = "1429810684"
+datestamp = "1438832945"
 
