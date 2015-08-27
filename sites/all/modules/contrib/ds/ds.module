@@ -302,6 +302,9 @@ function ds_get_fields($entity_type, $cache = TRUE) {
 
   static $static_fields, $fields_cached = array();
   static $loaded = FALSE;
+  // Load the ds file that handles ds call of hook_ds_fields_info, otherwise it
+  // doesn't get loaded
+  module_load_include('inc', 'ds', 'ds.ds_fields_info');
 
   // Get fields from cache.
   if (!$loaded) {
@@ -571,8 +574,13 @@ function ds_field_attach_view_alter(&$build, $context) {
     }
   }
 
+  $disable_css = FALSE;
+  if (!empty($layout['settings']['layout_disable_css'])) {
+    $disable_css = TRUE;
+  }
+
   // Add path to css file for this layout and disable block regions if necessary.
-  if (isset($layout['css']) && !isset($loaded_css[$layout['path'] . '/' . $layout['layout'] . '.css'])) {
+  if (!$disable_css && isset($layout['css']) && !isset($loaded_css[$layout['path'] . '/' . $layout['layout'] . '.css'])) {
     // Register css file.
     $loaded_css[$layout['path'] . '/' . $layout['layout'] . '.css'] = TRUE;
     // Add css file.
@@ -649,11 +657,12 @@ function ds_entity_variables(&$vars) {
         $layout['layout'] = $layout['panels']['theme'];
       }
 
+      $bundle = strtr($vars['elements']['#bundle'], '-', '_');
       $vars['theme_hook_suggestions'][] = $layout['layout'];
       $vars['theme_hook_suggestions'][] = $layout['layout'] . '__' . $vars['elements']['#entity_type'];
       $vars['theme_hook_suggestions'][] = $layout['layout'] . '__' . $vars['elements']['#entity_type'] . '_' . $vars['elements']['#view_mode'];
-      $vars['theme_hook_suggestions'][] = $layout['layout'] . '__' . $vars['elements']['#entity_type'] . '_' . $vars['elements']['#bundle'];
-      $vars['theme_hook_suggestions'][] = $layout['layout'] . '__' . $vars['elements']['#entity_type'] . '_' . $vars['elements']['#bundle'] . '_' . $vars['elements']['#view_mode'];
+      $vars['theme_hook_suggestions'][] = $layout['layout'] . '__' . $vars['elements']['#entity_type'] . '_' . $bundle;
+      $vars['theme_hook_suggestions'][] = $layout['layout'] . '__' . $vars['elements']['#entity_type'] . '_' . $bundle . '_' . $vars['elements']['#view_mode'];
     }
 
     // If the layout has wrapper class lets add it.
@@ -686,7 +695,7 @@ function ds_entity_variables(&$vars) {
         $vars[$region_name . '_classes'] = !empty($layout['settings']['classes'][$region_name]) ? ' ' . implode(' ', $layout['settings']['classes'][$region_name]) : '';
 
         // Token support for region classes.
-        if (module_exists('token')) {
+        if (module_exists('token') && isset($vars[$object])) {
           $vars[$region_name . '_classes'] = token_replace($vars[$region_name . '_classes'], array($object => $vars[$object]), array('clear' => TRUE, 'sanitize' => TRUE));
         }
       }
@@ -705,7 +714,12 @@ function ds_entity_variables(&$vars) {
     // Add layout attributes if any.
     $vars['layout_attributes'] = '';
     if (!empty($layout['settings']['layout_attributes'])) {
-      $vars['layout_attributes'] .= ' ' . $layout['settings']['layout_attributes'];
+      if (isset($vars[$object])) {
+        $vars['layout_attributes'] .= ' ' . token_replace($layout['settings']['layout_attributes'], array($object => $vars[$object]), array('clear' => TRUE, 'sanitize' => TRUE));
+      }
+      else {
+        $vars['layout_attributes'] .= ' ' . $layout['settings']['layout_attributes'];
+      }
     }
     // Merge in other attributes which were passed to the template.
     if (!empty($layout['settings']['layout_attributes_merge'])) {
@@ -718,7 +732,7 @@ function ds_entity_variables(&$vars) {
     }
 
     // Token support for layout classes.
-    if (module_exists('token')) {
+    if (module_exists('token') && isset($vars[$object])) {
       foreach ($vars['classes_array'] as &$class) {
         $class = token_replace($class, array($object => $vars[$object]), array('clear' => TRUE, 'sanitize' => TRUE));
       }
@@ -789,16 +803,17 @@ function ds_create_entity_context($entity_type, $entity, &$contexts, $context_ar
  */
 function ds_render_code_field($field) {
   if (isset($field['properties']['code'])) {
+    $value = $field['properties']['code']['value'];
+    // Token support - check on token property so we don't run every single field through token.
+    if (isset($field['properties']['use_token']) && $field['properties']['use_token']) {
+      $value = token_replace($value, array($field['entity_type'] => $field['entity']), array('clear' => TRUE));
+    }
     $format = (isset($field['properties']['code']['format'])) ? $field['properties']['code']['format'] : 'plain_text';
     if ($format == 'ds_code' && module_exists('ds_format')) {
-      $value = ds_format_php_eval($field['properties']['code']['value'], $field['entity'], isset($field['build']) ? $field['build'] : array());
+      $value = ds_format_php_eval($value, $field['entity'], isset($field['build']) ? $field['build'] : array());
     }
     else {
-      $value = check_markup($field['properties']['code']['value'], $format);
-    }
-    // Token support - check on token property so we don't run every single field through token.
-    if (isset($field['properties']['use_token']) && $field['properties']['use_token'] == TRUE) {
-      $value = token_replace($value, array($field['entity_type'] => $field['entity']), array('clear' => TRUE));
+      $value = check_markup($value, $format);
     }
     return $value;
   }
@@ -819,7 +834,12 @@ function ds_render_ctools_field($field) {
     // 3) embed a view with the 2 taxonomies as fields.
     if (isset($field['formatter_settings']['load_terms']) && $field['formatter_settings']['load_terms']) {
       static $terms_loaded = array();
-      $language = $field['entity']->language;
+      if (isset($field['entity']->language)) {
+        $language = $field['entity']->language;
+      }
+      else {
+        $language = LANGUAGE_NONE;
+      }
       $instances = field_info_instances($field['entity_type'], $field['bundle']);
       foreach ($instances as $key => $instance) {
         $info = field_info_field($key);
@@ -838,7 +858,7 @@ function ds_render_ctools_field($field) {
                   // This term is missing in the database.
                   continue;
                 }
-                $terms_loaded[$item['tid']];
+                $terms_loaded[$item['tid']] = $term;
               }
               $field['entity']->{$key}[$language][$tkey]['taxonomy_term'] = $terms_loaded[$item['tid']];
             }
@@ -870,7 +890,7 @@ function ds_render_ctools_field($field) {
       $content = '';
       if ($show_title) {
         if (empty($title_wrapper)) $title_wrapper = 'div';
-        $content .= '<' . check_plain($title_wrapper) . '>' . $data->title . '</' . check_plain($title_wrapper) . '>';
+        $content .= '<' . check_plain($title_wrapper) . ' class="title">' . $data->title . '</' . check_plain($title_wrapper) . '>';
       }
       if (is_array($data->content)) {
         $content .= drupal_render($data->content);
@@ -1227,6 +1247,9 @@ function ds_field_formatter_view($entity_type, $entity, $field, $instance, $lang
       }
       else {
         $term = taxonomy_term_load($item['tid']);
+        if (module_exists('i18n_taxonomy')) {
+          $term = i18n_taxonomy_localize_terms($term);
+        }
         if (!is_object($term)) {
           // This term is missing in the database.
           continue;
@@ -1259,6 +1282,9 @@ function ds_field_formatter_view($entity_type, $entity, $field, $instance, $lang
       }
       else {
         $term = taxonomy_term_load($item['tid']);
+        if (module_exists('i18n_taxonomy')) {
+          $term = i18n_taxonomy_localize_terms($term);
+        }
         if (!is_object($term)) {
           // This term is missing in the database.
           continue;
@@ -1269,7 +1295,7 @@ function ds_field_formatter_view($entity_type, $entity, $field, $instance, $lang
         $item_display = check_plain($term->name);
         if ($linked) {
           $uri = entity_uri('taxonomy_term', $term);
-          $item_display = l($term->name, $uri['path']);
+          $item_display = l($term->name, $uri['path'], $uri['options']);
         }
       }
       $terms[] = $item_display;

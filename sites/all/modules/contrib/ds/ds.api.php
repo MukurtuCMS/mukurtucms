@@ -196,7 +196,10 @@ function hook_ds_fields_info($entity_type) {
       'use_token' => TRUE, // or FALSE,
 
       // block: the module and delta of the block, only for block fields.
-      'block' => 'user-menu',
+      //
+      // @note: Display Suite uses a "|" token to split the module from
+      // the delta.
+      'block' => 'user|menu',
 
       // block_render: block render type, only for block fields.
       // - DS_BLOCK_CONTENT       : render through block template file.
@@ -238,7 +241,7 @@ function hook_ds_custom_fields_info() {
   );
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<? print "this is a custom field"; ?>',
+      'value' => '<?php print "this is a custom field"; ?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,
@@ -268,7 +271,9 @@ function hook_ds_vd_info() {
 }
 
 /**
- * Alter fields defined by Display Suite
+ * Alter fields defined by Display Suite.
+ *
+ * This function is called for each entity type.
  *
  * @param $fields
  *   An array with fields which can be altered just before they get cached.

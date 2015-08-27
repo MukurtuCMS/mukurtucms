@@ -28,21 +28,17 @@ function hook_colorbox_settings_alter(&$settings, &$style) {
   }
 }
 
-
 /**
- * Allow other modules to control access to forms opening in Colorbox.
+ * Allows to override activation of Colobox for the current URL.
  *
- * Implements hook_colorbox_form_access().
- *
- * @param $form_id
- *   The unique string identifying the current form.
+ * @param $active
+ *   A boolean indicating whether colorbox should be active for the current
+ *   URL or not.
  */
-function hook_colorbox_form_access($form_id) {
-  $access = FALSE;
-
-  if ($form_id == 'forward_form') {
-    return user_access('access forward');
+function hook_colorbox_active_alter(&$active) {
+  $path = drupal_get_path_alias($_GET['q']);
+  if (drupal_match_path($path, 'admin/config/colorbox_test')) {
+    // Enable colorbox for this URL.
+    $active = TRUE;
   }
-
-  return $access;
 }

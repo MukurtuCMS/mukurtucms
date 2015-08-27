@@ -12,10 +12,9 @@ class FeedsEntityProcessorTest extends FeedsWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Processor: Entity',
+      'name' => 'Basic import capabilities',
       'description' => 'Tests importing entities using the generic processor.',
-      'group' => 'Feeds',
-      'dependencies' => array('entity_test'),
+      'group' => 'Feeds entity processor',
     );
   }
 
@@ -23,19 +22,17 @@ class FeedsEntityProcessorTest extends FeedsWebTestCase {
    * Set up test.
    */
   public function setUp() {
-    parent::setUp(array('entity_test'));
+    parent::setUp(array('entity_test', 'feeds_entity_processor'));
     // Create an importer configuration.
     $this->createImporterConfiguration('Syndication', 'syndication');
     $this->setPlugin('syndication', 'FeedsEntityProcessorEntity_test');
-    $this->addMappings('syndication',
-      array(
-        0 => array(
-          'source' => 'guid',
-          'target' => 'guid',
-          'unique' => TRUE,
-        ),
-      )
-    );
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+    ));
   }
 
   /**

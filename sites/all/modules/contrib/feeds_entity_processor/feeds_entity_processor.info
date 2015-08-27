@@ -1,0 +1,15 @@
+name = Feeds entity processor
+description = Provides a generic entity processor for Feeds.
+package = Feeds
+core = 7.x
+dependencies[] = feeds (7.x-2.x-dev)
+dependencies[] = entity
+
+files[] = tests/feeds_processor_entity.test
+
+; Information added by Drupal.org packaging script on 2015-07-13
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "feeds_entity_processor"
+datestamp = "1436829540"
+

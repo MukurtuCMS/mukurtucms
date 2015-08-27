@@ -54,6 +54,10 @@ function ds_search_theme() {
  * Search page theming.
  */
 function theme_ds_search_page($build) {
+  // fix for Drupal 7.33+
+  if(isset($build['theme_hook_original'])) {
+    unset($build['theme_hook_original']);
+  }
 
   // Check on empty search results.
   if (empty($build['search_results'])) {

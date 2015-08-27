@@ -2,13 +2,14 @@
 
 /**
  * @file
- * Test case for mapping to node summary.
+ * Contains FeedsMapperNodeSummaryTestCase.
  */
 
 /**
- * Class for testing Feeds summary mapper.
+ * Test case for mapping to node summary.
  */
 class FeedsMapperNodeSummaryTestCase extends FeedsMapperTestCase {
+
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Text with summary',

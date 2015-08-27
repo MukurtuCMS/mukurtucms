@@ -6,11 +6,11 @@
  */
 
 /**
- * Implements hook_feeds_processor_targets_alter().
- *
- * @see FeedsProcessor::getMappingTargets()
+ * Implements hook_feeds_processor_targets().
  */
-function number_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+function number_feeds_processor_targets($entity_type, $bundle_name) {
+  $targets = array();
+
   $numeric_types = array(
     'number_integer',
     'number_decimal',
@@ -27,14 +27,14 @@ function number_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_n
       );
     }
   }
+
+  return $targets;
 }
 
 /**
- * Callback for mapping numerics.
- *
- * Ensure that $value is a numeric to avoid database errors.
+ * Callback for mapping number fields.
  */
-function number_feeds_set_target($source, $entity, $target, array $values) {
+function number_feeds_set_target(FeedsSource $source, $entity, $target, array $values) {
   // Iterate over all values.
   $field = isset($entity->$target) ? $entity->$target : array('und' => array());
 

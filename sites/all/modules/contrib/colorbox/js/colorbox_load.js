@@ -2,7 +2,7 @@
 
 Drupal.behaviors.initColorboxLoad = {
   attach: function (context, settings) {
-    if (!$.isFunction($.colorbox)) {
+    if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
       return;
     }
     $.urlParams = function (url) {

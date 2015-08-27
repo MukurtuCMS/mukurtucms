@@ -5,7 +5,6 @@
  * Colorbox theme functions.
  */
 
-
 /**
  * Returns HTML for an Colorbox image field formatter.
  *
@@ -26,14 +25,38 @@ function theme_colorbox_image_formatter($variables) {
 
   $image = array(
     'path' => $item['uri'],
-    'alt' => $item['alt'],
-    'title' => $item['title'],
+    'alt' => isset($item['alt']) ? $item['alt'] : '',
+    'title' => isset($item['title']) ? $item['title'] : '',
     'style_name' => $settings['colorbox_node_style'],
   );
+
+  if ($variables['delta'] == 0 && !empty($settings['colorbox_node_style_first'])) {
+    $image['style_name'] = $settings['colorbox_node_style_first'];
+  }
 
   if (isset($item['width']) && isset($item['height'])) {
     $image['width'] = $item['width'];
     $image['height'] = $item['height'];
+  }
+
+  if (isset($item['attributes'])) {
+    $image['attributes'] = $item['attributes'];
+  }
+
+  // Allow image attributes to be overridden.
+  if (isset($variables['item']['override']['attributes'])) {
+    foreach (array('width', 'height', 'alt', 'title') as $key) {
+      if (isset($variables['item']['override']['attributes'][$key])) {
+        $image[$key] = $variables['item']['override']['attributes'][$key];
+        unset($variables['item']['override']['attributes'][$key]);
+      }
+    }
+    if (isset($image['attributes'])) {
+      $image['attributes'] = $variables['item']['override']['attributes'] + $image['attributes'];
+    }
+    else {
+      $image['attributes'] = $variables['item']['override']['attributes'];
+    }
   }
 
   $entity_title = entity_label($entity_type, $entity);
@@ -136,44 +159,61 @@ function theme_colorbox_imagefield($variables) {
     $image = theme('image', $variables['image']);
   }
 
-  $options = array(
+  $options = drupal_parse_url($variables['path']);
+  $options += array(
     'html' => TRUE,
     'attributes' => array(
       'title' => $variables['title'],
-      'class' => implode(' ', $class),
+      'class' => $class,
       'rel' => $variables['gid'],
-    )
+    ),
+    'language' => array('language' => NULL),
   );
 
-  return l($image, $variables['path'], $options);
+  return l($image, $options['path'], $options);
 }
 
 /**
  * Preprocess variables for the colorbox-insert-image.tpl.php file.
  */
 function template_preprocess_colorbox_insert_image(&$variables) {
-  $class = array();
-  $file = file_load($variables['item']['fid']);
+  $item = $variables['item'];
+  $variables['file'] = file_load($item['fid']);
+  $variables['style_name'] = $item['style_name'];
+  $variables['width'] = isset($item['width']) ? $item['width'] : NULL;
+  $variables['height'] = isset($item['height']) ? $item['height'] : NULL;
 
+  // Determine dimensions of the image after the image style transformations.
+  image_style_transform_dimensions($variables['style_name'], $variables);
+
+  $class = array();
   if (!empty($variables['widget']['settings']['insert_class'])) {
     $class = explode(' ', $variables['widget']['settings']['insert_class']);
   }
-  $class[] = 'image-' . $variables['item']['style_name'];
+  $class[] = 'image-' . $variables['style_name'];
 
   foreach ($class as $key => $value) {
     $class[$key] = drupal_html_class($value);
   }
 
-  $variables['image_path'] = image_style_url($variables['item']['style_name'], $file->uri);
+  $variables['class'] = implode(' ', $class);
+
+  $variables['uri'] = image_style_path($variables['style_name'], $variables['file']->uri);
+  $absolute = isset($variables['widget']['settings']['insert_absolute']) ? $variables['widget']['settings']['insert_absolute'] : NULL;
+  $variables['url'] = insert_create_url($variables['uri'], $absolute, variable_get('clean_url'));
+
+  // http://drupal.org/node/1923336
+  if (function_exists('image_style_path_token')) {
+    $token_query = array(IMAGE_DERIVATIVE_TOKEN => image_style_path_token($variables['style_name'], $variables['file']->uri));
+    $variables['url'] .= (strpos($variables['url'], '?') !== FALSE ? '&' : '?') . drupal_http_build_query($token_query);
+  }
 
   if ($style_name = variable_get('colorbox_image_style', '')) {
-    $variables['link_path'] = image_style_url($style_name, $file->uri);
+    $variables['path'] = image_style_url($style_name, $variables['file']->uri);
   }
   else {
-    $variables['link_path'] = file_create_url($file->uri);
+    $variables['path'] = file_create_url($variables['file']->uri);
   }
-
-  $variables['class'] = implode(' ', $class);
 
   $variables['gallery_id'] = '';
   switch (variable_get('colorbox_insert_gallery', 0)) {
