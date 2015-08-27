@@ -706,23 +706,17 @@ function system_theme_settings_submit($form, &$form_state) {
   if (!empty($values['logo_upload'])) {
     $file = $values['logo_upload'];
     unset($values['logo_upload']);
-    $path = 'public://' . $file->filename;
-    $file->destination = $path;
-    $file->status = 1;
-    $file = file_copy($file, $file->destination);
+    $filename = file_unmanaged_copy($file->uri);
     $values['default_logo'] = 0;
-    $values['logo_path'] = $file->uri;;
+    $values['logo_path'] = $filename;
     $values['toggle_logo'] = 1;
   }
   if (!empty($values['favicon_upload'])) {
     $file = $values['favicon_upload'];
     unset($values['favicon_upload']);
-    $path = 'public://' . $file->filename;
-    $file->destination = $path;
-    $file->status = 1;
-    $file = file_copy($file, $file->destination);
+    $filename = file_unmanaged_copy($file->uri);
     $values['default_favicon'] = 0;
-    $values['favicon_path'] = $file->uri;
+    $values['favicon_path'] = $filename;
     $values['toggle_favicon'] = 1;
   }
 
@@ -2652,8 +2646,8 @@ function theme_system_modules_fieldset($variables) {
     }
     $row[] = array('data' => $description, 'class' => array('description'));
     // Display links (such as help or permissions) in their own columns.
-    foreach (array('help', 'permissions', 'configure') as $key) {
-      $row[] = array('data' => drupal_render($module['links'][$key]), 'class' => array($key));
+    foreach (array('help', 'permissions', 'configure') as $link_type) {
+      $row[] = array('data' => drupal_render($module['links'][$link_type]), 'class' => array($link_type));
     }
     $rows[] = $row;
   }
