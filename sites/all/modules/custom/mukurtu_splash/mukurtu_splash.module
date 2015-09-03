@@ -832,7 +832,7 @@ function mukurtu_splash_block_support() {
 
   $items[] = array (
     'title' => 'Mukurtu Video Channel',
-    'href' => 'https://www.youtube.com/user/mukurtu',
+    'href' => 'https://vimeo.com/channels/mukurtucms',
     'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
     'description' => t('How Tos and Walkthroughs'),
   );
