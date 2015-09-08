@@ -23,6 +23,13 @@ function ma_importexport_menu() {
     'weight' => 105,
   );
 
+  $items['digital-heritage/export'] = array(
+					    'title' => 'Export Digital Heritage Items',
+					    'page callback' => 'drupal_get_form',
+					    'page arguments' => array('ma_importexport_export_form'),
+					    'access callback' => TRUE,
+					    );
+
   return $items;
 }
 
@@ -156,7 +163,14 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
 function ma_importexport_export_form_submit($form, &$form_state)
 {
+  // Export from item page
   $items = $form['dh_export']['items']['#value'];
+
+  // Export from browse DH page
+  if(!$items && isset($_SESSION['digital_heritage_grid_list_nids'])) {
+    $items = $_SESSION['digital_heritage_grid_list_nids'];
+  }
+  
   $format = $form['dh_export']['format']['#value'];
   $options = array();
   if($format = 'csv') {
@@ -167,6 +181,23 @@ function ma_importexport_export_form_submit($form, &$form_state)
 
 function ma_importexport_export_form($form, &$form_state, $items, $format="csv") {
   $form = array();
+
+  $summary_items = array();
+  if($items) {
+    $summary_items = $items;
+  } else {
+    $summary_items = $_SESSION['digital_heritage_grid_list_nids'];
+  }
+
+  if(count($summary_items) > 1) {
+    $summary = '<h3>You selected the following items for export:</h3><ul>';
+    foreach($summary_items as $item) {
+      $n = node_load($item);
+      $summary .= '<li>' . $n->title . '</li>';
+    }
+    $summary .= '</ul>';
+    $form['dh_export']['summary'] = array('#markup' => $summary);
+  }
 
   $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
 
@@ -206,6 +237,44 @@ function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = 
 
   return drupal_get_form('ma_importexport_export_form', $items, $format);
 }
+
+
+/* VBO functions */
+// Form for the VBO
+function ma_importexport_dh_export_form($options) {
+  $form = array();
+  return $form;
+}
+
+// Form submit for the VBO form
+function ma_importexport_dh_export_submit($form, $form_state) {
+  $return = array(); 
+  return $return;
+}
+
+// Action to take for the VBO
+function ma_importexport_dh_export(&$node, $context) {
+  $message = t('Node title is %title.', array(
+    '%title' => $node->title,
+  ));
+  drupal_set_message($message);
+}
+
+// Defines the VBO
+function ma_importexport_action_info() {
+  return array(
+    'ma_importexport_dh_export' => array(
+      'type' => 'node',
+      'label' => t('Export Digital Heritage nodes'),
+      'behavior' => array(),
+      'configurable' => FALSE,
+      'vbo_configurable' => TRUE,
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/* End VBO functions */
 
 function ma_importexport_access_export($node) {
   global $user;
@@ -806,4 +875,17 @@ function ma_importexport_download_zip($files) {
       unlink($file['filename']);
     }
     drupal_exit();
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_importexport_views_pre_render(&$view) {
+  if ($view->name == 'digital_heritage_grid_list') {
+    $search_nids = array();
+    foreach($view->result as $search_result) {
+      $search_nids[] = $search_result->entity;
+    }
+    $_SESSION['digital_heritage_grid_list_nids'] = $search_nids;
+  }
 }
