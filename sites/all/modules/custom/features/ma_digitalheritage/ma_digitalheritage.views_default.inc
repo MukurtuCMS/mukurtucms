@@ -127,7 +127,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['header']['area']['table'] = 'views';
   $handler->display->display_options['header']['area']['field'] = 'area';
   $handler->display->display_options['header']['area']['label'] = 'Grid/List switcher';
-  $handler->display->display_options['header']['area']['content'] = '<div><a class="list btn btn-default">List</a> <a class="grid btn btn-default">Grid</a></div>';
+  $handler->display->display_options['header']['area']['content'] = '<div><a class="list btn btn-default">List</a> <a class="grid btn btn-default">Grid</a> <a class="btn btn-default" href="/digital-heritage/export">Export</a></div>';
   $handler->display->display_options['header']['area']['format'] = 'full_html';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
@@ -205,7 +205,7 @@ function ma_digitalheritage_views_default_views() {
     t('next ›'),
     t('last »'),
     t('Grid/List switcher'),
-    t('<div><a class="list btn btn-default">List</a> <a class="grid btn btn-default">Grid</a></div>'),
+    t('<div><a class="list btn btn-default">List</a> <a class="grid btn btn-default">Grid</a> <a class="btn btn-default" href="/digital-heritage/export">Export</a></div>'),
     t('No results matched your search.'),
     t('Node ID'),
     t('.'),
