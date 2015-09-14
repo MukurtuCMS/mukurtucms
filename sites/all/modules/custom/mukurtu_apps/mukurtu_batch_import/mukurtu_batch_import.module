@@ -258,6 +258,8 @@ function mukurtu_batch_import_import_metadata($path) {
     if(file_exists($csv_path)) {
       // Save as a managed file.
       $csv = file_get_contents($csv_path);
+      file_prepare_directory('private://feeds/', FILE_CREATE_DIRECTORY);
+      
       $file = file_save_data($csv, 'private://feeds/' . $filename, FILE_EXISTS_RENAME);
 
       // Load the Feeds Source object.
