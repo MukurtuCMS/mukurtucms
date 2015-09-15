@@ -72,12 +72,17 @@ function ma_importexport_users_feeds_importer_default() {
   $feeds_importer->id = 'import_communities';
   $feeds_importer->config = array(
     'name' => 'Import Communities',
-    'description' => 'Import Communities into Mukurtu',
+    'description' => 'Import Communities into Mukurtu.',
     'fetcher' => array(
       'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
         'allowed_extensions' => 'txt csv tsv xml opml',
         'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
       ),
     ),
     'parser' => array(
@@ -90,58 +95,61 @@ function ma_importexport_users_feeds_importer_default() {
     'processor' => array(
       'plugin_key' => 'FeedsNodeProcessor',
       'config' => array(
-        'content_type' => 'community',
         'expire' => '-1',
         'author' => 0,
         'mappings' => array(
           0 => array(
-            'source' => 'Sharing Protocols',
-            'target' => 'group_access',
-            'unique' => FALSE,
-          ),
-          1 => array(
-            'source' => 'Description',
-            'target' => 'body',
-            'unique' => FALSE,
-          ),
-          2 => array(
-            'source' => 'guid',
-            'target' => 'guid',
-            'unique' => 1,
-          ),
-          3 => array(
-            'source' => 'Media',
-            'target' => 'field_media:MediaFeedsLibraryProvider',
-            'unique' => FALSE,
-          ),
-          4 => array(
-            'source' => 'Media Internet',
-            'target' => 'field_media',
-            'unique' => FALSE,
-          ),
-          5 => array(
             'source' => 'nid',
             'target' => 'nid',
             'unique' => 1,
           ),
+          1 => array(
+            'source' => 'guid',
+            'target' => 'guid',
+            'unique' => 1,
+          ),
+          2 => array(
+            'source' => 'Name',
+            'target' => 'title',
+            'unique' => FALSE,
+          ),
+          3 => array(
+            'source' => 'Description',
+            'target' => 'body',
+            'unique' => FALSE,
+          ),
+          4 => array(
+            'source' => 'Banner Image',
+            'target' => 'field_community_image',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'Thumbnail Image',
+            'target' => 'field_community_image_thumbnail',
+            'unique' => FALSE,
+          ),
           6 => array(
-            'source' => 'uid',
-            'target' => 'uid',
+            'source' => 'Parent Community',
+            'target' => 'field_parent_community:etid',
             'unique' => FALSE,
           ),
           7 => array(
-            'source' => 'url',
-            'target' => 'url',
-            'unique' => 0,
+            'source' => 'Group Register',
+            'target' => 'group_register',
+            'unique' => FALSE,
           ),
           8 => array(
-            'source' => 'Title',
-            'target' => 'title',
-            'unique' => 0,
+            'source' => 'Group Roles',
+            'target' => 'og_roles_permissions',
+            'unique' => FALSE,
           ),
         ),
         'update_existing' => '2',
-        'input_format' => 'plain_text',
+        'input_format' => 'filtered_html',
+        'authorize' => 1,
+        'update_non_existent' => 'skip',
+        'skip_hash_check' => 0,
+        'bundle' => 'community',
       ),
     ),
     'content_type' => '',

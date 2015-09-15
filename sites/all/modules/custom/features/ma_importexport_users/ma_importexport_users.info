@@ -4,6 +4,7 @@ package = Features
 dependencies[] = ctools
 dependencies[] = feeds
 dependencies[] = feeds_tamper
+dependencies[] = taxonomy
 dependencies[] = views
 dependencies[] = views_data_export
 dependencies[] = views_json
