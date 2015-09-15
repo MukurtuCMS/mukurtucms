@@ -15,8 +15,8 @@ function ma_collection_feeds_importer_default() {
   $feeds_importer->api_version = 1;
   $feeds_importer->id = 'import_collection';
   $feeds_importer->config = array(
-    'name' => 'Import Collection',
-    'description' => 'Import a collection of digital heritage items.',
+    'name' => 'Import Collections',
+    'description' => 'Import Digital Heritage collections.',
     'fetcher' => array(
       'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
