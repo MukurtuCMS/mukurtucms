@@ -173,6 +173,11 @@ function ma_importexport_users_feeds_importer_default() {
       'config' => array(
         'allowed_extensions' => 'txt csv tsv xml opml',
         'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
       ),
     ),
     'parser' => array(
@@ -185,58 +190,66 @@ function ma_importexport_users_feeds_importer_default() {
     'processor' => array(
       'plugin_key' => 'FeedsNodeProcessor',
       'config' => array(
-        'content_type' => 'cultural_protocol_group',
         'expire' => '-1',
-        'author' => 0,
+        'author' => '1',
         'mappings' => array(
           0 => array(
-            'source' => 'Sharing Protocols',
-            'target' => 'group_access',
-            'unique' => FALSE,
-          ),
-          1 => array(
-            'source' => 'Description',
-            'target' => 'body',
-            'unique' => FALSE,
-          ),
-          2 => array(
-            'source' => 'guid',
-            'target' => 'guid',
-            'unique' => 1,
-          ),
-          3 => array(
-            'source' => 'Media',
-            'target' => 'field_media:MediaFeedsLibraryProvider',
-            'unique' => FALSE,
-          ),
-          4 => array(
-            'source' => 'Media Internet',
-            'target' => 'field_media',
-            'unique' => FALSE,
-          ),
-          5 => array(
             'source' => 'nid',
             'target' => 'nid',
             'unique' => 1,
           ),
+          1 => array(
+            'source' => 'guid',
+            'target' => 'guid',
+            'unique' => 1,
+          ),
+          2 => array(
+            'source' => 'Name',
+            'target' => 'title',
+            'unique' => FALSE,
+          ),
+          3 => array(
+            'source' => 'Sharing Protocol',
+            'target' => 'group_access',
+            'unique' => FALSE,
+          ),
+          4 => array(
+            'source' => 'Parent Community',
+            'target' => 'og_group_ref:etid',
+            'unique' => FALSE,
+          ),
+          5 => array(
+            'source' => 'Description',
+            'target' => 'body',
+            'unique' => FALSE,
+          ),
           6 => array(
-            'source' => 'uid',
-            'target' => 'uid',
+            'source' => 'Banner Image',
+            'target' => 'field_protocol_image',
             'unique' => FALSE,
           ),
           7 => array(
-            'source' => 'url',
-            'target' => 'url',
-            'unique' => 0,
+            'source' => 'Thumbnail Image',
+            'target' => 'field_protocol_image_thumbnail',
+            'unique' => FALSE,
           ),
           8 => array(
-            'source' => 'Title',
-            'target' => 'title',
-            'unique' => 0,
+            'source' => 'Auto Add Users',
+            'target' => 'field_protocol_auto_join',
+            'unique' => FALSE,
+          ),
+          9 => array(
+            'source' => 'Group Register',
+            'target' => 'group_register',
+            'unique' => FALSE,
           ),
         ),
         'update_existing' => '2',
-        'input_format' => 'plain_text',
+        'input_format' => 'filtered_html',
+        'authorize' => 1,
+        'update_non_existent' => 'skip',
+        'skip_hash_check' => 0,
+        'bundle' => 'cultural_protocol_group',
       ),
     ),
     'content_type' => '',
