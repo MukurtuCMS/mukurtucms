@@ -132,8 +132,11 @@ function mukurtu_batch_import_parse_zip($file) {
   $file_path = drupal_realpath($file->uri);
 
   // Create a unique temporary folder to extract the zip file in
-  $temp_extract_path = file_directory_temp();
+  /* $temp_extract_path = file_directory_temp();
   $temp_extract_path .= '/' . uniqid('mukurtu_upload_');
+  mkdir($temp_extract_path); */
+
+  $temp_extract_path = 'private://feeds/' . uniqid('zip_import_');
   mkdir($temp_extract_path);
   
   $zip = new ZipArchive;
@@ -158,14 +161,14 @@ function mukurtu_batch_import_parse_zip($file) {
   mukurtu_batch_import_feedback($messages);
 
   // Delete extracted files from temporary directory
-  rmdir($temp_extract_path);
+  //  rmdir($temp_extract_path);
 }
 
 /**
  * Display the feedback in a custom output and provide a file of results.
  */
 function mukurtu_batch_import_feedback($messages) {
- dpm($messages);
+  // dpm($messages);
 }
 
 /*
@@ -258,9 +261,11 @@ function mukurtu_batch_import_import_metadata($path) {
     if(file_exists($csv_path)) {
       // Save as a managed file.
       $csv = file_get_contents($csv_path);
-      file_prepare_directory('private://feeds/', FILE_CREATE_DIRECTORY);
+      //      $destination = 'private://feeds/';
+      $destination = $path;
+      file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
       
-      $file = file_save_data($csv, 'private://feeds/' . $filename, FILE_EXISTS_RENAME);
+      $file = file_save_data($csv, $destination . $filename, FILE_EXISTS_RENAME);
 
       // Load the Feeds Source object.
       $source = feeds_source($importer_id);
