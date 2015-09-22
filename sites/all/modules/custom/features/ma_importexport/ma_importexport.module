@@ -371,25 +371,6 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     $export_items['items'][] = $export_item;
   }
 
-  // Load collection nodes
-  $collection_list = array_unique($collection_list);
-  foreach($collection_list as $key => $nid) {
-    $collection_list[$key] = node_load($nid);
-  }
-
-  // Load cultural protocol nodes
-  $protocol_list = array_unique($protocol_list);
-  foreach($protocol_list as $key => $nid) {
-    $protocol_list[$key] = node_load($nid);
-  }
-    
-  // Load community nodes
-  // TODO: Get parent/child communities and add them to the list  
-  $community_list = array_unique($community_list);
-  foreach($community_list as $key => $nid) {
-    $community_list[$key] = node_load($nid);
-  }
-
   // Get list of scald atoms from digital heritage items
   $media_sids = array();
   foreach($export_items['items'] as $export_item) {
@@ -400,10 +381,63 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     }
   }
   
-  // TODO: Collections have scald media items too, add them to export list
-  // TODO: Communities have scald media items too, add them to export list
-  // TODO: Protocols have scald media items too, add them to export list
-  
+  // Load collection nodes
+  $collection_list = array_unique($collection_list);
+  foreach($collection_list as $key => $nid) {
+    $collection_list[$key] = node_load($nid);
+
+    // Collections have scald media atoms, add them to export list
+    $collection_image_sid = ma_importexport_node_field_export($collection_list[$key], 'field_collection_image');
+    if(count($collection_image_sid) > 0) {
+      if(!in_array($collection_image_sid[0], $media_sids)) {
+	$media_sids[] = $collection_image_sid[0];
+      }
+    }    
+  }
+
+  // Load cultural protocol nodes
+  $protocol_list = array_unique($protocol_list);
+  foreach($protocol_list as $key => $nid) {
+    $protocol_list[$key] = node_load($nid);
+
+     // Protocols have scald media atoms too, add them to export list   
+    $protocol_image_sid = ma_importexport_node_field_export($protocol_list[$key], 'field_protocol_image');
+    if(count($protocol_image_sid) > 0) {
+      if(!in_array($protocol_image_sid[0], $media_sids)) {
+	$media_sids[] = $protocol_image_sid[0];
+      }
+    }
+
+    $protocol_image_thumbnail_sid = ma_importexport_node_field_export($protocol_list[$key], 'field_protocol_image_thumbnail');
+    if(count($protocol_image_thumbnail_sid) > 0) {
+      if(!in_array($protocol_image_thumbnail_sid[0], $media_sids)) {
+	$media_sids[] = $protocol_image_thumbnail_sid[0];
+      }
+    }
+  }
+    
+  // Load community nodes
+  // TODO: Get parent/child communities and add them to the list  
+  $community_list = array_unique($community_list);
+  foreach($community_list as $key => $nid) {
+    $community_list[$key] = node_load($nid);
+    
+    // Communities have scald media atoms too, add them to export list                 
+    $community_image_sid = ma_importexport_node_field_export($community_list[$key], 'field_community_image');
+    if(count($community_image_sid) > 0) {
+      if(!in_array($community_image_sid[0], $media_sids)) {
+	$media_sids[] = $community_image_sid[0];
+      }
+    }
+
+    $community_image_thumbnail_sid = ma_importexport_node_field_export($community_list[$key], 'field_community_image_thumbnail');
+    if(count($community_image_thumbnail_sid) > 0) {
+      if(!in_array($community_image_thumbnail_sid[0], $media_sids)) {
+	$media_sids[] = $community_image_thumbnail_sid[0];
+      }
+    }
+  }
+    
   $exported_media = ma_importexport_load_scald_atoms($media_sids);
 
   $export = array('digitalheritage' => $export_items,
@@ -609,7 +643,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'field_community_image':
   case 'field_community_image_thumbnail':
   case 'field_protocol_image':
-  case 'field_protocol_image_thumbnail':    
+  case 'field_protocol_image_thumbnail':
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['sid']; 
     }
