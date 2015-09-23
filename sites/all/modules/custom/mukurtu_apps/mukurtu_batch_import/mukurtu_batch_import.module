@@ -136,8 +136,8 @@ function mukurtu_batch_import_parse_zip($file) {
   $temp_extract_path .= '/' . uniqid('mukurtu_upload_');
   mkdir($temp_extract_path); */
 
-  $temp_extract_path = 'private://feeds/' . uniqid('zip_import_');
-  mkdir($temp_extract_path);
+  $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
+  //  mkdir($temp_extract_path);
   
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
@@ -253,23 +253,18 @@ function mukurtu_batch_import_import_metadata($path) {
 			       'digitalheritage.csv' => 'digital_heritage_metadata',
 			       'collections.csv' => 'import_collection',
   ); 
-
-  // Copy media files so relative paths will work
-  //  file_unmanaged_copy($path . '/media', $
   
   foreach($feed_file_names as $filename => $importer_id) {
-    //http://nodesforbreakfast.com/article/2012/09/23/programmatically-execute-feeds-importer-drupal-7
-
     $csv_path = $path . '/' . $filename;
 
     if(file_exists($csv_path)) {
       // Save as a managed file.
       $csv = file_get_contents($csv_path);
-      //      $destination = 'private://feeds/';
+      //      $destination = 'private://feeds/'; 
       $destination = $path;
       file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
       
-      $file = file_save_data($csv, $destination . $filename, FILE_EXISTS_RENAME);
+      $file = file_save_data($csv, $destination . '/' . $filename, FILE_EXISTS_REPLACE);     
 
       // Load the Feeds Source object.
       $source = feeds_source($importer_id);
@@ -298,4 +293,27 @@ function mukurtu_batch_import_form_ajax($form, $form_state) {
   $commands[] = ajax_command_after('#breadcrumb-wrap', '<div id="messages-wrap">' . theme('status_messages') . '</div>');
 
   return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+function mukurtu_batch_import_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) { 
+  $config = $source->getConfig();
+  if($config && strpos($config['FeedsFileFetcher']['source'], 'zip_import_') != FALSE) {
+
+    // Get the path to the CSV file used for the feeds import
+    $dirname = drupal_dirname($config['FeedsFileFetcher']['source']);
+
+    // Update the relative paths to absolute drupal paths for scald imports
+    foreach($result->items as $key => $item) {
+      if(isset($item['sid'])) {
+	if(isset($item['file'])) {
+	  $result->items[$key]['file'] = $dirname . '/' . $item['file'];
+	}
+
+	if(isset($item['thumbnail'])){ 
+	  $result->items[$key]['thumbnail'] = $dirname . '/' . $item['thumbnail'];
+	}
+      }
+    }
+  }
+  //dpm($result);
 }
