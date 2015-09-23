@@ -215,6 +215,9 @@ function ma_importexport_digital_heritage_field_export($item, $field_name) {
   case 'nid':
     $result[] = $item->nid;
     break;
+  case 'guid':
+    $result[] = $item->type . '_' . $item->nid . '_' . $item->created;
+    break;    
   case 'body':
     foreach($item->{$field_name}[$item->language] as $field_value) {
       $result[] = $field_value['value']; 
@@ -677,6 +680,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'title':
     $result[] = $node->title;
     break;
+  case 'guid':
+    $result[] = $node->type . '_' . $node->nid . '_' . $node->created;
+    break;
   default:
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['value']; 
@@ -700,6 +706,9 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   case 'sid':
     $result[] = $atom->sid;
     break;
+  case 'guid':
+    $result[] = $atom->type . '_' . $atom->sid . '_' . $atom->created;
+    break;    
   case 'title':
     $result[] = $atom->{$field_name};
     break;
