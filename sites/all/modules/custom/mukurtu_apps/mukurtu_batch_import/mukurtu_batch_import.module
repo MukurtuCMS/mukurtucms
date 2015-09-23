@@ -242,18 +242,21 @@ function mukurtu_batch_import_import_metadata($path) {
 
   // File name -> Feed Importer lookup table
   $feed_file_names = array(			   
-			       'communities.csv' => 'import_communities',
-			       'protocols.csv' => 'import_cultural_protocols',
 			   //    'categories.csv' => 'import_categories',
 			   //    'users.csv' => 'import_users',
 			       'media_audio.csv' => 'import_media_audio',
 			       'media_files.csv' => 'import_media_files',
 			       'media_images.csv' => 'import_media_images',
 			       'media_video.csv' => 'import_media_video',
+			       'communities.csv' => 'import_communities',
+			       'protocols.csv' => 'import_cultural_protocols',			       
 			       'digitalheritage.csv' => 'digital_heritage_metadata',
 			       'collections.csv' => 'import_collection',
   ); 
 
+  // Copy media files so relative paths will work
+  //  file_unmanaged_copy($path . '/media', $
+  
   foreach($feed_file_names as $filename => $importer_id) {
     //http://nodesforbreakfast.com/article/2012/09/23/programmatically-execute-feeds-importer-drupal-7
 
