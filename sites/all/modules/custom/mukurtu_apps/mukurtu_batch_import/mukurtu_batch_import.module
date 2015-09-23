@@ -295,8 +295,17 @@ function mukurtu_batch_import_form_ajax($form, $form_state) {
   return array('#type' => 'ajax', '#commands' => $commands);
 }
 
-function mukurtu_batch_import_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) { 
+function mukurtu_batch_import_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  $relative_media_fields = array('archival tiff',
+				 'file',
+				 'full-size jpeg',
+				 'image',
+				 'original dng',
+				 'thumbnail',);
+				 
+  
   $config = $source->getConfig();
+
   if($config && strpos($config['FeedsFileFetcher']['source'], 'zip_import_') != FALSE) {
 
     // Get the path to the CSV file used for the feeds import
@@ -305,12 +314,10 @@ function mukurtu_batch_import_feeds_after_parse(FeedsSource $source, FeedsParser
     // Update the relative paths to absolute drupal paths for scald imports
     foreach($result->items as $key => $item) {
       if(isset($item['sid'])) {
-	if(isset($item['file'])) {
-	  $result->items[$key]['file'] = $dirname . '/' . $item['file'];
-	}
-
-	if(isset($item['thumbnail'])){ 
-	  $result->items[$key]['thumbnail'] = $dirname . '/' . $item['thumbnail'];
+	foreach($relative_media_fields as $media_field) {
+	  if(isset($item[$media_field]) && !empty($item[$media_field])) {
+	    $result->items[$key][$media_field] = $dirname . '/' . $item[$media_field];
+	  }
 	}
       }
     }
