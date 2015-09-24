@@ -81,7 +81,7 @@ function ma_importexport_export_form_submit($form, &$form_state)
   ma_importexport_digital_heritage_node_export($items, $format, $options);
 }
 
-function ma_importexport_export_form($form, &$form_state, $items, $format="csv") {
+function ma_importexport_export_form($form, &$form_state, $items = NULL, $format="csv") {
   $form = array();
 
   $summary_items = array();
@@ -202,9 +202,29 @@ function ma_importexport_access_export($node) {
   return $access;
 }
 
-function ma_importexport_digital_heritage_field_export($item, $field_name) {
+function ma_importexport_make_node_guid($nid) {
+  $node = node_load($nid);
+  if($node) {
+    return $node->type . '_' . $node->nid . '_' . $node->created;
+  }
+  return "";
+}
+
+function ma_importexport_make_atom_guid($sid) {
+  $atom = scald_atom_load($sid);
+  if($atom) {
+    return $atom->type . '_' . $atom->sid . '_' . $atom->created;
+  }
+  return "";
+}
+
+function ma_importexport_digital_heritage_field_export($item, $field_name, $use_guid = FALSE) {
   $result = array();
 
+  if(empty($item)) {
+    return $result;
+  }
+  
   // Strip off ':etid' suffix that Entity Reference puts on the field name to make things easier
   $field_name = str_replace(':etid', '', $field_name);
   
@@ -225,7 +245,11 @@ function ma_importexport_digital_heritage_field_export($item, $field_name) {
     break;
   case 'field_media_asset':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['sid']; 
+      if($use_guid) {
+	$result[] = ma_importexport_make_atom_guid($field_value['sid']);
+      } else {
+	$result[] = $field_value['sid'];
+      }
     }
     break;
   case 'field_category':
@@ -253,12 +277,20 @@ function ma_importexport_digital_heritage_field_export($item, $field_name) {
   case 'field_related_dh_items':
   case 'og_group_ref':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
-      $result[] = $ref['target_id'];
+      if($use_guid) {
+	$result[] = ma_importexport_make_node_guid($ref['target_id']);
+      } else {
+	$result[] = $ref['target_id'];
+      }
     }
     break;
   case 'field_community_ref':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
-      $result[] = $ref['nid'];
+      if($use_guid) {	
+	$result[] = ma_importexport_make_node_guid($ref['nid']);
+      } else {
+	$result[] = $ref['nid'];
+      }     
     }
     break;
   case 'field_coverage':
@@ -628,7 +660,7 @@ function ma_importexport_get_atom_field_mapping($type) {
 }
 
 
-function ma_importexport_node_field_export($node, $field_name, $mapping = array()) {
+function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = FALSE) {
   global $language;
 
   if(is_null($node)) {
@@ -648,19 +680,31 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'field_protocol_image':
   case 'field_protocol_image_thumbnail':
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['sid']; 
+      if($use_guid) {
+	$result[] = ma_importexport_make_atom_guid($field_value['sid']);
+      } else {
+	$result[] = $field_value['sid'];	
+      }
     }
     break;
   case 'field_parent_community:etid':
   case 'field_parent_community':
-    foreach($node->field_parent_community[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['target_id'];
+    foreach($node->field_parent_community[LANGUAGE_NONE] as $field_value) {           
+      if($use_guid) {
+	$result[] = ma_importexport_make_node_guid($field_value['target_id']);
+      } else {
+	$result[] = $field_value['target_id'];
+      }
     }
     break;
   case 'field_digital_heritage_items:etid':
   case 'field_digital_heritage_items':
     foreach($node->field_digital_heritage_items[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['target_id'];
+      if($use_guid) {
+	$result[] = ma_importexport_make_node_guid($field_value['target_id']);
+      } else {
+	$result[] = $field_value['target_id'];
+      }
     }
     break;
   case 'field_description:summary':
@@ -671,7 +715,11 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'og_group_ref':
   case 'og_group_ref:etid':
     foreach($node->og_group_ref[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['target_id'];
+      if($use_guid) {
+	$result[] = ma_importexport_make_node_guid($field_value['target_id']);
+      } else {
+	$result[] = $field_value['target_id'];
+      }
     }
     break;
   case 'nid':
@@ -693,7 +741,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
 }
 
 
-function ma_importexport_atom_field_export($atom, $field_name, $mapping = array()) {
+function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = FALSE) {
   global $language;
 
   if(is_null($atom)) {
@@ -740,12 +788,20 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   case 'field_scald_protocol':
   case 'og_group_ref':
     foreach($atom->{$field_name}[LANGUAGE_NONE] as $ref) {
-      $result[] = $ref['target_id'];
+      if($use_guid) {
+	$result[] = ma_importexport_make_node_guid($ref['target_id']);
+      } else {
+	$result[] = $ref['target_id'];
+      }
     }    
     break;
   case 'og_group_ref:etid':
     foreach($atom->field_scald_protocol[LANGUAGE_NONE] as $ref) {
-      $result[] = $ref['target_id'];
+      if($use_guid) {
+	$result[] = ma_importexport_make_node_guid($ref['target_id']);
+      } else {
+	$result[] = $ref['target_id'];
+      }
     }    
     break;
   case 'field_category':
@@ -783,7 +839,7 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping));
+    $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, TRUE));
   }
 
   fputcsv($csv_file, $row);
@@ -795,7 +851,7 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping));
+    $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping, TRUE));
   }
 
   fputcsv($csv_file, $row);
