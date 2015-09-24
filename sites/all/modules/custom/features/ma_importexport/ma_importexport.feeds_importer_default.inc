@@ -480,7 +480,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           4 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
           5 => array(
@@ -568,7 +568,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           3 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
           4 => array(
@@ -656,7 +656,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           2 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
           3 => array(
@@ -820,7 +820,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           3 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
           4 => array(
