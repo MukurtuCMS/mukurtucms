@@ -575,7 +575,7 @@ function ma_importexport_get_importer_mapping($nodetype, $type = null) {
     }
   }
 
-  $mapping['nid'] = 'nid';
+  //  $mapping['nid'] = 'nid';
   return $mapping;
 }
 
@@ -593,7 +593,7 @@ function ma_importexport_get_digital_heritage_mapping() {
     }
   }
 
-  $mapping['nid'] = 'nid';
+  //  $mapping['nid'] = 'nid';
   return $mapping;
 }
 
@@ -620,7 +620,7 @@ function ma_importexport_get_atom_field_mapping($type) {
   $mapping = array();
 
   // Force some fields
-  $mapping['sid'] = 'sid';
+  //  $mapping['sid'] = 'sid';
 
   
   if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => $importer_id))) {
@@ -722,9 +722,10 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       }
     }
     break;
-  case 'nid':
+    /*  case 'nid':
     $result[] = $node->nid;
     break;
+    */
   case 'title':
     $result[] = $node->title;
     break;
