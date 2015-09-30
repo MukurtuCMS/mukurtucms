@@ -5,3 +5,11 @@
  */
 
 include_once 'ma_glossary.features.inc';
+
+function ma_glossary_node_view($node, $view_mode) {
+  if($node->type == 'glossary') {
+    if($view_mode == 'full') {
+      dpm($node);
+    }
+  }
+}
