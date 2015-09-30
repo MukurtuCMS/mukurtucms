@@ -53,7 +53,52 @@ function ma_glossary_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 9,
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-glossary-field_glossary_destination'
+  $field_instances['node-glossary-field_glossary_destination'] = array(
+    'bundle' => 'glossary',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_glossary_destination',
+    'label' => 'Destination',
+    'required' => 1,
+    'settings' => array(
+      'context' => 'debug',
+      'context_default' => 'sdl_editor_representation',
+      'dnd_enabled' => 0,
+      'mee_enabled' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 10,
     ),
   );
 
@@ -101,7 +146,52 @@ function ma_glossary_field_default_field_instances() {
         'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 10,
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'node-glossary-field_glossary_source'
+  $field_instances['node-glossary-field_glossary_source'] = array(
+    'bundle' => 'glossary',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_glossary_source',
+    'label' => 'Source',
+    'required' => 1,
+    'settings' => array(
+      'context' => 'debug',
+      'context_default' => 'sdl_editor_representation',
+      'dnd_enabled' => 0,
+      'mee_enabled' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 9,
     ),
   );
 
@@ -406,11 +496,13 @@ function ma_glossary_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('Definition');
   t('Description');
+  t('Destination');
   t('Glossary Image');
   t('Glossary Terms');
   t('Media Assets');
   t('Protocol');
   t('Sample Sentences');
+  t('Source');
   t('Translation');
 
   return $field_instances;

@@ -37,6 +37,35 @@ function ma_glossary_field_default_field_bases() {
     'type' => 'text_long',
   );
 
+  // Exported field_base: 'field_glossary_destination'
+  $field_bases['field_glossary_destination'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_glossary_destination',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
   // Exported field_base: 'field_glossary_image'
   $field_bases['field_glossary_image'] = array(
     'active' => 1,
@@ -55,6 +84,35 @@ function ma_glossary_field_default_field_bases() {
     'settings' => array(),
     'translatable' => 0,
     'type' => 'atom_reference',
+  );
+
+  // Exported field_base: 'field_glossary_source'
+  $field_bases['field_glossary_source'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_glossary_source',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_glossary_terms'
