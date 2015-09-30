@@ -25,7 +25,9 @@ function ma_glossary_field_group_info() {
     'children' => array(
       0 => 'field_description',
       1 => 'field_glossary_image',
-      2 => 'title',
+      2 => 'field_glossary_source',
+      3 => 'title',
+      4 => 'field_glossary_destination',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
