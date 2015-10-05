@@ -9759,3 +9759,6 @@ a:hover {
   position: absolute;
   z-index: -1;
 }
+.view-mode-mukurtu_glossary_table .fluid-width-video-wrapper object {
+    height: 20px;
+}
