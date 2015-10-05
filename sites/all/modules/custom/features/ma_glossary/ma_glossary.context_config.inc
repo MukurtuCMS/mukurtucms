@@ -44,8 +44,8 @@ function ma_glossary_default_scald_context_config() {
     ),
   );
   $context_config->data = array(
-    'width' => '666px',
-    'height' => '666px',
+    'width' => '50px',
+    'height' => '20px',
   );
   $export['mukurtu_glossary_table'] = $context_config;
 
