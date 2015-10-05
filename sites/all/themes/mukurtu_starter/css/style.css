@@ -3053,3 +3053,7 @@ a:hover {
 .view-mode-mukurtu_glossary_table .fluid-width-video-wrapper object {
   height: 20px;
 }
+.view-mukurtu-glossary .views-field-field-media-asset ul {
+  list-style-type: none;
+  padding-left: 0px;
+}
