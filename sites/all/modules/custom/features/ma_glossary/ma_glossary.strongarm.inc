@@ -211,7 +211,20 @@ function ma_glossary_strongarm() {
           'weight' => '6',
         ),
       ),
-      'display' => array(),
+      'display' => array(
+        'found_in_glossary' => array(
+          'default' => array(
+            'weight' => '1',
+            'visible' => TRUE,
+          ),
+        ),
+        'glossary_navigation' => array(
+          'default' => array(
+            'weight' => '-10',
+            'visible' => TRUE,
+          ),
+        ),
+      ),
     ),
   );
   $export['field_bundle_settings_node__glossary_term'] = $strongarm;

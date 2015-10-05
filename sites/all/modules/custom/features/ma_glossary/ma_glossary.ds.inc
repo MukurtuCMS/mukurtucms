@@ -65,16 +65,20 @@ function ma_glossary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'title',
-        1 => 'field_translation',
-        2 => 'field_definition',
-        3 => 'field_sample_sentence',
-        4 => 'field_media_asset',
-        5 => 'og_group_ref',
+        0 => 'glossary_navigation',
+        1 => 'title',
+        2 => 'found_in_glossary',
+        3 => 'field_translation',
+        4 => 'field_definition',
+        5 => 'field_sample_sentence',
+        6 => 'field_media_asset',
+        7 => 'og_group_ref',
       ),
     ),
     'fields' => array(
+      'glossary_navigation' => 'ds_content',
       'title' => 'ds_content',
+      'found_in_glossary' => 'ds_content',
       'field_translation' => 'ds_content',
       'field_definition' => 'ds_content',
       'field_sample_sentence' => 'ds_content',
