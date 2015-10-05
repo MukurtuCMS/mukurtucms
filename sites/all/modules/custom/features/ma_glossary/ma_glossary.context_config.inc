@@ -35,12 +35,15 @@ function ma_glossary_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'video' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
   );
   $context_config->data = array(
