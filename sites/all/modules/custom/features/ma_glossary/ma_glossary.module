@@ -54,6 +54,22 @@ function ma_glossary_node_insert($node) {
   }
 }
 
+function ma_glossary_field_extra_fields() {
+  $extra['node']['glossary_term'] = array('display' => array('found_in_glossary' => array(
+					  'label' => t('Found in Glossary'),
+					  'description' => t('Which glossary or glossaries the term is found in.'),
+					  'weight' => '-5',
+					  ),),);
+
+  $extra['node']['glossary_term']['display']['glossary_navigation'] = array(
+									    'label' => t('Glossary Navigation Buttons'),
+									    'description' => t('Glossary Navigation Buttons'),
+									    'weight' => '-10',
+									    );
+  return $extra;
+}
+
+
 function ma_glossary_node_view($node, $view_mode) {
   if($node->type == 'glossary') {
     if($view_mode == 'full') {
@@ -64,6 +80,58 @@ function ma_glossary_node_view($node, $view_mode) {
       $glossary_content = views_embed_view('mukurtu_glossary', 'page_mukurtu_glossaries', $node->nid);
       $node->content['field_glossary_terms'][0]['#markup'] = $glossary_content;
     }
+  } elseif($node->type == 'glossary_term') {
+    // Find which glossaries the term belongs to
+    $glossaries_found_in = array();
+    $glossary_links = "";
+    $query = new EntityFieldQuery();
+    $result = $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'glossary')
+      ->execute();
+    $glossary_nodes = node_load_multiple(array_keys($result['node']));
+    foreach($glossary_nodes as $glossary) {
+      foreach($glossary->field_glossary_terms[LANGUAGE_NONE] as $term) {
+	if($term['target_id'] == $node->nid) {
+	  $glossaries_found_in[] = $glossary->nid;
+	  if(count($glossaries_found_in) > 1) {
+	    $glossary_links .= ', ';
+	  }
+	  //	  $glossary_home_path = url(drupal_get_path_alias('node/' . $glossary->nid));
+	  $glossary_home_path = url('glossaries/' . $glossary->nid);
+	  $glossary_links .= '<a href="'.$glossary_home_path.'">'. $glossary->title . '</a>';
+	}
+      }
+    }
+
+    // Builds the list of glossaries the term is a member of
+    $glossary_label = (count($glossaries_found_in) > 1) ? "glossaries" : "glossary";
+    $node->content['found_in_glossary'] = array('#markup' => '<div class="field field-found-in-glossary"><div class=\'label-above\'>Found in ' . $glossary_label . ':</div>' . $glossary_links . '</div>',);
+
+    // If the term is just in a single glossary, build buttons that link to the previous/next terms
+    if(count($glossaries_found_in) == 1) {
+      $previous = "";
+      $next = "";
+      foreach($glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE] as $key => $term) {
+	if($term['target_id'] == $node->nid) {
+	  if(isset($glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key - 1])) {
+	    $previous_nid = $glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key - 1]['target_id'];
+	    $previous_node = node_load($previous_nid);
+	    $previous = '< ' . $previous_node->title . ' (' . $previous_node->field_translation[LANGUAGE_NONE][0]['value'] . ')';
+	    $previous_link = url(drupal_get_path_alias('node/' . $previous_nid));
+	  }
+	  if(isset($glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key + 1])){
+	    $next_nid = $glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key + 1]['target_id'];
+	    $next_node = node_load($next_nid);
+	    $next = $next_node->title . ' (' . $next_node->field_translation[LANGUAGE_NONE][0]['value'] . ') >';
+	    $next_link = url(drupal_get_path_alias('node/' . $next_nid));
+	  }
+	  break;
+	}
+      }
+      $node->content['glossary_navigation'] = array('#markup' => '<div class="row"><div class="col-md-6"><a href="'. $previous_link . '" class="btn">' . $previous . '</a></div><div class="col-md-6"><a href="'.$next_link.'" class="btn">' . $next . '</a></div></div>');
+    }
+    
+    //    $node->content
   }
 }
 
