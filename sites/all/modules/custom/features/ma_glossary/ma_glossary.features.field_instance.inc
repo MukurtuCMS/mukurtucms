@@ -474,7 +474,7 @@ function ma_glossary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 1,
     ),
   );
 
@@ -547,7 +547,7 @@ function ma_glossary_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
