@@ -13,6 +13,12 @@ function license_traditional_license_load($data) {
   }
 }
 
+function license_traditional_build_license_label_uri($uri) {
+  $pattern = '/http:\/\/localcontexts.org\/tk\/([a-z]+)\/.*/';
+  $letter= preg_match($pattern, $uri, $matches);
+  return 'http://localcontexts.org/tk/label_' . $matches[1] . '.png';
+}
+
 function license_traditional_license_display($license, $entity) {
   if ($license['type'] == 'traditional') {
     $uri_attributes = array();
@@ -20,7 +26,8 @@ function license_traditional_license_display($license, $entity) {
     if (!empty($communities)) {
       $uri_attributes = array('query'=> array('group' => implode(', ', $communities)));
     }
-    return license_basic_display($license['uri'], $license['name'], $license['uri'] . '/icon/120.png', 'Traditional Knowledge Label', $uri_attributes);
+    license_traditional_build_license_label_uri($license['uri']);
+    return license_basic_display($license['uri'], $license['name'], license_traditional_build_license_label_uri($license['uri']) , 'Traditional Knowledge Label', $uri_attributes);
   }
 }
 
@@ -31,7 +38,7 @@ function license_traditional_license_display_export($license, $entity) {
     if (!empty($communities)) {
       $uri_attributes = array('query'=> array('group' => implode(', ', $communities)));
     }
-    return license_basic_display($license['uri'], $license['name'], $license['uri'] . '/icon/120.png', 'Traditional Knowledge Label', $uri_attributes);
+    return license_basic_display($license['uri'], $license['name'], license_traditional_build_license_label_uri($license['uri']), 'Traditional Knowledge Label', $uri_attributes);
   }
 }
 

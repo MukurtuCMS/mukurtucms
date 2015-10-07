@@ -9257,6 +9257,10 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-digital-heritage #edit-og-group-ref {
   display: none;
 }
+.node-type-digital-heritage .field-name-field-licence-trad a img,
+.page-node-add-digital-heritage .field-name-field-licence-trad a img {
+  width: 120px;
+}
 .node-type-community #edit-group-access,
 .page-node-add-community #edit-group-access {
   display: none;
