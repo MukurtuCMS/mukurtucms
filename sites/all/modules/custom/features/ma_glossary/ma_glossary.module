@@ -21,7 +21,7 @@ function ma_glossary_menu() {
 }
 
 function ma_glossary_add_glossary_term($node) {
-    drupal_goto ('node/add/glossary-term/' . $node->nid);
+    drupal_goto('node/add/glossary-term/' . $node->nid);
 }
 
 function ma_glossary_add_glossary_term_check($node) {
@@ -36,19 +36,19 @@ function ma_glossary_form_glossary_term_node_form_alter(&$form, &$form_state) {
     if(arg(2) == 'glossary-term') {
         if(arg(3) && $glossary_node = node_load(arg(3))) {
             drupal_set_title(t("Create Glossary Term in ") . $glossary_node->title);
-            node_save($glossary_node);
         }
     }
 }
 
 function ma_glossary_node_insert($node) {
     if($node->type == 'glossary_term') {
-        // Add new glossary term to glossary, if one was specified
+        // add new glossary term to glossary, if one was specified
         if(arg(3) && $glossary_node = node_load(arg(3))) {
             if($glossary_node->type == 'glossary') {
                 $glossary_node->field_glossary_terms[LANGUAGE_NONE][]['target_id'] = $node->nid;
                 node_save($glossary_node);
-                drupal_goto(drupal_get_path_alias('node/' . $glossary_node->nid));
+                // This drupal_goto was disabling pathauto for the glossary term, need to find out why
+                //                drupal_goto(drupal_get_path_alias('node/' . $glossary_node->nid));
             }
         }
     }
@@ -119,8 +119,7 @@ function ma_glossary_node_view($node, $view_mode) {
                     if(count($glossaries_found_in) > 1) {
                         $glossary_links .= ', ';
                     }
-                    //	  $glossary_home_path = url(drupal_get_path_alias('node/' . $glossary->nid));
-                    $glossary_home_path = url('glossaries/' . $glossary->nid);
+                    $glossary_home_path = url(drupal_get_path_alias('node/' . $glossary->nid));
                     $glossary_links .= '<a href="'.$glossary_home_path.'">'. $glossary->title . '</a>';
                 }
             }
