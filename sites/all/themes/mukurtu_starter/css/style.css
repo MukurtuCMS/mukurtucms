@@ -2853,6 +2853,19 @@ a:hover {
 .node-digital-heritage.view-mode-community_record .view-mode-search_result .scald-atom {
   margin-bottom: 0;
 }
+.node-digital-heritage.view-mode-full .view-dh-related-items-teasers .scald-atom,
+.node-digital-heritage.view-mode-community_record .view-dh-related-items-teasers .scald-atom {
+  margin-bottom: 0em;
+}
+.node-digital-heritage.view-mode-full .view-dh-related-items-teasers .views-field-field-media-asset,
+.node-digital-heritage.view-mode-community_record .view-dh-related-items-teasers .views-field-field-media-asset {
+  margin-bottom: 0.5em;
+}
+.node-digital-heritage.view-mode-full .view-dh-related-items-teasers .views-field-title,
+.node-digital-heritage.view-mode-community_record .view-dh-related-items-teasers .views-field-title {
+  font-size: 1.4em;
+  margin-bottom: 0.5em;
+}
 .node-digital-heritage.view-mode-full .dh-book-nav,
 .node-digital-heritage.view-mode-community_record .dh-book-nav {
   text-align: center;
