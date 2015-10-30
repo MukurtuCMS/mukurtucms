@@ -9770,3 +9770,7 @@ view-mukurtu-glossary .views-field-field-media-asset div {
     height: 20px;
     width: 60px;
 }
+.view-display-id-attachment_mukurtu_glossary a.active {
+    font-weight: bold;
+    color: #000000;
+}
