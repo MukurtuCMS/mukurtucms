@@ -347,6 +347,21 @@ function mukurtu_splash_block_site_start() {
     );
   }
 
+  if (user_access('administer site configuration')) {
+    if (variable_get('mukurtu_show_related_items_teasers')) {
+      $enable_disable_word = 'Disable';
+    }
+    else {
+      $enable_disable_word = 'Enable';
+    }
+    $items_layout[] = array(
+      'title' => $enable_disable_word . ' Related Items teasers',
+      'href' => 'admin/toggle-related-items-teasers',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t($enable_disable_word . ' Related Items teasers at top of right of Digital Heritage items.'),
+    );
+  }
+
 
   // remove the block if it's empty
   if (sizeof($items) < 2) {
