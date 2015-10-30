@@ -154,7 +154,19 @@ function ma_glossary_node_view($node, $view_mode) {
                     break;
                 }
             }
-            $node->content['glossary_navigation'] = array('#markup' => '<div class="row"><div class="col-md-6"><a href="'. $previous_link . '" class="btn">' . $previous . '</a></div><div class="col-md-6"><a href="'.$next_link.'" class="btn">' . $next . '</a></div></div>');
+            
+            $previous_button = "";            
+            if($previous != "") {
+                $previous_button = '<a href="'. $previous_link . '" class="previous-glossary-term btn">' . $previous . '</a>';
+            }
+
+            $next_button = "";
+            if($next != "") {
+                $next_button = '<a href="'. $next_link . '" class="previous-glossary-term btn">' . $next . '</a>';
+            }
+
+            $node->content['glossary_navigation'] = array('#markup' => '<div class="row"><div class="col-md-6">'. $previous_button .'</div><div class="col-md-6">' . $next_button . '</div></div>');
+            
         }
       
         //    $node->content
