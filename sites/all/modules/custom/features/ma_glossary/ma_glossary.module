@@ -26,7 +26,7 @@ function ma_glossary_add_glossary_term($node) {
 
 function ma_glossary_add_glossary_term_check($node) {
     if($node->type == 'glossary') {
-        return TRUE;
+        return node_access("update", $node);
     }
 
     return FALSE;

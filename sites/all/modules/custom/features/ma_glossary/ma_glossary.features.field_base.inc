@@ -161,6 +161,50 @@ function ma_glossary_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_related_digital_heritage'
+  $field_bases['field_related_digital_heritage'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_related_digital_heritage',
+    'foreign keys' => array(
+      'nid' => array(
+        'columns' => array(
+          'nid' => 'nid',
+        ),
+        'table' => 'node',
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array(
+        0 => 'nid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'node_reference',
+    'settings' => array(
+      'referenceable_types' => array(
+        'article' => 0,
+        'collection' => 0,
+        'community' => 0,
+        'cultural_protocol_group' => 0,
+        'digital_heritage' => 'digital_heritage',
+        'glossary' => 0,
+        'glossary_term' => 0,
+        'page' => 0,
+        'panel' => 0,
+      ),
+      'view' => array(
+        'args' => array(),
+        'display_name' => '',
+        'view_name' => '',
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'node_reference',
+  );
+
   // Exported field_base: 'field_sample_sentence'
   $field_bases['field_sample_sentence'] = array(
     'active' => 1,
