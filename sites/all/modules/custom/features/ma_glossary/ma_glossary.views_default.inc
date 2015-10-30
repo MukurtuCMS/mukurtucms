@@ -120,10 +120,11 @@ function ma_glossary_views_default_views() {
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['label'] = 'Media';
   $handler->display->display_options['fields']['field_media_asset']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_media_asset']['type'] = 'mukurtu_glossary_table';
+  $handler->display->display_options['fields']['field_media_asset']['type'] = 'sdl_editor_representation';
   $handler->display->display_options['fields']['field_media_asset']['settings'] = array(
     'link' => '0',
   );
+  $handler->display->display_options['fields']['field_media_asset']['delta_limit'] = '1';
   $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_media_asset']['multi_type'] = 'ul';
   /* Sort criterion: Content: Title */
@@ -229,6 +230,16 @@ function ma_glossary_views_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Title */
+  $handler->display->display_options['arguments']['title']['id'] = 'title';
+  $handler->display->display_options['arguments']['title']['table'] = 'node';
+  $handler->display->display_options['arguments']['title']['field'] = 'title';
+  $handler->display->display_options['arguments']['title']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['title']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['title']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['title']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['title']['specify_validation'] = TRUE;
+  $handler->display->display_options['arguments']['title']['limit'] = '0';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page_mukurtu_glossaries');

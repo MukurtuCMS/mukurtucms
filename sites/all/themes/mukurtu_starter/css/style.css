@@ -3050,8 +3050,16 @@ a:hover {
 .form-item-operation {
   padding-left: 15px;
 }
-.view-mode-mukurtu_glossary_table .fluid-width-video-wrapper object {
+.view-mukurtu-glossary .fluid-width-video-wrapper {
   height: 20px;
+  padding-right: 0px;
+}
+.view-mukurtu-glossary .views-field-field-media-asset {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.view-mukurtu-glossary td.views-field-field-media-asset {
+  width: 60px;
 }
 .view-mukurtu-glossary .views-field-field-media-asset ul {
   list-style-type: none;
@@ -3062,13 +3070,14 @@ view-mukurtu-glossary .views-field-field-media-asset div {
   width: 60px;
 }
 .view-display-id-attachment_mukurtu_glossary a.active {
-    font-weight: bold;
-    color: #000000;
+  font-weight: bold;
+  color: #000000;
 }
-.next-glossary-term , .previous-glossary-term {
-    display: inline-block;
-    padding: 5px 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 15px;
+.next-glossary-term,
+.previous-glossary-term {
+  display: inline-block;
+  padding: 5px 14px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 15px;
 }

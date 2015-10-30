@@ -202,25 +202,25 @@ function ma_glossary_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '0',
+          'weight' => '1',
         ),
         'path' => array(
-          'weight' => '7',
+          'weight' => '2',
         ),
         'redirect' => array(
-          'weight' => '6',
+          'weight' => '1',
         ),
       ),
       'display' => array(
         'found_in_glossary' => array(
           'default' => array(
-            'weight' => '1',
+            'weight' => '5',
             'visible' => TRUE,
           ),
         ),
         'glossary_navigation' => array(
           'default' => array(
-            'weight' => '-10',
+            'weight' => '0',
             'visible' => TRUE,
           ),
         ),

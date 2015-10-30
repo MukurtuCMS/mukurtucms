@@ -18,7 +18,7 @@ function ma_glossary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -26,6 +26,13 @@ function ma_glossary_ds_field_settings_info() {
         'wrapper' => '',
         'class' => '',
         'ft' => array(),
+      ),
+    ),
+    'field_sample_sentence' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
       ),
     ),
   );
@@ -61,29 +68,37 @@ function ma_glossary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'glossary_term';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
+      'header' => array(
         0 => 'glossary_navigation',
+      ),
+      'left' => array(
         1 => 'title',
-        2 => 'found_in_glossary',
-        3 => 'field_translation',
-        4 => 'field_definition',
-        5 => 'field_sample_sentence',
-        6 => 'field_media_asset',
-        7 => 'og_group_ref',
+        2 => 'field_definition',
+        3 => 'field_sample_sentence',
+      ),
+      'right' => array(
+        4 => 'field_translation',
+        5 => 'found_in_glossary',
+        6 => 'og_group_ref',
+      ),
+      'footer' => array(
+        7 => 'field_media_asset',
+        8 => 'field_related_digital_heritage',
       ),
     ),
     'fields' => array(
-      'glossary_navigation' => 'ds_content',
-      'title' => 'ds_content',
-      'found_in_glossary' => 'ds_content',
-      'field_translation' => 'ds_content',
-      'field_definition' => 'ds_content',
-      'field_sample_sentence' => 'ds_content',
-      'field_media_asset' => 'ds_content',
-      'og_group_ref' => 'ds_content',
+      'glossary_navigation' => 'header',
+      'title' => 'left',
+      'field_definition' => 'left',
+      'field_sample_sentence' => 'left',
+      'field_translation' => 'right',
+      'found_in_glossary' => 'right',
+      'og_group_ref' => 'right',
+      'field_media_asset' => 'footer',
+      'field_related_digital_heritage' => 'footer',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -91,13 +106,17 @@ function ma_glossary_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'header' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'footer' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|glossary_term|default'] = $ds_layout;
 
@@ -153,14 +172,14 @@ function ma_glossary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'field_description',
-        1 => 'field_glossary_image',
+        0 => 'field_glossary_image',
+        1 => 'field_description',
         2 => 'field_glossary_terms',
       ),
     ),
     'fields' => array(
-      'field_description' => 'ds_content',
       'field_glossary_image' => 'ds_content',
+      'field_description' => 'ds_content',
       'field_glossary_terms' => 'ds_content',
     ),
     'classes' => array(
