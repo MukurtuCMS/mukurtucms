@@ -141,7 +141,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['field_media_asset']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_media_asset']['type'] = 'mukurtu_scald_related_items';
   $handler->display->display_options['fields']['field_media_asset']['settings'] = array(
-    'link' => '0',
+    'link' => '1',
   );
   $handler->display->display_options['fields']['field_media_asset']['delta_limit'] = '1';
   $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';

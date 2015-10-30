@@ -479,8 +479,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'field_media_asset',
         1 => 'title',
-        2 => 'field_community_ref',
-        3 => 'group_list_view_fields',
+        2 => 'group_list_view_fields',
+        3 => 'field_community_ref',
         4 => 'field_category',
         5 => 'field_summary',
       ),
@@ -488,8 +488,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
     'fields' => array(
       'field_media_asset' => 'ds_content',
       'title' => 'ds_content',
-      'field_community_ref' => 'ds_content',
       'group_list_view_fields' => 'ds_content',
+      'field_community_ref' => 'ds_content',
       'field_category' => 'ds_content',
       'field_summary' => 'ds_content',
     ),
