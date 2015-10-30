@@ -144,6 +144,11 @@ function ma_digitalheritage_node_view($node, $view_mode) {
 
     elseif ($view_mode == 'full') {
 
+      // Hide the Related Items Teasers if the option is not selected
+      if (variable_get('mukurtu_show_related_items_teasers') <> 1) {
+        unset ($node->content['dh_related_items_teasers']);
+      }
+
       // Rewrite the Related DH Items reference field as paged, since there can be hundreds. This is a dupe of the same thing in ma_collection_node_view. See comments there if changing here, should also be changed there.
 
       $dh_items_per_page = 10;
@@ -311,6 +316,15 @@ function ma_digitalheritage_menu() {
     'weight' => 100,
   );
 
+  // Callback that toggles the display of the Related Items teasers
+  $items['admin/toggle-related-items-teasers'] = array(
+    'title' => 'Toggle Related Items Teasers',
+    'page callback' => 'ma_digitalheritage_toggle_related_items_teasers',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
   return $items;
 }
 
@@ -343,6 +357,16 @@ function ma_digitalheritage_add_book_page_check($node) {
       return TRUE;
     }
   }
+}
+
+function ma_digitalheritage_toggle_related_items_teasers () {
+  if (variable_get('mukurtu_show_related_items_teasers')) {
+    variable_set ('mukurtu_show_related_items_teasers', 0);
+  }
+  else {
+    variable_set ('mukurtu_show_related_items_teasers', 1);
+  }
+  drupal_goto ('dashboard');
 }
 
 function ma_digitalheritage_clone_dh_form($form, $form_state, $node) {
