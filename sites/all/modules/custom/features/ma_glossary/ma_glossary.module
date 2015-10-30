@@ -99,6 +99,10 @@ function ma_glossary_node_view($node, $view_mode) {
             if($letter) {
                 $hidden_letter = '<input type="hidden" name="letter" value="' . $letter . '"></form>';
                 $glossary_content = str_replace('</form>', $hidden_letter, $glossary_content);
+
+                // Add active class selected letter
+                $active_letter_pattern = '@(\?letter=' . $letter . '")@';
+                $glossary_content = preg_replace($active_letter_pattern, '$1 class="active"', $glossary_content);
             }            
 
             $node->content['field_glossary_terms'][0]['#markup'] = $glossary_content;
