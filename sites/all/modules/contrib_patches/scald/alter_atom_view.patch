@@ -1,5 +1,5 @@
 diff --git a/modules/fields/atom_reference/atom_reference.module b/modules/fields/atom_reference/atom_reference.module
-index 27effec..b7db943 100644
+index 27effec..58c78ab 100644
 --- a/modules/fields/atom_reference/atom_reference.module
 +++ b/modules/fields/atom_reference/atom_reference.module
 @@ -163,13 +163,20 @@ function atom_reference_field_formatter_settings_summary($field, $instance, $vie
@@ -23,7 +23,7 @@ index 27effec..b7db943 100644
  
    $uri = false;
  
-@@ -181,15 +188,46 @@ function atom_reference_field_formatter_view($entity_type, $entity, $field, $ins
+@@ -181,15 +188,54 @@ function atom_reference_field_formatter_view($entity_type, $entity, $field, $ins
    if (!empty($contexts[$render_context])) {
      foreach ($items as $delta => $item) {
        $sid = $item['sid'];
@@ -34,30 +34,38 @@ index 27effec..b7db943 100644
        }
 -      $element[$delta] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
 +
-+      if ($display['type'] <> 'ma_scald_search_results') {
++      if ($display['type'] <> 'ma_scald_search_results' && $display['type'] <> 'mukurtu_scald_related_items') {
 +        $priority_elements[$delta] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
 +      }
 +
 +      else {
 +
 +        // Scald Atom is Image
-+        if ($display['type'] == 'ma_scald_search_results' AND $atom->type == 'image') {
++        if ($atom->type == 'image') {
 +          $priority_elements[] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
 +        }
 +
 +        // Scald Atom is not an image
 +        else {
++
 +          // Use the atom thumbnail if there is one
 +          if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
++            $image_styles = array (
++              'ma_scald_search_results' => 'medium',
++              'mukurtu_scald_related_items' => 'related_items_teaser'
++            );
 +            $thumbnail_image = theme_image_style (array (
-+              'style_name' => 'medium',
++              'style_name' => $image_styles[$display['type']],
 +              'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
 +            ));
 +          }
 +          // If no atom thumbnail, use our default thumbnails
 +          else {
-+            $scald_thumbnail_path =  file_build_uri(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_audio_thumbnail.jpg');
-+            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail.jpg">';
++            $image_widths = array (
++              'ma_scald_search_results' => '220',
++              'mukurtu_scald_related_items' => '280'
++            );
++            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$display['type']] . '.jpg">';
 +          }
 +          $regular_elements[] = array('#markup' => $thumbnail_image);
 +        }
