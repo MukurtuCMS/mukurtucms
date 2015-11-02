@@ -299,7 +299,7 @@ function ma_digitalheritage_menu() {
     'title' => 'Add Community Record',
     'page callback' => 'ma_digitalheritage_add_community_record',
     'page arguments' => array(1),
-    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access callback' => 'ma_digitalheritage_add_cr_check',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 100,
@@ -334,6 +334,21 @@ function ma_digitalheritage_clone_dh_button_check($node) {
     if ($dh_emw->field_book_parent->value() OR $dh_emw->field_book_children->value()) { // Do not allow cloning or creating community records on book pages, whether child or parent
       return FALSE;
     }
+    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+      if (isset ($protocol)) {
+        $p_emw = entity_metadata_wrapper('node', $protocol);
+        $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+        if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+          return TRUE;
+        }
+      }
+    }
+  }
+}
+
+function ma_digitalheritage_add_cr_check($node) {
+  if ($node->type == 'digital_heritage') {
+    $dh_emw = entity_metadata_wrapper('node', $node);
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
       if (isset ($protocol)) {
         $p_emw = entity_metadata_wrapper('node', $protocol);
