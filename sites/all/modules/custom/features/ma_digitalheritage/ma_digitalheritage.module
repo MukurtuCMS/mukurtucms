@@ -721,10 +721,12 @@ function ma_digitalheritage_page_alter(&$data) {
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
     if ($node->type == 'digital_heritage') {
+
+      // Custom build page content for DH nodes
       $nids = element_children($data['content']['system_main']['nodes']);
       $nid = $nids[0];
 
-      // Custom build page content for DH nodes that are also book pages
+      // Book pages
       if ($node->field_book_children OR $node->field_book_parent) {
 
         // Show navigation buttons
@@ -741,76 +743,74 @@ function ma_digitalheritage_page_alter(&$data) {
             )
           );
         }
+      }
 
-        $parent_dh = entity_metadata_wrapper('node', $nid);
+      // Community Records
+      $parent_dh = entity_metadata_wrapper('node', $nid);
+      if ($community_records = $parent_dh->field_community_record_children->value()) {
 
-        // Node has community records
-        if ($community_records = $parent_dh->field_community_record_children->value()) {
+        $tab_settings = array(
+          'ajax' => 0,
+          'default_tab' => 0,
+          'title' => 'DH Tabs',
+          'renderer' => 'quicktabs',
+          'style' => 'Excel',
+          'hide_empty_tabs' => 1,
+        );
 
-          $tab_settings = array(
-            'ajax' => 0,
-            'default_tab' => 0,
-            'title' => 'DH Tabs',
-            'renderer' => 'quicktabs',
-            'style' => 'Excel',
-            'hide_empty_tabs' => 1,
-          );
+        // Parent tab
+        $parent_parent_community = node_load($node->field_community_ref[LANGUAGE_NONE][0]['nid']);
+        $dh_tabs[] = array(
+          'type' => 'node',
+          'nid' => $nid,
+          'view_mode' => 'full',
+          'title' => $parent_parent_community->title . ' Record',
+          'hide_title' => 0,
+          #'weight' => 0,
+        );
 
-          // Parent tab
-          $parent_parent_community = node_load($node->field_community_ref[LANGUAGE_NONE][0]['nid']);
-          $dh_tabs[] = array(
-            'type' => 'node',
-            'nid' => $nid,
-            'view_mode' => 'full',
-            'title' => $parent_parent_community->title . ' Record',
-            'hide_title' => 0,
-            #'weight' => 0,
-          );
+        foreach ($community_records as $community_record) {
 
-          foreach ($community_records as $community_record) {
+          global $user;
+          if (mukurtu_protocol_field_node_access($community_record, 'view', $user) == 'allow') {
 
-            global $user;
-            if (mukurtu_protocol_field_node_access($community_record, 'view', $user) == 'allow') {
-
-              // Tab title
-              $community_record_parent_communities = array();
-              foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
-                $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
-                $community_record_parent_communities[] = $community_record_parent_community_node->title;
-              }
-              $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
-
-
-              // Create the tab
-              $dh_tabs[] = array(
-                'type' => 'node',
-                'nid' => $community_record->nid,
-                'view_mode' => 'community_record',
-                'title' => $community_record_tab_title,
-                'hide_title' => 0,
-                #'weight' => 0,
-              );
+            // Tab title
+            $community_record_parent_communities = array();
+            foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
+              $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
+              $community_record_parent_communities[] = $community_record_parent_community_node->title;
             }
+            $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
 
-            // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
-            else {
-              $dh_tabs[] = array();
-            }
+
+            // Create the tab
+            $dh_tabs[] = array(
+              'type' => 'node',
+              'nid' => $community_record->nid,
+              'view_mode' => 'community_record',
+              'title' => $community_record_tab_title,
+              'hide_title' => 0,
+              #'weight' => 0,
+            );
           }
 
-          // Add the rendered quicktabs to the built page content
-          $dh_page_content .= drupal_render(quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs));
+          // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
+          else {
+            $dh_tabs[] = array();
+          }
         }
 
-        // Node does not have community records
-        // Just render the DH book page normally, below the nav and TOC
-        else {
-          $dh_page_content .= drupal_render(node_view($node, 'full'));
-        }
-
-        // Rewrite the output for DH nodes that are book pages with our built DH page content
-        $data['content']['system_main']['#markup'] = $dh_page_content;
+        // Add the rendered quicktabs to the built page content
+        $dh_page_content .= drupal_render(quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs));
       }
+
+      // Node does not have community records. Render DH normally.
+      else {
+        $dh_page_content .= drupal_render(node_view($node, 'full'));
+      }
+
+      // Rewrite the output for DH nodes with our built DH page content
+      $data['content']['system_main']['#markup'] = $dh_page_content;
     }
   }
 }
