@@ -572,15 +572,23 @@ a.tooltips span {
     }
   }
 
-  // DH Book Pages Navigation
-  .dh-book-nav {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    .nav-button {
-      padding-right: 20px;
-    }
+}
+// DH Book Pages Navigation -- this needs to go outside of the view modes because it is rendered in a hook_page_alter, not within the node
+.dh-book-nav {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  .nav-button {
+    padding-right: 20px;
   }
+}
+
+// DH Book Table of Contents Collapsible Header -- make it look like a regular field header
+h3.dh-book-toc-header {
+
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 22px;
 
 }
 

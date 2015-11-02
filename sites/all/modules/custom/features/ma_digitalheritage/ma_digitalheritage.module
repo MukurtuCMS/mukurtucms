@@ -720,7 +720,6 @@ function ma_digitalheritage_node_load($nodes, $types) {
  */
 function ma_digitalheritage_page_alter(&$data) {
 
-
   // If there are Child Records for a DH node, show the parent and child records in quicktabs
   if (isset($data['content']['system_main']['nodes'])) {
     $array_keys = array_keys($data['content']['system_main']['nodes']);
@@ -728,95 +727,100 @@ function ma_digitalheritage_page_alter(&$data) {
     if ($node->type == 'digital_heritage') {
       $nids = element_children($data['content']['system_main']['nodes']);
       $nid = $nids[0];
-      $parent_dh = entity_metadata_wrapper('node', $nid);
-      if ($community_records = $parent_dh->field_community_record_children->value()) {
 
-        $tab_settings = array(
-          'ajax' => 0,
-          'default_tab' => 0,
-          'title' => 'DH Tabs',
-          'renderer' => 'quicktabs',
-          'style' => 'Excel',
-          'hide_empty_tabs' => 1,
-        );
+      // Custom build page content for DH nodes that are also book pages
+      if ($node->field_book_children OR $node->field_book_parent) {
 
-        // Parent tab
-        $parent_parent_community = node_load($node->field_community_ref[LANGUAGE_NONE][0]['nid']);
-        $dh_tabs[] = array(
-          'type' => 'node',
-          'nid' => $nid,
-          'view_mode' => 'full',
-          'title' => $parent_parent_community->title . ' Record',
-          'hide_title' => 0,
-          #'weight' => 0,
-        );
+        // Show navigation buttons
+        $dh_page_content = ma_digital_heritage_book_page_navigation_buttons($node);
 
-        foreach ($community_records as $community_record) {
-
-          global $user;
-          if (mukurtu_protocol_field_node_access($community_record, 'view', $user) == 'allow') {
-
-            // Tab title
-            $community_record_parent_communities = array();
-            foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
-              $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
-              $community_record_parent_communities[] = $community_record_parent_community_node->title;
-            }
-            $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
-
-
-            // Create the tab
-            $dh_tabs[] = array(
-              'type' => 'node',
-              'nid' => $community_record->nid,
-              'view_mode' => 'community_record',
-              'title' => $community_record_tab_title,
-              'hide_title' => 0,
-              #'weight' => 0,
-            );
-          }
-
-          // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
-          else {
-            $dh_tabs[] = array(
-            );
-          }
+        // Show table of contents on parent (page 1) of book only
+        if ($node->field_book_children) {
+          $dh_page_content .= theme(
+            'ctools_collapsible',
+            array(
+              'handle' => '<h3 class = "dh-book-toc-header">' . 'Table of Contents' . '</h3>',
+              'content' => ma_digital_heritage_book_page_contents($node),
+              'collapsed' => FALSE
+            )
+          );
         }
 
-        $data['content']['system_main'] = array(
-          'content' => quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs),
-          '#weight' => 99,
-        );
+        $parent_dh = entity_metadata_wrapper('node', $nid);
+
+        // Node has community records
+        if ($community_records = $parent_dh->field_community_record_children->value()) {
+
+          $tab_settings = array(
+            'ajax' => 0,
+            'default_tab' => 0,
+            'title' => 'DH Tabs',
+            'renderer' => 'quicktabs',
+            'style' => 'Excel',
+            'hide_empty_tabs' => 1,
+          );
+
+          // Parent tab
+          $parent_parent_community = node_load($node->field_community_ref[LANGUAGE_NONE][0]['nid']);
+          $dh_tabs[] = array(
+            'type' => 'node',
+            'nid' => $nid,
+            'view_mode' => 'full',
+            'title' => $parent_parent_community->title . ' Record',
+            'hide_title' => 0,
+            #'weight' => 0,
+          );
+
+          foreach ($community_records as $community_record) {
+
+            global $user;
+            if (mukurtu_protocol_field_node_access($community_record, 'view', $user) == 'allow') {
+
+              // Tab title
+              $community_record_parent_communities = array();
+              foreach ($community_record->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
+                $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
+                $community_record_parent_communities[] = $community_record_parent_community_node->title;
+              }
+              $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
+
+
+              // Create the tab
+              $dh_tabs[] = array(
+                'type' => 'node',
+                'nid' => $community_record->nid,
+                'view_mode' => 'community_record',
+                'title' => $community_record_tab_title,
+                'hide_title' => 0,
+                #'weight' => 0,
+              );
+            }
+
+            // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
+            else {
+              $dh_tabs[] = array();
+            }
+          }
+
+          // Add the rendered quicktabs to the built page content
+          $dh_page_content .= drupal_render(quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs));
+        }
+
+        // Node does not have community records
+        // Just render the DH book page normally, below the nav and TOC
+        else {
+          $dh_page_content .= drupal_render(node_view($node, 'full'));
+        }
+
+        // Rewrite the output for DH nodes that are book pages with our built DH page content
+        $data['content']['system_main']['#markup'] = $dh_page_content;
       }
     }
   }
 }
 
-/**
- * Implements hook_ds_fields_info().
- */
-function ma_digitalheritage_ds_fields_info($entity_type) {
-  $fields = array();
 
-  $fields['book_page_navigation'] = array(
-    'title' => t('Book Page Navigation'),
-    'field_type' => DS_FIELD_TYPE_FUNCTION,
-    'ui_limit' => array('digital_heritage|full'),
-    'function' => 'ma_digital_heritage_book_page_navigation_field'
-  );
-
-  $fields['book_page_contents'] = array(
-    'title' => t('Book Page Contents'),
-    'field_type' => DS_FIELD_TYPE_FUNCTION,
-    'ui_limit' => array('digital_heritage|full'),
-    'function' => 'ma_digital_heritage_book_page_contents_field'
-  );
-
-  return array('node' => $fields);
-}
-
-function ma_digital_heritage_book_page_navigation_field ($field) {
-  $node = $field['entity'];
+function ma_digital_heritage_book_page_navigation_buttons ($node) {
   $output = "";
 
   $parent_emw = entity_metadata_wrapper('node', $node);
@@ -874,23 +878,18 @@ function ma_digital_heritage_book_page_navigation_field ($field) {
 }
 
 
-function ma_digital_heritage_book_page_contents_field ($field) {
-  $node = $field['entity'];
+function ma_digital_heritage_book_page_contents ($node) {
 
-  // Parent pages show a table of contents, plus the right arrow
-  if ($node->field_book_children) {
-    $toc = '<ol><li>' . $node->title .'</li>';
-    $parent_emw = entity_metadata_wrapper('node', $node);
-    $children = $parent_emw->field_book_children->value();
-    foreach ($children as $child) {
-      $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
-    }
-    $toc .= '</ol>';
-
-    return '<div class = "dh-book-nav-toc">' . $toc . '</div>';
-
+  // Parent book pages show a table of contents
+  $toc = '<ol><li>' . $node->title .'</li>';
+  $parent_emw = entity_metadata_wrapper('node', $node);
+  $children = $parent_emw->field_book_children->value();
+  foreach ($children as $child) {
+    $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
   }
+  $toc .= '</ol>';
 
+  return '<div class = "dh-book-nav-toc">' . $toc . '</div>';
 }
 
 /**
