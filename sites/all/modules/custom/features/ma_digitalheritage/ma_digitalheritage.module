@@ -363,10 +363,6 @@ function ma_digitalheritage_add_cr_check($node) {
 
 function ma_digitalheritage_add_book_page_check($node) {
   if ($node->type == 'digital_heritage') {
-    $dh_emw = entity_metadata_wrapper('node', $node);
-    if ($dh_emw->field_community_record_parent->value() OR $dh_emw->field_community_record_children->value()) { // Do not allow creating book pages on community records
-      return FALSE;
-    }
     global $user;
     if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
       return TRUE;
