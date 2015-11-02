@@ -49,7 +49,9 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'digital_heritage_node_form') {
 
     // Do not create this custom field for Book Pages
+    // Also hide the Item Sharing Settings field
     if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
+      $form['field_item_privacy_setting']['#access'] = FALSE;
       return;
     }
 
