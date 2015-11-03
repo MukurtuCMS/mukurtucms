@@ -321,7 +321,7 @@ function ma_digitalheritage_menu() {
     'title' => 'Toggle Related Items Teasers',
     'page callback' => 'ma_digitalheritage_toggle_related_items_teasers',
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_CALLBACK,
     'weight' => 100,
   );
 
