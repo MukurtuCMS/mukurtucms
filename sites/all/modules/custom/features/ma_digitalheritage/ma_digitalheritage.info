@@ -87,7 +87,6 @@ features[field_base][] = field_summary
 features[field_base][] = field_transcription
 features[field_group][] = group_advanced|taxonomy_term|category|form
 features[field_group][] = group_basic|taxonomy_term|category|form
-features[field_group][] = group_book_contents|node|digital_heritage|full
 features[field_group][] = group_dublin|node|digital_heritage|form
 features[field_group][] = group_essentials|node|digital_heritage|form
 features[field_group][] = group_licensing|node|digital_heritage|form

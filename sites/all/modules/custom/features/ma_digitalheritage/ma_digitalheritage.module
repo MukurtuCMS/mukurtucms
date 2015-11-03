@@ -299,7 +299,7 @@ function ma_digitalheritage_menu() {
     'title' => 'Add Community Record',
     'page callback' => 'ma_digitalheritage_add_community_record',
     'page arguments' => array(1),
-    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access callback' => 'ma_digitalheritage_add_cr_check',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 100,
@@ -346,12 +346,23 @@ function ma_digitalheritage_clone_dh_button_check($node) {
   }
 }
 
-function ma_digitalheritage_add_book_page_check($node) {
+function ma_digitalheritage_add_cr_check($node) {
   if ($node->type == 'digital_heritage') {
     $dh_emw = entity_metadata_wrapper('node', $node);
-    if ($dh_emw->field_community_record_parent->value() OR $dh_emw->field_community_record_children->value()) { // Do not allow creating book pages on community records
-      return FALSE;
+    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+      if (isset ($protocol)) {
+        $p_emw = entity_metadata_wrapper('node', $protocol);
+        $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+        if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+          return TRUE;
+        }
+      }
     }
+  }
+}
+
+function ma_digitalheritage_add_book_page_check($node) {
+  if ($node->type == 'digital_heritage') {
     global $user;
     if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
       return TRUE;
@@ -705,14 +716,36 @@ function ma_digitalheritage_node_load($nodes, $types) {
  */
 function ma_digitalheritage_page_alter(&$data) {
 
-
   // If there are Child Records for a DH node, show the parent and child records in quicktabs
   if (isset($data['content']['system_main']['nodes'])) {
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
     if ($node->type == 'digital_heritage') {
+
+      // Custom build page content for DH nodes
       $nids = element_children($data['content']['system_main']['nodes']);
       $nid = $nids[0];
+
+      // Book pages
+      if ($node->field_book_children OR $node->field_book_parent) {
+
+        // Show navigation buttons
+        $dh_page_content = ma_digital_heritage_book_page_navigation_buttons($node);
+
+        // Show table of contents on parent (page 1) of book only
+        if ($node->field_book_children) {
+          $dh_page_content .= '<div class = "dh-book-toc">' . theme(
+            'ctools_collapsible',
+            array(
+              'handle' => '<h3 class = "dh-book-toc-header">' . 'Table of Contents' . '</h3>',
+              'content' => ma_digital_heritage_book_page_contents($node),
+              'collapsed' => TRUE,
+            )
+          ) . '</div>';
+        }
+      }
+
+      // Community Records
       $parent_dh = entity_metadata_wrapper('node', $nid);
       if ($community_records = $parent_dh->field_community_record_children->value()) {
 
@@ -763,45 +796,27 @@ function ma_digitalheritage_page_alter(&$data) {
 
           // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
           else {
-            $dh_tabs[] = array(
-            );
+            $dh_tabs[] = array();
           }
         }
 
-        $data['content']['system_main'] = array(
-          'content' => quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs),
-          '#weight' => 99,
-        );
+        // Add the rendered quicktabs to the built page content
+        $dh_page_content .= drupal_render(quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs));
       }
+
+      // Node does not have community records. Render DH normally.
+      else {
+        $dh_page_content .= drupal_render(node_view($node, 'full'));
+      }
+
+      // Rewrite the output for DH nodes with our built DH page content
+      $data['content']['system_main']['#markup'] = $dh_page_content;
     }
   }
 }
 
-/**
- * Implements hook_ds_fields_info().
- */
-function ma_digitalheritage_ds_fields_info($entity_type) {
-  $fields = array();
 
-  $fields['book_page_navigation'] = array(
-    'title' => t('Book Page Navigation'),
-    'field_type' => DS_FIELD_TYPE_FUNCTION,
-    'ui_limit' => array('digital_heritage|full'),
-    'function' => 'ma_digital_heritage_book_page_navigation_field'
-  );
-
-  $fields['book_page_contents'] = array(
-    'title' => t('Book Page Contents'),
-    'field_type' => DS_FIELD_TYPE_FUNCTION,
-    'ui_limit' => array('digital_heritage|full'),
-    'function' => 'ma_digital_heritage_book_page_contents_field'
-  );
-
-  return array('node' => $fields);
-}
-
-function ma_digital_heritage_book_page_navigation_field ($field) {
-  $node = $field['entity'];
+function ma_digital_heritage_book_page_navigation_buttons ($node) {
   $output = "";
 
   $parent_emw = entity_metadata_wrapper('node', $node);
@@ -859,23 +874,18 @@ function ma_digital_heritage_book_page_navigation_field ($field) {
 }
 
 
-function ma_digital_heritage_book_page_contents_field ($field) {
-  $node = $field['entity'];
+function ma_digital_heritage_book_page_contents ($node) {
 
-  // Parent pages show a table of contents, plus the right arrow
-  if ($node->field_book_children) {
-    $toc = '<ol><li>' . $node->title .'</li>';
-    $parent_emw = entity_metadata_wrapper('node', $node);
-    $children = $parent_emw->field_book_children->value();
-    foreach ($children as $child) {
-      $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
-    }
-    $toc .= '</ol>';
-
-    return '<div class = "dh-book-nav-toc">' . $toc . '</div>';
-
+  // Parent book pages show a table of contents
+  $toc = '<ol><li>' . $node->title .'</li>';
+  $parent_emw = entity_metadata_wrapper('node', $node);
+  $children = $parent_emw->field_book_children->value();
+  foreach ($children as $child) {
+    $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
   }
+  $toc .= '</ol>';
 
+  return '<div class = "dh-book-nav-toc">' . $toc . '</div>';
 }
 
 /**

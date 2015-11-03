@@ -2866,15 +2866,23 @@ a:hover {
   font-size: 1.4em;
   margin-bottom: 0.5em;
 }
-.node-digital-heritage.view-mode-full .dh-book-nav,
-.node-digital-heritage.view-mode-community_record .dh-book-nav {
+.dh-book-nav {
   text-align: center;
   font-size: 20px;
   font-weight: bold;
+  margin-bottom: 15px;
 }
-.node-digital-heritage.view-mode-full .dh-book-nav .nav-button,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .nav-button {
+.dh-book-nav .nav-button {
   padding-right: 20px;
+}
+.dh-book-toc {
+  margin-bottom: 2em;
+}
+.dh-book-toc h3.dh-book-toc-header {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 22px;
+  margin-top: 0;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;

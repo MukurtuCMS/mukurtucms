@@ -572,16 +572,29 @@ a.tooltips span {
     }
   }
 
-  // DH Book Pages Navigation
-  .dh-book-nav {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    .nav-button {
-      padding-right: 20px;
-    }
+}
+// DH Book Pages Navigation -- this needs to go outside of the view modes because it is rendered in a hook_page_alter, not within the node
+.dh-book-nav {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  .nav-button {
+    padding-right: 20px;
   }
+  margin-bottom: 15px;
+}
 
+// DH Table of Contents (1st page of book)
+.dh-book-toc {
+  margin-bottom: 2em;
+
+  // Make the TOC header look like a regular field header
+  h3.dh-book-toc-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 22px;
+    margin-top: 0;
+  }
 }
 
 // collection node DH list view
