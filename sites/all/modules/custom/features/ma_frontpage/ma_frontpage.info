@@ -18,6 +18,5 @@ features[ctools][] = context:context:3
 features[ctools][] = views:views_default:3.0
 features[fe_block_settings][] = mukurtu_splash-mukurtu_wizard
 features[features_api][] = api:2
-features[views_view][] = featured
 features[views_view][] = ma_recent_comments
 features[views_view][] = map
