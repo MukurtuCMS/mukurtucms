@@ -734,14 +734,14 @@ function ma_digitalheritage_page_alter(&$data) {
 
         // Show table of contents on parent (page 1) of book only
         if ($node->field_book_children) {
-          $dh_page_content .= theme(
+          $dh_page_content .= '<div class = "dh-book-toc">' . theme(
             'ctools_collapsible',
             array(
               'handle' => '<h3 class = "dh-book-toc-header">' . 'Table of Contents' . '</h3>',
               'content' => ma_digital_heritage_book_page_contents($node),
               'collapsed' => FALSE
             )
-          );
+          ) . '</div>';
         }
       }
 
