@@ -2472,6 +2472,11 @@ table .checkbox input[type="checkbox"] {
   text-transform: uppercase;
   font-size: 22px;
 }
+.mukurtu-collapsed-fieldset-div h2 {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+}
 .mukurtu-collapsed-fieldset-div .field-group-format-toggler a {
   background: url(../grey-down-arrow.png) no-repeat left center;
   color: #333;

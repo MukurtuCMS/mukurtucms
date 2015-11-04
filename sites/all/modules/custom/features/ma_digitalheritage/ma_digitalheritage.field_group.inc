@@ -237,6 +237,38 @@ function ma_digitalheritage_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_related_items_teasers|node|digital_heritage|full';
+  $field_group->group_name = 'group_related_items_teasers';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'digital_heritage';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Related Items:',
+    'weight' => '12',
+    'children' => array(
+      0 => 'dh_related_items_teasers',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Related Items:',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-related-items-teasers field-group-div mukurtu-collapsed-fieldset-div',
+        'description' => '',
+        'show_label' => '1',
+        'label_element' => 'h2',
+        'effect' => 'none',
+        'speed' => 'fast',
+      ),
+      'formatter' => 'collapsed',
+    ),
+  );
+  $export['group_related_items_teasers|node|digital_heritage|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_relations|node|digital_heritage|form';
   $field_group->group_name = 'group_relations';
   $field_group->entity_type = 'node';
