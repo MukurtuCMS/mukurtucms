@@ -1,0 +1,563 @@
+<?php
+/**
+ * @file
+ * "Leaflet More Maps" adds more map layers to the Leaflet module.
+ *
+ * All maps support zoom levels 0..19, except where stated otherwise.
+ */
+
+define('LEAFLET_MORE_MAPS_NO_CUSTOM_MAPS', 3);
+
+function leaflet_more_maps_default_settings() {
+  $default_settings = array(
+    'attributionControl' => TRUE,
+    'closePopupOnClick'  => TRUE,
+    'doubleClickZoom'    => TRUE,
+    'dragging'           => TRUE,
+    'fadeAnimation'      => TRUE,
+    'layerControl'       => FALSE,
+    'maxZoom'            => 19,
+    'minZoom'            => 0,
+    'scrollWheelZoom'    => TRUE,
+    'touchZoom'          => TRUE,
+    'trackResize'        => TRUE,
+    // Don't specify, if you want to use Auto-box.
+    // 'zoom'               =>  2,
+    'zoomAnimation'      => TRUE,
+    'zoomControl'        => TRUE,
+  );
+  return $default_settings;
+}
+
+/**
+ * Implements hook_leaflet_map_info().
+ *
+ * All maps show at lat=31, long=-89, zoom=4
+ */
+function leaflet_more_maps_leaflet_map_info() {
+
+  $map_info = array();
+  $default_settings = leaflet_more_maps_default_settings();
+
+  _leaflet_more_maps_assemble_default_map_info($map_info, $default_settings);
+
+  $custom_maps = variable_get('leaflet_more_maps_custom_maps', array());
+
+  foreach ($custom_maps as $custom_map) {
+    _leaflet_more_maps_assemble_custom_map_info(
+      $custom_map['map-key'],
+      $custom_map['layer-keys'],
+      $map_info, $default_settings,
+      $custom_map['reverse-order']
+    );
+  }
+  return $map_info;
+}
+
+/**
+ * Preprocess function for leaflet_more_maps.
+ */
+function leaflet_more_maps_leaflet_map_prebuild_alter(&$variables = NULL) {
+  $path = drupal_get_path('module', 'leaflet_more_maps');
+  // Increase weight so we're included after 'leaflet.drupal.js'
+  $options = array('type' => 'file', 'weight' => 1);
+  drupal_add_js("$path/leaflet_more_maps.js", $options);
+}
+
+/**
+ * Implements hook_leaflet_map_info_alter().
+ */
+function leaflet_more_maps_leaflet_map_info_alter(&$map_info) {
+  @ksort($map_info, SORT_NATURAL | SORT_FLAG_CASE);
+}
+
+/**
+ * Assemble default map info.
+ */
+function _leaflet_more_maps_assemble_default_map_info(&$map_info, $default_settings = array()) {
+  // For most maps, use headless protocol rather than logic based on $is_https;
+  $prot = '//';
+  global $is_https;
+
+  // As used by most.
+  $zxy = '{z}/{x}/{y}.png';
+  // As used by Esri.
+  $zyx = '{z}/{y}/{x}.png';
+  // Google and Yandex also use x, y and z, but require different URL query
+  // templates, see below.
+  // Bing uses the quadtree system whereby x, y and z are encoded in a sequence
+  // of digits in the range 0..3. See leaflet_more_maps.js for the conversion
+  // algorithm.
+  // The Bing layers are non-transparent, so are entered as base_layers, which
+  // is the leaflet.drupal.js default.
+  $attr_bing = 'Tiles <a target="attr" href="http://www.bing.com/maps">Bing</a> &copy; Microsoft and suppliers';
+  $map_info['bing'] = array(
+    'label' => 'Bing road & satellite & hybrid (zoom 1..19)',
+    'description' => t('Bing road, satellite and hybrid layers'),
+    'settings' => array('minZoom' => 1, 'maxZoom' => 19, 'layerControl' => TRUE) + $default_settings,
+    'layers' => array(
+      'road layer' => array(
+        'type' => 'quad',
+        'urlTemplate' => $prot . 'ecn.t{s}.tiles.virtualearth.net/tiles/r{q}?g=1236',
+        'options' => array(
+          'attribution' => $attr_bing,
+          'subdomains' => array(0, 1, 2, 3, 4, 5, 6, 7),
+        ),
+      ),
+      'satellite layer' => array(
+        'type' => 'quad',
+        'urlTemplate' => $prot . 'ak.t{s}.tiles.virtualearth.net/tiles/a{q}?g=1236',
+        'options' => array(
+          'attribution' => $attr_bing,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+      ),
+      'hybrid layer' => array(
+        'type' => 'quad',
+        'urlTemplate' => $prot . 'ak.dynamic.t{s}.tiles.virtualearth.net/comp/ch/{q}?it=A,G,L&shading=hill',
+        'options' => array(
+          'attribution' => $attr_bing,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+      ),
+    ),
+  );
+
+  // Esri http://esri.com
+  $attr_esri = 'Tiles &copy; <a target="attr" href="http://esri.com">Esri</a>';
+  $esri_names = array(
+    // North America only, zoom 0..16.
+    'Specialty/Soil Survey Map',
+    // Parts of the world, zoom 0..10.
+    'Specialty/World Navigation Charts',
+    // Zoom 0..17.
+    'World Imagery',
+    // Zoom 0..12.
+    'NatGeo World Map',
+    // Zoom 0..8.
+    'World Physical Map',
+    // Zoom 0..10.
+    'Ocean BaseMap',
+    'Reference/World Transportation',
+    'World Topo Map',
+    'World Street Map',
+  );
+  $settings = $default_settings;
+  $esri_base = 'services.arcgisonline.com/ArcGIS/rest/services';
+  foreach ($esri_names as $esri_name) {
+    $code = str_replace(' ', '_', $esri_name);
+    $url_template = $prot . "$esri_base/$code/MapServer/tile/$zyx";
+    switch ($esri_name) {
+      case 'NatGeo World Map':
+        $label = t('Esri National Geographic (zoom 0..12)');
+        $settings['maxZoom'] = 12;
+        break;
+
+      case 'World Imagery':
+        $label = t('Esri World Imagery (zoom 0..17)');
+        $settings['maxZoom'] = 17;
+        break;
+
+      case 'World Physical Map':
+        $label = t('Esri Physical (zoom 0..8)');
+        $settings['maxZoom'] = 8;
+        break;
+
+      case 'Ocean BaseMap':
+        $label = t('Esri Ocean (zoom 0..10)');
+        $settings['maxZoom'] = 10;
+        break;
+
+      case 'Specialty/Soil Survey Map':
+        $label = t('Esri Soil Survey (North America, zoom 0..16)');
+        $settings['maxZoom'] = 16;
+        break;
+
+      case 'Specialty/World Navigation Charts':
+        $label = t('Esri Navigation Charts (parts of the world, zoom 0..10)');
+        $settings['maxZoom'] = 10;
+        break;
+
+      default:
+        $label = "Esri $esri_name (zoom 0..19)";
+        $settings['maxZoom'] = 19;
+    }
+    $map_info['esri-' . drupal_strtolower($code)] = array(
+      'label' => $label,
+      'description' => $label,
+      'settings' => $settings,
+      'layers' => array(
+        'layer' => array(
+          'urlTemplate' => $url_template,
+          'options' => array('attribution' => $attr_esri),
+        ),
+      ),
+    );
+  }
+
+  $attr_google = 'Map data &copy; <a target="attr" href="http://googlemaps.com">Google</a>';
+  $v = variable_get('google_satellite_version', 183);
+  $map_info['google-satellite'] = array(
+    'label' => 'Google satellite (zoom 0..21)',
+    'description' => t('Google satellite'),
+    'settings' => array('layerControl' => TRUE, 'maxZoom' => 21) + $default_settings,
+    'layers' => array(
+      'satellite' => array(
+        'type' => 'google',
+        'urlTemplate' => $prot . 'khms{s}.googleapis.com/kh?x={x}&y={y}&z={z}' . (empty($v) ? '' : "&v=$v"),
+        'options' => array(
+          'attribution' => $attr_google,
+          // 'detectRetina' => TRUE, // has bad effect
+          'subdomains' => array(0, 1, 2, 3)
+        ),
+      ),
+      'road overlay' => array(
+        'type' => 'google',
+        // Note 'lyrs=h' for transparent overlay.
+        'urlTemplate' => $prot . 'mt{s}.googleapis.com/vt?lyrs=h&x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_google,
+          'detectRetina' => TRUE,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+        'layer_type' => 'overlay',
+      ),
+    ),
+  );
+  $map_info['google-roadmap'] = array(
+    'label' => 'Google roadmap (zoom 0..21)',
+    'description' => t('Google roadmap'),
+    'settings' => array('maxZoom' => 21) + $default_settings,
+    'layers' => array(
+      'layer' => array(
+        'type' => 'google',
+        'urlTemplate' => $prot . 'mt{s}.googleapis.com/vt?x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_google,
+          'detectRetina' => FALSE,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+      ),
+    ),
+  );
+  // Two non-transparent layers, so entered as base_layers.
+  $map_info['google-high-res'] = array(
+    'label' => 'Google high-res road & terrain (zoom 0..21)',
+    'description' => t('Google road & terrain layers, with high-res (Retina) support'),
+    'settings' => array('layerControl' => TRUE, 'maxZoom' => 21) + $default_settings,
+    'layers' => array(
+      'roadmap' => array(
+        'type' => 'google',
+        // For retina displays we append '&style=high_dpi&w=512',
+        // see leaflet_more_maps.js
+        'urlTemplate' => $prot . 'mt{s}.googleapis.com/vt?x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_google,
+          'detectRetina' => TRUE,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+        'layer_type' => 'base',
+      ),
+      'terrain' => array(
+        'type' => 'google',
+        'urlTemplate' => $prot . 'mt{s}.googleapis.com/vt?lyrs=t,r&x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_google,
+          'detectRetina' => TRUE,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+        'layer_type' => 'base',
+      ),
+    ),
+  );
+
+  // MapBox/OSM http://mapbox.com
+  $mapbox_names = array(
+    // 'Streets', // as used by foursquare
+    // 'Chester',
+    // 'Graphite',
+    // 'Lacquer',
+    // 'Light',
+    // 'Nightvision',
+    // 'Osgoode',
+    // 'Simple',
+    // 'St-Clair',
+    // 'Union',
+    // 'Zenburn',
+    'Warden',
+  );
+  $attr_mapbox = 'Tiles by <a target="attr" href="http://mapbox.com">MapBox</a>. Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> and contributors';
+  foreach ($mapbox_names as $mapbox_name) {
+    $code = drupal_strtolower($mapbox_name);
+    $label = "MapBox $mapbox_name (zoom 0..19)";
+    $url_template = $prot . "{s}.tiles.mapbox.com/v3/mapbox.mapbox-$code/$zxy";
+    $map_info["mapbox-$code"] = array(
+      'label' => $code == 'streets' ? t('Mapbox streets, classic (zoom 0..19)') : $label,
+      'description' => $label,
+      'settings' => $default_settings,
+      'layers' => array(
+        'layer' => array(
+          'urlTemplate' => $url_template,
+          'options' => array('attribution' => $attr_mapbox),
+        ),
+      ),
+    );
+  }
+  // OpenStreetMap OSM Mapnik classic map is available via leaflet.module
+  $attr_osm = 'Map data &copy; <a target="attr" href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+  // MapQuest OSM. Two non-transparent layers.
+  $attr_mapquest = 'Tiles by <a target="attr" href="http://mapquest.com">MapQuest</a>. ' . $attr_osm;
+  $map_info['mapquest'] = array(
+    'label' => 'MapQuest OSM & Aerial (zoom 0..19)',
+    'description' => t('MapQuest rendering of OpenStreetMap, as well as Aerial layer'),
+    'settings' => array('layerControl' => TRUE) + $default_settings,
+    'layers' => array(
+      'road layer' => array(
+        'urlTemplate' => $prot . "otile{s}.mqcdn.com/tiles/1.0.0/map/$zxy",
+        'options' => array(
+          'attribution' => $attr_mapquest,
+          'subdomains' => array(1, 2, 3, 4),
+        ),
+        'layer_type' => 'base',
+      ),
+      'aerial layer' => array(
+        'urlTemplate' => $prot . "otile{s}.mqcdn.com/tiles/1.0.0/sat/$zxy",
+        'options' => array(
+          'attribution' => $attr_mapquest,
+          'subdomains' => array(1, 2, 3, 4),
+        ),
+        'layer_type' => 'base',
+      ),
+    ),
+  );
+
+  $attr_thunderforest = 'Thunderforest <a target="attr" href="http://thunderforest.com">OpenCycleMap</a>. ' . $attr_osm;
+  $map_info['osm-cycle'] = array(
+    'label' => 'OSM Thunderforest Cycle (zoom 0..19)',
+    'description' => t('OpenStreetMap for cyclists'),
+    'settings' => $default_settings,
+    'layers' => array(
+      'layer' => array(
+        'urlTemplate' => $prot . "{s}.tile.opencyclemap.org/cycle/$zxy",
+        'options' => array('attribution' => $attr_thunderforest),
+      ),
+    ),
+  );
+  $map_info['osm-transport'] = array(
+    // See http://thunderforest.com.
+    'label' => 'OSM Thunderforest Transport (zoom 0..19)',
+    'description' => t('OpenCycleMap with train & tram lines'),
+    'settings' => $default_settings,
+    'layers' => array(
+      'layer' => array(
+        'urlTemplate' => $prot . "{s}.tile2.opencyclemap.org/transport/$zxy",
+        'options' => array('attribution' => $attr_thunderforest),
+      ),
+    ),
+  );
+  $map_info['osm-landscape'] = array(
+    // See http://thunderforest.com.
+    'label' => 'OSM Thunderforest Landscape (zoom 0..19)',
+    'description' => t('OpenCycleMap with landscape'),
+    'settings' => $default_settings,
+    'layers' => array(
+      'layer' => array(
+        'urlTemplate' => $prot . "{s}.tile3.opencyclemap.org/landscape/$zxy",
+        'options' => array('attribution' => $attr_thunderforest),
+      ),
+    ),
+  );
+  $attr_piste = '<a target="attr" href="http://openpistemap.org">OpenPisteMap</a> ' . $attr_osm;
+  $map_info['osm-piste'] = array(
+    'label' => 'OSM OpenPisteMap (zoom 0..19)',
+    'description' => t('OpenStreetMap for skiers with 3 layers'),
+    'settings' =>  array('layerControl' => TRUE) + $default_settings,
+    'layers' => array(
+      'base' => array(
+        'urlTemplate' => $prot . "{s}.tile.openstreetmap.org/$zxy",
+        'options' => array('attribution' => $attr_piste),
+        'layer_type' => 'base',
+      ),
+      'relief shading' => array(
+        // Or tiles2?
+        'urlTemplate' => $prot . "tiles.openpistemap.org/landshaded/$zxy",
+        'options' => array('attribution' => $attr_piste),
+        'layer_type' => 'overlay',
+      ),
+      'pistes' => array(
+        'urlTemplate' => $prot . "tiles.openpistemap.org/nocontours/$zxy",
+        'options' => array('attribution' => $attr_piste),
+        'layer_type' => 'overlay',
+      ),
+    ),
+  );
+  // OpenSeeMap http://openseamap.org
+  $attr_ocm = 'OpenSeaMap. ' . $attr_osm;
+  $map_info['osm-sea'] = array(
+    'label' => 'OSM OpenSeaMap (zoom 0..19)',
+    'description' => t('OpenStreetMap with sea marks overlay'),
+    'settings' => array('layerControl' => TRUE) + $default_settings,
+    'layers' => array(
+      'base' => array(
+        'urlTemplate' => $prot . "{s}.tile.openstreetmap.org/$zxy",
+        'options' => array('attribution' => $attr_ocm),
+        'layer_type' => 'base',
+      ),
+      'sea marks' => array(
+        'urlTemplate' => $prot . "tiles.openseamap.org/seamark/$zxy",
+        'options' => array('attribution' => $attr_ocm),
+        'layer_type' => 'overlay',
+      ),
+    ),
+  );
+
+  // OpenWeatherMap http://openweathermap.org
+  $attr_owm = 'OpenWeatherMap. ' . $attr_osm;
+  $map_info['osm-weather'] = array(
+    'label' => 'OSM OpenWeatherMap (zoom 0..19)',
+    'description' => t('Precipitation with pressure contours'),
+    'settings' => array('layerControl' => TRUE) + $default_settings,
+    'layers' => array(
+      'base' => array(
+        'urlTemplate' => $prot . "{s}.tile.openstreetmap.org/$zxy",
+        'options' => array('attribution' => $attr_owm),
+        'layer_type' => 'base',
+      ),
+      'precipitation' => array(
+        'urlTemplate' => $prot . "{s}.tile.openweathermap.org/map/precipitation/$zxy",
+        'options' => array('attribution' => $attr_owm),
+        'layer_type' => 'overlay',
+      ),
+      'pressure' => array(
+        'urlTemplate' => $prot . "{s}.tile.openweathermap.org/map/pressure_cntr/$zxy",
+        'options' => array('attribution' => $attr_owm),
+        'layer_type' => 'overlay',
+      ),
+    ),
+  );
+
+  // geocommons http://geocommons.com
+  $attr_geocommons = 'Tiles by Geocommons &copy; <a target="attr" href="http://geocommons.com/overlays/acetate">Esri & Stamen</a>. ' . $attr_osm;
+  $map_info['geocommons'] = array(
+    'label' => 'Geocommons Acetate (zoom 2..19)',
+    'description' => t('Neutral basemap'),
+    'settings' => array('minZoom' => 2) + $default_settings,
+    'layers' => array(
+      'acetate' => array(
+        'urlTemplate' => $prot . "a{s}.acetate.geoiq.com/tiles/acetate/$zxy",
+        'options' => array(
+          'attribution' => $attr_geocommons,
+          'subdomains' => array(0, 1, 2, 3, 4, 5, 6),
+        ),
+      ),
+    ),
+  );
+
+  // Stamen http://stamen.com
+  $attr_stamen = 'Tiles by <a target="attr" href="http://stamen.com">Stamen Design</a> under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. ' . $attr_osm;
+  $stamen_names = array('Toner', 'Watercolor'/* , 'Terrain'*/);
+  foreach ($stamen_names as $stamen_name) {
+    $code = drupal_strtolower($stamen_name);
+    $label = "Stamen $stamen_name (zoom 0..19)";
+    $t = t('@label , USA only', array('@label' => $label));
+    if ($is_https) {
+      $url_template = $prot . "stamen-tiles-{s}.a.ssl.fastly.net/$code/$zxy";
+    }
+    else {
+      $url_template = $prot . "{s}.tile.stamen.com/$code/$zxy";
+    }
+    $map_info["stamen-$code"] = array(
+      'label' => $code == 'terrain' ? $t : $label,
+      'description' => t('@label layer.', array('@label' => $label)),
+      'settings' => $default_settings,
+      'layers' => array(
+        'layer' => array(
+          'urlTemplate' => $url_template,
+          'options' => array('attribution' => $attr_stamen),
+        ),
+      ),
+    );
+  }
+
+  // Yandex
+  $attr_yandex = 'Map data &copy; <a target="attr" href="http://maps.yandex.ru">Yandex.Maps</a>';
+  $map_info['yandex'] = array(
+    'label' => 'Yandex Maps (zoom 0..7 in many areas)',
+    'description' => t('Yandex roadmap'),
+    'settings' => array('layerControl' => TRUE) + $default_settings,
+    'layers' => array(
+      'people layer' => array(
+        'urlTemplate' => $prot . '0{s}.pvec.maps.yandex.net/tiles?l=pmap&x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_yandex,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+      ),
+      'satellite layer' => array(
+        'urlTemplate' => $prot . 'sat0{s}.maps.yandex.net/tiles?l=sat&x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_yandex,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+      ),
+      'road layer' => array(
+        'urlTemplate' => $prot . 'vec0{s}.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}',
+        'options' => array(
+          'attribution' => $attr_yandex,
+          'subdomains' => array(0, 1, 2, 3),
+        ),
+      ),
+    ),
+  );
+
+}
+
+/**
+ * Assemble custom map info.
+ */
+function _leaflet_more_maps_assemble_custom_map_info($custom_map_key, $selected_layer_keys, &$map_info, $default_settings = array(), $reverse_order = FALSE) {
+  if (empty($custom_map_key) || empty($selected_layer_keys)) {
+    return;
+  }
+  // Use tilde so custom maps come last alphabetically.
+  $map_info["~$custom_map_key"] = array(
+    'label' => $custom_map_key,
+    'description' => t('Custom defined map with layer switcher'),
+    'layers' => array(),
+  );
+  $i = $reverse_order ? count($selected_layer_keys) : 1;
+  foreach ($map_info as $map_key => $map) {
+    foreach ($map['layers'] as $layer_key => $layer) {
+      // Unique.
+      $custom_layer_key = "$map_key $layer_key";
+      if (in_array($custom_layer_key, $selected_layer_keys)) {
+        //$layer_switcher_key = t('layer') . " #$i";
+        $map_info["~$custom_map_key"]['layers'][$custom_layer_key] = $layer;
+        $i = $reverse_order ? $i - 1 : $i + 1;
+      }
+    }
+  }
+  if ($reverse_order) {
+    $map_info["~$custom_map_key"]['layers'] = array_reverse($map_info["~$custom_map_key"]['layers']);
+  }
+  $has_layer_control = count($map_info["~$custom_map_key"]['layers']) > 1;
+  $map_info["~$custom_map_key"]['settings'] = array('layerControl' => $has_layer_control) + $default_settings;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function leaflet_more_maps_menu() {
+  $items = array();
+  // Put the administrative settings under System on the Configuration page.
+  $items['admin/config/system/leaflet_more_maps'] = array(
+    'title' => 'Leaflet More Maps',
+    'description' => 'Assemble custom maps from available layers.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('leaflet_more_maps_admin_configure'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'leaflet_more_maps.admin.inc',
+  );
+  return $items;
+}
