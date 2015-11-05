@@ -801,7 +801,19 @@ function ma_digitalheritage_page_alter(&$data) {
         }
 
         // Add the rendered quicktabs to the built page content
-        $dh_page_content .= drupal_render(quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs));
+        $community_record_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs);
+        foreach($community_record_tabs['content']['content']['tabs']['tablinks'] as $key => $tab) {
+            // Shorten title if necessary.  Long titles break the tabs.
+             if(strlen($tab['#title']) > 25) {
+                 $word_break_pos = strpos($tab['#title'], ' ', 20);
+                 if($word_break_pos > 0) {
+                     $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
+                     $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($community_record_tab_title, 0, $word_break_pos) . '...';
+                 }
+             }
+        }
+
+        $dh_page_content .= drupal_render($community_record_tabs);
       }
 
       // Node does not have community records. Render DH normally.
