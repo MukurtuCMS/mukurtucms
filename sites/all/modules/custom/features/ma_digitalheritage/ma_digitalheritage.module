@@ -782,7 +782,6 @@ function ma_digitalheritage_page_alter(&$data) {
             }
             $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
 
-
             // Create the tab
             $dh_tabs[] = array(
               'type' => 'node',
@@ -805,11 +804,25 @@ function ma_digitalheritage_page_alter(&$data) {
         foreach($community_record_tabs['content']['content']['tabs']['tablinks'] as $key => $tab) {
             // Shorten title if necessary.  Long titles break the tabs.
              if(strlen($tab['#title']) > 25) {
-                 $word_break_pos = strpos($tab['#title'], ' ', 20);
-                 if($word_break_pos > 0) {
-                     $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
-                     $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($tab['#title'], 0, $word_break_pos) . '...';
+                 $comma_break_pos = strpos($tab['#title'], ',', 18);
+                 $colon_break_pos = strpos($tab['#title'], ':', 18);
+                 $word_break_pos = strpos($tab['#title'], ' ', 18);
+                 $break_pos = 25;
+
+                 if($comma_break_pos > 0) {
+                     $break_pos = $comma_break_pos;
                  }
+
+                 if($colon_break_pos > 0 && $colon_break_pos < $break_pos) {
+                     $break_pos = $colon_break_pos;
+                 }
+
+                 if($word_break_pos > 0 && $word_break_pos < $break_pos) {
+                     $break_pos = $word_break_pos;
+                 }
+
+                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
+                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($tab['#title'], 0, $break_pos) . '...';
              }
         }
 
@@ -826,7 +839,6 @@ function ma_digitalheritage_page_alter(&$data) {
     }
   }
 }
-
 
 function ma_digital_heritage_book_page_navigation_buttons ($node) {
   $output = "";
