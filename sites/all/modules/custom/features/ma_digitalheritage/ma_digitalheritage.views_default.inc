@@ -199,7 +199,7 @@ function ma_digitalheritage_views_default_views() {
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'search_api_index_default_node_index';
-  $view->human_name = 'Digital Heritage Grid/List';
+  $view->human_name = 'Digital Heritage Browse';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
