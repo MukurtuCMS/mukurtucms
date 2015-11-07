@@ -16,49 +16,76 @@
 Drupal.behaviors.my_custom_behavior = {
   attach: function(context, settings) {
 
-    // Sets default class for DH views and toggles between list/grid.
-    $('#main-content').once('grid-list-view', function() {
+    // Sets default class for DH views and toggles between list/grid/map.
+    $('#main-content').once('dh-browse-view', function() {
 
-      if ($(".view").hasClass("grid-list-view")) {
+      if ($(".view").hasClass("dh-browse-view")) {
 
         $('a.list').addClass('active');
 
         // Set the cookie to list view mode (default) if cookie is unset
-        if (!$.cookie('grid_list_mode')) {
-          $.cookie('grid_list_mode', 'list-view', {path: "/"});
+        if (!$.cookie('dh_browse_mode')) {
+          $.cookie('dh_browse_mode', 'list-view', {path: "/"});
+        }
 
-        } else if ($.cookie('grid_list_mode') == 'grid-view') {
+        else if ($.cookie('dh_browse_mode') == 'grid-view') {
           $('a.grid').addClass('active');
           $('a.list').removeClass('active');
+          $('a.map').removeClass('active');
           $('.field-name-field-media-asset').removeClass('col-md-push-8');
         }
 
-        $(".view").addClass($.cookie('grid_list_mode')); // use whichever mode is set in the cookie
+        else if ($.cookie('dh_browse_mode') == 'map-view') {
+          $('a.map').addClass('active');
+          $('a.list').removeClass('active');
+          $('a.grid').removeClass('active');
+          $('.field-name-field-media-asset').removeClass('col-md-push-8');
+        }
+
+        var originalViewMode = $.cookie('dh_browse_mode');
+        $(".view").addClass($.cookie('dh_browse_mode')); // use whichever mode is set in the cookie
 
         $("a.grid").click(function() {
-          if ($(".view").hasClass("list-view")) {
-            $('.field-name-field-media-asset').removeClass('col-md-push-8');
-            $(this).addClass('active');
-            $('a.list').removeClass('active');
-            $(".view").addClass("grid-view"); // adds .grid-view to the view class
-            $(".view").removeClass("list-view"); // removes .list-view from the view class
-            $.cookie('grid_list_mode', 'grid-view', {path: "/"}); // set the cookie to grid mode
+          $('.field-name-field-media-asset').removeClass('col-md-push-8');
+          $(this).addClass('active');
+          $('a.list').removeClass('active');
+          $('a.map').removeClass('active');
+          $(".view").addClass("grid-view"); // adds .grid-view to the view class
+          $(".view").removeClass("list-view"); // removes .list-view from the view class
 
-            $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry();
+          $.cookie('dh_browse_mode', 'grid-view', {path: "/"}); // set the cookie to grid mode
+
+          $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry();
+
+          if (originalViewMode == "map-view") {
+            location.reload();
           }
+
         });
 
         $("a.list").click(function() {
-          if ($(".view").hasClass("grid-view")) {
-            $('.field-name-field-media-asset').addClass('col-md-push-8');
-            $(this).addClass('active');
-            $('a.grid').removeClass('active');
-            $(".view").addClass("list-view"); // adds .list-view to the view class
-            $(".view").removeClass("grid-view"); // removes .grid-view from the view class
-            $.cookie('grid_list_mode', 'list-view', {path: "/"}); // set the cookie to list-view
+          $('.field-name-field-media-asset').addClass('col-md-push-8');
+          $(this).addClass('active');
+          $('a.grid').removeClass('active');
+          $('a.map').removeClass('active');
+          $(".view").addClass("list-view"); // adds .list-view to the view class
+          $(".view").removeClass("grid-view"); // removes .grid-view from the view class
+          $.cookie('dh_browse_mode', 'list-view', {path: "/"}); // set the cookie to list-view
 
-            $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry('destroy');
+          $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry('destroy');
+
+          if (originalViewMode == "map-view") {
+            location.reload();
           }
+
+        });
+
+        $("a.map").click(function() {
+          $(this).addClass('active');
+          $('a.list').removeClass('active');
+          $('a.grid').removeClass('active');
+          $.cookie('dh_browse_mode', 'map-view', {path: "/"}); // set the cookie to map-view
+          location.reload();
         });
 
       }

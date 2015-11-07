@@ -116,7 +116,7 @@ function ma_digitalheritage_preprocess_views_view(&$vars) {
  */
 // Delete the cookie that holds the DH grid/list view setting
 function ma_digitalheritage_user_logout ($account) {
-  setcookie('grid_list_mode', '', 1, '/');
+  setcookie('dh_browse_mode', '', 1, '/');
 }
 
 /**
