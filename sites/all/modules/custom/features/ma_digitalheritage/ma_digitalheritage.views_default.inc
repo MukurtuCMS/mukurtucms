@@ -360,6 +360,12 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
+  /* Filter criterion: Location: Geo Type (indexed) */
+  $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
   $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['digital_heritage_grid_list'] = array(
     t('Master'),
