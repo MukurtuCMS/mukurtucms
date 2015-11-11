@@ -326,7 +326,7 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
     return NODE_ACCESS_IGNORE;
   }
 
-  if (($op == 'view' || $op == 'update') && $node->type=='digital_heritage' ) {
+  if ($op == 'view' && $node->type=='digital_heritage') {
 
     // Safeguard. This should never happen. All DH items should be in a group.
     if (!$groups_on_node = og_get_entity_groups('node', $node)) {
@@ -407,4 +407,40 @@ function mukurtu_protocol_field_node_grants($account, $op) {
   // This grant is provided to everyone
   $grants['mukurtu_dh_any_public_group'][] = 0;
   return $grants;
+}
+
+/**
+ * Called by our patched og_node_access
+ * Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
+ * Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
+ */
+function mukurtu_protocol_field_update_dh_access ($node) {
+
+  // Safeguard. This should never happen. All DH items should be in a group.
+  if (!$groups_on_node = og_get_entity_groups('node', $node)) {
+    return NODE_ACCESS_DENY;
+  }
+
+  $groups_on_node = array_values($groups_on_node['node']);
+
+  // DH set to ANY
+  if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
+    foreach ($groups_on_node as $group) {
+      if (in_array('protocol steward', og_get_user_roles('node', $group))) {
+        return NODE_ACCESS_ALLOW; // Pass if user is a Protocol Steward of the CP
+      }
+    }
+    return NODE_ACCESS_DENY;
+  }
+
+  // DH set to ALL (default)
+  else {
+    foreach ($groups_on_node as $group) {
+      if (!in_array('protocol steward', og_get_user_roles('node', $group))) {
+        return NODE_ACCESS_DENY; // Deny if user is not a Protocol Steward of the CP
+      }
+    }
+    return NODE_ACCESS_ALLOW;
+  }
+
 }
