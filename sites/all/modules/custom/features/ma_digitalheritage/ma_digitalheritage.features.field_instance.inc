@@ -2824,9 +2824,11 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 0,
-      'module' => 'og',
-      'settings' => array(),
-      'type' => 'og_complex',
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+      ),
+      'type' => 'options_select',
       'weight' => 55,
     ),
   );
