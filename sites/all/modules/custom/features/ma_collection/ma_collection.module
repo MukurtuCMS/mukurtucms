@@ -248,3 +248,23 @@ function ma_collection_form_alter(&$form, $form_state, $form_id) {
     }
   }
 }
+
+// Rewrite the Collection node title in the Collection search view to show a count of DH items
+function ma_collection_collections_title_with_count ($entity) {
+  $dh_count = 0;
+  $coll_wrapper = entity_metadata_wrapper('node', $entity);
+  $dhs = $coll_wrapper->field_digital_heritage_items->value();
+  if (count($dhs)) {
+    if (user_access('bypass content access control')) {
+      $dh_count = count($dhs);
+    }
+    else {
+      foreach ($dhs as $dh) {
+        if (node_access('view', $dh)) {
+          $dh_count++;
+        }
+      }
+    }
+  }
+  return '<h2>' . l ($entity->title . ' (' . $dh_count . ')', 'node/' . $entity->nid) . '</h2>';
+}
