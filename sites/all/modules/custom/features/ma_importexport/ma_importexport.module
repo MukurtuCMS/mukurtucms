@@ -204,16 +204,34 @@ function ma_importexport_access_export($node) {
 
 function ma_importexport_make_node_guid($nid) {
   $node = node_load($nid);
+
   if($node) {
-    return $node->type . '_' . $node->nid . '_' . $node->created;
+      // Check for an existing feeds guid
+      $node_feeds_info = feeds_item_info_load('node', $node->nid);
+      
+      if($node_feeds_info && isset($node_feeds_info->guid)) {
+          return $node_feeds_info->guid;
+      }
+
+      // Otherwise generate a new one
+      return $node->type . '_' . $node->nid . '_' . $node->created;
   }
   return "";
 }
 
 function ma_importexport_make_atom_guid($sid) {
   $atom = scald_atom_load($sid);
+  
   if($atom) {
-    return $atom->type . '_' . $atom->sid . '_' . $atom->created;
+      // Check for an existing feeds guid
+      $atom_feeds_info = feeds_item_info_load('scald_atom', $sid);
+
+      if($atom_feeds_info && isset($atom_feeds_info->guid)) {
+          return $atom_feeds_info->guid;
+      }
+      
+      // Otherwise generate a new one      
+      return $atom->type . '_' . $atom->sid . '_' . $atom->created;
   }
   return "";
 }
