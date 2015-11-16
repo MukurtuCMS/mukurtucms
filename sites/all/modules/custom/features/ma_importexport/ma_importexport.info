@@ -9,6 +9,7 @@ dependencies[] = features
 dependencies[] = feeds
 dependencies[] = feeds_tamper
 dependencies[] = feeds_xpathparser
+dependencies[] = feeds_entity_processor
 dependencies[] = views
 dependencies[] = views_data_export
 dependencies[] = views_php
