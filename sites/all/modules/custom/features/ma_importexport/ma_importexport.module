@@ -159,6 +159,16 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
     $entity->data[$type . '_file'] = $file->uri;
     $entity->data[$type . '_id'] = $file->fid;
   }
+
+  // If an entity is a revision but is missing the nid, look it up.  Otherwise feeds will fail to save that entity
+  if($entity->revision && (!isset($entity->nid) || !$entity->nid)) {
+      list($id, $vid, $bundle) = entity_extract_ids($entity->feeds_item->entity_type, $entity);
+
+      if($vid) {
+          $existing_entity = entity_revision_load($entity->feeds_item->entity_type, $vid);
+          $entity->nid = $existing_entity->nid;
+      }
+  }
 }
 
 function ma_importexport_export_form_submit($form, &$form_state)
