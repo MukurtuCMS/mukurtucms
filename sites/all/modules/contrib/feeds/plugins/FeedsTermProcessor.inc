@@ -31,9 +31,10 @@ class FeedsTermProcessor extends FeedsProcessor {
    */
   protected function newEntity(FeedsSource $source) {
     $vocabulary = $this->vocabulary();
-    $term = new stdClass();
+    $term = parent::newEntity($source);
     $term->vid = $vocabulary->vid;
     $term->vocabulary_machine_name = $vocabulary->machine_name;
+
     return $term;
   }
 
@@ -41,6 +42,8 @@ class FeedsTermProcessor extends FeedsProcessor {
    * Validates a term.
    */
   protected function entityValidate($term) {
+    parent::entityValidate($term);
+
     if (drupal_strlen($term->name) == 0) {
       throw new FeedsValidationException(t('Term name missing.'));
     }
@@ -112,11 +115,21 @@ class FeedsTermProcessor extends FeedsProcessor {
 
       case 'parentguid':
         // value is parent_guid field value
+        $parent_tid = 0;
         $query = db_select('feeds_item')
           ->fields('feeds_item', array('entity_id'))
           ->condition('entity_type', $this->entityType());
-        $parent_tid = $query->condition('guid', $value)->execute()->fetchField();
-        $target_term->parent[] = ($parent_tid) ? $parent_tid : 0;
+        $term_ids = array_keys($query->condition('guid', $value)->execute()->fetchAllAssoc('entity_id'));
+        if (!empty($term_ids)) {
+          $terms = entity_load($this->entityType(), $term_ids);
+          foreach ($terms as $term) {
+            if ($term->vid == $target_term->vid) {
+              $parent_tid = $term->tid;
+              break;
+            }
+          }
+        }
+        $target_term->parent[] = $parent_tid;
         break;
 
       case 'weight':
@@ -177,21 +190,13 @@ class FeedsTermProcessor extends FeedsProcessor {
       'description' => array(
         'name' => t('Term description'),
         'description' => t('Description of the taxonomy term.'),
-        'summary_callback' => 'text_feeds_summary_callback',
-        'form_callback' => 'text_feeds_form_callback',
+        'summary_callbacks' => array('text_feeds_summary_callback'),
+        'form_callbacks' => array('text_feeds_form_callback'),
       ),
     );
 
-    // Let implementers of hook_feeds_term_processor_targets() add their targets.
-    try {
-      self::loadMappers();
-      $entity_type = $this->entityType();
-      $bundle = $this->bundle();
-      drupal_alter('feeds_processor_targets', $targets, $entity_type, $bundle);
-    }
-    catch (Exception $e) {
-      // Do nothing.
-    }
+    $this->getHookTargets($targets);
+
     return $targets;
   }
 

@@ -6,11 +6,11 @@
  */
 
 /**
- * Implements hook_feeds_processor_targets_alter().
- *
- * @see FeedsProcessor::getMappingTargets()
+ * Implements hook_feeds_processor_targets().
  */
-function link_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+function link_feeds_processor_targets($entity_type, $bundle_name) {
+  $targets = array();
+
   foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
     $info = field_info_field($name);
     if ($info['type'] == 'link_field') {
@@ -32,16 +32,14 @@ function link_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_nam
       }
     }
   }
+
+  return $targets;
 }
 
 /**
- * Callback for mapping. Here is where the actual mapping happens.
- *
- * When the callback is invoked, $target contains the name of the field the
- * user has decided to map to and $value contains the value of the feed item
- * element the user has picked as a source.
+ * Callback for mapping link fields.
  */
-function link_feeds_set_target($source, $entity, $target, array $values) {
+function link_feeds_set_target(FeedsSource $source, $entity, $target, array $values) {
   list($field_name, $column) = explode(':', $target);
 
   $field = isset($entity->$field_name) ? $entity->$field_name : array('und' => array());

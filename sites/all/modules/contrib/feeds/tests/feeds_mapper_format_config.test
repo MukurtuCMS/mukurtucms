@@ -9,6 +9,7 @@
  * Class for testing "Text format" mapping configuration on text fields.
  */
 class FeedsMapperFormatConfig extends FeedsMapperTestCase {
+
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Text format mapping configuration',

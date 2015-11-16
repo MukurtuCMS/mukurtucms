@@ -6,11 +6,11 @@
  */
 
 /**
- * Implements hook_feeds_processor_targets_alter().
- *
- * @see FeedsProcessor::getMappingTargets()
+ * Implements hook_feeds_processor_targets().
  */
-function list_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+function list_feeds_processor_targets($entity_type, $bundle_name) {
+  $targets = array();
+
   foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
     $info = field_info_field($name);
 
@@ -42,12 +42,14 @@ function list_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_nam
         break;
     }
   }
+
+  return $targets;
 }
 
 /**
  * Callback for setting list_boolean fields.
  */
-function list_feeds_set_boolean_target(FeedsSource $source, $entity, $target, array $values, array $mapping = array()) {
+function list_feeds_set_boolean_target(FeedsSource $source, $entity, $target, array $values) {
   $field = isset($entity->$target) ? $entity->$target : array(LANGUAGE_NONE => array());
 
   foreach ($values as $value) {
