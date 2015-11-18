@@ -300,7 +300,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['style_options']['data_source'] = 'field_coverage';
   $handler->display->display_options['style_options']['name_field'] = 'title';
   $handler->display->display_options['style_options']['description_field'] = '#rendered_entity';
-  $handler->display->display_options['style_options']['view_mode'] = 'search_result';
+  $handler->display->display_options['style_options']['view_mode'] = 'map_popup';
   $handler->display->display_options['style_options']['map'] = 'google-high-res';
   $handler->display->display_options['style_options']['height'] = '600';
   $handler->display->display_options['style_options']['hide_empty'] = 1;

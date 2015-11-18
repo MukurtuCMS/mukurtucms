@@ -245,6 +245,12 @@ col-md-4 col-md-push-8';
       'thumbed' => array(
         'custom_settings' => FALSE,
       ),
+      'related_items_teaser_map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

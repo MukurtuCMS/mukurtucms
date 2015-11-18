@@ -91,6 +91,27 @@ function ma_digitalheritage_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|map_popup';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'map_popup';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h3',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|digital_heritage|map_popup'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|digital_heritage|search_result';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'digital_heritage';
@@ -453,6 +474,43 @@ function ma_digitalheritage_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|digital_heritage|map_popup';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'digital_heritage';
+  $ds_layout->view_mode = 'map_popup';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_media_asset',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'field_media_asset' => 'ds_content',
+    ),
+    'limit' => array(
+      'field_media_asset' => '1',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+  );
+  $export['node|digital_heritage|map_popup'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|digital_heritage|search_result';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
@@ -513,6 +571,15 @@ function ma_digitalheritage_ds_view_modes_info() {
     'node' => 'node',
   );
   $export['community_record'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'map_popup';
+  $ds_view_mode->label = 'Map Popup';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+  );
+  $export['map_popup'] = $ds_view_mode;
 
   return $export;
 }

@@ -2635,6 +2635,9 @@ table .checkbox input[type="checkbox"] {
 a:hover {
   text-decoration: none;
 }
+.view-display-id-all_map .view-mode-map_popup h3 {
+  margin-top: 0;
+}
 .node-community .group-left,
 .node-cultural-protocol-group .group-left {
   width: 66%;
