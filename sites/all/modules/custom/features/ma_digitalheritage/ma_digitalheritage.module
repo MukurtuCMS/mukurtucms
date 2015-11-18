@@ -517,18 +517,11 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       // Set the parent
       $form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#value'] = $book_parent->title . ' (' . $book_parent->nid . ')'; // setting in the autocomplete widget format
 
-      // Set the privacy setting to that of the parent
+      // Set the privacy setting and protocols to that of the parent
       $book_parent_wrapper = entity_metadata_wrapper('node', $book_parent);
       $form['field_item_privacy_setting'][LANGUAGE_NONE]['#value'] = $book_parent_wrapper->field_item_privacy_setting->value();
-
-      // Set the protocol(s) to that of the parent (its communities will get set in hook_node_presave)
-      $parent_protocols = array();
       foreach ($book_parent_wrapper->og_group_ref->value() as $protocol) {
-        $parent_protocols[] = $protocol->title . ' (' . $protocol->nid . ')'; // setting in the autocomplete widget format
-      }
-      if (count($parent_protocols)) {
-        $default_protocols = implode (', ', $parent_protocols);
-        $form['og_group_ref'][LANGUAGE_NONE][0]['default']['#default_value'][0] = $default_protocols;
+        $form['og_group_ref'][LANGUAGE_NONE]['#default_value'][] = $protocol->nid;
       }
     }
 
