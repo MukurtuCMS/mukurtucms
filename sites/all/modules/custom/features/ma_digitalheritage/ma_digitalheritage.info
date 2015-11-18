@@ -95,7 +95,6 @@ features[field_group][] = group_essentials|node|digital_heritage|form
 features[field_group][] = group_licensing|node|digital_heritage|form
 features[field_group][] = group_list_view_fields|node|digital_heritage|search_result
 features[field_group][] = group_mukurtu_core|node|digital_heritage|form
-features[field_group][] = group_related_items_teasers|node|digital_heritage|full
 features[field_group][] = group_relations|node|digital_heritage|form
 features[field_group][] = group_tabs|node|digital_heritage|form
 features[field_group][] = group_tabs|taxonomy_term|category|form
