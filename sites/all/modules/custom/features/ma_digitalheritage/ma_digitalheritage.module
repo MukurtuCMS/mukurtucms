@@ -775,7 +775,6 @@ function ma_digitalheritage_page_alter(&$data) {
             }
             $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
 
-
             // Create the tab
             $dh_tabs[] = array(
               'type' => 'node',
@@ -794,7 +793,33 @@ function ma_digitalheritage_page_alter(&$data) {
         }
 
         // Add the rendered quicktabs to the built page content
-        $dh_page_content .= drupal_render(quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs));
+        $community_record_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs);
+        foreach($community_record_tabs['content']['content']['tabs']['tablinks'] as $key => $tab) {
+            // Shorten title if necessary.  Long titles break the tabs.
+             if(strlen($tab['#title']) > 25) {
+                 $comma_break_pos = strpos($tab['#title'], ',', 18);
+                 $colon_break_pos = strpos($tab['#title'], ':', 18);
+                 $word_break_pos = strpos($tab['#title'], ' ', 18);
+                 $break_pos = 25;
+
+                 if($comma_break_pos > 0) {
+                     $break_pos = $comma_break_pos;
+                 }
+
+                 if($colon_break_pos > 0 && $colon_break_pos < $break_pos) {
+                     $break_pos = $colon_break_pos;
+                 }
+
+                 if($word_break_pos > 0 && $word_break_pos < $break_pos) {
+                     $break_pos = $word_break_pos;
+                 }
+
+                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
+                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($tab['#title'], 0, $break_pos) . '...';
+             }
+        }
+
+        $dh_page_content .= drupal_render($community_record_tabs);
       }
 
       // Node does not have community records. Render DH normally.
@@ -807,7 +832,6 @@ function ma_digitalheritage_page_alter(&$data) {
     }
   }
 }
-
 
 function ma_digital_heritage_book_page_navigation_buttons ($node) {
   $output = "";
