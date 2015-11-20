@@ -72,6 +72,11 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['filters']['type_1']['expose']['operator'] = 'type_1_op';
   $handler->display->display_options['filters']['type_1']['expose']['identifier'] = 'type_1';
   $handler->display->display_options['filters']['type_1']['expose']['reduce'] = TRUE;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = '1';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page_1');
@@ -116,6 +121,11 @@ function ma_community_manage_views_default_views() {
     'community' => 'community',
   );
   $handler->display->display_options['filters']['type']['group'] = 1;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['path'] = 'communities';
 
   /* Display: Cultural Protocols */
@@ -126,17 +136,6 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['state']['id'] = 'state';
-  $handler->display->display_options['filters']['state']['table'] = 'og';
-  $handler->display->display_options['filters']['state']['field'] = 'state';
-  $handler->display->display_options['filters']['state']['relationship'] = 'og_rel';
-  $handler->display->display_options['filters']['state']['value'] = array(
-    1 => '1',
-  );
-  $handler->display->display_options['filters']['state']['group'] = 1;
-  $handler->display->display_options['filters']['state']['expose']['label'] = 'Group: Group\'s state';
-  $handler->display->display_options['filters']['state']['expose']['operator'] = 'state_op';
   /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
@@ -145,6 +144,11 @@ function ma_community_manage_views_default_views() {
     'cultural_protocol_group' => 'cultural_protocol_group',
   );
   $handler->display->display_options['filters']['type']['group'] = 1;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['path'] = 'cultural-protocols';
 
   /* Display: Group IDs */
@@ -168,18 +172,12 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['nodefield']['build_mode'] = 'browse_teaser';
   $handler->display->display_options['fields']['nodefield']['links'] = 0;
   $handler->display->display_options['fields']['nodefield']['comments'] = 0;
-  /* Field: Content: Body */
+  /* Field: Content: Description */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
   $handler->display->display_options['fields']['body']['label'] = 'description';
   $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
-  /* Field: Broken/missing handler */
-  $handler->display->display_options['fields']['field_media']['id'] = 'field_media';
-  $handler->display->display_options['fields']['field_media']['table'] = 'field_data_field_media';
-  $handler->display->display_options['fields']['field_media']['field'] = 'field_media';
-  $handler->display->display_options['fields']['field_media']['label'] = 'image';
-  $handler->display->display_options['fields']['field_media']['element_label_colon'] = FALSE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -188,17 +186,6 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['state']['id'] = 'state';
-  $handler->display->display_options['filters']['state']['table'] = 'og';
-  $handler->display->display_options['filters']['state']['field'] = 'state';
-  $handler->display->display_options['filters']['state']['relationship'] = 'og_rel';
-  $handler->display->display_options['filters']['state']['value'] = array(
-    1 => '1',
-  );
-  $handler->display->display_options['filters']['state']['group'] = 1;
-  $handler->display->display_options['filters']['state']['expose']['label'] = 'Group: Group\'s state';
-  $handler->display->display_options['filters']['state']['expose']['operator'] = 'state_op';
   /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
@@ -207,6 +194,11 @@ function ma_community_manage_views_default_views() {
     'community' => 'community',
   );
   $handler->display->display_options['filters']['type']['group'] = 1;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = '1';
   $handler->display->display_options['path'] = 'app/communities';
   $translatables['communities'] = array(
     t('Defaults'),
@@ -231,11 +223,9 @@ function ma_community_manage_views_default_views() {
     t('Community-based groups'),
     t('Cultural Protocols'),
     t('Cultural Protocol-based groups'),
-    t('Group: Group\'s state'),
     t('Group IDs'),
     t('content'),
     t('description'),
-    t('image'),
     t('title'),
   );
   $export['communities'] = $view;
