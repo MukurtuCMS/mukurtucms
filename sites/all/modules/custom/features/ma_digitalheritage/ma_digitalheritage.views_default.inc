@@ -278,6 +278,13 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['field_community_ref']['id'] = 'field_community_ref';
   $handler->display->display_options['filters']['field_community_ref']['table'] = 'search_api_index_default_node_index';
   $handler->display->display_options['filters']['field_community_ref']['field'] = 'field_community_ref';
+  /* Filter criterion: Indexed Node: Status */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = array(
+    1 => '1',
+  );
 
   /* Display: All */
   $handler = $view->new_display('panel_pane', 'All', 'all');
@@ -366,6 +373,26 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
   $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
   $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
+  /* Filter criterion: Indexed Node: Status */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = array(
+    1 => '1',
+  );
+  $handler->display->display_options['filters']['status']['expose']['operator_id'] = 'status_op';
+  $handler->display->display_options['filters']['status']['expose']['label'] = 'Status';
+  $handler->display->display_options['filters']['status']['expose']['operator'] = 'status_op';
+  $handler->display->display_options['filters']['status']['expose']['identifier'] = 'status';
+  $handler->display->display_options['filters']['status']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['status']['expose']['reduce'] = 0;
   $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['digital_heritage_grid_list'] = array(
     t('Master'),
@@ -394,6 +421,7 @@ function ma_digitalheritage_views_default_views() {
     t('All (Map)'),
     t('Location'),
     t('Title'),
+    t('Status'),
   );
   $export['digital_heritage_grid_list'] = $view;
 

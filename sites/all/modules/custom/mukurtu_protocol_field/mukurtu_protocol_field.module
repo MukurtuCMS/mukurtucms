@@ -206,7 +206,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
       '#submit' => array('form_field_add_communities'),
     );
 
-    $form['#tree'] = TRUE;
+    $form['oggroup_fieldset']['#tree'] = TRUE;
     array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
     //$form['og_group_ref']['#type'] = 'hidden';
     $weight = $form['og_group_ref']['#weight'];
