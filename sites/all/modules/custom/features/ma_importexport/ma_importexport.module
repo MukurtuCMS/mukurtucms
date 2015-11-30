@@ -127,7 +127,7 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
 
   $form['dh_export']['csvdelimiter'] = array('#type' => 'textfield',
 					     '#title' => t('CSV column multi-value delimiter'),
-					     '#default_value' => '||',
+					     '#default_value' => ',',
 					     '#size' => 4,
 					     '#maxlength' => 10);					     
   
@@ -355,7 +355,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     if(isset($options['multivalue_delimiter'])) {
       $multivalue_delimiter = $options['multivalue_delimiter'];
     } else {
-      $multivalue_delimiter = '||';
+      $multivalue_delimiter = ',';
     }
   }
   
@@ -542,7 +542,7 @@ function ma_importexport_load_scald_atoms($sids) {
 
 
 // SCT: TODO: delete this
-function ma_importexport_export_csv_old($export_items, $delimiter='||') {
+function ma_importexport_export_csv_old($export_items, $delimiter=',') {
   //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
   //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
 
@@ -862,7 +862,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
 }
 
 
-function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $delimiter='||') {
+function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $delimiter=',') {
   $fields = field_info_instances('node', $nodetype);
   $mapping = ma_importexport_get_importer_mapping($nodetype);
 
@@ -874,7 +874,7 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
   fputcsv($csv_file, $row);
 }
 
-function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter='||') {
+function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter=',') {
   $fields = field_info_instances('scald_atom', $type);
   $mapping = ma_importexport_get_atom_field_mapping($type);
 
@@ -896,7 +896,7 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
  * @param string $delimiter
  *   The glue string to use as a delimiter between multivalue terms
  */
-function ma_importexport_export_csv($export, $delimiter='||') {
+function ma_importexport_export_csv($export, $delimiter=',') {
   //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
   //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
 
