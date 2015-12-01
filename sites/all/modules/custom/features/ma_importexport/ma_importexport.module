@@ -892,13 +892,13 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   case 'field_archival_tiff':
   case 'field_full_size_jpeg':
     if(isset($atom->{$field_name}[LANGUAGE_NONE])) {
-      $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+      $media_dir = '[mukurtu:batch_import_temp_directory]/media/' . $atom->type . '/' . $atom->sid . '/';
       $result[] = $media_dir . $atom->{$field_name}[LANGUAGE_NONE][0]['filename'];
     }
     break;
   case 'scald_thumbnail:uri':
     if(isset($atom->scald_thumbnail[LANGUAGE_NONE])) {
-      $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+      $media_dir = '[mukurtu:batch_import_temp_directory]/media/' . $atom->type . '/' . $atom->sid . '/';
       $result[] = $media_dir . $atom->scald_thumbnail[LANGUAGE_NONE][0]['filename'];
     }
     break;
@@ -944,7 +944,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     break;
   case 'Temporary target 1':
   case 'scald_file:uri':
-    $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+    $media_dir = '[mukurtu:batch_import_temp_directory]/media/' . $atom->type . '/' . $atom->sid . '/';
     if($atom->type == 'video') {
       $result[] = $media_dir . basename($atom->data['video_file']);
     } else {
