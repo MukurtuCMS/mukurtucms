@@ -274,9 +274,9 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   case 'field_media_asset':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
-	$result[] = ma_importexport_make_atom_guid($field_value['sid']);
+          $result[] = ma_importexport_make_atom_guid($field_value['sid']);
       } else {
-	$result[] = $field_value['sid'];
+          $result[] = $field_value['sid'];
       }
     }
     break;
@@ -306,18 +306,18 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   case 'og_group_ref':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
       if($use_guid) {
-	$result[] = ma_importexport_make_node_guid($ref['target_id']);
+          $result[] = ma_importexport_make_node_guid($ref['target_id']);
       } else {
-	$result[] = $ref['target_id'];
+          $result[] = $ref['target_id'];
       }
     }
     break;
   case 'field_community_ref':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
       if($use_guid) {	
-	$result[] = ma_importexport_make_node_guid($ref['nid']);
+          $result[] = ma_importexport_make_node_guid($ref['nid']);
       } else {
-	$result[] = $ref['nid'];
+          $result[] = $ref['nid'];
       }     
     }
     break;
@@ -410,8 +410,8 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 
     // Get the list of any collections, communities, and cultural protocols that those DH items reference
     $collection_list = array_merge($collection_list, ma_importexport_digital_heritage_field_export($original_node, 'field_collection'));
-    $community_list = array_merge($community_list, ma_importexport_digital_heritage_field_export($original_node, 'field_community_ref'));
-    $protocol_list = array_merge($protocol_list, ma_importexport_digital_heritage_field_export($original_node, 'og_group_ref'));    
+    $protocol_list = array_merge($protocol_list, ma_importexport_digital_heritage_field_export($original_node, 'og_group_ref'));
+    //  $community_list = array_merge($community_list, ma_importexport_digital_heritage_field_export($original_node, 'field_community_ref'));
     
     // Check export permission for item
     if (!ma_importexport_access_export($original_node)) {
@@ -427,7 +427,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     // Loop through the fields we want to export
     foreach($mapping as $dhfield => $dhmap) {
       $field_export = NULL;
-      $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield);
+      $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield, TRUE);
       $export_item[$dhfield] = $field_export;
     }
 
@@ -460,8 +460,11 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 
   // Load cultural protocol nodes
   $protocol_list = array_unique($protocol_list);
-  foreach($protocol_list as $key => $nid) {
+  foreach($protocol_list as $key => $nid) {     
     $protocol_list[$key] = node_load($nid);
+
+    // Find all the communities that the protocols reference
+    $community_list = array_merge($community_list, ma_importexport_node_field_export($protocol_list[$key], 'og_group_ref'));
 
      // Protocols have scald media atoms too, add them to export list   
     $protocol_image_sid = ma_importexport_node_field_export($protocol_list[$key], 'field_protocol_image');
@@ -484,7 +487,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $community_list = array_unique($community_list);
   foreach($community_list as $key => $nid) {
     $community_list[$key] = node_load($nid);
-    
+
     // Communities have scald media atoms too, add them to export list                 
     $community_image_sid = ma_importexport_node_field_export($community_list[$key], 'field_community_image');
     if(count($community_image_sid) > 0) {
@@ -603,6 +606,11 @@ function ma_importexport_get_importer_mapping($nodetype, $type = null) {
     }
   }
 
+  if(isset($mapping['nid'])) {
+      unset($mapping['nid']);
+  }
+
+  
   //  $mapping['nid'] = 'nid';
   return $mapping;
 }
@@ -619,6 +627,10 @@ function ma_importexport_get_digital_heritage_mapping() {
     foreach($config->config['processor']['config']['mappings'] as $map) {
       $mapping[$map['target']] = $map['source'];
     }
+  }
+
+  if(isset($mapping['nid'])) {
+      unset($mapping['nid']);
   }
 
   //  $mapping['nid'] = 'nid';
@@ -709,9 +721,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'field_protocol_image_thumbnail':
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
-	$result[] = ma_importexport_make_atom_guid($field_value['sid']);
+          $result[] = ma_importexport_make_atom_guid($field_value['sid']);
       } else {
-	$result[] = $field_value['sid'];	
+          $result[] = $field_value['sid'];	
       }
     }
     break;
@@ -719,9 +731,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'field_parent_community':
     foreach($node->field_parent_community[LANGUAGE_NONE] as $field_value) {           
       if($use_guid) {
-	$result[] = ma_importexport_make_node_guid($field_value['target_id']);
+          $result[] = ma_importexport_make_node_guid($field_value['target_id']);
       } else {
-	$result[] = $field_value['target_id'];
+          $result[] = $field_value['target_id'];
       }
     }
     break;
@@ -729,9 +741,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'field_digital_heritage_items':
     foreach($node->field_digital_heritage_items[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
-	$result[] = ma_importexport_make_node_guid($field_value['target_id']);
+          $result[] = ma_importexport_make_node_guid($field_value['target_id']);
       } else {
-	$result[] = $field_value['target_id'];
+          $result[] = $field_value['target_id'];
       }
     }
     break;
@@ -744,9 +756,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'og_group_ref:etid':
     foreach($node->og_group_ref[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
-	$result[] = ma_importexport_make_node_guid($field_value['target_id']);
+          $result[] = ma_importexport_make_node_guid($field_value['target_id']);
       } else {
-	$result[] = $field_value['target_id'];
+          $result[] = $field_value['target_id'];
       }
     }
     break;
@@ -964,15 +976,15 @@ function ma_importexport_export_csv($export, $delimiter=',') {
   ma_importexport_write_atom_csv($scald_file_output, 'file');
 
   foreach($export['communities'] as $community) {
-    ma_importexport_write_node_csv($communities_output, 'community', $community, $delimiter);
+      ma_importexport_write_node_csv($communities_output, 'community', $community, $delimiter);
   }
 
   foreach($export['protocols'] as $protocol) {
-    ma_importexport_write_node_csv($protocols_output, 'cultural_protocol_group', $protocol, $delimiter);
+      ma_importexport_write_node_csv($protocols_output, 'cultural_protocol_group', $protocol, $delimiter);
   }
   
   foreach($export['collections'] as $collection) {
-    ma_importexport_write_node_csv($collections_output, 'collection', $collection, $delimiter);
+      ma_importexport_write_node_csv($collections_output, 'collection', $collection, $delimiter);
   }
   
   foreach($export['media'] as $atom) {
