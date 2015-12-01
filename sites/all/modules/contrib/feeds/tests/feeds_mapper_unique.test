@@ -9,6 +9,7 @@
  * Class for testing Feeds unique callbacks.
  */
 class FeedsMapperUniqueTestCase extends FeedsMapperTestCase {
+
   public static function getInfo() {
     return array(
       'name' => 'Unique target callbacks',

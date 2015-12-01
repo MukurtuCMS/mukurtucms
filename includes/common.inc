@@ -1057,6 +1057,12 @@ function drupal_http_request($url, array $options = array()) {
 
   switch ($code) {
     case 200: // OK
+    case 201: // Created
+    case 202: // Accepted
+    case 203: // Non-Authoritative Information
+    case 204: // No Content
+    case 205: // Reset Content
+    case 206: // Partial Content
     case 304: // Not modified
       break;
     case 301: // Moved permanently
@@ -1522,7 +1528,7 @@ function _filter_xss_split($m, $store = FALSE) {
     return '&lt;';
   }
 
-  if (!preg_match('%^<\s*(/\s*)?([a-zA-Z0-9]+)([^>]*)>?|(<!--.*?-->)$%', $string, $matches)) {
+  if (!preg_match('%^<\s*(/\s*)?([a-zA-Z0-9\-]+)([^>]*)>?|(<!--.*?-->)$%', $string, $matches)) {
     // Seriously malformed.
     return '';
   }
@@ -2812,11 +2818,11 @@ function drupal_map_assoc($array, $function = NULL) {
  * into script execution a call such as set_time_limit(20) is made, the
  * script will run for a total of 45 seconds before timing out.
  *
- * It also means that it is possible to decrease the total time limit if
- * the sum of the new time limit and the current time spent running the
- * script is inferior to the original time limit. It is inherent to the way
- * set_time_limit() works, it should rather be called with an appropriate
- * value every time you need to allocate a certain amount of time
+ * If the current time limit is not unlimited it is possible to decrease the
+ * total time limit if the sum of the new time limit and the current time spent
+ * running the script is inferior to the original time limit. It is inherent to
+ * the way set_time_limit() works, it should rather be called with an
+ * appropriate value every time you need to allocate a certain amount of time
  * to execute a task than only once at the beginning of the script.
  *
  * Before calling set_time_limit(), we check if this function is available
@@ -2833,7 +2839,11 @@ function drupal_map_assoc($array, $function = NULL) {
  */
 function drupal_set_time_limit($time_limit) {
   if (function_exists('set_time_limit')) {
-    @set_time_limit($time_limit);
+    $current = ini_get('max_execution_time');
+    // Do not set time limit if it is currently unlimited.
+    if ($current != 0) {
+      @set_time_limit($time_limit);
+    }
   }
 }
 
@@ -3802,7 +3812,7 @@ function drupal_load_stylesheet_content($contents, $optimize = FALSE) {
 
   // Replaces @import commands with the actual stylesheet content.
   // This happens recursively but omits external files.
-  $contents = preg_replace_callback('/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)([^\'"\()]+)[\'"]?\s*\)?\s*;/', '_drupal_load_stylesheet', $contents);
+  $contents = preg_replace_callback('/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', '_drupal_load_stylesheet', $contents);
   return $contents;
 }
 
@@ -4162,6 +4172,13 @@ function drupal_region_class($region) {
  *       else being the same, JavaScript added by a call to drupal_add_js() that
  *       happened later in the page request gets added to the page after one for
  *       which drupal_add_js() happened earlier in the page request.
+ *   - requires_jquery: Set this to FALSE if the JavaScript you are adding does
+ *     not have a dependency on jQuery. Defaults to TRUE, except for JavaScript
+ *     settings where it defaults to FALSE. This is used on sites that have the
+ *     'javascript_always_use_jquery' variable set to FALSE; on those sites, if
+ *     all the JavaScript added to the page by drupal_add_js() does not have a
+ *     dependency on jQuery, then for improved front-end performance Drupal
+ *     will not add jQuery and related libraries and settings to the page.
  *   - defer: If set to TRUE, the defer attribute is set on the <script>
  *     tag. Defaults to FALSE.
  *   - cache: If set to FALSE, the JavaScript file is loaded anew on every page
@@ -4179,6 +4196,14 @@ function drupal_region_class($region) {
  */
 function drupal_add_js($data = NULL, $options = NULL) {
   $javascript = &drupal_static(__FUNCTION__, array());
+  $jquery_added = &drupal_static(__FUNCTION__ . ':jquery_added', FALSE);
+
+  // If the $javascript variable has been reset with drupal_static_reset(),
+  // jQuery and related files will have been removed from the list, so set the
+  // variable back to FALSE to indicate they have not yet been added.
+  if (empty($javascript)) {
+    $jquery_added = FALSE;
+  }
 
   // Construct the options, taking the defaults into consideration.
   if (isset($options)) {
@@ -4188,6 +4213,9 @@ function drupal_add_js($data = NULL, $options = NULL) {
   }
   else {
     $options = array();
+  }
+  if (isset($options['type']) && $options['type'] == 'setting') {
+    $options += array('requires_jquery' => FALSE);
   }
   $options += drupal_js_defaults($data);
 
@@ -4199,14 +4227,18 @@ function drupal_add_js($data = NULL, $options = NULL) {
   $options['weight'] += count($javascript) / 1000;
 
   if (isset($data)) {
-    // Add jquery.js and drupal.js, as well as the basePath setting, the
-    // first time a JavaScript file is added.
-    if (empty($javascript)) {
+    // Add jquery.js, drupal.js, and related files and settings if they have
+    // not been added yet. However, if the 'javascript_always_use_jquery'
+    // variable is set to FALSE (indicating that the site does not want jQuery
+    // automatically added on all pages) then only add it if a file or setting
+    // that requires jQuery is being added also.
+    if (!$jquery_added && (variable_get('javascript_always_use_jquery', TRUE) || $options['requires_jquery'])) {
+      $jquery_added = TRUE;
       // url() generates the prefix using hook_url_outbound_alter(). Instead of
       // running the hook_url_outbound_alter() again here, extract the prefix
       // from url().
       url('', array('prefix' => &$prefix));
-      $javascript = array(
+      $default_javascript = array(
         'settings' => array(
           'data' => array(
             array('basePath' => base_path()),
@@ -4225,11 +4257,13 @@ function drupal_add_js($data = NULL, $options = NULL) {
           'group' => JS_LIBRARY,
           'every_page' => TRUE,
           'weight' => -1,
+          'requires_jquery' => TRUE,
           'preprocess' => TRUE,
           'cache' => TRUE,
           'defer' => FALSE,
         ),
       );
+      $javascript = drupal_array_merge_deep($javascript, $default_javascript);
       // Register all required libraries.
       drupal_add_library('system', 'jquery', TRUE);
       drupal_add_library('system', 'jquery.once', TRUE);
@@ -4270,6 +4304,7 @@ function drupal_js_defaults($data = NULL) {
     'group' => JS_DEFAULT,
     'every_page' => FALSE,
     'weight' => 0,
+    'requires_jquery' => TRUE,
     'scope' => 'header',
     'cache' => TRUE,
     'defer' => FALSE,
@@ -4316,7 +4351,12 @@ function drupal_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
   if (!isset($javascript)) {
     $javascript = drupal_add_js();
   }
-  if (empty($javascript)) {
+
+  // If no JavaScript items have been added, or if the only JavaScript items
+  // that have been added are JavaScript settings (which don't do anything
+  // without any JavaScript code to use them), then no JavaScript code should
+  // be added to the page.
+  if (empty($javascript) || (isset($javascript['settings']) && count($javascript) == 1)) {
     return '';
   }
 
@@ -4470,8 +4510,8 @@ function drupal_get_js($scope = 'header', $javascript = NULL, $skip_alter = FALS
  *
  * Libraries, JavaScript, CSS and other types of custom structures are attached
  * to elements using the #attached property. The #attached property is an
- * associative array, where the keys are the the attachment types and the values
- * are the attached data. For example:
+ * associative array, where the keys are the attachment types and the values are
+ * the attached data. For example:
  * @code
  * $build['#attached'] = array(
  *   'js' => array(drupal_get_path('module', 'taxonomy') . '/taxonomy.js'),
@@ -5182,6 +5222,11 @@ function _drupal_bootstrap_full() {
   fix_gpc_magic();
   // Load all enabled modules
   module_load_all();
+  // Reset drupal_alter() and module_implements() static caches as these
+  // include implementations for vital modules only when called early on
+  // in the bootstrap.
+  drupal_static_reset('drupal_alter');
+  drupal_static_reset('module_implements');
   // Make sure all stream wrappers are registered.
   file_get_stream_wrappers();
   // Ensure mt_rand is reseeded, to prevent random values from one page load
@@ -5278,8 +5323,8 @@ function drupal_page_set_cache() {
  *
  * Do not call this function from a test. Use $this->cronRun() instead.
  *
- * @return
- *   TRUE if cron ran successfully.
+ * @return bool
+ *   TRUE if cron ran successfully and FALSE if cron is already running.
  */
 function drupal_cron_run() {
   // Allow execution to continue even if the request gets canceled.
@@ -5341,12 +5386,12 @@ function drupal_cron_run() {
       // Do not run if queue wants to skip.
       continue;
     }
-    $function = $info['worker callback'];
+    $callback = $info['worker callback'];
     $end = time() + (isset($info['time']) ? $info['time'] : 15);
     $queue = DrupalQueue::get($queue_name);
     while (time() < $end && ($item = $queue->claimItem())) {
       try {
-        $function($item->data);
+        call_user_func($callback, $item->data);
         $queue->deleteItem($item);
       }
       catch (Exception $e) {
@@ -6299,13 +6344,21 @@ function drupal_render_cid_parts($granularity = NULL) {
   }
 
   if (!empty($granularity)) {
+    $cache_per_role = $granularity & DRUPAL_CACHE_PER_ROLE;
+    $cache_per_user = $granularity & DRUPAL_CACHE_PER_USER;
+    // User 1 has special permissions outside of the role system, so when
+    // caching per role is requested, it should cache per user instead.
+    if ($user->uid == 1 && $cache_per_role) {
+      $cache_per_user = TRUE;
+      $cache_per_role = FALSE;
+    }
     // 'PER_ROLE' and 'PER_USER' are mutually exclusive. 'PER_USER' can be a
     // resource drag for sites with many users, so when a module is being
     // equivocal, we favor the less expensive 'PER_ROLE' pattern.
-    if ($granularity & DRUPAL_CACHE_PER_ROLE) {
+    if ($cache_per_role) {
       $cid_parts[] = 'r.' . implode(',', array_keys($user->roles));
     }
-    elseif ($granularity & DRUPAL_CACHE_PER_USER) {
+    elseif ($cache_per_user) {
       $cid_parts[] = "u.$user->uid";
     }
 
@@ -7045,7 +7098,8 @@ function drupal_uninstall_schema($module) {
  * specification of a schema, as it was defined in a module's
  * hook_schema(). No additional default values will be set,
  * hook_schema_alter() is not invoked and these unprocessed
- * definitions won't be cached.
+ * definitions won't be cached. To retrieve the schema after
+ * hook_schema_alter() has been invoked use drupal_get_schema().
  *
  * This function can be used to retrieve a schema specification in
  * hook_schema(), so it allows you to derive your tables from existing
@@ -7105,6 +7159,24 @@ function _drupal_schema_initialize(&$schema, $module, $remove_descriptions = TRU
       }
     }
   }
+}
+
+/**
+ * Retrieves the type for every field in a table schema.
+ *
+ * @param $table
+ *   The name of the table from which to retrieve type information.
+ *
+ * @return
+ *   An array of types, keyed by field name.
+ */
+function drupal_schema_field_types($table) {
+  $table_schema = drupal_get_schema($table);
+  $field_types = array();
+  foreach ($table_schema['fields'] as $field_name => $field_info) {
+    $field_types[$field_name] = isset($field_info['type']) ? $field_info['type'] : NULL;
+  }
+  return $field_types;
 }
 
 /**
@@ -7308,7 +7380,16 @@ function drupal_write_record($table, &$record, $primary_keys = array()) {
  * Information stored in a module .info file:
  * - name: The real name of the module for display purposes.
  * - description: A brief description of the module.
- * - dependencies: An array of shortnames of other modules this module requires.
+ * - dependencies: An array of dependency strings. Each is in the form
+ *   'project:module (versions)'; with the following meanings:
+ *   - project: (optional) Project shortname, recommended to ensure uniqueness,
+ *     if the module is part of a project hosted on drupal.org. If omitted,
+ *     also omit the : that follows. The project name is currently ignored by
+ *     Drupal core but is used for automated testing.
+ *   - module: (required) Module shortname within the project.
+ *   - (versions): Optional version information, consisting of one or more
+ *     comma-separated operator/value pairs or simply version numbers, which
+ *     can contain "x" as a wildcard. Examples: (>=7.22, <7.28), (7.x-3.x).
  * - package: The name of the package of modules this module belongs to.
  *
  * See forum.info for an example of a module .info file.
@@ -7388,7 +7469,6 @@ function drupal_parse_info_file($filename) {
  */
 function drupal_parse_info_format($data) {
   $info = array();
-  $constants = get_defined_constants();
 
   if (preg_match_all('
     @^\s*                           # Start at the beginning of a line, ignoring leading whitespace
@@ -7428,8 +7508,8 @@ function drupal_parse_info_format($data) {
       }
 
       // Handle PHP constants.
-      if (isset($constants[$value])) {
-        $value = $constants[$value];
+      if (preg_match('/^\w+$/i', $value) && defined($value)) {
+        $value = constant($value);
       }
 
       // Insert actual value.
@@ -7593,7 +7673,12 @@ function debug($data, $label = NULL, $print_r = FALSE) {
  * Parses a dependency for comparison by drupal_check_incompatibility().
  *
  * @param $dependency
- *   A dependency string, for example 'foo (>=7.x-4.5-beta5, 3.x)'.
+ *   A dependency string, which specifies a module dependency, and optionally
+ *   the project it comes from and versions that are supported. Supported
+ *   formats include:
+ *   - 'module'
+ *   - 'project:module'
+ *   - 'project:module (>=version, version)'
  *
  * @return
  *   An associative array with three keys:
@@ -7608,6 +7693,12 @@ function debug($data, $label = NULL, $print_r = FALSE) {
  * @see drupal_check_incompatibility()
  */
 function drupal_parse_dependency($dependency) {
+  $value = array();
+  // Split out the optional project name.
+  if (strpos($dependency, ':')) {
+    list($project_name, $dependency) = explode(':', $dependency);
+    $value['project'] = $project_name;
+  }
   // We use named subpatterns and support every op that version_compare
   // supports. Also, op is optional and defaults to equals.
   $p_op = '(?P<operation>!=|==|=|<|<=|>|>=|<>)?';
@@ -7616,7 +7707,6 @@ function drupal_parse_dependency($dependency) {
   $p_major = '(?P<major>\d+)';
   // By setting the minor version to x, branches can be matched.
   $p_minor = '(?P<minor>(?:\d+|x)(?:-[A-Za-z]+\d+)?)';
-  $value = array();
   $parts = explode('(', $dependency, 2);
   $value['name'] = trim($parts[0]);
   if (isset($parts[1])) {
@@ -7731,6 +7821,7 @@ function entity_get_info($entity_type = NULL) {
         // Prepare entity schema fields SQL info for
         // DrupalEntityControllerInterface::buildQuery().
         if (isset($entity_info[$name]['base table'])) {
+          $entity_info[$name]['base table field types'] = drupal_schema_field_types($entity_info[$name]['base table']);
           $entity_info[$name]['schema_fields_sql']['base table'] = drupal_schema_fields_sql($entity_info[$name]['base table']);
           if (isset($entity_info[$name]['revision table'])) {
             $entity_info[$name]['schema_fields_sql']['revision table'] = drupal_schema_fields_sql($entity_info[$name]['revision table']);

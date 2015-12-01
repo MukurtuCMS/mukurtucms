@@ -256,6 +256,7 @@ features[file_display][] = video__media_small__media_oembed
 features[file_display][] = video__media_small__media_oembed_thumbnail
 features[image][] = digital_heritage_full_content
 features[image][] = full
+features[image][] = related_items_teaser
 features[variable][] = admin_theme
 features[variable][] = ds_styles_regions
 features[variable][] = node_admin_theme

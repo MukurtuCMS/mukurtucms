@@ -351,6 +351,10 @@ function feeds_schema() {
       'type' => array('type'),
     ),
   );
+
+  $schema['cache_feeds_http'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_feeds_http']['description'] = 'Cache table for Feeds downloads.';
+
   return $schema;
 }
 
@@ -743,5 +747,16 @@ function feeds_update_7211(&$sandbox) {
   if (empty($sandbox['importers'])) {
     $sandbox['#finished'] = 1;
     return t('@importers total importers processed, @updated_count with fields that were updated.', array('@importers' => $sandbox['max'], '@updated_count' => $sandbox['updated_count']));
+  }
+}
+
+/**
+ * Create {cache_feeds_http} table.
+ */
+function feeds_update_7212() {
+  if (!db_table_exists('cache_feeds_http')) {
+    $schema = drupal_get_schema_unprocessed('system', 'cache');
+    $schema['description'] = 'Cache table for Feeds downloads.';
+    db_create_table('cache_feeds_http', $schema);
   }
 }

@@ -338,33 +338,59 @@ function ds_extras_switch_view_mode_field($field) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
+function ds_extras_form_node_type_form_alter(&$form, $form_state, $form_id) {
+  $node_type = $form['#node_type']->type;
+
+  // Get the view modes.
+  $options = ds_extras_get_bundle_view_modes('node', $node_type);
+
+  // Only fire if we have more than 1 option.
+  if (count($options) > 1) {
+    if (!isset($form['ds_extras'])) {
+      $form['ds_extras'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Display Suite: Extras'), // There's already a 'Display settings' fieldset
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#group' => 'additional_settings',
+        '#weight' => 100,
+      );
+    }
+
+    $form['ds_extras']['ds_extras_view_modes'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('View modes'),
+      '#options' => $options,
+      '#default_value' => variable_get('ds_extras_view_modes_' . $node_type, array_keys($options)),
+      '#description' => t('Select which view modes will be available to switch to on node edit forms.'),
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
 function ds_extras_form_node_form_alter(&$form, $form_state, $form_id) {
+  $node = $form['#node'];
 
   // Switch full view mode.
-  if (user_access('ds_switch ' . $form['#node']->type)) {
-
-    $view_mode_settings = field_view_mode_settings('node', $form['#node']->type);
+  if (user_access('ds_switch ' . $node->type)) {
 
     // Get the view modes.
-    $ds_vm = ds_entity_view_modes('node');
+    $view_modes = ds_extras_get_bundle_view_modes('node', $node->type);
+    $enabled_vm = variable_get('ds_extras_view_modes_' . $node->type, array_keys($view_modes));
     $layouts = array();
-    $options = array('' => t('Default'));
-    foreach ($ds_vm as $key => $item) {
-      $overriden = (!empty($view_mode_settings[$key]['custom_settings']) ? TRUE : FALSE);
-      if ($overriden) {
-        $layout = ds_get_layout('node', $form['#node']->type, $key, FALSE);
+    $options = array();
+    foreach ($view_modes as $key => $label) {
+      if (in_array($key, $enabled_vm)) {
+        $layout = ds_get_layout('node', $node->type, $key, FALSE);
         $layouts[$key] = $layout;
-        $options[$key] = $item['label'];
+        $options[$key] = $label;
       }
     }
 
-    // Add default layout settings
-    $layouts[''] = ds_get_layout('node', $form['#node']->type, 'default', FALSE);
-
     // Only fire if we have more than 1 option.
     if (count($options) > 1) {
-      $node = $form['#node'];
-
       if (!isset($form['ds_extras'])) {
         $form['ds_extras'] = array(
           '#type' => 'fieldset',
@@ -380,7 +406,7 @@ function ds_extras_form_node_form_alter(&$form, $form_state, $form_id) {
         '#type' => 'select',
         '#title' => t('View mode'),
         '#options' => $options,
-        '#default_value' => isset($node->ds_switch) ? $node->ds_switch : '',
+        '#default_value' => isset($node->ds_switch) ? $node->ds_switch : 'default',
         '#description' => t('Switch to a different view mode to display the full page view of this node.'),
         '#weight' => -1,
         '#ajax' => array(
@@ -395,13 +421,17 @@ function ds_extras_form_node_form_alter(&$form, $form_state, $form_id) {
         '#suffix' => '</div>',
       );
 
-      $mode = isset($form_state['input']['ds_switch']) ? $form_state['input']['ds_switch'] : (isset($node->ds_switch) ? $node->ds_switch : '');
-      $chosen_layout = $layouts[$mode];
-
       $fallback_image = drupal_get_path('module', 'ds') . '/images/preview.png';
-      $image = (isset($chosen_layout['image']) && !empty($chosen_layout['image'])) ? $chosen_layout['path'] . '/' . $chosen_layout['layout'] . '.png' : $fallback_image;
-      if (isset($chosen_layout['panels']) && !empty($chosen_layout['panels']['icon'])) {
-        $image = $chosen_layout['panels']['path'] . '/' . $chosen_layout['panels']['icon'];
+      $mode = isset($form_state['input']['ds_switch']) ? $form_state['input']['ds_switch'] : (isset($node->ds_switch) ? $node->ds_switch : 'default');
+      if (isset($layouts[$mode])) {
+        $chosen_layout = $layouts[$mode];
+        $image = (isset($chosen_layout['image']) && !empty($chosen_layout['image'])) ? $chosen_layout['path'] . '/' . $chosen_layout['layout'] . '.png' : $fallback_image;
+        if (isset($chosen_layout['panels']) && !empty($chosen_layout['panels']['icon'])) {
+          $image = $chosen_layout['panels']['path'] . '/' . $chosen_layout['panels']['icon'];
+        }
+      }
+      else {
+        $image = $fallback_image;
       }
 
       $form['ds_extras']['preview']['image'] = array(
@@ -409,6 +439,25 @@ function ds_extras_form_node_form_alter(&$form, $form_state, $form_id) {
       );
     }
   }
+}
+
+/**
+ * Get view modes for an entity bundle.
+ */
+function ds_extras_get_bundle_view_modes($type, $bundle) {
+  $view_modes = array('default' => t('Default'));
+
+  $view_mode_settings = field_view_mode_settings($type, $bundle);
+  $ds_vm = ds_entity_view_modes($type);
+
+  foreach ($ds_vm as $key => $item) {
+    $overriden = (!empty($view_mode_settings[$key]['custom_settings']) ? TRUE : FALSE);
+    if ($overriden) {
+      $view_modes[$key] = $item['label'];
+    }
+  }
+
+  return $view_modes;
 }
 
 /**
@@ -606,11 +655,13 @@ function ds_extras_entity_view_alter(&$build, $entity_type) {
       $contexts = array();
       $id = (arg(0) == 'taxonomy') ? arg(2) : arg(1);
       $entity = entity_load($entity_type, array($id));
-      ds_create_entity_context($entity_type, $entity[$id], $contexts);
-      $title = $layout['settings']['page_option_title'];
-      $title = filter_xss_admin(ctools_context_keyword_substitute($title, array(), $contexts));
-      $page_title['title'] = $title;
-      $page_title['head_title'] = $title;
+      if (isset($entity[$id])) {
+        ds_create_entity_context($entity_type, $entity[$id], $contexts);
+        $title = $layout['settings']['page_option_title'];
+        $title = filter_xss_admin(ctools_context_keyword_substitute($title, array(), $contexts));
+        $page_title['title'] = t($title);
+        $page_title['head_title'] = t($title);
+      }
     }
   }
 
@@ -771,6 +822,8 @@ function theme_ds_field_expert($variables) {
   }
 
   // Render items.
+  $item_count = count($variables['items']);
+  $item_index = 0;
   foreach ($variables['items'] as $delta => $item) {
     // Field item wrapper.
     if (isset($config['fi'])) {
@@ -780,6 +833,12 @@ function theme_ds_field_expert($variables) {
       }
       if (!empty($config['fi-cl'])) {
         $class[] = $config['fi-cl'];
+      }
+      if(!empty($config['fi-first-last']) && $item_index == 0) {
+        $class[] = "first";
+      }
+      if(!empty($config['fi-first-last']) && $item_index == $item_count - 1) {
+        $class[] = "last";
       }
       $class = !empty($class) ? ' class="'. token_replace(implode(' ', $class), array($variables['element']['#entity_type'] => $variables['element']['#object']), array('clear' => TRUE)) .'"' : '';
       $attributes = array();
@@ -800,6 +859,7 @@ function theme_ds_field_expert($variables) {
     if (isset($config['fi'])) {
       $output .= '</' . $config['fi-el'] . '>';
     }
+    ++$item_index;
   }
 
   // Closing field items wrapper.
@@ -934,6 +994,7 @@ function ds_extras_ds_field_settings_alter(&$field_settings, $form, &$form_state
           // Odd even class.
           if ($wrapper_key == 'fi') {
             $field_settings[$key]['formatter_settings']['ft'][$wrapper_key . '-odd-even'] = !(empty($values[$wrapper_key . '-odd-even'])) ? TRUE : FALSE;
+            $field_settings[$key]['formatter_settings']['ft'][$wrapper_key . '-first-last'] = !(empty($values[$wrapper_key . '-first-last'])) ? TRUE : FALSE;
           }
         }
       }
@@ -991,6 +1052,7 @@ function ds_extras_preprocess_field(&$variables) {
     $variables['ds-config'] = $config;
     $variables['theme_hook_suggestions'] = array();
     // Either it uses the function.
+    $variables['theme_hook_suggestions'][] = str_replace('theme_', '', $config['func']);
     $variables['theme_hook_suggestions'][] = $config['func'];
     // Or the template file(s).
     $suggestion = 'field__' . str_replace('theme_ds_field_', '', $config['func']);
@@ -1003,6 +1065,7 @@ function ds_extras_preprocess_field(&$variables) {
   elseif (isset($field_instance_info['ds_extras_field_template']) && !empty($field_instance_info['ds_extras_field_template']) && $field_instance_info['ds_extras_field_template'] != 'theme_field') {
     $variables['theme_hook_suggestions'] = array();
     // Either it uses the function.
+    $variables['theme_hook_suggestions'][] = str_replace('theme_', '', $field_instance_info['ds_extras_field_template']);
     $variables['theme_hook_suggestions'][] = $field_instance_info['ds_extras_field_template'];
     // Or the template file(s).
     $suggestion = 'field__' . str_replace('theme_ds_field_', '', $field_instance_info['ds_extras_field_template']);
@@ -1018,6 +1081,7 @@ function ds_extras_preprocess_field(&$variables) {
       $variables['theme_hook_suggestions'] = array();
       $variables['ds-config'] = $config;
       // Either it uses the function.
+      $variables['theme_hook_suggestions'][] = str_replace('theme_', '', $field_theme_function);
       $variables['theme_hook_suggestions'][] = $field_theme_function;
       // Or the template file(s).
       $suggestion = 'field__' . str_replace('theme_ds_field_', '', $field_theme_function);
@@ -1025,6 +1089,18 @@ function ds_extras_preprocess_field(&$variables) {
       $variables['theme_hook_suggestions'][] = $suggestion . '__' . $field_name;
       $variables['theme_hook_suggestions'][] = $suggestion . '__' . $variables['element']['#bundle'];
       $variables['theme_hook_suggestions'][] = $suggestion . '__' . $field_name . '__' . $variables['element']['#bundle'];
+    }
+  }
+
+  // Sanitize the output of field templates
+  $fields = array(
+    'prefix',
+    'suffix',
+  );
+
+  foreach ($fields as $field) {
+    if (isset($variables['ds-config'][$field])) {
+      $variables['ds-config'][$field] = filter_xss_admin($variables['ds-config'][$field]);
     }
   }
 }

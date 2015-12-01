@@ -13,7 +13,7 @@ jQuery(document).ready(function($){
         itemSelector: '.views-row'
     });
 
-    if ( ($.cookie('grid_list_mode') != 'grid-view')) {
+    if ( ($.cookie('dh_browse_mode') != 'grid-view')) {
         $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry('destroy');
     }
 

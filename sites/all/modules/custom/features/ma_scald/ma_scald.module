@@ -45,11 +45,20 @@ function ma_scald_atom_download_link($field) {
 /**
  * Implements hook_form_ID_alter().
  */
-// Since these are hardcoded into the audio and video forms, hook here to change file system paths to private when uploading such
+
 function ma_scald_form_scald_atom_add_form_add_alter(&$form, &$form_state) {
+
+  // Since these are hardcoded into the audio and video forms, hook here to change file system paths to private when uploading such
   if ($upload_location = $form['file']['#upload_location']) {
     $form['file']['#upload_location'] = str_replace('public', 'private', $upload_location);
   }
+
+  // Hide these fields on the initial image atom add form
+  // These only show for images for some (scald) reason
+  // On the edit form that follows, the fields show along with the other metadata fields, for all atom types
+  $form['scald_authors']['#access'] = FALSE;
+  $form['scald_tags']['#access'] = FALSE;
+
 }
 
 /**

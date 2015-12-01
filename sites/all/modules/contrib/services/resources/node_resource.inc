@@ -259,6 +259,8 @@ function _node_resource_retrieve($nid) {
     // cause never ending recursion in rendering.
     unset($node->uri);
   }
+  //Lets check field_permissions
+  $node = services_field_permissions_clean('view', 'node', $node);
   return $node;
 }
 
@@ -309,11 +311,11 @@ function _node_resource_create($node) {
   // but always make the node author default to the current user (if the user
   // has permission to change it, $form_state['values'] will override this
   // default when the form is submitted).
-  
+
   //Patched to support multi value fields (e.g. field_ media_asset "sid") - Dario 20150726
   //based on proposed fix in comment https://www.drupal.org/node/2224803#comment-8844431
   //$stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language')));
-  $stub_node = $node; 
+  $stub_node = $node;
   $stub_node->name = $user->name;
 
   // Contributed modules may check the triggering element in the form state.
@@ -474,7 +476,6 @@ function _node_resource_delete($nid) {
  *       for index requests more straightforward?
  */
 function _node_resource_index($page, $fields, $parameters, $page_size) {
-  module_load_include('inc', 'services', 'services.module');
   $node_select = db_select('node', 't')
     ->addTag('node_access')
     ->orderBy('sticky', 'DESC')
@@ -609,7 +610,15 @@ function _node_resource_load_node_comments($nid, $count = 0, $start = 0) {
     $cids[] = $record->cid;
   }
 
-  return !empty($cids) ? comment_load_multiple($cids) : array();
+  !empty($cids) ? $comments = comment_load_multiple($cids) : array();
+
+  $return_comments = array();
+
+  foreach ($comments as $comment) {
+    $return_comments[] = services_field_permissions_comment_clean('view', 'comment', $comment);
+  }
+
+  return $return_comments;
 }
 
 /**

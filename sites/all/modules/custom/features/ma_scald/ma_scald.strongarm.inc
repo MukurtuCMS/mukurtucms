@@ -76,6 +76,18 @@ function ma_scald_strongarm() {
       'diff_standard' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_related_items' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_banner_image' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_scald_thumbnail_image' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -97,6 +109,10 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
           ),
@@ -136,6 +152,12 @@ function ma_scald_strongarm() {
       'token' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_related_items' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -157,6 +179,10 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
           ),
@@ -199,6 +225,12 @@ function ma_scald_strongarm() {
       'mukurtu_scald_thumbnail_image' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_scald_related_items' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -235,6 +267,10 @@ function ma_scald_strongarm() {
             'weight' => '0',
             'visible' => TRUE,
           ),
+          'mukurtu_scald_related_items' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
         ),
       ),
     ),
@@ -268,6 +304,15 @@ function ma_scald_strongarm() {
       'mukurtu_scald_banner_image' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_scald_related_items' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_thumbnail_image' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -289,6 +334,10 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
           ),
@@ -435,6 +484,14 @@ function ma_scald_strongarm() {
       'parseable' => TRUE,
       'formats' => array(),
     ),
+    'mukurtu_scald_related_items' => array(
+      'name' => 'mukurtu_scald_related_items',
+      'title' => 'Mukurtu Scald Related Items',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
   );
   $export['scald_custom_contexts'] = $strongarm;
 
@@ -444,6 +501,13 @@ function ma_scald_strongarm() {
   $strongarm->name = 'scald_tags_vocabulary';
   $strongarm->value = 'scald_tags';
   $export['scald_tags_vocabulary'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'scald_video_upload_location';
+  $strongarm->value = 'public://atoms/video/';
+  $export['scald_video_upload_location'] = $strongarm;
 
   return $export;
 }

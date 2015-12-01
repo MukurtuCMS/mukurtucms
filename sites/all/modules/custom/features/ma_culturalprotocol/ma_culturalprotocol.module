@@ -310,7 +310,6 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
  */
 function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
   $groups_for_user = og_get_groups_by_user(null, 'node');
-  global $user;
   $allowed_groups_for_user[] = array();
   foreach ($groups_for_user as $group_for_user) {
     $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);

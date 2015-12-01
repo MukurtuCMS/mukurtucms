@@ -113,21 +113,21 @@ function hook_hook_info_alter(&$hooks) {
  *     translation handlers. Array keys are the module names, array values
  *     can be any data structure the module uses to provide field translation.
  *     Any empty value disallows the module to appear as a translation handler.
- *   - entity keys: An array describing how the Field API can extract the
- *     information it needs from the objects of the type. Elements:
+ *   - entity keys: (optional) An array describing how the Field API can extract
+ *     the information it needs from the objects of the type. Elements:
  *     - id: The name of the property that contains the primary id of the
  *       entity. Every entity object passed to the Field API must have this
  *       property and its value must be numeric.
  *     - revision: The name of the property that contains the revision id of
  *       the entity. The Field API assumes that all revision ids are unique
  *       across all entities of a type. This entry can be omitted if the
- *       entities of this type are not versionable.
+ *       entities of this type are not versionable. Defaults to an empty string.
  *     - bundle: The name of the property that contains the bundle name for the
  *       entity. The bundle name defines which set of fields are attached to
  *       the entity (e.g. what nodes call "content type"). This entry can be
  *       omitted if this entity type exposes a single bundle (all entities have
  *       the same collection of fields). The name of this single bundle will be
- *       the same as the entity type.
+ *       the same as the entity type. Defaults to an empty string.
  *     - label: The name of the property that contains the entity label. For
  *       example, if the entity's label is located in $entity->subject, then
  *       'subject' should be specified here. If complex logic is required to
@@ -606,8 +606,8 @@ function hook_cron() {
  * @return
  *   An associative array where the key is the queue name and the value is
  *   again an associative array. Possible keys are:
- *   - 'worker callback': The name of the function to call. It will be called
- *     with one argument, the item created via DrupalQueue::createItem().
+ *   - 'worker callback': The name of an implementation of
+ *     callback_queue_worker().
  *   - 'time': (optional) How much time Drupal should spend on calling this
  *     worker in seconds. Defaults to 15.
  *   - 'skip on cron': (optional) Set to TRUE to avoid being processed during
@@ -1890,9 +1890,8 @@ function hook_init() {
 /**
  * Define image toolkits provided by this module.
  *
- * The file which includes each toolkit's functions must be declared as part of
- * the files array in the module .info file so that the registry will find and
- * parse it.
+ * The file which includes each toolkit's functions must be included in this
+ * hook.
  *
  * The toolkit's functions must be named image_toolkitname_operation().
  * where the operation may be:
@@ -2633,6 +2632,8 @@ function hook_flush_caches() {
  * module_enable() for a detailed description of the order in which install and
  * enable hooks are invoked.
  *
+ * This hook should be implemented in a .module file, not in an .install file.
+ *
  * @param $modules
  *   An array of the modules that were installed.
  *
@@ -3174,7 +3175,9 @@ function hook_requirements($phase) {
  * creation and alteration of the supported database engines.
  *
  * See the Schema API Handbook at http://drupal.org/node/146843 for details on
- * schema definition structures.
+ * schema definition structures. Note that foreign key definitions are for
+ * documentation purposes only; foreign keys are not created in the database,
+ * nor are they enforced by Drupal.
  *
  * @return array
  *   A schema definition structure array. For each element of the
@@ -3226,6 +3229,8 @@ function hook_schema() {
       'nid_vid' => array('nid', 'vid'),
       'vid'     => array('vid'),
     ),
+    // For documentation purposes only; foreign keys are not created in the
+    // database.
     'foreign keys' => array(
       'node_revision' => array(
         'table' => 'node_revision',
@@ -3694,8 +3699,9 @@ function hook_registry_files_alter(&$files, $modules) {
  *
  * Any tasks you define here will be run, in order, after the installer has
  * finished the site configuration step but before it has moved on to the
- * final import of languages and the end of the installation. You can have any
- * number of custom tasks to perform during this phase.
+ * final import of languages and the end of the installation. This is invoked
+ * by install_tasks().  You can have any number of custom tasks to perform
+ * during this phase.
  *
  * Each task you define here corresponds to a callback function which you must
  * separately define and which is called when your task is run. This function
@@ -3788,6 +3794,8 @@ function hook_registry_files_alter(&$files, $modules) {
  *
  * @see install_state_defaults()
  * @see batch_set()
+ * @see hook_install_tasks_alter()
+ * @see install_tasks()
  */
 function hook_install_tasks(&$install_state) {
   // Here, we define a variable to allow tasks to indicate that a particular,
@@ -3890,6 +3898,8 @@ function hook_html_head_alter(&$head_elements) {
 /**
  * Alter the full list of installation tasks.
  *
+ * This hook is invoked on the install profile in install_tasks().
+ *
  * @param $tasks
  *   An array of all available installation tasks, including those provided by
  *   Drupal core. You can modify this array to change or replace any part of
@@ -3897,6 +3907,9 @@ function hook_html_head_alter(&$head_elements) {
  *   is selected.
  * @param $install_state
  *   An array of information about the current installation state.
+ *
+ * @see hook_install_tasks()
+ * @see install_tasks()
  */
 function hook_install_tasks_alter(&$tasks, $install_state) {
   // Replace the "Choose language" installation task provided by Drupal core
@@ -4782,6 +4795,28 @@ function hook_filetransfer_info_alter(&$filetransfer_info) {
  * @addtogroup callbacks
  * @{
  */
+
+/**
+ * Work on a single queue item.
+ *
+ * Callback for hook_cron_queue_info().
+ *
+ * @param $queue_item_data
+ *   The data that was passed to DrupalQueueInterface::createItem() when the
+ *   item was queued.
+ *
+ * @throws Exception
+ *   The worker callback may throw an exception to indicate there was a problem.
+ *   The cron process will log the exception, and leave the item in the queue to
+ *   be processed again later.
+ *
+ * @see drupal_cron_run()
+ */
+function callback_queue_worker($queue_item_data) {
+  $node = node_load($queue_item_data);
+  $node->title = 'Updated title';
+  node_save($node);
+}
 
 /**
  * Return the URI for an entity.

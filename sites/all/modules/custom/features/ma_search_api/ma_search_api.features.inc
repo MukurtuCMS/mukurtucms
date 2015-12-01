@@ -166,6 +166,7 @@ function ma_search_api_default_search_api_index() {
         "field_collection_summary" : { "type" : "text" },
         "field_community_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_contributor:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_coverage:geo_type" : { "type" : "string" },
         "field_coverage_description:value" : { "type" : "text" },
         "field_creator:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_date" : { "type" : "text" },
@@ -555,6 +556,12 @@ function ma_search_api_default_search_api_server() {
           "field_book_children:field_tk_body:value" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_coverage:geo_type" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_coverage_geo_type",
+            "type" : "string",
             "boost" : "1.0"
           }
         }

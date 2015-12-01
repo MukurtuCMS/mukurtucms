@@ -23,7 +23,7 @@ define('FEEDS_TAXONOMY_SEARCH_TERM_GUID', 2);
 /**
  * Implements hook_feeds_parser_sources_alter().
  */
-function taxonomy_feeds_parser_sources_alter(&$sources, $content_type) {
+function taxonomy_feeds_parser_sources_alter(array &$sources, $content_type) {
   if (!empty($content_type)) {
     foreach (taxonomy_get_vocabularies($content_type) as $vocabulary) {
       $sources['parent:taxonomy:' . $vocabulary->machine_name] = array(
@@ -55,9 +55,11 @@ function taxonomy_feeds_get_source(FeedsSource $source, FeedsParserResult $resul
 }
 
 /**
- * Implements hook_feeds_processor_targets_alter().
+ * Implements hook_feeds_processor_targets().
  */
-function taxonomy_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+function taxonomy_feeds_processor_targets($entity_type, $bundle_name) {
+  $targets = array();
+
   foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
     $info = field_info_field($name);
     if ($info['type'] == 'taxonomy_term_reference') {
@@ -65,8 +67,8 @@ function taxonomy_feeds_processor_targets_alter(&$targets, $entity_type, $bundle
         'name' => check_plain($instance['label']),
         'callback' => 'taxonomy_feeds_set_target',
         'description' => t('The @label field of the entity.', array('@label' => $instance['label'])),
-        'summary_callback' => 'taxonomy_feeds_summary_callback',
-        'form_callback' => 'taxonomy_feeds_form_callback',
+        'summary_callbacks' => array('taxonomy_feeds_summary_callback'),
+        'form_callbacks' => array('taxonomy_feeds_form_callback'),
       );
     }
   }
@@ -75,14 +77,14 @@ function taxonomy_feeds_processor_targets_alter(&$targets, $entity_type, $bundle
     $targets['tid']['description'] = t('The tid of the taxonomy term. NOTE: use this feature with care, node ids are usually assigned by Drupal.');
     unset($targets['vocabulary']);
   }
+
+  return $targets;
 }
 
 /**
- * Callback for mapping. Here is where the actual mapping happens.
- *
- * @todo Do not create new terms for non-autotag fields.
+ * Callback for mapping taxonomy terms.
  */
-function taxonomy_feeds_set_target($source, $entity, $target, array $terms, $mapping = array()) {
+function taxonomy_feeds_set_target(FeedsSource $source, $entity, $target, array $terms, array $mapping) {
   // Add in default values.
   $mapping += array(
     'term_search' => FEEDS_TAXONOMY_SEARCH_TERM_NAME,
@@ -102,6 +104,12 @@ function taxonomy_feeds_set_target($source, $entity, $target, array $terms, $map
         $cache['allowed_vocabularies'][$target][$vocabulary->vid] = $vocabulary->machine_name;
       }
     }
+  }
+
+  // Some kind of configuration issue. Perhaps the vocabulary was deleted.
+  // Nothing we can do about it.
+  if (empty($cache['allowed_vocabularies'][$target])) {
+    return;
   }
 
   $query = new EntityFieldQuery();
@@ -246,24 +254,8 @@ function taxonomy_feeds_term_lookup_term_by_guid($guid) {
 
 /**
  * Mapping configuration summary for taxonomy.module.
- *
- * @param array $mapping
- *   Associative array of the mapping settings.
- * @param array $target
- *   Array of target settings, as defined by the processor or
- *   hook_feeds_processor_targets_alter().
- * @param array $form
- *   The whole mapping form.
- * @param array $form_state
- *   The form state of the mapping form.
- *
- * @return string
- *   Returns, as a string that may contain HTML, the summary to display while
- *   the full form isn't visible.
- *   If the return value is empty, no summary and no option to view the form
- *   will be displayed.
  */
-function taxonomy_feeds_summary_callback($mapping, $target, $form, $form_state) {
+function taxonomy_feeds_summary_callback(array $mapping, $target, array $form, array $form_state) {
   $options = _taxonomy_feeds_form_callback_options();
   if (empty($mapping['term_search'])) {
     return t('Search taxonomy terms by: <strong>@search</strong>', array('@search' => $options[FEEDS_TAXONOMY_SEARCH_TERM_NAME]));
@@ -273,12 +265,8 @@ function taxonomy_feeds_summary_callback($mapping, $target, $form, $form_state) 
 
 /**
  * Settings form callback.
- *
- * @return array
- *   The per mapping configuration form. Once the form is saved, $mapping will
- *   be populated with the form values.
  */
-function taxonomy_feeds_form_callback($mapping, $target, $form, $form_state) {
+function taxonomy_feeds_form_callback(array $mapping, $target, array $form, array $form_state) {
   return array(
     'term_search' => array(
       '#type' => 'select',

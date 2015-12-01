@@ -86,6 +86,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 5,
       ),
+      'map_popup' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
       'search_index' => array(
         'label' => 'above',
         'module' => 'text',
@@ -161,6 +173,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 42,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 42,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -230,6 +254,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 41,
       ),
       'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 41,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
+      'related_items_teaser_map_popup' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -326,6 +362,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 14,
       ),
+      'map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
+      ),
       'search_index' => array(
         'label' => 'inline',
         'module' => 'taxonomy',
@@ -400,6 +448,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'entityreference_label',
         'weight' => 16,
       ),
+      'map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -467,6 +527,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 43,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -541,6 +613,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 44,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -643,6 +727,18 @@ function ma_digitalheritage_field_default_field_instances() {
         ),
         'type' => 'textformatter_list',
         'weight' => 12,
+      ),
+      'map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -761,6 +857,18 @@ function ma_digitalheritage_field_default_field_instances() {
         ),
         'type' => 'textformatter_list',
         'weight' => 19,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -921,6 +1029,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'geofield_map_map',
         'weight' => 8,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1005,6 +1125,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 9,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1113,6 +1245,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 18,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1191,6 +1335,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 17,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1276,6 +1432,21 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 4,
       ),
+      'map_popup' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'trim_length' => 200,
+        ),
+        'type' => 'text_trimmed',
+        'weight' => 2,
+      ),
       'search_index' => array(
         'label' => 'above',
         'module' => 'text',
@@ -1357,6 +1528,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 28,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1434,6 +1617,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
         'weight' => 29,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 41,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1513,6 +1708,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 26,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 40,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -1598,6 +1805,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 45,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1680,6 +1899,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 20,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1759,6 +1990,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'license_formatter',
         'weight' => 23,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1837,6 +2080,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'license_formatter',
         'weight' => 22,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1901,7 +2156,6 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
-          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 27,
@@ -1921,6 +2175,24 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ma_colorbox',
         'weight' => 3,
       ),
+      'map_popup' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 1,
+        ),
+        'type' => 'ma_scald_search_results',
+        'weight' => 1,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+        ),
+        'type' => 'title',
+        'weight' => 1,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1931,8 +2203,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
-          'link' => 0,
-          'override' => 0,
+          'link' => 1,
         ),
         'type' => 'ma_scald_search_results',
         'weight' => 0,
@@ -2016,6 +2287,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 25,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2084,6 +2367,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'entityreference_entity_id',
         'weight' => 10,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2170,6 +2465,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 21,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 42,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2252,6 +2559,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 24,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2342,6 +2661,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 27,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2420,6 +2751,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 2,
+      ),
+      'map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2511,6 +2854,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 15,
       ),
+      'map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'search_index' => array(
         'label' => 'inline',
         'module' => 'taxonomy',
@@ -2591,6 +2946,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 6,
       ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2661,6 +3028,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 10,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 40,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -2773,6 +3152,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 13,
       ),
+      'map_popup' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
+      'related_items_teaser_map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2825,9 +3216,11 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 0,
-      'module' => 'og',
-      'settings' => array(),
-      'type' => 'og_complex',
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+      ),
+      'type' => 'options_select',
       'weight' => 55,
     ),
   );

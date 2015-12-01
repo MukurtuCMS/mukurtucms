@@ -65,10 +65,10 @@ function ma_collection_ds_custom_fields_info() {
   $ds_field->ui_limit = 'collection|search_result';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<h2><a href="[node:url:relative]">[node:title] ([node:field-digital-heritage-count])</a></h2>',
+      'value' => '<?php print ma_collection_collections_title_with_count ($entity); ?>',
       'format' => 'ds_code',
     ),
-    'use_token' => 1,
+    'use_token' => 0,
   );
   $export['collections_title_with_count'] = $ds_field;
 
