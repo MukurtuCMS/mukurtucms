@@ -79,7 +79,7 @@ function ma_collection_feeds_importer_default() {
           ),
           7 => array(
             'source' => 'Digital Heritage Items',
-            'target' => 'field_digital_heritage_items:etid',
+            'target' => 'field_digital_heritage_items',
             'unique' => FALSE,
           ),
         ),
@@ -89,6 +89,8 @@ function ma_collection_feeds_importer_default() {
         'update_non_existent' => 'skip',
         'skip_hash_check' => 0,
         'bundle' => 'collection',
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',

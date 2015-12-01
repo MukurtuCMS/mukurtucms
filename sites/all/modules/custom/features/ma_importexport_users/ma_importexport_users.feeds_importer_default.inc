@@ -130,7 +130,7 @@ function ma_importexport_users_feeds_importer_default() {
           ),
           6 => array(
             'source' => 'Parent Community',
-            'target' => 'field_parent_community:etid',
+            'target' => 'field_parent_community',
             'unique' => FALSE,
           ),
           7 => array(
@@ -150,6 +150,8 @@ function ma_importexport_users_feeds_importer_default() {
         'update_non_existent' => 'skip',
         'skip_hash_check' => 0,
         'bundle' => 'community',
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
@@ -215,7 +217,7 @@ function ma_importexport_users_feeds_importer_default() {
           ),
           4 => array(
             'source' => 'Parent Community',
-            'target' => 'og_group_ref:etid',
+            'target' => 'og_group_ref',
             'unique' => FALSE,
           ),
           5 => array(
@@ -250,6 +252,8 @@ function ma_importexport_users_feeds_importer_default() {
         'update_non_existent' => 'skip',
         'skip_hash_check' => 0,
         'bundle' => 'cultural_protocol_group',
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
