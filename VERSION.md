@@ -1,3 +1,27 @@
+## Mukurtu 2.03
+- Updated Drupal core to 7.41
+- Various contrib module security updates,
+- Map view of Digital Heritage items. Browse Digital Heritage now offers a Map view along with the existing List and Grid views. All Digital Heritage items that have a Location set, and also match the current search and filter criteria (and current user view permissions), display on the map as pins. Clicking on a pin reveals a popup which can be clicked through to the item.
+- Scald Services resource, allows for creating Digital Heritage items and their media assets via mobile json client.
+- Community Records on Book Pages. Community Records can now be added to the individual book pages of a Digital Heritage item.
+- Related Items teasers. There is a new option in the Administrator's Dashboard in the "Set up Site" section, "Enable Related Items teasers". Once enabled, any Digital Heritage items that have Related Items have those items shown, in addition to their existing location at the bottom of the Digital Heritage item, in a paged teaser format at the top of the right column.
+- Protocol Stewards can now edit any Digital Heritage items that are in one of their Cultural Protocols. Previously, only the original creator of the Digital Heritage item (and administrators) could edit these.
+- Youtube and Vimeo videos can now be imported during Digital Heritage imports from CSV. Simply enter the Youtube or Vimeo URL in the Media Assets column.
+- Collections Digital Heritage counts which appear in parentheses beside the name of a Collection in Browse Collections now reflect the number of Digital Heritage items the current user has permission to view, instead of the total count, which may differ. Additionally, the Digital Heritage Count filter now only shows to administrators, because this filter necessarily shows the total count.
+- Fixed bug that prevented nodes from being unpublished. Unpublishing a Digital Heritage item, for example, hides it from the Browse Digital Heritage page, but it remains available to be republished by the author, or an administrator via the Content menu.
+- Intelligent truncation for long Community Record tab names
+- Fixed TK Labels not showing
+- Removed Author and Tag fields that showed on the initial form when uploading an image. The fields are still available on the subsequent form, along with the other metadata fields.
+- Moved frontpage context from ma_core feature into install profile so that blocks can be added/removed from the frontpage for clients without creating feature override
+- Fixed linespacing for recent DH view on community page
+- Fixed LESS not compiling due to missing bootstrap files
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`.
+
 ## Mukurtu 2.02
 - Hierarchical Digital Heritage items.  Digital Heritage items now support hierarchical relationships to better represent multi-page content.  Ordering is changed by editing the parent node
 - add a new 'Transcription' field to the Digital Heritage 'Additional Metadata' section
