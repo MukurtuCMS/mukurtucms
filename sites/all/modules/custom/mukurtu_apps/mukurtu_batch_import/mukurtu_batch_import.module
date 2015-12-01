@@ -161,7 +161,7 @@ function mukurtu_batch_import_parse_zip($file) {
   mukurtu_batch_import_feedback($messages);
 
   // Delete extracted files from temporary directory
-  //  rmdir($temp_extract_path);
+  //  file_unmanaged_delete_recursive($temp_extract_path);
 }
 
 /**
@@ -260,6 +260,9 @@ function mukurtu_batch_import_import_metadata($path) {
     if(file_exists($csv_path)) {
       // Save as a managed file.
       $csv = file_get_contents($csv_path);
+
+      $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
+      
       //      $destination = 'private://feeds/'; 
       $destination = $path;
       file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
