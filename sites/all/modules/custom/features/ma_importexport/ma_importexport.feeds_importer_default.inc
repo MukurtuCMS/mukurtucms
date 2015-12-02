@@ -200,6 +200,21 @@ function ma_importexport_feeds_importer_default() {
             'target' => 'og_group_ref',
             'unique' => FALSE,
           ),
+          30 => array(
+            'source' => 'Book Pages',
+            'target' => 'field_book_children',
+            'unique' => FALSE,
+          ),
+          31 => array(
+            'source' => 'Community Records',
+            'target' => 'field_community_record_children',
+            'unique' => FALSE,
+          ),
+          32 => array(
+            'source' => 'Username',
+            'target' => 'user_name',
+            'unique' => FALSE,
+          ),
         ),
         'input_format' => 'filtered_html',
         'author' => '1',
