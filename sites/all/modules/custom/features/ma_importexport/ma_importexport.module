@@ -344,6 +344,88 @@ function ma_importexport_make_atom_guid($sid) {
   return "";
 }
 
+
+/**
+ *  Take a list of digital heritage nids and sort them topologically so that they can be imported without dependency issues.
+ *  Crude implementation of Kahn's algorithm.
+ */
+function ma_importexport_sort_digital_heritage_nodes($nids) {
+    $nodes = node_load_multiple($nids);
+
+    // Create a simple graph of the nodes, merging the different relations into a single "dependency" relationship    
+    $node_graph = array();
+    foreach($nodes as $node) {
+        if($node->type != 'digital_heritage') {
+            continue;
+        }
+        
+        $related_items = array();
+        $community_records = array();
+        $book_pages = array();
+
+        foreach($node->field_community_record_children[LANGUAGE_NONE] as $cr) {
+            $community_records[] = $cr['target_id'];
+        }
+
+        foreach($node->field_related_dh_items[LANGUAGE_NONE] as $ri) {
+            $related_items[] = $ri['target_id'];
+        }
+
+        foreach($node->field_book_children[LANGUAGE_NONE] as $page) {
+            $book_pages[] = $page['target_id'];
+        }
+
+        // graph['nid'] => array of edges
+        $outgoing_edges = array_unique(array_merge($community_records,$related_items,$book_pages));
+
+        // We want to graph in terms of incoming edges
+        $node_graph[$node->nid] = array();
+        foreach($outgoing_edges as $child) {
+            $node_graph[$child][] = $node->nid;
+        }
+    }
+
+    $sorted_nodes = array();
+    $edgeless_nodes = array();
+    
+    // Find nodes with no incoming edges
+    foreach($node_graph as $nid => $edges) {
+        if(empty($edges)) {
+            $edgeless_nodes[] = $nid;
+        }
+    }
+
+    // Process edges
+    while(!empty($edgeless_nodes)) {
+        $n = array_pop($edgeless_nodes);
+        $sorted_nodes[] = $n;
+
+        foreach($node_graph as $m => $m_edges) {
+            if(in_array($n, $m_edges)) {
+                // remove edge from graph
+                $node_graph[$m] = array_diff($node_graph[$m], [$n]);
+
+                // m has no more incoming edges, safe to be sorted now
+                if(empty($node_graph[$m])) {
+                    $sorted_nodes[] = $m;
+                }
+            }
+        }        
+    }
+
+    // Check for unprocessed edges, indicating that graph is not acyclic
+    foreach($node_graph as $m => $m_edges) {
+        if(!empty($m_edges)) {
+            dpm("Graph is not acyclic");   // TODO: Change this
+
+            // Put them at the end and hope for the best
+            $sorted_nodes[] = $m;
+        }
+    }
+
+    return $sorted_nodes;
+}
+
 function ma_importexport_digital_heritage_field_export($item, $field_name, $use_guid = FALSE) {
   $result = array();
 
@@ -486,6 +568,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   // Merge and dedup list of top level items and related items
   $dh_items = array_merge($items, $related_items);
   $dh_items = array_unique($dh_items);
+  $dh_items = ma_importexport_sort_digital_heritage_nodes($dh_items);
   
   // Get list of DH field names
   $dhfields = field_info_instances('node', 'digital_heritage');
