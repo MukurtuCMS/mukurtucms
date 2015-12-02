@@ -309,13 +309,13 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_licence_trad_1']['table'] = 'field_data_field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['field'] = 'field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['element_label_colon'] = FALSE;
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc_1']['id'] = 'field_licence_std_cc_1';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['field'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['label'] = 'Standard and Creative Commons Licensing URL';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['type'] = 'license_formatter_export';
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
@@ -714,7 +714,7 @@ print $output;
   $handler->display->display_options['fields']['field_licence_trad_1']['table'] = 'field_data_field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['field'] = 'field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['element_label_colon'] = FALSE;
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc_1']['id'] = 'field_licence_std_cc_1';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['field'] = 'field_licence_std_cc';
@@ -722,7 +722,7 @@ print $output;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['alter']['strip_tags'] = TRUE;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['type'] = 'license_formatter_export';
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
@@ -791,7 +791,7 @@ print $output;
     t('[field_licence_trad-value]'),
     t('Traditional Knowledge Labels'),
     t('Standard and Creative Commons Licensing URL'),
-    t('Licensing Options'),
+    t('Standard and Creative Commons Licensing'),
     t('Published'),
     t('Collections'),
     t('Sharing Protocol'),
