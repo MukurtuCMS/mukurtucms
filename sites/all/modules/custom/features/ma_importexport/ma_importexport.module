@@ -551,6 +551,10 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $related_items = array();
   foreach($items as $item) {    
     $original_node = node_load($item);
+
+    if(!empty($original_node->field_related_dh_items)) {
+      $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_related_dh_items'));
+    }
     if(!empty($original_node->field_community_record_children)) {
       $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_community_record_children'));
     }
