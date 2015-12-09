@@ -711,7 +711,7 @@ function ma_digitalheritage_node_load($nodes, $types) {
 function ma_digitalheritage_page_alter(&$data) {
 
   // If there are Child Records for a DH node, show the parent and child records in quicktabs
-  if (isset($data['content']['system_main']['nodes'])) {
+  if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
     if ($node->type == 'digital_heritage') {
