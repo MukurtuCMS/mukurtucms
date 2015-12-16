@@ -113,6 +113,16 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
 
   $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
 
+  // Export Options
+  $fields_to_export = array( 'field_blah1' => t('Community Records'),
+                             'field_blah2' => t('Related Items'),
+                             'field_blah3' => t('Book Pages') );
+  $form['dh_export']['options'] = array(
+      '#type' => 'checkboxes',
+      '#options' => $fields_to_export,
+      '#title' => t('Select fields to export')
+  );
+  
   // Export Format
   $options = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
 
@@ -153,23 +163,57 @@ function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = 
 
 /* VBO functions */
 // Form for the VBO
-function ma_importexport_dh_export_form($options) {
+function ma_importexport_dh_export_form($settings, &$form_state) {
   $form = array();
+
+  $export_formats = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
+
+  $form['dh_export']['format'] = array( '#type' => 'radios',
+                                        '#title' => t('Export Format'),
+                                        '#default_value' => 'csv',
+                                        '#options' => $export_formats,
+                                        '#required' => TRUE);
+
+  $form['dh_export']['format']['xml']['#attributes']['disabled'] = 'disabled';
+  $form['dh_export']['format']['json']['#attributes']['disabled'] = 'disabled';
+
+  $form['dh_export']['csvdelimiter'] = array('#type' => 'textfield',
+                                             '#title' => t('CSV column multi-value delimiter'),
+                                             '#default_value' => ',',
+                                             '#size' => 4,
+                                             '#maxlength' => 10,
+                                             '#required' => TRUE);
+
   return $form;
 }
 
 // Form submit for the VBO form
 function ma_importexport_dh_export_submit($form, $form_state) {
-  $return = array(); 
+  $return = array();
+  $return['format'] = $form_state['values']['format'];
+  $return['csvdelimiter'] = $form_state['values']['csvdelimiter'];
   return $return;
 }
 
 // Action to take for the VBO
 function ma_importexport_dh_export(&$node, $context) {
-  $message = t('Node title is %title.', array(
-    '%title' => $node->title,
-  ));
-  drupal_set_message($message);
+    if($context['progress']['current'] == 1) {
+        $_SESSION['digital_heritage_export_list'] = array();
+    }
+
+    $_SESSION['digital_heritage_export_list'][] = $node->nid;
+    if($context['progress']['current'] == $context['progress']['total']) {
+        $download_link = ma_importexport_digital_heritage_node_export($_SESSION['digital_heritage_export_list']);
+        $message = t('Download your items: <a href="@downloadlink">export.zip</a>', array('@downloadlink' => $download_link));
+        drupal_set_message($message);
+        
+    }
+    
+    /*    $message = t('Node title is %title.', array(
+        '%title' => $node->title,
+    ));
+    
+    drupal_set_message($message);*/
 }
 
 // Defines the VBO
@@ -178,13 +222,20 @@ function ma_importexport_action_info() {
     'ma_importexport_dh_export' => array(
       'type' => 'node',
       'label' => t('Export Digital Heritage nodes'),
-      'behavior' => array(),
+      'behavior' => array('views_property'),
       'configurable' => FALSE,
-      'vbo_configurable' => TRUE,
+      'vbo_configurable' => FALSE,
       'triggers' => array('any'),
     ),
   );
 }
+
+function ma_importexport_dh_export_views_bulk_operations_form($options) {
+  $form = array();
+ 
+  return $form;
+}
+
 
 /* End VBO functions */
 
@@ -598,9 +649,10 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 		  'collections' => $collection_list,
 		  'communities' => $community_list,
 		  'protocols' => $protocol_list);
-  ma_importexport_export_csv($export, $multivalue_delimiter);
   
-  drupal_set_message(t('Exported ') . $original_node->title);
+  return ma_importexport_export_csv($export, $multivalue_delimiter);
+  
+  //  drupal_set_message(t('Exported ') . $original_node->title);
 }
 
 
@@ -1160,11 +1212,53 @@ function ma_importexport_export_csv($export, $delimiter=',') {
   if($scald_file_count > 0) {
     $export_files[] = array('filename' => $scald_file_temp, 'localname' => 'media_files.csv'); 
   }
-  
-  ma_importexport_download_zip($export_files);
+
+  return ma_importexport_zip_download_url($export_files);
+  //  ma_importexport_download_zip($export_files);
   //drupal_exit();
 }
 
+function ma_importexport_zip_download_url($files) {
+    // Zip up the metadata CSVs and the media
+    $zip = new ZipArchive();
+    $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
+    $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
+    
+    foreach($files as $file) {
+        $zip->addFile($file['filename'], $file['localname']);
+    }
+    
+    $zip->close();
+
+    // Copy to a managed location that we can present for download
+    $destination = 'private://batch_export/';
+    file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
+    $filename = 'export.zip';
+    $download_file = file_save_data(file_get_contents($tempfile), $destination . $filename, FILE_EXISTS_RENAME);
+    dpm($download_file);
+    unlink(drupal_realpath($tempfile));
+    
+    return file_create_url($download_file->uri);
+}
+
+/**
+ * Implements hook_file_download().
+ */
+function ma_importexport_file_download($uri, $field_type = 'file') {
+    global $user;
+
+    // Only allow the user associated with a batch export file to download it
+    if($field_type == 'file' && strpos($uri, 'batch_export') !== FALSE) {
+        $files = file_load_multiple(array(), array('uri' => $uri));
+        $file = reset($files);
+
+        if($file->uid != $user->uid) {
+            return -1;
+        }
+    }
+}
+
+/*
 function ma_importexport_download_zip($files) {
     $zip = new ZipArchive();
 
@@ -1172,7 +1266,6 @@ function ma_importexport_download_zip($files) {
     $zip->open($tempfile, ZipArchive::CREATE);
 
     foreach($files as $file) {
-      $export_file = file_get_contents($file);
       $zip->addFile($file['filename'], $file['localname']);
     }
 
@@ -1187,6 +1280,7 @@ function ma_importexport_download_zip($files) {
     }
     drupal_exit();
 }
+*/
 
 /**
  * Implements hook_views_pre_render().
