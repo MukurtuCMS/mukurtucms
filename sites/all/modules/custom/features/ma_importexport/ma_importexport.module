@@ -498,7 +498,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
 
                 // m has no more incoming edges, safe to be sorted now
                 if(empty($node_graph[$m])) {
-                    $sorted_nodes[] = $m;
+                    $edgeless_nodes[] = $m;
                 }
             }
         }        
@@ -507,9 +507,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
     // Check for unprocessed edges, indicating that graph is not acyclic
     foreach($node_graph as $m => $m_edges) {
         if(!empty($m_edges)) {
-            dpm("Graph is not acyclic");   // TODO: Change this
-            dpm($m);
-            dpm($m_edges);
+            dpm("Graph of digital heritage items is not acyclic.  Exported files may not import correctly.");   // TODO: Change this
             // Put them at the end and hope for the best
             $sorted_nodes[] = $m;
         }
