@@ -77,7 +77,8 @@ function ma_importexport_export_form_submit($form, &$form_state)
 {
   // Export from item page
   $items = $form['dh_export']['items']['#value'];
-
+  //  dpm($form);
+  //  dpm($form_state);
   // Export from browse DH page
   if(!$items && isset($_SESSION['digital_heritage_grid_list_nids'])) {
     $items = $_SESSION['digital_heritage_grid_list_nids'];
@@ -88,7 +89,17 @@ function ma_importexport_export_form_submit($form, &$form_state)
   if($format = 'csv') {
     $options['multivalue_delimiter'] = $form['dh_export']['csvdelimiter']['#value'];
   }
-  ma_importexport_digital_heritage_node_export($items, $format, $options);
+
+  $options['export_community_records'] = $form['dh_export']['options']['export_community_records']['#checked'];
+  $options['export_related_items'] = $form['dh_export']['options']['export_related_items']['#checked'];
+  $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
+  
+  $download_link = ma_importexport_digital_heritage_node_export($items, $format, $options);
+  $message = t('Download your items: <div class="btn btn-primary"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
+  drupal_set_message($message);
+
+  $path = (isset($form['dh_export']['original_path']['#value'])) ? $form['dh_export']['original_path']['#value'] : current_path() ;
+  drupal_goto($path);
 }
 
 function ma_importexport_export_form($form, &$form_state, $items = NULL, $format="csv") {
@@ -112,15 +123,19 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
   }
 
   $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
-
+  
+  $export_url = current_path();
+  $form['dh_export']['original_path'] = array('#type' => 'hidden', '#value' => $export_url);
+  
   // Export Options
-  $fields_to_export = array( 'field_blah1' => t('Community Records'),
-                             'field_blah2' => t('Related Items'),
-                             'field_blah3' => t('Book Pages') );
+  $fields_to_export = array( 'export_community_records' => t('Community Records'),
+                             'export_all_pages' => t('All Pages'),
+                             'export_related_items' => t('Related Items'));
   $form['dh_export']['options'] = array(
       '#type' => 'checkboxes',
       '#options' => $fields_to_export,
-      '#title' => t('Select fields to export')
+      '#title' => t('Select fields to export'),
+      '#default_value' => array('export_community_records', 'export_all_pages')
   );
   
   // Export Format
@@ -166,6 +181,17 @@ function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = 
 function ma_importexport_dh_export_form($settings, &$form_state) {
   $form = array();
 
+
+  $fields_to_export = array( 'export_community_records' => t('Community Records'),
+                             'export_all_pages' => t('All Pages'),
+                             'export_related_items' => t('Related Items'));
+  $form['dh_export']['options'] = array(
+      '#type' => 'checkboxes',
+      '#options' => $fields_to_export,
+      '#title' => t('Select fields to export'),
+      '#default_value' => array('export_community_records', 'export_all_pages')
+  );
+  
   $export_formats = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
 
   $form['dh_export']['format'] = array( '#type' => 'radios',
@@ -190,8 +216,15 @@ function ma_importexport_dh_export_form($settings, &$form_state) {
 // Form submit for the VBO form
 function ma_importexport_dh_export_submit($form, $form_state) {
   $return = array();
+
+  $options = array();
+  $options['export_community_records'] = $form['dh_export']['options']['export_community_records']['#checked'];
+  $options['export_related_items'] = $form['dh_export']['options']['export_related_items']['#checked'];
+  $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
+  $options['multivalue_delimiter'] = $form_state['values']['csvdelimiter'];
+ 
   $return['format'] = $form_state['values']['format'];
-  $return['csvdelimiter'] = $form_state['values']['csvdelimiter'];
+  $return['export_options'] = $options;
   return $return;
 }
 
@@ -203,8 +236,9 @@ function ma_importexport_dh_export(&$node, $context) {
 
     $_SESSION['digital_heritage_export_list'][] = $node->nid;
     if($context['progress']['current'] == $context['progress']['total']) {
-        $download_link = ma_importexport_digital_heritage_node_export($_SESSION['digital_heritage_export_list']);
-        $message = t('Download your items: <a href="@downloadlink">export.zip</a>', array('@downloadlink' => $download_link));
+        dpm($context);
+        $download_link = ma_importexport_digital_heritage_node_export($_SESSION['digital_heritage_export_list'], $context['format'], $context['export_options']);
+        $message = t('Download your items: <div class="btn btn-primary"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
         drupal_set_message($message);
         
     }
@@ -223,7 +257,7 @@ function ma_importexport_action_info() {
       'type' => 'node',
       'label' => t('Export Digital Heritage nodes'),
       'behavior' => array('views_property'),
-      'configurable' => FALSE,
+      'configurable' => TRUE,
       'vbo_configurable' => FALSE,
       'triggers' => array('any'),
     ),
@@ -302,7 +336,7 @@ function ma_importexport_make_atom_guid($sid) {
  *  Take a list of digital heritage nids and sort them topologically so that they can be imported without dependency issues.
  *  Crude implementation of Kahn's algorithm.
  */
-function ma_importexport_sort_digital_heritage_nodes($nids) {
+function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
     $nodes = node_load_multiple($nids);
 
     // Create a simple graph of the nodes, merging the different relations into a single "dependency" relationship    
@@ -316,16 +350,22 @@ function ma_importexport_sort_digital_heritage_nodes($nids) {
         $community_records = array();
         $book_pages = array();
 
-        foreach($node->field_community_record_children[LANGUAGE_NONE] as $cr) {
-            $community_records[] = $cr['target_id'];
+        if($options['export_community_records']) {
+            foreach($node->field_community_record_children[LANGUAGE_NONE] as $cr) {
+                $community_records[] = $cr['target_id'];
+            }
+        }
+        
+        if($options['export_related_items']) {                   
+            foreach($node->field_related_dh_items[LANGUAGE_NONE] as $ri) {
+                $related_items[] = $ri['target_id'];
+            }
         }
 
-        foreach($node->field_related_dh_items[LANGUAGE_NONE] as $ri) {
-            $related_items[] = $ri['target_id'];
-        }
-
-        foreach($node->field_book_children[LANGUAGE_NONE] as $page) {
-            $book_pages[] = $page['target_id'];
+        if($options['export_all_pages']) {
+            foreach($node->field_book_children[LANGUAGE_NONE] as $page) {
+                $book_pages[] = $page['target_id'];
+            }
         }
 
         // graph['nid'] => array of edges
@@ -370,7 +410,8 @@ function ma_importexport_sort_digital_heritage_nodes($nids) {
     foreach($node_graph as $m => $m_edges) {
         if(!empty($m_edges)) {
             dpm("Graph is not acyclic");   // TODO: Change this
-
+            dpm($m);
+            dpm($m_edges);
             // Put them at the end and hope for the best
             $sorted_nodes[] = $m;
         }
@@ -505,19 +546,19 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   foreach($items as $item) {    
     $original_node = node_load($item);
 
-    if(!empty($original_node->field_related_dh_items)) {
+    if($options['export_related_items'] && !empty($original_node->field_related_dh_items)) {
       $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_related_dh_items'));
     }
-    if(!empty($original_node->field_community_record_children)) {
+    if($options['export_community_records'] && !empty($original_node->field_community_record_children)) {
       $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_community_record_children'));
     }
-    if(!empty($original_node->field_community_record_parent)) {
+    if($options['export_community_records'] && !empty($original_node->field_community_record_parent)) {
       $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_community_record_parent'));
     }
-    if(!empty($original_node->field_book_children)) {
+    if($options['export_all_pages'] && !empty($original_node->field_book_children)) {
       $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_book_children'));
     }
-    if(!empty($original_node->field_book_parent)) {
+    if($options['export_all_pages'] && !empty($original_node->field_book_parent)) {
       $related_items = array_merge($related_items, ma_importexport_digital_heritage_field_export($original_node, 'field_book_parent'));
     }
   }
@@ -525,7 +566,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   // Merge and dedup list of top level items and related items
   $dh_items = array_merge($items, $related_items);
   $dh_items = array_unique($dh_items);
-  $dh_items = ma_importexport_sort_digital_heritage_nodes($dh_items);
+  $dh_items = ma_importexport_sort_digital_heritage_nodes($dh_items, $options);
   
   // Get list of DH field names
   $dhfields = field_info_instances('node', 'digital_heritage');
