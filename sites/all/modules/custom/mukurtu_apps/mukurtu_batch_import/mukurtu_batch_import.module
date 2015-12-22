@@ -42,16 +42,16 @@ function mukurtu_batch_import_form() {
   $form['mukurtu_batch_import_form']['#attributes']['enctype'] = 'multipart/form-data';
   $form['mukurtu_batch_import_form']['media'] = array(
     '#type' => 'fieldset',
-    '#title' => '<h3>' . t('1. Gather your files.') . '</h3>',
+    '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>' . l('Download a sample zip archive', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('This zip file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.') . '</p>',
+    '#description' => '<p>' . l('Download a sample zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('This zip file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the <a href="@management_link">digital heritage management page</a>.', array('@management_link' => '/manage/digital-heritage')) . '</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
   
   $form['mukurtu_batch_import_form']['upload'] = array(
     '#type' => 'fieldset',
-    '#title' => '<h3>' . t('2. Upload your zip archive file.') . '</h3>',
+    '#title' => '<h3>' . t('2. Upload your zip file') . '</h3>',
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
