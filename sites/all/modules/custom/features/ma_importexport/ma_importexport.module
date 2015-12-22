@@ -95,7 +95,7 @@ function ma_importexport_export_form_submit($form, &$form_state)
   $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
   
   $download_link = ma_importexport_digital_heritage_node_export($items, $format, $options);
-  $message = t('Download your items: <div class="btn btn-primary"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
+  $message = t('Download your exported items: <div class="btn btn-primary"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
   drupal_set_message($message);
 
   $path = (isset($form['dh_export']['original_path']['#value'])) ? $form['dh_export']['original_path']['#value'] : current_path() ;
@@ -238,7 +238,7 @@ function ma_importexport_dh_export(&$node, $context) {
     if($context['progress']['current'] == $context['progress']['total']) {
         dpm($context);
         $download_link = ma_importexport_digital_heritage_node_export($_SESSION['digital_heritage_export_list'], $context['format'], $context['export_options']);
-        $message = t('Download your items: <div class="btn btn-primary"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
+        $message = t('Download your exported items: <div class="btn btn-primary"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
         drupal_set_message($message);
         
     }
