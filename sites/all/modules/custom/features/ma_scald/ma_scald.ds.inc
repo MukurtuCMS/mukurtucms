@@ -158,6 +158,33 @@ function ma_scald_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|audio|mukurtu_scald_related_items';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'audio';
+  $ds_layout->view_mode = 'mukurtu_scald_related_items';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|audio|mukurtu_scald_related_items'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'scald_atom|file|ma_colorbox';
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'file';
@@ -231,6 +258,35 @@ function ma_scald_ds_layout_settings_info() {
     'layout_link_custom' => '',
   );
   $export['scald_atom|file|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|file|mukurtu_scald_related_items';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'file';
+  $ds_layout->view_mode = 'mukurtu_scald_related_items';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+        1 => 'scald_thumbnail',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+      'scald_thumbnail' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|file|mukurtu_scald_related_items'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -364,6 +420,33 @@ function ma_scald_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|image|mukurtu_scald_related_items';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'image';
+  $ds_layout->view_mode = 'mukurtu_scald_related_items';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|image|mukurtu_scald_related_items'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'scald_atom|video|default';
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'video';
@@ -373,14 +456,16 @@ function ma_scald_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'atom',
-        1 => 'download_atom',
       ),
     ),
     'fields' => array(
       'atom' => 'ds_content',
-      'download_atom' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -463,6 +548,33 @@ function ma_scald_ds_layout_settings_info() {
     'layout_link_custom' => '',
   );
   $export['scald_atom|video|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|video|mukurtu_scald_related_items';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'video';
+  $ds_layout->view_mode = 'mukurtu_scald_related_items';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|video|mukurtu_scald_related_items'] = $ds_layout;
 
   return $export;
 }

@@ -167,9 +167,10 @@ function atom_reference_field_formatter_settings_summary($field, $instance, $vie
 /**
  * Implements hook_field_formatter_view.
  */
-// Patched by Shiraz -- in search results view:
+// Patched by Shiraz:
+// For Search Results and Related Items views,
 // 1. Return the first *image* in a scald node, falling back to first video or audio if no image.
-// 2. Show thumbnails instead of player for audio and video files if exists, otherwise use our default thumbnails according to atom type
+// 2. Show thumbnails instead of player for non-image atoms if exists, otherwise use our default thumbnails according to atom type
 function atom_reference_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
 
   $render_context = $display['type'];
@@ -194,32 +195,41 @@ function atom_reference_field_formatter_view($entity_type, $entity, $field, $ins
         $options['link'] = $uri['path'];
       }
 
-      if ($display['type'] <> 'ma_scald_search_results') {
+      if ($display['type'] <> 'ma_scald_search_results' && $display['type'] <> 'mukurtu_scald_related_items') {
         $priority_elements[$delta] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
       }
 
+      // Show thumbnails instead of player for non-image atoms if exists, otherwise use our default thumbnails according to atom type
       else {
 
         // Scald Atom is Image
-        if ($display['type'] == 'ma_scald_search_results' AND $atom->type == 'image') {
+        if ($atom->type == 'image') {
           $priority_elements[] = array('#markup' => scald_render($sid, $render_context, drupal_json_encode($options)));
         }
 
         // Scald Atom is not an image
         else {
+
           // Use the atom thumbnail if there is one
           if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
+            $image_styles = array (
+              'ma_scald_search_results' => 'medium',
+              'mukurtu_scald_related_items' => 'related_items_teaser'
+            );
             $thumbnail_image = theme_image_style (array (
-              'style_name' => 'medium',
+              'style_name' => $image_styles[$display['type']],
               'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
             ));
           }
           // If no atom thumbnail, use our default thumbnails
           else {
-            $scald_thumbnail_path =  file_build_uri(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_audio_thumbnail.jpg'); // TODO remove this line (unused) from here and the patch
-            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail.jpg">';
+            $image_widths = array (
+              'ma_scald_search_results' => '220',
+              'mukurtu_scald_related_items' => '280'
+            );
+            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$display['type']] . '.jpg">';
           }
-          $regular_elements[] = array('#markup' => $thumbnail_image);
+          $regular_elements[] = array('#markup' => l($thumbnail_image, 'node/' . $entity->nid, array('html' => TRUE)));
         }
       }
     }

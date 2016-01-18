@@ -11,7 +11,105 @@ include_once('ma_importexport.features.inc');
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
-  if($entity->feeds_item->entity_type == 'scald_atom') {   
+
+  // Custom handling of Youtube and Vimeo URLs
+  // This code is adapted from _ma_services_create_atom, which itself is adapted from scald provider code as commented there
+
+  if ($entity->type == 'digital_heritage') {
+
+    foreach ($item['media assets'] as $media_asset_index => $media_asset) { // There can be multiple media assets in a single cell, separated by comma (feeds tamper explode), so loop through each
+
+      if (substr ($media_asset, 0, 4) == 'http') { // the individual value must start with http/https in order to be identified as an externally-provided asset
+
+        // A file scald atom has already been created for this by this point. Delete it, and unset the field.
+        $already_created_sid = $entity->field_media_asset[LANGUAGE_NONE][$media_asset_index]['sid'];
+        entity_delete ('scald_atom', $already_created_sid);
+        $entity->field_media_asset[LANGUAGE_NONE][$media_asset_index] = '';
+
+        // Youtube
+        if (strpos($media_asset, 'youtube')) {
+          $provider = 'youtube';
+          $identifier = scald_youtube_parse_id($media_asset, TRUE);
+          if ($identifier == FALSE) {
+            drupal_set_message ('Skipped media asset due to invalid Youtube ID: ' . $media_asset, 'warning');
+            continue;
+          };
+          if (!$sid = scald_youtube_already_imported($identifier)) {
+            $video_identifier = $identifier['id'];
+            $infos = scald_youtube_video($video_identifier);
+          }
+        }
+
+        // Vimeo
+        elseif (strpos($media_asset, 'vimeo')) {
+          $provider = 'vimeo';
+          $vimeo_id = substr(strrchr($media_asset, '/'), 1); // Vimeo parse function expects just the numeric ID, cannot parse whole URL
+          $video_identifier = scald_vimeo_parse_id($vimeo_id, TRUE);
+          if ($video_identifier == FALSE) {
+            drupal_set_message ('Skipped media asset due to invalid Vimeo ID: ' . $media_asset, 'warning');
+            continue;
+          };
+          if (!$sid = scald_vimeo_already_imported($video_identifier)) {
+            $infos = scald_vimeo_video($video_identifier);
+          }
+        }
+
+        // No provider match
+        else {
+          drupal_set_message ('Skipped media asset due to no matching provider: ' . $media_asset, 'warning');
+          continue;
+        }
+
+
+        // Atom does not exist, needs to be created.
+        if (!$sid) {
+          $atom = new ScaldAtom('video', 'scald_' . $provider);
+          $atom->base_id = $video_identifier;
+          if (!isset($atom->data)) {
+            $atom->data = array();
+          }
+          if (isset($identifier['list'])) {
+            $atom->data['list'] = $identifier['list'];
+          }
+          $atom->title = $infos->title;
+
+          // Save video width and height.
+          $atom->data['video_width'] = $infos->width;
+          $atom->data['video_height'] = $infos->height;
+
+          // Download a copy of the video thumbnail. This makes it possible
+          // to do interesting manipulation with image styles presets.
+          $thumb = drupal_http_request($infos->thumbnail['src']);
+          if ($thumb->code == 200 && $directory = ScaldAtomController::getThumbnailPath('video')) {
+            $dest = $directory . '/' . $provider . '-' . $infos->id . '.jpg';
+            $file = file_save_data($thumb->data, $dest);
+
+            if ($file) {
+              // Set the file status to temporary.
+              $query = db_update('file_managed')
+                ->condition('fid', $file->fid)
+                ->fields(array('status' => 0))
+                ->execute();
+              $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
+              $atom->scald_thumbnail[$langcode][0] = (array) $file;
+            }
+          }
+
+          if (!$sid = scald_atom_save($atom)) {
+            drupal_set_message ('Unable to save atom for: ' . $provider, 'warning');
+            continue;
+          }
+        }
+
+        // Set the Scald ID in the DH item's Media Asset field
+        $entity->field_media_asset[LANGUAGE_NONE][$media_asset_index]['sid'] = $sid;
+
+      }
+    }
+  }
+
+
+  if($entity->feeds_item->entity_type == 'scald_atom') {
     if($entity->feeds_item->id == 'import_media_audio') {
       $type = 'audio';
     } elseif($entity->feeds_item->id == 'import_media_video') {
@@ -34,4 +132,5 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
     $entity->data[$type . '_file'] = $file->uri;
     $entity->data[$type . '_id'] = $file->fid;
   }
+
 }

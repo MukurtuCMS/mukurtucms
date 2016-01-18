@@ -1,0 +1,1 @@
+Patches to atom_reference.module (part of scald) are too frequent to make maintaining a patch file for it practical. In any case, we will not be updating scald unless we're preparing for a major overhaul. So instead I am just placing the original atom_reference.module in here to be diff'ed against our patched version when eventually we do update scald. 

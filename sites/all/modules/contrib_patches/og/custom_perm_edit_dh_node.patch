@@ -1,0 +1,18 @@
+diff --git a/og.module b/og.module
+index 8a0e5cd..746379d 100644
+--- a/og.module
++++ b/og.module
+@@ -545,6 +545,13 @@ function og_node_access($node, $op, $account) {
+         ($account->uid == $node->uid && og_user_access_entity("$op own $type content", 'node', $node, $account));
+     }
+ 
++    // Mukurtu patch
++    // Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
++    // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
++    if ($op == 'update' && $node->type=='digital_heritage') {
++      return mukurtu_protocol_field_update_dh_access($node);
++    }
++
+     if (!$access && $op == 'update' && og_is_group('node', $node)) {
+       // The node is a group, so check "update group" permission.
+       $access = og_user_access_entity('update group', 'node', $node, $account);

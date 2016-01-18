@@ -6,6 +6,28 @@
 
 include_once('ma_collection.features.inc');
 
+/**
+ * Implements hook_user_logout().
+ */
+// Delete the cookie that holds the Collections browse mode setting
+function ma_collection_user_logout ($account) {
+  setcookie('collections_browse_mode', '', 1, '/');
+}
+
+/**
+ * Implements template_preprocess_views_view.
+ */
+function ma_collection_preprocess_views_view(&$vars) {
+  $view = &$vars['view'];
+
+  // Add JS for browse mode switcher on Collections view
+  if ($view->name == 'collections_grid_list') {
+    drupal_add_library('system', 'jquery.cookie');
+    drupal_add_js(drupal_get_path('module', 'ma_collection') . '/js/collection_browse_mode_switcher.js');
+  }
+
+}
+
 function ma_collection_node_view($node, $view_mode) {
   if ($node->type == 'collection') {
 
@@ -225,4 +247,24 @@ function ma_collection_form_alter(&$form, $form_state, $form_id) {
       $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
     }
   }
+}
+
+// Rewrite the Collection node title in the Collection search view to show a count of DH items
+function ma_collection_collections_title_with_count ($entity) {
+  $dh_count = 0;
+  $coll_wrapper = entity_metadata_wrapper('node', $entity);
+  $dhs = $coll_wrapper->field_digital_heritage_items->value();
+  if (count($dhs)) {
+    if (user_access('bypass content access control')) {
+      $dh_count = count($dhs);
+    }
+    else {
+      foreach ($dhs as $dh) {
+        if (node_access('view', $dh)) {
+          $dh_count++;
+        }
+      }
+    }
+  }
+  return '<h2>' . l ($entity->title . ' (' . $dh_count . ')', 'node/' . $entity->nid) . '</h2>';
 }

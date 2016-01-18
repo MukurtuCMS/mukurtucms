@@ -104,19 +104,19 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
 function ma_digitalheritage_preprocess_views_view(&$vars) {
   $view = &$vars['view'];
 
-  // Add JS for grid/list view switcher on DH and Collections views
-  if ($view->name == 'digital_heritage_grid_list' OR $view->name == 'collections_grid_list') {
+  // Add JS for browse mode switcher on DH view
+  if ($view->name == 'digital_heritage_grid_list') {
     drupal_add_library('system', 'jquery.cookie');
-    drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/grid_list_switcher.js');
+    drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_browse_mode_switcher.js');
   }
 }
 
 /**
  * Implements hook_user_logout().
  */
-// Delete the cookie that holds the DH grid/list view setting
+// Delete the cookie that holds the DH browse mode setting
 function ma_digitalheritage_user_logout ($account) {
-  setcookie('grid_list_mode', '', 1, '/');
+  setcookie('dh_browse_mode', '', 1, '/');
 }
 
 /**
@@ -143,6 +143,11 @@ function ma_digitalheritage_node_view($node, $view_mode) {
     }
 
     elseif ($view_mode == 'full') {
+
+      // Hide the Related Items Teasers if the option is not selected
+      if (variable_get('mukurtu_show_related_items_teasers') <> 1) {
+        unset ($node->content['dh_related_items_teasers']);
+      }
 
       // Rewrite the Related DH Items reference field as paged, since there can be hundreds. This is a dupe of the same thing in ma_collection_node_view. See comments there if changing here, should also be changed there.
 
@@ -294,7 +299,7 @@ function ma_digitalheritage_menu() {
     'title' => 'Add Community Record',
     'page callback' => 'ma_digitalheritage_add_community_record',
     'page arguments' => array(1),
-    'access callback' => 'ma_digitalheritage_clone_dh_button_check',
+    'access callback' => 'ma_digitalheritage_add_cr_check',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 100,
@@ -308,6 +313,15 @@ function ma_digitalheritage_menu() {
     'access callback' => 'ma_digitalheritage_add_book_page_check',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  // Callback that toggles the display of the Related Items teasers
+  $items['admin/toggle-related-items-teasers'] = array(
+    'title' => 'Toggle Related Items Teasers',
+    'page callback' => 'ma_digitalheritage_toggle_related_items_teasers',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
     'weight' => 100,
   );
 
@@ -332,17 +346,38 @@ function ma_digitalheritage_clone_dh_button_check($node) {
   }
 }
 
-function ma_digitalheritage_add_book_page_check($node) {
+function ma_digitalheritage_add_cr_check($node) {
   if ($node->type == 'digital_heritage') {
     $dh_emw = entity_metadata_wrapper('node', $node);
-    if ($dh_emw->field_community_record_parent->value() OR $dh_emw->field_community_record_children->value()) { // Do not allow creating book pages on community records
-      return FALSE;
+    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+      if (isset ($protocol)) {
+        $p_emw = entity_metadata_wrapper('node', $protocol);
+        $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+        if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+          return TRUE;
+        }
+      }
     }
+  }
+}
+
+function ma_digitalheritage_add_book_page_check($node) {
+  if ($node->type == 'digital_heritage') {
     global $user;
     if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
       return TRUE;
     }
   }
+}
+
+function ma_digitalheritage_toggle_related_items_teasers () {
+  if (variable_get('mukurtu_show_related_items_teasers')) {
+    variable_set ('mukurtu_show_related_items_teasers', 0);
+  }
+  else {
+    variable_set ('mukurtu_show_related_items_teasers', 1);
+  }
+  drupal_goto ('dashboard');
 }
 
 function ma_digitalheritage_clone_dh_form($form, $form_state, $node) {
@@ -482,18 +517,11 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       // Set the parent
       $form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#value'] = $book_parent->title . ' (' . $book_parent->nid . ')'; // setting in the autocomplete widget format
 
-      // Set the privacy setting to that of the parent
+      // Set the privacy setting and protocols to that of the parent
       $book_parent_wrapper = entity_metadata_wrapper('node', $book_parent);
       $form['field_item_privacy_setting'][LANGUAGE_NONE]['#value'] = $book_parent_wrapper->field_item_privacy_setting->value();
-
-      // Set the protocol(s) to that of the parent (its communities will get set in hook_node_presave)
-      $parent_protocols = array();
       foreach ($book_parent_wrapper->og_group_ref->value() as $protocol) {
-        $parent_protocols[] = $protocol->title . ' (' . $protocol->nid . ')'; // setting in the autocomplete widget format
-      }
-      if (count($parent_protocols)) {
-        $default_protocols = implode (', ', $parent_protocols);
-        $form['og_group_ref'][LANGUAGE_NONE][0]['default']['#default_value'][0] = $default_protocols;
+        $form['og_group_ref'][LANGUAGE_NONE]['#default_value'][] = $protocol->nid;
       }
     }
 
@@ -521,27 +549,28 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
  */
 function ma_digitalheritage_node_validate($node, $form, &$form_state) {
   if ($node->type == 'digital_heritage') {
+      $original_node = node_load($node->nid);
 
     // Do not allow adding, changing, or removing of Community Records in the DH node form. The field is there only to allow users to reorder the Community Records.
     $original_community_records = array();
-    foreach ($form['field_community_record_children'][LANGUAGE_NONE] as $original_child) {
-      if (isset($original_child['target_id'])) {
-        $original_child_text = $original_child['target_id']['#default_value'];
-        $original_child_numeric = substr(substr(strstr($original_child_text, '('), 0, -1), 1);
-        if (is_numeric($original_child_numeric)) {
-          $original_community_records[] = $original_child_numeric;
+    if(isset($original_node->field_community_record_children)) {
+        foreach($original_node->field_community_record_children[LANGUAGE_NONE] as $original_child) {
+            $original_community_records[] = $original_child['target_id'];
         }
-      }
     }
+
     $new_community_records = array();
-    foreach ($form_state['values']['field_community_record_children'][LANGUAGE_NONE] as $new_child) {
-      if (isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
-        $new_community_records[] = $new_child['target_id'];
-        if (!in_array($new_child['target_id'], $original_community_records)) {
-          form_set_error('field_community_record_children', t('Do not add Community Records here. Use the "Add Community Record" button instead.'));
+    if(isset($node->field_community_record_children)) {
+        foreach($node->field_community_record_children[LANGUAGE_NONE] as $new_child) {
+            if(isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
+                $new_community_records[] = $new_child['target_id'];
+                if (!in_array($new_child['target_id'], $original_community_records)) {
+                    form_set_error('field_community_record_children', t('Do not add Community Records here. Use the "Add Community Record" button instead.'));
+                }
+            }
         }
-      }
     }
+
     foreach ($original_community_records as $original_child) {
       if (!in_array($original_child, $new_community_records)) {
         form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, edit the Community Record, then press "Delete". Note, only the creator of the Community Record can delete it.'));
@@ -550,30 +579,30 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
 
     // Do not allow adding, changing, or removing of Book Pages in the DH node form. The field is there only to allow users to reorder the Book Pages.
     $original_book_pages = array();
-    foreach ($form['field_book_children'][LANGUAGE_NONE] as $original_child) {
-      if (isset($original_child['target_id'])) {
-        $original_child_text = $original_child['target_id']['#default_value'];
-        $original_child_numeric = substr(substr(strstr($original_child_text, '('), 0, -1), 1);
-        if (is_numeric($original_child_numeric)) {
-          $original_book_pages[] = $original_child_numeric;
+    if(isset($original_node->field_book_children)) {
+        foreach($original_node->field_book_children[LANGUAGE_NONE] as $original_child) {
+            $original_book_pages[] = $original_child['target_id'];
         }
-      }
     }
+
     $new_book_pages = array();
-    foreach ($form_state['values']['field_book_children'][LANGUAGE_NONE] as $new_child) {
-      if (isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
-        $new_book_pages[] = $new_child['target_id'];
-        if (!in_array($new_child['target_id'], $original_book_pages)) {
-          form_set_error('field_book_children', t('Do not add Book Pages here. Use the "Add a Book Page" button instead.'));
+    if(isset($node->field_book_children)) {
+        foreach($node->field_book_children[LANGUAGE_NONE] as $new_child) {
+            if(isset($new_child['target_id']) && is_numeric($new_child['target_id'])) {
+                $new_book_pages[] = $new_child['target_id'];
+                if (!in_array($new_child['target_id'], $original_book_pages)) {
+                    form_set_error('field_book_children', t('Do not add Book Pages here. Use the "Add a Book Page" button instead.'));
+                }
+            }
         }
-      }
     }
+
     foreach ($original_book_pages as $original_child) {
       if (!in_array($original_child, $new_book_pages)) {
         form_set_error('field_book_children', t('Do not remove Book Pages here. Instead, edit the Book Page, then press "Delete".'));
       }
     }
-
+    
   }
 }
 
@@ -681,14 +710,36 @@ function ma_digitalheritage_node_load($nodes, $types) {
  */
 function ma_digitalheritage_page_alter(&$data) {
 
-
   // If there are Child Records for a DH node, show the parent and child records in quicktabs
-  if (isset($data['content']['system_main']['nodes'])) {
+  if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
     if ($node->type == 'digital_heritage') {
+
+      // Custom build page content for DH nodes
       $nids = element_children($data['content']['system_main']['nodes']);
       $nid = $nids[0];
+
+      // Book pages
+      if ($node->field_book_children OR $node->field_book_parent) {
+
+        // Show navigation buttons
+        $dh_page_content = ma_digital_heritage_book_page_navigation_buttons($node);
+
+        // Show table of contents on parent (page 1) of book only
+        if ($node->field_book_children) {
+          $dh_page_content .= '<div class = "dh-book-toc">' . theme(
+            'ctools_collapsible',
+            array(
+              'handle' => '<h3 class = "dh-book-toc-header">' . 'Table of Contents' . '</h3>',
+              'content' => ma_digital_heritage_book_page_contents($node),
+              'collapsed' => TRUE,
+            )
+          ) . '</div>';
+        }
+      }
+
+      // Community Records
       $parent_dh = entity_metadata_wrapper('node', $nid);
       if ($community_records = $parent_dh->field_community_record_children->value()) {
 
@@ -725,7 +776,6 @@ function ma_digitalheritage_page_alter(&$data) {
             }
             $community_record_tab_title = implode(' / ', $community_record_parent_communities) . ' Record';
 
-
             // Create the tab
             $dh_tabs[] = array(
               'type' => 'node',
@@ -739,45 +789,52 @@ function ma_digitalheritage_page_alter(&$data) {
 
           // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
           else {
-            $dh_tabs[] = array(
-            );
+            $dh_tabs[] = array();
           }
         }
 
-        $data['content']['system_main'] = array(
-          'content' => quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs),
-          '#weight' => 99,
-        );
+        // Add the rendered quicktabs to the built page content
+        $community_record_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs);
+        foreach($community_record_tabs['content']['content']['tabs']['tablinks'] as $key => $tab) {
+            // Shorten title if necessary.  Long titles break the tabs.
+             if(strlen($tab['#title']) > 25) {
+                 $comma_break_pos = strpos($tab['#title'], ',', 18);
+                 $colon_break_pos = strpos($tab['#title'], ':', 18);
+                 $word_break_pos = strpos($tab['#title'], ' ', 18);
+                 $break_pos = 25;
+
+                 if($comma_break_pos > 0) {
+                     $break_pos = $comma_break_pos;
+                 }
+
+                 if($colon_break_pos > 0 && $colon_break_pos < $break_pos) {
+                     $break_pos = $colon_break_pos;
+                 }
+
+                 if($word_break_pos > 0 && $word_break_pos < $break_pos) {
+                     $break_pos = $word_break_pos;
+                 }
+
+                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
+                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($tab['#title'], 0, $break_pos) . '...';
+             }
+        }
+
+        $dh_page_content .= drupal_render($community_record_tabs);
       }
+
+      // Node does not have community records. Render DH normally.
+      else {
+        $dh_page_content .= drupal_render(node_view($node, 'full'));
+      }
+
+      // Rewrite the output for DH nodes with our built DH page content
+      $data['content']['system_main']['#markup'] = $dh_page_content;
     }
   }
 }
 
-/**
- * Implements hook_ds_fields_info().
- */
-function ma_digitalheritage_ds_fields_info($entity_type) {
-  $fields = array();
-
-  $fields['book_page_navigation'] = array(
-    'title' => t('Book Page Navigation'),
-    'field_type' => DS_FIELD_TYPE_FUNCTION,
-    'ui_limit' => array('digital_heritage|full'),
-    'function' => 'ma_digital_heritage_book_page_navigation_field'
-  );
-
-  $fields['book_page_contents'] = array(
-    'title' => t('Book Page Contents'),
-    'field_type' => DS_FIELD_TYPE_FUNCTION,
-    'ui_limit' => array('digital_heritage|full'),
-    'function' => 'ma_digital_heritage_book_page_contents_field'
-  );
-
-  return array('node' => $fields);
-}
-
-function ma_digital_heritage_book_page_navigation_field ($field) {
-  $node = $field['entity'];
+function ma_digital_heritage_book_page_navigation_buttons ($node) {
   $output = "";
 
   $parent_emw = entity_metadata_wrapper('node', $node);
@@ -835,23 +892,18 @@ function ma_digital_heritage_book_page_navigation_field ($field) {
 }
 
 
-function ma_digital_heritage_book_page_contents_field ($field) {
-  $node = $field['entity'];
+function ma_digital_heritage_book_page_contents ($node) {
 
-  // Parent pages show a table of contents, plus the right arrow
-  if ($node->field_book_children) {
-    $toc = '<ol><li>' . $node->title .'</li>';
-    $parent_emw = entity_metadata_wrapper('node', $node);
-    $children = $parent_emw->field_book_children->value();
-    foreach ($children as $child) {
-      $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
-    }
-    $toc .= '</ol>';
-
-    return '<div class = "dh-book-nav-toc">' . $toc . '</div>';
-
+  // Parent book pages show a table of contents
+  $toc = '<ol><li>' . $node->title .'</li>';
+  $parent_emw = entity_metadata_wrapper('node', $node);
+  $children = $parent_emw->field_book_children->value();
+  foreach ($children as $child) {
+    $toc .= '<li>' . l($child->title, 'node/' . $child->nid) . '</li>';
   }
+  $toc .= '</ol>';
 
+  return '<div class = "dh-book-nav-toc">' . $toc . '</div>';
 }
 
 /**

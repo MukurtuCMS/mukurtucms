@@ -2635,6 +2635,9 @@ table .checkbox input[type="checkbox"] {
 a:hover {
   text-decoration: none;
 }
+.view-display-id-all_map .view-mode-map_popup h3 {
+  margin-top: 0;
+}
 .node-community .group-left,
 .node-cultural-protocol-group .group-left {
   width: 66%;
@@ -2853,15 +2856,36 @@ a:hover {
 .node-digital-heritage.view-mode-community_record .view-mode-search_result .scald-atom {
   margin-bottom: 0;
 }
-.node-digital-heritage.view-mode-full .dh-book-nav,
-.node-digital-heritage.view-mode-community_record .dh-book-nav {
+.node-digital-heritage.view-mode-full .view-dh-related-items-teasers .scald-atom,
+.node-digital-heritage.view-mode-community_record .view-dh-related-items-teasers .scald-atom {
+  margin-bottom: 0em;
+}
+.node-digital-heritage.view-mode-full .view-dh-related-items-teasers .views-field-field-media-asset,
+.node-digital-heritage.view-mode-community_record .view-dh-related-items-teasers .views-field-field-media-asset {
+  margin-bottom: 0.5em;
+}
+.node-digital-heritage.view-mode-full .view-dh-related-items-teasers .views-field-title,
+.node-digital-heritage.view-mode-community_record .view-dh-related-items-teasers .views-field-title {
+  font-size: 1.4em;
+  margin-bottom: 0.5em;
+}
+.dh-book-nav {
   text-align: center;
   font-size: 20px;
   font-weight: bold;
+  margin-bottom: 15px;
 }
-.node-digital-heritage.view-mode-full .dh-book-nav .nav-button,
-.node-digital-heritage.view-mode-community_record .dh-book-nav .nav-button {
+.dh-book-nav .nav-button {
   padding-right: 20px;
+}
+.dh-book-toc {
+  margin-bottom: 2em;
+}
+.dh-book-toc h3.dh-book-toc-header {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 22px;
+  margin-top: 0;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
