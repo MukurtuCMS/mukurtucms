@@ -38,7 +38,7 @@ function ma_importexport_menu() {
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
-  if($entity->feeds_item->entity_type == 'scald_atom') {   
+  if($entity->feeds_item->entity_type == 'scald_atom') {
     if($entity->feeds_item->id == 'import_media_audio') {
       $type = 'audio';
     } elseif($entity->feeds_item->id == 'import_media_video') {
@@ -46,14 +46,14 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
     } else {
       return;
     }
-
+    
     $path = ScaldAtomController::getThumbnailPath($type);
     try {
-      $data = file_get_contents($entity->{'Temporary target 1'});
-      $destination = (substr($path, -1) === '/' ? $path : $path . '/') . basename(urldecode($entity->{'Temporary target 1'}));
-      $file = file_save_data($data, $destination, FILE_EXISTS_RENAME);
+        $data = file_get_contents($entity->{'Temporary target 1'});
+        $destination = (substr($path, -1) === '/' ? $path : $path . '/') . basename(urldecode($entity->{'Temporary target 1'}));
+        $file = file_save_data($data, $destination, FILE_EXISTS_RENAME);
     } catch (Exception $e) {
-      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
+        watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
     }
 
     $entity->base_id = $file->fid;
@@ -585,7 +585,8 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   // Get list of DH field names
   $dhfields = field_info_instances('node', 'digital_heritage');
   
-  $mapping = ma_importexport_get_digital_heritage_mapping($options['export_nids']);
+  $mapping = ma_importexport_get_importer_mapping('digital_heritage', $options['export_nids']);
+  
   $export_items = array();
   
   // Add headers
@@ -745,14 +746,17 @@ function ma_importexport_get_importer_mapping($nodetype, $export_nids = TRUE) {
   $importer = "";
   switch($nodetype) {
   case 'community':
-    $importer = 'import_communities';
-    break;
+      $importer = 'import_communities';
+      break;
   case 'collection':
-    $importer = 'import_collection';
-    break;
+      $importer = 'import_collection';
+      break;
   case 'cultural_protocol_group':
-    $importer = 'import_cultural_protocols';
-    break;
+      $importer = 'import_cultural_protocols';
+      break;
+  case 'digital_heritage':
+      $importer = 'digital_heritage_metadata';
+      $break;
   }
 
   // Load mapping from importer to look up header names
@@ -778,32 +782,6 @@ function ma_importexport_get_importer_mapping($nodetype, $export_nids = TRUE) {
   return $mapping;
 }
 
-
-// TODO: delete this function, use ma_importexport_get_importer_mapping instead
-function ma_importexport_get_digital_heritage_mapping($export_nids = TRUE) {
-  ctools_include('export');
-
-  // Load mapping from Digial Heritage Metadata importer to look up header names
-  $mapping = array();
-  if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => 'digital_heritage_metadata'))) {
-    $config = array_shift($config);
-    foreach($config->config['processor']['config']['mappings'] as $map) {
-      $mapping[$map['target']] = $map['source'];
-    }
-  }
-
-  if(!$export_nids) {
-      if(isset($mapping['nid'])) {
-          unset($mapping['nid']);
-      }
-  } else {
-      if(!isset($mapping['nid'])) {
-          $mapping['nid'] = 'nid';
-      }
-  }
-  
-  return $mapping;
-}
 
 function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
   ctools_include('export');
