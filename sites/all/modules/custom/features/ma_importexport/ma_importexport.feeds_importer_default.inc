@@ -98,119 +98,124 @@ function ma_importexport_feeds_importer_default() {
             'autocreate' => 1,
           ),
           10 => array(
+            'source' => 'Type',
+            'target' => 'field_dh_type',
+            'unique' => FALSE,
+          ),
+          11 => array(
             'source' => 'Identifier',
             'target' => 'field_identifier',
             'unique' => FALSE,
           ),
-          11 => array(
+          12 => array(
             'source' => 'Language',
             'target' => 'field_language',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          12 => array(
+          13 => array(
             'source' => 'Publisher',
             'target' => 'field_publisher',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          13 => array(
+          14 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          14 => array(
+          15 => array(
             'source' => 'Source',
             'target' => 'field_source',
             'unique' => FALSE,
           ),
-          15 => array(
+          16 => array(
             'source' => 'Subject',
             'target' => 'field_subject',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          16 => array(
+          17 => array(
             'source' => 'Transcription',
             'target' => 'field_transcription',
             'unique' => FALSE,
           ),
-          17 => array(
+          18 => array(
             'source' => 'Traditional Knowledge',
             'target' => 'field_tk_body',
             'unique' => FALSE,
           ),
-          18 => array(
+          19 => array(
             'source' => 'Cultural Narrative',
             'target' => 'body',
             'unique' => FALSE,
           ),
-          19 => array(
+          20 => array(
             'source' => 'Latitude',
             'target' => 'field_coverage:lat',
             'unique' => FALSE,
           ),
-          20 => array(
+          21 => array(
             'source' => 'Longitude',
             'target' => 'field_coverage:lon',
             'unique' => FALSE,
           ),
-          21 => array(
+          22 => array(
             'source' => 'Location Description',
             'target' => 'field_coverage_description',
             'unique' => FALSE,
           ),
-          22 => array(
+          23 => array(
             'source' => 'nid',
             'target' => 'nid',
             'unique' => 1,
           ),
-          23 => array(
+          24 => array(
             'source' => 'Traditional Licensing URL',
             'target' => 'field_licence_trad',
             'unique' => FALSE,
           ),
-          24 => array(
+          25 => array(
             'source' => 'Standard and Creative Commons Licensing URL',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
           ),
-          25 => array(
+          26 => array(
             'source' => 'Collections',
             'target' => 'field_collection',
             'unique' => FALSE,
           ),
-          26 => array(
+          27 => array(
             'source' => 'Summary',
             'target' => 'field_summary',
             'unique' => FALSE,
           ),
-          27 => array(
+          28 => array(
             'source' => 'Related Items',
             'target' => 'field_related_dh_items',
             'unique' => FALSE,
           ),
-          28 => array(
+          29 => array(
             'source' => 'Sharing Settings',
             'target' => 'field_item_privacy_setting',
             'unique' => FALSE,
           ),
-          29 => array(
+          30 => array(
             'source' => 'Sharing Protocols',
             'target' => 'og_group_ref',
             'unique' => FALSE,
           ),
-          30 => array(
+          31 => array(
             'source' => 'Book Pages',
             'target' => 'field_book_children',
             'unique' => FALSE,
           ),
-          31 => array(
+          32 => array(
             'source' => 'Community Records',
             'target' => 'field_community_record_children',
             'unique' => FALSE,
           ),
-          32 => array(
+          33 => array(
             'source' => 'Username',
             'target' => 'user_name',
             'unique' => FALSE,
