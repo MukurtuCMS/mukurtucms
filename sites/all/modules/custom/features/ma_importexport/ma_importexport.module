@@ -73,6 +73,9 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
   }
 }
 
+/**
+ * Form submit for exporting from the browse DH page or DH node
+ */
 function ma_importexport_export_form_submit($form, &$form_state)
 {
   // Export from item page
@@ -102,6 +105,10 @@ function ma_importexport_export_form_submit($form, &$form_state)
   drupal_goto($path);
 }
 
+
+/**
+ * Build the form for exporting from the browse DH page or DH node
+ */
 function ma_importexport_export_form($form, &$form_state, $items = NULL, $format="csv") {
   $form = array();
 
@@ -171,6 +178,10 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
   return $form;
 }
 
+
+/**
+ * Grabs the form for exporting from the browse DH page or DH node 
+ */
 function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = NULL) {
   if (is_int($items)) {
     $items = array($items);
@@ -184,7 +195,9 @@ function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = 
 
 
 /* VBO functions */
-// Form for the VBO
+/**
+ * Build the form for exporting via VBO
+ */
 function ma_importexport_dh_export_form($settings, &$form_state) {
   $form = array();
 
@@ -227,7 +240,9 @@ function ma_importexport_dh_export_form($settings, &$form_state) {
   return $form;
 }
 
-// Form submit for the VBO form
+/**
+ * Form submit for exporting from VBO
+ */
 function ma_importexport_dh_export_submit($form, $form_state) {
   $return = array();
 
@@ -243,7 +258,10 @@ function ma_importexport_dh_export_submit($form, $form_state) {
   return $return;
 }
 
-// Action to take for the VBO
+
+/**
+ * VBO action for exporting from VBO
+ */
 function ma_importexport_dh_export(&$node, $context) {
     if($context['progress']['current'] == 1) {
         $_SESSION['digital_heritage_export_list'] = array();
@@ -256,15 +274,12 @@ function ma_importexport_dh_export(&$node, $context) {
         drupal_set_message($message);
         
     }
-    
-    /*    $message = t('Node title is %title.', array(
-        '%title' => $node->title,
-    ));
-    
-    drupal_set_message($message);*/
 }
 
-// Defines the VBO
+
+/**
+ * Define the VBO for DH export
+ */
 function ma_importexport_action_info() {
   return array(
     'ma_importexport_dh_export' => array(
@@ -287,6 +302,10 @@ function ma_importexport_dh_export_views_bulk_operations_form($options) {
 
 /* End VBO functions */
 
+
+/**
+ * Access control for DH item export
+ */
 function ma_importexport_access_export($node) {
   global $user;
   if (is_int($node)) {
@@ -311,9 +330,13 @@ function ma_importexport_access_export($node) {
   return $access;
 }
 
+
+/**
+ * Helper function to generate sensible GUIDs for nodes during export
+ */
 function ma_importexport_make_node_guid($nid) {
   $node = node_load($nid);
-  //      dpm($node);
+
   if($node) {
       // Check for an existing feeds guid
       $node_feeds_info = feeds_item_info_load('node', $node->nid);
@@ -329,6 +352,10 @@ function ma_importexport_make_node_guid($nid) {
   return "";
 }
 
+
+/**
+ * Helper function to generate sensible GUIDs for atoms during export
+ */
 function ma_importexport_make_atom_guid($sid) {
   $atom = scald_atom_load($sid);
   
@@ -351,6 +378,9 @@ function ma_importexport_make_atom_guid($sid) {
 /**
  *  Take a list of digital heritage nids and sort them topologically so that they can be imported without dependency issues.
  *  Crude implementation of Kahn's algorithm.
+ *
+ *  TODO: Long-term it would be better (for the user) to try and handle dependencies on import.  Users could alter this 
+ *        ordering of the exported items prior to import.
  */
 function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
     $nodes = node_load_multiple($nids);
@@ -621,7 +651,6 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     // Loop through the fields we want to export
     foreach($mapping as $dhfield => $dhmap) {
       $field_export = NULL;
-      //      $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield, TRUE);
       $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield, !$options['export_nids']);
       $export_item[$dhfield] = $field_export;
     }
@@ -708,8 +737,6 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 		  'protocols' => $protocol_list);
   
   return ma_importexport_export_csv($export, $multivalue_delimiter, $options['export_nids']);
-  
-  //  drupal_set_message(t('Exported ') . $original_node->title);
 }
 
 
@@ -740,6 +767,9 @@ function ma_importexport_load_scald_atoms($sids) {
 }
 
 
+/**
+ * For a given node type, lookup the standard Mukurtu importer and return a name=>field mapping
+ */
 function ma_importexport_get_importer_mapping($nodetype, $export_nids = TRUE) {
   ctools_include('export');
 
@@ -783,6 +813,9 @@ function ma_importexport_get_importer_mapping($nodetype, $export_nids = TRUE) {
 }
 
 
+/**
+ * For a given scald atom type, lookup the standard Mukurtu importer and return a name=>field mapping
+ */
 function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
   ctools_include('export');
 
@@ -1226,8 +1259,6 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
   }
 
   return ma_importexport_zip_download_url($export_files);
-  //  ma_importexport_download_zip($export_files);
-  //drupal_exit();
 }
 
 function ma_importexport_zip_download_url($files) {
@@ -1269,29 +1300,6 @@ function ma_importexport_file_download($uri, $field_type = 'file') {
     }
 }
 
-/*
-function ma_importexport_download_zip($files) {
-    $zip = new ZipArchive();
-
-    $tempfile = tempnam(sys_get_temp_dir(),'MUKURTUZIP');
-    $zip->open($tempfile, ZipArchive::CREATE);
-
-    foreach($files as $file) {
-      $zip->addFile($file['filename'], $file['localname']);
-    }
-
-    $zip->close();
-    header('Content-disposition: attachment; filename=export.zip');
-    header('Content-type: application/zip');
-    readfile($tempfile);
-
-    // Delete tempfiles
-    foreach($files as $file) {
-      unlink($file['filename']);
-    }
-    drupal_exit();
-}
-*/
 
 /**
  * Implements hook_views_pre_render().
