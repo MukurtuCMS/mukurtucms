@@ -749,7 +749,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     // Loop through the fields we want to export
     foreach($mapping as $dhfield => $dhmap) {
       $field_export = NULL;
-      $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield, !$options['export_nids']);
+      $field_export = ma_importexport_digital_heritage_field_export($original_node, $dhfield, FALSE); //SCT
       $export_item[$dhfield] = $field_export;
     }
 
@@ -761,7 +761,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   foreach($export_items['items'] as $export_item) {
     foreach($export_item['field_media_asset'] as $media) {
       if(!in_array($media, $media_sids)) {
-	$media_sids[] = $media;
+          $media_sids[] = $media;
       }
     }
   }
@@ -775,7 +775,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     $collection_image_sid = ma_importexport_node_field_export($collection_list[$key], 'field_collection_image');
     if(count($collection_image_sid) > 0) {
       if(!in_array($collection_image_sid[0], $media_sids)) {
-	$media_sids[] = $collection_image_sid[0];
+          $media_sids[] = $collection_image_sid[0];
       }
     }    
   }
@@ -792,14 +792,14 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     $protocol_image_sid = ma_importexport_node_field_export($protocol_list[$key], 'field_protocol_image');
     if(count($protocol_image_sid) > 0) {
       if(!in_array($protocol_image_sid[0], $media_sids)) {
-	$media_sids[] = $protocol_image_sid[0];
+          $media_sids[] = $protocol_image_sid[0];
       }
     }
 
     $protocol_image_thumbnail_sid = ma_importexport_node_field_export($protocol_list[$key], 'field_protocol_image_thumbnail');
     if(count($protocol_image_thumbnail_sid) > 0) {
       if(!in_array($protocol_image_thumbnail_sid[0], $media_sids)) {
-	$media_sids[] = $protocol_image_thumbnail_sid[0];
+          $media_sids[] = $protocol_image_thumbnail_sid[0];
       }
     }
   }
@@ -814,14 +814,14 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     $community_image_sid = ma_importexport_node_field_export($community_list[$key], 'field_community_image');
     if(count($community_image_sid) > 0) {
       if(!in_array($community_image_sid[0], $media_sids)) {
-	$media_sids[] = $community_image_sid[0];
+          $media_sids[] = $community_image_sid[0];
       }
     }
 
     $community_image_thumbnail_sid = ma_importexport_node_field_export($community_list[$key], 'field_community_image_thumbnail');
     if(count($community_image_thumbnail_sid) > 0) {
       if(!in_array($community_image_thumbnail_sid[0], $media_sids)) {
-	$media_sids[] = $community_image_thumbnail_sid[0];
+          $media_sids[] = $community_image_thumbnail_sid[0];
       }
     }
   }
@@ -983,7 +983,7 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
 }
 
 
-function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = FALSE) {
+function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = TRUE) {
   global $language;
 
   if(is_null($node)) {
@@ -1064,7 +1064,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
 }
 
 
-function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = FALSE) {
+function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = TRUE) {
   global $language;
 
   if(is_null($atom)) {
@@ -1162,19 +1162,26 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, !$export_nids));
+    $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping));
   }
 
+
+  //DEBUG
+  /*  if($nodetype == 'digital_heritage') {
+      dpm($mapping);
+      dpm($row);
+      }*/
+    
   fputcsv($csv_file, $row);
 }
 
-function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter=',', $export_sids) {
+function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter=',', $export_sids = FALSE) {
   $fields = field_info_instances('scald_atom', $type);
   $mapping = ma_importexport_get_atom_field_mapping($type, $export_sids);
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping, !$export_sids));
+    $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping));
   }
 
   fputcsv($csv_file, $row);
@@ -1191,36 +1198,37 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
  *   The glue string to use as a delimiter between multivalue terms
  */
 function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE) {
-  //drupal_add_http_header('Content-Type', 'text/csv; utf-8');
-  //  drupal_add_http_header('Content-Disposition', 'attachment;filename=csvfiles.csv');
-    
   // Prevent Devel from messing us up.
   $GLOBALS['devel_shutdown'] = TRUE;
+
+  //  dpm($export);
   
   // Write DH CSV
-  $dh_temp_file = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $digitalheritage_output = fopen($dh_temp_file, 'w');
+  $digitalheritage_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+  $digitalheritage_output = fopen($digitalheritage_temp, 'w');
 
   // Write column headers
-  $headers = array();
+    $headers = array();
   foreach($export['digitalheritage']['items'][0] as $key => $name) {
-    $headers[] = $export['digitalheritage']['headers'][$key] ? $export['digitalheritage']['headers'][$key] : $key;
-  }
+   $headers[] = $export['digitalheritage']['headers'][$key] ? $export['digitalheritage']['headers'][$key] : $key;
+   }
   fputcsv($digitalheritage_output, $headers);
 
   // Write items to rows
-  foreach($export['digitalheritage']['items'] as $item) {
+    foreach($export['digitalheritage']['items'] as $item) {
     $item_array = array();
     foreach($item as $field => $value) {
       $item_array[] = implode($delimiter, $value);
     }
     fputcsv($digitalheritage_output, $item_array);
   }
- 
-
-  $export_files = array(array('filename' => $dh_temp_file, 'localname' => 'digitalheritage.csv'));
+  
 
   // setup output files
+    //  $digitalheritage_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+    //  $digitalheritage_output = fopen($digitalheritage_temp, 'w');
+  $export_files = array(array('filename' => $digitalheritage_temp, 'localname' => 'digitalheritage.csv'));
+  
   $communities_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
   $communities_output = fopen($communities_temp, 'w');
   
@@ -1249,6 +1257,7 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
   $scald_file_count = 0;
 
   // Write headers
+  //  ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', NULL, $delimiter, $export_ids);
   ma_importexport_write_node_csv($communities_output, 'community', NULL, $delimiter, $export_ids);
   ma_importexport_write_node_csv($collections_output, 'collection', NULL, $delimiter, $export_ids);
   ma_importexport_write_node_csv($protocols_output, 'cultural_protocol_group', NULL, $delimiter, $export_ids);
@@ -1257,6 +1266,10 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
   ma_importexport_write_atom_csv($scald_video_output, 'video', NULL, $delimiter, $export_ids);
   ma_importexport_write_atom_csv($scald_file_output, 'file', NULL, $delimiter, $export_ids);
 
+  foreach($export['digitalheritage']['items'] as $dh) {
+      ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', $dh, $delimiter, $export_ids);
+  }
+  
   foreach($export['communities'] as $community) {
       ma_importexport_write_node_csv($communities_output, 'community', $community, $delimiter, $export_ids);
   }
@@ -1273,20 +1286,20 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
     switch($atom->type) {
     case 'image':
         ma_importexport_write_atom_csv($scald_image_output, 'image', $atom, $delimiter, $export_ids);
-      $scald_image_count++;
-      break;
+        $scald_image_count++;
+        break;
     case 'audio':
-      ma_importexport_write_atom_csv($scald_audio_output, 'audio', $atom, $delimiter, $export_ids);
-      $scald_audio_count++;
-      break;
+        ma_importexport_write_atom_csv($scald_audio_output, 'audio', $atom, $delimiter, $export_ids);
+        $scald_audio_count++;
+        break;
     case 'video':
-      ma_importexport_write_atom_csv($scald_video_output, 'video', $atom, $delimiter, $export_ids);
-      $scald_video_count++;      
-      break;
+        ma_importexport_write_atom_csv($scald_video_output, 'video', $atom, $delimiter, $export_ids);
+        $scald_video_count++;      
+        break;
     case 'file':
-      ma_importexport_write_atom_csv($scald_file_output, 'file', $atom, $delimiter, $export_ids);
-      $scald_file_count++;      
-      break;
+        ma_importexport_write_atom_csv($scald_file_output, 'file', $atom, $delimiter, $export_ids);
+        $scald_file_count++;      
+        break;
     default:
     }
 

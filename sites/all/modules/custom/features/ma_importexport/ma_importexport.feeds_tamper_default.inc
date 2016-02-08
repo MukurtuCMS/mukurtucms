@@ -18,9 +18,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Book Pages';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -49,9 +49,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Category';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -95,9 +95,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Collections';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -157,9 +157,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Community Records';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -188,9 +188,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Contributor';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -219,9 +219,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Creator';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -281,9 +281,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Keywords';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -312,9 +312,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Language';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -374,9 +374,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Media Assets';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -436,9 +436,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Publisher';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -467,9 +467,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Related Items';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -498,9 +498,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Sharing Protocols';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 3;
   $feeds_tamper->description = 'Explode';
@@ -559,9 +559,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Subject';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -605,9 +605,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Type';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -636,9 +636,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -713,9 +713,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Tags';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -744,9 +744,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -836,9 +836,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Tags';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -867,9 +867,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -898,9 +898,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Categories';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -944,9 +944,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Keywords';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -1006,9 +1006,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -1052,9 +1052,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Tags';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
