@@ -63,9 +63,9 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper->source = 'Parent Community';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Explode';
