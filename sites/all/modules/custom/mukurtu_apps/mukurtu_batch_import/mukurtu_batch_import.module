@@ -5,7 +5,7 @@
  */
 function mukurtu_batch_import_menu() {
 
-  $items['admin/mukurtu/batch_import'] = array(
+  $items['manage/zip_import'] = array(
     'title' => 'Import Batch Content',
     'description' => 'Import content into Mukurtu',
     'page callback' => 'drupal_get_form',
@@ -168,7 +168,7 @@ function mukurtu_batch_import_parse_zip($file) {
  * Display the feedback in a custom output and provide a file of results.
  */
 function mukurtu_batch_import_feedback($messages) {
-  // dpm($messages);
+    // dpm($messages);
 }
 
 /*
@@ -239,7 +239,7 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 
 function mukurtu_batch_import_import_metadata($path) {
   module_load_include('inc', 'feeds', 'feeds.pages');
-
+  
   // File name -> Feed Importer lookup table
   $feed_file_names = array(			   
 			   //    'categories.csv' => 'import_categories',
@@ -253,16 +253,18 @@ function mukurtu_batch_import_import_metadata($path) {
 			       'digitalheritage.csv' => 'digital_heritage_metadata',
 			       'collections.csv' => 'import_collection',
   ); 
-  
+
+
   foreach($feed_file_names as $filename => $importer_id) {
     $csv_path = $path . '/' . $filename;
-
+    
     if(file_exists($csv_path)) {
       // Save as a managed file.
       $csv = file_get_contents($csv_path);
 
+      // Crude method to support relative file paths
       $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
-      
+
       //      $destination = 'private://feeds/'; 
       $destination = $path;
       file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
@@ -282,7 +284,7 @@ function mukurtu_batch_import_import_metadata($path) {
       $source->save();
       $source->startImport();
     }
-  }  
+  }
 }
 
 function mukurtu_batch_import_form_ajax($form, $form_state) {
@@ -296,34 +298,4 @@ function mukurtu_batch_import_form_ajax($form, $form_state) {
   $commands[] = ajax_command_after('#breadcrumb-wrap', '<div id="messages-wrap">' . theme('status_messages') . '</div>');
 
   return array('#type' => 'ajax', '#commands' => $commands);
-}
-
-function mukurtu_batch_import_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
-  $relative_media_fields = array('archival tiff',
-				 'file',
-				 'full-size jpeg',
-				 'image',
-				 'original dng',
-				 'thumbnail',);
-				 
-  
-  $config = $source->getConfig();
-
-  if($config && strpos($config['FeedsFileFetcher']['source'], 'zip_import_') != FALSE) {
-
-    // Get the path to the CSV file used for the feeds import
-    $dirname = drupal_dirname($config['FeedsFileFetcher']['source']);
-
-    // Update the relative paths to absolute drupal paths for scald imports
-    foreach($result->items as $key => $item) {
-      if(isset($item['sid'])) {
-	foreach($relative_media_fields as $media_field) {
-	  if(isset($item[$media_field]) && !empty($item[$media_field])) {
-	    $result->items[$key][$media_field] = $dirname . '/' . $item[$media_field];
-	  }
-	}
-      }
-    }
-  }
-  //dpm($result);
 }

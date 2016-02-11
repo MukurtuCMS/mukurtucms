@@ -158,7 +158,7 @@ function mukurtu_splash_block_info() {
     'info' => t('Mukurtu Dashboard: Configure Mukurtu'),
   );
   $blocks['batch_import'] = array(
-    'info' => t('Mukurtu Dashboard: Import Content'),
+    'info' => t('Mukurtu Dashboard: Import/Export Content'),
   );
   $blocks['manage_content'] = array(
     'info' => t('Mukurtu Dashboard: Manage Content'),
@@ -532,6 +532,23 @@ function mukurtu_splash_block_batch_import() {
       'href' => 'import/import_media_files',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
       'description' => t('Batch import files and associated metadata from CSV file.'),
+    );
+  }
+
+  // Do we care who can access this?  View only shows items they have access for.
+  $items[] = array(
+      'title' => 'Export Digital Heritage Metadata',
+      'href' => 'manage/digital-heritage',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Select digital heritage items for export.'),
+    );
+  
+   if (feeds_access('import','digital_heritage_metadata')) {
+    $items[] = array(
+      'title' => 'Import Digital Heritage Metadata from Zip Archive',
+      'href' => 'manage/zip_import',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import many digital heritage items from a Zip Archive.'),
     );
   }
 
