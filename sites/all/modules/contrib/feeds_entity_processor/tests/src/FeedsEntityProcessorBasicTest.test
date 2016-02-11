@@ -8,7 +8,7 @@
 /**
  * Test aggregating a feed as node items.
  */
-class FeedsEntityProcessorTest extends FeedsWebTestCase {
+class FeedsEntityProcessorBasicTest extends FeedsWebTestCase {
 
   public static function getInfo() {
     return array(
@@ -26,13 +26,6 @@ class FeedsEntityProcessorTest extends FeedsWebTestCase {
     // Create an importer configuration.
     $this->createImporterConfiguration('Syndication', 'syndication');
     $this->setPlugin('syndication', 'FeedsEntityProcessorEntity_test');
-    $this->addMappings('syndication', array(
-      0 => array(
-        'source' => 'guid',
-        'target' => 'guid',
-        'unique' => TRUE,
-      ),
-    ));
   }
 
   /**
@@ -49,6 +42,13 @@ class FeedsEntityProcessorTest extends FeedsWebTestCase {
 
     $this->setSettings('syndication', 'FeedsEntityProcessorEntity_test', array(
       'bundle' => $bundle,
+    ));
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
     ));
 
     // Run import.
@@ -85,6 +85,49 @@ class FeedsEntityProcessorTest extends FeedsWebTestCase {
     $this->drupalPost('import/syndication/delete-items', array(), 'Delete');
     $this->assertText('Deleted 9 test entity');
     $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {entity_test}")->fetchField());
+  }
+
+  /**
+   * Tests if the entity ID can be used as an unique target.
+   */
+  public function testEntityIdAsUniqueTarget() {
+    // Include FeedsProcessor.inc so processor related constants are available.
+    module_load_include('inc', 'feeds', 'plugins/FeedsProcessor');
+
+    $bundle = drupal_strtolower($this->randomName());
+
+    // Create bundle entity.
+    entity_create('entity_test_type', array(
+      'id' => drupal_strtolower($this->randomName()),
+      'name' => $bundle,
+    ))->save();
+    // Create an entity_test record in the database.
+    $record = array(
+      'pid' => 1,
+      'name' => $bundle,
+      'uid' => 0,
+    );
+    drupal_write_record('entity_test', $record);
+
+    // Set importer settings.
+    $this->setPlugin('syndication', 'FeedsCSVParser');
+    $this->setSettings('syndication', 'FeedsEntityProcessorEntity_test', array(
+      'bundle' => $bundle,
+      'update_existing' => FEEDS_UPDATE_EXISTING,
+    ));
+    // Map to entity ID.
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'guid',
+        'target' => 'pid',
+        'unique' => TRUE,
+      ),
+    ));
+
+    // Run import.
+    $this->importURL('syndication', $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/content.csv');
+    $this->assertText('Updated 1 test entity');
+    $this->assertText('Created 1 test entity');
   }
 
 }
