@@ -166,7 +166,7 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
 
   $form['dh_export']['csvdelimiter'] = array('#type' => 'textfield',
 					     '#title' => t('CSV column multi-value delimiter'),
-					     '#default_value' => ',',
+					     '#default_value' => ';',
 					     '#size' => 4,
 					     '#maxlength' => 10);					     
   
@@ -232,7 +232,7 @@ function ma_importexport_dh_export_form($settings, &$form_state) {
 
   $form['dh_export']['csvdelimiter'] = array('#type' => 'textfield',
                                              '#title' => t('CSV column multi-value delimiter'),
-                                             '#default_value' => ',',
+                                             '#default_value' => ';',
                                              '#size' => 4,
                                              '#maxlength' => 10,
                                              '#required' => TRUE);
@@ -284,7 +284,7 @@ function ma_importexport_action_info() {
   return array(
     'ma_importexport_dh_export' => array(
       'type' => 'node',
-      'label' => t('Export Digital Heritage nodes'),
+      'label' => t('Export Digital Heritage Items'),
       'behavior' => array('views_property'),
       'configurable' => TRUE,
       'vbo_configurable' => FALSE,
@@ -320,6 +320,12 @@ function ma_importexport_access_export($node) {
     // Check basic role permissions first.
     $access = TRUE;
     //    $access = (user_access('export nodes') || ($user->uid && ($node->uid == $user->uid) && user_access('export own nodes')));
+
+    // Allow only admins to export
+    $access = $access && (in_array('administrator', $user->roles)
+                          || in_array('Mukurtu Administrator', $user->roles)
+                          || in_array('Community Administrator', $user->roles));
+    
     // Make sure the user can view the original node content.
     $access = $access && node_access('view', $node);
   }
@@ -464,6 +470,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
     return $sorted_nodes;
 }
 
+//TODO: Merge into node_field_export
 function ma_importexport_digital_heritage_field_export($item, $field_name, $use_guid = FALSE) {
   $result = array();
 
@@ -573,7 +580,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     if(isset($options['multivalue_delimiter'])) {
       $multivalue_delimiter = $options['multivalue_delimiter'];
     } else {
-      $multivalue_delimiter = ',';
+      $multivalue_delimiter = ';';
     }
   }
   
@@ -585,7 +592,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   }
 
   // Add any related items we need to export as well
-  // TODO: restructure this to avoid looping over and loading all nodes twice
+  // TODO: restructure this to avoid looping over and loading all nodes twice  
   $related_items = array();
   foreach($items as $item) {    
     $original_node = node_load($item);
@@ -620,10 +627,12 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $export_items = array();
   
   // Add headers
-  foreach($mapping as $f => $h) {
-    $export_items['headers'][$f] = $h;
-  }
+  // TODO: Purge this once generalized 
+  //  foreach($mapping as $f => $h) {
+  //  $export_items['headers'][$f] = $h;
+  //}
 
+  $digitalheritage_list = array();
   $community_list = array();
   $collection_list = array();
   $protocol_list = array();
@@ -631,6 +640,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   // Process Items
   foreach ($dh_items as $item) {
     $original_node = node_load($item);
+    $digitalheritage_list[] = $original_node;
 
     // Get the list of any collections, communities, and cultural protocols that those DH items reference
     $collection_list = array_merge($collection_list, ma_importexport_digital_heritage_field_export($original_node, 'field_collection'));
@@ -709,6 +719,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   // Load community nodes
   // TODO: Get parent/child communities and add them to the list  
   $community_list = array_unique($community_list);
+  
   foreach($community_list as $key => $nid) {
     $community_list[$key] = node_load($nid);
 
@@ -730,7 +741,8 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     
   $exported_media = ma_importexport_load_scald_atoms($media_sids);
 
-  $export = array('digitalheritage' => $export_items,
+  //  $export = array('digitalheritage' => $export_items,
+  $export = array('digitalheritage' => $digitalheritage_list,
 		  'media' => $exported_media,
 		  'collections' => $collection_list,
 		  'communities' => $community_list,
@@ -885,7 +897,7 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
 }
 
 
-function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = TRUE) {
+function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = FALSE) {
   global $language;
 
   if(is_null($node)) {
@@ -912,6 +924,23 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       }
     }
     break;
+  case 'field_creator':
+  case 'field_contributor':
+  case 'field_dh_type':
+  case 'field_format':
+  case 'field_language':
+  case 'field_publisher':
+  case 'field_subject':
+      foreach($node->{$field_name}[LANGUAGE_NONE] as $term) {
+          $result[] = taxonomy_term_load($term['tid'])->name;
+      }
+      break;    
+  case 'field_category':
+  case 'field_tags':
+      foreach($node->{$field_name}[$node->language] as $term) {
+          $result[] = taxonomy_term_load($term['tid'])->name;
+      }
+      break;    
   case 'field_parent_community:etid':
   case 'field_parent_community':
     foreach($node->field_parent_community[LANGUAGE_NONE] as $field_value) {           
@@ -932,6 +961,15 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       }
     }
     break;
+  case 'field_media_asset':
+    foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
+      if($use_guid) {
+          $result[] = ma_importexport_make_atom_guid($field_value['sid']);
+      } else {
+          $result[] = $field_value['sid'];
+      }
+    }
+    break;    
   case 'field_description:summary':
     foreach($node->field_collection_summary[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['value']; 
@@ -947,6 +985,44 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       }
     }
     break;
+  case 'field_book_children':
+  case 'field_book_parent':
+  case 'field_collection':
+  case 'field_community_record_children':
+  case 'field_community_record_parent':
+  case 'field_related_dh_items':
+      foreach($node->{$field_name}[LANGUAGE_NONE] as $ref) {
+          if($use_guid) {
+              $result[] = ma_importexport_make_node_guid($ref['target_id']);
+          } else {
+              $result[] = $ref['target_id'];
+          }
+      }
+      break;    
+  case 'field_community_ref':
+    foreach($node->{$field_name}[LANGUAGE_NONE] as $ref) {
+      if($use_guid) {	
+          $result[] = ma_importexport_make_node_guid($ref['nid']);
+      } else {
+          $result[] = $ref['nid'];
+      }     
+    }
+    break;
+  case 'field_coverage':
+    foreach($node->{$field_name}[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['geom'];
+    }
+    break;
+  case 'field_coverage:lat':
+    foreach($node->field_coverage[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['lat'];
+    }
+    break;
+  case 'field_coverage:lon':
+    foreach($node->field_coverage[LANGUAGE_NONE] as $ref) {
+      $result[] = $ref['lon'];
+    }
+    break;    
   case 'nid':
     $result[] = $node->nid;
     break;
@@ -966,7 +1042,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
 }
 
 
-function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = TRUE) {
+function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = FALSE) {
   global $language;
 
   if(is_null($atom)) {
@@ -1058,13 +1134,13 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
 }
 
 
-function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $delimiter=',', $export_nids = FALSE) {
+function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $delimiter=';', $export_nids = FALSE) {
   $fields = field_info_instances('node', $nodetype);
   $mapping = ma_importexport_get_importer_mapping($nodetype, $export_nids);
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping));
+      $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, TRUE)); //SCT
   }
 
 
@@ -1077,13 +1153,13 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
   fputcsv($csv_file, $row);
 }
 
-function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter=',', $export_sids = FALSE) {
+function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimiter=';', $export_sids = FALSE) {
   $fields = field_info_instances('scald_atom', $type);
   $mapping = ma_importexport_get_atom_field_mapping($type, $export_sids);
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-    $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping));
+      $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping, TRUE)); //SCT
   }
 
   fputcsv($csv_file, $row);
@@ -1099,17 +1175,16 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
  * @param string $delimiter
  *   The glue string to use as a delimiter between multivalue terms
  */
-function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE) {
+function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE) {
   // Prevent Devel from messing us up.
   $GLOBALS['devel_shutdown'] = TRUE;
 
-  //  dpm($export);
-  
   // Write DH CSV
   $digitalheritage_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
   $digitalheritage_output = fopen($digitalheritage_temp, 'w');
 
   // Write column headers
+  /*
     $headers = array();
   foreach($export['digitalheritage']['items'][0] as $key => $name) {
    $headers[] = $export['digitalheritage']['headers'][$key] ? $export['digitalheritage']['headers'][$key] : $key;
@@ -1117,14 +1192,14 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
   fputcsv($digitalheritage_output, $headers);
 
   // Write items to rows
-    foreach($export['digitalheritage']['items'] as $item) {
+  foreach($export['digitalheritage']['items'] as $item) {
     $item_array = array();
     foreach($item as $field => $value) {
       $item_array[] = implode($delimiter, $value);
     }
     fputcsv($digitalheritage_output, $item_array);
   }
-  
+  */  
 
   // setup output files
     //  $digitalheritage_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
@@ -1159,7 +1234,7 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
   $scald_file_count = 0;
 
   // Write headers
-  //  ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', NULL, $delimiter, $export_ids);
+  ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', NULL, $delimiter, $export_ids);
   ma_importexport_write_node_csv($communities_output, 'community', NULL, $delimiter, $export_ids);
   ma_importexport_write_node_csv($collections_output, 'collection', NULL, $delimiter, $export_ids);
   ma_importexport_write_node_csv($protocols_output, 'cultural_protocol_group', NULL, $delimiter, $export_ids);
@@ -1168,7 +1243,8 @@ function ma_importexport_export_csv($export, $delimiter=',', $export_ids = FALSE
   ma_importexport_write_atom_csv($scald_video_output, 'video', NULL, $delimiter, $export_ids);
   ma_importexport_write_atom_csv($scald_file_output, 'file', NULL, $delimiter, $export_ids);
 
-  foreach($export['digitalheritage']['items'] as $dh) {
+  //  foreach($export['digitalheritage']['items'] as $dh) {
+  foreach($export['digitalheritage'] as $dh) {
       ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', $dh, $delimiter, $export_ids);
   }
   
