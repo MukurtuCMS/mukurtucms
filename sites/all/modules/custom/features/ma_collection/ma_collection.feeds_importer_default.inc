@@ -45,7 +45,7 @@ function ma_collection_feeds_importer_default() {
           0 => array(
             'source' => 'NID',
             'target' => 'nid',
-            'unique' => 0,
+            'unique' => 1,
           ),
           1 => array(
             'source' => 'GUID',
