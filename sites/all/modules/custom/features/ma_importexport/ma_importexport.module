@@ -1130,6 +1130,14 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'guid':
     $result[] = $node->type . '_' . $node->nid . '_' . $node->created;
     break;
+  case 'user_name':
+      $account = user_load($node->uid);
+      if($account) {
+          $result[] = $account->name;
+      } else {
+          $result[] = "";
+      }
+      break;
   default:
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['value']; 
