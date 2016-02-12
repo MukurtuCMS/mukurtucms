@@ -446,6 +446,11 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '20';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page'] = TRUE;
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_options_all'] = TRUE;
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
     'views_bulk_operations' => 'views_bulk_operations',
@@ -740,7 +745,6 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['is_grouped'] = TRUE;
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['label'] = 'Is Community Record';
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['identifier'] = 'field_community_record_parent_target_id';
-  $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['remember'] = 1;
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['group_items'] = array(
     1 => array(
       'title' => 'Yes',
@@ -773,7 +777,6 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['field_book_parent_target_id']['is_grouped'] = TRUE;
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['label'] = 'Book Pages';
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['identifier'] = 'field_book_parent_target_id';
-  $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['remember'] = 1;
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['group_items'] = array(
     1 => array(
       'title' => 'Show first page only',
