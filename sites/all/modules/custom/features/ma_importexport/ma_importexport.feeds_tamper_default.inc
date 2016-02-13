@@ -13,14 +13,45 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-book_pages-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Book Pages';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-book_pages-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-book_pages-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Book Pages';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-book_pages-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-category-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Category';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -64,9 +95,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Collections';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -121,14 +152,45 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-community_records-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Community Records';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-community_records-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-community_records-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Community Records';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-community_records-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-contributor-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Contributor';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -157,9 +219,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Creator';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -219,9 +281,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Keywords';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -241,6 +303,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Trim';
   $export['digital_heritage_metadata-keywords-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-language-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Language';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-language-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-language-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Language';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-language-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
@@ -281,9 +374,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Media Assets';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -338,14 +431,45 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-publisher-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Publisher';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-publisher-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-publisher-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Publisher';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-publisher-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-related_items-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Related Items';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -374,9 +498,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Sharing Protocols';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 3;
   $feeds_tamper->description = 'Explode';
@@ -430,6 +554,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-subject-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Subject';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-subject-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-subject-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Subject';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-subject-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-title-required';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'title';
@@ -445,14 +600,45 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-type-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Type';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-type-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-type-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Type';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-type-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_media_audio-authors-explode';
   $feeds_tamper->importer = 'import_media_audio';
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -527,9 +713,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Tags';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -558,9 +744,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -650,9 +836,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Tags';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -681,9 +867,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -712,9 +898,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Categories';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -758,9 +944,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Keywords';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -820,9 +1006,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Authors';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -866,9 +1052,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Tags';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';

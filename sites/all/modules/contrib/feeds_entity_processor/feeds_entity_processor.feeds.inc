@@ -9,7 +9,7 @@
  * Implements hook_feeds_plugins().
  */
 function feeds_entity_processor_feeds_plugins() {
-  $path = drupal_get_path('module', 'feeds_entity_processor');
+  $path = drupal_get_path('module', 'feeds_entity_processor') . '/src';
 
   $info = array();
 

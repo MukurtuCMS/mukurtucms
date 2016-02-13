@@ -98,33 +98,38 @@ function ma_importexport_feeds_importer_default() {
             'autocreate' => 1,
           ),
           10 => array(
+            'source' => 'Type',
+            'target' => 'field_dh_type',
+            'unique' => FALSE,
+          ),
+          11 => array(
             'source' => 'Identifier',
             'target' => 'field_identifier',
             'unique' => FALSE,
           ),
-          11 => array(
+          12 => array(
             'source' => 'Language',
             'target' => 'field_language',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          12 => array(
+          13 => array(
             'source' => 'Publisher',
             'target' => 'field_publisher',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          13 => array(
+          14 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          14 => array(
+          15 => array(
             'source' => 'Source',
             'target' => 'field_source',
             'unique' => FALSE,
           ),
-          15 => array(
+          16 => array(
             'source' => 'Subject',
             'target' => 'field_subject',
             'term_search' => '0',
@@ -177,7 +182,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           26 => array(
             'source' => 'Collections',
-            'target' => 'field_collection:etid',
+            'target' => 'field_collection',
             'unique' => FALSE,
           ),
           27 => array(
@@ -187,7 +192,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           28 => array(
             'source' => 'Related Items',
-            'target' => 'field_related_dh_items:etid',
+            'target' => 'field_related_dh_items',
             'unique' => FALSE,
           ),
           29 => array(
@@ -197,7 +202,22 @@ function ma_importexport_feeds_importer_default() {
           ),
           30 => array(
             'source' => 'Sharing Protocols',
-            'target' => 'og_group_ref:etid',
+            'target' => 'og_group_ref',
+            'unique' => FALSE,
+          ),
+          31 => array(
+            'source' => 'Book Pages',
+            'target' => 'field_book_children',
+            'unique' => FALSE,
+          ),
+          32 => array(
+            'source' => 'Community Records',
+            'target' => 'field_community_record_children',
+            'unique' => FALSE,
+          ),
+          33 => array(
+            'source' => 'Username',
+            'target' => 'user_name',
             'unique' => FALSE,
           ),
         ),
@@ -207,6 +227,8 @@ function ma_importexport_feeds_importer_default() {
         'skip_hash_check' => 0,
         'bundle' => 'digital_heritage',
         'update_non_existent' => 'skip',
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
@@ -459,37 +481,42 @@ function ma_importexport_feeds_importer_default() {
       'config' => array(
         'mappings' => array(
           0 => array(
+            'source' => 'sid',
+            'target' => 'sid',
+            'unique' => 1,
+          ),
+          1 => array(
             'source' => 'GUID',
             'target' => 'guid',
             'unique' => 1,
           ),
-          1 => array(
+          2 => array(
             'source' => 'Title',
             'target' => 'title',
             'unique' => FALSE,
           ),
-          2 => array(
+          3 => array(
             'source' => 'File',
             'target' => 'Temporary target 1',
             'unique' => FALSE,
           ),
-          3 => array(
+          4 => array(
             'source' => 'Thumbnail',
             'target' => 'scald_thumbnail:uri',
             'unique' => FALSE,
           ),
-          4 => array(
+          5 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
-          5 => array(
+          6 => array(
             'source' => 'Authors',
             'target' => 'scald_authors',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          6 => array(
+          7 => array(
             'source' => 'Tags',
             'target' => 'scald_tags',
             'term_search' => '0',
@@ -510,6 +537,9 @@ function ma_importexport_feeds_importer_default() {
           'created' => '0',
           'changed' => '0',
         ),
+        'authorize' => TRUE,
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
@@ -552,37 +582,42 @@ function ma_importexport_feeds_importer_default() {
       'config' => array(
         'mappings' => array(
           0 => array(
+            'source' => 'sid',
+            'target' => 'sid',
+            'unique' => 1,
+          ),
+          1 => array(
             'source' => 'GUID',
             'target' => 'guid',
             'unique' => 1,
           ),
-          1 => array(
+          2 => array(
             'source' => 'Title',
             'target' => 'title',
             'unique' => FALSE,
           ),
-          2 => array(
+          3 => array(
             'source' => 'File',
             'target' => 'scald_file:uri',
             'unique' => FALSE,
           ),
-          3 => array(
+          4 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
-          4 => array(
+          5 => array(
             'source' => 'Thumbnail',
             'target' => 'scald_thumbnail:uri',
             'unique' => FALSE,
           ),
-          5 => array(
+          6 => array(
             'source' => 'Authors',
             'target' => 'scald_authors',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          6 => array(
+          7 => array(
             'source' => 'Tags',
             'target' => 'scald_tags',
             'term_search' => '0',
@@ -603,6 +638,9 @@ function ma_importexport_feeds_importer_default() {
           'created' => '0',
           'changed' => '0',
         ),
+        'authorize' => TRUE,
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
@@ -645,103 +683,108 @@ function ma_importexport_feeds_importer_default() {
       'config' => array(
         'mappings' => array(
           0 => array(
+            'source' => 'sid',
+            'target' => 'sid',
+            'unique' => 1,
+          ),
+          1 => array(
             'source' => 'GUID',
             'target' => 'guid',
             'unique' => 1,
           ),
-          1 => array(
+          2 => array(
             'source' => 'Title',
             'target' => 'title',
             'unique' => FALSE,
           ),
-          2 => array(
+          3 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
-          3 => array(
+          4 => array(
             'source' => 'Identifier',
             'target' => 'field_scald_identifier',
             'unique' => FALSE,
           ),
-          4 => array(
+          5 => array(
             'source' => 'Image',
             'target' => 'scald_thumbnail:uri',
             'unique' => FALSE,
           ),
-          5 => array(
+          6 => array(
             'source' => 'Original DNG',
             'target' => 'field_original_dng:uri',
             'unique' => FALSE,
           ),
-          6 => array(
+          7 => array(
             'source' => 'Archival TIFF',
             'target' => 'field_archival_tiff:uri',
             'unique' => FALSE,
           ),
-          7 => array(
+          8 => array(
             'source' => 'Full-Size JPEG',
             'target' => 'field_full_size_jpeg:uri',
             'unique' => FALSE,
           ),
-          8 => array(
+          9 => array(
             'source' => 'Caption',
             'target' => 'field_scald_headline',
             'unique' => FALSE,
           ),
-          9 => array(
+          10 => array(
             'source' => 'Created',
             'target' => 'field_scald_created:start',
             'unique' => FALSE,
           ),
-          10 => array(
+          11 => array(
             'source' => 'Creator',
             'target' => 'field_scald_creator',
             'unique' => FALSE,
           ),
-          11 => array(
+          12 => array(
             'source' => 'Authors',
             'target' => 'scald_authors',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          12 => array(
+          13 => array(
             'source' => 'Description',
             'target' => 'field_scald_description',
             'unique' => FALSE,
           ),
-          13 => array(
+          14 => array(
             'source' => 'Keywords',
             'target' => 'scald_tags',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          14 => array(
+          15 => array(
             'source' => 'Latitude',
             'target' => 'field_scald_geo_location:lat',
             'unique' => FALSE,
           ),
-          15 => array(
+          16 => array(
             'source' => 'Longitude',
             'target' => 'field_scald_geo_location:lon',
             'unique' => FALSE,
           ),
-          16 => array(
+          17 => array(
             'source' => 'Location',
             'target' => 'field_scald_location',
             'unique' => FALSE,
           ),
-          17 => array(
+          18 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
           ),
-          18 => array(
+          19 => array(
             'source' => 'Licensing',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
           ),
-          19 => array(
+          20 => array(
             'source' => 'Categories',
             'target' => 'field_category',
             'term_search' => '0',
@@ -762,6 +805,9 @@ function ma_importexport_feeds_importer_default() {
           'created' => '0',
           'changed' => '0',
         ),
+        'authorize' => TRUE,
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
@@ -804,37 +850,42 @@ function ma_importexport_feeds_importer_default() {
       'config' => array(
         'mappings' => array(
           0 => array(
+            'source' => 'sid',
+            'target' => 'sid',
+            'unique' => 1,
+          ),
+          1 => array(
             'source' => 'GUID',
             'target' => 'guid',
             'unique' => 1,
           ),
-          1 => array(
+          2 => array(
             'source' => 'Title',
             'target' => 'title',
             'unique' => FALSE,
           ),
-          2 => array(
+          3 => array(
             'source' => 'File',
             'target' => 'Temporary target 1',
             'unique' => FALSE,
           ),
-          3 => array(
+          4 => array(
             'source' => 'Protocol',
-            'target' => 'og_group_ref:etid',
+            'target' => 'field_scald_protocol',
             'unique' => FALSE,
           ),
-          4 => array(
+          5 => array(
             'source' => 'Thumbnail',
             'target' => 'scald_thumbnail:uri',
             'unique' => FALSE,
           ),
-          5 => array(
+          6 => array(
             'source' => 'Authors',
             'target' => 'scald_authors',
             'term_search' => '0',
             'autocreate' => 1,
           ),
-          6 => array(
+          7 => array(
             'source' => 'Tags',
             'target' => 'scald_tags',
             'term_search' => '0',
@@ -855,6 +906,9 @@ function ma_importexport_feeds_importer_default() {
           'created' => '0',
           'changed' => '0',
         ),
+        'authorize' => TRUE,
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
