@@ -81,11 +81,15 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
     $new_target = str_replace(':guid_or_nid', '', $target);                             
                 
     foreach($value as $id) {
-        $nid = ma_importexport_feeds_lookup_node_by_guid($id);
-        if(!$nid) {
-            $nid = $id;
+        if($id) {
+            // Check if ID is a valid GUID.  If so, we use that.
+            $nid = ma_importexport_feeds_lookup_node_by_guid($id);
+            if(!$nid) {
+                // Otherwise we assume ID is a NID
+                $nid = $id;
+            }
+            $entity->{$new_target}[$entity->language][]['target_id'] = $nid;
         }
-        $entity->{$new_target}[$entity->language][]['target_id'] = $nid;
     }    
 }
 
