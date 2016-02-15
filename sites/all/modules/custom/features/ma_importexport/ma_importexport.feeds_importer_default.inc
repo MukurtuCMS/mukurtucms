@@ -34,6 +34,7 @@ function ma_importexport_feeds_importer_default() {
       'config' => array(
         'delimiter' => ',',
         'no_headers' => 0,
+        'encoding' => 'UTF-8',
       ),
     ),
     'processor' => array(
@@ -43,182 +44,216 @@ function ma_importexport_feeds_importer_default() {
         'expire' => '-1',
         'mappings' => array(
           0 => array(
-            'source' => 'title',
-            'target' => 'title',
-            'unique' => 0,
-          ),
-          1 => array(
-            'source' => 'Media Assets',
-            'target' => 'field_media_asset',
-            'unique' => FALSE,
-          ),
-          2 => array(
             'source' => 'guid',
             'target' => 'guid',
             'unique' => 1,
+            'language' => 'und',
+          ),
+          1 => array(
+            'source' => 'nid',
+            'target' => 'nid',
+            'unique' => 1,
+            'language' => 'und',
+          ),
+          2 => array(
+            'source' => 'title',
+            'target' => 'title',
+            'unique' => 0,
+            'language' => 'und',
           ),
           3 => array(
+            'source' => 'Media Assets',
+            'target' => 'field_media_asset',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          4 => array(
+            'source' => 'Sharing Settings',
+            'target' => 'field_item_privacy_setting',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          5 => array(
+            'source' => 'Sharing Protocols',
+            'target' => 'og_group_ref:guid_or_nid',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          6 => array(
             'source' => 'Category',
             'target' => 'field_category',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
-          4 => array(
-            'source' => 'Keywords',
-            'target' => 'field_tags',
-            'term_search' => '0',
-            'autocreate' => 1,
+          7 => array(
+            'source' => 'Summary',
+            'target' => 'field_summary',
+            'unique' => FALSE,
+            'language' => 'und',
           ),
-          5 => array(
+          8 => array(
             'source' => 'Creator',
             'target' => 'field_creator',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
-          6 => array(
+          9 => array(
             'source' => 'Contributor',
             'target' => 'field_contributor',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
-          7 => array(
+          10 => array(
             'source' => 'Date',
             'target' => 'field_date',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          8 => array(
+          11 => array(
+            'source' => 'Cultural Narrative',
+            'target' => 'body',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          12 => array(
+            'source' => 'Traditional Knowledge',
+            'target' => 'field_tk_body',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          13 => array(
             'source' => 'Description',
             'target' => 'field_description',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          9 => array(
-            'source' => 'Format',
-            'target' => 'field_format',
+          14 => array(
+            'source' => 'Keywords',
+            'target' => 'field_tags',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
-          10 => array(
-            'source' => 'Type',
-            'target' => 'field_dh_type',
-            'unique' => FALSE,
-          ),
-          11 => array(
-            'source' => 'Identifier',
-            'target' => 'field_identifier',
-            'unique' => FALSE,
-          ),
-          12 => array(
-            'source' => 'Language',
-            'target' => 'field_language',
-            'term_search' => '0',
-            'autocreate' => 1,
-          ),
-          13 => array(
+          15 => array(
             'source' => 'Publisher',
             'target' => 'field_publisher',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
-          14 => array(
+          16 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          15 => array(
+          17 => array(
+            'source' => 'Traditional Licensing URL',
+            'target' => 'field_licence_trad',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          18 => array(
+            'source' => 'Standard and Creative Commons Licensing URL',
+            'target' => 'field_licence_std_cc',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          19 => array(
+            'source' => 'Format',
+            'target' => 'field_format',
+            'term_search' => '0',
+            'autocreate' => 1,
+            'language' => 'und',
+          ),
+          20 => array(
+            'source' => 'Type',
+            'target' => 'field_dh_type',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          21 => array(
+            'source' => 'Identifier',
+            'target' => 'field_identifier',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          22 => array(
+            'source' => 'Language',
+            'target' => 'field_language',
+            'term_search' => '0',
+            'autocreate' => 1,
+            'language' => 'und',
+          ),
+          23 => array(
             'source' => 'Source',
             'target' => 'field_source',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          16 => array(
+          24 => array(
             'source' => 'Subject',
             'target' => 'field_subject',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
-          17 => array(
+          25 => array(
             'source' => 'Transcription',
             'target' => 'field_transcription',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          18 => array(
-            'source' => 'Traditional Knowledge',
-            'target' => 'field_tk_body',
-            'unique' => FALSE,
-          ),
-          19 => array(
-            'source' => 'Cultural Narrative',
-            'target' => 'body',
-            'unique' => FALSE,
-          ),
-          20 => array(
+          26 => array(
             'source' => 'Latitude',
             'target' => 'field_coverage:lat',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          21 => array(
+          27 => array(
             'source' => 'Longitude',
             'target' => 'field_coverage:lon',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          22 => array(
+          28 => array(
             'source' => 'Location Description',
             'target' => 'field_coverage_description',
             'unique' => FALSE,
-          ),
-          23 => array(
-            'source' => 'nid',
-            'target' => 'nid',
-            'unique' => 1,
-          ),
-          24 => array(
-            'source' => 'Traditional Licensing URL',
-            'target' => 'field_licence_trad',
-            'unique' => FALSE,
-          ),
-          25 => array(
-            'source' => 'Standard and Creative Commons Licensing URL',
-            'target' => 'field_licence_std_cc',
-            'unique' => FALSE,
-          ),
-          26 => array(
-            'source' => 'Collections',
-            'target' => 'field_collection',
-            'unique' => FALSE,
-          ),
-          27 => array(
-            'source' => 'Summary',
-            'target' => 'field_summary',
-            'unique' => FALSE,
-          ),
-          28 => array(
-            'source' => 'Related Items',
-            'target' => 'field_related_dh_items',
-            'unique' => FALSE,
+            'language' => 'und',
           ),
           29 => array(
-            'source' => 'Sharing Settings',
-            'target' => 'field_item_privacy_setting',
+            'source' => 'Collections',
+            'target' => 'field_collection:guid_or_nid',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           30 => array(
-            'source' => 'Sharing Protocols',
-            'target' => 'og_group_ref',
+            'source' => 'Related Items',
+            'target' => 'field_related_dh_items:guid_or_nid',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           31 => array(
             'source' => 'Book Pages',
-            'target' => 'field_book_children',
+            'target' => 'field_book_children:guid_or_nid',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           32 => array(
             'source' => 'Community Records',
-            'target' => 'field_community_record_children',
+            'target' => 'field_community_record_children:guid_or_nid',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           33 => array(
             'source' => 'Username',
             'target' => 'user_name',
             'unique' => FALSE,
+            'language' => 'und',
           ),
         ),
         'input_format' => 'filtered_html',
