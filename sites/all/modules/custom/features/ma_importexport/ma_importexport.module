@@ -35,6 +35,73 @@ function ma_importexport_menu() {
 
 
 /**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'digital_heritage') {
+        $targets['og_group_ref:guid_or_nid'] = array(
+            'name' => t('Protocol (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Protocol of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'og_group_ref',
+        );
+        $targets['field_collection:guid_or_nid'] = array(
+            'name' => t('Collection (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Collections of field_collection matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_collection',
+        );
+        $targets['field_related_dh_items:guid_or_nid'] = array(
+            'name' => t('Related Items (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Related Items of field_related_dh_items matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_related_dh_items',
+        );
+        $targets['field_book_children:guid_or_nid'] = array(
+            'name' => t('Book Pages (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Book Pages of field_book_children matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_book_children',
+        );
+        $targets['field_community_record_children:guid_or_nid'] = array(
+            'name' => t('Community Records (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Community Records of field_community_record_children matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_community_record_children',
+        );
+    }
+}
+
+
+/**
+ * Callback for ma_importexport_feeds_processor_targets_alter
+ */
+function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
+{
+    $new_target = str_replace(':guid_or_nid', '', $target);                             
+                
+    foreach($value as $id) {
+        $nid = ma_importexport_feeds_lookup_node_by_guid($id);
+        if(!$nid) {
+            $nid = $id;
+        }
+        $entity->{$new_target}[$entity->language][]['target_id'] = $nid;
+    }    
+}
+
+/**
+ *  Lookup nid from guid
+ */
+function ma_importexport_feeds_lookup_node_by_guid($guid) {
+  return db_select('feeds_item')
+    ->fields('feeds_item', array('entity_id'))
+    ->condition('entity_type', 'node')
+    ->condition('guid', $guid)
+    ->execute()
+    ->fetchField();
+}
+
+/**
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
@@ -133,6 +200,14 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
       }
     }
+
+    // Allow import to use GUID or NID for relation fields
+    //    dpm($source);
+    //dpm($entity);
+    //dpm($item);
+
+    
+       
   }
 
 
