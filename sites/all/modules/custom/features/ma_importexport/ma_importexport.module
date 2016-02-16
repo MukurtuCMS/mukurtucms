@@ -1106,6 +1106,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   case 'field_dh_type':
   case 'field_format':
   case 'field_language':
+  case 'field_people':
   case 'field_publisher':
   case 'field_subject':
       foreach($node->{$field_name}[LANGUAGE_NONE] as $term) {
