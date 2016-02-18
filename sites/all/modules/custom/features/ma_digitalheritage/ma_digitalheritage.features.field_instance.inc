@@ -2245,7 +2245,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Names should be separated with a semicolon.',
+    'description' => 'The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -3354,7 +3354,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
 ');
   t('The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.');
-  t('The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Names should be separated with a semicolon.');
+  t('The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).');
   t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. ');
   t('There are different licensing options available to you for your content if you have copyright of the materials. ');
   t('This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
