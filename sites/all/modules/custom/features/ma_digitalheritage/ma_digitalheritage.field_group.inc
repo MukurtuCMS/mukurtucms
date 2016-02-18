@@ -48,14 +48,15 @@ function ma_digitalheritage_field_group_info() {
     'weight' => '4',
     'children' => array(
       0 => 'field_dh_type',
-      1 => 'field_coverage',
-      2 => 'field_coverage_description',
-      3 => 'field_format',
-      4 => 'field_identifier',
-      5 => 'field_language',
-      6 => 'field_source',
-      7 => 'field_subject',
-      8 => 'field_transcription',
+      1 => 'field_transcription',
+      2 => 'field_coverage',
+      3 => 'field_coverage_description',
+      4 => 'field_format',
+      5 => 'field_identifier',
+      6 => 'field_language',
+      7 => 'field_source',
+      8 => 'field_subject',
+      9 => 'field_people',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -215,11 +216,11 @@ function ma_digitalheritage_field_group_info() {
     'label' => 'Relations',
     'weight' => '5',
     'children' => array(
-      0 => 'field_collection',
-      1 => 'field_related_dh_items',
-      2 => 'field_community_record_children',
-      3 => 'field_book_parent',
-      4 => 'field_book_children',
+      0 => 'field_book_children',
+      1 => 'field_book_parent',
+      2 => 'field_collection',
+      3 => 'field_community_record_children',
+      4 => 'field_related_dh_items',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -318,7 +319,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Transcription:',
-    'weight' => '7',
+    'weight' => '6',
     'children' => array(
       0 => 'field_transcription',
     ),

@@ -148,6 +148,10 @@ function ma_search_api_default_search_api_index() {
         "field_book_children:field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_identifier" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_language:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
+        "field_book_children:field_people" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "taxonomy_term"
+        },
         "field_book_children:field_source" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_subject:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
         "field_book_children:field_summary" : { "type" : "list\\u003Ctext\\u003E" },
@@ -178,6 +182,8 @@ function ma_search_api_default_search_api_index() {
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
+        "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_source" : { "type" : "text" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
@@ -562,6 +568,23 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "field_coverage_geo_type",
             "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_people" : {
+            "table" : "search_api_db_default_node_index_field_people",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_people:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_book_children:field_people" : {
+            "table" : "search_api_db_default_node_index_field_book_children_field_peo",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
             "boost" : "1.0"
           }
         }

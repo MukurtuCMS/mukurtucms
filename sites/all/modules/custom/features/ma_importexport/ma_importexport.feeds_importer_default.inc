@@ -202,54 +202,60 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           25 => array(
+            'source' => 'People',
+            'target' => 'field_people',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          26 => array(
             'source' => 'Transcription',
             'target' => 'field_transcription',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          26 => array(
+          27 => array(
             'source' => 'Latitude',
             'target' => 'field_coverage:lat',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          27 => array(
+          28 => array(
             'source' => 'Longitude',
             'target' => 'field_coverage:lon',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          28 => array(
+          29 => array(
             'source' => 'Location Description',
             'target' => 'field_coverage_description',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          29 => array(
+          30 => array(
             'source' => 'Collections',
             'target' => 'field_collection:guid_or_nid',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          30 => array(
+          31 => array(
             'source' => 'Related Items',
             'target' => 'field_related_dh_items:guid_or_nid',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          31 => array(
+          32 => array(
             'source' => 'Book Pages',
             'target' => 'field_book_children:guid_or_nid',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          32 => array(
+          33 => array(
             'source' => 'Community Records',
             'target' => 'field_community_record_children:guid_or_nid',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          33 => array(
+          34 => array(
             'source' => 'Username',
             'target' => 'user_name',
             'unique' => FALSE,
