@@ -33,6 +33,13 @@ function ma_digitalheritage_ds_field_settings_info() {
       'label' => 'above',
       'format' => 'author',
     ),
+    'field_licence_trad' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'clearfix',
+        ),
+      ),
+    ),
   );
   $export['node|digital_heritage|community_record'] = $ds_fieldsetting;
 
@@ -83,6 +90,13 @@ function ma_digitalheritage_ds_field_settings_info() {
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
+        ),
+      ),
+    ),
+    'field_licence_trad' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'clearfix',
         ),
       ),
     ),
@@ -257,6 +271,7 @@ function ma_digitalheritage_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|digital_heritage|community_record'] = $ds_layout;
 
