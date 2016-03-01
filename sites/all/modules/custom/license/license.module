@@ -101,20 +101,20 @@ function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '')
   }
 
   // The content is the image followed by the name
-  $content = theme('image', $image) . '<p>' . $name . '</p>';
+  $title = theme('image', $image) . '<p>' . $name . '</p>';
 
   // Add a popup if there is hover text
   if ($hover_text) {
     require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
     $popup_attributes = array( // See the popup module's readme for more options
       'width' => 420,
-      #'effect' => 'slide-down', // not sure if I like this
-      'empty-body' => 'none',
+      'origin' => 'top-left',
+      'expand' => 'bottom-left',
     );
     if ($uri) {
       $popup_attributes['link'] = $uri; // Do not link TK Label image to LocalContexts if using custom TK Label
     }
-    $content = popup_element($content, $hover_text, $popup_attributes);
+    $content = popup_element($title, $hover_text, $popup_attributes);
   }
 
   return array(
