@@ -83,7 +83,7 @@ function license_field_formatter_view($entity_type, $entity, $field, $instance, 
  *   Optional attributes for the URI.
  * @return array
  */
-function license_basic_display($uri, $name, $image, $alt, $uri_attributes = array()) {
+function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '') {
   $image = array(
     'path' => $image,
     'alt' => $alt,
@@ -92,26 +92,46 @@ function license_basic_display($uri, $name, $image, $alt, $uri_attributes = arra
     'attributes' => array(
       'rel' => 'license',
     ),
-  ) + $uri_attributes;
+  );
+
+  // The content is the image followed by the name
+  $content = theme('image', $image) . '<p>' . $name . '</p>';
+
+  // Add a popup if there is hover text
+  if ($hover_text) {
+    require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
+    $popup_attributes = array( // See the popup module's readme for more options
+      'width' => 420,
+      #'effect' => 'slide-down', // not sure if I like this
+      'empty-body' => 'none',
+      'link' => $uri,
+    );
+    $content = popup_element($content, $hover_text, $popup_attributes);
+  }
+
   return array(
-    'image' => array(
+    'content' => array(
       '#type' => 'link',
-      '#title' => theme('image', $image),
+      '#title' => $content,
       '#href' => $uri,
       '#options' => array('html' => TRUE) + $attributes,
       '#suffix' => '<br />',
     ),
-    'link' => array(
-      '#type' => 'link',
-      '#title' => $name,
-      '#href' => $uri,
-      '#options' => $attributes,
-    ),
   );
 }
 
+function mukurtu_build_tk_label_text($entity, $uri) {
 
-function mukurtu_communities($entity) {
+  // Scrape the license description
+  // I was unable to do this by converting the HTML to a DOM object, so just strstr'ing for what we need
+  $desc = file_get_contents($uri);
+  $desc = strstr ($desc, 'et_pb_text');
+  $desc = strstr ($desc, '<p>');
+  $desc = strstr ($desc, '</div>', TRUE);
+  $desc = trim ($desc);
+
+  return $desc;
+
   global $language_content;
   $communities = array();
   if(!empty($entity->group_audience[$language_content->language])) {
