@@ -121,7 +121,6 @@ function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '')
       '#title' => $content,
       '#href' => $uri,
       '#options' => array('html' => TRUE) + $attributes,
-      '#suffix' => '<br />',
     ),
   );
 }

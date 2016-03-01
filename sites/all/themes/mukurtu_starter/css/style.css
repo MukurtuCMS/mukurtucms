@@ -2502,10 +2502,6 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-digital-heritage #edit-og-group-ref {
   display: none;
 }
-.node-type-digital-heritage .field-name-field-licence-trad a img,
-.page-node-add-digital-heritage .field-name-field-licence-trad a img {
-  width: 120px;
-}
 .node-type-community #edit-group-access,
 .page-node-add-community #edit-group-access {
   display: none;
@@ -2845,6 +2841,20 @@ a:hover {
   background: #f8f7f7 none repeat scroll 0 0;
   border-radius: 4px;
   padding: 30px;
+}
+.node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element,
+.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element {
+  width: 105px;
+  float: left;
+  height: 95px;
+}
+.node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element .popup-element-title img,
+.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element .popup-element-title img {
+  width: 88px;
+}
+.node-digital-heritage.view-mode-full .field-name-field-licence-trad .label-above,
+.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .label-above {
+  margin-bottom: 5px;
 }
 .node-digital-heritage.view-mode-full .view-mode-search_result,
 .node-digital-heritage.view-mode-community_record .view-mode-search_result {
