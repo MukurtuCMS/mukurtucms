@@ -2844,17 +2844,13 @@ a:hover {
 }
 .node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element,
 .node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element {
-  width: 105px;
+  width: 100px;
   float: left;
-  height: 95px;
 }
 .node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element .popup-element-title img,
 .node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element .popup-element-title img {
   width: 88px;
-}
-.node-digital-heritage.view-mode-full .field-name-field-licence-trad .label-above,
-.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .label-above {
-  margin-bottom: 5px;
+  margin-top: 5px;
 }
 .node-digital-heritage.view-mode-full .view-mode-search_result,
 .node-digital-heritage.view-mode-community_record .view-mode-search_result {
