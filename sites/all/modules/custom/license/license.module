@@ -122,6 +122,21 @@ function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '')
 
 function mukurtu_build_tk_label_text($entity, $uri) {
 
+  // First check if there is a custom TK License text for this label, for this DH node's community, and if so, use it.
+  $dh_wrapper = entity_metadata_wrapper('node', $entity);
+  $community = $dh_wrapper->field_community_ref->value();
+  if ($community) {
+    $com_wrapper = entity_metadata_wrapper('node', $community[0]->nid); // we use the *first* community for a DH node to determine what custom label text, if any, to use
+    if (isset ($com_wrapper->field_custom_tk_label_text)) {
+      foreach ($com_wrapper->field_custom_tk_label_text->value() as $custom_lk_label_fc_value) {
+        if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $uri) {
+          return $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'];
+        }
+      }
+    }
+  }
+
+  // There is no custom TK License text for this label for this DH node's community, so use the default one
   // Scrape the license description
   // I was unable to do this by converting the HTML to a DOM object, so just strstr'ing for what we need
   $desc = file_get_contents($uri);
@@ -131,29 +146,5 @@ function mukurtu_build_tk_label_text($entity, $uri) {
   $desc = trim ($desc);
 
   return $desc;
-
-  global $language_content;
-  $communities = array();
-  if(!empty($entity->group_audience[$language_content->language])) {
-    foreach ($entity->group_audience[$language_content->language] as $field) {
-      $group = og_load_entity_from_group($field['gid']);
-      if(!empty($group)){
-        if ($group->type == 'community') {
-          $communities[] = $group->title;
-        }
-      }
-    }
-  }
-  else if(!empty($entity->field_communities[$language_content->language])) {
-    foreach ($entity->field_communities[$language_content->language] as $field) {
-      $group = node_load($field['nid']);
-      if(!empty($group)){
-        if ($group->type == 'community') {
-          $communities[] = $group->title;
-        }
-      }
-    }  
-  }
-
-  return $communities;
+  
 }

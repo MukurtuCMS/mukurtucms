@@ -26,6 +26,7 @@ function ma_community_field_group_info() {
       0 => 'group_access',
       1 => 'group_register',
       2 => 'og_roles_permissions',
+      3 => 'field_custom_tk_label_text',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -54,10 +55,10 @@ function ma_community_field_group_info() {
     'weight' => '0',
     'children' => array(
       0 => 'body',
-      1 => 'field_community_image',
-      2 => 'field_community_image_thumbnail',
-      3 => 'field_parent_community',
-      4 => 'field_child_communities',
+      1 => 'field_child_communities',
+      2 => 'field_community_image',
+      3 => 'field_community_image_thumbnail',
+      4 => 'field_parent_community',
       5 => 'title',
     ),
     'format_type' => 'htab',
