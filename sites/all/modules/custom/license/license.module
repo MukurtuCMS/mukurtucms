@@ -126,7 +126,10 @@ function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '')
   );
 }
 
-function mukurtu_build_tk_label_text($entity, $uri) {
+function mukurtu_build_tk_label_text($entity, $license) {
+
+  // Prepend the TK Label text with the Label name, since it is abbreviated on the node view, so we now get to see the whole name
+  $initial_desc = '<h4><b>' . $license['name'] . '</b></h4>';
 
   // First check if there is a custom TK License text for this label, for this DH node's community, and if so, use it.
   $dh_wrapper = entity_metadata_wrapper('node', $entity);
@@ -135,8 +138,8 @@ function mukurtu_build_tk_label_text($entity, $uri) {
     $com_wrapper = entity_metadata_wrapper('node', $community[0]->nid); // we use the *first* community for a DH node to determine what custom label text, if any, to use
     if (isset ($com_wrapper->field_custom_tk_label_text)) {
       foreach ($com_wrapper->field_custom_tk_label_text->value() as $custom_lk_label_fc_value) {
-        if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $uri) {
-          return $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'];
+        if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $license['uri']) {
+          return $initial_desc . $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'];
         }
       }
     }
@@ -145,12 +148,12 @@ function mukurtu_build_tk_label_text($entity, $uri) {
   // There is no custom TK License text for this label for this DH node's community, so use the default one
   // Scrape the license description
   // I was unable to do this by converting the HTML to a DOM object, so just strstr'ing for what we need
-  $desc = file_get_contents($uri);
+  $desc = file_get_contents($license['uri']);
   $desc = strstr ($desc, 'et_pb_text');
   $desc = strstr ($desc, '<p>');
   $desc = strstr ($desc, '</div>', TRUE);
   $desc = trim ($desc);
 
-  return $desc;
+  return $initial_desc . $desc;
 
 }
