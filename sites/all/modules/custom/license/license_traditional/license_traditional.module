@@ -21,8 +21,8 @@ function license_traditional_build_license_label_uri($uri) {
 
 function license_traditional_license_display($license, $entity) {
   if ($license['type'] == 'traditional') {
-    $tk_license_text = mukurtu_build_tk_label_text ($entity, $license);
-    return license_basic_display($license['uri'], $license['name'], license_traditional_build_license_label_uri($license['uri']), 'Traditional Knowledge Label', $tk_license_text);
+    list ($tk_license_text, $uri) = mukurtu_build_tk_label_text ($entity, $license);
+    return license_basic_display($uri, $license['name'], license_traditional_build_license_label_uri($license['uri']), 'Traditional Knowledge Label', $tk_license_text);
   }
 }
 

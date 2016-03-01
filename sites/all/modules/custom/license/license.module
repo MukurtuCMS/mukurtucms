@@ -110,8 +110,10 @@ function license_basic_display($uri, $name, $image, $alt = '', $hover_text = '')
       'width' => 420,
       #'effect' => 'slide-down', // not sure if I like this
       'empty-body' => 'none',
-      'link' => $uri,
     );
+    if ($uri) {
+      $popup_attributes['link'] = $uri; // Do not link TK Label image to LocalContexts if using custom TK Label
+    }
     $content = popup_element($content, $hover_text, $popup_attributes);
   }
 
@@ -138,7 +140,7 @@ function mukurtu_build_tk_label_text($entity, $license) {
     if (isset ($com_wrapper->field_custom_tk_label_text)) {
       foreach ($com_wrapper->field_custom_tk_label_text->value() as $custom_lk_label_fc_value) {
         if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $license['uri']) {
-          return $initial_desc . $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'];
+          return array ($initial_desc . $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'], NULL);
         }
       }
     }
@@ -153,6 +155,6 @@ function mukurtu_build_tk_label_text($entity, $license) {
   $desc = strstr ($desc, '</div>', TRUE);
   $desc = trim ($desc);
 
-  return $initial_desc . $desc;
+  return array ($initial_desc . $desc, $license['uri']);
 
 }
