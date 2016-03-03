@@ -13,6 +13,12 @@ function ma_core_init() {
 
   // Add the JS for jquery_ui_tooltips. Simply use the class "jquery_ui_tooltip" on any title attribute to use this
   drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/jquery_ui_tooltips.js');
+
+  // Suppress status messages during profile installation
+  if ($_GET['profile'] == 'mukurtu') {
+     drupal_get_messages(); // clears the message queue by default
+  }
+
 }
 
 /**
@@ -208,3 +214,4 @@ function ma_core_get_create_tax_term ($term_name, $vocab_name) {
     return $term;
   }
 }
+
