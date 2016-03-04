@@ -1,0 +1,109 @@
+// Insert your styling here.
+
+// Footer sponsor logos
+
+.footer.container {
+	border-top: 0;
+	margin-top: 60px;
+	padding-bottom: 15px;
+	padding-top: 50px;
+
+	h2 {
+		font-size: 14px;
+		letter-spacing: 1px;
+		margin-bottom: 0;
+		text-align: center;
+		text-transform: uppercase;
+	}
+	.boxes-box-content {
+		text-align: center;
+		.organization {
+			background: url("../img/sprite_footer-logos.gif") 0 0 no-repeat;
+			display: block;
+			height: 0;
+			margin: 40px auto;
+			padding-top: 66px;
+			overflow: hidden;
+			&.neh {
+				background-position: 0 0;
+				width: 276px;
+			}
+			&.nacc {
+				background-position: -345px 0;
+				width: 383px;
+			}
+			&.acls {
+				background-position: -793px 0;
+				width: 380px;
+			}
+		}
+		@media screen and (min-width: 1200px) {
+			.organization {
+				float: left;
+				margin: 40px 0;	
+				&.neh {
+					background-position: 0 0;
+					width: 26.88%;
+				}
+				&.nacc {
+					background-position: -325px 0;
+					width: 38.65%;
+				}
+				&.acls {
+					background-position: -781px 0;
+					width: 34.47%;
+				}
+			}
+		}
+
+		p {
+			clear: both;
+			font-size: 14px;
+		}
+
+		border-bottom: 1px solid fade(@dark-grey,10%);
+		padding-bottom: 66px;
+	}
+
+}
+
+// Footer Bottom
+// Copyright & Menu
+
+.copyright {
+	display: inline-block;
+	float: left;
+	font-size: 14px;
+}
+.footer-bottom-wrapper {
+	padding-bottom: 30px;
+	h2 {
+		display: none;
+	}
+	display: inline-block;
+	float: right;
+	ul.menu {
+		margin: 0;
+		padding: 0;
+		li {
+			float: left;
+			a {
+				border-left: 1px solid fade(@dark-grey,20%);
+				color: @blue;
+				padding: 0 15px;
+				font-size: 14px;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				&:hover {
+					background: none;
+					color: @teal;
+				}
+			}
+			&.first {
+				a {
+					border-left: none;
+				}
+			}
+		}
+	}
+}

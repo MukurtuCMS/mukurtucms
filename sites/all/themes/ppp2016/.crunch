@@ -1,0 +1,42 @@
+{
+	"files": {
+		"less/style.less": {
+			"engines": [
+				{
+					"compiler": "less",
+					"output": "../css/style.css",
+					"options": {
+						"compress": false,
+						"ieCompat": false,
+						"strictMath": false,
+						"strictUnits": false,
+						"javascriptEnabled": false,
+						"sourcemap": true
+					}
+				}
+			],
+			"sources": [
+				"../font-awesome/less/animated.less",
+				"../font-awesome/less/bordered-pulled.less",
+				"../font-awesome/less/core.less",
+				"../font-awesome/less/fixed-width.less",
+				"../font-awesome/less/font-awesome.less",
+				"../font-awesome/less/icons.less",
+				"../font-awesome/less/larger.less",
+				"../font-awesome/less/list.less",
+				"../font-awesome/less/mixins.less",
+				"../font-awesome/less/path.less",
+				"../font-awesome/less/rotated-flipped.less",
+				"../font-awesome/less/stacked.less",
+				"../font-awesome/less/variables.less",
+				"content.less",
+				"footer.less",
+				"front.less",
+				"global.less",
+				"header.less",
+				"overrides.less",
+				"variables.less"
+			]
+		}
+	}
+}

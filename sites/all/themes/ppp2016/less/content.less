@@ -1,0 +1,1140 @@
+//Override container size
+@media (min-width: 1200px) {
+  .container {
+     // width: 1200px;
+  }
+}
+
+//// Scald
+//@import 'variables.less';
+
+// Scald library (drawer on node view)
+.scald-library {
+  .view-content {
+    li._insert  {
+      display: none;
+    }
+  }
+}
+
+// Reduce the huge file icon size
+.file-icon {
+  width: 20px;
+  height: auto;
+}
+
+// Scald atom add modal
+
+.page-node-edit .ctools-modal-content,.page-node-add .ctools-modal-content {
+
+
+  // Hide the background box
+  background: none !important;
+  border: none !important;
+  width: auto !important;
+
+  // Video upload source pages (choose between Drupal, Youtube, Vimeo, etc., and the follow-up page where you specify the external URL) is the only modal that needs to be sized. The plupload page of the modal sizes cleanly now that the themes are cleaned up.
+
+  // I am unable to use auto values here; have to use static pixel widths, so these values will need to be adjusted when the font size or other styling changes.
+  #scald-atom-add-form-source,.form-item-identifier {
+    width: 610px;
+    #edit-source,#edit-identifier {
+      width: 400px;
+    }
+  }
+
+  // This is the form that appears after files are uploaded or when editing an existing atom
+  #scald-atom-add-form-options {
+
+    .atom-protocol-desc {
+      margin-bottom: 1em;
+    }
+
+  }
+
+}
+
+
+
+
+
+//// Popup API
+
+.popup-element-title {
+  background: none;
+}
+
+////
+//// Dashboard video help link
+.video-help-embedded {
+  float: right;
+  width: 400px;
+}
+
+//// All node edits / adds
+
+// Hide the description field on long text fields because we have hacked bootstrap to show them as a tooltip
+.page-node-edit, .page-node-add {
+  .text-format-wrapper .description {
+    display: none;
+  }
+}
+
+// Description (field help text) tooltips
+.tooltip-inner {
+  max-width: 750px;
+  text-align:left;
+}
+
+//// Communities Structure view
+.view-communities-structure {
+  .view-header {
+    margin-bottom: 20px;
+  }
+  .views-table {
+    caption {
+      float: left;
+    }
+    .communities-structure-protocol a {
+      padding-left: 2em;
+    }
+  }
+}
+
+// general fields
+
+.field {
+  .label-inline {
+    float:left;
+    font-weight: bold;
+  }
+  .label-above, .field-label {
+    font-weight:bold;
+    text-transform: uppercase;
+  }
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+}
+
+.dnd-atom-wrapper.type-audio.context-sdl_editor_representation {
+  .fluid-width-video-wrapper {
+    height: 18px;
+    width: 180px
+  }
+}
+
+.ds-2col, .ds-2col-stacked {
+  .field {
+      margin-bottom: 10px;
+  }
+  .group-left {
+    .label-above {
+      font-size: 22px;
+    }
+  }
+}
+
+// Custom Mukurtu Collapsed/Collapsible div -- looks just like the other fields but collapsible with a dynamic arrow
+.mukurtu-collapsed-fieldset-div {
+  h3 {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 22px;
+  }
+  .field-group-format-toggler a {
+    background: url(../grey-down-arrow.png) no-repeat left center;
+    color: #333;
+    padding-left: 15px;
+    text-decoration: none;
+  }
+  &.collapsed .field-group-format-toggler a {
+    background-image: url(../grey-right-arrow.png);
+  }
+}
+
+
+//// Collections
+
+#edit-field-digital-heritage-items .field-label {
+  display: none;
+}
+
+//// Collections SAPI page
+// Hide the label on the search box. Not sure what I did on DH to not require this on that sapi page.
+#edit-search-api-views-fulltext-wrapper label {
+  display: none;
+}
+
+//// DH node form
+
+.node-type-digital-heritage, .page-node-add-digital-heritage {
+
+  // The following is taken from former mukurtu_protocol_field.css
+  /* hiding the og ref field for digital heritage items */
+  div.form-item table .form-type-textfield,
+  div.form-item table .form-type-textfield * {
+    display: inline-block;
+  }
+  #edit-og-group-ref {
+    display:none;
+  }
+
+  .field-name-field-licence-trad a img {
+      width: 120px;
+  }
+}
+
+//// Community node form
+
+.node-type-community, .page-node-add-community {
+
+  #edit-group-access {
+    display:none;
+  }
+}
+
+
+//// Digital Heritage grid/list view
+
+// Hide the embededed videos (the thumbnail will display instead)
+.view-id-digital_heritage_grid_list iframe {
+  display: none;
+}
+
+
+//// Grid/List Views (both DH and Collections)
+
+// toggle display via the grid/list clicker
+
+
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
+  margin-top: 40px;
+  padding-top:20px;
+  border-top:1px solid fade(@dark-grey, 15%);
+
+  .view-community-dh-items {
+    .view-content {
+      .views-row {
+        //border-bottom: 1px solid #ECEBEB;
+        margin: 30px 0;
+        padding: 0 0 30px 0;
+        &.views-row-first {
+          margin-top:0;
+        }
+        &.views-row-last {
+          margin-bottom:0;
+        }
+	.field {
+          margin-bottom: 0px;
+	}
+      }
+    }
+  }
+}
+
+.view-digital-heritage-grid-list,
+.view-collections-grid-list {
+  .view-header {
+    float:right;
+    margin-top:-60px;
+    margin-right: 20px;
+
+    a {
+      font-weight: 200;
+      color: @link-color;
+      padding: 2px 8px;
+      &.active {
+        color:white;
+        background: @gray;
+      }
+    }
+  }
+
+  &.list-view {
+    .node-digital-heritage.view-mode-search_result > div {
+      padding:0;
+    }
+    .view-content {
+      .views-row {
+        //border-bottom: 1px solid #ECEBEB;
+        margin: 30px 0;
+        padding: 0 0 30px 0;
+        &.views-row-first {
+          margin-top:0;
+        }
+
+        .field-name-field-media-asset,
+        .field-name-field-collection-image {
+          right:0;
+        }
+        .field-name-field-collection-image {
+          float: right;
+        }
+        &.views-row-last {
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+
+  &.grid-view {
+    .view-content {
+      margin-left: -25px;
+      margin-right: -25px;
+
+      .placeholder-image, .field-name-field-collection, .field-name-field-description, .field-name-field-community-ref, .field-name-field-category {
+        display: none;
+      }
+      .views-row {
+        float: left;
+        width: 220px;
+        background: #F8F7F7;
+        margin: 0 25px 20px 25px;
+        padding-bottom: 20px;
+
+
+        .field-name-field-media-asset,
+        .field-name-field-collection-image {
+          width: 100%;
+          padding: 0;
+          left:0;
+        }
+        .group_list_view_fields {
+          right: 0;
+          width: 100%;
+        }
+        .field-name-title h2,
+        .field-name-collections-title-with-count h2 {
+          font-size: 140%;
+        }
+        .label-inline {
+          float:none;
+          font-weight: bold;
+          display:none;
+        }
+        .col-md-8 {
+          position: static;
+          width: 100%;
+        }
+      }
+    }
+    .text-center {
+      clear: both;
+    }
+  }
+}
+
+.page-collections #block-system-main,
+.page-digital-heritage #block-system-main {
+  .contextual-links-region {
+    position: static;
+  }
+  .view-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    a, a.active {
+      background: none;
+      color: white;
+      border: 1px solid white;
+      font-size: 16px;
+      letter-spacing: 1px;
+      margin-right: 5px;
+      margin-top: -6px;
+      opacity: .5;
+      text-transform: uppercase;
+      &.btn {
+        border-radius: 0;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+      }
+    }
+    a.active,
+    a:hover {
+      opacity: 1;
+    }
+  }
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+// DH Map View
+.view-display-id-all_map {
+  .view-mode-map_popup {
+    h3 {
+      margin-top: 0;
+    }
+  }
+}
+
+// Shared styling for CP and Community nodes
+
+.node-community, .node-cultural-protocol-group {
+  .group-left {
+    width: 66%;
+    float: left;
+  }
+  .group-right {
+    width: 30%;
+    float: right;
+      a {
+        color: @teal;
+      }
+  }
+
+  .field-name-group-management-links {
+    background: #f8f7f7 none repeat scroll 0 0;
+    border-radius: 5px;
+  }
+
+  // Blocks in right column
+  .group-right .block-views, .group-right .field {
+    //background: #F8F7F7;
+    //border-radius: 5px;
+    h2.block-title, .label-above {
+      background: #E3E2E1;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      //padding: 5px 10px;
+      padding: 15px 20px 10px;
+      font-size: 140%;
+      font-weight: 400;
+      text-transform: none;
+    }
+    .view-content, .view-footer, ul {
+      padding-left: 20px;
+      padding-bottom: 10px;
+    }
+    ul {
+      padding-top: 10px;
+    }
+    margin-bottom: 2em;
+  }
+}
+
+
+
+// Sidebar
+.node-community .group-right .block-views,
+.panel-panel .right-pane,
+.pane-block {
+  background: #efefef;
+  margin-bottom: 30px;
+  //border-radius: 5px;
+  h2.pane-title,
+  h2.block-title {
+    background: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: 0;
+    padding: 5px 10px;
+    padding: 20px 20px 5px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: @blue;
+    text-transform: uppercase;
+  }
+  .pane-content {
+    padding-left:20px;
+    padding-bottom:10px;
+    .view-content {
+      line-height:25px;
+    }
+    a {
+      color: #333;
+      &:hover {
+        color: @teal;
+      }
+    }
+  }
+}
+
+// Can this go?
+.management-links {
+  margin-top: 15px;
+  .pane-content {
+    padding-bottom: 0;
+    a.btn:hover {
+      color:@link-hover-color;
+    }
+  }
+}
+
+// facets
+.facetapi-processed {
+  padding-bottom: 10px;
+  padding-left: 0;
+  input[type="radio"], input[type="checkbox"] {
+    margin: 7px 8px 7px 0;
+  }
+}
+
+// Tooltips
+a.tooltips span {
+
+}
+// Show tooltips in grid view only
+.grid-view {
+  .tooltips span {
+    top: 0px;
+    left: 0px;
+    width: 220px;
+    z-index: 999;
+  }
+}
+
+
+//// Banner images (Community and Cultural Protocol nodes)
+
+// Shrink or expand the banner image to full width and then set height to auto to maintain aspect ratio. User is expected to upload an appropriately proportioned image for the banner
+
+.field-name-field-protocol-image, .field-name-field-community-image {
+  .field-name-scald-thumbnail img {
+    width:100%;
+    height:auto;
+  }
+}
+
+//// Organic Groups Add and Manage Members links
+.add-manage-members-links {
+  margin-top: 1em;
+}
+
+.nav-top-wrapper {
+  background: #474440;
+}
+.navbar-top {
+  &.navbar.container {
+    margin-top: 0;
+  }
+  background:none;
+  border:none;
+  border-radius:0;
+  ul.nav {
+    width:100%;
+    li {
+      background: #585551;
+      margin: 8px 2px;
+      &.last {
+        float:right;
+        border-radius: 4px;
+        border: 1px solid #979797;
+        background:none;
+      }
+
+      a {
+        color: #F5F5F5;
+        padding: 6px 10px;
+      }
+      &:hover {
+        background: #F4EADE;
+        a {
+          color: #474440;
+        }
+      }
+    }
+  }
+}
+
+.navbar-bottom {
+  border:none;
+  border-radius:0;
+  background:none;
+  margin: 0 auto;
+  margin-top: -10px !important;
+  padding-bottom: 10px;
+  ul.nav {
+    li {
+      text-transform: uppercase;
+      a {
+        color: @navbar-default-color;
+        padding: 14px 25px;
+        font-size: 18px;
+        font-weight: 400;
+        letter-spacing: 2px;
+      }
+      &.active,
+      &:hover {
+        a {
+          background: none;
+          color: @orange;
+          &:hover {
+            background: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+#navbar {
+  margin-bottom:0;
+  background: @navbar-default-bg;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0+0,0.05+100 */
+  background: -moz-linear-gradient(left,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(left,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.05) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.05) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#0d000000',GradientType=1 ); /* IE6-9 */
+}
+
+
+
+.node-type-digital-heritage {
+
+  .group_scald_atom_metadata {
+    .popup-element {
+      width: 100%;
+      text-align: right;
+      height:20px;
+    }
+  }
+  .group_scald_atom_metadata {
+    border-bottom:1px solid #ECEBEB;
+    padding-bottom:10px;
+    margin-bottom:10px;
+  }
+  .view-mode-search_result {
+    .field {
+      margin-bottom: 0;
+    }
+
+
+  }
+}
+
+// DH full node and Community Record views
+.node-digital-heritage.view-mode-full, .node-digital-heritage.view-mode-community_record {
+  .scald-atom {
+    margin-bottom: 1em;
+    .scald-file-icon {
+      //  display: none;
+    }
+  }
+  .group-right {
+    background: #f8f7f7 none repeat scroll 0 0;
+   // border-radius: 4px;
+    padding: 30px;
+  }
+
+  // Related DH nodes (bottom)
+  .view-mode-search_result {
+    border-bottom: 1px solid #ecebeb;
+    margin-bottom: 2em;
+    padding-bottom: 2em;
+    .scald-atom {
+      margin-bottom: 0;
+    }
+  }
+
+  // Related DH Nodes Teasers (top right)
+  .view-dh-related-items-teasers {
+    .scald-atom {
+      margin-bottom: 0em;
+    }
+    .views-field-field-media-asset {
+      margin-bottom: 0.5em;
+    }
+    .views-field-title {
+      font-size: 1.4em;
+      margin-bottom: 0.5em;
+    }
+  }
+
+}
+// DH Book Pages Navigation -- this needs to go outside of the view modes because it is rendered in a hook_page_alter, not within the node
+.dh-book-nav {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  .nav-button {
+    padding-right: 20px;
+  }
+  margin-bottom: 15px;
+}
+
+// DH Table of Contents (1st page of book)
+.dh-book-toc {
+  margin-bottom: 2em;
+
+  // Make the TOC header look like a regular field header
+  h3.dh-book-toc-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 22px;
+    margin-top: 0;
+  }
+}
+
+// collection node DH list view
+.field-name-field-digital-heritage-items {
+  .group-list-view-fields {
+    padding:0;
+  }
+  .node-digital-heritage {
+    border-bottom: 1px solid #ECEBEB;
+    margin: 30px 0;
+    padding: 0 0 30px 0;
+  }
+  .label-above {
+    margin-bottom: -30px;
+  }
+}
+
+
+
+@media (max-width: @screen-md-min) {
+  .ds-2col > .group-left {
+    width: auto;
+    float:none;
+  }
+  .ds-2col > .group-right {
+    width: auto;
+    float: none;
+  }
+}
+
+@media (min-width: @screen-md-min) {
+  .navbar .logo {
+    margin: 10px 0 20px;
+  }
+  .ds-2col > .group-left {
+    width: 66%;
+    float: left;
+  }
+  .ds-2col > .group-right {
+    width: 30%;
+    float: right;
+  }
+
+  .panel-2col-stacked .panel-col-last {
+    float: right;
+    width: 40%;
+  }
+
+  .panel-2col-stacked {
+    .panel-col-first {
+      float: left;
+      width: 73%;
+    }
+    .panel-col-last {
+      float: right;
+      width: 25%;
+    }
+
+  }
+}
+
+
+/* Dashboard theming **/
+
+
+#homebox .homebox-portlet {
+  .homebox-portlet-inner {
+    border:none;
+  }
+  h3.portlet-header {
+    background: #E3E2E1;
+    padding: 10px 15px;
+    font-size: 140%;
+    font-weight: 400;
+  }
+  .portlet-content {
+    padding:10px 15px;
+    dd {
+      margin-bottom:10px;
+      color: #666;
+    }
+    dt {
+      font-weight: normal;
+    }
+    .view-content {
+      ul {
+        padding-left: 0px;
+        margin-top:5px;
+        list-style:none;
+        li {
+          margin-bottom:10px;
+        }
+      }
+    }
+  }
+}
+
+// wizard
+#block-mukurtu-splash-mukurtu-wizard {
+  h2.block-title {
+    display:none;
+  }
+  .btn {
+    margin-bottom: 10px;
+  }
+  .ui-widget-content {
+    border: 1px solid #aaa;
+  }
+  .ui-tabs {
+    padding: 0.2em;
+    position: relative;
+  }
+}
+.wizard-tabs {
+  margin-bottom:10px;
+  .ui-tabs-nav {
+    background:none;
+    border:none;
+    border-radius:0;
+    line-height: 28px;
+    padding:0;
+    li {
+      background: #585551;
+      margin: 0;
+      padding: 0;
+      a {
+        color: #F5F5F5;
+        padding: 6px 10px;
+      }
+      &:hover,
+      &.ui-state-active {
+        background: #e7e7e7;
+        a {
+          color: #474440;
+        }
+      }
+    }
+  }
+  .ui-tabs-panel {
+    padding: 0 20px 20px 20px;
+    border-style: solid none none;
+    border-top-width: 1px;
+    border-top-color: #aaa;
+    a {
+      color:@link-color;
+    }
+  }
+}
+
+.masonry-grid {
+  .masonry-brick {
+    width: 227px;
+
+  }
+}
+
+// dont know why this needs to be added
+.ui-tabs .ui-tabs-hide {
+  display: none !important;
+}
+
+// Fix Google map display inside of quicktabs (eg. for Community Records) (taken from https://www.drupal.org/node/352247#comment-9592623)
+.quicktabs_main {
+  position: relative;
+}
+.quicktabs-tabpage {
+  display: block;
+  visibility: visible;
+  width: 100%;
+}
+.quicktabs-tabpage.quicktabs-hide {
+  display: block;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  z-index: -1;
+}
+
+// Image Grid
+
+.image-grid {
+  margin-bottom: 40px;
+  position: relative;
+  img {
+    height: auto;
+    width: 100%;
+  }
+  .field-name-title {
+    background: fade(@orange, 90%); 
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    h3 {
+      font-size: 18px;
+      margin: 0;
+      padding: 10px;
+      a {
+        color: white;
+        font-weight: 400;
+        letter-spacing: .5px;
+      }
+    }
+  }
+  &:hover .field-name-title {
+    background: fade(@teal, 90%);
+  }
+}
+
+.view-communities {
+  .grid {
+    margin-bottom: 30px;
+    .node-community {
+      height: 170px;
+      background: url("../img/img_placeholder.gif") no-repeat;
+      .field-name-title {
+        background: fade(@orange, 90%); 
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        h3 {
+          font-size: 14px;
+          margin: 0;
+          padding: 10px;
+          a {
+            color: white;
+            font-weight: 400;
+            line-height: 1.4em;
+          }
+        }
+      }
+      &:hover {
+        .field-name-title {
+          background: fade(@teal, 90%);
+        }
+      }
+    }
+  }
+}
+
+//Spacing for interior page view-rows 
+
+.grid-list-view {
+  .views-row {
+    margin-bottom: 40px;
+  }
+}
+
+.footer-wrapper {
+  background: white;
+}
+
+//Sidebar Search Box
+
+form {
+  .views-exposed-form {
+    .views-exposed-widget,
+    .views-exposed-widgets {
+      padding: 0;
+      margin-bottom: 0;
+      position: relative;
+    }
+    background: white;
+    border: 1px solid fade(@dark-grey, 20%);
+    margin-bottom: 15px;
+    width: 290px; 
+  }
+  #edit-search-api-views-fulltext-wrapper {
+    width: 255px;
+    .form-control {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+  .views-exposed-widget.views-submit-button .form-submit {
+    background: url("../img/icon_search.png") 0 0 no-repeat;
+    border: none;
+    display: block;
+    height: 0;
+    margin-top: 5px !important;
+    padding-top: 25px;
+    overflow: hidden;
+    width: 25px;
+    &:hover {
+      background-position: -50px 0;
+    }
+  }  
+  .views-exposed-widget.views-reset-button {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    // The below is for the reset icon- no time left in budget to finish
+    .form-submit {
+      //background: url("../img/icon_search.png") 0 -37px no-repeat;
+      background:none;
+      border: none;
+      box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+      display: block;
+      //height: 0;
+      margin-top: 5px !important;
+      margin-right: 5px;
+      //padding-top: 20px;
+      overflow: hidden;
+      //width: 25px;
+
+      padding:0;
+      color: @teal;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }  
+  }
+}
+
+ul.facetapi-processed {
+  margin-bottom: 0;
+  li.leaf {
+    display:block;
+    clear:both;
+    margin-bottom: 10px;
+    overflow: hidden;
+    input[type=checkbox],
+    a {
+      display: block;
+      float: left;
+      margin: 0;
+    }
+    input[type=checkbox] {
+      margin: 5px 5px 0 0;
+    }
+    a {
+      line-height: 1.4em;
+      width: 85%;
+    }
+    &.last {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.node-digital-heritage.view-mode-full .group-right,
+.node-digital-heritage.view-mode-community_record .group-right {
+  .field {
+    margin-bottom: 20px;
+    .field-label,
+    .label-above {
+      color: @blue;
+      letter-spacing: 1px;
+    }
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+  background: #efefef;
+  a {
+    color: @teal;
+  }
+}
+
+//Recent DH Items on community pages
+
+.field-name-community-dh-items,
+.field-name-field-related-dh-items {
+  .label-above {
+    color: @blue;
+    margin-bottom: 20px;
+    text-transform: none;
+  }
+  .col-md-7 {
+    padding-left: 0;
+  }
+  .col-md-5 {
+    padding-right: 0;
+    padding-left: 30px;
+  }
+}
+.node-digital-heritage.view-mode-full .view-mode-search_result,
+.node-digital-heritage.view-mode-community_record .view-mode-search_result {
+  border-bottom: none;
+}
+
+//Download button on DH page
+.node-type-digital-heritage {
+  .field-name-download-atom a{
+    background: @orange;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 10px;
+    text-transform: uppercase;
+    &:after {
+      content: " Media";
+    }
+    &:hover {
+      background: @teal;
+    }
+  }
+
+  .field-name-scald-thumbnail img{
+    margin-bottom: 1.5em;
+  }
+
+  .view-mode-ma_colorbox {
+    img.scald-file-icon {
+      display: none
+    }
+    a[href$=".pdf"]{
+      background: @orange;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 10px;
+      text-transform: uppercase;
+      &:before {
+        content: "Download ";
+      }
+    }
+  }
+
+  .field-name-field-media-asset .view-mode-ma_colorbox{
+    text-align: center;
+  }
+
+  #comments {
+    border-top: 1px solid fade(@dark-grey, 10%);
+    clear:both;
+    margin-top: 2em;
+    padding-top: 1em;
+  }
+
+  .field-name-field-coverage,
+  .field-name-field-related-dh-items {
+    border-top: 1px solid fade(@dark-grey, 10%);
+    clear:both;
+    margin-top: 2em;
+    padding-top: 2em;
+  }
+
+  .field-name-field-coverage-description {
+    margin-top: 1em;
+  }
+
+  .ds-2col .group-left .label-above {
+    font-size: 18px;
+    text-transform: none;
+  }
+
+  .fluid-width-video-wrapper {
+    width: 200px;
+    margin: 0 auto 2em;
+  }
+
+  .mejs-container {
+    margin-bottom: 2em;
+  }
+
+}
+
+.quicktabs_main.quicktabs-style-excel {
+  border-bottom: none;
+}
+

@@ -1,0 +1,71 @@
+// Global design theming
+
+body {
+	font-size: @font-size-base;
+	line-height: @line-height-base;
+	font-family: @font-family-sans-serif;
+}
+a {
+	color: @orange;
+	&:hover {
+		color: @teal;
+	}
+}
+h1,h2,h3,h4,h5,h6 {
+	color: @blue;
+	font-family: @font-family-sans-serif;
+	font-weight: 600;
+}
+p{
+	letter-spacing: .25px;
+}
+.navbar.container {
+	max-width: 1170px;
+}
+.top-wrapper {
+	background: url("../img/bg_interior.jpg") no-repeat center;
+	background-size: cover;
+	.page-header {
+		color: white;
+		font-weight: 800;
+		letter-spacing: 2px;
+		margin-top: 40px;
+		text-transform: uppercase;
+	}
+}
+
+.not-front .region-content {
+	padding-top: 60px;
+}
+
+.col-md-8,
+.col-md-7, 
+.view-collections-grid-list {
+	.field-name-title,
+	.field-name-collections-title-with-count {
+		h2 { 
+			font-size: 20px;
+			margin-top: 0;
+		}
+		a {
+			color: @teal;
+			font-size: 20px;
+			font-weight: 700;
+			letter-spacing: 1px;
+		}
+	}
+}
+
+.not-front {
+	.footer.container {
+		border-top: 1px solid fade(@dark-grey, 10%);
+	}
+}
+
+.node-page .body h4 {
+	color: @blue;
+	font-size: 28px;
+	font-weight: 600;
+	letter-spacing: 1px;
+	margin-bottom: 20px;
+}
