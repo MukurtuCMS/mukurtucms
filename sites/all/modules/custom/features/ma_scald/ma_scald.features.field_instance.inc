@@ -741,11 +741,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'file_default',
         'weight' => 4,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -826,7 +838,19 @@ function ma_scald_field_default_field_instances() {
         'type' => 'taxonomy_term_reference_plain',
         'weight' => 16,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 9,
+      ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 9,
+      ),
+      'ma_scald_view_list_image' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -886,11 +910,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'file_default',
         'weight' => 5,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -953,7 +989,19 @@ function ma_scald_field_default_field_instances() {
         'type' => 'license_formatter',
         'weight' => 15,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
+      ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
+      ),
+      'ma_scald_view_list_image' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1015,11 +1063,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'file_default',
         'weight' => 3,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1100,7 +1160,19 @@ function ma_scald_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 14,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 10,
+      ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 10,
+      ),
+      'ma_scald_view_list_image' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1173,7 +1245,19 @@ function ma_scald_field_default_field_instances() {
         'type' => 'date_default',
         'weight' => 6,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
+      ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
+      ),
+      'ma_scald_view_list_image' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1246,11 +1330,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 7,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 7,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1316,11 +1412,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 10,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1387,11 +1495,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'geofield_wkt',
         'weight' => 12,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 5,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1453,11 +1573,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 9,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 1,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1523,7 +1655,19 @@ function ma_scald_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 2,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
+      ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
+      ),
+      'ma_scald_view_list_image' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1591,11 +1735,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 13,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 6,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1664,11 +1820,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'entityreference_label',
         'weight' => 0,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1733,11 +1901,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 1,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1830,11 +2010,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'taxonomy_term_reference_link',
         'weight' => 2,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 3,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1901,11 +2093,23 @@ function ma_scald_field_default_field_instances() {
         'type' => 'taxonomy_term_reference_link',
         'weight' => 3,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 4,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'above',
@@ -1993,11 +2197,31 @@ function ma_scald_field_default_field_instances() {
         'type' => 'colorbox',
         'weight' => 1,
       ),
+      'ma_scald_col_3_img' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'col-3_img',
+        ),
+        'type' => 'image',
+        'weight' => 0,
+      ),
       'ma_scald_search_results' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 2,
+      ),
+      'ma_scald_view_list_image' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => 'content',
+          'image_style' => 'view_list_img',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
       'mukurtu_scald_banner_image' => array(
         'label' => 'hidden',

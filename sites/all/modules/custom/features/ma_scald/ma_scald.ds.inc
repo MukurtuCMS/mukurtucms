@@ -51,10 +51,10 @@ function ma_scald_ds_field_settings_info() {
       'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
-    ),
-    'field_scald_protocol' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb' => 'Download Image',
+        ),
       ),
     ),
   );

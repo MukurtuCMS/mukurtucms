@@ -159,7 +159,8 @@ function ma_digitalheritage_field_group_info() {
     'format_settings' => array(
       'label' => 'List View Fields',
       'instance_settings' => array(
-        'classes' => 'col-md-8 col-md-pull-4',
+        'id' => '',
+        'classes' => 'col-md-7 col-md-pull-5',
         'description' => '',
         'show_label' => '0',
         'label_element' => 'h3',

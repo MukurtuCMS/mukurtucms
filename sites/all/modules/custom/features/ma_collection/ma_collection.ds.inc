@@ -39,7 +39,9 @@ function ma_collection_ds_field_settings_info() {
     ),
     'field_collection_image' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'classes' => 'col-xs-12 col-md-5',
+        ),
       ),
     ),
   );

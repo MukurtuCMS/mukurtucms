@@ -58,6 +58,31 @@ function ma_core_default_box() {
   $box = new stdClass();
   $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
   $box->api_version = 1;
+  $box->delta = 'ma_site_footer';
+  $box->plugin_key = 'simple';
+  $box->title = 'The Plateau Peoples’ Web Portal project is supported in part by';
+  $box->description = 'Custom Site Footer';
+  $box->options = array(
+    'body' => array(
+      'value' => '<div class="organization neh">National Endowment for the Humanities</div>
+
+<div class="organization nacc">Northwest Academic Computing Consortium</div>
+
+<div class="organization acls">American Council of Learned Societies</div>
+
+<p>This site is maintained by staff at <a href="http://libraries.wsu.edu/cdsc" title="Washington State University’s Center for Digital Scholarship and Curation">Washington State University’s Center for Digital Scholarship and Curation</a>, <a href="http://www.mukurtu.org" title="Mukurtu.org">Mukurtu.org</a> and in partnership with <a href="http://native.wsu.edu/" title="WSU’s Native Programs">WSU’s Native Programs</a>.</p>
+
+<p>This portal is an educational site. We encourage anyone interested to browse the content. Rights to reproduce material are listed in the "Rights" field for each piece of content.</p>
+',
+      'format' => 'full_html',
+    ),
+    'additional_classes' => '',
+  );
+  $export['ma_site_footer'] = $box;
+
+  $box = new stdClass();
+  $box->disabled = FALSE; /* Edit this to true to make a default box disabled initially */
+  $box->api_version = 1;
   $box->delta = 'ma_traditional_knowledge';
   $box->plugin_key = 'simple';
   $box->title = 'Traditional Knowledge';

@@ -282,7 +282,7 @@ function ma_community_field_default_field_instances() {
         'settings' => array(
           'link' => 1,
         ),
-        'type' => 'mukurtu_scald_thumbnail_image',
+        'type' => 'ma_scald_col_3_img',
         'weight' => 1,
       ),
     ),

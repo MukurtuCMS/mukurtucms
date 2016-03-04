@@ -96,6 +96,12 @@ function ma_core_context_default_contexts() {
           'region' => 'footer',
           'weight' => '-10',
         ),
+        'menu_block-1' => array(
+          'module' => 'menu_block',
+          'delta' => '1',
+          'region' => 'footer_bottom',
+          'weight' => '-10',
+        ),
       ),
     ),
   );

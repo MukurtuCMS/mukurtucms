@@ -231,6 +231,12 @@ function ma_scald_strongarm() {
       'mukurtu_scald_media_assets_edit_' => array(
         'custom_settings' => FALSE,
       ),
+      'ma_scald_col_3_img' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ma_scald_view_list_image' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -270,6 +276,14 @@ function ma_scald_strongarm() {
           'mukurtu_scald_related_items' => array(
             'weight' => '0',
             'visible' => TRUE,
+          ),
+          'ma_scald_col_3_img' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'ma_scald_view_list_image' => array(
+            'weight' => '1',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -487,6 +501,70 @@ function ma_scald_strongarm() {
     'mukurtu_scald_related_items' => array(
       'name' => 'mukurtu_scald_related_items',
       'title' => 'Mukurtu Scald Related Items',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'ma_scald_col_3_img' => array(
+      'name' => 'ma_scald_col_3_img',
+      'title' => 'Mukurtu Scald 3 Columns',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+      'provider' => 'scald',
+      'type_format' => array(
+        'audio' => array(
+          'file_format' => '*',
+          'transcoder' => 'passthrough',
+        ),
+        'file' => array(
+          'file_format' => '*',
+          'transcoder' => 'passthrough',
+        ),
+        'image' => array(
+          'file_format' => '*',
+          'transcoder' => 'passthrough',
+        ),
+        'video' => array(
+          'file_format' => '*',
+          'transcoder' => 'passthrough',
+        ),
+      ),
+      'transcoder' => array(
+        'audio' => array(
+          '*' => 'passthrough',
+        ),
+        'file' => array(
+          '*' => 'passthrough',
+        ),
+        'image' => array(
+          '*' => 'passthrough',
+        ),
+        'video' => array(
+          '*' => 'passthrough',
+        ),
+      ),
+      'player' => array(
+        'audio' => array(
+          '*' => 'default',
+        ),
+        'file' => array(
+          '*' => 'default',
+        ),
+        'image' => array(
+          '*' => 'default',
+          'settings' => array(),
+        ),
+        'video' => array(
+          '*' => 'default',
+        ),
+      ),
+    ),
+    'ma_scald_view_list_image' => array(
+      'name' => 'ma_scald_view_list_image',
+      'title' => 'Mukurtu Scald View List Image',
       'description' => '',
       'render_language' => 'XHTML',
       'parseable' => TRUE,

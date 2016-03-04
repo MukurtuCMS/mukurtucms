@@ -11,6 +11,244 @@ function ma_frontpage_views_default_views() {
   $export = array();
 
   $view = new view();
+  $view->name = 'content_spotlight';
+  $view->description = '';
+  $view->tag = 'default';
+  $view->base_table = 'node';
+  $view->human_name = 'Content Spotlight';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['title'] = 'Content Spotlight';
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'some';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '5';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'slideshow';
+  $handler->display->display_options['style_options']['slideshow_type'] = 'views_slideshow_cycle';
+  $handler->display->display_options['style_options']['slideshow_skin'] = 'default';
+  $handler->display->display_options['style_options']['skin_info'] = array(
+    'class' => 'default',
+    'name' => 'Default',
+    'module' => 'views_slideshow',
+    'path' => '',
+    'stylesheets' => array(),
+  );
+  $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_pager']['weight'] = '1';
+  $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_controls']['weight'] = '1';
+  $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_controls']['type'] = 'views_slideshow_controls_text';
+  $handler->display->display_options['style_options']['widgets']['top']['views_slideshow_slide_counter']['weight'] = '1';
+  $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_pager']['weight'] = '1';
+  $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_controls']['enable'] = 1;
+  $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_controls']['weight'] = '1';
+  $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_controls']['type'] = 'views_slideshow_controls_text';
+  $handler->display->display_options['style_options']['widgets']['bottom']['views_slideshow_slide_counter']['weight'] = '1';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['transition_advanced'] = 1;
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['timeout'] = '5000';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['speed'] = '700';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['delay'] = '0';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['start_paused'] = 0;
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['remember_slide_days'] = '1';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['items_per_slide'] = '1';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['wait_for_image_load_timeout'] = '3000';
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['cleartype'] = 0;
+  $handler->display->display_options['style_options']['views_slideshow_cycle']['cleartypenobg'] = 0;
+  $handler->display->display_options['row_plugin'] = 'fields';
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['label'] = '';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['nid']['element_label_colon'] = FALSE;
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  /* Field: Content: Media Asset */
+  $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
+  $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
+  $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
+  $handler->display->display_options['fields']['field_media_asset']['label'] = '';
+  $handler->display->display_options['fields']['field_media_asset']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_media_asset']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_media_asset']['type'] = 'mukurtu_scald_thumbnail_image';
+  $handler->display->display_options['fields']['field_media_asset']['settings'] = array(
+    'link' => '1',
+  );
+  $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';
+  /* Field: Content: Location */
+  $handler->display->display_options['fields']['field_coverage']['id'] = 'field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['table'] = 'field_data_field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['field'] = 'field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['label'] = '';
+  $handler->display->display_options['fields']['field_coverage']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_coverage']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_coverage']['click_sort_column'] = 'geom';
+  $handler->display->display_options['fields']['field_coverage']['type'] = 'geofield_map_map';
+  $handler->display->display_options['fields']['field_coverage']['settings'] = array(
+    'geofield_map_width' => '100%',
+    'geofield_map_height' => '300px',
+    'geofield_map_center' => array(
+      'lat' => '28.874986099999997',
+      'lon' => '-81.29425140000001',
+      'geocode' => 'Find my location',
+    ),
+    'geofield_map_zoom' => '8',
+    'geofield_map_min_zoom' => '0',
+    'geofield_map_max_zoom' => '0',
+    'geofield_map_controltype' => 'default',
+    'geofield_map_mtc' => 'standard',
+    'geofield_map_pancontrol' => 0,
+    'geofield_map_maptype' => 'map',
+    'geofield_map_baselayers_map' => 1,
+    'geofield_map_baselayers_satellite' => 0,
+    'geofield_map_baselayers_hybrid' => 0,
+    'geofield_map_baselayers_physical' => 0,
+    'geofield_map_scale' => 0,
+    'geofield_map_overview' => 0,
+    'geofield_map_overview_opened' => 0,
+    'geofield_map_scrollwheel' => 0,
+    'geofield_map_draggable' => 0,
+    'geofield_map_streetview_show' => 0,
+  );
+  /* Field: Content: Description */
+  $handler->display->display_options['fields']['field_description']['id'] = 'field_description';
+  $handler->display->display_options['fields']['field_description']['table'] = 'field_data_field_description';
+  $handler->display->display_options['fields']['field_description']['field'] = 'field_description';
+  $handler->display->display_options['fields']['field_description']['label'] = '';
+  $handler->display->display_options['fields']['field_description']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_description']['element_label_colon'] = FALSE;
+  /* Field: Content: Traditional Knowledge */
+  $handler->display->display_options['fields']['field_tk_body']['id'] = 'field_tk_body';
+  $handler->display->display_options['fields']['field_tk_body']['table'] = 'field_data_field_tk_body';
+  $handler->display->display_options['fields']['field_tk_body']['field'] = 'field_tk_body';
+  $handler->display->display_options['fields']['field_tk_body']['label'] = '';
+  $handler->display->display_options['fields']['field_tk_body']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_tk_body']['alter']['max_length'] = '300';
+  $handler->display->display_options['fields']['field_tk_body']['alter']['trim'] = TRUE;
+  $handler->display->display_options['fields']['field_tk_body']['element_label_colon'] = FALSE;
+  /* Field: Content: Related Items */
+  $handler->display->display_options['fields']['field_related_dh_items']['id'] = 'field_related_dh_items';
+  $handler->display->display_options['fields']['field_related_dh_items']['table'] = 'field_data_field_related_dh_items';
+  $handler->display->display_options['fields']['field_related_dh_items']['field'] = 'field_related_dh_items';
+  $handler->display->display_options['fields']['field_related_dh_items']['label'] = '';
+  $handler->display->display_options['fields']['field_related_dh_items']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['field_related_dh_items']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['field_related_dh_items']['alter']['path'] = '/node/[nid]';
+  $handler->display->display_options['fields']['field_related_dh_items']['alter']['absolute'] = TRUE;
+  $handler->display->display_options['fields']['field_related_dh_items']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_related_dh_items']['type'] = 'textformatter_list';
+  $handler->display->display_options['fields']['field_related_dh_items']['settings'] = array(
+    'textformatter_type' => 'ul',
+    'textformatter_comma_and' => 0,
+    'textformatter_comma_full_stop' => 0,
+    'textformatter_comma_override' => 0,
+    'textformatter_separator_custom' => '',
+    'textformatter_separator_custom_tag' => 'span',
+    'textformatter_separator_custom_class' => 'textformatter-separator',
+    'textformatter_comma_tag' => 'div',
+    'textformatter_class' => 'textformatter-list',
+    'textformatter_contrib' => array(
+      'entityreference_link' => 0,
+    ),
+  );
+  $handler->display->display_options['fields']['field_related_dh_items']['delta_offset'] = '0';
+  /* Field: Content: Link */
+  $handler->display->display_options['fields']['view_node']['id'] = 'view_node';
+  $handler->display->display_options['fields']['view_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['view_node']['field'] = 'view_node';
+  $handler->display->display_options['fields']['view_node']['label'] = '';
+  $handler->display->display_options['fields']['view_node']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['view_node']['element_class'] = 'content-link';
+  $handler->display->display_options['fields']['view_node']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['view_node']['text'] = 'View Content';
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = '';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = '<div class="col-xs-12 col-md-4">
+<div class="media">[field_media_asset]</div>
+[field_coverage]
+</div>
+<div class="col-xs-12 col-md-8">
+<h3>[title]</h3>
+[field_description]
+[field_tk_body]
+<div class="buttons">
+[field_related_dh_items]
+<div class="content-link">[view_node]</div>
+</div>
+</div>';
+  $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
+  /* Sort criterion: Content: Post date */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'node';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'digital_heritage' => 'digital_heritage',
+  );
+  /* Filter criterion: Content: Promoted to front page */
+  $handler->display->display_options['filters']['promote']['id'] = 'promote';
+  $handler->display->display_options['filters']['promote']['table'] = 'node';
+  $handler->display->display_options['filters']['promote']['field'] = 'promote';
+  $handler->display->display_options['filters']['promote']['value'] = '1';
+
+  /* Display: Block */
+  $handler = $view->new_display('block', 'Block', 'block');
+  $translatables['content_spotlight'] = array(
+    t('Master'),
+    t('Content Spotlight'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('View Content'),
+    t('<div class="col-xs-12 col-md-4">
+<div class="media">[field_media_asset]</div>
+[field_coverage]
+</div>
+<div class="col-xs-12 col-md-8">
+<h3>[title]</h3>
+[field_description]
+[field_tk_body]
+<div class="buttons">
+[field_related_dh_items]
+<div class="content-link">[view_node]</div>
+</div>
+</div>'),
+    t('Block'),
+  );
+  $export['content_spotlight'] = $view;
+
+  $view = new view();
   $view->name = 'ma_recent_comments';
   $view->description = 'Contains a block and a page to list recent comments; the block will automatically link to the page, which displays the comment body as well as a link to the node.';
   $view->tag = 'default';

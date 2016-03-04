@@ -92,7 +92,7 @@ function ma_collection_field_group_info() {
       'label' => 'List View Fields',
       'instance_settings' => array(
         'id' => '',
-        'classes' => '',
+        'classes' => 'col-xs-12 col-md-7 ',
         'description' => '',
         'show_label' => '0',
         'label_element' => 'h3',

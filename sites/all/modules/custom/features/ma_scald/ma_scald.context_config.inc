@@ -139,13 +139,52 @@ function ma_scald_default_scald_context_config() {
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
   $context_config->api_version = 1;
+  $context_config->context = 'ma_scald_col_3_img';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'default',
+    ),
+    'file' => array(
+      '*' => 'default',
+    ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
+  $export['ma_scald_col_3_img'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
   $context_config->context = 'ma_scald_search_results';
   $context_config->transcoder = array(
     'audio' => array(
       '*' => 'passthrough',
     ),
     'image' => array(
-      '*' => 'style-medium',
+      '*' => 'style-view_list_img',
     ),
     'video' => array(
       '*' => 'passthrough',
@@ -177,6 +216,45 @@ function ma_scald_default_scald_context_config() {
     'height' => '220px',
   );
   $export['ma_scald_search_results'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
+  $context_config->context = 'ma_scald_view_list_image';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'default',
+    ),
+    'file' => array(
+      '*' => 'default',
+    ),
+    'image' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'video' => array(
+      '*' => 'default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
+  $export['ma_scald_view_list_image'] = $context_config;
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
@@ -311,7 +389,7 @@ function ma_scald_default_scald_context_config() {
       '*' => 'passthrough',
     ),
     'image' => array(
-      '*' => 'style-medium',
+      '*' => 'style-comm_grid_img',
     ),
     'video' => array(
       '*' => 'passthrough',

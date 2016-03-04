@@ -127,6 +127,11 @@ function ma_community_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
+    'field_community_image_thumbnail' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|community|thumbed'] = $ds_fieldsetting;
 

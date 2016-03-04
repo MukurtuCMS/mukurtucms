@@ -38,6 +38,38 @@ function ma_digitalheritage_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|content_spotlight';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'content_spotlight';
+  $ds_fieldsetting->settings = array(
+    'component_media_items' => array(
+      'weight' => '7',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_related_dh_items' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_description' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
+      ),
+    ),
+  );
+  $export['node|digital_heritage|content_spotlight'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|digital_heritage|full';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'digital_heritage';
@@ -131,7 +163,7 @@ function ma_digitalheritage_ds_field_settings_info() {
     'field_media_asset' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-4 col-md-push-8',
+          'classes' => 'col-md-5 col-md-push-7',
         ),
       ),
     ),
@@ -259,6 +291,58 @@ function ma_digitalheritage_ds_layout_settings_info() {
     'layout_link_custom' => '',
   );
   $export['node|digital_heritage|community_record'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|digital_heritage|content_spotlight';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'digital_heritage';
+  $ds_layout->view_mode = 'content_spotlight';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'group_col_left',
+        1 => 'field_media_asset',
+        2 => 'field_coverage',
+        3 => 'group_col_right',
+        4 => 'title',
+        5 => 'field_description',
+        6 => 'field_summary',
+        7 => 'component_media_items',
+        8 => 'field_collection',
+        9 => 'field_dh_type',
+        10 => 'field_related_dh_items',
+      ),
+    ),
+    'fields' => array(
+      'group_col_left' => 'ds_content',
+      'field_media_asset' => 'ds_content',
+      'field_coverage' => 'ds_content',
+      'group_col_right' => 'ds_content',
+      'title' => 'ds_content',
+      'field_description' => 'ds_content',
+      'field_summary' => 'ds_content',
+      'component_media_items' => 'ds_content',
+      'field_collection' => 'ds_content',
+      'field_dh_type' => 'ds_content',
+      'field_related_dh_items' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+  );
+  $export['node|digital_heritage|content_spotlight'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -571,6 +655,15 @@ function ma_digitalheritage_ds_view_modes_info() {
     'node' => 'node',
   );
   $export['community_record'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'content_spotlight';
+  $ds_view_mode->label = 'Content Spotlight';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+  );
+  $export['content_spotlight'] = $ds_view_mode;
 
   $ds_view_mode = new stdClass();
   $ds_view_mode->api_version = 1;

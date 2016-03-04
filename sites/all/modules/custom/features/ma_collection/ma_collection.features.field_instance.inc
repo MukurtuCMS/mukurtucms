@@ -119,7 +119,7 @@ function ma_collection_field_default_field_instances() {
         'settings' => array(
           'link' => 0,
         ),
-        'type' => 'ma_scald_search_results',
+        'type' => 'ma_scald_view_list_image',
         'weight' => 0,
       ),
       'teaser' => array(

@@ -101,6 +101,14 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['title'] = 'Communities';
   $handler->display->display_options['display_description'] = 'Community-based groups';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['style_options']['row_class'] = 'col-xs-12 col-md-3 grid';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'entity';
+  $handler->display->display_options['row_options']['view_mode'] = 'thumbed';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Content: Node field */
   $handler->display->display_options['fields']['nodefield']['id'] = 'nodefield';
@@ -172,7 +180,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['nodefield']['build_mode'] = 'browse_teaser';
   $handler->display->display_options['fields']['nodefield']['links'] = 0;
   $handler->display->display_options['fields']['nodefield']['comments'] = 0;
-  /* Field: Content: Description */
+  /* Field: Content: Body */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
@@ -254,7 +262,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['pager']['options']['items_per_page'] = '27';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'default';
-  $handler->display->display_options['style_options']['row_class'] = 'masonry-brick';
+  $handler->display->display_options['style_options']['row_class'] = 'col-xs-6 col-md-4 image-grid';
   $handler->display->display_options['style_options']['default_row_class'] = FALSE;
   $handler->display->display_options['style_options']['row_class_special'] = FALSE;
   $handler->display->display_options['row_plugin'] = 'entity';

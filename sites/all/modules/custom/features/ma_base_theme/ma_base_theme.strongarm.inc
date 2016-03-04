@@ -117,7 +117,7 @@ grid-6';
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'theme_default';
-  $strongarm->value = 'mukurtu_starter';
+  $strongarm->value = 'ppp2016';
   $export['theme_default'] = $strongarm;
 
   return $export;
