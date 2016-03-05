@@ -147,14 +147,9 @@ function mukurtu_build_tk_label_text($entity, $license) {
   }
 
   // There is no custom TK License text for this label for this DH node's community, so use the default one
-  // Scrape the license description
-  // I was unable to do this by converting the HTML to a DOM object, so just strstr'ing for what we need
+  // Scrape the "TK User" section of the license description
   $desc = file_get_contents($license['uri']);
-  $desc = strstr ($desc, 'et_pb_text');
-  $desc = strstr ($desc, '<p>');
-  $desc = strstr ($desc, '</div>', TRUE);
-  $desc = trim ($desc);
-
-  return array ($initial_desc . $desc, $license['uri']);
-
+  preg_match ('/(?<=<p><strong>TK User<\/strong>: )(.*)(?=<\/p>)/', $desc, $matches);
+  $tk_user_text = '<p>' . $matches[0] . '</p>';
+  return array ($initial_desc . $tk_user_text, $license['uri']);
 }
