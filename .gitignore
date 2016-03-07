@@ -5,4 +5,4 @@ sites/*/settings*.php
 sites/*/private
 
 # Ignore Crunch files
-sites/all/themes/ppp-2016/*.map
+sites/all/themes/ppp2016/css/*.css.map
