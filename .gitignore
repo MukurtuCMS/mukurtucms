@@ -3,3 +3,6 @@ sites/*/settings*.php
 
 # Ignore paths that contain user-generated content.
 sites/*/private
+
+# Ignore Crunch files
+sites/all/themes/ppp-2016/*.map
