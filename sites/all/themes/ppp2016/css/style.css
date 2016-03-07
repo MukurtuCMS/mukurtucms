@@ -3005,6 +3005,10 @@ a:hover {
   background: #f8f7f7 none repeat scroll 0 0;
   padding: 30px;
 }
+.node-digital-heritage.view-mode-full .group-right .field,
+.node-digital-heritage.view-mode-community_record .group-right .field {
+  word-wrap: break-word;
+}
 .node-digital-heritage.view-mode-full .view-mode-search_result,
 .node-digital-heritage.view-mode-community_record .view-mode-search_result {
   border-bottom: 1px solid #ecebeb;
@@ -3056,6 +3060,9 @@ a:hover {
 }
 .field-name-field-digital-heritage-items .label-above {
   margin-bottom: -30px;
+}
+#popup-element-1 {
+  display: none;
 }
 @media (max-width: 992px) {
   .ds-2col > .group-left {
