@@ -171,11 +171,13 @@
     </div>
   </div>
 </div>
-<div class="content-bottom-wrapper">
-  <div class="content-bottom container">
-    <?php print render($page['content_bottom']); ?>
+<?php if (!empty($page['content_bottom'])): ?>
+  <div class="content-bottom-wrapper">
+    <div class="content-bottom container">
+      <?php print render($page['content_bottom']); ?>
+    </div>
   </div>
-</div>
+<?php endif; ?>
 <div class="footer-wrapper">
   <footer class="footer container">
     <?php print render($page['footer']); ?>
