@@ -153,3 +153,44 @@ function mukurtu_build_tk_label_text($entity, $license) {
   $tk_user_text = '<p>' . $matches[0] . '</p>';
   return array ($initial_desc . $tk_user_text, $license['uri']);
 }
+
+/**
+ * Implements hook_menu().
+ */
+function license_menu() {
+  $items = array();
+
+  // Indexed Fields page for admins (linked from dashboard)
+  $items['dashboard/customize-tk-label-text'] = array(
+    'title' => 'Customize Site-Wide Traditional Knowledge Label Text',
+    'page callback' => 'license_custom_tk_label_text',
+    'access callback' => 'user_access',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_SUGGESTED_ITEM,
+  );
+
+  // Callback that toggles between sitewide and community-level custom TK label text
+  $items['dashboard/toggle-custom-tk-label-text'] = array(
+    'title' => 'Toggle Between Site-Wide and Community-Level Custom TK Label Text',
+    'page callback' => 'license_toggle_custom_tk_label_text',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'weight' => 100,
+  );
+
+  return $items;
+}
+
+function license_custom_tk_label_text () {
+  return 'yo';
+}
+
+function license_toggle_custom_tk_label_text () {
+  if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+    variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 0);
+  }
+  else {
+    variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 1);
+  }
+  drupal_goto ('dashboard');
+}

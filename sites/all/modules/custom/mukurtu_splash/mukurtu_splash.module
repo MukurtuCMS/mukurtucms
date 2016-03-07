@@ -746,6 +746,29 @@ function mukurtu_splash_block_manage_community() {
     );
   }
 
+  if (user_access('administer site configuration')) {
+    $dh_tk_description = 'Switch digital heritage traditional knowledge label text customization from community-level to site-wide.';
+    if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+      $dh_tk_description = 'Switch digital heritage traditional knowledge label text customization from site-wide to community-level.';
+    }
+    $items[] = array(
+      'title' => 'Toggle TK Label Text Customization Level',
+      'href' => 'dashboard/toggle-custom-tk-label-text',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t($dh_tk_description),
+    );
+    if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+      $items[] = array (
+        'title' => 'Customize Site-Wide TK Label Text',
+        'href' => 'dashboard/customize-tk-label-text',
+        'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+        'description' => t('Customize site-wide digital heritage traditional knowledge label text.'),
+      );
+    }
+  }
+
+
+
   /*if (feeds_access('import','import_cultural_protocols')) {
     $items[] = array(
       'title' => 'Import Cultural Protocols',
