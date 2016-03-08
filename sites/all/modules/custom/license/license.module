@@ -132,21 +132,41 @@ function mukurtu_build_tk_label_text($entity, $license) {
   // Prepend the TK Label text with the Label name, since it is abbreviated on the node view, so we now get to see the whole name
   $initial_desc = '<h4><b>' . $license['name'] . '</b></h4>';
 
-  // First check if there is a custom TK License text for this label, for this DH node's community, and if so, use it.
-  $dh_wrapper = entity_metadata_wrapper('node', $entity);
-  $community = $dh_wrapper->field_community_ref->value();
-  if ($community) {
-    $com_wrapper = entity_metadata_wrapper('node', $community[0]->nid); // we use the *first* community for a DH node to determine what custom label text, if any, to use
-    if (isset ($com_wrapper->field_custom_tk_label_text)) {
-      foreach ($com_wrapper->field_custom_tk_label_text->value() as $custom_lk_label_fc_value) {
-        if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $license['uri']) {
-          return array ($initial_desc . $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'], NULL);
+  // If using site-wide custom TK label text, check if there is a custom TK License text for this label
+  if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+
+    $tk_labels_info = field_info_field('field_licence_trad');
+    $tk_labels = $tk_labels_info['settings']['allowed_values'];
+
+    $tk_label_name = $tk_labels[$license['uri']];
+    $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
+    $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
+    $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
+    $textfield_fieldname = 'customized_' . $tk_label_name_safe;
+
+    if (variable_get ('mukurtu_' . $checkbox_fieldname)) {
+      $customized_text = variable_get ('mukurtu_' . $textfield_fieldname);
+      return array($initial_desc . $customized_text, NULL);
+    }
+  }
+
+  // If using community-level custom TK label text, check if there is a custom TK License text for this label, for this DH node's community
+  else {
+    $dh_wrapper = entity_metadata_wrapper('node', $entity);
+    $community = $dh_wrapper->field_community_ref->value();
+    if ($community) {
+      $com_wrapper = entity_metadata_wrapper('node', $community[0]->nid); // we use the *first* community for a DH node to determine what custom label text, if any, to use
+      if (isset ($com_wrapper->field_custom_tk_label_text)) {
+        foreach ($com_wrapper->field_custom_tk_label_text->value() as $custom_lk_label_fc_value) {
+          if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $license['uri']) {
+            return array($initial_desc . $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'], NULL);
+          }
         }
       }
     }
   }
 
-  // There is no custom TK License text for this label for this DH node's community, so use the default one
+  // There is no custom TK License text for this label, so use the default one
   $tk_user_text = license_build_default_tk_label_text($license['uri']);
   return array ($initial_desc . $tk_user_text, $license['uri']);
 }
