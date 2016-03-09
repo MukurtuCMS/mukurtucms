@@ -421,7 +421,7 @@ function _services_file_check_destination($destination) {
  */
 function _services_file_check_name_extension($name) {
   // This whitelist is copied from file_save_upload().
-  $extensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
+  $extensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp m4a';
 
   // Get the part of the name after the last period (".").
   $name = explode('.', $name);

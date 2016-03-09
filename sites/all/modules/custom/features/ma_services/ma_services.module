@@ -203,7 +203,7 @@ function _ma_services_create_atom ($fn, $id, $external, $title, $author, $catego
     // Check for matching atom title and atom type
     $scald_query = array('title' => $title, 'type' => $type);
     $sids = scald_search($scald_query, FALSE);
-    if (count($sids)) {
+    if ($sids != FALSE && (count($sids) > 0)) {
       foreach ($sids as $sid) {
 
         $atom = scald_atom_load($sid);

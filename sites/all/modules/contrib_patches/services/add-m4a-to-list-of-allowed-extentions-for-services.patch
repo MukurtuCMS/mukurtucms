@@ -1,0 +1,25 @@
+From 6c44f3704c5dac9daf628a4375e57e04d7b3c47b Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Wed, 9 Mar 2016 10:29:18 -0800
+Subject: [PATCH] Add m4a to list of allowed extentions for services
+
+---
+ sites/all/modules/contrib/services/resources/file_resource.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sites/all/modules/contrib/services/resources/file_resource.inc b/sites/all/modules/contrib/services/resources/file_resource.inc
+index 0529756..73b84fb 100644
+--- a/sites/all/modules/contrib/services/resources/file_resource.inc
++++ b/sites/all/modules/contrib/services/resources/file_resource.inc
+@@ -421,7 +421,7 @@ function _services_file_check_destination($destination) {
+  */
+ function _services_file_check_name_extension($name) {
+   // This whitelist is copied from file_save_upload().
+-  $extensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
++  $extensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp m4a';
+ 
+   // Get the part of the name after the last period (".").
+   $name = explode('.', $name);
+-- 
+2.1.4
+
