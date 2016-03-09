@@ -26,7 +26,7 @@ function ma_community_field_group_info() {
       0 => 'group_access',
       1 => 'group_register',
       2 => 'og_roles_permissions',
-      3 => 'field_custom_tk_label_text',
+      3 => 'group_custom_tk_label_text',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -73,6 +73,33 @@ function ma_community_field_group_info() {
     ),
   );
   $export['group_basic|node|community|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_custom_tk_label_text|node|community|form';
+  $field_group->group_name = 'group_custom_tk_label_text';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'community';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_advanced';
+  $field_group->data = array(
+    'label' => 'Custom TK Label Text',
+    'weight' => '7',
+    'children' => array(),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Custom TK Label Text',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-custom-tk-label-text field-group-div',
+        'description' => 'Tick a TK label\'s checkbox to customize its text. Hover over the label to see its default (non-customized) text.',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $export['group_custom_tk_label_text|node|community|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */

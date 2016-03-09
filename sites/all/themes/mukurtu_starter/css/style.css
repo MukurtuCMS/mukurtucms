@@ -2904,8 +2904,14 @@ a:hover {
 .field-name-field-digital-heritage-items .label-above {
   margin-bottom: -30px;
 }
-#license-custom-tk-label-text-form .filter-wrapper {
+#license-custom-tk-label-text-form .filter-wrapper,
+.group-custom-tk-label-text .filter-wrapper {
   display: none;
+}
+#license-custom-tk-label-text-form .help-block,
+.group-custom-tk-label-text .help-block {
+  font-weight: bold;
+  font-size: 1.3em;
 }
 @media (max-width: 992px) {
   .ds-2col > .group-left {

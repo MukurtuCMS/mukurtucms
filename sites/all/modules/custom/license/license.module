@@ -132,37 +132,31 @@ function mukurtu_build_tk_label_text($entity, $license) {
   // Prepend the TK Label text with the Label name, since it is abbreviated on the node view, so we now get to see the whole name
   $initial_desc = '<h4><b>' . $license['name'] . '</b></h4>';
 
-  // If using site-wide custom TK label text, check if there is a custom TK License text for this label
+
+  // Use customized TK Labels, if set
+  $tk_labels_info = field_info_field('field_licence_trad');
+  $tk_labels = $tk_labels_info['settings']['allowed_values'];
+
+  $tk_label_name = $tk_labels[$license['uri']];
+  $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
+  $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
+  $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
+
+  // Site-wide
   if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
-
-    $tk_labels_info = field_info_field('field_licence_trad');
-    $tk_labels = $tk_labels_info['settings']['allowed_values'];
-
-    $tk_label_name = $tk_labels[$license['uri']];
-    $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
-    $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
-    $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
-    $textfield_fieldname = 'customized_' . $tk_label_name_safe;
-
     if (variable_get ('mukurtu_' . $checkbox_fieldname)) {
-      $customized_text = variable_get ('mukurtu_' . $textfield_fieldname);
+      $customized_text = variable_get ('mukurtu_customized_' . $tk_label_name_safe);
       return array($initial_desc . $customized_text, NULL);
     }
   }
 
-  // If using community-level custom TK label text, check if there is a custom TK License text for this label, for this DH node's community
+  // Community-level
   else {
-    $dh_wrapper = entity_metadata_wrapper('node', $entity);
-    $community = $dh_wrapper->field_community_ref->value();
-    if ($community) {
-      $com_wrapper = entity_metadata_wrapper('node', $community[0]->nid); // we use the *first* community for a DH node to determine what custom label text, if any, to use
-      if (isset ($com_wrapper->field_custom_tk_label_text)) {
-        foreach ($com_wrapper->field_custom_tk_label_text->value() as $custom_lk_label_fc_value) {
-          if ($custom_lk_label_fc_value->field_licence_trad[LANGUAGE_NONE][0]['value'] == $license['uri']) {
-            return array($initial_desc . $custom_lk_label_fc_value->field_custom_text [LANGUAGE_NONE][0]['value'], NULL);
-          }
-        }
-      }
+    $community_nid = $entity->field_community_ref[LANGUAGE_NONE][0]['nid']; // "0" because we are using the first community for customizations
+    $customized_comm_tk_labels = variable_get('mukurtu_comm_' . $checkbox_fieldname);
+    if ($customized_comm_tk_labels[$community_nid]['custom']) {
+      $customized_text = $customized_comm_tk_labels[$community_nid]['text'];
+      return array($initial_desc . $customized_text, NULL);
     }
   }
 
@@ -211,6 +205,19 @@ function license_custom_tk_label_text_form ($form, &$form_state) {
 
   $form['#prefix'] = "<label>Tick a TK label's checkbox to customize its text. Hover over the label to see its default (non-customized) text.</label>";
 
+  $form = array_merge ($form, license_custom_tk_label_form_shared());
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+// Shared portion of the custom TK Label form (shared by site-wide form and community node form)
+function license_custom_tk_label_form_shared($community_nid = NULL) {
+
   $tk_labels_info = field_info_field('field_licence_trad');
   $tk_labels = $tk_labels_info['settings']['allowed_values'];
 
@@ -230,11 +237,29 @@ function license_custom_tk_label_text_form ($form, &$form_state) {
     $textfield_fieldname = 'customized_' . $tk_label_name_safe;
     $textfield_container = $textfield_fieldname . '_container';
 
-    $form[$checkbox_fieldname] = array (
+    // Set the default values
+    $default_checkbox_value = 0;
+    $default_textfield_value = '';
+		
+		// Community-level
+    if ($community_nid) {
+      $custom_tk_variable_name = 'mukurtu_comm_' . $checkbox_fieldname;
+      $customized_comm_tk_labels = variable_get($custom_tk_variable_name);
+      $default_checkbox_value = $customized_comm_tk_labels[$community_nid]['custom'];
+      $default_textfield_value = $customized_comm_tk_labels[$community_nid]['text'];
+    }
+		
+		// Site-wide
+    else {
+      $default_checkbox_value = variable_get('mukurtu_' . $checkbox_fieldname);
+      $default_textfield_value = variable_get('mukurtu_' . $textfield_fieldname);
+    }
+
+    $form[$checkbox_fieldname] = array(
       '#type' => 'checkbox',
-      //'#title' => popup_element($tk_label_name, $tk_label_uri, $popup_attributes),
+      // '#title' => popup_element($tk_label_name, $tk_label_uri, $popup_attributes),
       '#title' => popup_element($tk_label_name, license_build_default_tk_label_text($tk_label_uri), $popup_attributes),
-      '#default_value' => variable_get ('mukurtu_' . $checkbox_fieldname),
+      '#default_value' => $default_checkbox_value,
     );
 
     $form[$textfield_container] = array(
@@ -245,23 +270,20 @@ function license_custom_tk_label_text_form ($form, &$form_state) {
         ),
       ),
     );
-    $form[$textfield_container][$textfield_fieldname] = array (
+    $form[$textfield_container][$textfield_fieldname] = array(
       '#title' => 'Custom text for <i>' . $tk_label_name . '</i>',
       '#type' => 'text_format',
       '#format' => 'filtered_html',
-      '#default_value' => variable_get ('mukurtu_' . $textfield_fieldname),
+      '#default_value' => $default_textfield_value,
     );
+
   }
 
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Submit'),
-  );
-
   return $form;
+
 }
 
-// Save the form values to drupal variables, whether or not they are customized
+// Save the site-wide TK Label custom fields to drupal variables, whether or not they are customized
 function license_custom_tk_label_text_form_submit ($form, &$form_state) {
   $tk_labels_info = field_info_field('field_licence_trad');
   $tk_labels = $tk_labels_info['settings']['allowed_values'];

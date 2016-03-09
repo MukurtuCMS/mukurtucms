@@ -289,11 +289,11 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'group_tabs',
-        1 => 'title',
+        0 => 'title',
+        1 => 'group_tabs',
         2 => 'group_basic',
-        3 => 'group_advanced',
-        4 => 'redirect',
+        3 => 'redirect',
+        4 => 'group_advanced',
         5 => 'body',
         6 => 'path',
         7 => 'field_community_image',
@@ -303,7 +303,7 @@ function ma_community_ds_layout_settings_info() {
         13 => 'field_child_communities',
         14 => 'group_register',
         15 => 'og_roles_permissions',
-        16 => 'field_custom_tk_label_text',
+        16 => 'group_custom_tk_label_text',
       ),
       'hidden' => array(
         11 => 'group_group',
@@ -312,11 +312,11 @@ function ma_community_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
-      'group_tabs' => 'ds_content',
       'title' => 'ds_content',
+      'group_tabs' => 'ds_content',
       'group_basic' => 'ds_content',
-      'group_advanced' => 'ds_content',
       'redirect' => 'ds_content',
+      'group_advanced' => 'ds_content',
       'body' => 'ds_content',
       'path' => 'ds_content',
       'field_community_image' => 'ds_content',
@@ -328,7 +328,7 @@ function ma_community_ds_layout_settings_info() {
       'field_child_communities' => 'ds_content',
       'group_register' => 'ds_content',
       'og_roles_permissions' => 'ds_content',
-      'field_custom_tk_label_text' => 'ds_content',
+      'group_custom_tk_label_text' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(

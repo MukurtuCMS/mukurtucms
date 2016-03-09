@@ -28,6 +28,29 @@ function _set_community_manager_on_community_create ($node) {
  */
 function ma_community_form_community_node_form_alter(&$form, &$form_state) {
 
+  // custom form fields for the Custom TK Label Text, if at community-level customization
+  if (!variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+    $form = array_merge($form, license_custom_tk_label_form_shared($form['#entity']->nid)); // insert the custom form
+
+    // Move the custom fields into their fieldgroup
+    // For some reason, we have to do this separately instead of in the merged in form. If we do it in the merged in form, we lose the advanced tab altogether
+    // TODO: figure out how to get this working in the merged in form (reduce repeat code)
+    $tk_labels_info = field_info_field('field_licence_trad');
+    $tk_labels = $tk_labels_info['settings']['allowed_values'];
+
+    foreach ($tk_labels as $tk_label_uri => $tk_label_name) {
+      $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
+      $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
+
+      $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
+      $textfield_fieldname = 'customized_' . $tk_label_name_safe;
+      $textfield_container = $textfield_fieldname . '_container';
+      $form['#group_children'][$checkbox_fieldname] = 'group_custom_tk_label_text';
+      $form['#group_children'][$textfield_container] = 'group_custom_tk_label_text';
+    }
+  }
+
+
   // Hide the Child Communities field in all cases
   $form['field_child_communities']['#access'] = FALSE;
 
@@ -90,6 +113,45 @@ function ma_community_node_validate($node, $form, &$form_state) {
       }
       else {
         unset ($_SESSION['parent_community_change_warning_issued'][$warning_key]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_submit().
+ */
+function ma_community_node_submit($node, $form, &$form_state) {
+  if ($node->type == 'community') {
+
+    // Save the customized TK Labels (custom form fields) to drupal variables (if using community-level customization)
+    if (!variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+
+      $tk_labels_info = field_info_field('field_licence_trad');
+      $tk_labels = $tk_labels_info['settings']['allowed_values'];
+
+      foreach ($tk_labels as $tk_label_uri => $tk_label_name) {
+        $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
+        $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
+        $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
+        $checkbox_value = $form_state['values'][$checkbox_fieldname];
+        $custom_tk_variable_name = 'mukurtu_comm_' . $checkbox_fieldname;
+        $customized_comm_tk_labels_original = $customized_comm_tk_labels = variable_get($custom_tk_variable_name);
+
+        // Update the checkbox value regardless
+        $customized_comm_tk_labels[$form['#node']->nid]['custom'] = $checkbox_value;
+
+        // Only if checkbox is checked, update the text value
+        if ($checkbox_value) {
+          $textfield_fieldname = 'customized_' . $tk_label_name_safe;
+          $textfield_value = $form_state['values'][$textfield_fieldname]['value'];
+          $customized_comm_tk_labels[$form['#node']->nid]['text'] = $textfield_value;
+        }
+
+        // Set the updated variable if changed
+        if ($customized_comm_tk_labels <> $customized_comm_tk_labels_original) {
+          variable_set($custom_tk_variable_name, $customized_comm_tk_labels);
+        }
       }
     }
   }
