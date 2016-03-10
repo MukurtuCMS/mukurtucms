@@ -2502,10 +2502,6 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-digital-heritage #edit-og-group-ref {
   display: none;
 }
-.node-type-digital-heritage .field-name-field-licence-trad a img,
-.page-node-add-digital-heritage .field-name-field-licence-trad a img {
-  width: 120px;
-}
 .node-type-community #edit-group-access,
 .page-node-add-community #edit-group-access {
   display: none;
@@ -2846,6 +2842,16 @@ a:hover {
   border-radius: 4px;
   padding: 30px;
 }
+.node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element,
+.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element {
+  width: 100px;
+  float: left;
+}
+.node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element .popup-element-title img,
+.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element .popup-element-title img {
+  width: 88px;
+  margin-top: 5px;
+}
 .node-digital-heritage.view-mode-full .view-mode-search_result,
 .node-digital-heritage.view-mode-community_record .view-mode-search_result {
   border-bottom: 1px solid #ecebeb;
@@ -2897,6 +2903,15 @@ a:hover {
 }
 .field-name-field-digital-heritage-items .label-above {
   margin-bottom: -30px;
+}
+#license-custom-tk-label-text-form .filter-wrapper,
+.group-custom-tk-label-text .filter-wrapper {
+  display: none;
+}
+#license-custom-tk-label-text-form .help-block,
+.group-custom-tk-label-text .help-block {
+  font-weight: bold;
+  font-size: 1.3em;
 }
 @media (max-width: 992px) {
   .ds-2col > .group-left {

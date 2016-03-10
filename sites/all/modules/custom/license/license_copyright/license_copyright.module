@@ -24,10 +24,6 @@ function license_copyright_license_display($license, $entity) {
       }
     }
     $owner = variable_get('site_name', '');
-    $communities = mukurtu_communities($entity);
-    if (!empty($communities)) {
-      $owner = implode(', ', $communities);
-    }
     return array('#markup' => 'Copyright © ' . $date . ' ' . $owner . '. All rights reserved.');
   }
 }
@@ -43,12 +39,8 @@ function license_copyright_license_display_export($license, $entity) {
     }
     $image = '';
     $owner = variable_get('site_name', '');
-    $communities = mukurtu_communities($entity);
-    if (!empty($communities)) {
-      $owner = implode(', ', $communities);
-    }
     // Alt does not do anything right now.
     $alt = 'Copyright © ' . $date . ' ' . $owner . '. All rights reserved.';
-    return license_basic_display($license['uri'], $license['name'], $image, $alt);
+    return license_basic_display($license['uri'], $license['name'], $image);
   }
 }

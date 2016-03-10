@@ -2033,7 +2033,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => 1,
       ),
       'type' => 'options_select',
       'weight' => 50,
@@ -2111,6 +2111,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 18,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_licence_trad',
     'label' => 'Traditional Knowledge Labels',
@@ -2122,7 +2123,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => 1,
       ),
       'type' => 'options_select',
       'weight' => 49,
