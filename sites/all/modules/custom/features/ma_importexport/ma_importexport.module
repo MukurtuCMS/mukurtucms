@@ -79,7 +79,7 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
 function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
 {
     $new_target = str_replace(':guid_or_nid', '', $target);
-                
+
     foreach($value as $id) {
         if($id) {
             // Check if ID is a valid GUID.  If so, we use that.
@@ -1329,7 +1329,7 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-      $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, TRUE)); //SCT
+      $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, !$export_nids)); //SCT
   }
 
 
@@ -1348,7 +1348,7 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
 
   $row = array();
   foreach($mapping as $field_name => $field) {
-      $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping, TRUE)); //SCT
+      $row[] = implode($delimiter, ma_importexport_atom_field_export($atom, $field_name, $mapping, !$export_sids)); //SCT
   }
 
   fputcsv($csv_file, $row);
