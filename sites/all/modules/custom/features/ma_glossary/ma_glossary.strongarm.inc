@@ -217,14 +217,14 @@ function ma_glossary_strongarm() {
       'display' => array(
         'found_in_glossary' => array(
           'default' => array(
-            'weight' => '5',
-            'visible' => TRUE,
+            'weight' => '23',
+            'visible' => FALSE,
           ),
         ),
         'glossary_navigation' => array(
           'default' => array(
-            'weight' => '0',
-            'visible' => TRUE,
+            'weight' => '18',
+            'visible' => FALSE,
           ),
         ),
       ),
