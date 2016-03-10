@@ -78,7 +78,7 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
  */
 function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
 {
-    $new_target = str_replace(':guid_or_nid', '', $target);                             
+    $new_target = str_replace(':guid_or_nid', '', $target);
                 
     foreach($value as $id) {
         if($id) {
@@ -657,6 +657,7 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   
   // Strip off ':etid' suffix that Entity Reference puts on the field name to make things easier
   $field_name = str_replace(':etid', '', $field_name);
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
   
   switch($field_name) {
   case 'title':
@@ -1075,16 +1076,16 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
 
 
 function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = FALSE) {
-  global $language;
-
   if(is_null($node)) {
     return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
   }
 
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
+  
   $result = array();
   switch($field_name) {
   case 'body':
-    foreach($node->{$field_name}[$language->language] as $field_value) {
+    foreach($node->{$field_name}[$node->language] as $field_value) {
       $result[] = $field_value['value']; 
     }
     break;
@@ -1155,6 +1156,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
     break;
   case 'og_group_ref':
   case 'og_group_ref:etid':
+  case 'og_group_ref:guid_or_nid':
     foreach($node->og_group_ref[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
           $result[] = ma_importexport_make_node_guid($field_value['target_id']);
@@ -1229,8 +1231,6 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
 
 
 function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = FALSE) {
-  global $language;
-
   if(is_null($atom)) {
     return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
   }
@@ -1282,6 +1282,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
       }
     }    
     break;
+    // SCT: TODO why is this here and not above?
   case 'og_group_ref:etid':
     foreach($atom->field_scald_protocol[LANGUAGE_NONE] as $ref) {
       if($use_guid) {
@@ -1292,7 +1293,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     }    
     break;
   case 'field_category':
-    foreach($atom->{$field_name}[$language->language] as $term) {
+    foreach($atom->{$field_name}[LANGUAGE_NONE] as $term) {
       $result[] = taxonomy_term_load($term['tid'])->name;
     }
     break;
@@ -1312,9 +1313,11 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     }
     break;
   default:
-    foreach($atom->{$field_name}[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['value']; 
-    }
+      if(isset($atom->{$field_name}) && isset($atom->{$field_name}[LANGUAGE_NONE])) {
+          foreach($atom->{$field_name}[LANGUAGE_NONE] as $field_value) {
+              $result[] = $field_value['value']; 
+          }
+      }
   }
   return $result;
 }
@@ -1331,10 +1334,10 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
 
 
   //DEBUG
-  /*  if($nodetype == 'digital_heritage') {
+  /*    if($nodetype == 'digital_heritage') {
       dpm($mapping);
       dpm($row);
-      }*/
+      } */
     
   fputcsv($csv_file, $row);
 }
