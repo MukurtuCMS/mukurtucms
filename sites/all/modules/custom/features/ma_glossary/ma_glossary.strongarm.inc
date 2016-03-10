@@ -198,6 +198,9 @@ function ma_glossary_strongarm() {
       'revision' => array(
         'custom_settings' => FALSE,
       ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -205,10 +208,10 @@ function ma_glossary_strongarm() {
           'weight' => '1',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '10',
         ),
         'redirect' => array(
-          'weight' => '1',
+          'weight' => '9',
         ),
       ),
       'display' => array(

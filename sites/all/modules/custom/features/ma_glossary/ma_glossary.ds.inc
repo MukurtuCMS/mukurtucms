@@ -18,40 +18,12 @@ function ma_glossary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '1',
-      'label' => 'above',
-      'format' => 'default',
-      'formatter_settings' => array(
-        'link' => '0',
-        'wrapper' => '',
-        'class' => '',
-        'ft' => array(),
-      ),
-    ),
-    'field_sample_sentence' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'func' => 'theme_field',
-        ),
-      ),
-    ),
-  );
-  $export['node|glossary_term|default'] = $ds_fieldsetting;
-
-  $ds_fieldsetting = new stdClass();
-  $ds_fieldsetting->api_version = 1;
-  $ds_fieldsetting->id = 'node|glossary_term|search_result';
-  $ds_fieldsetting->entity_type = 'node';
-  $ds_fieldsetting->bundle = 'glossary_term';
-  $ds_fieldsetting->view_mode = 'search_result';
-  $ds_fieldsetting->settings = array(
-    'title' => array(
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
     ),
   );
-  $export['node|glossary_term|search_result'] = $ds_fieldsetting;
+  $export['node|glossary_term|default'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -68,37 +40,37 @@ function ma_glossary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'glossary_term';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_2col_stacked';
+  $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
-      'header' => array(
-        0 => 'glossary_navigation',
-      ),
       'left' => array(
-        1 => 'title',
-        2 => 'field_definition',
-        3 => 'field_sample_sentence',
+        0 => 'title',
+        1 => 'field_glossary_term_language',
+        2 => 'field_transliteration',
+        3 => 'field_glossary_recording',
+        4 => 'field_translation',
+        5 => 'field_definition',
+        6 => 'field_sample_sentence',
+        7 => 'field_media_asset',
       ),
       'right' => array(
-        4 => 'field_translation',
-        5 => 'found_in_glossary',
-        6 => 'og_group_ref',
-      ),
-      'footer' => array(
-        7 => 'field_media_asset',
-        8 => 'field_related_digital_heritage',
+        8 => 'field_glossary_synonyms',
+        9 => 'field_glossary_related_dh',
+        10 => 'og_group_ref',
       ),
     ),
     'fields' => array(
-      'glossary_navigation' => 'header',
       'title' => 'left',
+      'field_glossary_term_language' => 'left',
+      'field_transliteration' => 'left',
+      'field_glossary_recording' => 'left',
+      'field_translation' => 'left',
       'field_definition' => 'left',
       'field_sample_sentence' => 'left',
-      'field_translation' => 'right',
-      'found_in_glossary' => 'right',
+      'field_media_asset' => 'left',
+      'field_glossary_synonyms' => 'right',
+      'field_glossary_related_dh' => 'right',
       'og_group_ref' => 'right',
-      'field_media_asset' => 'footer',
-      'field_related_digital_heritage' => 'footer',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -106,10 +78,8 @@ function ma_glossary_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'header' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'footer' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
@@ -122,28 +92,54 @@ function ma_glossary_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|glossary_term|search_result';
+  $ds_layout->id = 'node|glossary_term|form';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'glossary_term';
-  $ds_layout->view_mode = 'search_result';
+  $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'title',
-        1 => 'field_translation',
-        2 => 'field_definition',
-        3 => 'field_sample_sentence',
-        4 => 'field_media_asset',
-        5 => 'og_group_ref',
+        0 => 'group_tabs',
+        1 => 'title',
+        2 => 'field_glossary_term_language',
+        3 => 'field_transliteration',
+        4 => 'field_glossary_recording',
+        5 => 'field_translation',
+        6 => 'field_definition',
+        7 => 'field_sample_sentence',
+        8 => 'field_media_asset',
+        9 => 'redirect',
+        10 => 'path',
+        11 => 'group_glossary_basic',
+        12 => 'field_glossary_synonyms',
+        13 => 'group_glossary_relations',
+        14 => 'field_glossary_related_dh',
+        15 => 'field_related_digital_heritage',
+        17 => 'og_group_ref',
+      ),
+      'hidden' => array(
+        16 => '_add_existing_field',
       ),
     ),
     'fields' => array(
+      'group_tabs' => 'ds_content',
       'title' => 'ds_content',
+      'field_glossary_term_language' => 'ds_content',
+      'field_transliteration' => 'ds_content',
+      'field_glossary_recording' => 'ds_content',
       'field_translation' => 'ds_content',
       'field_definition' => 'ds_content',
       'field_sample_sentence' => 'ds_content',
       'field_media_asset' => 'ds_content',
+      'redirect' => 'ds_content',
+      'path' => 'ds_content',
+      'group_glossary_basic' => 'ds_content',
+      'field_glossary_synonyms' => 'ds_content',
+      'group_glossary_relations' => 'ds_content',
+      'field_glossary_related_dh' => 'ds_content',
+      'field_related_digital_heritage' => 'ds_content',
+      '_add_existing_field' => 'hidden',
       'og_group_ref' => 'ds_content',
     ),
     'classes' => array(
@@ -160,75 +156,7 @@ function ma_glossary_ds_layout_settings_info() {
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
   );
-  $export['node|glossary_term|search_result'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|glossary|default';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'glossary';
-  $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'field_glossary_image',
-        1 => 'field_description',
-        2 => 'field_glossary_terms',
-      ),
-    ),
-    'fields' => array(
-      'field_glossary_image' => 'ds_content',
-      'field_description' => 'ds_content',
-      'field_glossary_terms' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-  );
-  $export['node|glossary|default'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'scald_atom|audio|mukurtu_glossary_table';
-  $ds_layout->entity_type = 'scald_atom';
-  $ds_layout->bundle = 'audio';
-  $ds_layout->view_mode = 'mukurtu_glossary_table';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'atom',
-      ),
-    ),
-    'fields' => array(
-      'atom' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-  );
-  $export['scald_atom|audio|mukurtu_glossary_table'] = $ds_layout;
+  $export['node|glossary_term|form'] = $ds_layout;
 
   return $export;
 }
