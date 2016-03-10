@@ -16,9 +16,54 @@ function ma_glossary_menu() {
         'type' => MENU_LOCAL_TASK,
         'weight' => 100,
     );
-    
+
+    // Form to set default language
+    $items['dashboard/set-default-language'] = array(
+      'title' => 'Set Default Language',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('glossary_set_default_language'),
+      'access arguments' => array('administer taxonomy'),
+    );
+
     return $items;
 }
+
+function glossary_set_default_language() {
+    $language = taxonomy_vocabulary_machine_name_load('language');
+    $terms = taxonomy_get_tree($language->vid);
+
+    foreach ($terms as $term) {
+        $options[$term->tid] = $term->name;
+    }
+
+    $form['default_language'] = array (
+      '#type' => 'radios',
+
+      '#title' => 'Select the default language used when creating glossary terms',
+      '#default_value' => variable_get ('mukurtu_default_language'),
+      '#options' => $options,
+    );
+
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    return $form;
+}
+
+function glossary_set_default_language_submit ($form, &$form_state) {
+    if ($tid = $form_state['values']['default_language']) {
+        variable_set ('mukurtu_default_language', $tid);
+        $term = taxonomy_term_load($tid);
+        drupal_set_message('Default language set to <i>' . $term->name . '</i>.');
+    }
+    drupal_goto ('dashboard');
+
+}
+
+
 
 function ma_glossary_add_glossary_term($node) {
     drupal_goto('node/add/glossary-term/' . $node->nid);
@@ -33,11 +78,21 @@ function ma_glossary_add_glossary_term_check($node) {
 }
 
 function ma_glossary_form_glossary_term_node_form_alter(&$form, &$form_state) {
-    if(arg(2) == 'glossary-term') {
-        if(arg(3) && $glossary_node = node_load(arg(3))) {
-            drupal_set_title(t("Create Glossary Term in ") . $glossary_node->title);
+
+    // Actions to perform when adding (not editing) glossary terms
+    if ($form['#action'] == '/node/add/glossary-term') {
+
+        // When creating in a glossary collection, add that info to current page title
+        if(arg(2) == 'glossary-term') {
+            if(arg(3) && $glossary_node = node_load(arg(3))) {
+                drupal_set_title(t("Create Glossary Term in ") . $glossary_node->title);
+            }
         }
+
+        // Set the default language, if one is defined
+        $form['field_glossary_term_language'][LANGUAGE_NONE]['#default_value'] = variable_get ('mukurtu_default_language');
     }
+
 }
 
 function ma_glossary_node_insert($node) {

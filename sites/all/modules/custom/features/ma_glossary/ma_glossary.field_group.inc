@@ -57,10 +57,9 @@ function ma_glossary_field_group_info() {
     'label' => 'Relations',
     'weight' => '15',
     'children' => array(
-      0 => 'field_related_digital_heritage',
-      1 => 'og_group_ref',
-      2 => 'field_glossary_related_dh',
-      3 => 'field_glossary_synonyms',
+      0 => 'og_group_ref',
+      1 => 'field_glossary_related_dh',
+      2 => 'field_glossary_synonyms',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

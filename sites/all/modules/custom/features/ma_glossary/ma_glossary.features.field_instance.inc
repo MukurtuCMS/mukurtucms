@@ -458,7 +458,7 @@ function ma_glossary_field_default_field_instances() {
   // Exported field_instance: 'node-glossary_term-field_glossary_term_language'
   $field_instances['node-glossary_term-field_glossary_term_language'] = array(
     'bundle' => 'glossary_term',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -494,9 +494,9 @@ function ma_glossary_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
       ),
-      'type' => 'options_select',
+      'type' => 'options_buttons',
       'weight' => 2,
     ),
   );
