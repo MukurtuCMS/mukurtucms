@@ -220,10 +220,18 @@ function ma_glossary_strongarm() {
             'weight' => '23',
             'visible' => FALSE,
           ),
+          'search_result' => array(
+            'weight' => '7',
+            'visible' => FALSE,
+          ),
         ),
         'glossary_navigation' => array(
           'default' => array(
             'weight' => '18',
+            'visible' => FALSE,
+          ),
+          'search_result' => array(
+            'weight' => '6',
             'visible' => FALSE,
           ),
         ),

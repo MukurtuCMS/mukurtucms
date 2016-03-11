@@ -179,11 +179,13 @@ function ma_search_api_default_search_api_index() {
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
+        "field_glossary_term_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_sample_sentence" : { "type" : "list\\u003Ctext\\u003E" },
         "field_source" : { "type" : "text" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
@@ -191,6 +193,8 @@ function ma_search_api_default_search_api_index() {
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
         "field_transcription" : { "type" : "text" },
+        "field_translation" : { "type" : "text" },
+        "field_transliteration" : { "type" : "text" },
         "language" : { "type" : "string" },
         "nid" : { "type" : "integer" },
         "promote" : { "type" : "boolean" },
@@ -585,6 +589,27 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_book_children_field_peo",
             "column" : "value",
             "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_sample_sentence" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_translation" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_glossary_term_language" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_glossary_term_language",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_transliteration" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
             "boost" : "1.0"
           }
         }

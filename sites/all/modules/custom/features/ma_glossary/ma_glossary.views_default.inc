@@ -114,11 +114,10 @@ function ma_glossary_views_default_views() {
     'textformatter_class' => 'textformatter-list',
   );
   $handler->display->display_options['fields']['field_sample_sentence']['delta_offset'] = '0';
-  /* Field: Content: Media Assets */
+  /* Field: Content: Media */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
-  $handler->display->display_options['fields']['field_media_asset']['label'] = 'Media';
   $handler->display->display_options['fields']['field_media_asset']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_media_asset']['type'] = 'sdl_editor_representation';
   $handler->display->display_options['fields']['field_media_asset']['settings'] = array(

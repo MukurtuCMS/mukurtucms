@@ -257,10 +257,9 @@ function ma_glossary_field_default_field_instances() {
       ),
       'search_result' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 2,
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -313,7 +312,7 @@ function ma_glossary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -368,7 +367,7 @@ function ma_glossary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -422,7 +421,7 @@ function ma_glossary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -473,7 +472,7 @@ function ma_glossary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -525,13 +524,13 @@ function ma_glossary_field_default_field_instances() {
         'weight' => 7,
       ),
       'search_result' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
         ),
-        'type' => 'ma_colorbox',
-        'weight' => 4,
+        'type' => 'ma_scald_search_results',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -593,22 +592,9 @@ function ma_glossary_field_default_field_instances() {
       ),
       'search_result' => array(
         'label' => 'above',
-        'module' => 'textformatter',
-        'settings' => array(
-          'textformatter_class' => 'textformatter-list',
-          'textformatter_comma_and' => 0,
-          'textformatter_comma_full_stop' => 0,
-          'textformatter_comma_override' => 0,
-          'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(),
-          'textformatter_separator_custom' => '',
-          'textformatter_separator_custom_class' => 'textformatter-separator',
-          'textformatter_separator_custom_tag' => 'span',
-          'textformatter_term_plain' => 0,
-          'textformatter_type' => 'ul',
-        ),
-        'type' => 'textformatter_list',
-        'weight' => 3,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -656,7 +642,7 @@ function ma_glossary_field_default_field_instances() {
         'weight' => 1,
       ),
       'search_result' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
@@ -711,7 +697,7 @@ function ma_glossary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -761,9 +747,8 @@ function ma_glossary_field_default_field_instances() {
       ),
       'search_result' => array(
         'label' => 'above',
-        'module' => 'og_ui',
         'settings' => array(),
-        'type' => 'og_list_default',
+        'type' => 'hidden',
         'weight' => 5,
       ),
       'teaser' => array(
