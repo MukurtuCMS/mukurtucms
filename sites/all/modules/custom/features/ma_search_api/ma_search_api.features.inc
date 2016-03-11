@@ -196,7 +196,7 @@ function ma_search_api_default_search_api_index() {
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
         "field_transcription" : { "type" : "text" },
-        "field_translation" : { "type" : "text" },
+        "field_translation" : { "type" : "string" },
         "field_transliteration" : { "type" : "text" },
         "language" : { "type" : "string" },
         "nid" : { "type" : "integer" },
@@ -600,9 +600,10 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0"
           },
           "field_translation" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "text",
-            "boost" : "1.0"
+            "table" : "search_api_db_default_node_index",
+            "type" : "string",
+            "boost" : "1.0",
+            "column" : "field_translation"
           },
           "field_glossary_term_language" : {
             "table" : "search_api_db_default_node_index",
