@@ -36,6 +36,17 @@ function ma_glossary_ds_field_settings_info() {
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_media_asset' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
     ),
   );
   $export['node|glossary_term|search_result'] = $ds_fieldsetting;
@@ -190,6 +201,9 @@ function ma_glossary_ds_layout_settings_info() {
       'title' => 'ds_content',
       'field_translation' => 'ds_content',
       'field_media_asset' => 'ds_content',
+    ),
+    'limit' => array(
+      'field_media_asset' => '1',
     ),
     'classes' => array(
       'layout_class' => array(

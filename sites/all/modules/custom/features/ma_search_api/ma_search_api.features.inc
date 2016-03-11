@@ -174,11 +174,14 @@ function ma_search_api_default_search_api_index() {
         "field_coverage_description:value" : { "type" : "text" },
         "field_creator:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_date" : { "type" : "text" },
+        "field_definition" : { "type" : "text" },
         "field_description:value" : { "type" : "text" },
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
+        "field_glossary_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_glossary_synonyms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_glossary_term_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
@@ -610,6 +613,23 @@ function ma_search_api_default_search_api_server() {
           "field_transliteration" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_definition" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_glossary_related_dh" : {
+            "table" : "search_api_db_default_node_index_field_glossary_related_dh",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_glossary_synonyms" : {
+            "table" : "search_api_db_default_node_index_field_glossary_synonyms",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }
