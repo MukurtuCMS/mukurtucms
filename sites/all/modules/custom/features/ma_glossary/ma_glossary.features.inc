@@ -5,6 +5,23 @@
  */
 
 /**
+ * Implements hook_default_cer().
+ */
+function ma_glossary_default_cer() {
+  $items = array();
+  $items['node:glossary_term:field_glossary_synonyms*node:glossary_term:field_glossary_synonyms'] = entity_import('cer', '{
+    "identifier" : "node:glossary_term:field_glossary_synonyms*node:glossary_term:field_glossary_synonyms",
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:glossary_term:field_glossary_synonyms" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:glossary_term:field_glossary_synonyms" } ] },
+    "rdf_mapping" : []
+  }');
+  return $items;
+}
+
+/**
  * Implements hook_ctools_plugin_api().
  */
 function ma_glossary_ctools_plugin_api($module = NULL, $api = NULL) {

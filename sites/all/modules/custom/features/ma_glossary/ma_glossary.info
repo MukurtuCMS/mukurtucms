@@ -26,6 +26,7 @@ dependencies[] = text
 dependencies[] = textformatter
 dependencies[] = views
 dependencies[] = views_content
+features[cer][] = node:glossary_term:field_glossary_synonyms*node:glossary_term:field_glossary_synonyms
 features[ctools][] = ds:ds:1
 features[ctools][] = facetapi:facetapi_defaults:1
 features[ctools][] = field_group:field_group:1
