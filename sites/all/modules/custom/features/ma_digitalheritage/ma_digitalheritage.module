@@ -104,10 +104,27 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
 function ma_digitalheritage_preprocess_views_view(&$vars) {
   $view = &$vars['view'];
 
-  // Add JS for browse mode switcher on DH view
   if ($view->name == 'digital_heritage_grid_list') {
+    // Add JS for browse mode switcher on DH view
     drupal_add_library('system', 'jquery.cookie');
     drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_browse_mode_switcher.js');
+
+    // If none of the resultant DH items have geofield data, don't show map view as an option
+    $remove_map_browse = true;
+
+    if(isset($view->result)) {
+        foreach($view->result as $search_result) {
+            $dh_node = node_load($search_result->entity);
+            if(isset($dh_node->field_coverage['und'][0]['geom'])) {
+                $remove_map_browse = false;
+                break;
+            }
+        }
+    }
+
+    if(isset($vars['header']) && $remove_map_browse) {
+        $vars['header'] = str_replace('<a class="map btn">Map</a>', '', $vars['header']);
+    }
   }
 }
 
