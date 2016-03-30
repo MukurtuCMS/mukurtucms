@@ -67,6 +67,9 @@
 .front  .content-bottom-wrapper {
     background-color: #f4f4f4;
     padding: 50px 0;
+    #block-views-content-spotlight-block {
+      position: relative;
+    }
     h2.block-title {
         color: @dark-grey;
         font-size: 36px;
@@ -115,7 +118,18 @@
       }
     }
     .col-md-4 {
-      .media,
+      .media .fluid-width-video-wrapper {
+        height: 220px;
+        background-color: @teal;
+        object {
+          top: 50% !important;
+          margin-top: -10px !important;
+          left: 50% !important;
+          margin-left: -100px !important;
+        }
+      }
+      .media a,
+      .media .fluid-width-video-wrapper,
       .geofieldMap {
         &:after {
           bottom: 1px;
@@ -126,12 +140,16 @@
           width: 36px;
         }
       }
-      .media:after {
+      .media a:after {
         background: url("../img/icon_camera.png") center no-repeat;
         background-color: fade(@blue, 90%);
       }
       .geofieldMap:after {
         background: url("../img/icon_map.png") center no-repeat;
+        background-color: fade(@blue, 90%);
+      }
+      .media .fluid-width-video-wrapper:after {
+        background: url("../img/icon_play.png") center no-repeat;
         background-color: fade(@blue, 90%);
       }
     }
@@ -150,6 +168,7 @@
               display: inline;
               font-size: 14px;
               letter-spacing: 1px;
+              line-height: 60px;
               margin-right: 10px;
               padding: 10px;
               text-transform: uppercase;
@@ -174,7 +193,7 @@
             display: inline;
             font-size: 14px;
             letter-spacing: 1px;
-            margin-top: -7px;
+            margin-top: 10px;
             padding: 9px 10px;
             text-transform: uppercase;
             &:hover {

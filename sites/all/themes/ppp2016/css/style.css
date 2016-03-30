@@ -2690,6 +2690,7 @@ p {
   width: 220px;
   background: #F8F7F7;
   margin: 0 25px 20px 25px;
+  overflow: hidden;
   padding-bottom: 20px;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-field-media-asset,
@@ -2721,6 +2722,16 @@ p {
 .view-collections-grid-list.grid-view .view-content .views-row .col-md-8 {
   position: static;
   width: 100%;
+}
+.view-digital-heritage-grid-list.grid-view .view-content .col-md-pull-5,
+.view-collections-grid-list.grid-view .view-content .col-md-pull-5 {
+  right: 0;
+  width: 100%;
+  margin-top: 20px;
+}
+.view-digital-heritage-grid-list.grid-view .view-content .col-md-pull-5 .field-name-title a,
+.view-collections-grid-list.grid-view .view-content .col-md-pull-5 .field-name-title a {
+  font-size: 16px;
 }
 .view-digital-heritage-grid-list.grid-view .text-center,
 .view-collections-grid-list.grid-view .text-center {
@@ -3202,6 +3213,9 @@ a:hover {
   margin-bottom: 40px;
   position: relative;
 }
+.image-grid .ds-1col {
+  position: relative;
+}
 .image-grid img {
   height: auto;
   width: 100%;
@@ -3500,6 +3514,9 @@ ul.facetapi-processed li.leaf.last {
   background-color: #f4f4f4;
   padding: 50px 0;
 }
+.front .content-bottom-wrapper #block-views-content-spotlight-block {
+  position: relative;
+}
 .front .content-bottom-wrapper h2.block-title {
   color: #333;
   font-size: 36px;
@@ -3546,7 +3563,18 @@ ul.facetapi-processed li.leaf.last {
 .front .content-bottom-wrapper .col-md-4.half .geofieldMap {
   height: 237px !important;
 }
-.front .content-bottom-wrapper .col-md-4 .media:after,
+.front .content-bottom-wrapper .col-md-4 .media .fluid-width-video-wrapper {
+  height: 220px;
+  background-color: #4e909e;
+}
+.front .content-bottom-wrapper .col-md-4 .media .fluid-width-video-wrapper object {
+  top: 50% !important;
+  margin-top: -10px !important;
+  left: 50% !important;
+  margin-left: -100px !important;
+}
+.front .content-bottom-wrapper .col-md-4 .media a:after,
+.front .content-bottom-wrapper .col-md-4 .media .fluid-width-video-wrapper:after,
 .front .content-bottom-wrapper .col-md-4 .geofieldMap:after {
   bottom: 1px;
   content: "";
@@ -3555,12 +3583,16 @@ ul.facetapi-processed li.leaf.last {
   position: absolute;
   width: 36px;
 }
-.front .content-bottom-wrapper .col-md-4 .media:after {
+.front .content-bottom-wrapper .col-md-4 .media a:after {
   background: url("../img/icon_camera.png") center no-repeat;
   background-color: rgba(30, 74, 91, 0.9);
 }
 .front .content-bottom-wrapper .col-md-4 .geofieldMap:after {
   background: url("../img/icon_map.png") center no-repeat;
+  background-color: rgba(30, 74, 91, 0.9);
+}
+.front .content-bottom-wrapper .col-md-4 .media .fluid-width-video-wrapper:after {
+  background: url("../img/icon_play.png") center no-repeat;
   background-color: rgba(30, 74, 91, 0.9);
 }
 .front .content-bottom-wrapper .col-md-8 .buttons {
@@ -3580,6 +3612,7 @@ ul.facetapi-processed li.leaf.last {
   display: inline;
   font-size: 14px;
   letter-spacing: 1px;
+  line-height: 60px;
   margin-right: 10px;
   padding: 10px;
   text-transform: uppercase;
@@ -3601,7 +3634,7 @@ ul.facetapi-processed li.leaf.last {
   display: inline;
   font-size: 14px;
   letter-spacing: 1px;
-  margin-top: -7px;
+  margin-top: 10px;
   padding: 9px 10px;
   text-transform: uppercase;
 }

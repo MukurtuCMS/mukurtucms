@@ -13,18 +13,14 @@ jQuery(document).ready(function($){
         itemSelector: '.views-row'
     });
 
-    if ( ($.cookie('dh_browse_mode') != 'grid-view')) {
-        $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry('destroy');
-    }
-
-    //if($('.views-slideshow-cycle-main-frame-row-item .col-md-4').find('.field-name-field-coverage').length != 0) {
-     //   $(this).addClass('half');
-    //}
-
     $('.views-slideshow-cycle-main-frame-row .geofieldMap').parent().addClass('half');
 
     if ($('.views-slideshow-cycle-main-frame-row ul li:contains(".wav")').length > 0) {
         $('.views-slideshow-cycle-main-frame-row ul li').addClass('audio');
+    }
+
+    if ( ($.cookie('dh_browse_mode') != 'grid-view')) {
+        $('.view-digital-heritage-grid-list .view-content, .view-collections-grid-list .view-content').masonry('destroy');
     }
 
 });

@@ -295,6 +295,7 @@
         width: 220px;
         background: #F8F7F7;
         margin: 0 25px 20px 25px;
+        overflow: hidden;
         padding-bottom: 20px;
 
 
@@ -320,6 +321,14 @@
         .col-md-8 {
           position: static;
           width: 100%;
+        }
+      }
+      .col-md-pull-5 {
+        right: 0;
+        width: 100%;
+        margin-top: 20px;
+        .field-name-title a {
+          font-size: 16px;
         }
       }
     }
@@ -862,6 +871,9 @@ a.tooltips span {
 .image-grid {
   margin-bottom: 40px;
   position: relative;
+  .ds-1col {
+    position: relative;
+  }
   img {
     height: auto;
     width: 100%;
