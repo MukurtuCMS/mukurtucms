@@ -566,7 +566,7 @@ a.tooltips span {
       text-transform: uppercase;
       a {
         color: @navbar-default-color;
-        padding: 14px 25px;
+        padding: 14px 20px;
         font-size: 18px;
         font-weight: 400;
         letter-spacing: 2px;
@@ -580,6 +580,9 @@ a.tooltips span {
             background: none;
           }
         }
+      }
+      &.last a{
+        padding-right: 0;
       }
     }
   }
@@ -905,6 +908,7 @@ a.tooltips span {
     .node-community {
       height: 170px;
       background: url("../img/img_placeholder.gif") no-repeat;
+      position: relative;
       .field-name-title {
         background: fade(@orange, 90%); 
         bottom: 0;

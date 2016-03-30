@@ -2426,6 +2426,7 @@ p {
   color: white;
   font-weight: 800;
   letter-spacing: 2px;
+  margin-left: -2px;
   margin-top: 40px;
   text-transform: uppercase;
 }
@@ -2967,7 +2968,7 @@ a:hover {
 }
 .navbar-bottom ul.nav li a {
   color: white;
-  padding: 14px 25px;
+  padding: 14px 20px;
   font-size: 18px;
   font-weight: 400;
   letter-spacing: 2px;
@@ -2980,6 +2981,9 @@ a:hover {
 .navbar-bottom ul.nav li.active a:hover,
 .navbar-bottom ul.nav li:hover a:hover {
   background: none;
+}
+.navbar-bottom ul.nav li.last a {
+  padding-right: 0;
 }
 #navbar {
   margin-bottom: 0;
@@ -3245,6 +3249,7 @@ a:hover {
 .view-communities .grid .node-community {
   height: 170px;
   background: url("../img/img_placeholder.gif") no-repeat;
+  position: relative;
 }
 .view-communities .grid .node-community .field-name-title {
   background: rgba(229, 150, 55, 0.9);
