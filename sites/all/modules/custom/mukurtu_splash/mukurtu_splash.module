@@ -391,33 +391,36 @@ function mukurtu_splash_block_site_config() {
 
   $markup = '';
 
-  $items[] = array (
-    'title' => 'Configure Google Analytics',
-    'href' => 'admin/config/system/googleanalytics',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('You will need to create a Google Analytics account and then configure Google Analytics on this site.'),
-  );
+  if(user_access('administer site configuration')) {
+      $items[] = array (
+          'title' => 'Configure Google Analytics',
+          'href' => 'admin/config/system/googleanalytics',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('You will need to create a Google Analytics account and then configure Google Analytics on this site.'),
+      );
 
-  $items[] = array (
-    'title' => 'Configure Mollom',
-    'href' => 'admin/config/content/mollom/settings',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('Mollom is a content moderation web service used to filter out spam and malicious content.  Requires a Mollom account.'),
-  );
+      $items[] = array (
+          'title' => 'Configure Mollom',
+          'href' => 'admin/config/content/mollom/settings',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('Mollom is a content moderation web service used to filter out spam and malicious content.  Requires a Mollom account.'),
+      );
 
-  $items[] = array (
-    'title' => 'Rebuild Site Permissions',
-    'href' => 'admin/reports/status/rebuild',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('If doing a lot of site content editing, you may need to rebuild permissions to make sure that access permissions remain set correctly.'),
-  );
-  
-  $content = array ('content' => $items);
-  $markup = theme('admin_block_content', $content);
+      $items[] = array (
+          'title' => 'Rebuild Site Permissions',
+          'href' => 'admin/reports/status/rebuild',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('If doing a lot of site content editing, you may need to rebuild permissions to make sure that access permissions remain set correctly.'),
+      );
 
-  $block = array(
-    '#markup' => $markup,
-  );
+      $content = array ('content' => $items);
+      $markup = theme('admin_block_content', $content);
+
+      $block = array(
+          '#markup' => $markup,
+      );
+  }
+
   return $block;
 }
 
@@ -550,23 +553,32 @@ function mukurtu_splash_block_batch_import() {
     );
   }
 
-  // Do we care who can access this?  View only shows items they have access for.
-  $items[] = array(
-      'title' => 'Export Digital Heritage Metadata',
-      'href' => 'manage/digital-heritage',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Select digital heritage items for export.'),
-    );
+  // Only show these import/export dashboard links to Mukurtu or Drupal Admins
+  $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
+  $drupal_admin =  user_role_load_by_name('administrator');
+
+  if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+      $items[] = array(
+          'title' => 'Export Digital Heritage Metadata',
+          'href' => 'manage/digital-heritage',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('Select digital heritage items for export.'),
+      );
   
-   if (feeds_access('import','digital_heritage_metadata')) {
-    $items[] = array(
-      'title' => 'Import Digital Heritage Metadata from Zip Archive',
-      'href' => 'manage/zip_import',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Batch import many digital heritage items from a Zip Archive.'),
-    );
+      if (feeds_access('import','digital_heritage_metadata')) {
+          $items[] = array(
+              'title' => 'Import Digital Heritage Metadata from Zip Archive',
+              'href' => 'manage/zip_import',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Batch import many digital heritage items from a Zip Archive.'),
+          );
+      }
   }
 
+  if(count($items) < 1) {
+      return;
+  }
+  
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
   
