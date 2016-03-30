@@ -98,6 +98,20 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
 
 }
 
+
+/**
+ * Implements template_preprocess_field.
+ */
+function ma_digitalheritage_preprocess_field(&$variables, $hook) {
+    if ($variables['element']['#field_name'] == 'field_transcription') {
+        // Convert newlines in transcription fields to html if plain text only
+        if(!isset($variables['element']['#items'][0]['format']) && isset($variables['element']['#items'][0]['safe_value'])) {
+            $variables['items'][0]['#markup'] = nl2br($variables['items'][0]['#markup']);
+        }
+    }
+}
+
+
 /**
  * Implements template_preprocess_views_view.
  */
