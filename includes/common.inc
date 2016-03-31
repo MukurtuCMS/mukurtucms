@@ -7589,7 +7589,7 @@ function drupal_implode_tags($tags) {
 
     $encoded_tags[] = $tag;
   }
-  return implode(', ', $encoded_tags);
+  return implode('; ', $encoded_tags);
 }
 
 /**
