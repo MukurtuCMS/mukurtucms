@@ -277,7 +277,7 @@ Drupal.ACDB.prototype.search = function (searchString) {
   // Skip empty search strings, or search strings ending with a comma, since
   // that is the separator between search terms.
   if (searchString.length <= 0 ||
-    searchString.charAt(searchString.length - 1) == ',') {
+    searchString.charAt(searchString.length - 1) == ';') {
     return;
   }
 
