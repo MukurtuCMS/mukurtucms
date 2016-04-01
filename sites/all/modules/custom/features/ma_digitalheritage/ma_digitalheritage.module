@@ -218,8 +218,10 @@ function ma_digitalheritage_node_view($node, $view_mode) {
     }
     elseif ($view_mode == 'community_record') {
 
-      // Add an edit link to community record after its title
-      $node->content['title'][0]['#markup'] = $node->title . l(' (edit)', 'node/' . $node->nid . '/edit');
+        // Add an edit link to community record after its title
+        if(node_access('update', $node)) {
+            $node->content['title'][0]['#markup'] = $node->title . l(' (edit)', 'node/' . $node->nid . '/edit');
+        }
     }
 
   }
