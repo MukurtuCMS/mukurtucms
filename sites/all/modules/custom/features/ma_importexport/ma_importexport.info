@@ -60,6 +60,7 @@ features[feeds_tamper][] = digital_heritage_metadata-related_items-trim
 features[feeds_tamper][] = digital_heritage_metadata-sharing_protocols-explode
 features[feeds_tamper][] = digital_heritage_metadata-sharing_protocols-required
 features[feeds_tamper][] = digital_heritage_metadata-sharing_protocols-trim
+features[feeds_tamper][] = digital_heritage_metadata-sharing_settings-convert_case
 features[feeds_tamper][] = digital_heritage_metadata-sharing_settings-required
 features[feeds_tamper][] = digital_heritage_metadata-subject-explode
 features[feeds_tamper][] = digital_heritage_metadata-subject-trim
