@@ -69,6 +69,12 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
             'callback' => 'ma_importexport_set_target',
             'real_target' => 'field_community_record_children',
         );
+        $targets['field_community_record_parent:guid_or_nid'] = array(
+            'name' => t('Community Record Parent (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Community Record Parent of field_community_record_parent matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_community_record_parent',
+        );
     }
 }
 

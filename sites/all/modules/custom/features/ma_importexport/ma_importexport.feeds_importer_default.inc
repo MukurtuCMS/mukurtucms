@@ -256,6 +256,12 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           34 => array(
+            'source' => 'Community Record Parent',
+            'target' => 'field_community_record_parent:guid_or_nid',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          35 => array(
             'source' => 'Username',
             'target' => 'user_name',
             'unique' => FALSE,
