@@ -60,7 +60,6 @@ function ma_scald_user_default_permissions() {
   $permissions['administer scald atoms'] = array(
     'name' => 'administer scald atoms',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -70,7 +69,6 @@ function ma_scald_user_default_permissions() {
   $permissions['bypass atom access restrictions'] = array(
     'name' => 'bypass atom access restrictions',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'scald',
@@ -80,7 +78,6 @@ function ma_scald_user_default_permissions() {
   $permissions['bypass file access'] = array(
     'name' => 'bypass file access',
     'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'file_entity',
