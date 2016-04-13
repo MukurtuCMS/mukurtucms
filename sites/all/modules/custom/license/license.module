@@ -169,7 +169,7 @@ function mukurtu_build_tk_label_text($entity, $license) {
 function license_build_default_tk_label_text ($license_uri) {
   // Scrape the "TK User" section of the license description
   $desc = file_get_contents($license_uri);
-  preg_match ('/(?<=<p><strong>TK User<\/strong>: |<p><strong>TK User:<\/strong> )(.*)(?=<\/p>)/', $desc, $matches); // In some cases the colon is before the closing strong tag and in other cases after.
+  preg_match ('/(?<=<p><strong>TK Label Description<\/strong>: |<p><strong>TK Label Description:<\/strong> )(.*)(?=<\/p>)/', $desc, $matches); // In some cases the colon is before the closing strong tag and in other cases after.
   $tk_user_text = '<p>' . $matches[0] . '</p>';
   return $tk_user_text;
 }
