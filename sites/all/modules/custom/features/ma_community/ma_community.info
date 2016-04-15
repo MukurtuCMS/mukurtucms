@@ -38,6 +38,7 @@ features[ds_field_settings][] = node|community|browse_teaser
 features[ds_field_settings][] = node|community|default
 features[ds_field_settings][] = node|community|full
 features[ds_field_settings][] = node|community|thumbed
+features[ds_fields][] = community_browse_all_dh_link
 features[ds_fields][] = community_dh_items
 features[ds_fields][] = community_protocol_items
 features[ds_fields][] = group_management_links
