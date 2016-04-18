@@ -279,6 +279,7 @@ function ma_importexport_export_form_submit($form, &$form_state)
   $options['export_community_records'] = $form['dh_export']['options']['export_community_records']['#checked'];
   $options['export_related_items'] = $form['dh_export']['options']['export_related_items']['#checked'];
   $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
+  $options['export_package'] = $form['dh_export']['package']['#value'];
   
   $download_link = ma_importexport_digital_heritage_node_export($items, $format, $options);
   $message = t('Download your exported items: <div class="btn btn-primary export-download"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
@@ -322,7 +323,7 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
       '#type' => 'checkbox',
       '#title' => t('Export local item IDs (nids) for reimport'),
       '#default_value' => 1
-  );  
+  );
   
   // Export Options
   $fields_to_export = array( 'export_community_records' => t('Community Records'),
@@ -334,6 +335,16 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
       '#title' => t('Select fields to export'),
       '#default_value' => array('export_community_records', 'export_all_pages')
   );
+
+  /* Download package option */
+  $options = array('package_dh_only' => t('Download Digital Heritage metadata only'),
+                   'package_zip' => t('Download a Zip archive with all metadata and media assets'));
+
+  $form['dh_export']['package'] = array( '#type' => 'radios',
+  					'#title' => t('Download Options'),
+  					'#default_value' => 'package_dh_only',
+  					'#options' => $options,
+  					);
   
   // Export Format
   $options = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
@@ -401,6 +412,17 @@ function ma_importexport_dh_export_form($settings, &$form_state) {
       '#title' => t('Select fields to export'),
       '#default_value' => array('export_community_records', 'export_all_pages')
   );
+
+
+  /* Download package option */
+  $options = array('package_dh_only' => t('Download Digital Heritage metadata only'),
+                  'package_zip' => t('Download a Zip archive with all metadata and media assets'));
+
+  $form['dh_export']['package'] = array( '#type' => 'radios',
+  					'#title' => t('Download Options'),
+  					'#default_value' => 'package_dh_only',
+  					'#options' => $options,
+  					);
   
   $export_formats = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
 
@@ -435,6 +457,7 @@ function ma_importexport_dh_export_submit($form, $form_state) {
   $options['export_related_items'] = $form['dh_export']['options']['export_related_items']['#checked'];
   $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
   $options['multivalue_delimiter'] = $form_state['values']['csvdelimiter'];
+  $options['export_package'] = $form['dh_export']['package']['#value'];
  
   $return['format'] = $form_state['values']['format'];
   $return['export_options'] = $options;
@@ -929,11 +952,14 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $exported_media = ma_importexport_load_scald_atoms($media_sids);
 
   //  $export = array('digitalheritage' => $export_items,
-  $export = array('digitalheritage' => $digitalheritage_list,
-		  'media' => $exported_media,
-		  'collections' => $collection_list,
-		  'communities' => $community_list,
-		  'protocols' => $protocol_list);
+  $export = array(
+      'nodes' =>array(
+          'digital_heritage' => $digitalheritage_list,
+		  'collection' => $collection_list,
+		  'community' => $community_list,
+		  'cultural_protocol_group' => $protocol_list),
+      'atoms' => $exported_media,
+      );
   
   return ma_importexport_export_csv($export, $multivalue_delimiter, $options['export_nids']);
 }
@@ -1375,172 +1401,111 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
   // Prevent Devel from messing us up.
   $GLOBALS['devel_shutdown'] = TRUE;
 
-  // Write DH CSV
-  $digitalheritage_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $digitalheritage_output = fopen($digitalheritage_temp, 'w');
+  $node_types = array('digital_heritage', 'community', 'collection', 'cultural_protocol_group');
 
-  // Write column headers
-  /*
-    $headers = array();
-  foreach($export['digitalheritage']['items'][0] as $key => $name) {
-   $headers[] = $export['digitalheritage']['headers'][$key] ? $export['digitalheritage']['headers'][$key] : $key;
-   }
-  fputcsv($digitalheritage_output, $headers);
+  // These are the filenames that each node type will have in the Zip archive
+  $node_localnames = array('digital_heritage' => 'digitalheritage.csv',
+                           'community' => 'communities.csv',
+                           'collection' => 'collections.csv',
+                           'cultural_protocol_group' => 'protocols.csv');
+  
+  $atom_types = array('image', 'audio', 'video', 'file');
 
-  // Write items to rows
-  foreach($export['digitalheritage']['items'] as $item) {
-    $item_array = array();
-    foreach($item as $field => $value) {
-      $item_array[] = implode($delimiter, $value);
-    }
-    fputcsv($digitalheritage_output, $item_array);
-  }
-  */  
-
-  // setup output files
-    //  $digitalheritage_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-    //  $digitalheritage_output = fopen($digitalheritage_temp, 'w');
-  $export_files = array(array('filename' => $digitalheritage_temp, 'localname' => 'digitalheritage.csv'));
+  // These are the filenames that each atom type will have in the Zip archive
+  $atom_localnames = array('image' => 'media_images.csv',
+                           'audio' => 'media_audio.csv',
+                           'video' => 'media_video.csv',
+                           'file' => 'media_files.csv');
   
-  $communities_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $communities_output = fopen($communities_temp, 'w');
+  $node_type = array();
+  $atom_output = array();
   
-  $collections_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $collections_output = fopen($collections_temp, 'w');
-
-  $protocols_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $protocols_output = fopen($protocols_temp, 'w');
-  
-  // media
-  $scald_image_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $scald_image_output = fopen($scald_image_temp, 'w');
-  
-  $scald_audio_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $scald_audio_output = fopen($scald_audio_temp, 'w');
-  
-  $scald_video_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $scald_video_output = fopen($scald_video_temp, 'w');
-  
-  $scald_file_temp = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
-  $scald_file_output = fopen($scald_file_temp, 'w');
-  
-  $scald_image_count = 0;
-  $scald_audio_count = 0;
-  $scald_video_count = 0;
-  $scald_file_count = 0;
-
-  // Write headers
-  ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', NULL, $delimiter, $export_ids);
-  ma_importexport_write_node_csv($communities_output, 'community', NULL, $delimiter, $export_ids);
-  ma_importexport_write_node_csv($collections_output, 'collection', NULL, $delimiter, $export_ids);
-  ma_importexport_write_node_csv($protocols_output, 'cultural_protocol_group', NULL, $delimiter, $export_ids);
-  ma_importexport_write_atom_csv($scald_image_output, 'image', NULL, $delimiter, $export_ids);
-  ma_importexport_write_atom_csv($scald_audio_output, 'audio', NULL, $delimiter, $export_ids);
-  ma_importexport_write_atom_csv($scald_video_output, 'video', NULL, $delimiter, $export_ids);
-  ma_importexport_write_atom_csv($scald_file_output, 'file', NULL, $delimiter, $export_ids);
-
-  //  foreach($export['digitalheritage']['items'] as $dh) {
-  foreach($export['digitalheritage'] as $dh) {
-      ma_importexport_write_node_csv($digitalheritage_output, 'digital_heritage', $dh, $delimiter, $export_ids);
-  }
-  
-  foreach($export['communities'] as $community) {
-      ma_importexport_write_node_csv($communities_output, 'community', $community, $delimiter, $export_ids);
+  foreach($node_types as $type) {
+      $node_output[$type]['file'] = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+      $node_output[$type]['handle'] = fopen($node_output[$type]['file'], 'w');
+      $node_output[$type]['localname'] = $node_localnames[$type];
+      $node_output[$type]['count'] = 0;
   }
 
-  foreach($export['protocols'] as $protocol) {
-      ma_importexport_write_node_csv($protocols_output, 'cultural_protocol_group', $protocol, $delimiter, $export_ids);
+  foreach($atom_types as $type) {
+      $atom_output[$type]['file'] = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
+      $atom_output[$type]['handle'] = fopen($atom_output[$type]['file'], 'w');
+      $atom_output[$type]['localname'] = $atom_localnames[$type];
+      $atom_output[$type]['count'] = 0;
   }
-  
-  foreach($export['collections'] as $collection) {
-      ma_importexport_write_node_csv($collections_output, 'collection', $collection, $delimiter, $export_ids);
-  }
-  
-  foreach($export['media'] as $atom) {
-    switch($atom->type) {
-    case 'image':
-        ma_importexport_write_atom_csv($scald_image_output, 'image', $atom, $delimiter, $export_ids);
-        $scald_image_count++;
-        break;
-    case 'audio':
-        ma_importexport_write_atom_csv($scald_audio_output, 'audio', $atom, $delimiter, $export_ids);
-        $scald_audio_count++;
-        break;
-    case 'video':
-        ma_importexport_write_atom_csv($scald_video_output, 'video', $atom, $delimiter, $export_ids);
-        $scald_video_count++;      
-        break;
-    case 'file':
-        ma_importexport_write_atom_csv($scald_file_output, 'file', $atom, $delimiter, $export_ids);
-        $scald_file_count++;      
-        break;
-    default:
-    }
 
-    // Copy Thumbnails
-    foreach($atom->scald_thumbnail[LANGUAGE_NONE] as $thumbnail) {
-      $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
-      $tempmedia = file_unmanaged_copy($thumbnail['uri'], $tempmedia, FILE_EXISTS_REPLACE);
-      if($tempmedia) {
-	$media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
-	$export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $thumbnail['filename']); 
+  // Write headers in CSV files
+  foreach($node_types as $type) {
+      ma_importexport_write_node_csv($node_output[$type]['handle'], $type, NULL, $delimiter, $export_ids);
+  }
+
+  foreach($atom_types as $type) {
+      ma_importexport_write_atom_csv($atom_output[$type]['handle'], $type, NULL, $delimiter, $export_ids);
+  }
+
+  // Export nodes to CSV files
+  foreach($export['nodes'] as $node_type => $nodes_to_export) {
+      if(count($nodes_to_export) > 0) {
+          foreach($nodes_to_export as $node_to_export) {
+              ma_importexport_write_node_csv($node_output[$node_type]['handle'], $node_type, $node_to_export, $delimiter, $export_ids);
+              $node_output[$node_type]['count']++;
+          }
       }
-    }
-
-    // Copy base entity file
-    if(isset($atom->base_entity)) {
-      $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
-      $tempmedia = file_unmanaged_copy($atom->base_entity->uri, $tempmedia, FILE_EXISTS_REPLACE);
-      if($tempmedia) {
-	$media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
-	$export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->base_entity->filename);
-      }
-    }
-
-    // Copy video
-    if(isset($atom->data['video_file'])) {
-      $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
-      $tempmedia = file_unmanaged_copy($atom->data['video_file'], $tempmedia, FILE_EXISTS_REPLACE);
-      if($tempmedia) {
-	$media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
-	$export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. basename($atom->data['video_file']));
-      }
-    }   
   }
 
-  // Close all temp files
-  fclose($digitalheritage_output);
-  fclose($collections_output);
-  fclose($communities_output);
-  fclose($protocols_output);
-  fclose($scald_image_output);
-  fclose($scald_audio_output);
-  fclose($scald_video_output);
-  fclose($scald_file_output);
+  // Export atoms to CSV files and copy media to temp location 
+  foreach($export['atoms'] as $atom) {
+      ma_importexport_write_atom_csv($atom_output[$atom->type]['handle'], $atom->type, $atom, $delimiter, $export_ids);
+      $atom_output[$atom->type]['count']++;
+  
+      // Copy Thumbnails
+      foreach($atom->scald_thumbnail[LANGUAGE_NONE] as $thumbnail) {
+          $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+          $tempmedia = file_unmanaged_copy($thumbnail['uri'], $tempmedia, FILE_EXISTS_REPLACE);
+          if($tempmedia) {
+              $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+              $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $thumbnail['filename']); 
+          }
+      }
 
-  if(count($export['collections']) > 0) {
-    $export_files[] = array('filename' => $collections_temp, 'localname' => 'collections.csv'); 
-  }
-
-  if(count($export['communities']) > 0) {
-    $export_files[] = array('filename' => $communities_temp, 'localname' => 'communities.csv'); 
+      // Copy base entity file
+      if(isset($atom->base_entity)) {
+          $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+          $tempmedia = file_unmanaged_copy($atom->base_entity->uri, $tempmedia, FILE_EXISTS_REPLACE);
+          if($tempmedia) {
+              $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+              $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->base_entity->filename);
+          }
+      }
+      
+      // Copy video
+      if(isset($atom->data['video_file'])) {
+          $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+          $tempmedia = file_unmanaged_copy($atom->data['video_file'], $tempmedia, FILE_EXISTS_REPLACE);
+          if($tempmedia) {
+              $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
+              $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. basename($atom->data['video_file']));
+          }
+      }   
   }
   
-  if(count($export['protocols']) > 0) {
-    $export_files[] = array('filename' => $protocols_temp, 'localname' => 'protocols.csv'); 
+  // Close all node temp files
+  foreach($node_output as $type) {
+      fclose($type['handle']);
+
+      // Add files with content to export list to be packaged for download
+      if($type['count'] > 0) {
+          $export_files[] = array('filename' => $type['file'], 'localname' => $type['localname']); 
+      }
   }
-  
-  if($scald_image_count > 0) {
-    $export_files[] = array('filename' => $scald_image_temp, 'localname' => 'media_images.csv'); 
-  }
-  if($scald_audio_count > 0) {
-    $export_files[] = array('filename' => $scald_audio_temp, 'localname' => 'media_audio.csv');
-  }
-  if($scald_video_count > 0) {
-    $export_files[] = array('filename' => $scald_video_temp, 'localname' => 'media_video.csv');
-  }
-  if($scald_file_count > 0) {
-    $export_files[] = array('filename' => $scald_file_temp, 'localname' => 'media_files.csv'); 
+
+  // Close all atom temp files
+  foreach($atom_output as $type) {
+      fclose($type['handle']);
+
+      if($type['count'] > 0) {
+          $export_files[] = array('filename' => $type['file'], 'localname' => $type['localname']); 
+      }
   }
 
   return ma_importexport_zip_download_url($export_files);
