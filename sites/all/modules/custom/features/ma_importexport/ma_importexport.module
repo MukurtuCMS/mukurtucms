@@ -495,6 +495,10 @@ function ma_importexport_access_export($node) {
     $node = node_load($node);
   }
 
+  if($node->type != 'digital_heritage') {
+      return FALSE;
+  }
+
   if (function_exists('drush_main')) {
     // Always allow drush to export nodes.
     $access = TRUE;
