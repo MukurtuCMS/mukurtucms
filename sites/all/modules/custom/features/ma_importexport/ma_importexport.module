@@ -960,8 +960,13 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
 		  'cultural_protocol_group' => $protocol_list),
       'atoms' => $exported_media,
       );
+
+  $export_all = TRUE;
+  if($options['export_package'] == 'package_dh_only') {
+      $export_all = FALSE;
+  }
   
-  return ma_importexport_export_csv($export, $multivalue_delimiter, $options['export_nids']);
+  return ma_importexport_export_csv($export, $multivalue_delimiter, $options['export_nids'], $export_all);
 }
 
 
@@ -1397,19 +1402,23 @@ function ma_importexport_write_atom_csv($csv_file, $type, $atom = NULL, $delimit
  * @param string $delimiter
  *   The glue string to use as a delimiter between multivalue terms
  */
-function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE) {
+function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE, $export_all = TRUE) {
   // Prevent Devel from messing us up.
   $GLOBALS['devel_shutdown'] = TRUE;
 
-  $node_types = array('digital_heritage', 'community', 'collection', 'cultural_protocol_group');
+  if($export_all) {
+      $node_types = array('digital_heritage', 'community', 'collection', 'cultural_protocol_group');
+      $atom_types = array('image', 'audio', 'video', 'file');
+  } else {
+      $node_types = array('digital_heritage');
+      $atom_types = array();
+  }
 
   // These are the filenames that each node type will have in the Zip archive
   $node_localnames = array('digital_heritage' => 'digitalheritage.csv',
                            'community' => 'communities.csv',
                            'collection' => 'collections.csv',
                            'cultural_protocol_group' => 'protocols.csv');
-  
-  $atom_types = array('image', 'audio', 'video', 'file');
 
   // These are the filenames that each atom type will have in the Zip archive
   $atom_localnames = array('image' => 'media_images.csv',
@@ -1445,7 +1454,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
 
   // Export nodes to CSV files
   foreach($export['nodes'] as $node_type => $nodes_to_export) {
-      if(count($nodes_to_export) > 0) {
+      if(in_array($node_type, $node_types) && count($nodes_to_export) > 0) {
           foreach($nodes_to_export as $node_to_export) {
               ma_importexport_write_node_csv($node_output[$node_type]['handle'], $node_type, $node_to_export, $delimiter, $export_ids);
               $node_output[$node_type]['count']++;
@@ -1455,6 +1464,10 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
 
   // Export atoms to CSV files and copy media to temp location 
   foreach($export['atoms'] as $atom) {
+      if(!in_array($atom->type, $atom_types)) {
+          continue;
+      }
+      
       ma_importexport_write_atom_csv($atom_output[$atom->type]['handle'], $atom->type, $atom, $delimiter, $export_ids);
       $atom_output[$atom->type]['count']++;
   
@@ -1508,7 +1521,22 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
       }
   }
 
+  if(!$export_all) {
+      return ma_importexport_file_download_url($export_files[0]);
+  }
+
   return ma_importexport_zip_download_url($export_files);
+}
+
+function ma_importexport_file_download_url($file) {   
+    // Copy to a managed location that we can present for download
+    $destination = 'private://batch_export/';
+    file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
+    $filename = $file['localname'];
+    $download_file = file_save_data(file_get_contents($file['filename']), $destination . $filename, FILE_EXISTS_RENAME);
+    unlink(drupal_realpath($tempfile));
+    
+    return file_create_url($download_file->uri);
 }
 
 function ma_importexport_zip_download_url($files) {
