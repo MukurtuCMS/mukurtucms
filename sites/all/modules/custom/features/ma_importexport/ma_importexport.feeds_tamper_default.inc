@@ -29,6 +29,21 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-book_pages-require_valid_book_pages';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Book Pages';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Book Pages';
+  $export['digital_heritage_metadata-book_pages-require_valid_book_pages'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-book_pages-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Book Pages';
@@ -106,6 +121,21 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-collections-require_valid_collection';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Collections';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'collection',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Collection';
+  $export['digital_heritage_metadata-collections-require_valid_collection'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-collections-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Collections';
@@ -152,6 +182,21 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-community_record_parent-require_valid_community_record_p';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Community Record Parent';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Require valid Community Record Parent';
+  $export['digital_heritage_metadata-community_record_parent-require_valid_community_record_p'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-community_records-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Community Records';
@@ -164,6 +209,21 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
   $export['digital_heritage_metadata-community_records-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-community_records-require_valid_community_records';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Community Records';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Community Records';
+  $export['digital_heritage_metadata-community_records-require_valid_community_records'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
@@ -509,6 +569,21 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-related_items-require_valid_related_items';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Related Items';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Related Items';
+  $export['digital_heritage_metadata-related_items-require_valid_related_items'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-related_items-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Related Items';
@@ -536,6 +611,20 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 3;
   $feeds_tamper->description = 'Explode';
   $export['digital_heritage_metadata-sharing_protocols-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-sharing_protocols-require_valid_cultural_protocol';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Sharing Protocols';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'node_type' => 'cultural_protocol_group',
+  );
+  $feeds_tamper->weight = 5;
+  $feeds_tamper->description = 'Require valid Cultural Protocol';
+  $export['digital_heritage_metadata-sharing_protocols-require_valid_cultural_protocol'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
