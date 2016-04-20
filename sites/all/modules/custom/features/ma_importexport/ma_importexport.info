@@ -10,6 +10,7 @@ dependencies[] = feeds
 dependencies[] = feeds_entity_processor
 dependencies[] = feeds_tamper
 dependencies[] = feeds_xpathparser
+dependencies[] = mukurtu_feeds_tamper_plugins
 dependencies[] = views
 dependencies[] = views_data_export
 dependencies[] = views_php

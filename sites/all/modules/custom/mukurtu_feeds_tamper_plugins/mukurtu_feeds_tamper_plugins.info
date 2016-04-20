@@ -1,0 +1,7 @@
+name = Mukurtu Feeds Tamper Plugins
+description = Mukurtu specific tamper plugins for feeds
+package = Mukurtu
+dependencies[] = feeds
+core = 7.x
+version = "7.x-0.1"
+
