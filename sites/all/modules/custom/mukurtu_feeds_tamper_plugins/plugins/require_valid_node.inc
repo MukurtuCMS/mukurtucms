@@ -25,6 +25,13 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_form($importer, $elemen
       $options[$node_type] = $node_type_info->name;
   }
 
+  $form['allow_empty'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow this field to be empty'),
+    '#default_value' => !empty($settings['allow_empty']),
+    '#description' => t('Allowing this field to be empty will make this field optional.'),
+  );
+
   $form['node_type'] = array(
       '#type' => 'radios',
       '#options' => $options,
@@ -36,13 +43,21 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_form($importer, $elemen
 }
 
 function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item_key, $element_key, &$field, $settings, $source) {
+    // Check settings for allowed node type
     if(!empty($settings['node_type']) && in_array($settings['node_type'], array_keys(node_type_get_types()))) {
         $node_type = $settings['node_type'];
     } else {
         $node_type = 'any';
     }
 
+    // Check settings to see if we are allowing empty values
+    $allow_empty = (!empty($settings['allow_empty']) && $settings['allow_empty'] == 1) ? TRUE : FALSE;
+    
     foreach($field as $node_ref) {
+        if(empty($node_ref) && $allow_empty) {
+            continue;
+        }
+        
         if(!is_numeric($node_ref)) {
             // Lookup NID from GUID
             $referenced_node_nid = _mukurtu_feeds_tamper_plugins_require_valid_node_lookup_node_by_guid($node_ref);
