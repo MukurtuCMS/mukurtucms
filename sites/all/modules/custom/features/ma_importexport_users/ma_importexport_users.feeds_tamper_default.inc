@@ -74,6 +74,21 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_cultural_protocols-parent_community-require_valid_community';
+  $feeds_tamper->importer = 'import_cultural_protocols';
+  $feeds_tamper->source = 'Parent Community';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 0,
+    'node_type' => 'community',
+  );
+  $feeds_tamper->weight = 3;
+  $feeds_tamper->description = 'Require valid Community Parent';
+  $export['import_cultural_protocols-parent_community-require_valid_community'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_cultural_protocols-parent_community-required';
   $feeds_tamper->importer = 'import_cultural_protocols';
   $feeds_tamper->source = 'Parent Community';
