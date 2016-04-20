@@ -44,23 +44,30 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
 
     foreach($field as $node_ref) {
         if(!is_numeric($node_ref)) {
+            // Lookup NID from GUID
             $referenced_node_nid = _mukurtu_feeds_tamper_plugins_require_valid_node_lookup_node_by_guid($node_ref);
         } else {
+            // Treat as a NID
             $referenced_node_nid = $node_ref;
         }
         $referenced_node = node_load($referenced_node_nid);
 
         if(!empty($referenced_node)) {
+            
+            // A setting of 'any' means any type is valid, so if it's a real node we can move on to the next          
             if($node_type == 'any') {
                 continue;
             }
 
+            // If the node doesn't match the specified type, don't import the item and also notify the user why it failed
             if($referenced_node->type != $node_type) {
                 unset($result->items[$item_key]);
                 _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'did not reference the requried node type of "' . $node_type . '"');
                 return;
             }
+            
         } else {
+            // The node could not be loaded, skip the import for this item and notify the user
             unset($result->items[$item_key]);
             _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'was not a valid node reference');
             return;
