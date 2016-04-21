@@ -65,15 +65,18 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
         if(empty($node_ref) && $allow_empty) {
             continue;
         }
+
+        // Try using the reference as a GUID first
+        $referenced_node_nid = _mukurtu_feeds_tamper_plugins_require_valid_node_lookup_node_by_guid($node_ref);
         
-        if(!is_numeric($node_ref)) {
-            // Lookup NID from GUID
-            $referenced_node_nid = _mukurtu_feeds_tamper_plugins_require_valid_node_lookup_node_by_guid($node_ref);
-        } else {
-            // Treat as a NID
-            $referenced_node_nid = $node_ref;
+        if(is_numeric($referenced_node_nid)) {
+            $referenced_node = node_load($referenced_node_nid);
         }
-        $referenced_node = node_load($referenced_node_nid);
+
+        // If that fails, treat it as a NID
+        if(!$referenced_node and is_numeric($node_ref)) {
+            $referenced_node = node_load($node_ref);
+        }
 
         if(!empty($referenced_node)) {
             
@@ -90,9 +93,21 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
             }
             
         } else {
-            // The node could not be loaded, skip the import for this item and notify the user
-            unset($result->items[$item_key]);
-            _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'was not a valid node reference');
+            // The node could not be loaded, check if we are creating a node with that GUID in this current batch
+            $guid_in_current_batch = FALSE;
+
+            foreach($result->items as $new_node) {
+                if($new_node['guid'] == $node_ref) {
+                    $guid_in_current_batch = TRUE;
+                    break;
+                }
+            }
+
+            // if the node doesn't exist or isn't being created right now, skip the import for this item and notify the user
+            if(!$guid_in_current_batch) {
+                unset($result->items[$item_key]);
+                _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'was not a valid node reference');
+            }
             return;
         }
     }
