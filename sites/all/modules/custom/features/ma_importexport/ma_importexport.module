@@ -80,9 +80,18 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
    if($entity_type == 'node' && $bundle_name == 'cultural_protocol_group') {
         $targets['og_group_ref:guid_or_nid'] = array(
             'name' => t('Parent Community (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Protocol of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'description' => t('The field instance Parent Community of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
             'callback' => 'ma_importexport_set_target',
             'real_target' => 'og_group_ref',
+        );
+   }
+
+   if($entity_type == 'node' && $bundle_name == 'collection') {
+        $targets['field_digital_heritage_items:guid_or_nid'] = array(
+            'name' => t('Digital Heritage Items (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Digital Heritage Items of field_digital_heritage_items matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_digital_heritage_items',
         );
    }
 }

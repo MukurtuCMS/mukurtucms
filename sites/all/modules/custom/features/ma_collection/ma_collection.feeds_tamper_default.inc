@@ -45,6 +45,21 @@ function ma_collection_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_collection-digital_heritage_items-require_valid_digital_heritage';
+  $feeds_tamper->importer = 'import_collection';
+  $feeds_tamper->source = 'Digital Heritage Items';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Digital Heritage';
+  $export['import_collection-digital_heritage_items-require_valid_digital_heritage'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_collection-digital_heritage_items-trim';
   $feeds_tamper->importer = 'import_collection';
   $feeds_tamper->source = 'Digital Heritage Items';

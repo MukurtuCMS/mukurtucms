@@ -34,6 +34,7 @@ function ma_collection_feeds_importer_default() {
       'config' => array(
         'delimiter' => ',',
         'no_headers' => 0,
+        'encoding' => 'UTF-8',
       ),
     ),
     'processor' => array(
@@ -46,40 +47,47 @@ function ma_collection_feeds_importer_default() {
             'source' => 'NID',
             'target' => 'nid',
             'unique' => 1,
+            'language' => 'und',
           ),
           1 => array(
             'source' => 'GUID',
             'target' => 'guid',
             'unique' => 1,
+            'language' => 'und',
           ),
           2 => array(
             'source' => 'Title',
             'target' => 'title',
             'unique' => 0,
+            'language' => 'und',
           ),
           3 => array(
             'source' => 'Summary',
             'target' => 'field_description:summary',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           4 => array(
             'source' => 'Description',
             'target' => 'field_description',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           5 => array(
             'source' => 'Image',
             'target' => 'field_collection_image',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           6 => array(
             'source' => 'Credit',
             'target' => 'field_collection_credit',
             'unique' => FALSE,
+            'language' => 'und',
           ),
           7 => array(
             'source' => 'Digital Heritage Items',
-            'target' => 'field_digital_heritage_items',
+            'target' => 'field_digital_heritage_items:guid_or_nid',
             'unique' => FALSE,
           ),
         ),

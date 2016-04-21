@@ -46,6 +46,7 @@ features[features_api][] = api:2
 features[feeds_importer][] = import_collection
 features[feeds_tamper][] = import_collection-digital_heritage-explode
 features[feeds_tamper][] = import_collection-digital_heritage_items-explode
+features[feeds_tamper][] = import_collection-digital_heritage_items-require_valid_digital_heritage
 features[feeds_tamper][] = import_collection-digital_heritage_items-trim
 features[field_base][] = field_collection_credit
 features[field_base][] = field_collection_image
