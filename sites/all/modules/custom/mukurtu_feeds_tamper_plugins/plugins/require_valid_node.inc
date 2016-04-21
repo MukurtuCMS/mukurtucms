@@ -2,7 +2,8 @@
 
 /**
  * @file
- * Make field required. If not present, the feed item will be removed.
+ * Check referenced NID/GUIDs to make sure it actually represents a valid node of the specified type. 
+ * If not present, the feed item will be removed.
  */
 
 $plugin = array(
@@ -52,8 +53,15 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
 
     // Check settings to see if we are allowing empty values
     $allow_empty = (!empty($settings['allow_empty']) && $settings['allow_empty'] == 1) ? TRUE : FALSE;
-    
-    foreach($field as $node_ref) {
+
+    // Make sure the node references are in an array
+    $node_refs = $field;
+    if(!is_array($field)) {
+        $node_refs = array($field);
+    }
+
+    // Check each node reference to see if it is valid and matches the specified type
+    foreach($node_refs as $node_ref) {
         if(empty($node_ref) && $allow_empty) {
             continue;
         }
