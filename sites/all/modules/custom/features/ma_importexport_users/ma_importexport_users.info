@@ -17,6 +17,7 @@ features[feeds_importer][] = import_categories
 features[feeds_importer][] = import_communities
 features[feeds_importer][] = import_cultural_protocols
 features[feeds_importer][] = import_users
+features[feeds_tamper][] = import_communities-parent_community-require_valid_parent_community
 features[feeds_tamper][] = import_cultural_protocols-group_register-required
 features[feeds_tamper][] = import_cultural_protocols-group_roles-required
 features[feeds_tamper][] = import_cultural_protocols-name-required
