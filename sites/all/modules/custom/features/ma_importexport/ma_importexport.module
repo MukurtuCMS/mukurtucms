@@ -1153,8 +1153,6 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
 
 
 function ma_importexport_node_field_export($node, $field_name, $mapping = array(), $use_guid = FALSE) {
-  global $language;
-
   if(is_null($node)) {
     return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
   }
@@ -1165,7 +1163,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   $result = array();
   switch($field_name) {
   case 'body':
-    foreach($node->{$field_name}[$language->language] as $field_value) {
+    foreach($node->{$field_name}[$node->language] as $field_value) {
       $result[] = $field_value['value']; 
     }
     break;
@@ -1310,8 +1308,6 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
 
 
 function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(), $use_guid = FALSE) {
-  global $language;
-
   if(is_null($atom)) {
     return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
   }
@@ -1373,7 +1369,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     }    
     break;
   case 'field_category':
-    foreach($atom->{$field_name}[$language->language] as $term) {
+    foreach($atom->{$field_name}[$atom->language] as $term) {
       $result[] = taxonomy_term_load($term['tid'])->name;
     }
     break;
