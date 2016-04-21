@@ -103,6 +103,15 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
             'real_target' => 'field_parent_community',
        );
    }
+
+   if($entity_type == 'scald_atom') {
+       $targets['field_scald_protocol:guid_or_nid'] = array(
+           'name' => t('Protocol (Entity reference by Feeds GUID, failover to NID)'),
+           'description' => t('The field instance Protocol of field_scald_protocol matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+           'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_scald_protocol',
+       );
+   }
 }
 
 
