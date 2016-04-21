@@ -726,6 +726,7 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   
   // Strip off ':etid' suffix that Entity Reference puts on the field name to make things easier
   $field_name = str_replace(':etid', '', $field_name);
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
   
   switch($field_name) {
   case 'title':
@@ -1158,6 +1159,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
     return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
   }
 
+  $field_name = str_replace(':etid', '', $field_name);
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
+  
   $result = array();
   switch($field_name) {
   case 'body':
