@@ -148,9 +148,30 @@ function ma_importexport_feeds_lookup_node_by_guid($guid) {
 }
 
 /**
+ *  Lookup sid from guid
+ */
+function ma_importexport_feeds_lookup_atom_by_guid($guid) {
+  return db_select('feeds_item')
+    ->fields('feeds_item', array('entity_id'))
+    ->condition('entity_type', 'scald_atom')
+    ->condition('guid', $guid)
+    ->execute()
+    ->fetchField();
+}
+
+/**
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
+    $scald_dnd_enabled_fields = array(
+        'digital_heritage' => array(
+            'body',
+            'field_tk_body',
+            'field_description',
+            'field_coverage_description'
+        )
+    );
+    
 
   // Custom handling of Youtube and Vimeo URLs
   // This code is adapted from _ma_services_create_atom, which itself is adapted from scald provider code as commented there
@@ -246,14 +267,15 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
       }
     }
+  }
 
-    // Allow import to use GUID or NID for relation fields
-    //    dpm($source);
-    //dpm($entity);
-    //dpm($item);
-
-    
-       
+  // Replace embedded Scald atom GUIDs with local SIDs
+  if(isset($scald_dnd_enabled_fields[$entity->type])) {
+      foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
+          if(!empty($entity->{$field})) {
+              $entity->{$field} = ma_importexport_scald_dnd_decode($entity->{$field});
+          }
+      }
   }
 
 
@@ -814,6 +836,10 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
     }
   }
 
+  if($use_guid) {
+      $result = ma_importexport_scald_dnd_encode($result);
+  }
+  
   return $result;
 }
 
@@ -1164,7 +1190,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   switch($field_name) {
   case 'body':
     foreach($node->{$field_name}[$node->language] as $field_value) {
-      $result[] = $field_value['value']; 
+        $result[] = ma_importexport_scald_dnd_encode($field_value['value']); 
     }
     break;
   case 'field_collection_image':
@@ -1226,10 +1252,10 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
           $result[] = $field_value['sid'];
       }
     }
-    break;    
+    break;
   case 'field_description:summary':
     foreach($node->field_collection_summary[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['value']; 
+        $result[] = ma_importexport_scald_dnd_encode($field_value['value']); 
     }
     break;
   case 'og_group_ref':
@@ -1299,10 +1325,14 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       break;
   default:
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['value']; 
+        $result[] = ma_importexport_scald_dnd_encode($field_value['value']); 
     }
   }
 
+
+  if($use_guid) {
+      $result = ma_importexport_scald_dnd_encode($result);
+  }
   return $result;
 }
 
@@ -1626,4 +1656,65 @@ function ma_importexport_views_pre_render(&$view) {
     }
     $_SESSION['digital_heritage_grid_list_nids'] = $search_nids;
   }
+}
+
+/**
+ *  Replace SIDs with GUIDs in embedded Scald drag and drop fields for export
+ */
+function ma_importexport_scald_dnd_encode($fields) {
+    $single_value = FALSE;
+    if(!is_array($fields)) {
+        $fields = array($fields);
+        $single_value = TRUE;
+    }
+    $sid_pattern = "/\[scald=(\d+):/";
+
+    foreach($fields as $key => $field) {
+        preg_match_all($sid_pattern, $field, $matches);
+        foreach($matches[1] as $sid) {
+            $atom_guid = ma_importexport_make_atom_guid($sid);
+            if($atom_guid != "") {
+                $atom_guid_token = '[MUKURTU_ATOM_GUID:' . $atom_guid . ']';
+                $field = str_replace("[scald=$sid:", "[scald=$atom_guid_token:", $field);
+                $field = str_replace("<!--copyright=$sid", "<!--copyright=$atom_guid_token", $field);
+                $field = str_replace("<!--END copyright=$sid", "<!--END copyright=$atom_guid_token", $field);
+                $fields[$key] = $field;
+            }
+        }
+    }
+
+    if($single_value) {
+        return $fields[0];
+    }
+    return $fields;
+}
+
+/**
+ *  Replace GUIDs with SIDs in embedded Scald drag and drop fields for import
+ */
+function ma_importexport_scald_dnd_decode($fields) {
+    $single_value = FALSE;
+    if(!is_array($fields)) {
+        $fields = array($fields);
+        $single_value = TRUE;        
+    }
+    
+    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/";
+
+    foreach($fields as $key => $field) {
+        preg_match_all($guid_pattern, $field, $matches);
+
+        foreach(array_unique($matches[1]) as $guid) {
+            $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($guid);
+            if($atom_sid) {
+                $field = str_replace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
+                $fields[$key] = $field;
+            }
+        }
+    }
+    
+    if($single_value) {
+        return $fields[0];
+    }
+    return $fields;
 }
