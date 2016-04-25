@@ -671,20 +671,26 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
         $book_pages = array();
 
         if($options['export_community_records']) {
-            foreach($node->field_community_record_children[LANGUAGE_NONE] as $cr) {
-                $community_records[] = $cr['target_id'];
+            if(!empty($node->field_community_record_children)) {
+                foreach($node->field_community_record_children[LANGUAGE_NONE] as $cr) {
+                    $community_records[] = $cr['target_id'];
+                }
             }
         }
         
-        if($options['export_related_items']) {                   
-            foreach($node->field_related_dh_items[LANGUAGE_NONE] as $ri) {
-                $related_items[] = $ri['target_id'];
+        if($options['export_related_items']) {
+            if(!empty($node->field_related_dh_items)) {
+                foreach($node->field_related_dh_items[LANGUAGE_NONE] as $ri) {
+                    $related_items[] = $ri['target_id'];
+                }
             }
         }
 
         if($options['export_all_pages']) {
-            foreach($node->field_book_children[LANGUAGE_NONE] as $page) {
-                $book_pages[] = $page['target_id'];
+            if(!empty($node->field_book_children)) {
+                foreach($node->field_book_children[LANGUAGE_NONE] as $page) {
+                    $book_pages[] = $page['target_id'];
+                }
             }
         }
 
@@ -746,10 +752,13 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
     return $result;
   }
   
-  // Strip off ':etid' suffix that Entity Reference puts on the field name to make things easier
-  $field_name = str_replace(':etid', '', $field_name);
-  $field_name = str_replace(':guid_or_nid', '', $field_name);
-  
+  // Strip off any suffix on the field name to make things easier
+  $field_name = preg_replace("/:.+$/", '', $field_name);
+
+  if($field_name != 'guid' && empty($item->{$field_name})) {
+      return $result;
+  }
+
   switch($field_name) {
   case 'title':
     $result[] = $item->title;
@@ -785,6 +794,7 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   case 'field_dh_type':
   case 'field_format':
   case 'field_language':
+  case 'field_people':
   case 'field_publisher':
   case 'field_subject':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $term) {
@@ -1142,28 +1152,6 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
     unset($mapping['field_scald_created:start']);
   }
 
-  // Force bundle specific field changes
-  switch($type) {
-  case 'image':
-    $mapping['field_scald_protocol'] = $mapping['og_group_ref:etid'];
-    unset($mapping['og_group_ref:etid']);
-    $mapping['scald_thumbnail'] = $mapping['scald_thumbnail:uri'];
-    unset($mapping['scald_thumbnail:uri']);
-    $mapping['field_original_dng'] = $mapping['field_original_dng:uri'];
-    unset($mapping['field_original_dng:uri']);
-    $mapping['field_archival_tiff'] = $mapping['field_archival_tiff:uri'];
-    unset($mapping['field_archival_tiff:uri']);
-    $mapping['field_full_size_jpeg'] = $mapping['field_full_size_jpeg:uri'];
-    unset($mapping['field_full_size_jpeg:uri']);
-    break;
-  case 'audio':
-    break;
-  case 'video':
-    break;
-  case 'file':    
-    break;
-  }
-
   if(!$export_sids) {
       if(isset($mapping['sid'])) {
           unset($mapping['sid']);
@@ -1183,10 +1171,15 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
     return (isset($mapping[$field_name])) ? array($mapping[$field_name]) : array($field_name);
   }
 
-  $field_name = str_replace(':etid', '', $field_name);
-  $field_name = str_replace(':guid_or_nid', '', $field_name);
-  
   $result = array();
+
+  // Strip off any suffix on the field name to make things easier
+  $field_name = preg_replace("/:.+$/", '', $field_name);
+
+  if($field_name != 'guid' && empty($node->{$field_name})) {
+      return $result;
+  }
+ 
   switch($field_name) {
   case 'body':
     foreach($node->{$field_name}[$node->language] as $field_value) {
@@ -1344,6 +1337,14 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
 
   $result = array();
 
+  
+  // Strip off any suffix on the field name to make things easier
+  $field_name = preg_replace("/:.+$/", '', $field_name);
+
+  if($field_name != 'guid' && empty($atom->{$field_name})) {
+      return $result;
+  }
+  
   switch($field_name) {
   case 'sid':
     $result[] = $atom->sid;
@@ -1600,7 +1601,6 @@ function ma_importexport_file_download_url($file) {
     file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
     $filename = $file['localname'];
     $download_file = file_save_data(file_get_contents($file['filename']), $destination . $filename, FILE_EXISTS_RENAME);
-    unlink(drupal_realpath($tempfile));
     
     return file_create_url($download_file->uri);
 }
