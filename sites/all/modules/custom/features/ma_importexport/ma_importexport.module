@@ -753,12 +753,15 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   }
   
   // Strip off any suffix on the field name to make things easier
-  $field_name = preg_replace("/:.+$/", '', $field_name);
+  $field_name = str_replace(':etid', '', $field_name);
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
+  $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
-  if($field_name != 'guid' && empty($item->{$field_name})) {
+  // If the field is empty we can return now, except on special fields like guid
+  if($base_field_name != 'guid' && empty($item->{$base_field_name})) {
       return $result;
   }
-
+  
   switch($field_name) {
   case 'title':
     $result[] = $item->title;
@@ -1174,12 +1177,15 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   $result = array();
 
   // Strip off any suffix on the field name to make things easier
-  $field_name = preg_replace("/:.+$/", '', $field_name);
+  $field_name = str_replace(':etid', '', $field_name);
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
+  $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
-  if($field_name != 'guid' && empty($node->{$field_name})) {
+  // If the field is empty we can return now, except on special fields like guid
+  if($base_field_name != 'guid' && empty($node->{$base_field_name})) {
       return $result;
   }
- 
+  
   switch($field_name) {
   case 'body':
     foreach($node->{$field_name}[$node->language] as $field_value) {
@@ -1339,9 +1345,12 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
 
   
   // Strip off any suffix on the field name to make things easier
-  $field_name = preg_replace("/:.+$/", '', $field_name);
+  $field_name = str_replace(':etid', '', $field_name);
+  $field_name = str_replace(':guid_or_nid', '', $field_name);
+  $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
-  if($field_name != 'guid' && empty($atom->{$field_name})) {
+  // If the field is empty we can return now, except on special fields like guid
+  if($base_field_name != 'guid' && empty($atom->{$base_field_name})) {
       return $result;
   }
   
