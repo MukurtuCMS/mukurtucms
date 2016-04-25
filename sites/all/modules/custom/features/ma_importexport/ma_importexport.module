@@ -758,10 +758,11 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
   // If the field is empty we can return now, except on special fields like guid
-  if($base_field_name != 'guid' && empty($item->{$base_field_name})) {
+  $excluded_fields = array('guid', 'user_name');
+  if(!in_array($base_field_name, $excluded_fields) && empty($item->{$base_field_name})) {
       return $result;
   }
-  
+ 
   switch($field_name) {
   case 'title':
     $result[] = $item->title;
@@ -1182,7 +1183,8 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
   // If the field is empty we can return now, except on special fields like guid
-  if($base_field_name != 'guid' && empty($node->{$base_field_name})) {
+  $excluded_fields = array('guid', 'user_name');
+  if(!in_array($base_field_name, $excluded_fields) && empty($node->{$base_field_name})) {
       return $result;
   }
   
@@ -1350,7 +1352,8 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
   // If the field is empty we can return now, except on special fields like guid
-  if($base_field_name != 'guid' && empty($atom->{$base_field_name})) {
+  $excluded_fields = array('guid', 'user_name');
+  if(!in_array($base_field_name, $excluded_fields) && empty($atom->{$base_field_name})) {
       return $result;
   }
   
