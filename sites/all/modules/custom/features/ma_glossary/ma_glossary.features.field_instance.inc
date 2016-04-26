@@ -140,7 +140,7 @@ function ma_glossary_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_glossary_recording',
-    'label' => 'Spoken',
+    'label' => 'Recording',
     'required' => 0,
     'settings' => array(
       'referencable_types' => array(
@@ -249,7 +249,7 @@ function ma_glossary_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_glossary_synonyms',
-    'label' => 'Synonyms',
+    'label' => 'Related Dictionary Words',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -525,7 +525,7 @@ function ma_glossary_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_transliteration',
-    'label' => 'Transliteration',
+    'label' => 'Pronunciation',
     'required' => 0,
     'settings' => array(
       'context' => 'debug',
@@ -633,13 +633,13 @@ function ma_glossary_field_default_field_instances() {
   t('Description');
   t('Language');
   t('Media');
+  t('Pronunciation');
   t('Protocol');
+  t('Recording');
+  t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Sample Sentences');
-  t('Spoken');
-  t('Synonyms');
   t('Translation');
-  t('Transliteration');
 
   return $field_instances;
 }
