@@ -1352,7 +1352,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   $base_field_name = preg_replace("/:.+$/", '', $field_name);
 
   // If the field is empty we can return now, except on special fields like guid
-  $excluded_fields = array('guid', 'user_name');
+  $excluded_fields = array('guid', 'user_name', 'Temporary target 1', 'scald_thumbnail:uri');
   if(!in_array($base_field_name, $excluded_fields) && empty($atom->{$base_field_name})) {
       return $result;
   }
@@ -1427,6 +1427,8 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     $media_dir = '[mukurtu:batch_import_temp_directory]/media/' . $atom->type . '/' . $atom->sid . '/';
     if($atom->type == 'video') {
       $result[] = $media_dir . basename($atom->data['video_file']);
+    } elseif($atom->type == 'audio') {
+        $result[] = $media_dir . basename($atom->data['audio_file']);
     } else {
       $result[] = $media_dir . $atom->base_entity->filename;
     }
