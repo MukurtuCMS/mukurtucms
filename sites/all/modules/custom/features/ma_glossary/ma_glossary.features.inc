@@ -57,14 +57,6 @@ function ma_glossary_views_api($module = NULL, $api = NULL) {
  */
 function ma_glossary_node_info() {
   $items = array(
-    'glossary' => array(
-      'name' => t('Glossary'),
-      'base' => 'node_content',
-      'description' => t('A collection of glossary terms.'),
-      'has_title' => '1',
-      'title_label' => t('Glossary Name'),
-      'help' => '',
-    ),
     'glossary_term' => array(
       'name' => t('Glossary Term'),
       'base' => 'node_content',
