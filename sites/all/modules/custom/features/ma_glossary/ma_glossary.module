@@ -7,15 +7,6 @@
 include_once 'ma_glossary.features.inc';
 
 function ma_glossary_menu() {
-    $items['node/%node/add-term'] = array(
-        'title' => 'Add New Glossary Term',
-        'page callback' => 'ma_glossary_add_glossary_term',
-        'page arguments' => array(1),
-        'access callback' => 'ma_glossary_add_glossary_term_check',
-        'access arguments' => array(1),
-        'type' => MENU_LOCAL_TASK,
-        'weight' => 100,
-    );
 
     // Form to set default language
     $items['dashboard/set-default-language'] = array(
@@ -24,7 +15,6 @@ function ma_glossary_menu() {
       'page arguments' => array('glossary_set_default_language'),
       'access arguments' => array('administer taxonomy'),
     );
-
     return $items;
 }
 
@@ -38,12 +28,10 @@ function glossary_set_default_language() {
 
     $form['default_language'] = array (
       '#type' => 'radios',
-
       '#title' => 'Select the default language used when creating glossary terms',
       '#default_value' => variable_get ('mukurtu_default_language'),
       '#options' => $options,
     );
-
 
     $form['submit'] = array(
       '#type' => 'submit',
@@ -60,185 +48,18 @@ function glossary_set_default_language_submit ($form, &$form_state) {
         drupal_set_message('Default language set to <i>' . $term->name . '</i>.');
     }
     drupal_goto ('dashboard');
-
 }
 
-
-
-function ma_glossary_add_glossary_term($node) {
-    drupal_goto('node/add/glossary-term/' . $node->nid);
-}
-
-function ma_glossary_add_glossary_term_check($node) {
-    if($node->type == 'glossary') {
-        return node_access("update", $node);
-    }
-
-    return FALSE;
-}
-
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
 function ma_glossary_form_glossary_term_node_form_alter(&$form, &$form_state) {
 
     // Actions to perform when adding (not editing) glossary terms
     if ($form['#action'] == '/node/add/glossary-term') {
 
-        // When creating in a glossary collection, add that info to current page title
-        if(arg(2) == 'glossary-term') {
-            if(arg(3) && $glossary_node = node_load(arg(3))) {
-                drupal_set_title(t("Create Glossary Term in ") . $glossary_node->title);
-            }
-        }
-
         // Set the default language, if one is defined
         $form['field_glossary_term_language'][LANGUAGE_NONE]['#default_value'] = variable_get ('mukurtu_default_language');
     }
-
 }
 
-function ma_glossary_node_insert($node) {
-    if($node->type == 'glossary_term') {
-        // add new glossary term to glossary, if one was specified
-        if(arg(3) && $glossary_node = node_load(arg(3))) {
-            if($glossary_node->type == 'glossary') {
-                $glossary_node->field_glossary_terms[LANGUAGE_NONE][]['target_id'] = $node->nid;
-                node_save($glossary_node);
-                // This drupal_goto was disabling pathauto for the glossary term, need to find out why
-                //                drupal_goto(drupal_get_path_alias('node/' . $glossary_node->nid));
-            }
-        }
-    }
-}
-
-function ma_glossary_field_extra_fields() {
-    $extra['node']['glossary_term'] = array('display' => array('found_in_glossary' => array(
-        'label' => t('Found in Glossary'),
-        'description' => t('Which glossary or glossaries the term is found in.'),
-        'weight' => '-5',
-    ),),);
-
-    $extra['node']['glossary_term']['display']['glossary_navigation'] = array(
-        'label' => t('Glossary Navigation Buttons'),
-        'description' => t('Glossary Navigation Buttons'),
-        'weight' => '-10',
-    );
-    return $extra;
-}
-
-
-function ma_glossary_node_view($node, $view_mode) {
-    if($node->type == 'glossary') {
-        if($view_mode == 'full') {
-            $search_params = drupal_get_query_parameters();
-
-            if(isset($search_params['letter']) && strlen($search_params['letter']) == 1) {
-                $letter = strtolower($search_params['letter']);
-            } else {
-                $letter = NULL;
-            }
-            
-            foreach($node->content['field_glossary_terms']['#items'] as $key => $target_id) {
-                $node->content['field_glossary_terms'][$key]['#markup'] = "";
-            }
-
-            $glossary_content = views_embed_view('mukurtu_glossary', 'attachment_mukurtu_glossary', $node->nid);
-            $glossary_content = str_replace('glossaries/' . $node->nid . '/', drupal_get_path_alias('node/' . $node->nid) . '?letter=', $glossary_content);
-            
-            $glossary_content .= views_embed_view('mukurtu_glossary', 'page_mukurtu_glossaries', $node->nid, $letter);
-
-            // This is super hacky.  We want to embed the glossary terms view in the glossary node page.  Here we
-            // alter the links the view generates to stay on the glossary node rather than going to the view.
-            $glossary_content = str_replace('glossaries/' . $node->nid, drupal_get_path_alias('node/' . $node->nid), $glossary_content);
-            $glossary_content = preg_replace('@(action="/glossary/[\w\-]+)/\w@', '$1', $glossary_content);
-
-            // Adds the current glossary first character as a hidden field for the exposed filter form
-            if($letter) {
-                $hidden_letter = '<input type="hidden" name="letter" value="' . $letter . '"></form>';
-                $glossary_content = str_replace('</form>', $hidden_letter, $glossary_content);
-
-                // Add active class selected letter
-                $active_letter_pattern = '@(\?letter=' . $letter . '")@';
-                $glossary_content = preg_replace($active_letter_pattern, '$1 class="active"', $glossary_content);
-            }            
-
-            $node->content['field_glossary_terms'][0]['#markup'] = $glossary_content;
-        }
-    } elseif($node->type == 'glossary_term') {
-        // Find which glossaries the term belongs to
-        $glossaries_found_in = array();
-        $glossary_links = "";
-        $query = new EntityFieldQuery();
-        $result = $query->entityCondition('entity_type', 'node')
-                ->entityCondition('bundle', 'glossary')
-                ->execute();
-        $glossary_nodes = node_load_multiple(array_keys($result['node']));
-        foreach($glossary_nodes as $glossary) {
-            foreach($glossary->field_glossary_terms[LANGUAGE_NONE] as $term) {
-                if($term['target_id'] == $node->nid) {
-                    $glossaries_found_in[] = $glossary->nid;
-                    if(count($glossaries_found_in) > 1) {
-                        $glossary_links .= ', ';
-                    }
-                    $glossary_home_path = url(drupal_get_path_alias('node/' . $glossary->nid));
-                    $glossary_links .= '<a href="'.$glossary_home_path.'">'. $glossary->title . '</a>';
-                }
-            }
-        }
-
-        // Builds the list of glossaries the term is a member of
-        $glossary_label = (count($glossaries_found_in) > 1) ? "glossaries" : "glossary";
-        $node->content['found_in_glossary'] = array('#markup' => '<div class="field field-found-in-glossary"><div class=\'label-above\'>Found in ' . $glossary_label . ':</div>' . $glossary_links . '</div>',);
-      
-        // If the term is just in a single glossary, build buttons that link to the previous/next terms
-        if(count($glossaries_found_in) == 1) {
-            $previous = "";
-            $next = "";
-            foreach($glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE] as $key => $term) {
-                if($term['target_id'] == $node->nid) {
-                    if(isset($glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key - 1])) {
-                        $previous_nid = $glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key - 1]['target_id'];
-                        $previous_node = node_load($previous_nid);
-                        $previous = '< ' . $previous_node->title . ' (' . $previous_node->field_translation[LANGUAGE_NONE][0]['value'] . ')';
-                        $previous_link = url(drupal_get_path_alias('node/' . $previous_nid));
-                    }
-                    if(isset($glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key + 1])){
-                        $next_nid = $glossary_nodes[$glossaries_found_in[0]]->field_glossary_terms[LANGUAGE_NONE][$key + 1]['target_id'];
-                        $next_node = node_load($next_nid);
-                        $next = $next_node->title . ' (' . $next_node->field_translation[LANGUAGE_NONE][0]['value'] . ') >';
-                        $next_link = url(drupal_get_path_alias('node/' . $next_nid));
-                    }
-                    break;
-                }
-            }
-            
-            $previous_button = "";            
-            if($previous != "") {
-                $previous_button = '<a href="'. $previous_link . '" class="previous-glossary-term btn">' . $previous . '</a>';
-            }
-
-            $next_button = "";
-            if($next != "") {
-                $next_button = '<a href="'. $next_link . '" class="previous-glossary-term btn">' . $next . '</a>';
-            }
-
-            $node->content['glossary_navigation'] = array('#markup' => '<div class="row"><div class="col-md-6">'. $previous_button .'</div><div class="col-md-6">' . $next_button . '</div></div>');
-            
-        }
-      
-        //    $node->content
-    }
-}
-
-function ma_glossary_views_pre_render(&$view) {
-    //  dpm($view);
-
-    if($view->name == 'mukurtu_glossary' && $view->is_attachment == FALSE) {
-        if(isset($view->args)) {
-            $node = node_load($view->args[0]);
-            if($node) {
-                //	dpm($node);
-                //$view->set_title($node->field_glossary_source[LANGUAGE_NONE][0]['value']);
-                $view->set_title($node->title);
-            }
-        }
-    }
-}
