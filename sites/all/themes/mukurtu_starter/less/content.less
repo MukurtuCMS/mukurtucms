@@ -194,7 +194,7 @@
 }
 
 
-//// Grid/List Views (both DH and Collections)
+//// Grid/List Views (DH, Collections, and just List view on Glossary)
 
 // toggle display via the grid/list clicker
 
@@ -222,7 +222,8 @@
 }
 
 .view-digital-heritage-grid-list,
-.view-collections-grid-list {
+.view-collections-grid-list,
+.view-glossary-terms {
   .view-header {
     float:right;
     margin-top:-60px;
@@ -804,12 +805,45 @@ a.tooltips span {
   z-index: -1;
 }
 
-
 // DH management page
 .form-item-operation {
     padding-left: 15px;
 }
 
-.export-download > a {
-    color: #ffffff;
+// Glossaries
+.view-mukurtu-glossary .fluid-width-video-wrapper {
+    height: 20px;
+    padding-right: 0px;
+}
+
+.view-mukurtu-glossary .views-field-field-media-asset {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.view-mukurtu-glossary td.views-field-field-media-asset {
+    width: 60px;
+}
+
+.view-mukurtu-glossary .views-field-field-media-asset ul {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+view-mukurtu-glossary .views-field-field-media-asset div {
+    height: 20px;
+    width: 60px;
+}
+
+.view-display-id-attachment_mukurtu_glossary a.active {
+    font-weight: bold;
+    color: #000000;
+}
+
+.next-glossary-term , .previous-glossary-term {
+    display: inline-block;
+    padding: 5px 14px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 15px;
 }

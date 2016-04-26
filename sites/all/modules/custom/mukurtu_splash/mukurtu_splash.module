@@ -488,6 +488,23 @@ function mukurtu_splash_block_manage_content() {
     );
   }
 
+  if (user_access('administer taxonomy')) {
+    $items[] = array(
+      'title' => 'Manage Languages',
+      'href' => 'admin/structure/taxonomy/language',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Manage the languages that are selectable in glossary terms and digital heritage items.'),
+    );
+  }
+
+  if (user_access('administer taxonomy')) {
+    $items[] = array(
+      'title' => 'Set Default Language',
+      'href' => 'dashboard/set-default-language',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Set the default language used when creating glossary terms.'),
+    );
+  }
 
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
