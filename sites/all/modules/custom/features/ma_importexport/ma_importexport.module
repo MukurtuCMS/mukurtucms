@@ -265,8 +265,8 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
   if(isset($scald_dnd_enabled_fields[$entity->type])) {
       foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
           if(!empty($entity->{$field})) {
-              foreach($entity->{$field}[LANGUAGE_NONE] as $field_value) {
-                  $field_value['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
+              foreach($entity->{$field}[LANGUAGE_NONE] as $key => $field_value) {
+                  $entity->{$field}[LANGUAGE_NONE][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
               }
           }
       }
@@ -917,6 +917,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $community_list = array();
   $collection_list = array();
   $protocol_list = array();
+  $media_sids = array();
   
   // Process Items
   foreach ($dh_items as $item) {
@@ -937,6 +938,12 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
       );
     }
 
+    // Look for Scald atoms in embedded text fields
+    $embedded_atoms = ma_importexport_get_embedded_dnd_scald_atoms($original_node);
+    foreach($embedded_atoms as $embedded_atom) {
+        $media_sids[] =	$embedded_atom;
+    }
+
     $export_item = array();
 
     // Loop through the fields we want to export
@@ -950,9 +957,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   }
 
   // Get list of scald atoms from digital heritage items
-  $media_sids = array();
   foreach($export_items['items'] as $export_item) {
-      $media_sids = array_merge(ma_importexport_get_embedded_dnd_scald_atoms($export_item), $media_sids);
       foreach($export_item['field_media_asset'] as $media) {
           if(!in_array($media, $media_sids)) {
               $media_sids[] = $media;
@@ -1443,13 +1448,6 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
   foreach($mapping as $field_name => $field) {
       $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, TRUE)); //SCT
   }
-
-
-  //DEBUG
-  /*  if($nodetype == 'digital_heritage') {
-      dpm($mapping);
-      dpm($row);
-      }*/
     
   fputcsv($csv_file, $row);
 }
@@ -1710,23 +1708,24 @@ function ma_importexport_scald_dnd_decode($fields) {
 
     foreach($fields as $key => $field) {
         preg_match_all($guid_pattern, $field, $matches);
-        dpm($matches);
         foreach(array_unique($matches[1]) as $guid) {
             $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($guid);
-            dpm("$guid returned $atom_sid");
             if($atom_sid) {
                 $field = str_replace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
                 $fields[$key] = $field;
             }
         }
     }
-    
+
     if($single_value) {
         return $fields[0];
     }
     return $fields;
 }
 
+/**
+ * Return the array of scald drag and drop enabled fields, by entity type
+ */
 // TODO: See if we can get this programmatically
 function ma_importexport_get_scald_dnd_enabled_fields()
 {
@@ -1742,6 +1741,11 @@ function ma_importexport_get_scald_dnd_enabled_fields()
     return $scald_dnd_enabled_fields;
 }
 
+
+/**
+ * Take a node or nid and return an array of scald atom sids that are
+ * embedded in fields.
+ */
 function ma_importexport_get_embedded_dnd_scald_atoms($node)
 {
     $sids = array();
@@ -1768,6 +1772,5 @@ function ma_importexport_get_embedded_dnd_scald_atoms($node)
         }
     }
 
-    dpm($sids);
     return $sids;
 }
