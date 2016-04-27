@@ -226,7 +226,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 29,
+      'weight' => 30,
     ),
   );
 
@@ -312,7 +312,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 30,
+      'weight' => 31,
     ),
   );
 
@@ -420,9 +420,9 @@ function ma_digitalheritage_field_default_field_instances() {
   $field_instances['node-digital_heritage-field_collection'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A collection is an aggregation of digital heritage resources. Type the title of an existing collection in your CMS.
-',
+    'description' => 'A collection is an aggregation of digital heritage items.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -479,22 +479,26 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_collection',
     'label' => 'Collection',
     'required' => 0,
     'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => 1,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 26,
     ),
   );
@@ -581,7 +585,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 28,
+      'weight' => 29,
     ),
   );
 
@@ -2420,7 +2424,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.',
+    'description' => 'A reference to one or many related digital heritage items.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2478,7 +2482,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_dh_items',
-    'label' => 'Related Items',
+    'label' => 'Related Digital Heritage Items',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -2490,14 +2494,90 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => 1,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 27,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_related_dictionary_words'
+  $field_instances['node-digital_heritage-field_related_dictionary_words'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'A reference to one or many related dictionary words.',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 44,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_dictionary_words',
+    'label' => 'Related Dictionary Words',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+      ),
+      'type' => 'options_select',
+      'weight' => 28,
     ),
   );
 
@@ -3307,9 +3387,9 @@ function ma_digitalheritage_field_default_field_instances() {
   t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
   t('A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
 ');
-  t('A collection is an aggregation of digital heritage resources. Type the title of an existing collection in your CMS.
-');
-  t('A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.');
+  t('A collection is an aggregation of digital heritage items.');
+  t('A reference to one or many related dictionary words.');
+  t('A reference to one or many related digital heritage items.');
   t('An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.');
   t('Book Pages');
   t('Book Parent');
@@ -3344,7 +3424,8 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Rather than a quick gloss (like the description field) the Cultural Narrative field allows one to provide lengthy commentary, stories, observations, or any relevant context for the DH item. For example, if the item is a basket, this field may contain a narrative from the basket-maker about his/her technique or it may tell a story about how the baskets were used by previous generations and how they are used today. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Reference to a resource from which the present content is derived, for example if the content is part of a larger collection, ie. "McWhorter Collection" or "Smith Photos."
 ');
-  t('Related Items');
+  t('Related Dictionary Words');
+  t('Related Digital Heritage Items');
   t('Rights');
   t('Source');
   t('Subject');
