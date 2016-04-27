@@ -206,6 +206,7 @@ function ma_search_api_default_search_api_index() {
         "status" : { "type" : "boolean" },
         "sticky" : { "type" : "boolean" },
         "title" : { "type" : "text", "boost" : "5.0" },
+        "title_az_glossary" : { "type" : "string" },
         "type" : { "type" : "string" }
       }
     },
@@ -631,6 +632,12 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_glossary_synonyms",
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "title_az_glossary" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "title_az_glossary",
+            "type" : "string",
             "boost" : "1.0"
           }
         }

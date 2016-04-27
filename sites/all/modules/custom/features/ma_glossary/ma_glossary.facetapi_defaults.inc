@@ -72,6 +72,53 @@ function ma_glossary_facetapi_default_facet_settings() {
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
   $facet->api_version = 1;
+  $facet->name = 'search_api@default_node_index::title_az_glossary';
+  $facet->searcher = 'search_api@default_node_index';
+  $facet->realm = '';
+  $facet->facet = 'title_az_glossary';
+  $facet->enabled = FALSE;
+  $facet->settings = array(
+    'operator' => 'or',
+    'hard_limit' => '-1',
+    'dependencies' => array(
+      'roles' => array(
+        1 => 0,
+        2 => 0,
+        6 => 0,
+        3 => 0,
+        5 => 0,
+        4 => 0,
+      ),
+      'bundle' => 'none',
+      'bundle_selected' => array(
+        'article' => 0,
+        'page' => 0,
+        'collection' => 0,
+        'community' => 0,
+        'cultural_protocol_group' => 0,
+        'digital_heritage' => 0,
+        'glossary' => 0,
+        'glossary_term' => 0,
+        'panel' => 0,
+      ),
+    ),
+    'facet_mincount' => '1',
+    'facet_missing' => '0',
+    'flatten' => 0,
+    'individual_parent' => 0,
+    'query_type' => 'term',
+    'limit_active_items' => 0,
+    'default_true' => '1',
+    'facet_search_ids' => array(),
+    'exclude' => 0,
+    'pretty_paths_alias' => 'title',
+    'title_az_glossary_field' => '',
+  );
+  $export['search_api@default_node_index::title_az_glossary'] = $facet;
+
+  $facet = new stdClass();
+  $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
+  $facet->api_version = 1;
   $facet->name = 'search_api@default_node_index:block:field_glossary_term_language';
   $facet->searcher = 'search_api@default_node_index';
   $facet->realm = 'block';
@@ -154,6 +201,63 @@ function ma_glossary_facetapi_default_facet_settings() {
     ),
   );
   $export['search_api@default_node_index:block:field_translation'] = $facet;
+
+  $facet = new stdClass();
+  $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
+  $facet->api_version = 1;
+  $facet->name = 'search_api@default_node_index:block:title_az_glossary';
+  $facet->searcher = 'search_api@default_node_index';
+  $facet->realm = 'block';
+  $facet->facet = 'title_az_glossary';
+  $facet->enabled = TRUE;
+  $facet->settings = array(
+    'weight' => 0,
+    'widget' => 'search_api_glossary',
+    'filters' => array(
+      'active_items' => array(
+        'status' => 0,
+        'weight' => '-50',
+      ),
+      'glossary_rewrite_items' => array(
+        'status' => 1,
+        'weight' => '-49',
+      ),
+    ),
+    'active_sorts' => array(
+      'active' => 'active',
+      'glossary_az' => 'glossary_az',
+      'count' => 0,
+      'display' => 0,
+      'indexed' => 0,
+    ),
+    'sort_weight' => array(
+      'active' => '-50',
+      'glossary_az' => '-49',
+      'count' => '-48',
+      'display' => '-47',
+      'indexed' => '-46',
+    ),
+    'sort_order' => array(
+      'active' => '3',
+      'glossary_az' => '4',
+      'count' => '3',
+      'display' => '4',
+      'indexed' => '4',
+    ),
+    'empty_behavior' => 'none',
+    'facet_more_text' => 'Show more',
+    'facet_fewer_text' => 'Show fewer',
+    'soft_limit' => '0',
+    'nofollow' => 1,
+    'show_expanded' => 0,
+    'show_all' => 0,
+    'show_count' => 0,
+    'empty_text' => array(
+      'value' => '',
+      'format' => 'filtered_html',
+    ),
+  );
+  $export['search_api@default_node_index:block:title_az_glossary'] = $facet;
 
   return $export;
 }

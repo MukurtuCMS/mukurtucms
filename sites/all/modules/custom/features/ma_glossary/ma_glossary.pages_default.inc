@@ -141,12 +141,12 @@ function ma_glossary_default_page_manager_pages() {
     $pane->pid = 'new-2';
     $pane->panel = 'center';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-MCkHWhX76DE3uWj0L6Nof21KTVpxIyHh';
+    $pane->subtype = 'facetapi-j4ofkY8Mm2DXhtD0cJlPexdUQ4v5sH7l';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Language',
+      'override_title_text' => 'Title',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -163,12 +163,12 @@ function ma_glossary_default_page_manager_pages() {
     $pane->pid = 'new-3';
     $pane->panel = 'center';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-eoJbbh0FZuBbOM3YuytrcKc1VNogMMot';
+    $pane->subtype = 'facetapi-MCkHWhX76DE3uWj0L6Nof21KTVpxIyHh';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Translation',
+      'override_title_text' => 'Language',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -183,6 +183,28 @@ function ma_glossary_default_page_manager_pages() {
     $display->panels['center'][2] = 'new-3';
     $pane = new stdClass();
     $pane->pid = 'new-4';
+    $pane->panel = 'center';
+    $pane->type = 'block';
+    $pane->subtype = 'facetapi-eoJbbh0FZuBbOM3YuytrcKc1VNogMMot';
+    $pane->shown = TRUE;
+    $pane->access = array();
+    $pane->configuration = array(
+      'override_title' => 1,
+      'override_title_text' => 'Translation',
+      'override_title_heading' => 'h2',
+    );
+    $pane->cache = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
+    $pane->css = array();
+    $pane->extras = array();
+    $pane->position = 3;
+    $pane->locks = array();
+    $display->content['new-4'] = $pane;
+    $display->panels['center'][3] = 'new-4';
+    $pane = new stdClass();
+    $pane->pid = 'new-5';
     $pane->panel = 'left';
     $pane->type = 'views_panes';
     $pane->subtype = 'glossary_terms-all';
@@ -197,8 +219,8 @@ function ma_glossary_default_page_manager_pages() {
     $pane->extras = array();
     $pane->position = 0;
     $pane->locks = array();
-    $display->content['new-4'] = $pane;
-    $display->panels['left'][0] = 'new-4';
+    $display->content['new-5'] = $pane;
+    $display->panels['left'][0] = 'new-5';
   $display->hide_title = PANELS_TITLE_FIXED;
   $display->title_pane = '0';
   $handler->conf['display'] = $display;
