@@ -6,15 +6,32 @@
  */
 
 /**
- * Enable the "Glossary" browse menu item
+ * Enable the "Browse Dictionary" browse menu item
  */
 function ma_glossary_install () {
   $item = array(
     'link_path' => 'glossary',
-    'link_title' => 'Glossary',
+    'link_title' => 'Browse Dictionary',
     'menu_name' => 'menu-browse-menu',
     'weight' => -40,
     'expanded' => 0,
+    'customized' => 1,
+  );
+  menu_link_save($item);
+}
+
+/**
+ * Enable the "Browse Dictionary" browse menu item
+ */
+function ma_glossary_update_7001() {
+  field_delete_field('og_user_node1');
+  $item = array(
+    'link_path' => 'glossary',
+    'link_title' => 'Browse Dictionary',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -40,
+    'expanded' => 0,
+    'customized' => 1,
   );
   menu_link_save($item);
 }
