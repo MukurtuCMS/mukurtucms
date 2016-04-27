@@ -1,19 +1,19 @@
 <?php
 /**
  * @file
- * ma_glossary.context_config.inc
+ * ma_dictionary.context_config.inc
  */
 
 /**
  * Implements hook_default_scald_context_config().
  */
-function ma_glossary_default_scald_context_config() {
+function ma_dictionary_default_scald_context_config() {
   $export = array();
 
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
   $context_config->api_version = 1;
-  $context_config->context = 'mukurtu_glossary_table';
+  $context_config->context = 'mukurtu_dictionary_table';
   $context_config->transcoder = array(
     'audio' => array(
       '*' => 'passthrough',
@@ -50,7 +50,7 @@ function ma_glossary_default_scald_context_config() {
     'width' => '50px',
     'height' => '20px',
   );
-  $export['mukurtu_glossary_table'] = $context_config;
+  $export['mukurtu_dictionary_table'] = $context_config;
 
   return $export;
 }

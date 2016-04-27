@@ -177,12 +177,12 @@ function ma_search_api_default_search_api_index() {
         "field_definition" : { "type" : "text" },
         "field_description:value" : { "type" : "text" },
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
         "field_glossary_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_glossary_synonyms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
-        "field_glossary_term_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
@@ -606,9 +606,9 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0",
             "column" : "field_translation"
           },
-          "field_glossary_term_language" : {
+          "field_dictionary_word_language" : {
             "table" : "search_api_db_default_node_index",
-            "column" : "field_glossary_term_language",
+            "column" : "field_dictionary_word_language",
             "type" : "integer",
             "boost" : "1.0"
           },
@@ -639,7 +639,7 @@ function ma_search_api_default_search_api_server() {
             "column" : "title_az_glossary",
             "type" : "string",
             "boost" : "1.0"
-          }
+          },
         }
       }
     },

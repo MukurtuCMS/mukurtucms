@@ -1,65 +1,18 @@
 <?php
 /**
  * @file
- * ma_glossary.features.field_instance.inc
+ * ma_dictionary.features.field_instance.inc
  */
 
 /**
  * Implements hook_field_default_field_instances().
  */
-function ma_glossary_field_default_field_instances() {
+function ma_dictionary_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-glossary-field_description'
-  $field_instances['node-glossary-field_description'] = array(
-    'bundle' => 'glossary',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 1,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_description',
-    'label' => 'Description',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'display_summary' => 0,
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 11,
-    ),
-  );
-
-  // Exported field_instance: 'node-glossary_term-field_definition'
-  $field_instances['node-glossary_term-field_definition'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_definition'
+  $field_instances['node-dictionary_word-field_definition'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -108,9 +61,108 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_glossary_recording'
-  $field_instances['node-glossary_term-field_glossary_recording'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_description'
+  $field_instances['node-dictionary_word-field_description'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_description',
+    'label' => 'Description',
+    'required' => 0,
+    'settings' => array(
+      'context' => 'debug',
+      'context_default' => 'sdl_editor_representation',
+      'display_summary' => 0,
+      'dnd_enabled' => 1,
+      'mee_enabled' => 0,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_language'
+  $field_instances['node-dictionary_word-field_dictionary_word_language'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 2,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_dictionary_word_language',
+    'label' => 'Language',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+      ),
+      'type' => 'options_buttons',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_recording'
+  $field_instances['node-dictionary_word-field_dictionary_word_recording'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'An audio or video file of the word spoken in its native tongue.',
@@ -139,7 +191,7 @@ function ma_glossary_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_glossary_recording',
+    'field_name' => 'field_dictionary_word_recording',
     'label' => 'Recording',
     'required' => 0,
     'settings' => array(
@@ -162,9 +214,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_glossary_related_dh'
-  $field_instances['node-glossary_term-field_glossary_related_dh'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_related_dh'
+  $field_instances['node-dictionary_word-field_dictionary_word_related_dh'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -194,7 +246,7 @@ function ma_glossary_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_glossary_related_dh',
+    'field_name' => 'field_dictionary_word_related_dh',
     'label' => 'Related Digital Heritage Items',
     'required' => 0,
     'settings' => array(
@@ -216,9 +268,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_glossary_synonyms'
-  $field_instances['node-glossary_term-field_glossary_synonyms'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_synonyms'
+  $field_instances['node-dictionary_word-field_dictionary_word_synonyms'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -248,7 +300,7 @@ function ma_glossary_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_glossary_synonyms',
+    'field_name' => 'field_dictionary_word_synonyms',
     'label' => 'Related Dictionary Words',
     'required' => 0,
     'settings' => array(
@@ -270,55 +322,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_glossary_term_language'
-  $field_instances['node-glossary_term-field_glossary_term_language'] = array(
-    'bundle' => 'glossary_term',
-    'default_value' => array(),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'taxonomy',
-        'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 2,
-      ),
-      'search_result' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 16,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_glossary_term_language',
-    'label' => 'Language',
-    'required' => 1,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'apply_chosen' => '',
-      ),
-      'type' => 'options_buttons',
-      'weight' => 3,
-    ),
-  );
-
-  // Exported field_instance: 'node-glossary_term-field_media_asset'
-  $field_instances['node-glossary_term-field_media_asset'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_media_asset'
+  $field_instances['node-dictionary_word-field_media_asset'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Any media related to the term. Examples:
@@ -380,9 +386,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_sample_sentence'
-  $field_instances['node-glossary_term-field_sample_sentence'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_sample_sentence'
+  $field_instances['node-dictionary_word-field_sample_sentence'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -443,9 +449,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_translation'
-  $field_instances['node-glossary_term-field_translation'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_translation'
+  $field_instances['node-dictionary_word-field_translation'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -495,9 +501,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-field_transliteration'
-  $field_instances['node-glossary_term-field_transliteration'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-field_transliteration'
+  $field_instances['node-dictionary_word-field_transliteration'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -546,9 +552,9 @@ function ma_glossary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-glossary_term-og_group_ref'
-  $field_instances['node-glossary_term-og_group_ref'] = array(
-    'bundle' => 'glossary_term',
+  // Exported field_instance: 'node-dictionary_word-og_group_ref'
+  $field_instances['node-dictionary_word-og_group_ref'] = array(
+    'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,

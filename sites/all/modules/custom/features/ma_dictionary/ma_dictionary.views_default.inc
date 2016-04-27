@@ -1,21 +1,21 @@
 <?php
 /**
  * @file
- * ma_glossary.views_default.inc
+ * ma_dictionary.views_default.inc
  */
 
 /**
  * Implements hook_views_default_views().
  */
-function ma_glossary_views_default_views() {
+function ma_dictionary_views_default_views() {
   $export = array();
 
   $view = new view();
-  $view->name = 'glossary_terms';
+  $view->name = 'dictionary_words';
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'search_api_index_default_node_index';
-  $view->human_name = 'Glossary Terms';
+  $view->human_name = 'Dictionary Words';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
@@ -80,7 +80,7 @@ function ma_glossary_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'search_api_index_default_node_index';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'glossary_term' => 'glossary_term',
+    'dictionary_word' => 'dictionary_word',
   );
   $handler->display->display_options['filters']['type']['group'] = 1;
   /* Filter criterion: Indexed Node: Status */
@@ -96,7 +96,7 @@ function ma_glossary_views_default_views() {
   $handler = $view->new_display('panel_pane', 'Content pane', 'all');
   $handler->display->display_options['exposed_block'] = TRUE;
   $handler->display->display_options['inherit_panels_path'] = '1';
-  $translatables['glossary_terms'] = array(
+  $translatables['dictionary_words'] = array(
     t('Master'),
     t('more'),
     t('Apply'),
@@ -117,7 +117,7 @@ function ma_glossary_views_default_views() {
     t('Content pane'),
     t('View panes'),
   );
-  $export['glossary_terms'] = $view;
+  $export['dictionary_words'] = $view;
 
   return $export;
 }

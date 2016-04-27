@@ -1,22 +1,22 @@
 <?php
 /**
  * @file
- * ma_glossary.field_group.inc
+ * ma_dictionary.field_group.inc
  */
 
 /**
  * Implements hook_field_group_info().
  */
-function ma_glossary_field_group_info() {
+function ma_dictionary_field_group_info() {
   $export = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_glossary_basic|node|glossary_term|form';
-  $field_group->group_name = 'group_glossary_basic';
+  $field_group->identifier = 'group_dictionary_word_basic|node|dictionary_word|form';
+  $field_group->group_name = 'group_dictionary_word_basic';
   $field_group->entity_type = 'node';
-  $field_group->bundle = 'glossary_term';
+  $field_group->bundle = 'dictionary_word';
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
@@ -24,8 +24,8 @@ function ma_glossary_field_group_info() {
     'weight' => '14',
     'children' => array(
       0 => 'field_definition',
-      1 => 'field_glossary_recording',
-      2 => 'field_glossary_term_language',
+      1 => 'field_dictionary_word_recording',
+      2 => 'field_dictionary_word_language',
       3 => 'field_media_asset',
       4 => 'field_sample_sentence',
       5 => 'field_translation',
@@ -37,28 +37,28 @@ function ma_glossary_field_group_info() {
       'formatter' => 'closed',
       'instance_settings' => array(
         'description' => '',
-        'classes' => 'group-glossary-basic field-group-htab',
+        'classes' => 'group-dictionary_word-basic field-group-htab',
         'required_fields' => 1,
       ),
     ),
   );
-  $export['group_glossary_basic|node|glossary_term|form'] = $field_group;
+  $export['group_dictionary_word_basic|node|dictionary_word|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_glossary_relations|node|glossary_term|form';
-  $field_group->group_name = 'group_glossary_relations';
+  $field_group->identifier = 'group_dictionary_word_relations|node|dictionary_word|form';
+  $field_group->group_name = 'group_dictionary_word_relations';
   $field_group->entity_type = 'node';
-  $field_group->bundle = 'glossary_term';
+  $field_group->bundle = 'dictionary_word';
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Relations',
     'weight' => '15',
     'children' => array(
-      0 => 'field_glossary_related_dh',
-      1 => 'field_glossary_synonyms',
+      0 => 'field_dictionary_word_related_dh',
+      1 => 'field_dictionary_word_synonyms',
       2 => 'og_group_ref',
     ),
     'format_type' => 'htab',
@@ -66,28 +66,28 @@ function ma_glossary_field_group_info() {
       'formatter' => 'closed',
       'instance_settings' => array(
         'description' => '',
-        'classes' => 'group-glossary-relations field-group-htab',
+        'classes' => 'group-dictionary_word-relations field-group-htab',
         'required_fields' => 1,
       ),
     ),
   );
-  $export['group_glossary_relations|node|glossary_term|form'] = $field_group;
+  $export['group_dictionary_word_relations|node|dictionary_word|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_tabs|node|glossary_term|form';
+  $field_group->identifier = 'group_tabs|node|dictionary_word|form';
   $field_group->group_name = 'group_tabs';
   $field_group->entity_type = 'node';
-  $field_group->bundle = 'glossary_term';
+  $field_group->bundle = 'dictionary_word';
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
     'weight' => '0',
     'children' => array(
-      0 => 'group_glossary_basic',
-      1 => 'group_glossary_relations',
+      0 => 'group_dictionary_word_basic',
+      1 => 'group_dictionary_word_relations',
     ),
     'format_type' => 'htabs',
     'format_settings' => array(
@@ -98,7 +98,7 @@ function ma_glossary_field_group_info() {
       ),
     ),
   );
-  $export['group_tabs|node|glossary_term|form'] = $field_group;
+  $export['group_tabs|node|dictionary_word|form'] = $field_group;
 
   return $export;
 }

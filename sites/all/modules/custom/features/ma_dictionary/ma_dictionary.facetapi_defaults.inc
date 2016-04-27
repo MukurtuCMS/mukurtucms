@@ -1,22 +1,22 @@
 <?php
 /**
  * @file
- * ma_glossary.facetapi_defaults.inc
+ * ma_dictionary.facetapi_defaults.inc
  */
 
 /**
  * Implements hook_facetapi_default_facet_settings().
  */
-function ma_glossary_facetapi_default_facet_settings() {
+function ma_dictionary_facetapi_default_facet_settings() {
   $export = array();
 
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
   $facet->api_version = 1;
-  $facet->name = 'search_api@default_node_index::field_glossary_term_language';
+  $facet->name = 'search_api@default_node_index::field_dictionary_word_language';
   $facet->searcher = 'search_api@default_node_index';
   $facet->realm = '';
-  $facet->facet = 'field_glossary_term_language';
+  $facet->facet = 'field_dictionary_word_language';
   $facet->enabled = FALSE;
   $facet->settings = array(
     'operator' => 'and',
@@ -24,6 +24,7 @@ function ma_glossary_facetapi_default_facet_settings() {
     'dependencies' => array(
       'bundle' => 'none',
       'bundle_selected' => array(),
+      'roles' => array(),
     ),
     'facet_mincount' => '1',
     'facet_missing' => '0',
@@ -38,7 +39,7 @@ function ma_glossary_facetapi_default_facet_settings() {
     'pretty_paths_taxonomy_pathauto' => 1,
     'pretty_paths_taxonomy_pathauto_vocabulary' => 'language',
   );
-  $export['search_api@default_node_index::field_glossary_term_language'] = $facet;
+  $export['search_api@default_node_index::field_dictionary_word_language'] = $facet;
 
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
@@ -119,10 +120,10 @@ function ma_glossary_facetapi_default_facet_settings() {
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
   $facet->api_version = 1;
-  $facet->name = 'search_api@default_node_index:block:field_glossary_term_language';
+  $facet->name = 'search_api@default_node_index:block:field_dictionary_word_language';
   $facet->searcher = 'search_api@default_node_index';
   $facet->realm = 'block';
-  $facet->facet = 'field_glossary_term_language';
+  $facet->facet = 'field_dictionary_word_language';
   $facet->enabled = TRUE;
   $facet->settings = array(
     'weight' => 0,
@@ -157,7 +158,7 @@ function ma_glossary_facetapi_default_facet_settings() {
       'format' => 'filtered_html',
     ),
   );
-  $export['search_api@default_node_index:block:field_glossary_term_language'] = $facet;
+  $export['search_api@default_node_index:block:field_dictionary_word_language'] = $facet;
 
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */

@@ -1,21 +1,21 @@
 <?php
 /**
  * @file
- * ma_glossary.features.inc
+ * ma_dictionary.features.inc
  */
 
 /**
  * Implements hook_default_cer().
  */
-function ma_glossary_default_cer() {
+function ma_dictionary_default_cer() {
   $items = array();
-  $items['node:glossary_term:field_glossary_synonyms*node:glossary_term:field_glossary_synonyms'] = entity_import('cer', '{
-    "identifier" : "node:glossary_term:field_glossary_synonyms*node:glossary_term:field_glossary_synonyms",
+  $items['node:dictionary_word:field_dictionary_word_synonyms*node:dictionary_word:field_dictionary_word_synonyms'] = entity_import('cer', '{
+    "identifier" : "node:dictionary_word:field_dictionary_word_synonyms*node:dictionary_word:field_dictionary_word_synonyms",
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
     "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:glossary_term:field_glossary_synonyms" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:glossary_term:field_glossary_synonyms" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:dictionary_word:field_dictionary_word_synonyms" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:dictionary_word:field_dictionary_word_synonyms" } ] },
     "rdf_mapping" : []
   }');
   return $items;
@@ -24,7 +24,7 @@ function ma_glossary_default_cer() {
 /**
  * Implements hook_ctools_plugin_api().
  */
-function ma_glossary_ctools_plugin_api($module = NULL, $api = NULL) {
+function ma_dictionary_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "ds" && $api == "ds") {
     return array("version" => "1");
   }
@@ -48,17 +48,17 @@ function ma_glossary_ctools_plugin_api($module = NULL, $api = NULL) {
 /**
  * Implements hook_views_api().
  */
-function ma_glossary_views_api($module = NULL, $api = NULL) {
+function ma_dictionary_views_api($module = NULL, $api = NULL) {
   return array("api" => "3.0");
 }
 
 /**
  * Implements hook_node_info().
  */
-function ma_glossary_node_info() {
+function ma_dictionary_node_info() {
   $items = array(
-    'glossary_term' => array(
-      'name' => t('Glossary Term'),
+    'dictionary_word' => array(
+      'name' => t('Dictionary Word'),
       'base' => 'node_content',
       'description' => t('Provide definitions, sample sentences, and audio/video for terms.'),
       'has_title' => '1',

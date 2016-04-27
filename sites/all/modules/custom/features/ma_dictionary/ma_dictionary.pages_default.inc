@@ -1,21 +1,21 @@
 <?php
 /**
  * @file
- * ma_glossary.pages_default.inc
+ * ma_dictionary.pages_default.inc
  */
 
 /**
  * Implements hook_default_page_manager_pages().
  */
-function ma_glossary_default_page_manager_pages() {
+function ma_dictionary_default_page_manager_pages() {
   $page = new stdClass();
   $page->disabled = FALSE; /* Edit this to true to make a default page disabled initially */
   $page->api_version = 1;
-  $page->name = 'browse_glossary';
+  $page->name = 'browse_dictionary';
   $page->task = 'page';
-  $page->admin_title = 'Browse Glossary';
+  $page->admin_title = 'Browse Dictionary';
   $page->admin_description = '';
-  $page->path = 'glossary';
+  $page->path = 'dictionary';
   $page->access = array(
     'plugins' => array(
       0 => array(
@@ -28,6 +28,8 @@ function ma_glossary_default_page_manager_pages() {
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array();
   $page->arguments = array();
@@ -38,9 +40,9 @@ function ma_glossary_default_page_manager_pages() {
   $handler = new stdClass();
   $handler->disabled = FALSE; /* Edit this to true to make a default handler disabled initially */
   $handler->api_version = 1;
-  $handler->name = 'page_browse_glossary__panel';
+  $handler->name = 'page_browse_dictionary__panel';
   $handler->task = 'page';
-  $handler->subtask = 'browse_glossary';
+  $handler->subtask = 'browse_dictionary';
   $handler->handler = 'panel_context';
   $handler->weight = 0;
   $handler->conf = array(
@@ -111,14 +113,14 @@ function ma_glossary_default_page_manager_pages() {
     ),
   );
   $display->cache = array();
-  $display->title = 'Glossary';
+  $display->title = 'Dictionary';
   $display->content = array();
   $display->panels = array();
     $pane = new stdClass();
     $pane->pid = 'new-1';
     $pane->panel = 'center';
     $pane->type = 'block';
-    $pane->subtype = 'views--exp-glossary_terms-all';
+    $pane->subtype = 'views--exp-dictionary_words-all';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
@@ -163,7 +165,7 @@ function ma_glossary_default_page_manager_pages() {
     $pane->pid = 'new-3';
     $pane->panel = 'center';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-MCkHWhX76DE3uWj0L6Nof21KTVpxIyHh';
+    $pane->subtype = 'facetapi-ouKoXsqCwerg0QTUdl8QMqWGs15NtJKc';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
@@ -207,7 +209,7 @@ function ma_glossary_default_page_manager_pages() {
     $pane->pid = 'new-5';
     $pane->panel = 'left';
     $pane->type = 'views_panes';
-    $pane->subtype = 'glossary_terms-all';
+    $pane->subtype = 'dictionary_words-all';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array();
@@ -225,7 +227,7 @@ function ma_glossary_default_page_manager_pages() {
   $display->title_pane = '0';
   $handler->conf['display'] = $display;
   $page->default_handlers[$handler->name] = $handler;
-  $pages['browse_glossary'] = $page;
+  $pages['browse_dictionary'] = $page;
 
   return $pages;
 

@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * ma_glossary.features.field_base.inc
+ * ma_dictionary.features.field_base.inc
  */
 
 /**
  * Implements hook_field_default_field_bases().
  */
-function ma_glossary_field_default_field_bases() {
+function ma_dictionary_field_default_field_bases() {
   $field_bases = array();
 
   // Exported field_base: 'field_definition'
@@ -37,13 +37,47 @@ function ma_glossary_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_glossary_recording'
-  $field_bases['field_glossary_recording'] = array(
+  // Exported field_base: 'field_dictionary_word_language'
+  $field_bases['field_dictionary_word_language'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_glossary_recording',
+    'field_name' => 'field_dictionary_word_language',
+    'foreign keys' => array(
+      'tid' => array(
+        'columns' => array(
+          'tid' => 'tid',
+        ),
+        'table' => 'taxonomy_term_data',
+      ),
+    ),
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'language',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_dictionary_word_recording'
+  $field_bases['field_dictionary_word_recording'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_dictionary_word_recording',
     'foreign keys' => array(),
     'indexes' => array(
       'sid' => array(
@@ -57,13 +91,13 @@ function ma_glossary_field_default_field_bases() {
     'type' => 'atom_reference',
   );
 
-  // Exported field_base: 'field_glossary_related_dh'
-  $field_bases['field_glossary_related_dh'] = array(
+  // Exported field_base: 'field_dictionary_word_related_dh'
+  $field_bases['field_dictionary_word_related_dh'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_glossary_related_dh',
+    'field_name' => 'field_dictionary_word_related_dh',
     'foreign keys' => array(
       'node' => array(
         'columns' => array(
@@ -101,13 +135,13 @@ function ma_glossary_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_glossary_synonyms'
-  $field_bases['field_glossary_synonyms'] = array(
+  // Exported field_base: 'field_dictionary_word_synonyms'
+  $field_bases['field_dictionary_word_synonyms'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_glossary_synonyms',
+    'field_name' => 'field_dictionary_word_synonyms',
     'foreign keys' => array(
       'node' => array(
         'columns' => array(
@@ -136,47 +170,13 @@ function ma_glossary_field_default_field_bases() {
           'type' => 'none',
         ),
         'target_bundles' => array(
-          'glossary_term' => 'glossary_term',
+          'dictionary_word' => 'dictionary_word',
         ),
       ),
       'target_type' => 'node',
     ),
     'translatable' => 0,
     'type' => 'entityreference',
-  );
-
-  // Exported field_base: 'field_glossary_term_language'
-  $field_bases['field_glossary_term_language'] = array(
-    'active' => 1,
-    'cardinality' => 1,
-    'deleted' => 0,
-    'entity_types' => array(),
-    'field_name' => 'field_glossary_term_language',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
-    'indexes' => array(
-      'tid' => array(
-        0 => 'tid',
-      ),
-    ),
-    'locked' => 0,
-    'module' => 'taxonomy',
-    'settings' => array(
-      'allowed_values' => array(
-        0 => array(
-          'vocabulary' => 'language',
-          'parent' => 0,
-        ),
-      ),
-    ),
-    'translatable' => 0,
-    'type' => 'taxonomy_term_reference',
   );
 
   // Exported field_base: 'field_sample_sentence'
