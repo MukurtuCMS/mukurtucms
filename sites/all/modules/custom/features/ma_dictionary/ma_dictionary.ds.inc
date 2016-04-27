@@ -22,6 +22,11 @@ function ma_dictionary_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_dictionary_word_synonyms' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|dictionary_word|default'] = $ds_fieldsetting;
 
