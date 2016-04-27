@@ -479,7 +479,7 @@ function ma_glossary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 0,
+      'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 0,
       'user_register_form' => FALSE,
@@ -530,7 +530,7 @@ function ma_glossary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 0,
+      'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 0,
       'user_register_form' => FALSE,
