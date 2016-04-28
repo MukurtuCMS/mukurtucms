@@ -272,8 +272,15 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
       }
   }
 
-
   if($entity->feeds_item->entity_type == 'scald_atom') {
+      // If a scald atom comes in with just a GUID and no SID, check if that atom already exists and re-use that sid
+      if(!empty($entity->feeds_item->guid) && empty($entity->feeds_item->sid) && $entity->sid == "") {
+          $existing_sid = ma_importexport_feeds_lookup_atom_by_guid($entity->feeds_item->guid);
+          if($existing_sid) {
+              $entity->sid = $existing_sid;
+          }
+      }
+
     if($entity->feeds_item->id == 'import_media_audio') {
       $type = 'audio';
     } elseif($entity->feeds_item->id == 'import_media_video') {
@@ -281,7 +288,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
     } else {
       return;
     }
-    
+
     $path = ScaldAtomController::getThumbnailPath($type);
     try {
         $data = file_get_contents($entity->{'Temporary target 1'});
