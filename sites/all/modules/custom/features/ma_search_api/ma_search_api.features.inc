@@ -639,7 +639,7 @@ function ma_search_api_default_search_api_server() {
             "column" : "title_az_glossary",
             "type" : "string",
             "boost" : "1.0"
-          },
+          }
         }
       }
     },
