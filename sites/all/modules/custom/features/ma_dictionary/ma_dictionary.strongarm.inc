@@ -193,7 +193,7 @@ function ma_dictionary_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_dictionary_word_pattern';
-  $strongarm->value = 'dictionary_word-term/[node:title]';
+  $strongarm->value = 'dictionary-word/[node:title]';
   $export['pathauto_node_dictionary_word_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
