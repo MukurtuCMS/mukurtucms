@@ -25,7 +25,7 @@ function ma_core_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 1,
     'expanded' => 0,
-    'weight' => -41,
+    'weight' => -40,
     'customized' => 1,
   );
   // Exported menu link: main-menu_log-in:user/login
@@ -43,7 +43,7 @@ function ma_core_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -42,
+    'weight' => -41,
     'customized' => 1,
   );
   // Exported menu link: main-menu_log-out:user/logout
@@ -61,7 +61,7 @@ function ma_core_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -43,
+    'weight' => -42,
     'customized' => 1,
   );
   // Exported menu link: main-menu_user-account:user
@@ -84,7 +84,7 @@ function ma_core_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -44,
+    'weight' => -43,
     'customized' => 1,
   );
   // Translatables

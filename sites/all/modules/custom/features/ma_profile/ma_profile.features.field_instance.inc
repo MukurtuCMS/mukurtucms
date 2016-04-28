@@ -49,7 +49,7 @@ function ma_profile_field_default_field_instances() {
   // Exported field_instance: 'user-user-og_user_node'
   $field_instances['user-user-og_user_node'] = array(
     'bundle' => 'user',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
