@@ -273,6 +273,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
   }
 
   if($entity->feeds_item->entity_type == 'scald_atom') {
+
       // If a scald atom comes in with just a GUID and no SID, check if that atom already exists and re-use that sid
       if(!empty($entity->feeds_item->guid) && empty($entity->feeds_item->sid) && $entity->sid == "") {
           $existing_sid = ma_importexport_feeds_lookup_atom_by_guid($entity->feeds_item->guid);
@@ -285,10 +286,56 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
       $type = 'audio';
     } elseif($entity->feeds_item->id == 'import_media_video') {
       $type = 'video';
+
+      // TODO: Generalize handling of different scald providers.
+      // Check for YouTube link
+      if (stripos($entity->{'Temporary target 1'}, 'youtube.com/')) {
+          $provider = 'scald_youtube';
+          $identifier = scald_youtube_parse_id($entity->{'Temporary target 1'}, TRUE);
+          $info = scald_youtube_video($identifier['id']);
+      }
+
+      // Check for Vimeo link
+      elseif (stripos($entity->{'Temporary target 1'}, 'vimeo.com/')) {
+          $provider = 'scald_vimeo';
+          $vimeo_id = substr(strrchr($entity->{'Temporary target 1'}, '/'), 1);
+          $video_identifier = scald_vimeo_parse_id($vimeo_id, TRUE);
+          $info = scald_vimeo_video($video_identifier);
+      }
+
+      if($info) {
+          $entity->title = $info->title;
+          $entity->provider = $provider;
+          $entity->base_id = $info->id;
+
+          // Save video width and height.
+          $entity->data['video_width'] = $info->width;
+          $entity->data['video_height'] = $info->height;
+
+          // Download a copy of the video thumbnail. This makes it possible
+          // to do interesting manipulation with image styles presets.
+          $thumb = drupal_http_request($info->thumbnail['src']);
+          if ($thumb->code == 200 && $directory = ScaldAtomController::getThumbnailPath('video')) {
+              $dest = $directory . '/' . $provider . '-' . $info->id . '.jpg';
+              $file = file_save_data($thumb->data, $dest);
+
+              if ($file) {
+                  // Set the file status to temporary.
+                  $query = db_update('file_managed')
+                         ->condition('fid', $file->fid)
+                         ->fields(array('status' => 0))
+                         ->execute();
+                  $langcode = field_language('scald_entity', $entity, 'scald_thumbnail');
+                  $entity->scald_thumbnail[$langcode][0] = (array) $file;
+              }
+          }
+          return;
+      }
     } else {
       return;
     }
 
+    // This is for audio and video files import only
     $path = ScaldAtomController::getThumbnailPath($type);
     try {
         $data = file_get_contents($entity->{'Temporary target 1'});
@@ -1433,7 +1480,17 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   case 'scald_file:uri':
     $media_dir = '[mukurtu:batch_import_temp_directory]/media/' . $atom->type . '/' . $atom->sid . '/';
     if($atom->type == 'video') {
-      $result[] = $media_dir . basename($atom->data['video_file']);
+        if($atom->provider == 'scald_video') {
+            $result[] = $media_dir . basename($atom->data['video_file']);
+        }
+
+        if($atom->provider == 'scald_youtube') {
+            $result[] = 'http://www.youtube.com/watch?v=' . $atom->base_id;
+        }
+
+        if($atom->provider == 'scald_vimeo') {
+            $result[] = 'http://www.vimeo.com/' . $atom->base_id;
+        }
     } elseif($atom->type == 'audio') {
         $result[] = $media_dir . basename($atom->data['audio_file']);
     } else {
