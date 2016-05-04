@@ -13,6 +13,51 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_communities-nid-require_valid_community';
+  $feeds_tamper->importer = 'import_communities';
+  $feeds_tamper->source = 'nid';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'community',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Require valid Community';
+  $export['import_communities-nid-require_valid_community'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_communities-nid-trim';
+  $feeds_tamper->importer = 'import_communities';
+  $feeds_tamper->source = 'nid';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Trim';
+  $export['import_communities-nid-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_communities-parent_community-require_valid_parent_community';
+  $feeds_tamper->importer = 'import_communities';
+  $feeds_tamper->source = 'Parent Community';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'community',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Require valid Parent Community';
+  $export['import_communities-parent_community-require_valid_parent_community'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_cultural_protocols-group_register-required';
   $feeds_tamper->importer = 'import_cultural_protocols';
   $feeds_tamper->source = 'Group Register';
@@ -58,6 +103,36 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_cultural_protocols-nid-require_valid_cultural_protocol';
+  $feeds_tamper->importer = 'import_cultural_protocols';
+  $feeds_tamper->source = 'nid';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'cultural_protocol_group',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Require valid Cultural Protocol';
+  $export['import_cultural_protocols-nid-require_valid_cultural_protocol'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_cultural_protocols-nid-trim';
+  $feeds_tamper->importer = 'import_cultural_protocols';
+  $feeds_tamper->source = 'nid';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Trim';
+  $export['import_cultural_protocols-nid-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_cultural_protocols-parent_community-explode';
   $feeds_tamper->importer = 'import_cultural_protocols';
   $feeds_tamper->source = 'Parent Community';
@@ -70,6 +145,21 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Explode';
   $export['import_cultural_protocols-parent_community-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_cultural_protocols-parent_community-require_valid_community';
+  $feeds_tamper->importer = 'import_cultural_protocols';
+  $feeds_tamper->source = 'Parent Community';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 0,
+    'node_type' => 'community',
+  );
+  $feeds_tamper->weight = 3;
+  $feeds_tamper->description = 'Require valid Community Parent';
+  $export['import_cultural_protocols-parent_community-require_valid_community'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
