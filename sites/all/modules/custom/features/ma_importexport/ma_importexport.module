@@ -160,6 +160,66 @@ function ma_importexport_feeds_lookup_atom_by_guid($guid) {
 }
 
 /**
+ * Implements hook_feeds_after_save().
+ */
+function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $entity_id) {
+    if ($entity->type == 'digital_heritage') {
+
+        // If community record children exist, we need to set the community record parent on them.
+        // This is handled by a session variable when created via the GUI, but we need to handle feeds import as a special case
+        if(!empty($entity->field_community_record_children)) {
+            foreach($entity->field_community_record_children[LANGUAGE_NONE] as $community_record_ref) {
+                $community_record = node_load($community_record_ref['target_id']);
+                if($community_record) {
+                    // only a single community record parent is allowed
+                    $community_record->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $entity->nid;
+                    node_save($community_record);
+
+                    // This mostly a copy of ma_digitalheritage_node_insert, but hook_node_insert gets executed first,
+                    // so we need to duplicate some here to create the CR -> parent redirect
+                    if (isset($community_record->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
+                        $redirect = new stdClass();
+                        redirect_object_prepare(
+                            $redirect,
+                            array(
+                                'source' => 'node/' . $community_record->nid,
+                                'source_options' => array(),
+                                'redirect' => 'node/' . $community_record->field_community_record_parent[LANGUAGE_NONE][0]['target_id'],
+                                'redirect_options' => array(),
+                                'language' => LANGUAGE_NONE,
+                            )
+                        );
+                        redirect_save($redirect);
+                    }
+                }
+            }
+        }
+
+        // The feeds importer supports setting the DH community record parent field on the community record
+        // In this case, we need to lookup the parent and set the community record children field
+        if(!empty($entity->field_community_record_parent)) {
+            // only a single community record parent is allowed
+            $parent_record = node_load($entity->field_community_record_parent[LANGUAGE_NONE][0]['target_id']);
+            if($parent_record) {
+                // A DH item can have multiple CRs, check and make sure this reference doesn't already exist
+                $child_reference_exists = FALSE;
+                foreach($parent_record->field_community_record_children[LANGUAGE_NONE] as $child) {
+                    if($child['target_id'] == $entity->nid) {
+                        $child_reference_exists = TRUE;
+                    }
+                }
+
+                // If the parent -> child reference doesn't already exist, add it
+                if(!$child_reference_exists) {
+                    $parent_record->field_community_record_children[LANGUAGE_NONE][] = array('target_id' => $entity->nid);
+                    node_save($parent_record);
+                }
+            }
+        }
+    }
+}
+
+/**
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
