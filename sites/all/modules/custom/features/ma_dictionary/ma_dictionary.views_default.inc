@@ -29,13 +29,20 @@ function ma_dictionary_views_default_views() {
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '12';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '20';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['pager']['options']['id'] = '0';
   $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'entity';
   $handler->display->display_options['row_options']['view_mode'] = 'search_result';
+  /* Header: Global: Text area */
+  $handler->display->display_options['header']['area']['id'] = 'area';
+  $handler->display->display_options['header']['area']['table'] = 'views';
+  $handler->display->display_options['header']['area']['field'] = 'area';
+  $handler->display->display_options['header']['area']['label'] = 'Grid/List switcher';
+  $handler->display->display_options['header']['area']['content'] = '<div><a class="list btn btn-default">List</a> <a class="grid btn btn-default">Grid</a></div>';
+  $handler->display->display_options['header']['area']['format'] = 'filtered_html';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
@@ -111,6 +118,8 @@ function ma_dictionary_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('Grid/List switcher'),
+    t('<div><a class="list btn btn-default">List</a> <a class="grid btn btn-default">Grid</a></div>'),
     t('No results matched your search.'),
     t('CER » Context'),
     t('Fulltext search'),

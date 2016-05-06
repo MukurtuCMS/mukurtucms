@@ -26,9 +26,10 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'search_result' => array(
         'label' => 'above',
+        'module' => 'text',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 3,
+        'type' => 'text_plain',
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -78,7 +79,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -131,7 +132,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -176,10 +177,13 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 4,
       ),
       'search_result' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 19,
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -246,7 +250,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -370,12 +374,9 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'search_result' => array(
         'label' => 'hidden',
-        'module' => 'atom_reference',
-        'settings' => array(
-          'link' => 1,
-        ),
-        'type' => 'ma_scald_search_results',
-        'weight' => 2,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -439,7 +440,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -487,11 +488,11 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 1,
       ),
       'search_result' => array(
-        'label' => 'hidden',
+        'label' => 'above',
         'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 1,
+        'type' => 'text_plain',
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -540,9 +541,10 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'search_result' => array(
         'label' => 'above',
+        'module' => 'text',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 20,
+        'type' => 'text_plain',
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -594,7 +596,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',

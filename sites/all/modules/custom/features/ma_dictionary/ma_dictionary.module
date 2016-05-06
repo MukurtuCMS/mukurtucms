@@ -63,3 +63,17 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
     }
 }
 
+/**
+ * Implements template_preprocess_views_view.
+ */
+function ma_dictionary_preprocess_views_view(&$vars) {
+  $view = &$vars['view'];
+
+  // Add JS for browse mode switcher on Dictionary view
+  if ($view->name == 'dictionary_words') {
+    drupal_add_library('system', 'jquery.cookie');
+    drupal_add_js(drupal_get_path('module', 'ma_dictionary') . '/js/dictionary_browse_mode_switcher.js');
+  }
+
+}
+

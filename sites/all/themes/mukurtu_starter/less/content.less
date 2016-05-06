@@ -185,45 +185,31 @@
   }
 }
 
+// Dictionary Word node form
+#dictionary-word-node-form {
+
+  // TODO: make sure this doesn't catch any videos. Should just be for the audio player.
+  #dewplayer-2 {
+    height: 20px;
+  }
+}
 
 //// Digital Heritage grid/list view
 
-// Hide the embededed videos (the thumbnail will display instead)
+// Hide the embedded videos (the thumbnail will display instead)
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
 
 
-//// Grid/List Views (DH, Collections, and just List view on Glossary)
+//// Grid/List Views (DH, Collections, Dictionary)
 
 // toggle display via the grid/list clicker
 
 
-.field-name-protocol-dh-items,
-.field-name-community-dh-items {
-  padding-top:20px;
-  border-top:1px solid #ECEBEB;
-
-  .view-community-dh-items {
-    .view-content {
-      .views-row {
-        border-bottom: 1px solid #ECEBEB;
-        margin: 30px 0;
-        padding: 0 0 30px 0;
-        &.views-row-first {
-          margin-top:0;
-        }
-	.field {
-          margin-bottom: 0px;
-	}
-      }
-    }
-  }
-}
-
 .view-digital-heritage-grid-list,
 .view-collections-grid-list,
-.view-glossary-terms {
+.view-dictionary-words {
   .view-header {
     float:right;
     margin-top:-60px;
@@ -253,18 +239,23 @@
           margin-top:0;
         }
 
-        .field-name-field-media-asset,
-        .field-name-field-collection-image {
+        .field-name-field-media-asset {
           right:0;
-        }
-        .field-name-field-collection-image {
-          float: right;
         }
       }
     }
   }
 
   &.grid-view {
+
+    // Show tooltips in grid view only
+    .tooltips span {
+      top: 0px;
+      left: 0px;
+      width: 220px;
+      z-index: 999;
+    }
+
     .view-content {
       margin-left: -25px;
       margin-right: -25px;
@@ -280,8 +271,7 @@
         padding-bottom: 20px;
 
 
-        .field-name-field-media-asset,
-        .field-name-field-collection-image {
+        .field-name-field-media-asset {
           width: 100%;
           padding: 0;
           left:0;
@@ -315,6 +305,55 @@ a:hover {
   text-decoration: none;
 }
 
+// Dictionary-specific Grid / List view
+.view-dictionary-words {
+
+  .field-name-download-atom {
+    display: none;
+  }
+  .fluid-width-video-wrapper {
+    height: 20px;
+  }
+
+  .field {
+    margin-bottom: 5px;
+  }
+
+  .field-name-field-dictionary-word-recording {
+    width: 190px; // cannot set width to 100% or else it will fill the column in list view. Cannot use separate widths for list and grid views because mediaelement renders the atom once, and will not respond to our grid-list JS+CSS switcher. Thus, the list view atom is 190px wide (equal to the grid view) which is slightly smaller than the list view atom thumbnails on the DH browse list view (220px). This is not an issue in the other grid/list views because we don't show atoms there, only their thumbnails. Here we want to show the atoms, to be playable right on the search page.
+  }
+
+   &.list-view {
+      // float the audio/video atom of the recording to the top right
+      .field-name-field-dictionary-word-recording {
+        float: right;
+        margin-top: -40px;
+        margin-right: 20px;
+        margin-left: 20px;
+      }
+      .views-row {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 15px !important;
+      }
+  }
+
+  &.grid-view {
+    .dictionary-list-fields {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    // do not show field labels in grid view
+    .label-above {
+      display: none;
+    }
+    // fields to not show in grid view
+    .field-name-field-translation {
+      display: none;
+    }
+  }
+}
+
 // DH Map View
 .view-display-id-all_map {
   .view-mode-map_popup {
@@ -323,6 +362,8 @@ a:hover {
     }
   }
 }
+
+
 
 // Shared styling for CP and Community nodes
 
@@ -363,6 +404,29 @@ a:hover {
       padding-top: 10px;
     }
     margin-bottom: 2em;
+  }
+}
+
+// this section should probably be within the above section (within the node views)
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
+  padding-top:20px;
+  border-top:1px solid #ECEBEB;
+
+  .view-community-dh-items {
+    .view-content {
+      .views-row {
+        border-bottom: 1px solid #ECEBEB;
+        margin: 30px 0;
+        padding: 0 0 30px 0;
+        &.views-row-first {
+          margin-top:0;
+        }
+        .field {
+          margin-bottom: 0px;
+        }
+      }
+    }
   }
 }
 
@@ -415,15 +479,7 @@ a:hover {
 a.tooltips span {
 
 }
-// Show tooltips in grid view only
-.grid-view {
-  .tooltips span {
-    top: 0px;
-    left: 0px;
-    width: 220px;
-    z-index: 999;
-  }
-}
+
 
 
 //// Banner images (Community and Cultural Protocol nodes)
@@ -810,40 +866,3 @@ a.tooltips span {
     padding-left: 15px;
 }
 
-// Glossaries
-.view-mukurtu-glossary .fluid-width-video-wrapper {
-    height: 20px;
-    padding-right: 0px;
-}
-
-.view-mukurtu-glossary .views-field-field-media-asset {
-    padding-left: 0px;
-    padding-right: 0px;
-}
-
-.view-mukurtu-glossary td.views-field-field-media-asset {
-    width: 60px;
-}
-
-.view-mukurtu-glossary .views-field-field-media-asset ul {
-    list-style-type: none;
-    padding-left: 0px;
-}
-
-view-mukurtu-glossary .views-field-field-media-asset div {
-    height: 20px;
-    width: 60px;
-}
-
-.view-display-id-attachment_mukurtu_glossary a.active {
-    font-weight: bold;
-    color: #000000;
-}
-
-.next-glossary-term , .previous-glossary-term {
-    display: inline-block;
-    padding: 5px 14px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 15px;
-}

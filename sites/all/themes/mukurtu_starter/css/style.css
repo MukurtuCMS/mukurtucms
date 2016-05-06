@@ -9221,104 +9221,88 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-community #edit-group-access {
   display: none;
 }
+#dictionary-word-node-form #dewplayer-2 {
+  height: 20px;
+}
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
-.field-name-protocol-dh-items,
-.field-name-community-dh-items {
-  padding-top: 20px;
-  border-top: 1px solid #ECEBEB;
-}
-.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row,
-.field-name-community-dh-items .view-community-dh-items .view-content .views-row {
-  border-bottom: 1px solid #ECEBEB;
-  margin: 30px 0;
-  padding: 0 0 30px 0;
-}
-.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row.views-row-first,
-.field-name-community-dh-items .view-community-dh-items .view-content .views-row.views-row-first {
-  margin-top: 0;
-}
-.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row .field,
-.field-name-community-dh-items .view-community-dh-items .view-content .views-row .field {
-  margin-bottom: 0px;
-}
 .view-digital-heritage-grid-list .view-header,
 .view-collections-grid-list .view-header,
-.view-glossary-terms .view-header {
+.view-dictionary-words .view-header {
   float: right;
   margin-top: -60px;
   margin-right: 20px;
 }
 .view-digital-heritage-grid-list .view-header a,
 .view-collections-grid-list .view-header a,
-.view-glossary-terms .view-header a {
+.view-dictionary-words .view-header a {
   font-weight: 200;
   color: #337ab7;
   padding: 2px 8px;
 }
 .view-digital-heritage-grid-list .view-header a.active,
 .view-collections-grid-list .view-header a.active,
-.view-glossary-terms .view-header a.active {
+.view-dictionary-words .view-header a.active {
   color: white;
   background: #555555;
 }
 .view-digital-heritage-grid-list.list-view .node-digital-heritage.view-mode-search_result > div,
 .view-collections-grid-list.list-view .node-digital-heritage.view-mode-search_result > div,
-.view-glossary-terms.list-view .node-digital-heritage.view-mode-search_result > div {
+.view-dictionary-words.list-view .node-digital-heritage.view-mode-search_result > div {
   padding: 0;
 }
 .view-digital-heritage-grid-list.list-view .view-content .views-row,
 .view-collections-grid-list.list-view .view-content .views-row,
-.view-glossary-terms.list-view .view-content .views-row {
+.view-dictionary-words.list-view .view-content .views-row {
   border-bottom: 1px solid #ECEBEB;
   margin: 30px 0;
   padding: 0 0 30px 0;
 }
 .view-digital-heritage-grid-list.list-view .view-content .views-row.views-row-first,
 .view-collections-grid-list.list-view .view-content .views-row.views-row-first,
-.view-glossary-terms.list-view .view-content .views-row.views-row-first {
+.view-dictionary-words.list-view .view-content .views-row.views-row-first {
   margin-top: 0;
 }
 .view-digital-heritage-grid-list.list-view .view-content .views-row .field-name-field-media-asset,
 .view-collections-grid-list.list-view .view-content .views-row .field-name-field-media-asset,
-.view-glossary-terms.list-view .view-content .views-row .field-name-field-media-asset,
-.view-digital-heritage-grid-list.list-view .view-content .views-row .field-name-field-collection-image,
-.view-collections-grid-list.list-view .view-content .views-row .field-name-field-collection-image,
-.view-glossary-terms.list-view .view-content .views-row .field-name-field-collection-image {
+.view-dictionary-words.list-view .view-content .views-row .field-name-field-media-asset {
   right: 0;
 }
-.view-digital-heritage-grid-list.list-view .view-content .views-row .field-name-field-collection-image,
-.view-collections-grid-list.list-view .view-content .views-row .field-name-field-collection-image,
-.view-glossary-terms.list-view .view-content .views-row .field-name-field-collection-image {
-  float: right;
+.view-digital-heritage-grid-list.grid-view .tooltips span,
+.view-collections-grid-list.grid-view .tooltips span,
+.view-dictionary-words.grid-view .tooltips span {
+  top: 0px;
+  left: 0px;
+  width: 220px;
+  z-index: 999;
 }
 .view-digital-heritage-grid-list.grid-view .view-content,
 .view-collections-grid-list.grid-view .view-content,
-.view-glossary-terms.grid-view .view-content {
+.view-dictionary-words.grid-view .view-content {
   margin-left: -25px;
   margin-right: -25px;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .placeholder-image,
 .view-collections-grid-list.grid-view .view-content .placeholder-image,
-.view-glossary-terms.grid-view .view-content .placeholder-image,
+.view-dictionary-words.grid-view .view-content .placeholder-image,
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-collection,
 .view-collections-grid-list.grid-view .view-content .field-name-field-collection,
-.view-glossary-terms.grid-view .view-content .field-name-field-collection,
+.view-dictionary-words.grid-view .view-content .field-name-field-collection,
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-description,
 .view-collections-grid-list.grid-view .view-content .field-name-field-description,
-.view-glossary-terms.grid-view .view-content .field-name-field-description,
+.view-dictionary-words.grid-view .view-content .field-name-field-description,
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-community-ref,
 .view-collections-grid-list.grid-view .view-content .field-name-field-community-ref,
-.view-glossary-terms.grid-view .view-content .field-name-field-community-ref,
+.view-dictionary-words.grid-view .view-content .field-name-field-community-ref,
 .view-digital-heritage-grid-list.grid-view .view-content .field-name-field-category,
 .view-collections-grid-list.grid-view .view-content .field-name-field-category,
-.view-glossary-terms.grid-view .view-content .field-name-field-category {
+.view-dictionary-words.grid-view .view-content .field-name-field-category {
   display: none;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row,
 .view-collections-grid-list.grid-view .view-content .views-row,
-.view-glossary-terms.grid-view .view-content .views-row {
+.view-dictionary-words.grid-view .view-content .views-row {
   float: left;
   width: 220px;
   background: #F8F7F7;
@@ -9327,48 +9311,78 @@ table .checkbox input[type="checkbox"] {
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-field-media-asset,
 .view-collections-grid-list.grid-view .view-content .views-row .field-name-field-media-asset,
-.view-glossary-terms.grid-view .view-content .views-row .field-name-field-media-asset,
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-field-collection-image,
-.view-collections-grid-list.grid-view .view-content .views-row .field-name-field-collection-image,
-.view-glossary-terms.grid-view .view-content .views-row .field-name-field-collection-image {
+.view-dictionary-words.grid-view .view-content .views-row .field-name-field-media-asset {
   width: 100%;
   padding: 0;
   left: 0;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .group_list_view_fields,
 .view-collections-grid-list.grid-view .view-content .views-row .group_list_view_fields,
-.view-glossary-terms.grid-view .view-content .views-row .group_list_view_fields {
+.view-dictionary-words.grid-view .view-content .views-row .group_list_view_fields {
   right: 0;
   width: 100%;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-title h2,
 .view-collections-grid-list.grid-view .view-content .views-row .field-name-title h2,
-.view-glossary-terms.grid-view .view-content .views-row .field-name-title h2,
+.view-dictionary-words.grid-view .view-content .views-row .field-name-title h2,
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-collections-title-with-count h2,
 .view-collections-grid-list.grid-view .view-content .views-row .field-name-collections-title-with-count h2,
-.view-glossary-terms.grid-view .view-content .views-row .field-name-collections-title-with-count h2 {
+.view-dictionary-words.grid-view .view-content .views-row .field-name-collections-title-with-count h2 {
   font-size: 140%;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .label-inline,
 .view-collections-grid-list.grid-view .view-content .views-row .label-inline,
-.view-glossary-terms.grid-view .view-content .views-row .label-inline {
+.view-dictionary-words.grid-view .view-content .views-row .label-inline {
   float: none;
   font-weight: bold;
   display: none;
 }
 .view-digital-heritage-grid-list.grid-view .view-content .views-row .col-md-8,
 .view-collections-grid-list.grid-view .view-content .views-row .col-md-8,
-.view-glossary-terms.grid-view .view-content .views-row .col-md-8 {
+.view-dictionary-words.grid-view .view-content .views-row .col-md-8 {
   position: static;
   width: 100%;
 }
 .view-digital-heritage-grid-list.grid-view .text-center,
 .view-collections-grid-list.grid-view .text-center,
-.view-glossary-terms.grid-view .text-center {
+.view-dictionary-words.grid-view .text-center {
   clear: both;
 }
 a:hover {
   text-decoration: none;
+}
+.view-dictionary-words .field-name-download-atom {
+  display: none;
+}
+.view-dictionary-words .fluid-width-video-wrapper {
+  height: 20px;
+}
+.view-dictionary-words .field {
+  margin-bottom: 5px;
+}
+.view-dictionary-words .field-name-field-dictionary-word-recording {
+  width: 190px;
+}
+.view-dictionary-words.list-view .field-name-field-dictionary-word-recording {
+  float: right;
+  margin-top: -40px;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+.view-dictionary-words.list-view .views-row {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 15px !important;
+}
+.view-dictionary-words.grid-view .dictionary-list-fields {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.view-dictionary-words.grid-view .label-above {
+  display: none;
+}
+.view-dictionary-words.grid-view .field-name-field-translation {
+  display: none;
 }
 .view-display-id-all_map .view-mode-map_popup h3 {
   margin-top: 0;
@@ -9434,6 +9448,25 @@ a:hover {
 .node-cultural-protocol-group .group-right .field ul {
   padding-top: 10px;
 }
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
+  padding-top: 20px;
+  border-top: 1px solid #ECEBEB;
+}
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row {
+  border-bottom: 1px solid #ECEBEB;
+  margin: 30px 0;
+  padding: 0 0 30px 0;
+}
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row.views-row-first,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row.views-row-first {
+  margin-top: 0;
+}
+.field-name-protocol-dh-items .view-community-dh-items .view-content .views-row .field,
+.field-name-community-dh-items .view-community-dh-items .view-content .views-row .field {
+  margin-bottom: 0px;
+}
 .panel-panel .right-pane,
 .pane-block {
   background: #F8F7F7;
@@ -9474,12 +9507,6 @@ a:hover {
 .facetapi-processed input[type="radio"],
 .facetapi-processed input[type="checkbox"] {
   margin: 7px 8px 7px 0;
-}
-.grid-view .tooltips span {
-  top: 0px;
-  left: 0px;
-  width: 220px;
-  z-index: 999;
 }
 .field-name-field-protocol-image .field-name-scald-thumbnail img,
 .field-name-field-community-image .field-name-scald-thumbnail img {
@@ -9788,35 +9815,4 @@ a:hover {
 }
 .form-item-operation {
   padding-left: 15px;
-}
-.view-mukurtu-glossary .fluid-width-video-wrapper {
-  height: 20px;
-  padding-right: 0px;
-}
-.view-mukurtu-glossary .views-field-field-media-asset {
-  padding-left: 0px;
-  padding-right: 0px;
-}
-.view-mukurtu-glossary td.views-field-field-media-asset {
-  width: 60px;
-}
-.view-mukurtu-glossary .views-field-field-media-asset ul {
-  list-style-type: none;
-  padding-left: 0px;
-}
-view-mukurtu-glossary .views-field-field-media-asset div {
-  height: 20px;
-  width: 60px;
-}
-.view-display-id-attachment_mukurtu_glossary a.active {
-  font-weight: bold;
-  color: #000000;
-}
-.next-glossary-term,
-.previous-glossary-term {
-  display: inline-block;
-  padding: 5px 14px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 15px;
 }

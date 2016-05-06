@@ -38,18 +38,13 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
         'link' => '1',
         'wrapper' => 'h2',
         'class' => '',
-        'ft' => array(),
-      ),
-    ),
-    'field_media_asset' => array(
-      'formatter_settings' => array(
         'ft' => array(),
       ),
     ),
@@ -197,18 +192,21 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'title',
-        1 => 'field_translation',
-        2 => 'field_media_asset',
+        0 => 'group_list_view_fields',
+        1 => 'title',
+        2 => 'field_dictionary_word_recording',
+        3 => 'field_transliteration',
+        4 => 'field_translation',
+        5 => 'field_definition',
       ),
     ),
     'fields' => array(
+      'group_list_view_fields' => 'ds_content',
       'title' => 'ds_content',
+      'field_dictionary_word_recording' => 'ds_content',
+      'field_transliteration' => 'ds_content',
       'field_translation' => 'ds_content',
-      'field_media_asset' => 'ds_content',
-    ),
-    'limit' => array(
-      'field_media_asset' => '1',
+      'field_definition' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
