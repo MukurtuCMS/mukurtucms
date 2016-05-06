@@ -9384,6 +9384,14 @@ a:hover {
 .view-dictionary-words.grid-view .field-name-field-translation {
   display: none;
 }
+.facetapi-facet-title-az-glossary {
+  overflow: hidden;
+}
+.facetapi-facet-title-az-glossary li {
+  font-size: 18px;
+  float: left;
+  margin-right: 0.5em;
+}
 .view-display-id-all_map .view-mode-map_popup h3 {
   margin-top: 0;
 }
