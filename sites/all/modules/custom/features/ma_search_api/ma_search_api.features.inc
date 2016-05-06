@@ -178,11 +178,11 @@ function ma_search_api_default_search_api_index() {
         "field_description:value" : { "type" : "text" },
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_dictionary_word_synonyms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
-        "field_glossary_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
-        "field_glossary_synonyms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
@@ -622,22 +622,22 @@ function ma_search_api_default_search_api_server() {
             "type" : "text",
             "boost" : "1.0"
           },
-          "field_glossary_related_dh" : {
-            "table" : "search_api_db_default_node_index_field_glossary_related_dh",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
-          "field_glossary_synonyms" : {
-            "table" : "search_api_db_default_node_index_field_glossary_synonyms",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
           "title_az_glossary" : {
             "table" : "search_api_db_default_node_index",
             "column" : "title_az_glossary",
             "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_dictionary_word_related_dh" : {
+            "table" : "search_api_db_default_node_index_field_dictionary_word_related",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_dictionary_word_synonyms" : {
+            "table" : "search_api_db_default_node_index_field_dictionary_word_synonym",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }
