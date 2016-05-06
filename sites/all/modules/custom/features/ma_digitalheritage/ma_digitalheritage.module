@@ -175,6 +175,26 @@ function ma_digitalheritage_node_view($node, $view_mode) {
 
     elseif ($view_mode == 'full') {
 
+        // Users (especially new admins) are sometimes viewing community records independently of the parent record and getting confused
+        // because they think it is a standalone record.  Add a link back to the parent record to avoid confusion.
+        // Only show to users with edit rights, only concerned about unintentional edits.
+        if(!empty($node->field_community_record_parent)) {
+            $parent_record = node_load($node->field_community_record_parent[$node->language][0]['target_id']);
+            if($parent_record && node_access('update', $node)) {
+
+                // Form community name title for the label
+                $community_record_parent_communities = array();
+                foreach ($node->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
+                    $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
+                    $community_record_parent_communities[] = $community_record_parent_community_node->title;
+                }
+                $community_record_title = implode(' / ', $community_record_parent_communities);
+
+                // Link to the parent node
+                $parent_link  = t('This is a ') . $community_record_title . t(' community record of ') . l($parent_record->title, 'node/' . $parent_record->nid);
+                $node->content['field_media_asset'][0]['#markup'] = '<div class="alert alert-block alert-success">' . $parent_link .'</div>' . $node->content['field_media_asset'][0]['#markup'];
+            }
+        }
       // Hide the Related Items Teasers if the option is not selected
       if (variable_get('mukurtu_show_related_items_teasers') <> 1) {
         unset ($node->content['dh_related_items_teasers']);
@@ -362,7 +382,7 @@ function ma_digitalheritage_menu() {
 }
 
 function ma_digitalheritage_clone_dh_button_check($node) {
-  if ($node->type == 'digital_heritage') {
+  if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     $dh_emw = entity_metadata_wrapper('node', $node);
     if ($dh_emw->field_book_parent->value() OR $dh_emw->field_book_children->value()) { // Do not allow cloning or creating community records on book pages, whether child or parent
       return FALSE;
@@ -380,7 +400,7 @@ function ma_digitalheritage_clone_dh_button_check($node) {
 }
 
 function ma_digitalheritage_add_cr_check($node) {
-  if ($node->type == 'digital_heritage') {
+ if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     $dh_emw = entity_metadata_wrapper('node', $node);
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
       if (isset ($protocol)) {
@@ -395,7 +415,7 @@ function ma_digitalheritage_add_cr_check($node) {
 }
 
 function ma_digitalheritage_add_book_page_check($node) {
-  if ($node->type == 'digital_heritage') {
+  if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     global $user;
     if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
       return TRUE;
