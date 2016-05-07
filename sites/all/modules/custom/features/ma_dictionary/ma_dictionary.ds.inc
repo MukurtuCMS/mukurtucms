@@ -22,11 +22,6 @@ function ma_dictionary_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_dictionary_word_synonyms' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
   );
   $export['node|dictionary_word|default'] = $ds_fieldsetting;
 
@@ -77,9 +72,9 @@ function ma_dictionary_ds_layout_settings_info() {
         4 => 'field_dictionary_word_recording',
         5 => 'field_definition',
         6 => 'field_sample_sentence',
-        7 => 'field_media_asset',
       ),
       'right' => array(
+        7 => 'field_media_asset',
         8 => 'field_dictionary_word_synonyms',
         9 => 'field_dictionary_word_related_dh',
         10 => 'og_group_ref',
@@ -93,7 +88,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_dictionary_word_recording' => 'left',
       'field_definition' => 'left',
       'field_sample_sentence' => 'left',
-      'field_media_asset' => 'left',
+      'field_media_asset' => 'right',
       'field_dictionary_word_synonyms' => 'right',
       'field_dictionary_word_related_dh' => 'right',
       'og_group_ref' => 'right',

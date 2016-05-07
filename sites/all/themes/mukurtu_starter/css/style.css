@@ -9224,6 +9224,17 @@ table .checkbox input[type="checkbox"] {
 #dictionary-word-node-form #dewplayer-2 {
   height: 20px;
 }
+.node-dictionary-word.view-mode-full .field-name-field-media-asset {
+  width: 280px !important;
+}
+.node-dictionary-word.view-mode-full .scald-atom,
+.node-dictionary-word.view-mode-full .scald_video,
+.node-dictionary-word.view-mode-full .fluid-width-video-wrapper {
+  margin-bottom: 10px;
+}
+.node-dictionary-word.view-mode-full #dewplayer-2 {
+  height: 20px;
+}
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
