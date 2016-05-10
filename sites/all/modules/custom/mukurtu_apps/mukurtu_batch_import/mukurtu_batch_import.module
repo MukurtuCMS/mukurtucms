@@ -249,9 +249,9 @@ function mukurtu_batch_import_import_metadata($path) {
 			       'media_images.csv' => 'import_media_images',
 			       'media_video.csv' => 'import_media_video',
 			       'communities.csv' => 'import_communities',
-			       'protocols.csv' => 'import_cultural_protocols',			       
+			       'protocols.csv' => 'import_cultural_protocols',
+                   'collections.csv' => 'import_collection',
 			       'digitalheritage.csv' => 'digital_heritage_metadata',
-			       'collections.csv' => 'import_collection',
   ); 
 
 
