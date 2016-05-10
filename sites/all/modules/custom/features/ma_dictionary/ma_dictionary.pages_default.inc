@@ -32,7 +32,7 @@ function ma_dictionary_default_page_manager_pages() {
   );
   $page->menu = array(
     'type' => 'none',
-    'title' => 'Browse Collections',
+    'title' => 'Browse Dictionary',
     'name' => 'menu-browse-menu',
     'weight' => '0',
     'parent' => array(
