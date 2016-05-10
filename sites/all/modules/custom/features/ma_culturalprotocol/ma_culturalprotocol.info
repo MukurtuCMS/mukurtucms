@@ -40,7 +40,6 @@ features[ds_layout_settings][] = node|cultural_protocol_group|browse_teaser
 features[ds_layout_settings][] = node|cultural_protocol_group|default
 features[ds_layout_settings][] = node|cultural_protocol_group|full
 features[features_api][] = api:2
-features[feeds_tamper][] = import_cultural_protocols-sharing_protocol-convert_case
 features[field_base][] = field_protocl_signup_permissions
 features[field_base][] = field_protocol_auto_join
 features[field_base][] = field_protocol_image
