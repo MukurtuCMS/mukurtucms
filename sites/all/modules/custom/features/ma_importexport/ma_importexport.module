@@ -1669,7 +1669,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
 
   // Write headers in CSV files
   foreach($node_types as $type) {
-      ma_importexport_write_node_csv($node_output[$type]['handle'], $type, NULL, $delimiter, $export_ids, $excluded_fields[$node_type]);
+      ma_importexport_write_node_csv($node_output[$type]['handle'], $type, NULL, $delimiter, $export_ids, $excluded_fields[$type]);
   }
 
   foreach($atom_types as $type) {
