@@ -21,11 +21,19 @@ function ma_search_api_node_update($node) {
       ),
       'triggers' => array(),
     ),
+    'dictionary_word' => array(
+      'relationships' => array(
+        'field_dictionary_word_synonyms' => 'not dh',
+        'field_dictionary_word_related_dh' => 'dh',
+      ),
+      'triggers' => array(),
+    ),
     'digital_heritage' => array(
       'relationships' => array(
         'field_collection' => 'not dh',
         'field_related_dh_items' => 'dh',
         'og_group_ref' => 'not dh',
+        'field_related_dictionary_words' => 'not dh',
       ),
       'triggers' => array(
         'field_item_privacy_setting' => 'regular',
