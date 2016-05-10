@@ -493,7 +493,7 @@ function mukurtu_splash_block_manage_content() {
       'title' => 'Manage Languages',
       'href' => 'admin/structure/taxonomy/language',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Manage the languages that are selectable in glossary terms and digital heritage items.'),
+      'description' => t('Manage the languages that are selectable in dictionary words and digital heritage items.'),
     );
   }
 
@@ -502,7 +502,7 @@ function mukurtu_splash_block_manage_content() {
       'title' => 'Set Default Language',
       'href' => 'dashboard/set-default-language',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Set the default language used when creating glossary terms.'),
+      'description' => t('Set the default language used when creating dictionary words.'),
     );
   }
 
