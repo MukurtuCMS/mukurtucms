@@ -172,8 +172,8 @@ function ma_importexport_feeds_importer_default() {
           20 => array(
             'source' => 'Type',
             'target' => 'field_dh_type',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           21 => array(
             'source' => 'Identifier',
@@ -204,7 +204,8 @@ function ma_importexport_feeds_importer_default() {
           25 => array(
             'source' => 'People',
             'target' => 'field_people',
-            'unique' => FALSE,
+            'term_search' => '0',
+            'autocreate' => 1,
             'language' => 'und',
           ),
           26 => array(
