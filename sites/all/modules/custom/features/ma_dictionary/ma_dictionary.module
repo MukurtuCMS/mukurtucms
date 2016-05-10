@@ -77,3 +77,18 @@ function ma_dictionary_preprocess_views_view(&$vars) {
 
 }
 
+/**
+ * Implements hook_url_outbound_alter
+ */
+// For the title (first letter) facet, restrict to one letter (or digit, or non-letter) at a time.
+// Interestingly, this cannot be done in the facet config, by whatever combo of Operator and "Limit to one active item"
+
+function ma_dictionary_url_outbound_alter(&$path, &$options, $original_path) {
+  if (substr($path, 0, 11) == 'dictionary/') {
+    if (substr_count($path, 'title') > 1) { // this catches first letter links adding to an existing first-letter-filtered URL
+      $start_of_first_title = strpos ($path, '/title/');
+      $end_of_first_title = strpos ($path, '/', $start_of_first_title + 8);
+      $path = substr($path, 0, $start_of_first_title) . substr($path, $end_of_first_title); // strip out the first (ie. existing) title filter on the outbound link
+    }
+  }
+}
