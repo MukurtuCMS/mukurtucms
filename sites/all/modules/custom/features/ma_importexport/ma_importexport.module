@@ -1571,9 +1571,16 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
 }
 
 
-function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $delimiter=';', $export_nids = FALSE) {
+function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $delimiter=';', $export_nids = FALSE, $excluded_fields = array()) {
   $fields = field_info_instances('node', $nodetype);
   $mapping = ma_importexport_get_importer_mapping($nodetype, $export_nids);
+
+  // remove excluded fields
+  foreach($excluded_fields as $excluded_field) {
+      if(isset($mapping[$excluded_field])) {
+          unset($mapping[$excluded_field]);
+      }
+  }
 
   $row = array();
   foreach($mapping as $field_name => $field) {
@@ -1610,11 +1617,25 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
   $GLOBALS['devel_shutdown'] = TRUE;
 
   if($export_all) {
-      $node_types = array('digital_heritage', 'community', 'collection', 'cultural_protocol_group');
+      $node_types = array('digital_heritage', 'community','cultural_protocol_group'); // 'collection'
       $atom_types = array('image', 'audio', 'video', 'file');
   } else {
       $node_types = array('digital_heritage');
       $atom_types = array();
+  }
+
+  if($export_ids) {
+      $excluded_fields = array(
+          'digital_heritage' => array(),
+          'community' => array(),
+          'cultural_protocol_group' => array(),
+      );
+  } else {
+      $excluded_fields = array(
+          'digital_heritage' => array('field_collection:guid_or_nid'),
+          'community' => array(),
+          'cultural_protocol_group' => array(),
+      );
   }
 
   // These are the filenames that each node type will have in the Zip archive
@@ -1659,7 +1680,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
   foreach($export['nodes'] as $node_type => $nodes_to_export) {
       if(in_array($node_type, $node_types) && count($nodes_to_export) > 0) {
           foreach($nodes_to_export as $node_to_export) {
-              ma_importexport_write_node_csv($node_output[$node_type]['handle'], $node_type, $node_to_export, $delimiter, $export_ids);
+              ma_importexport_write_node_csv($node_output[$node_type]['handle'], $node_type, $node_to_export, $delimiter, $export_ids, $excluded_fields[$node_type]);
               $node_output[$node_type]['count']++;
           }
       }
