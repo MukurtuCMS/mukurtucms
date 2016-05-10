@@ -21,6 +21,14 @@ function mukurtu_splash_menu() {
     'access callback' => TRUE,
   );
 
+  // Callback that toggles the Dictionary feature
+  $items['admin/toggle-dictionary'] = array(
+    'title' => 'Toggle Dictionary',
+    'page callback' => 'ma_splash_toggle_dictionary',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -48,6 +56,32 @@ function mukurtu_splash_toggle_wizard() {
   }
 }
 
+/**
+ * Toggle the dictionary feature on and off
+ */
+function ma_splash_toggle_dictionary () {
+  if (module_exists('ma_dictionary')) {
+    module_disable(array('ma_dictionary'));
+    menu_link_delete (NULL, 'dictionary');
+    menu_link_delete (NULL, 'node/add/dictionary-word');
+    drupal_set_message ('The Dictionary has been disabled.');
+  }
+  else {
+    module_enable(array('ma_dictionary'));
+    // Re-add the menu link. Any customizations thereof would be lost by a disable and renenabling of the Dictionary
+    $item = array(
+      'link_path' => 'dictionary',
+      'link_title' => 'Browse Dictionary',
+      'menu_name' => 'menu-browse-menu',
+      'weight' => -40,
+      'expanded' => 0,
+      'customized' => 1,
+    );
+    menu_link_save($item);
+    drupal_set_message ('The Dictionary has been enabled.');
+  }
+  drupal_goto ('dashboard');
+}
 
 /**
  * Implementation of hook_init().
@@ -433,12 +467,29 @@ function mukurtu_splash_block_manage_content() {
 
   $markup = '';
 
+  if (user_access('administer site configuration')) {
+    if (module_exists('ma_dictionary')) {
+      $title = 'Disable Dictionary';
+      $description = 'The dictionary can be re-enabled later without losing any content.';
+    }
+    else {
+      $title = "Enable Dictionary";
+      $description = 'Any previously added content will be restored.';
+    }
+    $items[] = array(
+      'title' => $title,
+      'href' => 'admin/toggle-dictionary',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t($description),
+    );
+  }
+
   if (node_access('create','digital_heritage')) {
     $items[] = array(
       'title' => 'Add a Digital Heritage item',
       'href' => 'node/add/digital-heritage',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Add a Digital Hertiage Item.'),
+      'description' => t('Add a Digital Heritage Item.'),
     );
   }
 
