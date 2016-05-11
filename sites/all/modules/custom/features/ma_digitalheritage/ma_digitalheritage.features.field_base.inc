@@ -255,10 +255,11 @@ function ma_digitalheritage_field_default_field_bases() {
     'settings' => array(
       'referenceable_types' => array(
         'article' => 0,
+        'collection' => 0,
         'community' => 'community',
         'cultural_protocol_group' => 0,
+        'dictionary_word' => 0,
         'digital_heritage' => 0,
-        'ma_collection' => 0,
         'page' => 0,
         'panel' => 0,
       ),
