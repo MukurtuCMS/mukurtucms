@@ -155,7 +155,7 @@ function ma_community_ds_custom_fields_info() {
   $ds_field->ui_limit = 'community|full';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<h2 class="block-title">Digital Hertiage</h2><div class="view-content"><a href="/digital-heritage/community/[node:nid]">Browse All Digital Heritage in [node:title]</a></div>',
+      'value' => '<h2 class="block-title">Digital Heritage</h2><div class="view-content"><a href="/digital-heritage/community/[node:nid]">Browse All Digital Heritage in [node:title]</a></div>',
       'format' => 'ds_code',
     ),
     'use_token' => 1,
