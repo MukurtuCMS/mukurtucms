@@ -76,8 +76,16 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
   // Actions to perform when adding (not editing) dictionary words
   if ($form['#action'] == '/node/add/dictionary-word') {
 
-    // Set the default language, if one is defined
-    $form['field_dictionary_word_language'][LANGUAGE_NONE]['#default_value'] = variable_get ('mukurtu_default_language');
+    // Set the default language, if one is defined, or the first language if no default is defined
+    $default_language = variable_get ('mukurtu_default_language');
+    if (!$default_language) {
+      $language = taxonomy_vocabulary_machine_name_load('language');
+      $terms = taxonomy_get_tree($language->vid);
+      if (count($terms)) {
+        $default_language = $terms[0]->tid;
+      }
+    }
+    $form['field_dictionary_word_language'][LANGUAGE_NONE]['#default_value'] = $default_language;
   }
 
 }
