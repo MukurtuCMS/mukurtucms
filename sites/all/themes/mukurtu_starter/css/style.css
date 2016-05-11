@@ -9221,7 +9221,8 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-community #edit-group-access {
   display: none;
 }
-#dictionary-word-node-form #dewplayer-2 {
+#dictionary-word-node-form #dewplayer-2,
+#dictionary-word-node-form #dewplayer-1 {
   height: 20px;
 }
 #dictionary-word-node-form #edit-og-group-ref {
@@ -9235,7 +9236,8 @@ table .checkbox input[type="checkbox"] {
 .node-dictionary-word.view-mode-full .fluid-width-video-wrapper {
   margin-bottom: 10px;
 }
-.node-dictionary-word.view-mode-full #dewplayer-2 {
+.node-dictionary-word.view-mode-full #dewplayer-2,
+.node-dictionary-word.view-mode-full #dewplayer-1 {
   height: 20px;
 }
 .view-id-digital_heritage_grid_list iframe {
@@ -9661,7 +9663,9 @@ a:hover {
   font-size: 14px;
 }
 .node-digital-heritage.view-mode-full .view-mode-search_result #dewplayer-2,
-.node-digital-heritage.view-mode-community_record .view-mode-search_result #dewplayer-2 {
+.node-digital-heritage.view-mode-community_record .view-mode-search_result #dewplayer-2,
+.node-digital-heritage.view-mode-full .view-mode-search_result #dewplayer-1,
+.node-digital-heritage.view-mode-community_record .view-mode-search_result #dewplayer-1 {
   height: 20px;
 }
 .node-digital-heritage.view-mode-full .view-mode-search_result .field-name-download-atom,
