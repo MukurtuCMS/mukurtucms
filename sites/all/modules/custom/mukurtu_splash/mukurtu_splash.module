@@ -438,7 +438,7 @@ function mukurtu_splash_block_manage_content() {
       'title' => 'Add a Digital Heritage item',
       'href' => 'node/add/digital-heritage',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Add a Digital Hertiage Item.'),
+      'description' => t('Add a Digital Heritage Item.'),
     );
   }
 
