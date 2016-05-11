@@ -60,6 +60,7 @@ function ma_dictionary_field_group_info() {
       0 => 'field_dictionary_word_related_dh',
       1 => 'field_dictionary_word_synonyms',
       2 => 'og_group_ref',
+      3 => 'field_item_privacy_setting',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

@@ -9224,6 +9224,9 @@ table .checkbox input[type="checkbox"] {
 #dictionary-word-node-form #dewplayer-2 {
   height: 20px;
 }
+#dictionary-word-node-form #edit-og-group-ref {
+  display: none;
+}
 .node-dictionary-word.view-mode-full .field-name-field-media-asset {
   width: 280px !important;
 }

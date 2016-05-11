@@ -22,6 +22,20 @@ function ma_dictionary_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'og_group_ref' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
+      ),
+    ),
+    'field_community_ref' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
+      ),
+    ),
   );
   $export['node|dictionary_word|default'] = $ds_fieldsetting;
 
@@ -77,7 +91,8 @@ function ma_dictionary_ds_layout_settings_info() {
         7 => 'field_media_asset',
         8 => 'field_dictionary_word_synonyms',
         9 => 'field_dictionary_word_related_dh',
-        10 => 'og_group_ref',
+        10 => 'field_community_ref',
+        11 => 'og_group_ref',
       ),
     ),
     'fields' => array(
@@ -91,6 +106,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_media_asset' => 'right',
       'field_dictionary_word_synonyms' => 'right',
       'field_dictionary_word_related_dh' => 'right',
+      'field_community_ref' => 'right',
       'og_group_ref' => 'right',
     ),
     'classes' => array(
@@ -132,14 +148,17 @@ function ma_dictionary_ds_layout_settings_info() {
         8 => 'field_media_asset',
         9 => 'redirect',
         10 => 'path',
-        11 => 'group_dictionary_word_basic',
-        12 => 'field_dictionary_word_synonyms',
-        13 => 'group_dictionary_word_relations',
-        14 => 'field_dictionary_word_related_dh',
-        15 => 'og_group_ref',
+        12 => 'group_dictionary_word_basic',
+        13 => 'field_dictionary_word_synonyms',
+        14 => 'group_dictionary_word_relations',
+        15 => 'field_dictionary_word_related_dh',
+        16 => 'og_group_ref',
+        17 => 'field_item_privacy_setting',
       ),
       'hidden' => array(
-        16 => '_add_existing_field',
+        11 => 'field_description',
+        18 => 'field_community_ref',
+        19 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -154,11 +173,14 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_media_asset' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
+      'field_description' => 'hidden',
       'group_dictionary_word_basic' => 'ds_content',
       'field_dictionary_word_synonyms' => 'ds_content',
       'group_dictionary_word_relations' => 'ds_content',
       'field_dictionary_word_related_dh' => 'ds_content',
       'og_group_ref' => 'ds_content',
+      'field_item_privacy_setting' => 'ds_content',
+      'field_community_ref' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(

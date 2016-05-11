@@ -10,6 +10,68 @@
 function ma_dictionary_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'node-dictionary_word-field_community_ref'
+  $field_instances['node-dictionary_word-field_community_ref'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'node_reference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 10,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_ref',
+    'label' => 'Community',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'node_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'node_reference/autocomplete',
+        'size' => 60,
+      ),
+      'type' => 'node_reference_autocomplete',
+      'weight' => 20,
+    ),
+  );
+
   // Exported field_instance: 'node-dictionary_word-field_definition'
   $field_instances['node-dictionary_word-field_definition'] = array(
     'bundle' => 'dictionary_word',
@@ -59,58 +121,6 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'type' => 'text_textarea',
       'weight' => 6,
-    ),
-  );
-
-  // Exported field_instance: 'node-dictionary_word-field_description'
-  $field_instances['node-dictionary_word-field_description'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 22,
-      ),
-      'search_result' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 15,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_description',
-    'label' => 'Description',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'display_summary' => 0,
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 11,
     ),
   );
 
@@ -349,6 +359,53 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-dictionary_word-field_item_privacy_setting'
+  $field_instances['node-dictionary_word-field_item_privacy_setting'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => array(
+      0 => array(
+        'value' => 'all',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_item_privacy_setting',
+    'label' => 'Item Sharing Settings',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_buttons',
+      'weight' => 18,
+    ),
+  );
+
   // Exported field_instance: 'node-dictionary_word-field_media_asset'
   $field_instances['node-dictionary_word-field_media_asset'] = array(
     'bundle' => 'dictionary_word',
@@ -568,17 +625,31 @@ function ma_dictionary_field_default_field_instances() {
   // Exported field_instance: 'node-dictionary_word-og_group_ref'
   $field_instances['node-dictionary_word-og_group_ref'] = array(
     'bundle' => 'dictionary_word',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'og_ui',
-        'settings' => array(),
-        'type' => 'og_list_default',
-        'weight' => 10,
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 11,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -630,9 +701,11 @@ function ma_dictionary_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 0,
-      'module' => 'og',
-      'settings' => array(),
-      'type' => 'og_complex',
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+      ),
+      'type' => 'options_select',
       'weight' => 18,
     ),
   );
@@ -648,8 +721,9 @@ function ma_dictionary_field_default_field_instances() {
 <li> a PDF with information about the term
 </ul>
  ');
+  t('Community');
   t('Definition');
-  t('Description');
+  t('Item Sharing Settings');
   t('Language');
   t('Media');
   t('Pronunciation');
