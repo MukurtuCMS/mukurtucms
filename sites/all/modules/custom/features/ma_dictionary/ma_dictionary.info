@@ -24,6 +24,7 @@ dependencies[] = og_ui
 dependencies[] = options
 dependencies[] = page_manager
 dependencies[] = scald
+dependencies[] = search_api_glossary
 dependencies[] = strongarm
 dependencies[] = taxonomy
 dependencies[] = text
