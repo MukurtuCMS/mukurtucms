@@ -66,24 +66,9 @@ function ma_importexport_users_feeds_tamper_default() {
     'invert' => 0,
     'log' => 0,
   );
-  $feeds_tamper->weight = 0;
+  $feeds_tamper->weight = 2;
   $feeds_tamper->description = 'Required field';
   $export['import_cultural_protocols-group_register-required'] = $feeds_tamper;
-
-  $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
-  $feeds_tamper->api_version = 2;
-  $feeds_tamper->id = 'import_cultural_protocols-group_roles-required';
-  $feeds_tamper->importer = 'import_cultural_protocols';
-  $feeds_tamper->source = 'Group Roles';
-  $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array(
-    'invert' => 0,
-    'log' => 0,
-  );
-  $feeds_tamper->weight = 0;
-  $feeds_tamper->description = 'Required field';
-  $export['import_cultural_protocols-group_roles-required'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
@@ -164,21 +149,6 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
-  $feeds_tamper->id = 'import_cultural_protocols-parent_community-required';
-  $feeds_tamper->importer = 'import_cultural_protocols';
-  $feeds_tamper->source = 'Parent Community';
-  $feeds_tamper->plugin_id = 'required';
-  $feeds_tamper->settings = array(
-    'invert' => 0,
-    'log' => 0,
-  );
-  $feeds_tamper->weight = 0;
-  $feeds_tamper->description = 'Required field';
-  $export['import_cultural_protocols-parent_community-required'] = $feeds_tamper;
-
-  $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
-  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_cultural_protocols-parent_community-trim';
   $feeds_tamper->importer = 'import_cultural_protocols';
   $feeds_tamper->source = 'Parent Community';
@@ -194,6 +164,46 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_cultural_protocols-sharing_protocol-find_replace';
+  $feeds_tamper->importer = 'import_cultural_protocols';
+  $feeds_tamper->source = 'Sharing Protocol';
+  $feeds_tamper->plugin_id = 'find_replace';
+  $feeds_tamper->settings = array(
+    'find' => 'strict',
+    'replace' => '2',
+    'case_sensitive' => 0,
+    'word_boundaries' => 0,
+    'whole' => 0,
+    'regex' => FALSE,
+    'func' => 'str_ireplace',
+  );
+  $feeds_tamper->weight = 6;
+  $feeds_tamper->description = 'Replace \'strict\' with 2';
+  $export['import_cultural_protocols-sharing_protocol-find_replace'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_cultural_protocols-sharing_protocol-find_replace_open_zero';
+  $feeds_tamper->importer = 'import_cultural_protocols';
+  $feeds_tamper->source = 'Sharing Protocol';
+  $feeds_tamper->plugin_id = 'find_replace';
+  $feeds_tamper->settings = array(
+    'find' => 'open',
+    'replace' => '0',
+    'case_sensitive' => 0,
+    'word_boundaries' => 0,
+    'whole' => 0,
+    'regex' => FALSE,
+    'func' => 'str_ireplace',
+  );
+  $feeds_tamper->weight = 5;
+  $feeds_tamper->description = 'Replace \'open\' with 0';
+  $export['import_cultural_protocols-sharing_protocol-find_replace_open_zero'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_cultural_protocols-sharing_protocol-required';
   $feeds_tamper->importer = 'import_cultural_protocols';
   $feeds_tamper->source = 'Sharing Protocol';
@@ -202,7 +212,7 @@ function ma_importexport_users_feeds_tamper_default() {
     'invert' => 0,
     'log' => 0,
   );
-  $feeds_tamper->weight = 0;
+  $feeds_tamper->weight = 7;
   $feeds_tamper->description = 'Required field';
   $export['import_cultural_protocols-sharing_protocol-required'] = $feeds_tamper;
 
@@ -236,37 +246,6 @@ function ma_importexport_users_feeds_tamper_default() {
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Trim';
   $export['import_users-community_affiliations-trim'] = $feeds_tamper;
-
-  $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
-  $feeds_tamper->api_version = 2;
-  $feeds_tamper->id = 'import_users-cultural_protocols-explode';
-  $feeds_tamper->importer = 'import_users';
-  $feeds_tamper->source = 'Cultural Protocols';
-  $feeds_tamper->plugin_id = 'explode';
-  $feeds_tamper->settings = array(
-    'separator' => ',',
-    'limit' => '',
-    'real_separator' => ',',
-  );
-  $feeds_tamper->weight = 0;
-  $feeds_tamper->description = 'Explode';
-  $export['import_users-cultural_protocols-explode'] = $feeds_tamper;
-
-  $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
-  $feeds_tamper->api_version = 2;
-  $feeds_tamper->id = 'import_users-cultural_protocols-trim';
-  $feeds_tamper->importer = 'import_users';
-  $feeds_tamper->source = 'Cultural Protocols';
-  $feeds_tamper->plugin_id = 'trim';
-  $feeds_tamper->settings = array(
-    'mask' => '',
-    'side' => 'trim',
-  );
-  $feeds_tamper->weight = 1;
-  $feeds_tamper->description = 'Trim';
-  $export['import_users-cultural_protocols-trim'] = $feeds_tamper;
 
   return $export;
 }
