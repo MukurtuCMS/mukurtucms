@@ -22,6 +22,7 @@
 #### Manual Upgrade Steps
 - database update: `drush updb`
 - rebuild registry: `drush rr`
+- revert features: `drush fra`. Please first review if there are any custom changes you have done that may be overwritten.
 - clear all caches: `drush cc all`
 - search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`
 
