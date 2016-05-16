@@ -8,6 +8,7 @@
 - The link to edit a community record now only appears to users with edit permissions for that item
 - Community pages now link to the browse screen with the community facet selected
 - Changed wording of the media "Download" link
+- Fixed a bug where it was possible for a digital heritage item to be incorrectly saved as a community record
 - Fixed a bug where it was possible to get stuck in the map view on the digital heritage browse page
 - Fixed a bug where clicking an auto-completed taxonomy term would result in the term being double-quoted
 - Fixed case where latitude and longitude would not be imported correctly from digital heritage importer
