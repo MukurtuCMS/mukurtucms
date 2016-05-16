@@ -17,6 +17,7 @@
  * @ingroup themeable
  */
 function theme_colorbox_image_formatter($variables) {
+  static $gallery_token = NULL;
   $item = $variables['item'];
   $entity_type = $variables['entity_type'];
   $entity = $variables['entity'];
@@ -121,6 +122,16 @@ function theme_colorbox_image_formatter($variables) {
       break;
     default:
       $gallery_id = '';
+  }
+
+  // If gallery id is not empty add unique per-request token to avoid images being added manually to galleries.
+  if (!empty($gallery_id)) {
+    // Check if gallery token has alrady been set, we need to reuse the token for the whole request.
+    if (is_null($gallery_token)) {
+      // We use a short token since randomness is not critical.
+      $gallery_token = drupal_random_key(8);
+    }
+    $gallery_id = $gallery_id . '-' . $gallery_token;
   }
 
   if ($style_name = $settings['colorbox_image_style']) {

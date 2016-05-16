@@ -15,9 +15,15 @@ function ma_digitalheritage_node_presave($node) {
     $dh_emw = entity_metadata_wrapper('node', $node);
 
     // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
-    if (isset ($_SESSION['community_record_parent'])) {
-      $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $_SESSION['community_record_parent'];
-      unset ($_SESSION['community_record_parent']);
+    if (isset ($_SESSION['community_record_parent']) && isset($_SESSION['community_record_parent_requesting_path'])) {
+        // Check and see if the previous page we were on matches the requesting page.  We don't want to set the parent on the wrong
+        // node if the user navigated away from the new community record page.
+        $previous_page = drupal_get_destination();
+        if($previous_page['destination'] == $_SESSION['community_record_parent_requesting_path']) {
+            $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'] = $_SESSION['community_record_parent'];
+            unset ($_SESSION['community_record_parent']);
+            unset ($_SESSION['community_record_parent_requesting_path']);
+        }
     }
 
     // Update the Community field according to the protocols for the DH node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet). It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
@@ -98,16 +104,47 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
 
 }
 
+
+/**
+ * Implements template_preprocess_field.
+ */
+function ma_digitalheritage_preprocess_field(&$variables, $hook) {
+    if ($variables['element']['#field_name'] == 'field_transcription') {
+        // Convert newlines in transcription fields to html if plain text only
+        if(!isset($variables['element']['#items'][0]['format']) && isset($variables['element']['#items'][0]['safe_value'])) {
+            $variables['items'][0]['#markup'] = nl2br($variables['items'][0]['#markup']);
+        }
+    }
+}
+
+
 /**
  * Implements template_preprocess_views_view.
  */
 function ma_digitalheritage_preprocess_views_view(&$vars) {
   $view = &$vars['view'];
 
-  // Add JS for browse mode switcher on DH view
   if ($view->name == 'digital_heritage_grid_list') {
+    // Add JS for browse mode switcher on DH view
     drupal_add_library('system', 'jquery.cookie');
     drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_browse_mode_switcher.js');
+
+    // If none of the resultant DH items have geofield data, don't show map view as an option
+    $remove_map_browse = true;
+
+    if(isset($view->result)) {
+        foreach($view->result as $search_result) {
+            $dh_node = node_load($search_result->entity);
+            if(isset($dh_node->field_coverage['und'][0]['geom'])) {
+                $remove_map_browse = false;
+                break;
+            }
+        }
+    }
+
+    if(isset($vars['header']) && $remove_map_browse) {
+        $vars['header'] = str_replace('<a class="map btn">Map</a>', '', $vars['header']);
+    }
   }
 }
 
@@ -144,6 +181,26 @@ function ma_digitalheritage_node_view($node, $view_mode) {
 
     elseif ($view_mode == 'full') {
 
+        // Users (especially new admins) are sometimes viewing community records independently of the parent record and getting confused
+        // because they think it is a standalone record.  Add a link back to the parent record to avoid confusion.
+        // Only show to users with edit rights, only concerned about unintentional edits.
+        if(!empty($node->field_community_record_parent)) {
+            $parent_record = node_load($node->field_community_record_parent[$node->language][0]['target_id']);
+            if($parent_record && node_access('update', $node)) {
+
+                // Form community name title for the label
+                $community_record_parent_communities = array();
+                foreach ($node->field_community_ref[LANGUAGE_NONE] as $community_record_parent_community) {
+                    $community_record_parent_community_node = node_load($community_record_parent_community['nid']);
+                    $community_record_parent_communities[] = $community_record_parent_community_node->title;
+                }
+                $community_record_title = implode(' / ', $community_record_parent_communities);
+
+                // Link to the parent node
+                $parent_link  = t('This is a ') . $community_record_title . t(' community record of ') . l($parent_record->title, 'node/' . $parent_record->nid);
+                $node->content['field_media_asset'][0]['#markup'] = '<div class="alert alert-block alert-success">' . $parent_link .'</div>' . $node->content['field_media_asset'][0]['#markup'];
+            }
+        }
       // Hide the Related Items Teasers if the option is not selected
       if (variable_get('mukurtu_show_related_items_teasers') <> 1) {
         unset ($node->content['dh_related_items_teasers']);
@@ -187,8 +244,10 @@ function ma_digitalheritage_node_view($node, $view_mode) {
     }
     elseif ($view_mode == 'community_record') {
 
-      // Add an edit link to community record after its title
-      $node->content['title'][0]['#markup'] = $node->title . l(' (edit)', 'node/' . $node->nid . '/edit');
+        // Add an edit link to community record after its title
+        if(node_access('update', $node)) {
+            $node->content['title'][0]['#markup'] = $node->title . l(' (edit)', 'node/' . $node->nid . '/edit');
+        }
     }
 
   }
@@ -329,7 +388,7 @@ function ma_digitalheritage_menu() {
 }
 
 function ma_digitalheritage_clone_dh_button_check($node) {
-  if ($node->type == 'digital_heritage') {
+  if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     $dh_emw = entity_metadata_wrapper('node', $node);
     if ($dh_emw->field_book_parent->value() OR $dh_emw->field_book_children->value()) { // Do not allow cloning or creating community records on book pages, whether child or parent
       return FALSE;
@@ -347,7 +406,7 @@ function ma_digitalheritage_clone_dh_button_check($node) {
 }
 
 function ma_digitalheritage_add_cr_check($node) {
-  if ($node->type == 'digital_heritage') {
+ if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     $dh_emw = entity_metadata_wrapper('node', $node);
     foreach ($dh_emw->og_group_ref->value() as $protocol) {
       if (isset ($protocol)) {
@@ -362,7 +421,7 @@ function ma_digitalheritage_add_cr_check($node) {
 }
 
 function ma_digitalheritage_add_book_page_check($node) {
-  if ($node->type == 'digital_heritage') {
+  if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     global $user;
     if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
       return TRUE;
@@ -468,6 +527,8 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
         // Use a session var to set the parent community record nid. This then gets set in the child in ma_digitalheritage_node_presave. (we cannot set the field value here because it is a hidden form element)
         $_SESSION['community_record_parent'] = arg(4);
 
+        // Also include the current path.  This will be used to verify that we are altering the correct node later
+        $_SESSION['community_record_parent_requesting_path'] = current_path();
         break;
       }
     }

@@ -86,13 +86,22 @@ abstract class FeedsProcessor extends FeedsPlugin {
   /**
    * Create a new entity.
    *
-   * @param $source
+   * @param FeedsSource $source
    *   The feeds source that spawns this entity.
    *
-   * @return
+   * @return object
    *   A new entity object.
    */
-  protected abstract function newEntity(FeedsSource $source);
+  protected function newEntity(FeedsSource $source) {
+    $entity = new stdClass();
+
+    $info = $this->entityInfo();
+    if (!empty($info['entity keys']['language'])) {
+      $entity->{$info['entity keys']['language']} = $this->entityLanguage();
+    }
+
+    return $entity;
+  }
 
   /**
    * Load an existing entity.
@@ -109,28 +118,46 @@ abstract class FeedsProcessor extends FeedsPlugin {
    *   existing ids first.
    */
   protected function entityLoad(FeedsSource $source, $entity_id) {
-    if ($this->config['update_existing'] == FEEDS_UPDATE_EXISTING) {
-      $entities = entity_load($this->entityType(), array($entity_id));
-      return reset($entities);
-    }
-
     $info = $this->entityInfo();
 
-    $args = array(':entity_id' => $entity_id);
+    if ($this->config['update_existing'] == FEEDS_UPDATE_EXISTING) {
+      $entities = entity_load($this->entityType(), array($entity_id));
+      $entity = reset($entities);
+    }
+    else {
+      $args = array(':entity_id' => $entity_id);
+      $table = db_escape_table($info['base table']);
+      $key = db_escape_field($info['entity keys']['id']);
+      $entity = db_query("SELECT * FROM {" . $table . "} WHERE $key = :entity_id", $args)->fetchObject();
+    }
 
-    $table = db_escape_table($info['base table']);
-    $key = db_escape_field($info['entity keys']['id']);
+    if ($entity && !empty($info['entity keys']['language'])) {
+      $entity->{$info['entity keys']['language']} = $this->entityLanguage();
+    }
 
-    return db_query("SELECT * FROM {" . $table . "} WHERE $key = :entity_id", $args)->fetchObject();
+    return $entity;
   }
 
   /**
-   * Validate an entity.
+   * Validates an entity.
    *
    * @throws FeedsValidationException $e
-   *   If validation fails.
+   *   Thrown if validation fails.
    */
-  protected function entityValidate($entity) {}
+  protected function entityValidate($entity) {
+    $info = $this->entityInfo();
+    if (empty($info['entity keys']['language'])) {
+      return;
+    }
+
+    // Ensure that a valid language is always set.
+    $key = $info['entity keys']['language'];
+    $languages = language_list('enabled');
+
+    if (empty($entity->$key) || !isset($languages[1][$entity->$key])) {
+      $entity->$key = $this->entityLanguage();
+    }
+  }
 
   /**
    * Access check for saving an enity.
@@ -166,7 +193,38 @@ abstract class FeedsProcessor extends FeedsPlugin {
    * 'label plural' ... the plural label of an entity type.
    */
   protected function entityInfo() {
-    return entity_get_info($this->entityType());
+    $info = entity_get_info($this->entityType());
+
+    // Entity module has defined the plural label in "plural label" instead of
+    // "label plural". So if "plural label" is defined, this will have priority
+    // over "label plural".
+    if (isset($info['plural label'])) {
+      $info['label plural'] = $info['plural label'];
+    }
+
+    return $info;
+  }
+
+  /**
+   * Returns the current language for entities.
+   *
+   * This checks if the configuration value is valid.
+   *
+   * @return string
+   *   The current language code.
+   */
+  protected function entityLanguage() {
+    if (!module_exists('locale')) {
+      // language_list() may return languages even if the locale module is
+      // disabled. See https://www.drupal.org/node/173227 why.
+      // When the locale module is disabled, there are no selectable languages
+      // in the UI, so the content should be imported in LANGUAGE_NONE.
+      return LANGUAGE_NONE;
+    }
+
+    $languages = language_list('enabled');
+
+    return isset($languages[1][$this->config['language']]) ? $this->config['language'] : LANGUAGE_NONE;
   }
 
   /**
@@ -647,6 +705,8 @@ abstract class FeedsProcessor extends FeedsPlugin {
    */
   protected function map(FeedsSource $source, FeedsParserResult $result, $target_item = NULL) {
     $targets = $this->getCachedTargets();
+    // Get fields for the entity type we are mapping to.
+    $fields = field_info_instances($this->entityType(), $this->bundle());
 
     if (empty($target_item)) {
       $target_item = array();
@@ -655,12 +715,24 @@ abstract class FeedsProcessor extends FeedsPlugin {
     // Many mappers add to existing fields rather than replacing them. Hence we
     // need to clear target elements of each item before mapping in case we are
     // mapping on a prepopulated item such as an existing node.
-    foreach ($this->config['mappings'] as $mapping) {
+    foreach ($this->getMappings() as $mapping) {
       if (isset($targets[$mapping['target']]['real_target'])) {
-        $target_item->{$targets[$mapping['target']]['real_target']} = NULL;
+        $target_name = $targets[$mapping['target']]['real_target'];
       }
       else {
-        $target_item->{$mapping['target']} = NULL;
+        $target_name = $mapping['target'];
+      }
+
+      // If the target is a field empty the value for the targeted language
+      // only.
+      // In all other cases, just empty the target completely.
+      if (isset($fields[$target_name])) {
+        // Empty the target for the specified language.
+        $target_item->{$target_name}[$mapping['language']] = array();
+      }
+      else {
+        // Empty the whole target.
+        $target_item->{$target_name} = NULL;
       }
     }
 
@@ -668,7 +740,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     // the parser's getSourceElement() method to retrieve the value of the
     // source element and pass it to the processor's setTargetElement() to stick
     // it on the right place of the target item.
-    foreach ($this->config['mappings'] as $mapping) {
+    foreach ($this->getMappings() as $mapping) {
       $value = $this->getSourceValue($source, $result, $mapping['source']);
 
       $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
@@ -715,12 +787,6 @@ abstract class FeedsProcessor extends FeedsPlugin {
   protected function mapToTarget(FeedsSource $source, $target, &$target_item, $value, array $mapping) {
     $targets = $this->getCachedTargets();
 
-    if (isset($targets[$target]['preprocess_callbacks'])) {
-      foreach ($targets[$target]['preprocess_callbacks'] as $callback) {
-        call_user_func_array($callback, array($source, $target_item, $target, &$mapping));
-      }
-    }
-
     // Map the source element's value to the target.
     // If the mapping specifies a callback method, use the callback instead of
     // setTargetElement().
@@ -764,6 +830,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
       'input_format' => NULL,
       'skip_hash_check' => FALSE,
       'bundle' => $bundle,
+      'language' => LANGUAGE_NONE,
     );
   }
 
@@ -787,6 +854,16 @@ abstract class FeedsProcessor extends FeedsPlugin {
       $form['bundle'] = array(
         '#type' => 'value',
         '#value' => $this->entityType(),
+      );
+    }
+
+    if (module_exists('locale') && !empty($info['entity keys']['language'])) {
+      $form['language'] = array(
+        '#type' => 'select',
+        '#options' => array(LANGUAGE_NONE => t('Language neutral')) + locale_language_list('name'),
+        '#title' => t('Language'),
+        '#required' => TRUE,
+        '#default_value' => $this->config['language'],
       );
     }
 
@@ -853,7 +930,38 @@ abstract class FeedsProcessor extends FeedsPlugin {
    * Get mappings.
    */
   public function getMappings() {
-    return isset($this->config['mappings']) ? $this->config['mappings'] : array();
+    $cache = &drupal_static('FeedsProcessor::getMappings', array());
+
+    if (!isset($cache[$this->id])) {
+      $mappings = $this->config['mappings'];
+      $targets = $this->getCachedTargets();
+      $languages = language_list('enabled');
+
+      foreach ($mappings as &$mapping) {
+
+        if (isset($targets[$mapping['target']]['preprocess_callbacks'])) {
+          foreach ($targets[$mapping['target']]['preprocess_callbacks'] as $callback) {
+            call_user_func_array($callback, array($targets[$mapping['target']], &$mapping));
+          }
+        }
+
+        // Ensure there's always a language set.
+        if (empty($mapping['language'])) {
+          $mapping['language'] = LANGUAGE_NONE;
+        }
+        else {
+          // Check if the configured language is available. If not, fallback to
+          // LANGUAGE_NONE.
+          if (!isset($languages[1][$mapping['language']])) {
+            $mapping['language'] = LANGUAGE_NONE;
+          }
+        }
+      }
+
+      $cache[$this->id] = $mappings;
+    }
+
+    return $cache[$this->id];
   }
 
   /**
@@ -994,7 +1102,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
   protected function uniqueTargets(FeedsSource $source, FeedsParserResult $result) {
     $parser = feeds_importer($this->id)->parser;
     $targets = array();
-    foreach ($this->config['mappings'] as $mapping) {
+    foreach ($this->getMappings() as $mapping) {
       if (!empty($mapping['unique'])) {
         // Invoke the parser's getSourceElement to retrieve the value for this
         // mapping's source.
@@ -1052,12 +1160,13 @@ abstract class FeedsProcessor extends FeedsPlugin {
    * Include mappings as a change in mappings may have an affect on the item
    * produced.
    *
-   * @return Always returns a hash, even with empty, NULL, FALSE:
-   *  Empty arrays return 40cd750bba9870f18aada2478b24840a
-   *  Empty/NULL/FALSE strings return d41d8cd98f00b204e9800998ecf8427e
+   * @return string
+   *   A hash is always returned, even when the item is empty, NULL or FALSE.
    */
   protected function hash($item) {
-    return hash('md5', serialize($item) . serialize($this->config['mappings']));
+    $sources = feeds_importer($this->id)->parser->getMappingSourceList();
+    $mapped_item = array_intersect_key($item, array_flip($sources));
+    return hash('md5', serialize($mapped_item) . serialize($this->getMappings()));
   }
 
   /**
@@ -1108,7 +1217,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Creates a log entry for when an exception occured during import.
+   * Creates a log entry for when an exception occurred during import.
    *
    * @param Exception $e
    *   The exception that was throwned during processing the item.

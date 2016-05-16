@@ -15,8 +15,8 @@
  * Implements hook_node_insert().
  */
 function mukurtu_protocol_field_node_insert($node) {
-  if ($node->type == 'community') {
-
+  if ($node->type == 'community' && !property_exists($node,'feeds_item')) {
+    
     // create protocol
     $newnode = new stdClass();
     $newnode->title = $node->title." Community Only";
@@ -25,7 +25,7 @@ function mukurtu_protocol_field_node_insert($node) {
     $newnode->uid = $node->uid;
     $newnode->status = $node->status;
     $newnode->comment = $node->comment;
-    $newnode->promot = 0;
+    $newnode->promote = 0;
     $newnode->language = $node->language;
     $newnode->group_group[LANGUAGE_NONE][0]['value'] = 1;
     $newnode->group_access[LANGUAGE_NONE][0]['value'] = 2;

@@ -158,7 +158,7 @@ function mukurtu_splash_block_info() {
     'info' => t('Mukurtu Dashboard: Configure Mukurtu'),
   );
   $blocks['batch_import'] = array(
-    'info' => t('Mukurtu Dashboard: Import Content'),
+    'info' => t('Mukurtu Dashboard: Import/Export Content'),
   );
   $blocks['manage_content'] = array(
     'info' => t('Mukurtu Dashboard: Manage Content'),
@@ -391,33 +391,36 @@ function mukurtu_splash_block_site_config() {
 
   $markup = '';
 
-  $items[] = array (
-    'title' => 'Configure Google Analytics',
-    'href' => 'admin/config/system/googleanalytics',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('You will need to create a Google Analytics account and then configure Google Analytics on this site.'),
-  );
+  if(user_access('administer site configuration')) {
+      $items[] = array (
+          'title' => 'Configure Google Analytics',
+          'href' => 'admin/config/system/googleanalytics',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('You will need to create a Google Analytics account and then configure Google Analytics on this site.'),
+      );
 
-  $items[] = array (
-    'title' => 'Configure Mollom',
-    'href' => 'admin/config/content/mollom/settings',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('Mollom is a content moderation web service used to filter out spam and malicious content.  Requires a Mollom account.'),
-  );
+      $items[] = array (
+          'title' => 'Configure Mollom',
+          'href' => 'admin/config/content/mollom/settings',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('Mollom is a content moderation web service used to filter out spam and malicious content.  Requires a Mollom account.'),
+      );
 
-  $items[] = array (
-    'title' => 'Rebuild Site Permissions',
-    'href' => 'admin/reports/status/rebuild',
-    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-    'description' => t('If doing a lot of site content editing, you may need to rebuild permissions to make sure that access permissions remain set correctly.'),
-  );
-  
-  $content = array ('content' => $items);
-  $markup = theme('admin_block_content', $content);
+      $items[] = array (
+          'title' => 'Rebuild Site Permissions',
+          'href' => 'admin/reports/status/rebuild',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('If doing a lot of site content editing, you may need to rebuild permissions to make sure that access permissions remain set correctly.'),
+      );
 
-  $block = array(
-    '#markup' => $markup,
-  );
+      $content = array ('content' => $items);
+      $markup = theme('admin_block_content', $content);
+
+      $block = array(
+          '#markup' => $markup,
+      );
+  }
+
   return $block;
 }
 
@@ -435,7 +438,7 @@ function mukurtu_splash_block_manage_content() {
       'title' => 'Add a Digital Heritage item',
       'href' => 'node/add/digital-heritage',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Add a Digital Hertiage Item.'),
+      'description' => t('Add a Digital Heritage Item.'),
     );
   }
 
@@ -550,6 +553,32 @@ function mukurtu_splash_block_batch_import() {
     );
   }
 
+  // Only show these import/export dashboard links to Mukurtu or Drupal Admins
+  $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
+  $drupal_admin =  user_role_load_by_name('administrator');
+
+  if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+      $items[] = array(
+          'title' => 'Export Digital Heritage Metadata',
+          'href' => 'manage/digital-heritage',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('Select digital heritage items for export.'),
+      );
+  
+      if (feeds_access('import','digital_heritage_metadata')) {
+          $items[] = array(
+              'title' => 'Import Digital Heritage Metadata from Zip Archive',
+              'href' => 'manage/zip_import',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Batch import many digital heritage items from a Zip Archive.'),
+          );
+      }
+  }
+
+  if(count($items) < 1) {
+      return;
+  }
+  
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
   
@@ -729,6 +758,29 @@ function mukurtu_splash_block_manage_community() {
     );
   }
 
+  if (user_access('administer site configuration')) {
+    $dh_tk_description = 'Switch digital heritage traditional knowledge label text customization from community-level to site-wide.';
+    if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+      $dh_tk_description = 'Switch digital heritage traditional knowledge label text customization from site-wide to community-level.';
+    }
+    $items[] = array(
+      'title' => 'Toggle TK Label Text Customization Level',
+      'href' => 'dashboard/toggle-custom-tk-label-text',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t($dh_tk_description),
+    );
+    if (variable_get('mukurtu_use_sitewide_custom_tk_label_text')) {
+      $items[] = array (
+        'title' => 'Customize Site-Wide TK Label Text',
+        'href' => 'dashboard/customize-tk-label-text',
+        'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+        'description' => t('Customize site-wide digital heritage traditional knowledge label text.'),
+      );
+    }
+  }
+
+
+
   /*if (feeds_access('import','import_cultural_protocols')) {
     $items[] = array(
       'title' => 'Import Cultural Protocols',
@@ -847,7 +899,7 @@ function mukurtu_splash_block_support() {
 
   $items[] = array (
     'title' => 'Mukurtu Video Channel',
-    'href' => 'https://www.youtube.com/user/mukurtu',
+    'href' => 'https://vimeo.com/channels/mukurtucms',
     'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
     'description' => t('How Tos and Walkthroughs'),
   );

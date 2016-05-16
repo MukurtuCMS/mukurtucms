@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the license module.
+ */
+
+/**
+ * Use site-wide custom TK Label text by default
+ */
+function license_install() {
+  variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 1);
+}
+
+/**
+ * Use site-wide custom TK Label text by default
+ */
+function license_update_7100() {
+  variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 1);
+}

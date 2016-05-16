@@ -144,6 +144,51 @@ function ma_culturalprotocol_node_update($node) {
   }
 }
 
+
+/**
+ * Return if a cultural protocol is being referenced by nodes or atoms
+ *
+ * @param $node
+ */
+function _ma_culturalprotocol_is_active($node) {
+    // Check nodes for CP references
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+        ->fieldCondition('og_group_ref', 'target_id', $node->nid)
+        ->count();
+
+    $results = intval($query->execute());
+
+    // Check Scald atoms for CP references
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'scald_atom')
+        ->fieldCondition('field_scald_protocol', 'target_id', $node->nid)
+        ->count();
+
+    $results += intval($query->execute());
+
+    if($results > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Implements hook_node_access().
+ */
+function ma_culturalprotocol_node_access($node, $op, $account) {
+    $type = is_string($node) ? $node : $node->type;
+
+    if($type == 'cultural_protocol_group' && $op == 'delete') {
+        // Don't let a user delete a cultural protocol if it is being actively referenced
+        if(_ma_culturalprotocol_is_active($node)) {
+            return NODE_ACCESS_DENY;
+        }
+    }
+}
+
+
 /**
  * Allows a single field to be used to select the type of non-member signups in a node
  *

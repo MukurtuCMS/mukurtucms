@@ -84,7 +84,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 3,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -1027,7 +1027,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 8,
+        'weight' => 7,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1082,7 +1082,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'map_type' => 'HYBRID',
       ),
       'type' => 'geofield_gmap',
-      'weight' => 32,
+      'weight' => 33,
     ),
   );
 
@@ -1124,7 +1124,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 8,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1177,7 +1177,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 33,
+      'weight' => 34,
     ),
   );
 
@@ -1430,7 +1430,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 2,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -2033,7 +2033,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => 1,
       ),
       'type' => 'options_select',
       'weight' => 50,
@@ -2111,6 +2111,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 18,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_licence_trad',
     'label' => 'Traditional Knowledge Labels',
@@ -2122,7 +2123,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => 1,
       ),
       'type' => 'options_select',
       'weight' => 49,
@@ -2173,7 +2174,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'link' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 3,
+        'weight' => 1,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -2237,6 +2238,81 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 54,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_people'
+  $field_instances['node-digital_heritage-field_people'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 43,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 5,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_people',
+    'label' => 'People',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
+      ),
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 31,
     ),
   );
 
@@ -2366,7 +2442,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'entityreference',
         'settings' => array(),
         'type' => 'entityreference_entity_id',
-        'weight' => 10,
+        'weight' => 9,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2750,7 +2826,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 0,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -2944,7 +3020,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 4,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3080,7 +3156,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 31,
+      'weight' => 32,
     ),
   );
 
@@ -3261,6 +3337,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Location Description');
   t('Media Assets');
   t('Original Date');
+  t('People');
   t('Please provide a brief summary of this item in less than 140 characters. Other fields will allow for more elaboration about the content.');
   t('Protocol');
   t('Publisher');
@@ -3278,6 +3355,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
 ');
   t('The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.');
+  t('The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).');
   t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. ');
   t('There are different licensing options available to you for your content if you have copyright of the materials. ');
   t('This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');

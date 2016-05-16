@@ -5,7 +5,7 @@
  */
 function mukurtu_batch_import_menu() {
 
-  $items['admin/mukurtu/batch_import'] = array(
+  $items['manage/zip_import'] = array(
     'title' => 'Import Batch Content',
     'description' => 'Import content into Mukurtu',
     'page callback' => 'drupal_get_form',
@@ -36,23 +36,22 @@ function mukurtu_batch_import_form() {
   
   $form['mukurtu_batch_import_form']['header'] = array(
     '#type' => 'markup',
-    '#markup' => '<p>' . t('Upload content into Mukurtu by uploading a properly configured file folder.') . '</p>',
+    '#markup' => '<p>' . t('Upload content into Mukurtu by uploading a zip archive.') . '</p>',
   );
 
   $form['mukurtu_batch_import_form']['#attributes']['enctype'] = 'multipart/form-data';
   $form['mukurtu_batch_import_form']['media'] = array(
     '#type' => 'fieldset',
-    '#title' => '<h3>' . t('1. Gather your files.') . '</h3>',
+    '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>' . l('Download a sample folder', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('
-You will see all of the media files as well as tabular data (CSV) files that will allow you to bulk import many pieces of content. <br /> This includes Cultural Protocols, Communities, Categories, Users, Digital Heritage content and Glossary items.') . '</p>',
+    '#description' => '<p>' . l('Download a sample zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('This zip file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the <a href="@management_link">digital heritage management page</a>.', array('@management_link' => '/manage/digital-heritage')) . '</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
   
   $form['mukurtu_batch_import_form']['upload'] = array(
     '#type' => 'fieldset',
-    '#title' => '<h3>' . t('2. Upload your Content Folder.') . '</h3>',
+    '#title' => '<h3>' . t('2. Upload your zip file') . '</h3>',
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
@@ -61,9 +60,12 @@ function mukurtu_batch_import_form() {
   $form['mukurtu_batch_import_form']['upload']['folder'] = array(
     '#type' => 'managed_file',
     '#title' => empty($default_upload) ? t('File') : NULL,
-    '#description' => empty($default_upload) ? t('Select a file from your local system.') : t('Select a different file from your local system.'),
+    '#description' => empty($default_upload) ? t('Select a zip file from your local system.') : t('Select a different zip file from your local system.'),
     '#size' => 22,
-    '#upload_location' => 'public://mukurtu_batch_import',
+    '#upload_location' => 'private://mukurtu_batch_import',
+    '#upload_validators' => array(
+				  'file_validate_extensions' => array('zip')
+				  ),
     '#default_value' => $default_upload,
   );
 
@@ -78,7 +80,7 @@ function mukurtu_batch_import_form() {
 
   $form['mukurtu_batch_import_form']['help'] = array(
     '#type' => 'markup',
-    '#markup' => '<div class="">Manage: ' . l('Files', 'admin/content/file'). " | " . l('Content','admin/content') . " | " . l('Communities','admin/communities') . " | " . l('Cultural Protocols','admin/cultural_protocols') . " | " . l('Users','admin/people') . " | " . l('Categories','admin/structure/taxonomy/category') . '<br />' . l('Back to Dashboard','admin/dashboard') . '<br /><br />' . 'Questions?' . l('Contact Support','http://mukurtu.zendesk.com') . '</div>' ,
+    '#markup' => '<div class="">' . l(t('Return to Dashboard'),'/dashboard', array('attributes' => array('class' => 'btn btn-default'))) . '</div>' ,
   );
 
 
@@ -129,39 +131,47 @@ function mukurtu_batch_import_parse_zip($file) {
  
   $file_path = drupal_realpath($file->uri);
 
+  // Create a unique temporary folder to extract the zip file in
+  /* $temp_extract_path = file_directory_temp();
+  $temp_extract_path .= '/' . uniqid('mukurtu_upload_');
+  mkdir($temp_extract_path); */
+
+  $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
+  //  mkdir($temp_extract_path);
+  
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
-      $zip->extractTo('public://mukurtu_batch_import');
-      $zip->close();
-      dsm('Zip file extracted');      
+  //      $zip->extractTo('public://mukurtu_batch_import');
+    $zip->extractTo($temp_extract_path);
+    $zip->close();
+    dsm('Zip file extracted');      
   } else {
-      dsm('Zip file not extracted.');
+    dsm('Zip file not extracted.');
   }
-
-  $filename_split = explode(".", $file->filename);
-  $foldername = $filename_split[0];
   
-  $folder_path = drupal_realpath('public://mukurtu_batch_import/' . $foldername);
-  
-  $media_path = $folder_path . '/media';
-  $metadata_path = $folder_path . '/metadata';
+  //  $media_path = $folder_path . '/media';
+  //  $metadata_path = $folder_path . '/metadata';
 
   $feedback = array();
-  mukurtu_batch_import_import_media($media_path);
-  mukurtu_batch_import_import_metadata($metadata_path, $file->fid);  
+  //  mukurtu_batch_import_import_media($extracted_folder_path);
+  mukurtu_batch_import_import_metadata($temp_extract_path);
 
   // Record/store feedback
   $messages = drupal_get_messages('status');
   mukurtu_batch_import_feedback($messages);
+
+  // Delete extracted files from temporary directory
+  //  file_unmanaged_delete_recursive($temp_extract_path);
 }
 
 /**
  * Display the feedback in a custom output and provide a file of results.
  */
 function mukurtu_batch_import_feedback($messages) {
- dpm($messages);
+    // dpm($messages);
 }
 
+/*
 function mukurtu_batch_import_import_media($directory) {
     if (!is_dir($directory)) {
       form_set_error('directory', t('The provided directory does not exist.'));
@@ -181,11 +191,13 @@ function mukurtu_batch_import_import_media($directory) {
     batch_set($batch);
 }
 
-$counter = 0;
 
+$counter = 0;
+*/
 /**
  * BatchAPI callback op for media import.
  */
+/*
 function mukurtu_batch_import_media_batch($files, &$context) {
   if (!isset($context['sandbox']['files'])) {
     // This runs the first time the batch runs.
@@ -222,43 +234,57 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 
   $context['finished'] = ($context['sandbox']['max'] - count($files)) / $context['sandbox']['max'];
 }
+*/
 
 
-
-function mukurtu_batch_import_import_metadata($metadata_path, $fid) {
+function mukurtu_batch_import_import_metadata($path) {
   module_load_include('inc', 'feeds', 'feeds.pages');
-    
-  $feed_file_names = array(
-    'cutural_protocols.csv' => 'import_cultural_protocols',
-    'communities.csv' => 'import_communities',
-    'categories.csv' => 'import_categories',
-    'users.csv' => 'import_users',
-    'digital_heritage.csv' => 'digital_heritage_metadata',
+  
+  // File name -> Feed Importer lookup table
+  $feed_file_names = array(			   
+			   //    'categories.csv' => 'import_categories',
+			   //    'users.csv' => 'import_users',
+			       'media_audio.csv' => 'import_media_audio',
+			       'media_files.csv' => 'import_media_files',
+			       'media_images.csv' => 'import_media_images',
+			       'media_video.csv' => 'import_media_video',
+			       'communities.csv' => 'import_communities',
+			       'protocols.csv' => 'import_cultural_protocols',
+                   'collections.csv' => 'import_collection',
+			       'digitalheritage.csv' => 'digital_heritage_metadata',
   ); 
 
+
   foreach($feed_file_names as $filename => $importer_id) {
-
-    //http://nodesforbreakfast.com/article/2012/09/23/programmatically-execute-feeds-importer-drupal-7
-
-    $file_path = $metadata_path . '/' . $filename;
+    $csv_path = $path . '/' . $filename;
     
-    // Save as a managed file.
-    $csv = file_get_contents($file_path);
-    $file = file_save_data($csv, 'public://feeds/' . $filename, FILE_EXISTS_RENAME);
+    if(file_exists($csv_path)) {
+      // Save as a managed file.
+      $csv = file_get_contents($csv_path);
 
-    // Load the Feeds Source object.
-    $source = feeds_source($importer_id);
-    $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-    $fetcher_config['source'] = $file->uri;
-    $fetcher_config['file'] = $file;
+      // Crude method to support relative file paths
+      $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
 
-    // Set the source fetcher config.
-    $source->setConfigFor($source->importer->fetcher, $fetcher_config);
+      //      $destination = 'private://feeds/'; 
+      $destination = $path;
+      file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
+      
+      $file = file_save_data($csv, $destination . '/' . $filename, FILE_EXISTS_REPLACE);     
+
+      // Load the Feeds Source object.
+      $source = feeds_source($importer_id);
+      $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+      $fetcher_config['source'] = $file->uri;
+      $fetcher_config['file'] = $file;
+
+      // Set the source fetcher config.
+      $source->setConfigFor($source->importer->fetcher, $fetcher_config);
     
-    // Save the source.
-    $source->save();
-    $source->startImport();
-  }  
+      // Save the source.
+      $source->save();
+      $source->startImport();
+    }
+  }
 }
 
 function mukurtu_batch_import_form_ajax($form, $form_state) {

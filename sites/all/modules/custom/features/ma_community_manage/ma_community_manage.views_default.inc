@@ -687,6 +687,14 @@ function ma_community_manage_views_default_views() {
 
   /* Display: Community */
   $handler = $view->new_display('block', 'Community', 'block_1');
+  $handler->display->display_options['defaults']['footer'] = FALSE;
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['content'] = '<div class="add-members-link btn btn-default"><a href="/digital-heritage/community/!1">Browse All Digital Heritage in %1</a></div>';
+  $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  $handler->display->display_options['footer']['area']['tokenize'] = TRUE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   /* Contextual filter: Content: Community (field_community_ref) */
   $handler->display->display_options['arguments']['field_community_ref_nid']['id'] = 'field_community_ref_nid';
@@ -730,6 +738,7 @@ function ma_community_manage_views_default_views() {
     t('Community'),
     t('All'),
     t('more'),
+    t('<div class="add-members-link btn btn-default"><a href="/digital-heritage/community/!1">Browse All Digital Heritage in %1</a></div>'),
     t('Protocol'),
     t('OG membership from node'),
   );

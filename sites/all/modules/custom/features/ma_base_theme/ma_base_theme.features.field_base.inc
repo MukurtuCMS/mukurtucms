@@ -548,7 +548,7 @@ function ma_base_theme_field_default_field_bases() {
   // Exported field_base: 'field_licence_trad'
   $field_bases['field_licence_trad'] = array(
     'active' => 1,
-    'cardinality' => 1,
+    'cardinality' => 4,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_licence_trad',

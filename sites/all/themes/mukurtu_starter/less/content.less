@@ -169,14 +169,10 @@
   /* hiding the og ref field for digital heritage items */
   div.form-item table .form-type-textfield,
   div.form-item table .form-type-textfield * {
-    display: inline-block;
+
   }
   #edit-og-group-ref {
     display:none;
-  }
-
-  .field-name-field-licence-trad a img {
-      width: 120px;
   }
 }
 
@@ -557,6 +553,19 @@ a.tooltips span {
     padding: 30px;
   }
 
+  // TK Labels
+  .field-name-field-licence-trad {
+    .popup-element {
+      .popup-element-title img {
+        width: 88px; // Make TK Label image the same width as Licensing Options image
+        margin-top: 5px;
+      }
+      // 2 per row
+      width: 100px;
+      float: left;
+    }
+  }
+
   // Related DH nodes (bottom)
   .view-mode-search_result {
     border-bottom: 1px solid #ecebeb;
@@ -618,6 +627,18 @@ a.tooltips span {
   }
   .label-above {
     margin-bottom: -30px;
+  }
+}
+
+
+// TK Label Customization form
+#license-custom-tk-label-text-form, .group-custom-tk-label-text {
+  .filter-wrapper {
+    display: none;
+  }
+  .help-block {
+    font-weight: bold;
+    font-size: 1.3em;
   }
 }
 
@@ -781,4 +802,14 @@ a.tooltips span {
   left: 0px;
   position: absolute;
   z-index: -1;
+}
+
+
+// DH management page
+.form-item-operation {
+    padding-left: 15px;
+}
+
+.export-download > a {
+    color: #ffffff;
 }

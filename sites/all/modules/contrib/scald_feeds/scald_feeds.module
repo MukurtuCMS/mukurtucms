@@ -75,14 +75,23 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
   $field = isset($entity->$target) ? $entity->$target : array();
 
   foreach ($value as $v) {
-
+    // First check if we are given a scald ID
+    $existing_sid = FALSE;
+    if(is_numeric($v->getValue())) {
+        $atom = scald_atom_load($v->getValue());
+        if($atom) {
+            $existing_sid = $atom->sid;
+        }
+    }
+      
     // Check if using a GUID for an existing scald atom previously imported by feeds
-    $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
+    if($existing_sid == FALSE) {
+        $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
+    }
 
+    // Search for a previously imported matching scald atom and use that if found.
     if($existing_sid == FALSE) {
       $type = _scald_feeds_get_provider_by_mime_type($v->getMimeType());
-    
-      // Search for a previously imported matching scald atom and use that if found.
       $existing_sid = scald_feeds_fetch_matching_atom($v->getValue(), $type);
     }
 

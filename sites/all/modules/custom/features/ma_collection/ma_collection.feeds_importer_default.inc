@@ -15,13 +15,18 @@ function ma_collection_feeds_importer_default() {
   $feeds_importer->api_version = 1;
   $feeds_importer->id = 'import_collection';
   $feeds_importer->config = array(
-    'name' => 'Import Collection',
-    'description' => 'Import a collection of digital heritage items.',
+    'name' => 'Import Collections',
+    'description' => 'Import Digital Heritage collections.',
     'fetcher' => array(
       'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
         'allowed_extensions' => 'txt csv tsv xml opml',
         'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
       ),
     ),
     'parser' => array(
@@ -29,68 +34,71 @@ function ma_collection_feeds_importer_default() {
       'config' => array(
         'delimiter' => ',',
         'no_headers' => 0,
+        'encoding' => 'UTF-8',
       ),
     ),
     'processor' => array(
       'plugin_key' => 'FeedsNodeProcessor',
       'config' => array(
-        'content_type' => 'collection',
         'expire' => '-1',
         'author' => 0,
         'mappings' => array(
           0 => array(
-            'source' => 'Title',
-            'target' => 'title',
-            'unique' => 0,
-          ),
-          1 => array(
             'source' => 'NID',
             'target' => 'nid',
-            'unique' => 0,
+            'unique' => 1,
+            'language' => 'und',
           ),
-          2 => array(
-            'source' => 'Description',
-            'target' => 'field_description',
-            'unique' => FALSE,
-          ),
-          3 => array(
-            'source' => 'Type',
-            'target' => 'field_term_ma_collection',
-            'unique' => FALSE,
-          ),
-          4 => array(
-            'source' => 'Tags',
-            'target' => 'field_tags',
-            'unique' => FALSE,
-          ),
-          5 => array(
-            'source' => 'Cultural Protocols',
-            'target' => 'field_cultural_protocol_groups',
-            'unique' => FALSE,
-          ),
-          6 => array(
-            'source' => 'Community Groups',
-            'target' => 'field_community_groups',
-            'unique' => FALSE,
-          ),
-          7 => array(
+          1 => array(
             'source' => 'GUID',
             'target' => 'guid',
             'unique' => 1,
+            'language' => 'und',
           ),
-          8 => array(
-            'source' => 'Audience',
-            'target' => 'group_audience',
+          2 => array(
+            'source' => 'Title',
+            'target' => 'title',
+            'unique' => 0,
+            'language' => 'und',
+          ),
+          3 => array(
+            'source' => 'Summary',
+            'target' => 'field_description:summary',
             'unique' => FALSE,
+            'language' => 'und',
           ),
-          9 => array(
-            'source' => 'Digital Heritage',
-            'target' => 'field_reference_digital_heritage',
+          4 => array(
+            'source' => 'Description',
+            'target' => 'field_description',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          5 => array(
+            'source' => 'Image',
+            'target' => 'field_collection_image',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          6 => array(
+            'source' => 'Credit',
+            'target' => 'field_collection_credit',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          7 => array(
+            'source' => 'Digital Heritage Items',
+            'target' => 'field_digital_heritage_items:guid_or_nid',
             'unique' => FALSE,
           ),
         ),
         'update_existing' => '2',
-        'input_format' => 'plain_text',
+        'input_format' => 'filtered_html',
+        'authorize' => 1,
+        'update_non_existent' => 'skip',
+        'skip_hash_check' => 0,
+        'bundle' => 'collection',
+        'insert_new' => 1,
+        'language' => 'und',
       ),
     ),
     'content_type' => '',

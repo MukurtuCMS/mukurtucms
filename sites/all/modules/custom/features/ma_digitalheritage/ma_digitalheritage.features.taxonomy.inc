@@ -13,7 +13,7 @@ function ma_digitalheritage_taxonomy_default_vocabularies() {
       'name' => 'Category',
       'machine_name' => 'category',
       'description' => 'The cultural categories to which digital content refers. Associating content with one or more categories facilitates browsing.',
-      'hierarchy' => 0,
+      'hierarchy' => 1,
       'module' => 'taxonomy',
       'weight' => -10,
       'rdf_mapping' => array(
@@ -154,6 +154,29 @@ function ma_digitalheritage_taxonomy_default_vocabularies() {
       'hierarchy' => 0,
       'module' => 'taxonomy',
       'weight' => -8,
+      'rdf_mapping' => array(
+        'rdftype' => array(
+          0 => 'skos:ConceptScheme',
+        ),
+        'name' => array(
+          'predicates' => array(
+            0 => 'dc:title',
+          ),
+        ),
+        'description' => array(
+          'predicates' => array(
+            0 => 'rdfs:comment',
+          ),
+        ),
+      ),
+    ),
+    'people' => array(
+      'name' => 'People',
+      'machine_name' => 'people',
+      'description' => 'Lists input from the "People" field in the Digital Heritage content creation form.',
+      'hierarchy' => 0,
+      'module' => 'taxonomy',
+      'weight' => 0,
       'rdf_mapping' => array(
         'rdftype' => array(
           0 => 'skos:ConceptScheme',

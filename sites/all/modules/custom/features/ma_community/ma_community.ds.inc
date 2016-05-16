@@ -62,6 +62,11 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'community_browse_all_dh_link' => array(
+      'weight' => '9',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'community_dh_items' => array(
       'weight' => '4',
       'label' => 'above',
@@ -92,14 +97,14 @@ function ma_community_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_parent_community' => array(
+    'field_child_communities' => array(
       'formatter_settings' => array(
         'ft' => array(
           'lb-col' => TRUE,
         ),
       ),
     ),
-    'field_child_communities' => array(
+    'field_parent_community' => array(
       'formatter_settings' => array(
         'ft' => array(
           'lb-col' => TRUE,
@@ -138,6 +143,24 @@ function ma_community_ds_field_settings_info() {
  */
 function ma_community_ds_custom_fields_info() {
   $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'community_browse_all_dh_link';
+  $ds_field->label = 'Community Browse All DH Link';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'community|full';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<h2 class="block-title">Digital Heritage</h2><div class="view-content"><a href="/digital-heritage/community/[node:nid]">Browse All Digital Heritage in [node:title]</a></div>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 1,
+  );
+  $export['community_browse_all_dh_link'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -290,43 +313,45 @@ function ma_community_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'title',
-        1 => 'group_basic',
-        2 => 'group_tabs',
-        3 => 'body',
-        4 => 'redirect',
-        5 => 'group_advanced',
-        6 => 'field_community_image',
-        7 => 'path',
+        1 => 'group_tabs',
+        2 => 'group_basic',
+        3 => 'redirect',
+        4 => 'group_advanced',
+        5 => 'body',
+        6 => 'path',
+        7 => 'field_community_image',
         8 => 'field_community_image_thumbnail',
-        9 => 'field_parent_community',
-        10 => 'group_access',
-        12 => 'field_child_communities',
+        9 => 'group_access',
+        10 => 'field_parent_community',
+        13 => 'field_child_communities',
         14 => 'group_register',
         15 => 'og_roles_permissions',
+        16 => 'group_custom_tk_label_text',
       ),
       'hidden' => array(
         11 => 'group_group',
-        13 => 'og_group_ref',
-        16 => '_add_existing_field',
+        12 => 'og_group_ref',
+        17 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'title' => 'ds_content',
-      'group_basic' => 'ds_content',
       'group_tabs' => 'ds_content',
-      'body' => 'ds_content',
+      'group_basic' => 'ds_content',
       'redirect' => 'ds_content',
       'group_advanced' => 'ds_content',
-      'field_community_image' => 'ds_content',
+      'body' => 'ds_content',
       'path' => 'ds_content',
+      'field_community_image' => 'ds_content',
       'field_community_image_thumbnail' => 'ds_content',
-      'field_parent_community' => 'ds_content',
       'group_access' => 'ds_content',
+      'field_parent_community' => 'ds_content',
       'group_group' => 'hidden',
-      'field_child_communities' => 'ds_content',
       'og_group_ref' => 'hidden',
+      'field_child_communities' => 'ds_content',
       'group_register' => 'ds_content',
       'og_roles_permissions' => 'ds_content',
+      'group_custom_tk_label_text' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -368,6 +393,7 @@ function ma_community_ds_layout_settings_info() {
         6 => 'community_protocol_items',
         7 => 'field_parent_community',
         8 => 'field_child_communities',
+        9 => 'community_browse_all_dh_link',
       ),
     ),
     'fields' => array(
@@ -380,6 +406,7 @@ function ma_community_ds_layout_settings_info() {
       'community_protocol_items' => 'right',
       'field_parent_community' => 'right',
       'field_child_communities' => 'right',
+      'community_browse_all_dh_link' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -397,6 +424,7 @@ function ma_community_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|community|full'] = $ds_layout;
 

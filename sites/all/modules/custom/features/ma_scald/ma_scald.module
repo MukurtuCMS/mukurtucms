@@ -39,7 +39,10 @@ function ma_scald_atom_download_link($field) {
   if ($field['bundle'] == 'video' AND $entity->provider <> 'scald_video') {
     return;
   }
-  return l('Download', file_create_url ($entity->file_source));
+
+  // 'Download' was determined to be unpalatable, switching to 'Access'
+  $download_link_text = 'Access' . ((empty($entity->type)) ? '' : ' ' . $entity->type);
+  return l($download_link_text, file_create_url ($entity->file_source));
 }
 
 /**

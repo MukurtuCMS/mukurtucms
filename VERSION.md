@@ -1,4 +1,33 @@
-## Mukurtu 2.03
+## Mukurtu 2.0.4
+- Digital Heritage items now support multiple TK labels
+- The text of individual TK labels can now be customized at the site or community level
+- Removed the option to delete a cultural protocol that is being actively referenced
+- An option to export digital heritage has been added, as well as new import functionality
+- Remove some bypass permissions from the 'Mukurtu Administrator' role so that protocols work as expected
+- A 'people' field was added to the Digital Heritage content type
+- The link to edit a community record now only appears to users with edit permissions for that item
+- Community pages now link to the browse screen with the community facet selected
+- Changed wording of the media "Download" link
+- Fixed a bug where it was possible for a digital heritage item to be incorrectly saved as a community record
+- Fixed a bug where it was possible to get stuck in the map view on the digital heritage browse page
+- Fixed a bug where clicking an auto-completed taxonomy term would result in the term being double-quoted
+- Fixed case where latitude and longitude would not be imported correctly from digital heritage importer
+- Multi-value delimiters should now be a consistent ';' for both the web UI and the importers
+- Subject field in Digital Heritage importer now accepts multiple values
+- The type field for the Digital Heritage importer was added
+- Fixed bug where audio files imported from Mukurtu Mobile had incorrect file extension
+- Fixed minor display issues in the Digital Heritage edit screen
+- Changed the Mukurtu Video Channel link to point to Vimeo instead of YouTube
+- Security updates
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- revert features: `drush fra`. Please first review if there are any custom changes you have done that may be overwritten.
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`
+
+## Mukurtu 2.0.3
 - Updated Drupal core to 7.41
 - Various contrib module security updates,
 - Map view of Digital Heritage items. Browse Digital Heritage now offers a Map view along with the existing List and Grid views. All Digital Heritage items that have a Location set, and also match the current search and filter criteria (and current user view permissions), display on the map as pins. Clicking on a pin reveals a popup which can be clicked through to the item.
@@ -22,7 +51,7 @@
 - clear all caches: `drush cc all`
 - search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`.
 
-## Mukurtu 2.02
+## Mukurtu 2.0.2
 - Hierarchical Digital Heritage items.  Digital Heritage items now support hierarchical relationships to better represent multi-page content.  Ordering is changed by editing the parent node
 - add a new 'Transcription' field to the Digital Heritage 'Additional Metadata' section
 - fix bug where child communities could be dropped when the parent community was altered
@@ -48,7 +77,7 @@
 - search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`.
 
 
-## Mukurtu 2.01
+## Mukurtu 2.0.1
 
 - Community Records. Protocol Stewards may create community-specific "Community Records" within Digital Heritage items that share the media assets but otherwise have custom information
 - Parent Communities. Communities can now be placed within Parent Communities. Explanation is provided within the field's help text.
