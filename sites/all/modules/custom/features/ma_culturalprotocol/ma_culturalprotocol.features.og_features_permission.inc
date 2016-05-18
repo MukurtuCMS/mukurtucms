@@ -162,7 +162,10 @@ function ma_culturalprotocol_og_features_default_permissions() {
 
   // Exported og permission: 'node:cultural_protocol_group:update any dictionary_word content'
   $permissions['node:cultural_protocol_group:update any dictionary_word content'] = array(
-    'roles' => array(),
+    'roles' => array(
+      'contributor' => 'contributor',
+      'protocol steward' => 'protocol steward',
+    ),
   );
 
   // Exported og permission: 'node:cultural_protocol_group:update any digital_heritage content'
