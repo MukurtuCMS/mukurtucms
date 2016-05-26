@@ -9762,3 +9762,18 @@ a:hover {
 .export-download > a {
   color: #ffffff;
 }
+.page-number {
+  text-align: center;
+}
+.owl-carousel {
+  padding-bottom: 20px;
+}
+.owl-item {
+    padding-right: 10px;
+}
+.owl-item .selected {
+    background: #e59637;
+}
+.owl-item .selected a {
+    color: white;
+}
