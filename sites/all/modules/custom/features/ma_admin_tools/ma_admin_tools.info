@@ -1,0 +1,8 @@
+name = Mukurtu Admin Tools
+description = Power tools for Mukurtu and site administrators
+core = 7.x
+package = Features
+version = 7.x-0.1
+project = ma_admin_tools
+dependencies[] = mukurtu_feeds_tamper_plugins
+features[features_api][] = api:2

@@ -1,0 +1,108 @@
+<?php
+/**
+ * @file
+ * Drupal needs this blank file.
+ */
+
+
+function ma_admin_tools_action_info() {
+  return array(
+    'ma_admin_tools_cr_health_check' => array(
+      'type' => 'node',
+      'label' => t('Community Record Health Check'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => TRUE,
+      'triggers' => array('any'),
+      'permissions' => array('edit any digital-heritage content'),
+    ),
+  );
+}
+
+function ma_admin_tools_cr_health_check_form($options) {
+  $form = array();
+  $form['cr_health']['create_redirects'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Create missing community record redirects'),
+      '#default_value' => 1
+  );
+
+  $form['cr_health']['fix_redirects'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Overwrite community record redirects to point to the current parent node'),
+      '#default_value' => 1
+  );
+
+  return $form;
+}
+
+function ma_admin_tools_cr_health_check_submit($form, $form_state) {
+  $return = array();
+  $return['create_redirects'] = $form_state['values']['create_redirects'];
+  $return['fix_redirects'] = $form_state['values']['fix_redirects'];
+
+  return $return;
+}
+
+function ma_admin_tools_cr_health_check(&$node, $context) {
+    $option_create_redirects = ($context['create_redirects'] == 1) ? TRUE : FALSE;
+    $option_fix_redirects = ($context['fix_redirects'] == 1) ? TRUE : FALSE;
+
+    // Node has no community record relationships
+    if(empty($node->field_community_record_parent) && empty($node->field_community_record_children)) {
+        return;
+    }
+
+
+    // Check that the parent has correct redirects
+    // Node is a community record, we want to find the parent to iterate through the CRs
+    $parent = $node;
+    if(!empty($node->field_community_record_parent)) {
+        $parent_nid = $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'];
+        $parent = node_load($parent_nid);
+    }
+
+    // Iterate through the CRs and check if the parent has the correct redirect
+    if(!empty($parent->field_community_record_children)) {
+        foreach($parent->field_community_record_children[LANGUAGE_NONE] as $cr) {
+            $cr_nid = $cr['target_id'];
+            $redirect = redirect_load_by_source("node/$cr_nid");
+
+            if(empty($redirect)) {
+                // Create the missing redirect if that option was selected
+                if($option_create_redirects) {
+                    _ma_admin_tools_create_cr_redirect($cr_nid, $parent->nid);
+                    drupal_set_message("Created missing redirect from community record node $cr_nid to parent node " . $parent->nid);
+                } else {
+                    drupal_set_message("Node " . $parent->nid . " is missing redirect from source 'node/$cr_nid'");
+                }
+            } else {
+                if($redirect->redirect != 'node/' . $parent->nid) {
+                    if($option_fix_redirects) {
+                        drupal_set_message("Fixed community record $cr_nid that was incorrect redirecting to " . $redirect->redirect . " instead of parent node " . $parent->nid);
+                        $redirect->redirect = 'node/' . $parent->nid;
+                        redirect_save($redirect);
+                    } else {
+                        drupal_set_message("Community record $cr_nid redirecting to " . $redirect->redirect . " instead of parent node " . $parent->nid);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+function _ma_admin_tools_create_cr_redirect($cr_nid, $parent_nid) {
+    $new_redirect = new stdClass();
+    redirect_object_prepare(
+        $new_redirect,
+        array(
+            'source' => 'node/' . $cr_nid,
+            'source_options' => array(),
+            'redirect' => 'node/' . $parent_nid,
+            'redirect_options' => array(),
+            'language' => LANGUAGE_NONE,
+        )
+    );
+    redirect_save($new_redirect);
+}
