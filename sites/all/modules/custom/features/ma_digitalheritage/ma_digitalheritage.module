@@ -930,32 +930,41 @@ function ma_digital_heritage_book_page_build_carousel($node) {
         $parent_node = $node;
         $parent_emw = entity_metadata_wrapper('node', $node);
         $class = " class='selected' ";
+        $combo_selected = "selected='selected'";
     } else {
         // We are on a child page
         $parent_node = node_load($node->field_book_parent[LANGUAGE_NONE][0]['target_id']);
         $parent_emw = entity_metadata_wrapper('node', $parent_node);
         $class = "";
+        $combo_selected = "";
     }
 
     $children = $parent_emw->field_book_children->value();
 
     $pages = array();
+    $combobox = "<div id='mulitpage-select'><form name='multipagecombo'><select class='form-control' id=\"urlSelect\" onchange=\"window.location = jQuery('#urlSelect option:selected').val();\">";
+
     $image = ma_digital_heritage_book_page_get_carousel_image($parent_node);
     $url = url(drupal_get_path_alias('node/' . $parent_node->nid));
+    $combobox .= "<option value='$url' $combo_selected>" . $parent_node->title . " [Page 1]</option>";
     $pages[]['row'] = "<div$class><a href='$url'><img src=$image><div class='page-number'>Page 1</div></a></div>";
     $page_number = 2;
     foreach($children as $page) {
         $image = ma_digital_heritage_book_page_get_carousel_image($page);
         $url = url(drupal_get_path_alias('node/' . $page->nid));
         $class = "";
+        $combo_selected = "";
         if($page->nid == $node->nid) {
             $active_page = $page_number - 1;
             $class = " class='selected' ";
+            $combo_selected = "selected='selected'";
         }
 
+        $combobox .= "<option value='$url' $combo_selected>" . $page->title . " [Page $page_number]</option>";
         $pages[]['row'] = "<div$class><a href='$url'><img src=$image><div class='page-number'>Page $page_number</div></a></div>";
         $page_number += 1;
     }
+    $combobox .= "</select></form></div>";
 
     $_SESSION['multipage_dh_start_position'] = $active_page;
     $output = array(
@@ -973,7 +982,7 @@ function ma_digital_heritage_book_page_build_carousel($node) {
 
     $rendered_output = drupal_render($output);
     unset($_SESSION['multipage_dh_start_position']);
-    return $rendered_output;
+    return $rendered_output . $combobox;
 }
 
 function ma_digital_heritage_book_page_navigation_buttons ($node) {
