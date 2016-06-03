@@ -8,7 +8,7 @@
  * Implements hook_field_group_info().
  */
 function ma_digitalheritage_field_group_info() {
-  $export = array();
+  $field_groups = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -20,7 +20,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = '';
-  $export['group_advanced|taxonomy_term|category|form'] = $field_group;
+  $field_groups['group_advanced|taxonomy_term|category|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -32,7 +32,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = '';
-  $export['group_basic|taxonomy_term|category|form'] = $field_group;
+  $field_groups['group_basic|taxonomy_term|category|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -69,7 +69,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_dublin|node|digital_heritage|form'] = $field_group;
+  $field_groups['group_dublin|node|digital_heritage|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -105,7 +105,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_essentials|node|digital_heritage|form'] = $field_group;
+  $field_groups['group_essentials|node|digital_heritage|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -136,7 +136,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_licensing|node|digital_heritage|form'] = $field_group;
+  $field_groups['group_licensing|node|digital_heritage|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -170,7 +170,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_list_view_fields|node|digital_heritage|search_result'] = $field_group;
+  $field_groups['group_list_view_fields|node|digital_heritage|search_result'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -201,7 +201,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_mukurtu_core|node|digital_heritage|form'] = $field_group;
+  $field_groups['group_mukurtu_core|node|digital_heritage|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -233,7 +233,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_relations|node|digital_heritage|form'] = $field_group;
+  $field_groups['group_relations|node|digital_heritage|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -262,7 +262,7 @@ function ma_digitalheritage_field_group_info() {
       ),
     ),
   );
-  $export['group_tabs|node|digital_heritage|form'] = $field_group;
+  $field_groups['group_tabs|node|digital_heritage|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -274,7 +274,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = '';
-  $export['group_tabs|taxonomy_term|category|form'] = $field_group;
+  $field_groups['group_tabs|taxonomy_term|category|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -306,7 +306,7 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'collapsed',
     ),
   );
-  $export['group_transcription_cr|node|digital_heritage|community_record'] = $field_group;
+  $field_groups['group_transcription_cr|node|digital_heritage|community_record'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -338,7 +338,18 @@ function ma_digitalheritage_field_group_info() {
       'formatter' => 'collapsed',
     ),
   );
-  $export['group_transcription|node|digital_heritage|full'] = $field_group;
+  $field_groups['group_transcription|node|digital_heritage|full'] = $field_group;
 
-  return $export;
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Additional Metadata');
+  t('List View Fields');
+  t('Mukurtu Core');
+  t('Mukurtu Essentials');
+  t('Relations');
+  t('Rights and Permissions');
+  t('Tabs');
+  t('Transcription:');
+
+  return $field_groups;
 }
