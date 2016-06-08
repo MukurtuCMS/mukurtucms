@@ -885,13 +885,22 @@ function ma_digital_heritage_book_page_get_carousel_image($node) {
     if(isset($node->field_media_asset)) {
         $sid = $node->field_media_asset[LANGUAGE_NONE][0]['sid'];
         $atom = scald_atom_load($sid);
-        if($atom && isset($atom->scald_thumbnail)) {
-            return image_style_url('carousel_thumbnail', $atom->scald_thumbnail[LANGUAGE_NONE][0][uri]);
+        if($atom && !empty($atom->scald_thumbnail)) {
+            return image_style_url('carousel_thumbnail', $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri']);
         } else {
-            return "";
+            switch($atom->type) {
+            case 'audio':
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_audio_thumbnail_150.jpg');
+            case 'file':
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_file_thumbnail_150.jpg');
+            case 'video':
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_video_thumbnail_150.jpg');
+            default:
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available_150.jpg');
+            }
         }
     }
-    return "";
+    return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available_150.jpg');
 }
 
 /**
