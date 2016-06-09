@@ -783,6 +783,7 @@ function ma_digitalheritage_page_alter(&$data) {
 
       // Book pages
       if ($node->field_book_children OR $node->field_book_parent) {
+          drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
           $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
       }
 
@@ -927,7 +928,10 @@ function ma_digitalheritage_file_download($uri){
  *   Settings group identifier.
  */
 function ma_digitalheritage_owlcarousel_settings_alter(&$settings, $instance) {
-    if(isset($_SESSION['multipage_dh_start_position']) && is_numeric($_SESSION['multipage_dh_start_position'])) {
+    $parameters = drupal_get_query_parameters();
+    if(isset($parameters['position']) && is_numeric($parameters['position']) && $parameters['position'] >= 0) {
+        $settings['settings']['startPosition'] = $parameters['position'];
+    } else if(isset($_SESSION['multipage_dh_start_position']) && is_numeric($_SESSION['multipage_dh_start_position'])) {
         $settings['settings']['startPosition'] = $_SESSION['multipage_dh_start_position'];
     }
 }
