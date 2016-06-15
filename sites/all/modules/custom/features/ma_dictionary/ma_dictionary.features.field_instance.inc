@@ -10,6 +10,57 @@
 function ma_dictionary_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'node-dictionary_word-field_additional_media'
+  $field_instances['node-dictionary_word-field_additional_media'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_additional_media',
+    'label' => 'Additional Media',
+    'required' => 0,
+    'settings' => array(
+      'context' => 'debug',
+      'context_default' => 'sdl_editor_representation',
+      'dnd_enabled' => 1,
+      'mee_enabled' => 0,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'node-dictionary_word-field_community_ref'
   $field_instances['node-dictionary_word-field_community_ref'] = array(
     'bundle' => 'dictionary_word',
@@ -374,7 +425,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -403,67 +454,6 @@ function ma_dictionary_field_default_field_instances() {
       'settings' => array(),
       'type' => 'options_buttons',
       'weight' => 18,
-    ),
-  );
-
-  // Exported field_instance: 'node-dictionary_word-field_media_asset'
-  $field_instances['node-dictionary_word-field_media_asset'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'Any media related to the term. Examples:
-<ul>
-<li> an image of a plant
-<li> a video of an animal
-<li> an audio of the animal sound
-<li> a PDF with information about the term
-</ul>
- ',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'atom_reference',
-        'settings' => array(
-          'link' => 0,
-        ),
-        'type' => 'mukurtu_scald_dictionary_media',
-        'weight' => 7,
-      ),
-      'search_result' => array(
-        'label' => 'hidden',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 14,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_media_asset',
-    'label' => 'Media',
-    'required' => 0,
-    'settings' => array(
-      'referencable_types' => array(
-        'audio' => 'audio',
-        'file' => 'file',
-        'image' => 'image',
-        'video' => 'video',
-      ),
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'atom_reference',
-      'settings' => array(
-        'context' => 'sdl_editor_representation',
-      ),
-      'type' => 'atom_reference_textfield',
-      'weight' => 8,
     ),
   );
 
@@ -712,20 +702,12 @@ function ma_dictionary_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Additional Media');
   t('An audio or video file of the word spoken in its native tongue.');
-  t('Any media related to the term. Examples:
-<ul>
-<li> an image of a plant
-<li> a video of an animal
-<li> an audio of the animal sound
-<li> a PDF with information about the term
-</ul>
- ');
   t('Community');
   t('Definition');
   t('Item Sharing Settings');
   t('Language');
-  t('Media');
   t('Pronunciation');
   t('Protocol');
   t('Recording');

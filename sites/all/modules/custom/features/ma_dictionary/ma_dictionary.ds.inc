@@ -22,14 +22,14 @@ function ma_dictionary_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'og_group_ref' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
         ),
       ),
     ),
-    'field_community_ref' => array(
+    'og_group_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
@@ -93,6 +93,7 @@ function ma_dictionary_ds_layout_settings_info() {
         9 => 'field_dictionary_word_related_dh',
         10 => 'field_community_ref',
         11 => 'og_group_ref',
+        12 => 'field_additional_media',
       ),
     ),
     'fields' => array(
@@ -108,6 +109,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_dictionary_word_related_dh' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',
+      'field_additional_media' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -146,8 +148,9 @@ function ma_dictionary_ds_layout_settings_info() {
         6 => 'field_definition',
         7 => 'field_sample_sentence',
         8 => 'field_media_asset',
-        9 => 'redirect',
-        10 => 'path',
+        9 => 'field_additional_media',
+        10 => 'redirect',
+        11 => 'path',
         12 => 'group_dictionary_word_basic',
         13 => 'field_dictionary_word_synonyms',
         14 => 'group_dictionary_word_relations',
@@ -156,7 +159,6 @@ function ma_dictionary_ds_layout_settings_info() {
         17 => 'field_item_privacy_setting',
       ),
       'hidden' => array(
-        11 => 'field_description',
         18 => 'field_community_ref',
         19 => '_add_existing_field',
       ),
@@ -171,9 +173,9 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_definition' => 'ds_content',
       'field_sample_sentence' => 'ds_content',
       'field_media_asset' => 'ds_content',
+      'field_additional_media' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
-      'field_description' => 'hidden',
       'group_dictionary_word_basic' => 'ds_content',
       'field_dictionary_word_synonyms' => 'ds_content',
       'group_dictionary_word_relations' => 'ds_content',

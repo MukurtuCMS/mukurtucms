@@ -24,13 +24,14 @@ function ma_dictionary_field_group_info() {
     'weight' => '14',
     'children' => array(
       0 => 'field_definition',
-      1 => 'field_dictionary_word_recording',
-      2 => 'field_dictionary_word_language',
+      1 => 'field_dictionary_word_language',
+      2 => 'field_dictionary_word_recording',
       3 => 'field_media_asset',
       4 => 'field_sample_sentence',
       5 => 'field_translation',
       6 => 'field_transliteration',
-      7 => 'title',
+      7 => 'field_additional_media',
+      8 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -55,12 +56,12 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Relations',
-    'weight' => '15',
+    'weight' => '16',
     'children' => array(
       0 => 'field_dictionary_word_related_dh',
       1 => 'field_dictionary_word_synonyms',
-      2 => 'og_group_ref',
-      3 => 'field_item_privacy_setting',
+      2 => 'field_item_privacy_setting',
+      3 => 'og_group_ref',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
