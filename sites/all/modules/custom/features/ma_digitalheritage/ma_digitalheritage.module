@@ -783,21 +783,8 @@ function ma_digitalheritage_page_alter(&$data) {
 
       // Book pages
       if ($node->field_book_children OR $node->field_book_parent) {
-
-        // Show navigation buttons
-        $dh_page_content = ma_digital_heritage_book_page_navigation_buttons($node);
-
-        // Show table of contents on parent (page 1) of book only
-        if ($node->field_book_children) {
-          $dh_page_content .= '<div class = "dh-book-toc">' . theme(
-            'ctools_collapsible',
-            array(
-              'handle' => '<h3 class = "dh-book-toc-header">' . 'Table of Contents' . '</h3>',
-              'content' => ma_digital_heritage_book_page_contents($node),
-              'collapsed' => TRUE,
-            )
-          ) . '</div>';
-        }
+          drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
+          $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
       }
 
       // Community Records
@@ -893,6 +880,122 @@ function ma_digitalheritage_page_alter(&$data) {
       $data['content']['system_main']['#markup'] = $dh_page_content;
     }
   }
+}
+
+function ma_digital_heritage_book_page_get_carousel_image($node) {
+    if(isset($node->field_media_asset)) {
+        $sid = $node->field_media_asset[LANGUAGE_NONE][0]['sid'];
+        $atom = scald_atom_load($sid);
+        if($atom && !empty($atom->scald_thumbnail)) {
+            return image_style_url('carousel_thumbnail', $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri']);
+        } else {
+            switch($atom->type) {
+            case 'audio':
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_audio_thumbnail_150.jpg');
+            case 'file':
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_file_thumbnail_150.jpg');
+            case 'video':
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/default_video_thumbnail_150.jpg');
+            default:
+                return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available_150.jpg');
+            }
+        }
+    }
+    return url(drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available_150.jpg');
+}
+
+/**
+ * Implements hook_file_download()
+ */
+function ma_digitalheritage_file_download($uri){
+  $info = image_get_info($uri);
+
+  // Allow carousel thumbnails for multipage DH items to be cached locally for a week
+  if(isset($info['mime_type']) && strpos($info['mime_type'], 'image/') === 0 && strpos($uri, 'carousel_thumbnail') > 0){
+    return array('Cache-Control' => 'max-age=604800, private',
+                 'Expires' => gmdate('D, d M Y H:i:s', time() + 604800) .' GMT',
+                 'Last-Modified' => gmdate('D, d M Y H:i:s', time() - 604800) .' GMT',
+                 'ETag' => strtr(md5($info['file_size']), 0, 10));
+  }
+}
+
+/**
+ * Implements hook_owlcarousel_settings_alter().
+ *
+ * @param array
+ *   Settings array to apply.
+ * @param string
+ *   Settings group identifier.
+ */
+function ma_digitalheritage_owlcarousel_settings_alter(&$settings, $instance) {
+    $parameters = drupal_get_query_parameters();
+    if(isset($parameters['position']) && is_numeric($parameters['position']) && $parameters['position'] >= 0) {
+        $settings['settings']['startPosition'] = $parameters['position'];
+    } else if(isset($_SESSION['multipage_dh_start_position']) && is_numeric($_SESSION['multipage_dh_start_position'])) {
+        $settings['settings']['startPosition'] = $_SESSION['multipage_dh_start_position'];
+    }
+}
+
+function ma_digital_heritage_book_page_build_carousel($node) {
+    $active_page = 0;
+    if(isset($node->field_book_children) && count($node->field_book_children) > 0) {
+        // We are on the first page
+        $parent_node = $node;
+        $parent_emw = entity_metadata_wrapper('node', $node);
+        $class = " class='selected' ";
+        $combo_selected = "selected='selected'";
+    } else {
+        // We are on a child page
+        $parent_node = node_load($node->field_book_parent[LANGUAGE_NONE][0]['target_id']);
+        $parent_emw = entity_metadata_wrapper('node', $parent_node);
+        $class = "";
+        $combo_selected = "";
+    }
+
+    $children = $parent_emw->field_book_children->value();
+
+    $pages = array();
+    $combobox = "<div id='mulitpage-select'><form name='multipagecombo'><select class='form-control' id=\"urlSelect\" onchange=\"window.location = jQuery('#urlSelect option:selected').val();\">";
+
+    $image = ma_digital_heritage_book_page_get_carousel_image($parent_node);
+    $url = url(drupal_get_path_alias('node/' . $parent_node->nid));
+    $combobox .= "<option value='$url' $combo_selected>" . $parent_node->title . " [Page 1]</option>";
+    $pages[]['row'] = "<div$class><a href='$url'><img src=$image><div class='page-number'>Page 1</div></a></div>";
+    $page_number = 2;
+    foreach($children as $page) {
+        $image = ma_digital_heritage_book_page_get_carousel_image($page);
+        $url = url(drupal_get_path_alias('node/' . $page->nid));
+        $class = "";
+        $combo_selected = "";
+        if($page->nid == $node->nid) {
+            $active_page = $page_number - 1;
+            $class = " class='selected' ";
+            $combo_selected = "selected='selected'";
+        }
+
+        $combobox .= "<option value='$url' $combo_selected>" . $page->title . " [Page $page_number]</option>";
+        $pages[]['row'] = "<div$class><a href='$url'><img src=$image><div class='page-number'>Page $page_number</div></a></div>";
+        $page_number += 1;
+    }
+    $combobox .= "</select></form></div>";
+
+    $_SESSION['multipage_dh_start_position'] = $active_page;
+    $output = array(
+        '#theme' => 'owlcarousel',
+        '#items' => $pages,
+        '#settings' => array(
+            // The settings group to apply.
+            'instance' => 'owlcarousel_settings_multipage',
+            // Attributes are rendered via drupal_attributes on the wrapper element.
+            'attributes' => array(
+                'class' => array('owl-carousel'),
+            )
+        )
+    );
+
+    $rendered_output = drupal_render($output);
+    unset($_SESSION['multipage_dh_start_position']);
+    return $rendered_output . $combobox;
 }
 
 function ma_digital_heritage_book_page_navigation_buttons ($node) {
