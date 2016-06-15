@@ -98,17 +98,17 @@ function _scald_file_pdf_thumbnail($atom, $file) {
       $temp = file_directory_temp() . '/pdf_thumb.png';
       if (scald_file_is_exec_available()) {
         if (scald_file_command_exists('pdfdraw')) {
-          exec('pdfdraw -o ' . $temp . ' ' . $uri . ' 1');
+          exec('pdfdraw -o ' . $temp . ' "' . $uri . '" 1');
         }
         else if (scald_file_command_exists('convert')) {
-          exec('convert ' . $uri . '[0] ' . $temp);
+          exec('convert "' . $uri . '"[0] ' . $temp);
         }
       }
-      else if (extension_loaded('imagick') && class_exists("Imagick")) {
+      if (!file_exists($temp) && extension_loaded('imagick') && class_exists("Imagick")) {
         $im = new Imagick($uri . '[0]');
         $im = $im->flattenImages();
         $im->setImageFormat("png");
-        $im->thumbnailImage(400, 0);
+        $im->thumbnailImage(500, 0);
         $im->writeImage($temp);
       }
       if (file_exists($temp)) {
