@@ -1,0 +1,42 @@
+From ec943963a0eda3f1dd4ee43c333a90cc93a2954a Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 14 Jun 2016 16:16:32 -0700
+Subject: [PATCH] Quote path and failover to imagick php module
+
+File paths with spaces were failing, wrapping in quotes should fix this
+for many systems. Also the previous control logic would not failover to
+the imagick php module if scald_file_is_exec_available returned true but
+both scald_file_command_exist calls returned false.
+---
+ sites/all/modules/contrib/scald_file/scald_file.module | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/sites/all/modules/contrib/scald_file/scald_file.module b/sites/all/modules/contrib/scald_file/scald_file.module
+index a88158e..fce3313 100644
+--- a/sites/all/modules/contrib/scald_file/scald_file.module
++++ b/sites/all/modules/contrib/scald_file/scald_file.module
+@@ -98,17 +98,17 @@ function _scald_file_pdf_thumbnail($atom, $file) {
+       $temp = file_directory_temp() . '/pdf_thumb.png';
+       if (scald_file_is_exec_available()) {
+         if (scald_file_command_exists('pdfdraw')) {
+-          exec('pdfdraw -o ' . $temp . ' ' . $uri . ' 1');
++          exec('pdfdraw -o ' . $temp . ' "' . $uri . '" 1');
+         }
+         else if (scald_file_command_exists('convert')) {
+-          exec('convert ' . $uri . '[0] ' . $temp);
++          exec('convert "' . $uri . '"[0] ' . $temp);
+         }
+       }
+-      else if (extension_loaded('imagick') && class_exists("Imagick")) {
++      if (!file_exists($temp) && extension_loaded('imagick') && class_exists("Imagick")) {
+         $im = new Imagick($uri . '[0]');
+         $im = $im->flattenImages();
+         $im->setImageFormat("png");
+-        $im->thumbnailImage(400, 0);
++        $im->thumbnailImage(500, 0);
+         $im->writeImage($temp);
+       }
+       if (file_exists($temp)) {
+-- 
+2.1.4
+
