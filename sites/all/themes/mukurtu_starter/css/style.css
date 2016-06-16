@@ -9242,6 +9242,9 @@ table .checkbox input[type="checkbox"] {
   border-radius: 4px;
   padding: 30px;
 }
+.node-dictionary-word.view-mode-full .group-right .fluid-width-video-wrapper {
+  padding-bottom: 3.5%;
+}
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
