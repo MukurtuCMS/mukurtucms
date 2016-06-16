@@ -17,6 +17,16 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'dictionary_word_related_dh_tease' => array(
+      'weight' => '7',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Related Digital Heritage Items',
+        ),
+      ),
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -64,6 +74,30 @@ function ma_dictionary_ds_field_settings_info() {
 }
 
 /**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_dictionary_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'dictionary_word_related_dh_tease';
+  $ds_field->label = 'Dictionary Word Related DH Teasers';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'dictionary_word|default';
+  $ds_field->properties = array(
+    'block' => 'views|aac39530523f9b5eb2373230629f0528',
+    'block_render' => '3',
+  );
+  $export['dictionary_word_related_dh_tease'] = $ds_field;
+
+  return $export;
+}
+
+/**
  * Implements hook_ds_layout_settings_info().
  */
 function ma_dictionary_ds_layout_settings_info() {
@@ -88,12 +122,11 @@ function ma_dictionary_ds_layout_settings_info() {
         6 => 'field_sample_sentence',
       ),
       'right' => array(
-        7 => 'field_media_asset',
+        7 => 'dictionary_word_related_dh_tease',
         8 => 'field_dictionary_word_synonyms',
-        9 => 'field_dictionary_word_related_dh',
-        10 => 'field_community_ref',
-        11 => 'og_group_ref',
-        12 => 'field_additional_media',
+        9 => 'field_community_ref',
+        10 => 'og_group_ref',
+        11 => 'field_additional_media',
       ),
     ),
     'fields' => array(
@@ -104,9 +137,8 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_dictionary_word_recording' => 'left',
       'field_definition' => 'left',
       'field_sample_sentence' => 'left',
-      'field_media_asset' => 'right',
+      'dictionary_word_related_dh_tease' => 'right',
       'field_dictionary_word_synonyms' => 'right',
-      'field_dictionary_word_related_dh' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',
       'field_additional_media' => 'right',
