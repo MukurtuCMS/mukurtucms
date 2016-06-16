@@ -8,7 +8,7 @@
  * Implements hook_field_group_info().
  */
 function ma_scald_field_group_info() {
-  $export = array();
+  $field_groups = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -41,7 +41,7 @@ function ma_scald_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_scald_atom_metadata|scald_atom|audio|ma_colorbox'] = $field_group;
+  $field_groups['group_scald_atom_metadata|scald_atom|audio|ma_colorbox'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -74,7 +74,7 @@ function ma_scald_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_scald_atom_metadata|scald_atom|file|ma_colorbox'] = $field_group;
+  $field_groups['group_scald_atom_metadata|scald_atom|file|ma_colorbox'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -120,7 +120,7 @@ function ma_scald_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_scald_atom_metadata|scald_atom|image|ma_colorbox'] = $field_group;
+  $field_groups['group_scald_atom_metadata|scald_atom|image|ma_colorbox'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -153,7 +153,11 @@ function ma_scald_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_scald_atom_metadata|scald_atom|video|ma_colorbox'] = $field_group;
+  $field_groups['group_scald_atom_metadata|scald_atom|video|ma_colorbox'] = $field_group;
 
-  return $export;
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Metadata');
+
+  return $field_groups;
 }
