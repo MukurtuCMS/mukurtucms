@@ -85,7 +85,7 @@ function ma_base_theme_modify_default_image_style($image_style_name){
             'data' => array(),
             'weight' => $lowest_weight - 1,
         );
-        $image_style['effects'][] = $autorotate_effect;
+        array_unshift($image_style['effects'], $autorotate_effect);
     }
 
     image_default_style_save($image_style);
