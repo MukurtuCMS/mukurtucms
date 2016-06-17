@@ -19,6 +19,7 @@ dependencies[] = file_entity
 dependencies[] = geofield
 dependencies[] = geofield_map
 dependencies[] = image
+dependencies[] = imagecache_autorotate
 dependencies[] = license
 dependencies[] = list
 dependencies[] = ma_core
