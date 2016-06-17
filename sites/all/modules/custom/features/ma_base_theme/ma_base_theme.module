@@ -31,3 +31,62 @@ function ma_base_theme_css_alter(&$css) {
   $css['sites/all/themes/mukurtu_theme/css/colors.css']['weight'] = 1000;
 */
 }
+
+/**
+ * Implements hook_install().
+ */
+function ma_base_theme_install() {
+    ma_base_theme_modify_default_image_style('thumbnail');
+    ma_base_theme_modify_default_image_style('medium');
+    ma_base_theme_modify_default_image_style('large');
+}
+
+/**
+ * Adds an autorotate image effect to the default image styles
+ */
+function ma_base_theme_update_7000(&$sandbox) {
+    ma_base_theme_modify_default_image_style('thumbnail');
+    ma_base_theme_modify_default_image_style('medium');
+    ma_base_theme_modify_default_image_style('large');
+}
+
+// Adds the autorotate effect to an image style
+// We use this for the default image styles that features doesn't work with
+function ma_base_theme_modify_default_image_style($image_style_name){
+    $image_style = image_style_load($image_style_name);
+    if(empty($image_style_name)) {
+        return;
+    }
+
+    $lowest_weight = 1000000;
+    $skip = FALSE;
+    foreach($image_style['effects'] as $effect) {
+        // We need to find the lowest weight because we want to have autorotate come first
+        if(intval($effect['weight']) < $lowest_weight) {
+            $lowest_weight = intval($effect['weight']);
+        }
+
+        // If it already has autorotate, don't add it a second time
+        if($effect['effect callback'] == 'imagecache_autorotate_effect') {
+            $skip = TRUE;
+        }
+    }
+
+    if(!$skip) {
+        $autorotate_effect = array(
+            'label' => 'Autorotate',
+            'help' => 'Autorotate image based on EXIF orientation and reset that tag.',
+            'effect callback' => 'imagecache_autorotate_effect',
+            'dimensions callback' => 'imagecache_autorotate_dimensions',
+            'form callback' => 'imagecache_autorotate_form',
+            'summary theme' => 'imagecache_autorotate_summary',
+            'module' => 'imagecache_autorotate',
+            'name' => 'imagecache_autorotate',
+            'data' => array(),
+            'weight' => $lowest_weight - 1,
+        );
+        array_unshift($image_style['effects'], $autorotate_effect);
+    }
+
+    image_default_style_save($image_style);
+}
