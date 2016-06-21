@@ -189,6 +189,7 @@ function license_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('license_custom_tk_label_text_form'),
     'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
   );
 
   // Callback that toggles between sitewide and community-level custom TK label text
