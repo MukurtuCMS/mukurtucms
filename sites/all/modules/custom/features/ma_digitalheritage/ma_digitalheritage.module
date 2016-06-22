@@ -441,7 +441,7 @@ function ma_digitalheritage_toggle_related_items_teasers () {
 
 function ma_digitalheritage_clone_dh_form($form, $form_state, $node) {
   $question = "<i>Duplicate Digital Heritage Item</i> " . $node->title;
-  $description = "<div>Are you sure?</div>";
+  $description = "<div>Are you sure you want to duplicate of <i>$node->title</i>?<br><br>Community records and book pages will not be copied.</div>";
   return confirm_form($form, $question, 'node/' . $node->nid, $description);
 }
 
@@ -451,6 +451,11 @@ function ma_digitalheritage_clone_dh_form_submit($form, $form_state) {
   $original_nid = arg(1);
   $cloned = replicate_clone_entity_by_id ('node', $original_nid);
   $cloned->title = $cloned->title . ' - copy';
+
+  // Unset any CR or book relations
+  $cloned->field_community_record_children = array();
+  $cloned->field_book_children = array();
+  $cloned->field_book_parent = array();
   node_save ($cloned);
 
   // Unset any CPs that the cloning protocol steward is not a contributor or protocol steward for
