@@ -220,3 +220,20 @@ function ma_scald_prevent_unsetting_cp_when_no_permission(&$form, &$form_state) 
     $atom_index++;
   }
 }
+
+/**
+ * Implements hook_views_default_views_alter
+ */
+function ma_scald_views_default_views_alter(&$views)
+{
+    if(isset($views['scald_atoms'])) {
+        $views['scald_atoms']->display['default']->display_options['access']['type'] = 'php';
+        $views['scald_atoms']->display['default']->display_options['access']['php_access'] = '$admin = user_role_load_by_name(\'administrator\');
+$mukurtuadmin = user_role_load_by_name(\'Mukurtu Administrator\');
+
+if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+     return TRUE;
+}
+return FALSE;';
+    }
+}
