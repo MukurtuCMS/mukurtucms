@@ -428,6 +428,8 @@ function mukurtu_splash_block_site_config() {
  * Helper function to assemble the initial site configuration block.
  */
 function mukurtu_splash_block_manage_content() {
+    $admin = user_role_load_by_name('administrator');
+    $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
 
   $items = array();
 
@@ -461,7 +463,7 @@ function mukurtu_splash_block_manage_content() {
   }
 
 
-  if (user_access('administer scald atoms')) {
+  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
     $items[] = array(
       'title' => 'View Media',
       'href' => 'admin/content/atoms',
