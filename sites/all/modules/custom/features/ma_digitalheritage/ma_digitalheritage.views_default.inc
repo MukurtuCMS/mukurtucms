@@ -133,7 +133,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Assets */
+  /* Field: Content: Media Asset */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -439,7 +439,14 @@ function ma_digitalheritage_views_default_views() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Manage Digital Heritage';
   $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['type'] = 'php';
+  $handler->display->display_options['access']['php_access'] = '$admin = user_role_load_by_name(\'administrator\');
+$mukurtuadmin = user_role_load_by_name(\'Mukurtu Administrator\');
+
+if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+     return TRUE;
+}
+return FALSE;';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
@@ -579,7 +586,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Assets */
+  /* Field: Content: Media Asset */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -820,7 +827,7 @@ function ma_digitalheritage_views_default_views() {
     t('Select All'),
     t('- Choose an operation -'),
     t('Title'),
-    t('Media Assets'),
+    t('Media Asset'),
     t('Updated date'),
     t('Summary'),
     t('Community'),
