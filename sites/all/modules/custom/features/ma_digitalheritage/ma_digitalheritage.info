@@ -50,6 +50,7 @@ dependencies[] = text
 dependencies[] = textformatter
 dependencies[] = views
 dependencies[] = views_content
+dependencies[] = views_php
 features[cer][] = node:digital_heritage:field_book_parent*node:digital_heritage:field_book_children
 features[cer][] = node:digital_heritage:field_community_record_parent*node:digital_heritage:field_community_record_children
 features[cer][] = node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items
