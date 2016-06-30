@@ -174,6 +174,7 @@ function ma_importexport_feeds_importer_default() {
             'target' => 'field_dh_type',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
           21 => array(
             'source' => 'Identifier',
@@ -257,12 +258,6 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           34 => array(
-            'source' => 'Community Record Parent',
-            'target' => 'field_community_record_parent:guid_or_nid',
-            'unique' => FALSE,
-            'language' => 'und',
-          ),
-          35 => array(
             'source' => 'Username',
             'target' => 'user_name',
             'unique' => FALSE,
