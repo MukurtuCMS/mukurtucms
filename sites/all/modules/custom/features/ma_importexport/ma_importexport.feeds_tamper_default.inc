@@ -826,6 +826,664 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-book_pages-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Book Pages';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-book_pages-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-book_pages-require_valid_book_pages';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Book Pages';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Book Pages';
+  $export['import_digital_heritage_community_records-book_pages-require_valid_book_pages'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-book_pages-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Book Pages';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-book_pages-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-category-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Category';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-category-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-category-required';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Category';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Required field';
+  $export['import_digital_heritage_community_records-category-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-category-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Category';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-category-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-collections-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Collections';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-collections-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-collections-require_valid_collection';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Collections';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'collection',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Collection';
+  $export['import_digital_heritage_community_records-collections-require_valid_collection'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-collections-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Collections';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-collections-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-community_record_parent-require_valid_node';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Community Record Parent';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 0,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Require valid community record parent';
+  $export['import_digital_heritage_community_records-community_record_parent-require_valid_node'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-community_record_parent-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Community Record Parent';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-community_record_parent-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-contributor-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Contributor';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-contributor-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-contributor-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Contributor';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-contributor-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-creator-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Creator';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-creator-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-creator-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Creator';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-creator-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-keywords-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Keywords';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-keywords-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-keywords-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Keywords';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-keywords-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-language-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Language';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-language-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-language-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Language';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-language-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-media_assets-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Media Assets';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-media_assets-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-media_assets-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Media Assets';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-media_assets-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-nid-require_valid_digital_heritage';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'nid';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Require valid digital heritage node';
+  $export['import_digital_heritage_community_records-nid-require_valid_digital_heritage'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-nid-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'nid';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-nid-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-people-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-people-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-people-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-people-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-publisher-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Publisher';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-publisher-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-publisher-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Publisher';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-publisher-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-related_items-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Related Items';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-related_items-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-related_items-require_valid_related_items';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Related Items';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'digital_heritage',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid Related Items';
+  $export['import_digital_heritage_community_records-related_items-require_valid_related_items'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-related_items-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Related Items';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-related_items-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-sharing_protocols-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Sharing Protocols';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 3;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-sharing_protocols-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-sharing_protocols-require_valid_cultural_protocol';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Sharing Protocols';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'node_type' => 'cultural_protocol_group',
+  );
+  $feeds_tamper->weight = 5;
+  $feeds_tamper->description = 'Require valid Cultural Protocol';
+  $export['import_digital_heritage_community_records-sharing_protocols-require_valid_cultural_protocol'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-sharing_protocols-required';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Sharing Protocols';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Required field';
+  $export['import_digital_heritage_community_records-sharing_protocols-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-sharing_protocols-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Sharing Protocols';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 4;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-sharing_protocols-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-sharing_settings-convert_case';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Sharing Settings';
+  $feeds_tamper->plugin_id = 'convert_case';
+  $feeds_tamper->settings = array(
+    'mode' => '1',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Convert case';
+  $export['import_digital_heritage_community_records-sharing_settings-convert_case'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-sharing_settings-required';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Sharing Settings';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Required field';
+  $export['import_digital_heritage_community_records-sharing_settings-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-subject-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Subject';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-subject-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-subject-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Subject';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-subject-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-title-required';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'title';
+  $feeds_tamper->plugin_id = 'required';
+  $feeds_tamper->settings = array(
+    'invert' => 0,
+    'log' => 1,
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Required field';
+  $export['import_digital_heritage_community_records-title-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-traditional_licensing_url-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Traditional Licensing URL';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-traditional_licensing_url-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-traditional_licensing_url-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Traditional Licensing URL';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-traditional_licensing_url-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-type-explode';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Type';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_digital_heritage_community_records-type-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_digital_heritage_community_records-type-trim';
+  $feeds_tamper->importer = 'import_digital_heritage_community_records';
+  $feeds_tamper->source = 'Type';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_digital_heritage_community_records-type-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_media_audio-authors-explode';
   $feeds_tamper->importer = 'import_media_audio';
   $feeds_tamper->source = 'Authors';

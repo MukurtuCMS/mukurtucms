@@ -519,6 +519,15 @@ function mukurtu_splash_block_batch_import() {
     );
   }
 
+  if (feeds_access('import','import_digital_heritage_community_records')) {
+    $items[] = array(
+      'title' => 'Import Digital Heritage Community Records',
+      'href' => 'import/import_digital_heritage_community_records',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import many community records for pre-existing digital heritage items from CSV file.'),
+    );
+  }
+
   if (feeds_access('import','import_media_images')) {
     $items[] = array(
       'title' => 'Import Images',
