@@ -72,7 +72,7 @@ function mukurtu_batch_import_form() {
   if(isset($default_upload)) {
     $file = file_load($default_upload);
       if($file) {
-        $form['mukurtu_batch_import_form']['upload']['folder']['#field_suffix'] = '<div class="file-link">' . t("Download File: ") . l($file->filename, $file->uri) . '</div>';
+          $form['mukurtu_batch_import_form']['upload']['folder']['#field_suffix'] = '<div class="file-link">' . t("Download File: ") . l($file->filename, file_create_url($file->uri)) . '</div>';
 
       }
   }
@@ -141,7 +141,6 @@ function mukurtu_batch_import_parse_zip($file) {
   
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
-  //      $zip->extractTo('public://mukurtu_batch_import');
     $zip->extractTo($temp_extract_path);
     $zip->close();
     dsm('Zip file extracted');      
@@ -153,13 +152,11 @@ function mukurtu_batch_import_parse_zip($file) {
   //  $metadata_path = $folder_path . '/metadata';
 
   $feedback = array();
-  //  mukurtu_batch_import_import_media($extracted_folder_path);
   mukurtu_batch_import_import_metadata($temp_extract_path);
 
   // Record/store feedback
-  $messages = drupal_get_messages('status');
   mukurtu_batch_import_feedback($messages);
-
+  $messages = drupal_get_messages('status');
   // Delete extracted files from temporary directory
   //  file_unmanaged_delete_recursive($temp_extract_path);
 }
@@ -254,11 +251,32 @@ function mukurtu_batch_import_import_metadata($path) {
 			       'digitalheritage.csv' => 'digital_heritage_metadata',
   ); 
 
+  // Some zip archive programs place files inside a single folder. Rather than failing, if there is one directory in the root,
+  // check if the files are there first.
+  $files = scandir($path);
 
+  foreach($files as $key => $file) {
+      if($file == '.' || $file == '..') {
+          unset($files[$key]);
+      }
+  }
+
+  if(count($files) == 1) {
+      foreach($files as $file) {
+          if(is_dir($path . DIRECTORY_SEPARATOR . $file)) {
+              $path = $path . DIRECTORY_SEPARATOR . $file;
+          }
+      }
+  }
+
+  $success = FALSE;
   foreach($feed_file_names as $filename => $importer_id) {
-    $csv_path = $path . '/' . $filename;
+    $csv_path = $path . DIRECTORY_SEPARATOR . $filename;
     
     if(file_exists($csv_path)) {
+      // Success in this case is finding at least one of the files we were looking for
+      $success = TRUE;
+
       // Save as a managed file.
       $csv = file_get_contents($csv_path);
 
@@ -269,7 +287,7 @@ function mukurtu_batch_import_import_metadata($path) {
       $destination = $path;
       file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
       
-      $file = file_save_data($csv, $destination . '/' . $filename, FILE_EXISTS_REPLACE);     
+      $file = file_save_data($csv, $destination . DIRECTORY_SEPARATOR . $filename, FILE_EXISTS_REPLACE);
 
       // Load the Feeds Source object.
       $source = feeds_source($importer_id);
@@ -284,6 +302,10 @@ function mukurtu_batch_import_import_metadata($path) {
       $source->save();
       $source->startImport();
     }
+  }
+
+  if(!$success) {
+      dpm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
   }
 }
 
