@@ -72,7 +72,7 @@ function mukurtu_batch_import_form() {
   if(isset($default_upload)) {
     $file = file_load($default_upload);
       if($file) {
-        $form['mukurtu_batch_import_form']['upload']['folder']['#field_suffix'] = '<div class="file-link">' . t("Download File: ") . l($file->filename, $file->uri) . '</div>';
+          $form['mukurtu_batch_import_form']['upload']['folder']['#field_suffix'] = '<div class="file-link">' . t("Download File: ") . l($file->filename, file_create_url($file->uri)) . '</div>';
 
       }
   }
