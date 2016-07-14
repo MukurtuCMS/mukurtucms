@@ -109,7 +109,7 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'dictionary_word';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_2col';
+  $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
@@ -126,6 +126,8 @@ function ma_dictionary_ds_layout_settings_info() {
         8 => 'field_dictionary_word_synonyms',
         9 => 'field_community_ref',
         10 => 'og_group_ref',
+      ),
+      'footer' => array(
         11 => 'field_additional_media',
       ),
     ),
@@ -141,7 +143,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_dictionary_word_synonyms' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',
-      'field_additional_media' => 'right',
+      'field_additional_media' => 'footer',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -149,8 +151,10 @@ function ma_dictionary_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
+      'header' => 'div',
       'left' => 'div',
       'right' => 'div',
+      'footer' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

@@ -130,5 +130,12 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
         $language_alias = drupal_get_path_alias('taxonomy/term/' . $node->field_dictionary_word_language['und'][0]['tid']);
         $language = substr($language_alias, strripos($language_alias, '/') + 1);
         $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
+
+        // Wrap sample sentences with div tags. Doing this in manage display messes with scald rendering.
+        if(isset($node->content['field_sample_sentence'])) {
+            foreach($node->content['field_sample_sentence']['#items'] as $key => $item) {
+                $node->content['field_sample_sentence'][$key]['#markup'] = '<div class="sample-sentence">' . $node->content['field_sample_sentence'][$key]['#markup'] . '</div>';
+            }
+        }
     }
 }

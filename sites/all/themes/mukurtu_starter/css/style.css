@@ -9237,13 +9237,26 @@ table .checkbox input[type="checkbox"] {
 .node-dictionary-word.view-mode-full #dewplayer-1 {
   height: 20px;
 }
+.node-dictionary-word.view-mode-full .group-left {
+  width: 66%;
+}
 .node-dictionary-word.view-mode-full .group-right {
+  width: 30%;
   background: #f8f7f7 none repeat scroll 0 0;
   border-radius: 4px;
   padding: 30px;
 }
 .node-dictionary-word.view-mode-full .group-right .fluid-width-video-wrapper {
   padding-bottom: 3.5%;
+}
+.node-dictionary-word.view-mode-full .group-footer {
+  padding-top: 20px;
+}
+.node-dictionary-word.view-mode-full .group-footer .label-above {
+  font-size: 22px;
+}
+.node-dictionary-word.view-mode-full .sample-sentence {
+  padding-bottom: 10px;
 }
 .view-id-digital_heritage_grid_list iframe {
   display: none;
