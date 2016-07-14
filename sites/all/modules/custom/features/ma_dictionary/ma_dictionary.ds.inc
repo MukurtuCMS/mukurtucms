@@ -115,13 +115,13 @@ function ma_dictionary_ds_layout_settings_info() {
       'left' => array(
         0 => 'title',
         1 => 'field_translation',
-        2 => 'field_dictionary_word_language',
         3 => 'field_transliteration',
         4 => 'field_dictionary_word_recording',
         5 => 'field_definition',
         6 => 'field_sample_sentence',
       ),
       'right' => array(
+        2 => 'field_dictionary_word_language',
         7 => 'dictionary_word_related_dh_tease',
         8 => 'field_dictionary_word_synonyms',
         9 => 'field_community_ref',
@@ -132,7 +132,7 @@ function ma_dictionary_ds_layout_settings_info() {
     'fields' => array(
       'title' => 'left',
       'field_translation' => 'left',
-      'field_dictionary_word_language' => 'left',
+      'field_dictionary_word_language' => 'right',
       'field_transliteration' => 'left',
       'field_dictionary_word_recording' => 'left',
       'field_definition' => 'left',

@@ -119,3 +119,16 @@ function ma_dictionary_url_outbound_alter(&$path, &$options, $original_path) {
     }
   }
 }
+
+/**
+ *
+ */
+function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
+    if($node->type == 'dictionary_word' && $view_mode == 'full') {
+        // Replace the link to the language taxonomy with a link to the dictionary browse page, with language pre-selected.
+        // Language is required and only one is allowed, so hardcoding is fine here.
+        $language_alias = drupal_get_path_alias('taxonomy/term/' . $node->field_dictionary_word_language['und'][0]['tid']);
+        $language = substr($language_alias, strripos($language_alias, '/') + 1);
+        $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
+    }
+}
