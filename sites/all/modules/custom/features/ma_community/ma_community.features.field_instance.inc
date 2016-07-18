@@ -10,7 +10,7 @@
 function ma_community_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'comment-comment_node_community-comment_body'
+  // Exported field_instance: 'comment-comment_node_community-comment_body'.
   $field_instances['comment-comment_node_community-comment_body'] = array(
     'bundle' => 'comment_node_community',
     'default_value' => NULL,
@@ -46,7 +46,7 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-community-body'
+  // Exported field_instance: 'node-community-body'.
   $field_instances['node-community-body'] = array(
     'bundle' => 'community',
     'default_value' => NULL,
@@ -115,7 +115,7 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-community-field_child_communities'
+  // Exported field_instance: 'node-community-field_child_communities'.
   $field_instances['node-community-field_child_communities'] = array(
     'bundle' => 'community',
     'default_value' => NULL,
@@ -190,7 +190,7 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-community-field_community_image'
+  // Exported field_instance: 'node-community-field_community_image'.
   $field_instances['node-community-field_community_image'] = array(
     'bundle' => 'community',
     'default_value' => NULL,
@@ -250,7 +250,7 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-community-field_community_image_thumbnail'
+  // Exported field_instance: 'node-community-field_community_image_thumbnail'.
   $field_instances['node-community-field_community_image_thumbnail'] = array(
     'bundle' => 'community',
     'default_value' => NULL,
@@ -311,7 +311,7 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-community-field_parent_community'
+  // Exported field_instance: 'node-community-field_parent_community'.
   $field_instances['node-community-field_parent_community'] = array(
     'bundle' => 'community',
     'default_value' => NULL,
@@ -386,7 +386,7 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-community-group_access'
+  // Exported field_instance: 'node-community-group_access'.
   $field_instances['node-community-group_access'] = array(
     'bundle' => 'community',
     'default_value' => array(
@@ -447,7 +447,7 @@ Strict - Your community page is invisible to all site users who are not members 
     ),
   );
 
-  // Exported field_instance: 'node-community-group_group'
+  // Exported field_instance: 'node-community-group_group'.
   $field_instances['node-community-group_group'] = array(
     'bundle' => 'community',
     'default_value' => array(
@@ -518,7 +518,7 @@ Strict - Your community page is invisible to all site users who are not members 
     'widget_type' => 'options_select',
   );
 
-  // Exported field_instance: 'node-community-og_group_ref'
+  // Exported field_instance: 'node-community-og_group_ref'.
   $field_instances['node-community-og_group_ref'] = array(
     'bundle' => 'community',
     'default_value' => array(),
