@@ -98,10 +98,10 @@ function image_gd_resize(stdClass $image, $width, $height) {
  *   $image->info['height'] values will be modified by this call.
  * @param $degrees
  *   The number of (clockwise) degrees to rotate the image.
- * @param int $background
- *   An 24 bit or 32 bit ARGB value  specifying the background color to use for
- *   the uncovered area of the image after the rotation. E.g. 0 for black,
- *   16711935 for fuchsia, and 16777215 for white. For images that support
+ * @param $background
+ *   An hexadecimal integer specifying the background color to use for the
+ *   uncovered area of the image after the rotation. E.g. 0x000000 for black,
+ *   0xff00ff for magenta, and 0xffffff for white. For images that support
  *   transparency, this will default to transparent. Otherwise it will
  *   be white.
  * @return
@@ -121,13 +121,23 @@ function image_gd_rotate(stdClass $image, $degrees, $background = NULL) {
   // angle to a positive one between 0 and 360 degrees.
   $degrees -= floor($degrees / 360) * 360;
 
+  // Convert the hexadecimal background value to a RGBA array.
   if (isset($background)) {
-    $background = _image_dec_to_rgba($background);
-    $background['alpha'] /= 2;
+    $background = array(
+      'red' => $background >> 16 & 0xFF,
+      'green' => $background >> 8 & 0xFF,
+      'blue' => $background & 0xFF,
+      'alpha' => 0,
+    );
   }
   else {
     // Background color is not specified: use transparent white as background.
-    $background = array('red' => 255, 'green' => 255, 'blue' => 255, 'alpha' => 127);
+    $background = array(
+      'red' => 255,
+      'green' => 255,
+      'blue' => 255,
+      'alpha' => 127
+    );
   }
 
   // Store the color index for the background as that is what GD uses.

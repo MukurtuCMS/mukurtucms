@@ -706,23 +706,17 @@ function system_theme_settings_submit($form, &$form_state) {
   if (!empty($values['logo_upload'])) {
     $file = $values['logo_upload'];
     unset($values['logo_upload']);
-    $path = 'public://' . $file->filename;
-    $file->destination = $path;
-    $file->status = 1;
-    $file = file_copy($file, $file->destination);
+    $filename = file_unmanaged_copy($file->uri);
     $values['default_logo'] = 0;
-    $values['logo_path'] = $file->uri;;
+    $values['logo_path'] = $filename;
     $values['toggle_logo'] = 1;
   }
   if (!empty($values['favicon_upload'])) {
     $file = $values['favicon_upload'];
     unset($values['favicon_upload']);
-    $path = 'public://' . $file->filename;
-    $file->destination = $path;
-    $file->status = 1;
-    $file = file_copy($file, $file->destination);
+    $filename = file_unmanaged_copy($file->uri);
     $values['default_favicon'] = 0;
-    $values['favicon_path'] = $file->uri;
+    $values['favicon_path'] = $filename;
     $values['toggle_favicon'] = 1;
   }
 
@@ -1862,7 +1856,7 @@ function system_image_toolkit_settings() {
   if (count($toolkits_available) == 0) {
     variable_del('image_toolkit');
     $form['image_toolkit_help'] = array(
-      '#markup' => t("No image toolkits were detected. Drupal includes support for <a href='!gd-link'>PHP's built-in image processing functions</a> but they were not detected on this system. You should consult your system administrator to have them enabled, or try using a third party toolkit.", array('gd-link' => url('http://php.net/gd'))),
+      '#markup' => t("No image toolkits were detected. Drupal includes support for <a href='!gd-link'>PHP's built-in image processing functions</a> but they were not detected on this system. You should consult your system administrator to have them enabled, or try using a third party toolkit.", array('!gd-link' => url('http://php.net/gd'))),
     );
     return $form;
   }
