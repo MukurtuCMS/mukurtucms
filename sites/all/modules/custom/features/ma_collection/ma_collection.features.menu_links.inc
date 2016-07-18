@@ -10,7 +10,7 @@
 function ma_collection_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_-collection:node/add/collection
+  // Exported menu link: main-menu_-collection:node/add/collection.
   $menu_links['main-menu_-collection:node/add/collection'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'node/add/collection',
@@ -28,10 +28,10 @@ function ma_collection_menu_default_menu_links() {
     'weight' => -48,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('+ Collection');
-
 
   return $menu_links;
 }
