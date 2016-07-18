@@ -9,3 +9,16 @@
 function ma_core_update_7100() {
   mukurtu_create_default_contexts();
 }
+
+/**
+ * Delete old references to the views_fluid_grid module. This is necessary as of Drupal
+ * core v7.50 which gives a warning about missing module files.
+ */
+function ma_core_update_7101() {
+    $modules = array(
+        'views_fluid_grid',
+    );
+    db_delete('system')
+        ->condition('name', $modules, 'IN')
+        ->execute();
+}
