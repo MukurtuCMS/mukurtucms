@@ -48,12 +48,12 @@ function views_ajax() {
 
       // Add all $_POST data, because AJAX is always a post and many things,
       // such as tablesorts, exposed filters and paging assume $_GET.
-      $_GET = $_POST + $_GET;
+      $_GET = $_POST + drupal_get_query_parameters($_GET, array('page'));
 
       // Overwrite the destination.
       // @see drupal_get_destination()
       $origin_destination = $path;
-      $query = drupal_http_build_query($_REQUEST);
+      $query = drupal_http_build_query(drupal_get_query_parameters());
       if ($query != '') {
         $origin_destination .= '?' . $query;
       }
@@ -358,13 +358,13 @@ function views_ajax_autocomplete_taxonomy($vid, $tags_typed = '') {
       ->execute()
       ->fetchAllKeyed();
 
-    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . '; ' : '';
+    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . ', ' : '';
 
     $term_matches = array();
     foreach ($tags_return as $tid => $name) {
       $n = $name;
       // Term names containing commas or quotes must be wrapped in quotes.
-      if (strpos($name, ';') !== FALSE || strpos($name, '"') !== FALSE) {
+      if (strpos($name, ',') !== FALSE || strpos($name, '"') !== FALSE) {
         $n = '"' . str_replace('"', '""', $name) . '"';
       }
       // Add term name to list of matches.
