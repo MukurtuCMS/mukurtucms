@@ -10,21 +10,13 @@
 function ma_scald_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_archival_tiff'
+  // Exported field_base: 'field_archival_tiff'.
   $field_bases['field_archival_tiff'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_archival_tiff',
-    'foreign keys' => array(
-      'fid' => array(
-        'columns' => array(
-          'fid' => 'fid',
-        ),
-        'table' => 'file_managed',
-      ),
-    ),
     'indexes' => array(
       'fid' => array(
         0 => 'fid',
@@ -41,21 +33,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'file',
   );
 
-  // Exported field_base: 'field_full_size_jpeg'
+  // Exported field_base: 'field_full_size_jpeg'.
   $field_bases['field_full_size_jpeg'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_full_size_jpeg',
-    'foreign keys' => array(
-      'fid' => array(
-        'columns' => array(
-          'fid' => 'fid',
-        ),
-        'table' => 'file_managed',
-      ),
-    ),
     'indexes' => array(
       'fid' => array(
         0 => 'fid',
@@ -72,21 +56,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'file',
   );
 
-  // Exported field_base: 'field_original_dng'
+  // Exported field_base: 'field_original_dng'.
   $field_bases['field_original_dng'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_original_dng',
-    'foreign keys' => array(
-      'fid' => array(
-        'columns' => array(
-          'fid' => 'fid',
-        ),
-        'table' => 'file_managed',
-      ),
-    ),
     'indexes' => array(
       'fid' => array(
         0 => 'fid',
@@ -103,14 +79,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'file',
   );
 
-  // Exported field_base: 'field_scald_created'
+  // Exported field_base: 'field_scald_created'.
   $field_bases['field_scald_created'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_created',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -133,21 +108,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'datetime',
   );
 
-  // Exported field_base: 'field_scald_creator'
+  // Exported field_base: 'field_scald_creator'.
   $field_bases['field_scald_creator'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_creator',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -162,21 +129,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_scald_description'
+  // Exported field_base: 'field_scald_description'.
   $field_bases['field_scald_description'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_description',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -189,14 +148,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_scald_geo_location'
+  // Exported field_base: 'field_scald_geo_location'.
   $field_bases['field_scald_geo_location'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_geo_location',
-    'foreign keys' => array(),
     'indexes' => array(
       'bbox' => array(
         0 => 'top',
@@ -240,21 +198,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'geofield',
   );
 
-  // Exported field_base: 'field_scald_headline'
+  // Exported field_base: 'field_scald_headline'.
   $field_bases['field_scald_headline'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_headline',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -269,21 +219,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_scald_identifier'
+  // Exported field_base: 'field_scald_identifier'.
   $field_bases['field_scald_identifier'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_identifier',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -298,21 +240,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_scald_location'
+  // Exported field_base: 'field_scald_location'.
   $field_bases['field_scald_location'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_location',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -327,21 +261,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_scald_protocol'
+  // Exported field_base: 'field_scald_protocol'.
   $field_bases['field_scald_protocol'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_scald_protocol',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -371,7 +297,7 @@ function ma_scald_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'og_membership_invitation'
+  // Exported field_base: 'og_membership_invitation'.
   $field_bases['og_membership_invitation'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -380,7 +306,6 @@ function ma_scald_field_default_field_bases() {
       0 => 'og_membership',
     ),
     'field_name' => 'og_membership_invitation',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -399,21 +324,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
-  // Exported field_base: 'scald_author_url'
+  // Exported field_base: 'scald_author_url'.
   $field_bases['scald_author_url'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_author_url',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -429,21 +346,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'scald_authors'
+  // Exported field_base: 'scald_authors'.
   $field_bases['scald_authors'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_authors',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -464,21 +373,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'scald_file'
+  // Exported field_base: 'scald_file'.
   $field_bases['scald_file'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_file',
-    'foreign keys' => array(
-      'fid' => array(
-        'columns' => array(
-          'fid' => 'fid',
-        ),
-        'table' => 'file_managed',
-      ),
-    ),
     'indexes' => array(
       'fid' => array(
         0 => 'fid',
@@ -495,21 +396,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'file',
   );
 
-  // Exported field_base: 'scald_tags'
+  // Exported field_base: 'scald_tags'.
   $field_bases['scald_tags'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_tags',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -530,21 +423,13 @@ function ma_scald_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'scald_thumbnail'
+  // Exported field_base: 'scald_thumbnail'.
   $field_bases['scald_thumbnail'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'scald_thumbnail',
-    'foreign keys' => array(
-      'fid' => array(
-        'columns' => array(
-          'fid' => 'fid',
-        ),
-        'table' => 'file_managed',
-      ),
-    ),
     'indexes' => array(
       'fid' => array(
         0 => 'fid',
