@@ -10,7 +10,7 @@
 function ma_collection_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'comment-comment_node_collection-comment_body'
+  // Exported field_instance: 'comment-comment_node_collection-comment_body'.
   $field_instances['comment-comment_node_collection-comment_body'] = array(
     'bundle' => 'comment_node_collection',
     'default_value' => NULL,
@@ -46,7 +46,7 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-collection-field_collection_credit'
+  // Exported field_instance: 'node-collection-field_collection_credit'.
   $field_instances['node-collection-field_collection_credit'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
@@ -97,7 +97,7 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-collection-field_collection_image'
+  // Exported field_instance: 'node-collection-field_collection_image'.
   $field_instances['node-collection-field_collection_image'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
@@ -154,7 +154,7 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-collection-field_collection_summary'
+  // Exported field_instance: 'node-collection-field_collection_summary'.
   $field_instances['node-collection-field_collection_summary'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
@@ -205,7 +205,7 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-collection-field_description'
+  // Exported field_instance: 'node-collection-field_description'.
   $field_instances['node-collection-field_description'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
@@ -258,7 +258,7 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-collection-field_digital_heritage_count'
+  // Exported field_instance: 'node-collection-field_digital_heritage_count'.
   $field_instances['node-collection-field_digital_heritage_count'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,
@@ -310,7 +310,7 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-collection-field_digital_heritage_items'
+  // Exported field_instance: 'node-collection-field_digital_heritage_items'.
   $field_instances['node-collection-field_digital_heritage_items'] = array(
     'bundle' => 'collection',
     'default_value' => NULL,

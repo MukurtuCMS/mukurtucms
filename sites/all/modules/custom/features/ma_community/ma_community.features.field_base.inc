@@ -10,21 +10,13 @@
 function ma_community_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_child_communities'
+  // Exported field_base: 'field_child_communities'.
   $field_bases['field_child_communities'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_child_communities',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -56,14 +48,13 @@ function ma_community_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_community_image'
+  // Exported field_base: 'field_community_image'.
   $field_bases['field_community_image'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_community_image',
-    'foreign keys' => array(),
     'indexes' => array(
       'sid' => array(
         0 => 'sid',
@@ -76,14 +67,13 @@ function ma_community_field_default_field_bases() {
     'type' => 'atom_reference',
   );
 
-  // Exported field_base: 'field_community_image_thumbnail'
+  // Exported field_base: 'field_community_image_thumbnail'.
   $field_bases['field_community_image_thumbnail'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_community_image_thumbnail',
-    'foreign keys' => array(),
     'indexes' => array(
       'sid' => array(
         0 => 'sid',
@@ -96,21 +86,13 @@ function ma_community_field_default_field_bases() {
     'type' => 'atom_reference',
   );
 
-  // Exported field_base: 'field_parent_community'
+  // Exported field_base: 'field_parent_community'.
   $field_bases['field_parent_community'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parent_community',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',

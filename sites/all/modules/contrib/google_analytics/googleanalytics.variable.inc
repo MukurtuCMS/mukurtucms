@@ -17,6 +17,7 @@ function googleanalytics_variable_info($options) {
     'required' => TRUE,
     'group' => 'googleanalytics',
     'localize' => TRUE,
+    'multidomain' => TRUE,
     'validate callback' => 'googleanalytics_validate_googleanalytics_account',
   );
 
@@ -39,12 +40,16 @@ function googleanalytics_variable_group_info() {
 
 /**
  * Validate Web Property ID variable.
+ *
+ * @param array $variable
+ *
+ * @return string
  */
 function googleanalytics_validate_googleanalytics_account($variable) {
   // Replace all type of dashes (n-dash, m-dash, minus) with the normal dashes.
   $variable['value'] = str_replace(array('–', '—', '−'), '-', $variable['value']);
 
-  if (!preg_match('/^UA-\d{4,}-\d+$/', $variable['value'])) {
+  if (!preg_match('/^UA-\d+-\d+$/', $variable['value'])) {
     return t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.');
   }
 }

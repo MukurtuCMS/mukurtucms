@@ -10,7 +10,8 @@
 function ma_profile_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'og_membership-og_membership_type_default-og_membership_request'
+  // Exported field_instance:
+  // 'og_membership-og_membership_type_default-og_membership_request'.
   $field_instances['og_membership-og_membership_type_default-og_membership_request'] = array(
     'bundle' => 'og_membership_type_default',
     'default_value' => NULL,
@@ -46,10 +47,10 @@ function ma_profile_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'user-user-og_user_node'
+  // Exported field_instance: 'user-user-og_user_node'.
   $field_instances['user-user-og_user_node'] = array(
     'bundle' => 'user',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',

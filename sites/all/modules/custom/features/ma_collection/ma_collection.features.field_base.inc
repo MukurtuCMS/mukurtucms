@@ -10,21 +10,13 @@
 function ma_collection_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_collection_credit'
+  // Exported field_base: 'field_collection_credit'.
   $field_bases['field_collection_credit'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_collection_credit',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -39,14 +31,13 @@ function ma_collection_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_collection_image'
+  // Exported field_base: 'field_collection_image'.
   $field_bases['field_collection_image'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_collection_image',
-    'foreign keys' => array(),
     'indexes' => array(
       'sid' => array(
         0 => 'sid',
@@ -59,21 +50,13 @@ function ma_collection_field_default_field_bases() {
     'type' => 'atom_reference',
   );
 
-  // Exported field_base: 'field_collection_summary'
+  // Exported field_base: 'field_collection_summary'.
   $field_bases['field_collection_summary'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_collection_summary',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -88,14 +71,13 @@ function ma_collection_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_digital_heritage_count'
+  // Exported field_base: 'field_digital_heritage_count'.
   $field_bases['field_digital_heritage_count'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_digital_heritage_count',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'number',
@@ -104,21 +86,13 @@ function ma_collection_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
-  // Exported field_base: 'field_digital_heritage_items'
+  // Exported field_base: 'field_digital_heritage_items'.
   $field_bases['field_digital_heritage_items'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_digital_heritage_items',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',

@@ -10,7 +10,8 @@
 function ma_digitalheritage_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'comment-comment_node_digital_heritage-comment_body'
+  // Exported field_instance:
+  // 'comment-comment_node_digital_heritage-comment_body'.
   $field_instances['comment-comment_node_digital_heritage-comment_body'] = array(
     'bundle' => 'comment_node_digital_heritage',
     'default_value' => NULL,
@@ -46,7 +47,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-body'
+  // Exported field_instance: 'node-digital_heritage-body'.
   $field_instances['node-digital_heritage-body'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -144,7 +145,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_book_children'
+  // Exported field_instance: 'node-digital_heritage-field_book_children'.
   $field_instances['node-digital_heritage-field_book_children'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -230,7 +231,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_book_parent'
+  // Exported field_instance: 'node-digital_heritage-field_book_parent'.
   $field_instances['node-digital_heritage-field_book_parent'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -316,7 +317,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_category'
+  // Exported field_instance: 'node-digital_heritage-field_category'.
   $field_instances['node-digital_heritage-field_category'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -416,7 +417,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_collection'
+  // Exported field_instance: 'node-digital_heritage-field_collection'.
   $field_instances['node-digital_heritage-field_collection'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -499,7 +500,8 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_community_record_children'
+  // Exported field_instance:
+  // 'node-digital_heritage-field_community_record_children'.
   $field_instances['node-digital_heritage-field_community_record_children'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -585,7 +587,8 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_community_record_parent'
+  // Exported field_instance:
+  // 'node-digital_heritage-field_community_record_parent'.
   $field_instances['node-digital_heritage-field_community_record_parent'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => array(),
@@ -672,7 +675,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_community_ref'
+  // Exported field_instance: 'node-digital_heritage-field_community_ref'.
   $field_instances['node-digital_heritage-field_community_ref'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -794,7 +797,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_contributor'
+  // Exported field_instance: 'node-digital_heritage-field_contributor'.
   $field_instances['node-digital_heritage-field_contributor'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -909,7 +912,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_coverage'
+  // Exported field_instance: 'node-digital_heritage-field_coverage'.
   $field_instances['node-digital_heritage-field_coverage'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => array(
@@ -1086,7 +1089,8 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_coverage_description'
+  // Exported field_instance:
+  // 'node-digital_heritage-field_coverage_description'.
   $field_instances['node-digital_heritage-field_coverage_description'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1181,7 +1185,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_creator'
+  // Exported field_instance: 'node-digital_heritage-field_creator'.
   $field_instances['node-digital_heritage-field_creator'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1296,7 +1300,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_date'
+  // Exported field_instance: 'node-digital_heritage-field_date'.
   $field_instances['node-digital_heritage-field_date'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1391,7 +1395,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_description'
+  // Exported field_instance: 'node-digital_heritage-field_description'.
   $field_instances['node-digital_heritage-field_description'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1494,7 +1498,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_dh_type'
+  // Exported field_instance: 'node-digital_heritage-field_dh_type'.
   $field_instances['node-digital_heritage-field_dh_type'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1579,7 +1583,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_format'
+  // Exported field_instance: 'node-digital_heritage-field_format'.
   $field_instances['node-digital_heritage-field_format'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1669,7 +1673,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_identifier'
+  // Exported field_instance: 'node-digital_heritage-field_identifier'.
   $field_instances['node-digital_heritage-field_identifier'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1763,7 +1767,8 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_item_privacy_setting'
+  // Exported field_instance:
+  // 'node-digital_heritage-field_item_privacy_setting'.
   $field_instances['node-digital_heritage-field_item_privacy_setting'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => array(
@@ -1852,7 +1857,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_language'
+  // Exported field_instance: 'node-digital_heritage-field_language'.
   $field_instances['node-digital_heritage-field_language'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -1950,7 +1955,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_licence_std_cc'
+  // Exported field_instance: 'node-digital_heritage-field_licence_std_cc'.
   $field_instances['node-digital_heritage-field_licence_std_cc'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2040,7 +2045,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_licence_trad'
+  // Exported field_instance: 'node-digital_heritage-field_licence_trad'.
   $field_instances['node-digital_heritage-field_licence_trad'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2130,7 +2135,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_media_asset'
+  // Exported field_instance: 'node-digital_heritage-field_media_asset'.
   $field_instances['node-digital_heritage-field_media_asset'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2241,7 +2246,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_people'
+  // Exported field_instance: 'node-digital_heritage-field_people'.
   $field_instances['node-digital_heritage-field_people'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2320,7 +2325,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_publisher'
+  // Exported field_instance: 'node-digital_heritage-field_publisher'.
   $field_instances['node-digital_heritage-field_publisher'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2418,7 +2423,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_related_dh_items'
+  // Exported field_instance: 'node-digital_heritage-field_related_dh_items'.
   $field_instances['node-digital_heritage-field_related_dh_items'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2505,7 +2510,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_rights'
+  // Exported field_instance: 'node-digital_heritage-field_rights'.
   $field_instances['node-digital_heritage-field_rights'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2599,7 +2604,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_source'
+  // Exported field_instance: 'node-digital_heritage-field_source'.
   $field_instances['node-digital_heritage-field_source'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2694,7 +2699,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_subject'
+  // Exported field_instance: 'node-digital_heritage-field_subject'.
   $field_instances['node-digital_heritage-field_subject'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2792,7 +2797,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_summary'
+  // Exported field_instance: 'node-digital_heritage-field_summary'.
   $field_instances['node-digital_heritage-field_summary'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2888,7 +2893,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_tags'
+  // Exported field_instance: 'node-digital_heritage-field_tags'.
   $field_instances['node-digital_heritage-field_tags'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2986,7 +2991,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_tk_body'
+  // Exported field_instance: 'node-digital_heritage-field_tk_body'.
   $field_instances['node-digital_heritage-field_tk_body'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -3081,7 +3086,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_transcription'
+  // Exported field_instance: 'node-digital_heritage-field_transcription'.
   $field_instances['node-digital_heritage-field_transcription'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -3164,7 +3169,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-og_group_ref'
+  // Exported field_instance: 'node-digital_heritage-og_group_ref'.
   $field_instances['node-digital_heritage-og_group_ref'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => array(),
