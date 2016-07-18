@@ -7,20 +7,24 @@ $(document).ready(function() {
   // Attach mousedown, keyup, touchstart events to document only and catch
   // clicks on all elements.
   $(document.body).bind("mousedown keyup touchstart", function(event) {
+    console.group("Running Google Analytics for Drupal.");
+    console.info("Event '%s' has been detected.", event.type);
 
     // Catch the closest surrounding link of a clicked element.
     $(event.target).closest("a,area").each(function() {
+      console.info("Closest element '%o' has been found. URL '%s' extracted.", this, this.href);
 
       // Is the clicked URL internal?
       if (Drupal.googleanalytics.isInternal(this.href)) {
         // Skip 'click' tracking, if custom tracking events are bound.
         if ($(this).is('.colorbox') && (Drupal.settings.googleanalytics.trackColorbox)) {
           // Do nothing here. The custom event will handle all tracking.
-          //console.info("Click on .colorbox item has been detected.");
+          console.info("Click on .colorbox item has been detected.");
         }
         // Is download tracking activated and the file extension configured for download tracking?
         else if (Drupal.settings.googleanalytics.trackDownload && Drupal.googleanalytics.isDownload(this.href)) {
           // Download link clicked.
+          console.info("Download url '%s' has been found. Tracked download as extension '%s'.", Drupal.googleanalytics.getPageUrl(this.href), Drupal.googleanalytics.getDownloadExtension(this.href).toUpperCase());
           ga("send", {
             "hitType": "event",
             "eventCategory": "Downloads",
@@ -31,16 +35,22 @@ $(document).ready(function() {
         }
         else if (Drupal.googleanalytics.isInternalSpecial(this.href)) {
           // Keep the internal URL for Google Analytics website overlay intact.
+          console.info("Click on internal special link '%s' has been tracked.", Drupal.googleanalytics.getPageUrl(this.href));
           ga("send", {
             "hitType": "pageview",
             "page": Drupal.googleanalytics.getPageUrl(this.href),
             "transport": "beacon"
           });
         }
+        else {
+          // e.g. anchor in same page or other internal page link
+          console.info("Click on internal link '%s' detected, but not tracked by click.", this.href);
+        }
       }
       else {
         if (Drupal.settings.googleanalytics.trackMailto && $(this).is("a[href^='mailto:'],area[href^='mailto:']")) {
           // Mailto link clicked.
+          console.info("Click on e-mail '%s' has been tracked.", this.href.substring(7));
           ga("send", {
             "hitType": "event",
             "eventCategory": "Mails",
@@ -52,6 +62,7 @@ $(document).ready(function() {
         else if (Drupal.settings.googleanalytics.trackOutbound && this.href.match(/^\w+:\/\//i)) {
           if (Drupal.settings.googleanalytics.trackDomainMode !== 2 || (Drupal.settings.googleanalytics.trackDomainMode === 2 && !Drupal.googleanalytics.isCrossDomain(this.hostname, Drupal.settings.googleanalytics.trackCrossDomains))) {
             // External link clicked / No top-level cross domain clicked.
+            console.info("Outbound link '%s' has been tracked.", this.href);
             ga("send", {
               "hitType": "event",
               "eventCategory": "Outbound links",
@@ -60,14 +71,20 @@ $(document).ready(function() {
               "transport": "beacon"
             });
           }
+          else {
+            console.info("Internal link '%s' clicked, not tracked.", this.href);
+          }
         }
       }
     });
+
+    console.groupEnd();
   });
 
   // Track hash changes as unique pageviews, if this option has been enabled.
   if (Drupal.settings.googleanalytics.trackUrlFragments) {
     window.onhashchange = function() {
+      console.info("Track URL '%s' as pageview. Hash '%s' has changed.", location.pathname + location.search + location.hash, location.hash);
       ga("send", {
         "hitType": "pageview",
         "page": location.pathname + location.search + location.hash
@@ -81,6 +98,7 @@ $(document).ready(function() {
     $(document).bind("cbox_complete", function () {
       var href = $.colorbox.element().attr("href");
       if (href) {
+        console.info("Colorbox transition to url '%s' has been tracked.", Drupal.googleanalytics.getPageUrl(href));
         ga("send", {
           "hitType": "pageview",
           "page": Drupal.googleanalytics.getPageUrl(href)
