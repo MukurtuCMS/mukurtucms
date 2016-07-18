@@ -778,6 +778,7 @@ function ma_digitalheritage_page_alter(&$data) {
 
   // If there are Child Records for a DH node, show the parent and child records in quicktabs
   if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
+    $dh_page_content = "";
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
     if ($node->type == 'digital_heritage') {
@@ -878,7 +879,8 @@ function ma_digitalheritage_page_alter(&$data) {
 
       // Node does not have community records. Render DH normally.
       else {
-        $dh_page_content .= drupal_render(node_view($node, 'full'));
+        $node_array = node_view($node, 'full');
+        $dh_page_content .= drupal_render($node_array);
       }
 
       // Rewrite the output for DH nodes with our built DH page content
