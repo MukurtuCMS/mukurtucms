@@ -10,6 +10,24 @@
 function ma_dictionary_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: 'administer paragraphs bundles'.
+  $permissions['administer paragraphs bundles'] = array(
+    'name' => 'administer paragraphs bundles',
+    'roles' => array(
+      'Curator' => 'Curator',
+    ),
+    'module' => 'paragraphs',
+  );
+
+  // Exported permission: 'bypass paragraphs bundle content access'.
+  $permissions['bypass paragraphs bundle content access'] = array(
+    'name' => 'bypass paragraphs bundle content access',
+    'roles' => array(
+      'Curator' => 'Curator',
+    ),
+    'module' => 'paragraphs_bundle_permissions',
+  );
+
   // Exported permission: 'create dictionary_word content'.
   $permissions['create dictionary_word content'] = array(
     'name' => 'create dictionary_word content',
@@ -18,6 +36,13 @@ function ma_dictionary_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'create paragraph content dictionary_word_bundle'.
+  $permissions['create paragraph content dictionary_word_bundle'] = array(
+    'name' => 'create paragraph content dictionary_word_bundle',
+    'roles' => array(),
+    'module' => 'paragraphs_bundle_permissions',
   );
 
   // Exported permission: 'delete any dictionary_word content'.
@@ -40,6 +65,13 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'delete paragraph content dictionary_word_bundle'.
+  $permissions['delete paragraph content dictionary_word_bundle'] = array(
+    'name' => 'delete paragraph content dictionary_word_bundle',
+    'roles' => array(),
+    'module' => 'paragraphs_bundle_permissions',
+  );
+
   // Exported permission: 'edit any dictionary_word content'.
   $permissions['edit any dictionary_word content'] = array(
     'name' => 'edit any dictionary_word content',
@@ -58,6 +90,20 @@ function ma_dictionary_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'update paragraph content dictionary_word_bundle'.
+  $permissions['update paragraph content dictionary_word_bundle'] = array(
+    'name' => 'update paragraph content dictionary_word_bundle',
+    'roles' => array(),
+    'module' => 'paragraphs_bundle_permissions',
+  );
+
+  // Exported permission: 'view paragraph content dictionary_word_bundle'.
+  $permissions['view paragraph content dictionary_word_bundle'] = array(
+    'name' => 'view paragraph content dictionary_word_bundle',
+    'roles' => array(),
+    'module' => 'paragraphs_bundle_permissions',
   );
 
   return $permissions;

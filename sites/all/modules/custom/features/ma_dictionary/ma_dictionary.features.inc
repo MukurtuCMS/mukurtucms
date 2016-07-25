@@ -78,3 +78,17 @@ function ma_dictionary_node_info() {
   drupal_alter('node_info', $items);
   return $items;
 }
+
+/**
+ * Implements hook_paragraphs_info().
+ */
+function ma_dictionary_paragraphs_info() {
+  $items = array(
+    'dictionary_word_bundle' => array(
+      'name' => 'Dictionary Word Bundle',
+      'bundle' => 'dictionary_word_bundle',
+      'locked' => '1',
+    ),
+  );
+  return $items;
+}
