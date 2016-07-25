@@ -57,7 +57,7 @@ function ma_dictionary_field_default_field_instances() {
         'rows' => 20,
       ),
       'type' => 'text_textarea',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -123,58 +123,6 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_definition'
-  $field_instances['node-dictionary_word-field_definition'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 4,
-      ),
-      'search_result' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_plain',
-        'weight' => 5,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_definition',
-    'label' => 'Definition',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 5,
-      ),
-      'type' => 'text_textarea',
-      'weight' => 6,
-    ),
-  );
-
   // Exported field_instance: 'node-dictionary_word-field_dictionary_word_language'
   $field_instances['node-dictionary_word-field_dictionary_word_language'] = array(
     'bundle' => 'dictionary_word',
@@ -217,64 +165,7 @@ function ma_dictionary_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_buttons',
-      'weight' => 3,
-    ),
-  );
-
-  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_recording'
-  $field_instances['node-dictionary_word-field_dictionary_word_recording'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'An audio or video file of the word spoken in its native tongue.',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'atom_reference',
-        'settings' => array(
-          'link' => 0,
-        ),
-        'type' => 'ma_colorbox',
-        'weight' => 3,
-      ),
-      'search_result' => array(
-        'label' => 'hidden',
-        'module' => 'atom_reference',
-        'settings' => array(
-          'link' => 0,
-        ),
-        'type' => 'ma_colorbox',
-        'weight' => 2,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_dictionary_word_recording',
-    'label' => 'Recording',
-    'required' => 0,
-    'settings' => array(
-      'referencable_types' => array(
-        'audio' => 'audio',
-        'file' => 0,
-        'image' => 0,
-        'video' => 'video',
-      ),
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'atom_reference',
-      'settings' => array(
-        'context' => 'sdl_editor_representation',
-      ),
-      'type' => 'atom_reference_textfield',
-      'weight' => 5,
+      'weight' => 2,
     ),
   );
 
@@ -325,7 +216,7 @@ function ma_dictionary_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 16,
+      'weight' => 13,
     ),
   );
 
@@ -391,7 +282,7 @@ function ma_dictionary_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 12,
     ),
   );
 
@@ -438,109 +329,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 18,
-    ),
-  );
-
-  // Exported field_instance: 'node-dictionary_word-field_sample_sentence'
-  $field_instances['node-dictionary_word-field_sample_sentence'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 5,
-      ),
-      'search_result' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 17,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_sample_sentence',
-    'label' => 'Sample Sentences',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 7,
-    ),
-  );
-
-  // Exported field_instance: 'node-dictionary_word-field_source'
-  $field_instances['node-dictionary_word-field_source'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 26,
-      ),
-      'search_result' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_source',
-    'label' => 'Source',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 0,
-      'mee_enabled' => 0,
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 9,
+      'weight' => 15,
     ),
   );
 
@@ -599,30 +388,31 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_translation'
-  $field_instances['node-dictionary_word-field_translation'] = array(
+  // Exported field_instance: 'node-dictionary_word-field_word_entry'
+  $field_instances['node-dictionary_word-field_word_entry'] = array(
     'bundle' => 'dictionary_word',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 1,
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 27,
       ),
       'search_result' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_plain',
-        'weight' => 4,
+        'type' => 'hidden',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -633,77 +423,29 @@ function ma_dictionary_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_translation',
-    'label' => 'Translation',
+    'field_name' => 'field_word_entry',
+    'label' => 'Word Entry',
     'required' => 1,
     'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 0,
+      'add_mode' => 'select',
+      'allowed_bundles' => array(
+        'dictionary_word_bundle' => 'dictionary_word_bundle',
+      ),
+      'bundle_weights' => array(
+        'dictionary_word_bundle' => 2,
+      ),
+      'default_edit_mode' => 'open',
+      'default_edit_mode_override' => 1,
+      'title' => 'Paragraph',
+      'title_multiple' => 'Paragraphs',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 2,
-    ),
-  );
-
-  // Exported field_instance: 'node-dictionary_word-field_transliteration'
-  $field_instances['node-dictionary_word-field_transliteration'] = array(
-    'bundle' => 'dictionary_word',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 2,
-      ),
-      'search_result' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_plain',
-        'weight' => 3,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_transliteration',
-    'label' => 'Pronunciation',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 4,
+      'active' => 0,
+      'module' => 'paragraphs',
+      'settings' => array(),
+      'type' => 'paragraphs_embed',
+      'weight' => 3,
     ),
   );
 
@@ -791,27 +533,21 @@ function ma_dictionary_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 18,
+      'weight' => 14,
     ),
   );
 
   // Translatables
   // Included for use with string extractors like potx.
   t('Additional Media');
-  t('An audio or video file of the word spoken in its native tongue.');
   t('Community');
-  t('Definition');
   t('Item Sharing Settings');
   t('Keywords');
   t('Language');
-  t('Pronunciation');
   t('Protocol');
-  t('Recording');
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
-  t('Sample Sentences');
-  t('Source');
-  t('Translation');
+  t('Word Entry');
 
   return $field_instances;
 }
