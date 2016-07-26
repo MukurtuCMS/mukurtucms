@@ -10,7 +10,7 @@
 function ma_digitalheritage_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_-category:admin/structure/taxonomy/category/add
+  // Exported menu link: main-menu_-category:admin/structure/taxonomy/category/add.
   $menu_links['main-menu_-category:admin/structure/taxonomy/category/add'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'admin/structure/taxonomy/category/add',
@@ -30,7 +30,7 @@ function ma_digitalheritage_menu_default_menu_links() {
     'weight' => -49,
     'customized' => 1,
   );
-  // Exported menu link: main-menu_-digital-heritage:node/add/digital-heritage
+  // Exported menu link: main-menu_-digital-heritage:node/add/digital-heritage.
   $menu_links['main-menu_-digital-heritage:node/add/digital-heritage'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'node/add/digital-heritage',
@@ -50,11 +50,11 @@ function ma_digitalheritage_menu_default_menu_links() {
     'weight' => -50,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('+ Category');
   t('+ Digital Heritage');
-
 
   return $menu_links;
 }

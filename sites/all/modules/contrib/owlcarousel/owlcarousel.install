@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ * owlcarousel.install
+ */
+ 
+/**
+ * Implements hook_install().
+ */
+function owlcarousel_install() {
+  // Add default optionset.
+  variable_set('owlcarousel_settings_default', 'owlcarousel_default');
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function owlcarousel_requirements($phase) {
+  $t = get_t();
+
+  $requirements = array();
+  if ($phase == 'runtime') {
+    $library = libraries_get_path('owlcarousel');
+    $path = $library . '/owl.carousel.min.js';
+
+    $requirements['owlcarousel'] = array(
+      'title' => $t('Owl Carousel'),
+      'value' => $t('Owl Carousel library not found; the correct path should be @path.', array('@path' => 'sites/all/libraries/owlcarousel/owl.carousel.min.js')),
+      'severity' => REQUIREMENT_ERROR,
+    );
+
+    if (file_exists($path)) {
+      $requirements['owlcarousel']['value'] = $t('Enabled');
+      $requirements['owlcarousel']['severity'] = REQUIREMENT_OK;
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function owlcarousel_uninstall() {
+  $query = 'SELECT name FROM {variable} WHERE name LIKE :name';
+  $results = db_query($query, array(':name' => db_like('owlcarousel_') . '%'))->fetchAll();
+
+  foreach ($results as $result) {
+    // Clean up stored variables.
+    variable_del($result->name);
+  }
+}

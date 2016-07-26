@@ -428,6 +428,8 @@ function mukurtu_splash_block_site_config() {
  * Helper function to assemble the initial site configuration block.
  */
 function mukurtu_splash_block_manage_content() {
+    $admin = user_role_load_by_name('administrator');
+    $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
 
   $items = array();
 
@@ -461,7 +463,7 @@ function mukurtu_splash_block_manage_content() {
   }
 
 
-  if (user_access('administer scald atoms')) {
+  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
     $items[] = array(
       'title' => 'View Media',
       'href' => 'admin/content/atoms',
@@ -514,6 +516,15 @@ function mukurtu_splash_block_batch_import() {
       'href' => 'import/digital_heritage_metadata',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
       'description' => t('Batch import many digital heritage items from CSV file. If the media assets have associated metadata, import the media files first using the media importers.'),
+    );
+  }
+
+  if (feeds_access('import','import_digital_heritage_community_records')) {
+    $items[] = array(
+      'title' => 'Import Digital Heritage Community Records',
+      'href' => 'import/import_digital_heritage_community_records',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import many community records for pre-existing digital heritage items from CSV file.'),
     );
   }
 

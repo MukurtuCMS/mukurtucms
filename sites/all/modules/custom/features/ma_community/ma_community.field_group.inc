@@ -8,7 +8,7 @@
  * Implements hook_field_group_info().
  */
 function ma_community_field_group_info() {
-  $export = array();
+  $field_groups = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -39,7 +39,7 @@ function ma_community_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_advanced|node|community|form'] = $field_group;
+  $field_groups['group_advanced|node|community|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -72,7 +72,7 @@ function ma_community_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_basic|node|community|form'] = $field_group;
+  $field_groups['group_basic|node|community|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -99,7 +99,7 @@ function ma_community_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_custom_tk_label_text|node|community|form'] = $field_group;
+  $field_groups['group_custom_tk_label_text|node|community|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -125,7 +125,14 @@ function ma_community_field_group_info() {
       ),
     ),
   );
-  $export['group_tabs|node|community|form'] = $field_group;
+  $field_groups['group_tabs|node|community|form'] = $field_group;
 
-  return $export;
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Advanced');
+  t('Basic');
+  t('Custom TK Label Text');
+  t('Tabs');
+
+  return $field_groups;
 }

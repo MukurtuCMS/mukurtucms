@@ -210,6 +210,7 @@ function ma_scald_user_default_permissions() {
   $permissions['delete terms in scald_authors'] = array(
     'name' => 'delete terms in scald_authors',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -219,6 +220,7 @@ function ma_scald_user_default_permissions() {
   $permissions['delete terms in scald_tags'] = array(
     'name' => 'delete terms in scald_tags',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -372,6 +374,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit terms in scald_authors'] = array(
     'name' => 'edit terms in scald_authors',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -381,6 +384,7 @@ function ma_scald_user_default_permissions() {
   $permissions['edit terms in scald_tags'] = array(
     'name' => 'edit terms in scald_tags',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',

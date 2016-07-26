@@ -44,37 +44,21 @@ function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id)
   // Only show communities for the group ref field, and add a submit handler to add the user's protocols back after the form is submitted
   $communities_only = $form['og_user_node'][LANGUAGE_NONE]['#options']['Community'];
   $form['og_user_node'][LANGUAGE_NONE]['#options'] = $communities_only;
-  $form['#submit'][] = 'ma_profile_add_protocols_back_in';
-}
-
-
-/**
- * Custom submit handler
- */
-function ma_profile_add_protocols_back_in(&$form, &$form_state) {
-  $non_community_groups = array();
-  foreach ($form['og_user_node'][LANGUAGE_NONE]['#default_value'] as $gid) {
-    $group = node_load($gid);
-    if ($group->type <> 'community') {
-      $non_community_groups[] = array('target_id' => $gid);
-    }
-  }
-  if (isset($non_community_groups)) {
-    // Unable to get to get form_set_value to work here or in a validation hook, so save the non-community groups to a $session var and add them back in on the user_presave
-    $_SESSION['non-community_groups_to_add_back'] = $non_community_groups;
-  }
 }
 
 /**
  * Implements hook_user_presave().
  */
 function ma_profile_user_presave(&$edit, $account, $category) {
-
-  // Add back in any non-community groups from ma_profile_add_protocols_back_in
-  if (isset ($_SESSION['non-community_groups_to_add_back'])) {
-    $edit['og_user_node'][LANGUAGE_NONE] = array_merge($edit['og_user_node'][LANGUAGE_NONE], $_SESSION['non-community_groups_to_add_back']);
-    unset ($_SESSION['non-community_groups_to_add_back']);
-  }
+    // Copy over any non-community groups from og_user_node
+    if(isset($account->og_user_node[LANGUAGE_NONE])) {
+        foreach($account->og_user_node[LANGUAGE_NONE] as $group) {
+            $group_node = node_load($group['target_id']);
+            if($group_node && $group_node->type <> 'community') {
+                array_push($edit['og_user_node'][LANGUAGE_NONE], array('target_id' => $group_node->nid));
+            }
+        }
+    }
 }
 
 /**

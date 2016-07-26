@@ -31,74 +31,85 @@ function ma_base_theme_ctools_plugin_api($module = NULL, $api = NULL) {
 function ma_base_theme_image_default_styles() {
   $styles = array();
 
+  // Exported image style: carousel_thumbnail.
+  $styles['carousel_thumbnail'] = array(
+    'label' => 'Carousel Thumbnail',
+    'effects' => array(
+      10 => array(
+        'name' => 'imagecache_autorotate',
+        'data' => array(),
+        'weight' => -10,
+      ),
+      1 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 150,
+          'height' => 195,
+        ),
+        'weight' => -9,
+      ),
+    ),
+  );
+
   // Exported image style: digital_heritage_full_content.
   $styles['digital_heritage_full_content'] = array(
-    'name' => 'digital_heritage_full_content',
+    'label' => 'digital_heritage_full_content',
     'effects' => array(
       3 => array(
-        'label' => 'Scale',
-        'help' => 'Scaling will maintain the aspect-ratio of the original image. If only a single dimension is specified, the other dimension will be calculated.',
-        'effect callback' => 'image_scale_effect',
-        'dimensions callback' => 'image_scale_dimensions',
-        'form callback' => 'image_scale_form',
-        'summary theme' => 'image_scale_summary',
-        'module' => 'image',
+        'name' => 'imagecache_autorotate',
+        'data' => array(),
+        'weight' => -10,
+      ),
+      2 => array(
         'name' => 'image_scale',
         'data' => array(
           'width' => 580,
           'height' => '',
           'upscale' => 0,
         ),
-        'weight' => 2,
+        'weight' => -9,
       ),
     ),
-    'label' => 'digital_heritage_full_content',
   );
 
   // Exported image style: full.
   $styles['full'] = array(
-    'name' => 'full',
+    'label' => 'full',
     'effects' => array(
-      1 => array(
-        'label' => 'Scale',
-        'help' => 'Scaling will maintain the aspect-ratio of the original image. If only a single dimension is specified, the other dimension will be calculated.',
-        'effect callback' => 'image_scale_effect',
-        'dimensions callback' => 'image_scale_dimensions',
-        'form callback' => 'image_scale_form',
-        'summary theme' => 'image_scale_summary',
-        'module' => 'image',
+      12 => array(
+        'name' => 'imagecache_autorotate',
+        'data' => array(),
+        'weight' => -10,
+      ),
+      11 => array(
         'name' => 'image_scale',
         'data' => array(
           'width' => 800,
           'height' => '',
           'upscale' => 0,
         ),
-        'weight' => 1,
+        'weight' => -9,
       ),
     ),
-    'label' => 'full',
   );
 
   // Exported image style: related_items_teaser.
   $styles['related_items_teaser'] = array(
-    'name' => 'related_items_teaser',
     'label' => 'Related Items Teaser',
     'effects' => array(
-      1 => array(
-        'label' => 'Scale',
-        'help' => 'Scaling will maintain the aspect-ratio of the original image. If only a single dimension is specified, the other dimension will be calculated.',
-        'effect callback' => 'image_scale_effect',
-        'dimensions callback' => 'image_scale_dimensions',
-        'form callback' => 'image_scale_form',
-        'summary theme' => 'image_scale_summary',
-        'module' => 'image',
+      14 => array(
+        'name' => 'imagecache_autorotate',
+        'data' => array(),
+        'weight' => -10,
+      ),
+      13 => array(
         'name' => 'image_scale',
         'data' => array(
           'width' => 280,
           'height' => 280,
           'upscale' => 1,
         ),
-        'weight' => 1,
+        'weight' => -9,
       ),
     ),
   );

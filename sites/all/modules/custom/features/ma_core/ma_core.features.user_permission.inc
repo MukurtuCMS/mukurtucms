@@ -563,6 +563,7 @@ function ma_core_user_default_permissions() {
   $permissions['administer taxonomy'] = array(
     'name' => 'administer taxonomy',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -911,6 +912,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in contributor'] = array(
     'name' => 'delete terms in contributor',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -920,6 +922,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in creator'] = array(
     'name' => 'delete terms in creator',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -929,6 +932,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in dh_type'] = array(
     'name' => 'delete terms in dh_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -938,6 +942,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in format'] = array(
     'name' => 'delete terms in format',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -947,6 +952,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in language'] = array(
     'name' => 'delete terms in language',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -956,6 +962,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in media_folders'] = array(
     'name' => 'delete terms in media_folders',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -965,6 +972,17 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in media_type'] = array(
     'name' => 'delete terms in media_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'delete terms in people'.
+  $permissions['delete terms in people'] = array(
+    'name' => 'delete terms in people',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -974,6 +992,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in publisher'] = array(
     'name' => 'delete terms in publisher',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -983,6 +1002,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in subject'] = array(
     'name' => 'delete terms in subject',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1133,6 +1153,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in contributor'] = array(
     'name' => 'edit terms in contributor',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1142,6 +1163,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in creator'] = array(
     'name' => 'edit terms in creator',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1151,6 +1173,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in dh_type'] = array(
     'name' => 'edit terms in dh_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1160,6 +1183,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in format'] = array(
     'name' => 'edit terms in format',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1169,6 +1193,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in language'] = array(
     'name' => 'edit terms in language',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1178,6 +1203,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in media_folders'] = array(
     'name' => 'edit terms in media_folders',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1187,6 +1213,17 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in media_type'] = array(
     'name' => 'edit terms in media_type',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'edit terms in people'.
+  $permissions['edit terms in people'] = array(
+    'name' => 'edit terms in people',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1196,6 +1233,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in publisher'] = array(
     'name' => 'edit terms in publisher',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',
@@ -1205,6 +1243,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in subject'] = array(
     'name' => 'edit terms in subject',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'taxonomy',

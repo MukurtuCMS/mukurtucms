@@ -9762,3 +9762,41 @@ a:hover {
 .export-download > a {
   color: #ffffff;
 }
+.page-number {
+  text-align: center;
+}
+.owl-carousel {
+    padding-bottom: 20px;
+}
+.owl-stage-outer {
+    padding-bottom: 20px;
+}
+.owl-item .selected .page-number {
+    background: #e59637;
+}
+.owl-item .selected a {
+    color: white;
+}
+.owl-nav {
+    color: #337ab7;
+}
+.owl-prev, .owl-next {
+    float: left;
+    width: 20%;
+}
+.owl-prev {
+    margin-right: 30%;
+}
+.owl-next {
+    text-align: right;
+    margin-left: 30%;
+}
+#mulitpage-select {
+    position: relative;
+    top: -30px;
+    width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+    margin-bottom: -20px;
+    z-index:10;
+}

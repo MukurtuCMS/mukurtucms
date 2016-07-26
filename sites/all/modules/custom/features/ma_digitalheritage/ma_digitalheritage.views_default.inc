@@ -439,7 +439,14 @@ function ma_digitalheritage_views_default_views() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Manage Digital Heritage';
   $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['type'] = 'php';
+  $handler->display->display_options['access']['php_access'] = '$admin = user_role_load_by_name(\'administrator\');
+$mukurtuadmin = user_role_load_by_name(\'Mukurtu Administrator\');
+
+if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+     return TRUE;
+}
+return FALSE;';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';

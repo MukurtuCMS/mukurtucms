@@ -10,7 +10,8 @@
 function ma_scald_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'og_membership-og_membership_type_default-og_membership_invitation'
+  // Exported field_instance:
+  // 'og_membership-og_membership_type_default-og_membership_invitation'.
   $field_instances['og_membership-og_membership_type_default-og_membership_invitation'] = array(
     'bundle' => 'og_membership_type_default',
     'default_value' => NULL,
@@ -40,7 +41,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-field_scald_protocol'
+  // Exported field_instance: 'scald_atom-audio-field_scald_protocol'.
   $field_instances['scald_atom-audio-field_scald_protocol'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
@@ -103,7 +104,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-og_group_ref'
+  // Exported field_instance: 'scald_atom-audio-og_group_ref'.
   $field_instances['scald_atom-audio-og_group_ref'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
@@ -181,7 +182,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-scald_authors'
+  // Exported field_instance: 'scald_atom-audio-scald_authors'.
   $field_instances['scald_atom-audio-scald_authors'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
@@ -233,7 +234,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-scald_tags'
+  // Exported field_instance: 'scald_atom-audio-scald_tags'.
   $field_instances['scald_atom-audio-scald_tags'] = array(
     'bundle' => 'audio',
     'default_value' => NULL,
@@ -285,7 +286,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-audio-scald_thumbnail'
+  // Exported field_instance: 'scald_atom-audio-scald_thumbnail'.
   $field_instances['scald_atom-audio-scald_thumbnail'] = array(
     'bundle' => 'audio',
     'deleted' => 0,
@@ -357,7 +358,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-field_scald_protocol'
+  // Exported field_instance: 'scald_atom-file-field_scald_protocol'.
   $field_instances['scald_atom-file-field_scald_protocol'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -420,7 +421,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-og_group_ref'
+  // Exported field_instance: 'scald_atom-file-og_group_ref'.
   $field_instances['scald_atom-file-og_group_ref'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -497,7 +498,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_authors'
+  // Exported field_instance: 'scald_atom-file-scald_authors'.
   $field_instances['scald_atom-file-scald_authors'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -548,7 +549,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_file'
+  // Exported field_instance: 'scald_atom-file-scald_file'.
   $field_instances['scald_atom-file-scald_file'] = array(
     'bundle' => 'file',
     'deleted' => 0,
@@ -602,7 +603,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_tags'
+  // Exported field_instance: 'scald_atom-file-scald_tags'.
   $field_instances['scald_atom-file-scald_tags'] = array(
     'bundle' => 'file',
     'default_value' => NULL,
@@ -653,7 +654,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-file-scald_thumbnail'
+  // Exported field_instance: 'scald_atom-file-scald_thumbnail'.
   $field_instances['scald_atom-file-scald_thumbnail'] = array(
     'bundle' => 'file',
     'deleted' => 0,
@@ -722,7 +723,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_archival_tiff'
+  // Exported field_instance: 'scald_atom-image-field_archival_tiff'.
   $field_instances['scald_atom-image-field_archival_tiff'] = array(
     'bundle' => 'image',
     'deleted' => 0,
@@ -806,7 +807,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_category'
+  // Exported field_instance: 'scald_atom-image-field_category'.
   $field_instances['scald_atom-image-field_category'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -867,7 +868,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_full_size_jpeg'
+  // Exported field_instance: 'scald_atom-image-field_full_size_jpeg'.
   $field_instances['scald_atom-image-field_full_size_jpeg'] = array(
     'bundle' => 'image',
     'deleted' => 0,
@@ -933,7 +934,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_licence_std_cc'
+  // Exported field_instance: 'scald_atom-image-field_licence_std_cc'.
   $field_instances['scald_atom-image-field_licence_std_cc'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -996,7 +997,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_original_dng'
+  // Exported field_instance: 'scald_atom-image-field_original_dng'.
   $field_instances['scald_atom-image-field_original_dng'] = array(
     'bundle' => 'image',
     'deleted' => 0,
@@ -1080,7 +1081,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_rights'
+  // Exported field_instance: 'scald_atom-image-field_rights'.
   $field_instances['scald_atom-image-field_rights'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1148,7 +1149,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_created'
+  // Exported field_instance: 'scald_atom-image-field_scald_created'.
   $field_instances['scald_atom-image-field_scald_created'] = array(
     'bundle' => 'image',
     'deleted' => 0,
@@ -1226,7 +1227,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_creator'
+  // Exported field_instance: 'scald_atom-image-field_scald_creator'.
   $field_instances['scald_atom-image-field_scald_creator'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1296,7 +1297,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_description'
+  // Exported field_instance: 'scald_atom-image-field_scald_description'.
   $field_instances['scald_atom-image-field_scald_description'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1365,7 +1366,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_geo_location'
+  // Exported field_instance: 'scald_atom-image-field_scald_geo_location'.
   $field_instances['scald_atom-image-field_scald_geo_location'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1433,7 +1434,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_headline'
+  // Exported field_instance: 'scald_atom-image-field_scald_headline'.
   $field_instances['scald_atom-image-field_scald_headline'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1503,7 +1504,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_identifier'
+  // Exported field_instance: 'scald_atom-image-field_scald_identifier'.
   $field_instances['scald_atom-image-field_scald_identifier'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1571,7 +1572,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_location'
+  // Exported field_instance: 'scald_atom-image-field_scald_location'.
   $field_instances['scald_atom-image-field_scald_location'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1641,7 +1642,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-field_scald_protocol'
+  // Exported field_instance: 'scald_atom-image-field_scald_protocol'.
   $field_instances['scald_atom-image-field_scald_protocol'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1713,7 +1714,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-og_group_ref'
+  // Exported field_instance: 'scald_atom-image-og_group_ref'.
   $field_instances['scald_atom-image-og_group_ref'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1802,7 +1803,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-scald_authors'
+  // Exported field_instance: 'scald_atom-image-scald_authors'.
   $field_instances['scald_atom-image-scald_authors'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1873,7 +1874,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-scald_tags'
+  // Exported field_instance: 'scald_atom-image-scald_tags'.
   $field_instances['scald_atom-image-scald_tags'] = array(
     'bundle' => 'image',
     'default_value' => NULL,
@@ -1945,7 +1946,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-image-scald_thumbnail'
+  // Exported field_instance: 'scald_atom-image-scald_thumbnail'.
   $field_instances['scald_atom-image-scald_thumbnail'] = array(
     'bundle' => 'image',
     'deleted' => 0,
@@ -2049,7 +2050,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-video-field_scald_protocol'
+  // Exported field_instance: 'scald_atom-video-field_scald_protocol'.
   $field_instances['scald_atom-video-field_scald_protocol'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
@@ -2109,7 +2110,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-video-og_group_ref'
+  // Exported field_instance: 'scald_atom-video-og_group_ref'.
   $field_instances['scald_atom-video-og_group_ref'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
@@ -2186,7 +2187,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-video-scald_authors'
+  // Exported field_instance: 'scald_atom-video-scald_authors'.
   $field_instances['scald_atom-video-scald_authors'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
@@ -2237,7 +2238,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-video-scald_tags'
+  // Exported field_instance: 'scald_atom-video-scald_tags'.
   $field_instances['scald_atom-video-scald_tags'] = array(
     'bundle' => 'video',
     'default_value' => NULL,
@@ -2288,7 +2289,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'scald_atom-video-scald_thumbnail'
+  // Exported field_instance: 'scald_atom-video-scald_thumbnail'.
   $field_instances['scald_atom-video-scald_thumbnail'] = array(
     'bundle' => 'video',
     'deleted' => 0,
@@ -2350,7 +2351,7 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'taxonomy_term-scald_authors-scald_author_url'
+  // Exported field_instance: 'taxonomy_term-scald_authors-scald_author_url'.
   $field_instances['taxonomy_term-scald_authors-scald_author_url'] = array(
     'bundle' => 'scald_authors',
     'default_value' => NULL,

@@ -10,7 +10,7 @@
 function ma_community_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_-community:node/add/community
+  // Exported menu link: main-menu_-community:node/add/community.
   $menu_links['main-menu_-community:node/add/community'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'node/add/community',
@@ -32,10 +32,10 @@ function ma_community_menu_default_menu_links() {
     'weight' => -47,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('+ Community');
-
 
   return $menu_links;
 }

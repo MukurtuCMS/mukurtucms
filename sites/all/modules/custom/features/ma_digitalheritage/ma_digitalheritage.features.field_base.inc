@@ -10,21 +10,13 @@
 function ma_digitalheritage_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_book_children'
+  // Exported field_base: 'field_book_children'.
   $field_bases['field_book_children'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_book_children',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -54,21 +46,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_book_parent'
+  // Exported field_base: 'field_book_parent'.
   $field_bases['field_book_parent'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_book_parent',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -98,21 +82,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_collection'
+  // Exported field_base: 'field_collection'.
   $field_bases['field_collection'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_collection',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -142,21 +118,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_community_record_children'
+  // Exported field_base: 'field_community_record_children'.
   $field_bases['field_community_record_children'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_community_record_children',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -186,21 +154,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_community_record_parent'
+  // Exported field_base: 'field_community_record_parent'.
   $field_bases['field_community_record_parent'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_community_record_parent',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -230,21 +190,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_community_ref'
+  // Exported field_base: 'field_community_ref'.
   $field_bases['field_community_ref'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_community_ref',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -272,21 +224,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_dh_type'
+  // Exported field_base: 'field_dh_type'.
   $field_bases['field_dh_type'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_dh_type',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -306,21 +250,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_people'
+  // Exported field_base: 'field_people'.
   $field_bases['field_people'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_people',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -340,21 +276,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_related_dh_items'
+  // Exported field_base: 'field_related_dh_items'.
   $field_bases['field_related_dh_items'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_related_dh_items',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -383,21 +311,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_summary'
+  // Exported field_base: 'field_summary'.
   $field_bases['field_summary'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_summary',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -412,21 +332,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_transcription'
+  // Exported field_base: 'field_transcription'.
   $field_bases['field_transcription'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_transcription',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',

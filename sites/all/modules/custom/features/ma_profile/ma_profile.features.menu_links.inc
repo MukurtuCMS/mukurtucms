@@ -10,7 +10,7 @@
 function ma_profile_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_-user:admin/people/create
+  // Exported menu link: main-menu_-user:admin/people/create.
   $menu_links['main-menu_-user:admin/people/create'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'admin/people/create',
@@ -32,10 +32,10 @@ function ma_profile_menu_default_menu_links() {
     'weight' => -45,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('+ User');
-
 
   return $menu_links;
 }

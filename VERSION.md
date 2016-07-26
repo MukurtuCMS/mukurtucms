@@ -1,3 +1,27 @@
+## Mukurtu 2.0.5
+- New thumbnail carousel view for multi-page Digital Heritage items
+- Images with Exif orientation data will now generate automatically rotated thumbnails
+- Fixed a bug where a user would lose community/protocol membership after updating their profile
+- The "Community Record Parent" field in the Digital Heritage importer has been removed and a separate importer for adding community records in that manner has been added
+- Erroneous drop-down menu item in the dashboard has been removed
+- "Duplicate Record" functionality will no longer copy community record or multi-page relationships
+- People field permissions are now configured like the other taxonomies
+- People field now displays properly on community records
+- "View Media" link has been restored to the dashboard for Mukurtu Admins
+- Fixed a bug where the zip importer was generating an incorrect download URL for previously uploaded zip files
+- The zip importer will now handle the case where the files have been placed within a single sub-folder (as many zip archive programs do by default)
+- Fixed a bug where the cultural protocol importer would fail when given a numeric '0' for the 'sharing protocol' field
+- Fixed a bug in digital heritage node view that would cause multiple notices/warnings to be generated in the error log
+- Updated Drupal core to 7.50
+- Security updates for Features, Google Analytics, Search API, and Views modules
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- revert features: `drush fra`. Please first review if there are any custom changes you have done that may be overwritten.
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`
+
 ## Mukurtu 2.0.4
 - Digital Heritage items now support multiple TK labels
 - The text of individual TK labels can now be customized at the site or community level
