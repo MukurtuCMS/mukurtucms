@@ -265,5 +265,64 @@ function ma_dictionary_ds_layout_settings_info() {
   );
   $export['node|dictionary_word|search_result'] = $ds_layout;
 
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|dictionary_word_bundle|default';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'dictionary_word_bundle';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_3col_stacked_fluid';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'header' => array(
+        0 => 'field_entry_title',
+        1 => 'field_source',
+      ),
+      'left' => array(
+        2 => 'field_translation',
+      ),
+      'middle' => array(
+        3 => 'field_transliteration',
+      ),
+      'right' => array(
+        4 => 'field_part_of_speech',
+      ),
+      'footer' => array(
+        5 => 'field_dictionary_word_recording',
+        6 => 'field_definition',
+        7 => 'field_sample_sentence',
+      ),
+    ),
+    'fields' => array(
+      'field_entry_title' => 'header',
+      'field_source' => 'header',
+      'field_translation' => 'left',
+      'field_transliteration' => 'middle',
+      'field_part_of_speech' => 'right',
+      'field_dictionary_word_recording' => 'footer',
+      'field_definition' => 'footer',
+      'field_sample_sentence' => 'footer',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'header' => 'div',
+      'left' => 'div',
+      'middle' => 'div',
+      'right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_layout;
+
   return $export;
 }
