@@ -131,3 +131,14 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
         $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
     }
 }
+
+function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
+    // Wrap sample sentences in a div
+    if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        if(isset($entity->content['field_sample_sentence'])) {
+            foreach($entity->content['field_sample_sentence']['#items'] as $key => $value) {
+                $entity->content['field_sample_sentence'][$key]['#markup'] = '<div class="sample-sentence">' . $entity->content['field_sample_sentence'][$key]['#markup'] . '</div>';
+            }
+        }
+    }
+}
