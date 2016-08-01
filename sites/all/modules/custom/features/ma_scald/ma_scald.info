@@ -55,6 +55,7 @@ features[ds_field_settings][] = scald_atom|video|ma_colorbox
 features[ds_layout_settings][] = scald_atom|audio|ma_colorbox
 features[ds_layout_settings][] = scald_atom|audio|ma_scald_search_results
 features[ds_layout_settings][] = scald_atom|audio|mukurtu_scald_dictionary_media
+features[ds_layout_settings][] = scald_atom|audio|mukurtu_scald_recording
 features[ds_layout_settings][] = scald_atom|audio|mukurtu_scald_related_items
 features[ds_layout_settings][] = scald_atom|file|ma_colorbox
 features[ds_layout_settings][] = scald_atom|file|ma_scald_search_results

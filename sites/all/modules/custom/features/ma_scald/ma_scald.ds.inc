@@ -267,6 +267,44 @@ function ma_scald_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|audio|mukurtu_scald_recording';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'audio';
+  $ds_layout->view_mode = 'mukurtu_scald_recording';
+  $ds_layout->layout = 'ds_2col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'atom',
+      ),
+      'right' => array(
+        1 => 'scald_authors',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'left',
+      'scald_authors' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['scald_atom|audio|mukurtu_scald_recording'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'scald_atom|audio|mukurtu_scald_related_items';
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'audio';
