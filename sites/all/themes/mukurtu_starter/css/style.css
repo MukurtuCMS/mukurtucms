@@ -9281,12 +9281,19 @@ table .checkbox input[type="checkbox"] {
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .group-footer {
   margin-left: 20px;
+  padding-top: 0px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .label-above {
   font-size: 14px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-entry-title {
   font-size: 22px;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .fluid-width-video-wrapper {
+  height: 20px;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .scald-atom {
+  margin-bottom: 0px;
 }
 .view-id-digital_heritage_grid_list iframe {
   display: none;
