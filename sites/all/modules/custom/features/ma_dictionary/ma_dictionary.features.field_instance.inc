@@ -595,7 +595,7 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(
           'link' => 0,
         ),
-        'type' => 'ma_colorbox',
+        'type' => 'mukurtu_scald_recording',
         'weight' => 5,
       ),
       'paragraphs_editor_preview' => array(
@@ -627,55 +627,6 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 4,
-    ),
-  );
-
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_entry_title'
-  $field_instances['paragraphs_item-dictionary_word_bundle-field_entry_title'] = array(
-    'bundle' => 'dictionary_word_bundle',
-    'default_value' => array(
-      0 => array(
-        'value' => 'Entry #',
-      ),
-    ),
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 0,
-      ),
-      'paragraphs_editor_preview' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'paragraphs_item',
-    'field_name' => 'field_entry_title',
-    'label' => 'Entry Title',
-    'required' => 1,
-    'settings' => array(
-      'context' => 'debug',
-      'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 0,
-      'mee_enabled' => 0,
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 1,
     ),
   );
 
@@ -806,7 +757,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 1,
     ),
   );
 
@@ -905,7 +856,6 @@ function ma_dictionary_field_default_field_instances() {
   t('Additional Media');
   t('Community');
   t('Definition');
-  t('Entry Title');
   t('Item Sharing Settings');
   t('Keywords');
   t('Language');

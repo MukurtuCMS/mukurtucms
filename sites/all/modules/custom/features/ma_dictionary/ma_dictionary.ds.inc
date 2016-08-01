@@ -70,6 +70,23 @@ function ma_dictionary_ds_field_settings_info() {
   );
   $export['node|dictionary_word|search_result'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'paragraphs_item|dictionary_word_bundle|default';
+  $ds_fieldsetting->entity_type = 'paragraphs_item';
+  $ds_fieldsetting->bundle = 'dictionary_word_bundle';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'field_dictionary_word_recording' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Recording(s)',
+        ),
+      ),
+    ),
+  );
+  $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -275,26 +292,24 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'header' => array(
-        0 => 'field_entry_title',
-        1 => 'field_source',
+        0 => 'field_source',
       ),
       'left' => array(
-        2 => 'field_translation',
+        1 => 'field_translation',
       ),
       'middle' => array(
-        3 => 'field_transliteration',
+        2 => 'field_transliteration',
       ),
       'right' => array(
-        4 => 'field_part_of_speech',
+        3 => 'field_part_of_speech',
       ),
       'footer' => array(
-        5 => 'field_dictionary_word_recording',
-        6 => 'field_definition',
-        7 => 'field_sample_sentence',
+        4 => 'field_dictionary_word_recording',
+        5 => 'field_definition',
+        6 => 'field_sample_sentence',
       ),
     ),
     'fields' => array(
-      'field_entry_title' => 'header',
       'field_source' => 'header',
       'field_translation' => 'left',
       'field_transliteration' => 'middle',
