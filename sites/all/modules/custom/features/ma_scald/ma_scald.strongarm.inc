@@ -91,6 +91,9 @@ function ma_scald_strongarm() {
       'mukurtu_scald_dictionary_media' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -121,6 +124,10 @@ function ma_scald_strongarm() {
           ),
           'mukurtu_scald_dictionary_media' => array(
             'weight' => '1',
+            'visible' => TRUE,
+          ),
+          'mukurtu_scald_recording' => array(
+            'weight' => '0',
             'visible' => TRUE,
           ),
         ),
@@ -527,6 +534,15 @@ function ma_scald_strongarm() {
       'render_language' => 'XHTML',
       'parseable' => TRUE,
       'formats' => array(),
+    ),
+    'mukurtu_scald_recording' => array(
+      'name' => 'mukurtu_scald_recording',
+      'title' => 'Mukurtu Scald Recording',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+      'provider' => 'scald',
     ),
   );
   $export['scald_custom_contexts'] = $strongarm;

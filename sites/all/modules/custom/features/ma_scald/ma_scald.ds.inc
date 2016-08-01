@@ -42,6 +42,21 @@ function ma_scald_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'scald_atom|audio|mukurtu_scald_recording';
+  $ds_fieldsetting->entity_type = 'scald_atom';
+  $ds_fieldsetting->bundle = 'audio';
+  $ds_fieldsetting->view_mode = 'mukurtu_scald_recording';
+  $ds_fieldsetting->settings = array(
+    'scald_authors' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['scald_atom|audio|mukurtu_scald_recording'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'scald_atom|file|ma_scald_search_results';
   $ds_fieldsetting->entity_type = 'scald_atom';
   $ds_fieldsetting->bundle = 'file';
