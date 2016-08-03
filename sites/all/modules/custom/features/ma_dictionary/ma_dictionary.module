@@ -130,14 +130,41 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
         $language = substr($language_alias, strripos($language_alias, '/') + 1);
         $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
     }
+
+    // Only render the first word entry per term in the search results
+    if($node->type == 'dictionary_word' && $view_mode == 'search_result') {
+        if(count($node->field_word_entry) > 0) {
+            $first = TRUE;
+            foreach($node->content['field_word_entry']['#items'] as $key => $item) {
+                if(!$first) {
+                    unset($node->content['field_word_entry'][$key]);
+                }
+                $first = FALSE;
+            }
+        }
+    }
 }
 
 function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
-    // Wrap sample sentences in a div
     if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        // Wrap sample sentences in a div
         if(isset($entity->content['field_sample_sentence'])) {
             foreach($entity->content['field_sample_sentence']['#items'] as $key => $value) {
                 $entity->content['field_sample_sentence'][$key]['#markup'] = '<div class="sample-sentence">' . $entity->content['field_sample_sentence'][$key]['#markup'] . '</div>';
+            }
+        }
+
+        // Only render one recording in teaser
+        if($view_mode == 'dictionary_teaser') {
+            unset($entity->content['field_dictionary_word_recording'][1]);
+            if(count($entity->field_dictionary_word_recording) > 1) {
+                $first = TRUE;
+                foreach($entity->content['field_dictionary_word_recording']['#items'] as $key => $item) {
+                    if(!$first) {
+                        unset($entity->content['field_dictionary_word_recording'][$key]);
+                    }
+                    $first = FALSE;
+                }
             }
         }
     }

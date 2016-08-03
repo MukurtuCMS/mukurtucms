@@ -82,14 +82,8 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '1',
-    'children' => array(
-      0 => 'field_definition',
-      1 => 'field_dictionary_word_recording',
-      2 => 'field_translation',
-      3 => 'field_transliteration',
-      4 => 'title',
-    ),
+    'weight' => '18',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'List View Fields',

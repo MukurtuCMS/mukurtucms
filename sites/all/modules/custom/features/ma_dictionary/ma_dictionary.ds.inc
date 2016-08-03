@@ -57,7 +57,7 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '1',
+      'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -250,21 +250,13 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'group_list_view_fields',
-        1 => 'title',
-        2 => 'field_dictionary_word_recording',
-        3 => 'field_transliteration',
-        4 => 'field_translation',
-        5 => 'field_definition',
+        0 => 'title',
+        1 => 'field_word_entry',
       ),
     ),
     'fields' => array(
-      'group_list_view_fields' => 'ds_content',
       'title' => 'ds_content',
-      'field_dictionary_word_recording' => 'ds_content',
-      'field_transliteration' => 'ds_content',
-      'field_translation' => 'ds_content',
-      'field_definition' => 'ds_content',
+      'field_word_entry' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -338,6 +330,24 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_disable_css' => 0,
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_layout;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_view_modes_info().
+ */
+function ma_dictionary_ds_view_modes_info() {
+  $export = array();
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'dictionary_teaser';
+  $ds_view_mode->label = 'Dictionary Teaser';
+  $ds_view_mode->entities = array(
+    'paragraphs_item' => 'paragraphs_item',
+  );
+  $export['dictionary_teaser'] = $ds_view_mode;
 
   return $export;
 }

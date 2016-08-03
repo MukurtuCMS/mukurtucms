@@ -155,6 +155,9 @@ function ma_dictionary_strongarm() {
       'token' => array(
         'custom_settings' => FALSE,
       ),
+      'dictionary_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

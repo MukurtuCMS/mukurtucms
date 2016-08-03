@@ -50,6 +50,7 @@ features[ds_layout_settings][] = node|dictionary_word|default
 features[ds_layout_settings][] = node|dictionary_word|form
 features[ds_layout_settings][] = node|dictionary_word|search_result
 features[ds_layout_settings][] = paragraphs_item|dictionary_word_bundle|default
+features[ds_view_modes][] = dictionary_teaser
 features[facetapi][] = search_api@default_node_index::field_dictionary_word_language
 features[facetapi][] = search_api@default_node_index::field_dictionary_word_related_dh
 features[facetapi][] = search_api@default_node_index::field_dictionary_word_synonyms
