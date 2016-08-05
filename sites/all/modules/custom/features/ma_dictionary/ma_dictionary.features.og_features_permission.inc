@@ -10,8 +10,18 @@
 function ma_dictionary_og_features_default_permissions() {
   $permissions = array();
 
+  // Exported og permission: 'node:community:create dictionary_word content'
+  $permissions['node:community:create dictionary_word content'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:community:create language_community content'
   $permissions['node:community:create language_community content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:delete any dictionary_word content'
+  $permissions['node:community:delete any dictionary_word content'] = array(
     'roles' => array(),
   );
 
@@ -20,13 +30,28 @@ function ma_dictionary_og_features_default_permissions() {
     'roles' => array(),
   );
 
+  // Exported og permission: 'node:community:delete own dictionary_word content'
+  $permissions['node:community:delete own dictionary_word content'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:community:delete own language_community content'
   $permissions['node:community:delete own language_community content'] = array(
     'roles' => array(),
   );
 
+  // Exported og permission: 'node:community:update any dictionary_word content'
+  $permissions['node:community:update any dictionary_word content'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:community:update any language_community content'
   $permissions['node:community:update any language_community content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:update own dictionary_word content'
+  $permissions['node:community:update own dictionary_word content'] = array(
     'roles' => array(),
   );
 
