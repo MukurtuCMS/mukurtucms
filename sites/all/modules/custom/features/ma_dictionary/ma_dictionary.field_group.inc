@@ -128,5 +128,66 @@ function ma_dictionary_field_group_info() {
   );
   $export['group_tabs|node|dictionary_word|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_word_bundle|paragraphs_item|dictionary_word_bundle|form';
+  $field_group->group_name = 'group_word_bundle';
+  $field_group->entity_type = 'paragraphs_item';
+  $field_group->bundle = 'dictionary_word_bundle';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_word_group';
+  $field_group->data = array(
+    'label' => 'New Word Entry',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_translation',
+      1 => 'field_transliteration',
+      2 => 'field_dictionary_word_recording',
+      3 => 'field_definition',
+      4 => 'field_sample_sentence',
+      5 => 'field_part_of_speech',
+      6 => 'field_source',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'New Word Entry',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-word-bundle field-group-accordion-item',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $export['group_word_bundle|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_word_group|paragraphs_item|dictionary_word_bundle|form';
+  $field_group->group_name = 'group_word_group';
+  $field_group->entity_type = 'paragraphs_item';
+  $field_group->bundle = 'dictionary_word_bundle';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Word Group',
+    'weight' => '0',
+    'children' => array(
+      0 => 'group_word_bundle',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'effect' => 'none',
+        'classes' => 'group-word-group field-group-accordion',
+        'id' => '',
+      ),
+    ),
+  );
+  $export['group_word_group|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
+
   return $export;
 }

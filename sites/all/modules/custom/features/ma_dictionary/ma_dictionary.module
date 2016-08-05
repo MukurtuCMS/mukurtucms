@@ -101,6 +101,63 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
     }
   }
 
+  // Change paragraphs button text to be dictionary specific
+  $form['field_word_entry'][LANGUAGE_NONE]['add_more']['add_more']['#value'] = t('Add new word entry');
+}
+
+
+/**
+ * Implements hook_field_widget_form_alter.
+ */
+function ma_dictionary_field_widget_form_alter(&$element, &$form_state, $context) {
+    if($element['#field_name'] == 'field_word_entry') {
+        $n_entries = 0;
+        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > 0) {
+            $n_entries = $element['#max_delta'];
+            foreach(range(0, $n_entries) as $i) {
+                // Change the field group title for each word entry, customized based on source/translation
+                $word_number = $i + 1;
+                $new_word_title = "#$word_number ";
+                $source = "";
+                $translation = "";
+
+                if(!empty($element[$i]['field_source'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+                    $source = $element[$i]['field_source'][LANGUAGE_NONE][0]['value']['#default_value'] . ' ';
+                }
+
+                if(!empty($element[$i]['field_translation'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+                    $translation .= $element[$i]['field_translation'][LANGUAGE_NONE][0]['value']['#default_value'] . ' ';
+                }
+
+                if(!empty($source)) {
+                    if(!empty($translation)) {
+                        $new_word_title .= $source . ' - ' . $translation;
+                    } else {
+                        $new_word_title .= $source;
+                    }
+                } else {
+                    $new_word_title .= $translation;
+                }
+
+                // This is pretty gross. All elements fieldgroup points to the same object by reference.
+                // Here we make a copy and change just the title, so we can have different titles for the same
+                // field group
+                $group_clone = (object) (array) $element[$i]['#groups']['group_word_bundle'];
+                $group_clone->label = $new_word_title;
+                $element[$i]['#fieldgroups']['group_word_bundle'] = $group_clone;
+
+
+                // Remove paragraph bundle type text
+                unset($element[$i]['paragraph_bundle_title']['info']['#markup']);
+
+                // Change add sample sentence text
+                $element[$i]['field_sample_sentence'][LANGUAGE_NONE]['add_more']['#value'] = t('Add another sample sentence');
+
+                // Change add another recording text
+                $element[$i]['field_dictionary_word_recording'][LANGUAGE_NONE]['add_more']['#value'] = t('Add another recording');
+            }
+        }
+    }
 }
 
 /**
@@ -194,7 +251,7 @@ function ma_dictionary_node_access($node, $op, $account) {
 
         if($op == 'update') {
             dpm($node);
-        }            
+        }
     }
     */
     return NODE_ACCESS_IGNORE;

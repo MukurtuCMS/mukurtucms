@@ -9295,6 +9295,9 @@ table .checkbox input[type="checkbox"] {
 .paragraphs-item-dictionary-word-bundle.view-mode-full .scald-atom {
   margin-bottom: 0px;
 }
+.node-dictionary_word-form .field-group-accordion-wrapper .field-group-format-wrapper {
+  padding: 10px;
+}
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }

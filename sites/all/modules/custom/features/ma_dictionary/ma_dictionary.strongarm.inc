@@ -151,7 +151,7 @@ function ma_dictionary_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '1',
+          'weight' => '24',
         ),
         'path' => array(
           'weight' => '10',
@@ -234,7 +234,7 @@ function ma_dictionary_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'redirect' => array(
-          'weight' => '0',
+          'weight' => '2',
         ),
       ),
       'display' => array(),
