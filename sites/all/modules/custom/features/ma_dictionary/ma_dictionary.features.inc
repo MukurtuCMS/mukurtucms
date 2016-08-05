@@ -74,6 +74,14 @@ function ma_dictionary_node_info() {
       'title_label' => t('Term'),
       'help' => '',
     ),
+    'language_community' => array(
+      'name' => t('Language Community'),
+      'base' => 'node_content',
+      'description' => t('Language Community Groups are used to give users the ability to add and edit dictionary words for a given language.'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
   );
   drupal_alter('node_info', $items);
   return $items;

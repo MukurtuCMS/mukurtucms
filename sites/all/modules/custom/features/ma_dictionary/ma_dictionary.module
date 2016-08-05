@@ -74,6 +74,13 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
 
   // Actions to perform when adding (not editing) dictionary words
   if ($form['#action'] == '/node/add/dictionary-word') {
+      // Remove any languages the user isn't a member of
+      $user_language_communities = _ma_dictionary_get_user_language_communities();
+      foreach($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'] as $lang_id => $lang) {
+          if(!isset($user_language_communities[$lang_id])) {
+              unset($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'][$lang_id]);
+          }
+      }
 
     // Set the default language, if one is defined, or the first language if no default is defined
     $default_language = variable_get ('mukurtu_default_language');
@@ -85,6 +92,13 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
       }
     }
     $form['field_dictionary_word_language'][LANGUAGE_NONE]['#default_value'] = $default_language;
+
+    // Set default language community to anything valid. It'll be changed to the correct value on save
+    $first_language_tid = array_keys($form['field_dictionary_word_language']['und']['#options'])[0];
+    $first_language_community = _ma_dictionary_get_language_community_from_tid($first_language_tid);
+    if($first_language_community) {
+        $form['field_language_community'][LANGUAGE_NONE][0]['default']['#default_value'] = $first_language_community;
+    }
   }
 
 }
@@ -168,4 +182,78 @@ function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
             }
         }
     }
+}
+
+/**
+ * Implements hook_node_access
+ */
+function ma_dictionary_node_access($node, $op, $account) {
+    /*    $type = is_string($node) ? $node : $node->type;
+    if($type == 'dictionary_word') {
+        $user_language_communities = _ma_dictionary_get_user_language_communities($account);
+
+        if($op == 'update') {
+            dpm($node);
+        }            
+    }
+    */
+    return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Implements hook_node_update
+ */
+function ma_dictionary_node_presave($node) {
+    if($node->type == 'dictionary_word') {
+        // We always want the dictionary word's language community to be set to the language community that has the corresponding
+        // related language taxonomy term. Language community is a hidden field.
+        $lang_nid = _ma_dictionary_get_language_community_from_tid($node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid']);
+        if($lang_nid) {
+            $node->field_language_community['und'][0]['target_id'] = $lang_nid;
+        }
+    }
+}
+
+// Helper function to return an array of roles a user has per language community
+function _ma_dictionary_get_user_language_communities($account = NULL) {
+    $user_language_communities = array();
+
+    if(empty($account)) {
+        global $user;
+        $account = $user;
+    }
+    
+    $groups = og_get_groups_by_user($account, 'node');
+    foreach($groups as $group) {
+        $group_node = node_load($group);
+        if($group_node->type == 'language_community') {
+            $roles = og_get_user_roles('node', $group, $account->uid);
+            foreach($roles as $role) {
+                if($role == 'language contributor' || $role == 'language steward') {
+                    $user_language_communities[$group_node->field_language[LANGUAGE_NONE][0]['tid']][] = $role;
+                }
+            }
+        }
+    }
+
+    return $user_language_communities;
+}
+
+// Helper function to lookup language community nid from language taxonomy id
+function _ma_dictionary_get_language_community_from_tid($tid) {
+    if(is_numeric($tid) & $tid > 0) {
+        $query = new EntityFieldQuery();
+
+        $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', 'language_community')
+            ->fieldCondition('field_language', 'tid', $tid)
+            ->range(0,1);
+
+        $result = $query->execute();
+
+        if(isset($result['node'])) {
+            return array_keys($result['node'])[0];
+        }
+    }
+    return NULL;
 }
