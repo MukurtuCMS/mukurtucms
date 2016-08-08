@@ -112,7 +112,7 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
 function ma_dictionary_field_widget_form_alter(&$element, &$form_state, $context) {
     if($element['#field_name'] == 'field_word_entry') {
         $n_entries = 0;
-        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > 0) {
+        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > -1) {
             $n_entries = $element['#max_delta'];
             foreach(range(0, $n_entries) as $i) {
                 // Change the field group title for each word entry, customized based on source/translation
@@ -159,6 +159,7 @@ function ma_dictionary_field_widget_form_alter(&$element, &$form_state, $context
         }
     }
 }
+
 
 /**
  * Implements template_preprocess_views_view.
@@ -255,6 +256,24 @@ function ma_dictionary_node_access($node, $op, $account) {
     }
     */
     return NODE_ACCESS_IGNORE;
+}
+
+function ma_dictionary_node_prepare($node) {
+    if($node->type == 'dictionary_word') {
+        if(empty($node->field_word_entry)) {
+            // Start with an empty word entry form for any new dictionary word
+            // It's the only bundle type, we don't want the user to have to click a button needlessly
+            $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_word_entry', 'bundle' => 'dictionary_word_bundle'));
+            $paragraph->is_new = TRUE;
+            $paragraph->setHostEntity('node', $node);
+            $paragraph->field_source = array();
+            $paragraph->field_translation = array();
+            $paragraph->field_transliteration = array();
+            $paragraph->field_dictionary_word_recording = array();
+            $paragraph->field_definition = array();
+            $paragraph->field_part_of_speech = array();
+        }
+    }
 }
 
 /**
