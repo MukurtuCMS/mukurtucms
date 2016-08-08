@@ -1,0 +1,14 @@
+name = Paragraphs Bundle Permissions
+description = Add view / create / update / delete permissions for all paragraph bundles.
+core = 7.x
+package = Paragraphs
+
+dependencies[] = paragraphs
+
+
+; Information added by Drupal.org packaging script on 2016-06-23
+version = "7.x-1.0-rc4+5-dev"
+core = "7.x"
+project = "paragraphs"
+datestamp = "1466688973"
+

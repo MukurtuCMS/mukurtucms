@@ -172,7 +172,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 42,
+        'weight' => 43,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -227,7 +227,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 29,
+      'weight' => 30,
     ),
   );
 
@@ -258,7 +258,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 42,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -313,7 +313,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 30,
+      'weight' => 31,
     ),
   );
 
@@ -361,7 +361,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 14,
+        'weight' => 15,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -420,10 +420,10 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_collection'.
   $field_instances['node-digital_heritage-field_collection'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'default_value' => array(),
+    'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A collection is an aggregation of digital heritage resources. Type the title of an existing collection in your CMS.
-',
+    'description' => 'A collection is an aggregation of digital heritage items.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -447,7 +447,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -480,22 +480,26 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_collection',
     'label' => 'Collection',
     'required' => 0,
     'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => 1,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 26,
     ),
   );
@@ -528,7 +532,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 43,
+        'weight' => 44,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -583,7 +587,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 28,
+      'weight' => 29,
     ),
   );
 
@@ -615,7 +619,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 44,
+        'weight' => 45,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -729,7 +733,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 12,
+        'weight' => 13,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -859,7 +863,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 19,
+        'weight' => 20,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1247,7 +1251,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1338,7 +1342,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1530,7 +1534,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1620,7 +1624,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1711,7 +1715,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1808,7 +1812,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 46,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1902,7 +1906,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1993,7 +1997,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2083,7 +2087,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2370,7 +2374,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2426,10 +2430,10 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_related_dh_items'.
   $field_instances['node-digital_heritage-field_related_dh_items'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.',
+    'description' => 'A reference to one or many related digital heritage items.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2487,7 +2491,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_dh_items',
-    'label' => 'Related Items',
+    'label' => 'Related Digital Heritage Items',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -2499,18 +2503,98 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => 1,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 27,
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_rights'.
+  // Exported field_instance: 'node-digital_heritage-field_related_dictionary_words'
+  $field_instances['node-digital_heritage-field_related_dictionary_words'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'A reference to one or many related dictionary words.',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 44,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => 1,
+          'view_mode' => 'search_result',
+        ),
+        'type' => 'entityreference_entity_view',
+        'weight' => 10,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_dictionary_words',
+    'label' => 'Related Dictionary Words',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+      ),
+      'type' => 'options_select',
+      'weight' => 28,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_rights'
   $field_instances['node-digital_heritage-field_rights'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2548,7 +2632,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2643,7 +2727,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2744,7 +2828,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2937,7 +3021,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -3235,7 +3319,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 13,
+        'weight' => 14,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -3316,9 +3400,9 @@ function ma_digitalheritage_field_default_field_instances() {
   t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
   t('A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
 ');
-  t('A collection is an aggregation of digital heritage resources. Type the title of an existing collection in your CMS.
-');
-  t('A reference to one or many related digital heritage resources. Type the title of the resource and select from content in your CMS.');
+  t('A collection is an aggregation of digital heritage items.');
+  t('A reference to one or many related dictionary words.');
+  t('A reference to one or many related digital heritage items.');
   t('An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.');
   t('Book Pages');
   t('Book Parent');
@@ -3353,7 +3437,8 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Rather than a quick gloss (like the description field) the Cultural Narrative field allows one to provide lengthy commentary, stories, observations, or any relevant context for the DH item. For example, if the item is a basket, this field may contain a narrative from the basket-maker about his/her technique or it may tell a story about how the baskets were used by previous generations and how they are used today. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Reference to a resource from which the present content is derived, for example if the content is part of a larger collection, ie. "McWhorter Collection" or "Smith Photos."
 ');
-  t('Related Items');
+  t('Related Dictionary Words');
+  t('Related Digital Heritage Items');
   t('Rights');
   t('Source');
   t('Subject');

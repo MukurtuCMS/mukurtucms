@@ -352,6 +352,17 @@ function ma_core_user_default_permissions() {
     'module' => 'image',
   );
 
+  // Exported permission: 'administer language vocabulary terms'.
+  $permissions['administer language vocabulary terms'] = array(
+    'name' => 'administer language vocabulary terms',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'vppr',
+  );
+
   // Exported permission: 'administer languages'.
   $permissions['administer languages'] = array(
     'name' => 'administer languages',
@@ -952,6 +963,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in language'] = array(
     'name' => 'delete terms in language',
     'roles' => array(
+      'Community Administrator' => 'Community Administrator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1193,6 +1205,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in language'] = array(
     'name' => 'edit terms in language',
     'roles' => array(
+      'Community Administrator' => 'Community Administrator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1322,6 +1335,17 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'features',
+  );
+
+  // Exported permission: 'merge language terms'.
+  $permissions['merge language terms'] = array(
+    'name' => 'merge language terms',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'term_merge',
   );
 
   // Exported permission: 'merge tags terms'.

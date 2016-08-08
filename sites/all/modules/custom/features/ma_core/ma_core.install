@@ -5,7 +5,8 @@
  */
 
 /**
- * Recreate the frontpage context since the old one gets deleted as it's been removed from the ma_core feature */
+ * Recreate the frontpage context since the old one gets deleted as it's been removed from the ma_core feature
+ */
 function ma_core_update_7100() {
   mukurtu_create_default_contexts();
 }
@@ -21,4 +22,11 @@ function ma_core_update_7101() {
     db_delete('system')
         ->condition('name', $modules, 'IN')
         ->execute();
+}
+
+/**
+ * Enable the Dictionary feature initially. After this, it can be disabled or re-enabled in the Dashboard.
+ */
+function ma_core_update_7102() {
+  module_enable(array('ma_dictionary'));
 }

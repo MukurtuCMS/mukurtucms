@@ -1,0 +1,12 @@
+name = Search API AZ Glossary
+description = Creates a glossary fields (A B C ...) based on node titles and user names
+core = 7.x
+dependencies[] = facetapi
+dependencies[] = search_api
+
+; Information added by Drupal.org packaging script on 2016-04-12
+version = "7.x-2.1"
+core = "7.x"
+project = "search_api_glossary"
+datestamp = "1460455441"
+

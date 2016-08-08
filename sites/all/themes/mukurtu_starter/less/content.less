@@ -185,44 +185,122 @@
   }
 }
 
+// Dictionary Word node form
+#dictionary-word-node-form {
+
+  #dewplayer-2, #dewplayer-1 {
+    height: 20px;
+  }
+
+  // Hide the default protocol field
+  #edit-og-group-ref {
+    display: none;
+  }
+
+}
+// Dictionary Word full node view
+.node-dictionary-word.view-mode-full {
+
+  .scald-atom, .scald_video, .fluid-width-video-wrapper {
+    margin-bottom: 10px;
+  }
+  #dewplayer-2, #dewplayer-1 {
+    height: 20px;
+  }
+  .group-left {
+    width: 66%
+  }
+  .group-right {
+    width: 30%;
+    background: #f8f7f7 none repeat scroll 0 0;
+    border-radius: 4px;
+    padding: 30px;
+  }
+  .group-right .fluid-width-video-wrapper {
+    padding-bottom: 3.5%;
+  }
+  .group-footer {
+    padding-top: 20px;
+
+   .label-above {
+     font-size: 14px;
+   }
+  }
+  .sample-sentence {
+    padding-bottom: 10px;
+  }
+}
+
+// Dictionary Word entry (paragraphs)
+.paragraphs-item-dictionary-word-bundle.view-mode-full {
+    .group-header {
+	margin-bottom: 10px;
+	border-bottom: 1px solid #dddddd;
+
+	div {
+	    margin-bottom: 0px;
+	}
+    }    
+    
+    .group-left, .group-middle, .group-right {
+	width: 30%;
+	margin-left: 20px;
+    }
+
+    .group-right {
+	background: none;
+	padding: 0px;
+	border-radius: 0px;
+    }
+
+    .group-footer {
+	margin-left: 20px;
+	padding-top: 0px;
+    }
+
+    .label-above {
+	font-size: 14px;
+    }
+
+    .field-name-field-entry-title {
+	font-size: 22px;
+    }
+
+    .fluid-width-video-wrapper {
+	height: 20px;
+    }
+
+    .scald-atom {
+	margin-bottom: 0px;
+    }
+    
+    padding-bottom: 30px;
+}
+
+.node-dictionary_word-form {
+    .field-group-accordion-wrapper {
+        .field-group-format-wrapper {
+    	    padding: 10px;
+    	}
+     }
+}
 
 //// Digital Heritage grid/list view
 
-// Hide the embededed videos (the thumbnail will display instead)
+// Hide the embedded videos (the thumbnail will display instead)
 .view-id-digital_heritage_grid_list iframe {
   display: none;
 }
 
 
-//// Grid/List Views (both DH and Collections)
+//// Grid/List Views (DH, Collections, Dictionary)
 
 // toggle display via the grid/list clicker
 
 
-.field-name-protocol-dh-items,
-.field-name-community-dh-items {
-  padding-top:20px;
-  border-top:1px solid #ECEBEB;
-
-  .view-community-dh-items {
-    .view-content {
-      .views-row {
-        border-bottom: 1px solid #ECEBEB;
-        margin: 30px 0;
-        padding: 0 0 30px 0;
-        &.views-row-first {
-          margin-top:0;
-        }
-	.field {
-          margin-bottom: 0px;
-	}
-      }
-    }
-  }
-}
-
 .view-digital-heritage-grid-list,
-.view-collections-grid-list {
+.view-collections-grid-list,
+.view-dictionary-words {
   .view-header {
     float:right;
     margin-top:-60px;
@@ -252,18 +330,23 @@
           margin-top:0;
         }
 
-        .field-name-field-media-asset,
-        .field-name-field-collection-image {
+        .field-name-field-media-asset {
           right:0;
-        }
-        .field-name-field-collection-image {
-          float: right;
         }
       }
     }
   }
 
   &.grid-view {
+
+    // Show tooltips in grid view only
+    .tooltips span {
+      top: 0px;
+      left: 0px;
+      width: 220px;
+      z-index: 999;
+    }
+
     .view-content {
       margin-left: -25px;
       margin-right: -25px;
@@ -279,8 +362,7 @@
         padding-bottom: 20px;
 
 
-        .field-name-field-media-asset,
-        .field-name-field-collection-image {
+        .field-name-field-media-asset {
           width: 100%;
           padding: 0;
           left:0;
@@ -314,6 +396,67 @@ a:hover {
   text-decoration: none;
 }
 
+// Dictionary-specific Grid / List view
+.view-dictionary-words {
+
+  .field-name-download-atom {
+    display: none;
+  }
+  .fluid-width-video-wrapper {
+    height: 20px;
+  }
+
+  .field {
+    margin-bottom: 5px;
+  }
+
+  .field-name-field-dictionary-word-recording {
+    width: 190px; // cannot set width to 100% or else it will fill the column in list view. Cannot use separate widths for list and grid views because mediaelement renders the atom once, and will not respond to our grid-list JS+CSS switcher. Thus, the list view atom is 190px wide (equal to the grid view) which is slightly smaller than the list view atom thumbnails on the DH browse list view (220px). This is not an issue in the other grid/list views because we don't show atoms there, only their thumbnails. Here we want to show the atoms, to be playable right on the search page.
+  }
+
+   &.list-view {
+      // float the audio/video atom of the recording to the top right
+      .field-name-field-dictionary-word-recording {
+        float: right;
+        margin-top: -40px;
+        margin-right: 20px;
+        margin-left: 20px;
+      }
+      .views-row {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 15px !important;
+      }
+  }
+
+  &.grid-view {
+    .dictionary-list-fields {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    // do not show field labels in grid view
+    .label-above {
+      display: none;
+    }
+    // fields to not show in grid view
+    .field-name-field-translation {
+      display: none;
+    }
+  }
+}
+
+// facets on the dictionary grid/list view
+
+.facetapi-facet-title-az-glossary {
+  overflow: hidden;
+  li {
+    font-size: 18px;
+    float: left;
+    margin-right: 0.5em;
+  }
+}
+
+
 // DH Map View
 .view-display-id-all_map {
   .view-mode-map_popup {
@@ -322,6 +465,8 @@ a:hover {
     }
   }
 }
+
+
 
 // Shared styling for CP and Community nodes
 
@@ -362,6 +507,29 @@ a:hover {
       padding-top: 10px;
     }
     margin-bottom: 2em;
+  }
+}
+
+// this section should probably be within the above section (within the node views)
+.field-name-protocol-dh-items,
+.field-name-community-dh-items {
+  padding-top:20px;
+  border-top:1px solid #ECEBEB;
+
+  .view-community-dh-items {
+    .view-content {
+      .views-row {
+        border-bottom: 1px solid #ECEBEB;
+        margin: 30px 0;
+        padding: 0 0 30px 0;
+        &.views-row-first {
+          margin-top:0;
+        }
+        .field {
+          margin-bottom: 0px;
+        }
+      }
+    }
   }
 }
 
@@ -414,15 +582,7 @@ a:hover {
 a.tooltips span {
 
 }
-// Show tooltips in grid view only
-.grid-view {
-  .tooltips span {
-    top: 0px;
-    left: 0px;
-    width: 220px;
-    z-index: 999;
-  }
-}
+
 
 
 //// Banner images (Community and Cultural Protocol nodes)
@@ -575,6 +735,30 @@ a.tooltips span {
       margin-bottom: 0;
     }
   }
+
+  // Related Dictionary Words (bottom)
+  .view-mode-search_result {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 15px !important;
+    .label-above {
+      font-size: 14px;
+    }
+    #dewplayer-2, #dewplayer-1 {
+      height: 20px;
+    }
+    .field-name-download-atom {
+      display: none;
+    }
+    .field-name-field-dictionary-word-recording {
+      width: 190px; // see comment on this in the Dictionary Words search results list view formatting
+      float: right;
+      margin-top: -40px;
+      margin-right: 20px;
+      margin-left: 20px;
+    }
+  }
+
 
   // Related DH Nodes Teasers (top right)
   .view-dh-related-items-teasers {
@@ -844,12 +1028,8 @@ a.tooltips span {
   z-index: -1;
 }
 
-
 // DH management page
 .form-item-operation {
     padding-left: 15px;
 }
 
-.export-download > a {
-    color: #ffffff;
-}

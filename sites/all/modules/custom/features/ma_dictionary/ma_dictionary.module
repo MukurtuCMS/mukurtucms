@@ -1,0 +1,335 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Dictionary feature.
+ */
+
+include_once 'ma_dictionary.features.inc';
+
+function ma_dictionary_menu() {
+
+    // Form to set default language
+    $items['dashboard/set-default-language'] = array(
+      'title' => 'Set Default Language',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ma_dictionary_set_default_language'),
+      'access arguments' => array('administer taxonomy'),
+    );
+    return $items;
+}
+
+function ma_dictionary_set_default_language() {
+    $language = taxonomy_vocabulary_machine_name_load('language');
+    $terms = taxonomy_get_tree($language->vid);
+
+    foreach ($terms as $term) {
+        $options[$term->tid] = $term->name;
+    }
+
+    $form['default_language'] = array (
+      '#type' => 'radios',
+      '#title' => 'Select the default language used when creating dictionary words',
+      '#default_value' => variable_get ('mukurtu_default_language'),
+      '#options' => $options,
+    );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+    );
+
+    return $form;
+}
+
+function ma_dictionary_set_default_language_submit ($form, &$form_state) {
+    if ($tid = $form_state['values']['default_language']) {
+        variable_set ('mukurtu_default_language', $tid);
+        $term = taxonomy_term_load($tid);
+        drupal_set_message('Default language set to <i>' . $term->name . '</i>.');
+    }
+    drupal_goto ('dashboard');
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state) {
+  // "Item Sharing Settings" field customizations versus how it works by default (as used in the DH node form) //
+
+  // Not required for Dictionary Words
+  $form['field_item_privacy_setting'][LANGUAGE_NONE]['#required'] = FALSE;
+
+  // The field has a default value. This is just to catch cases on demo sites where words were set already before this field was added
+  if (!$form['field_item_privacy_setting'][LANGUAGE_NONE]['#default_value']) {
+    $form['field_item_privacy_setting'][LANGUAGE_NONE]['#default_value'] = 'all';
+  }
+
+  // Hide the field unless a Community is selected in the first value
+  $form['field_item_privacy_setting']['#states'] = array(
+    'invisible' => array(
+      ':input[id="edit-oggroup-fieldset-0-dropdown-first"]' => array('value' => 0),
+    ),
+  );
+
+
+  // Actions to perform when adding (not editing) dictionary words
+  if ($form['#action'] == '/node/add/dictionary-word') {
+      // Remove any languages the user isn't a member of
+      $user_language_communities = _ma_dictionary_get_user_language_communities();
+      foreach($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'] as $lang_id => $lang) {
+          if(!isset($user_language_communities[$lang_id])) {
+              unset($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'][$lang_id]);
+          }
+      }
+
+    // Set the default language, if one is defined, or the first language if no default is defined
+    $default_language = variable_get ('mukurtu_default_language');
+    if (!$default_language) {
+      $language = taxonomy_vocabulary_machine_name_load('language');
+      $terms = taxonomy_get_tree($language->vid);
+      if (count($terms)) {
+        $default_language = $terms[0]->tid;
+      }
+    }
+    $form['field_dictionary_word_language'][LANGUAGE_NONE]['#default_value'] = $default_language;
+
+    // Set default language community to anything valid. It'll be changed to the correct value on save
+    $first_language_tid = array_keys($form['field_dictionary_word_language']['und']['#options'])[0];
+    $first_language_community = _ma_dictionary_get_language_community_from_tid($first_language_tid);
+    if($first_language_community) {
+        $form['field_language_community'][LANGUAGE_NONE][0]['default']['#default_value'] = $first_language_community;
+    }
+  }
+
+  // Change paragraphs button text to be dictionary specific
+  $form['field_word_entry'][LANGUAGE_NONE]['add_more']['add_more']['#value'] = t('Add new word entry');
+}
+
+
+/**
+ * Implements hook_field_widget_form_alter.
+ */
+function ma_dictionary_field_widget_form_alter(&$element, &$form_state, $context) {
+    if($element['#field_name'] == 'field_word_entry') {
+        $n_entries = 0;
+        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > -1) {
+            $n_entries = $element['#max_delta'];
+            foreach(range(0, $n_entries) as $i) {
+                // Change the field group title for each word entry, customized based on source/translation
+                $word_number = $i + 1;
+                $new_word_title = "#$word_number ";
+                $source = "";
+                $translation = "";
+
+                if(!empty($element[$i]['field_source'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+                    $source = $element[$i]['field_source'][LANGUAGE_NONE][0]['value']['#default_value'] . ' ';
+                }
+
+                if(!empty($element[$i]['field_translation'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+                    $translation .= $element[$i]['field_translation'][LANGUAGE_NONE][0]['value']['#default_value'] . ' ';
+                }
+
+                if(!empty($source)) {
+                    if(!empty($translation)) {
+                        $new_word_title .= $source . ' - ' . $translation;
+                    } else {
+                        $new_word_title .= $source;
+                    }
+                } else {
+                    $new_word_title .= $translation;
+                }
+
+                // This is pretty gross. All elements fieldgroup points to the same object by reference.
+                // Here we make a copy and change just the title, so we can have different titles for the same
+                // field group
+                $group_clone = (object) (array) $element[$i]['#groups']['group_word_bundle'];
+                $group_clone->label = $new_word_title;
+                $element[$i]['#fieldgroups']['group_word_bundle'] = $group_clone;
+
+
+                // Remove paragraph bundle type text
+                unset($element[$i]['paragraph_bundle_title']['info']['#markup']);
+
+                // Change add sample sentence text
+                $element[$i]['field_sample_sentence'][LANGUAGE_NONE]['add_more']['#value'] = t('Add another sample sentence');
+
+                // Change add another recording text
+                $element[$i]['field_dictionary_word_recording'][LANGUAGE_NONE]['add_more']['#value'] = t('Add another recording');
+            }
+        }
+    }
+}
+
+
+/**
+ * Implements template_preprocess_views_view.
+ */
+function ma_dictionary_preprocess_views_view(&$vars) {
+  $view = &$vars['view'];
+
+  // Add JS for browse mode switcher on Dictionary view
+  if ($view->name == 'dictionary_words') {
+    drupal_add_library('system', 'jquery.cookie');
+    drupal_add_js(drupal_get_path('module', 'ma_dictionary') . '/js/dictionary_browse_mode_switcher.js');
+  }
+
+}
+
+/**
+ * Implements hook_url_outbound_alter
+ */
+// For the title (first letter) facet, restrict to one letter (or digit, or non-letter) at a time.
+// Interestingly, this cannot be done in the facet config, by whatever combo of Operator and "Limit to one active item"
+
+function ma_dictionary_url_outbound_alter(&$path, &$options, $original_path) {
+  if (substr($path, 0, 11) == 'dictionary/') {
+    if (substr_count($path, 'title') > 1) { // this catches first letter links adding to an existing first-letter-filtered URL
+      $start_of_first_title = strpos ($path, '/title/');
+      $end_of_first_title = strpos ($path, '/', $start_of_first_title + 8);
+      $path = substr($path, 0, $start_of_first_title) . substr($path, $end_of_first_title); // strip out the first (ie. existing) title filter on the outbound link
+    }
+  }
+}
+
+/**
+ *
+ */
+function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
+    if($node->type == 'dictionary_word' && $view_mode == 'full') {
+        // Replace the link to the language taxonomy with a link to the dictionary browse page, with language pre-selected.
+        // Language is required and only one is allowed, so hardcoding is fine here.
+        $language_alias = drupal_get_path_alias('taxonomy/term/' . $node->field_dictionary_word_language['und'][0]['tid']);
+        $language = substr($language_alias, strripos($language_alias, '/') + 1);
+        $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
+    }
+
+    // Only render the first word entry per term in the search results
+    if($node->type == 'dictionary_word' && $view_mode == 'search_result') {
+        if(count($node->field_word_entry) > 0) {
+            $first = TRUE;
+            foreach($node->content['field_word_entry']['#items'] as $key => $item) {
+                if(!$first) {
+                    unset($node->content['field_word_entry'][$key]);
+                }
+                $first = FALSE;
+            }
+        }
+    }
+}
+
+function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
+    if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        // Wrap sample sentences in a div
+        if(isset($entity->content['field_sample_sentence'])) {
+            foreach($entity->content['field_sample_sentence']['#items'] as $key => $value) {
+                $entity->content['field_sample_sentence'][$key]['#markup'] = '<div class="sample-sentence">' . $entity->content['field_sample_sentence'][$key]['#markup'] . '</div>';
+            }
+        }
+
+        // Only render one recording in teaser
+        if($view_mode == 'dictionary_teaser') {
+            unset($entity->content['field_dictionary_word_recording'][1]);
+            if(count($entity->field_dictionary_word_recording) > 1) {
+                $first = TRUE;
+                foreach($entity->content['field_dictionary_word_recording']['#items'] as $key => $item) {
+                    if(!$first) {
+                        unset($entity->content['field_dictionary_word_recording'][$key]);
+                    }
+                    $first = FALSE;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_node_access
+ */
+function ma_dictionary_node_access($node, $op, $account) {
+    /*    $type = is_string($node) ? $node : $node->type;
+    if($type == 'dictionary_word') {
+        $user_language_communities = _ma_dictionary_get_user_language_communities($account);
+
+        if($op == 'update') {
+            dpm($node);
+        }
+    }
+    */
+    return NODE_ACCESS_IGNORE;
+}
+
+function ma_dictionary_node_prepare($node) {
+    if($node->type == 'dictionary_word') {
+        if(empty($node->field_word_entry)) {
+            // Start with an empty word entry form for any new dictionary word
+            // It's the only bundle type, we don't want the user to have to click a button needlessly
+            $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_word_entry', 'bundle' => 'dictionary_word_bundle'));
+            $paragraph->is_new = TRUE;
+            $paragraph->setHostEntity('node', $node);
+            $paragraph->field_source = array();
+            $paragraph->field_translation = array();
+            $paragraph->field_transliteration = array();
+            $paragraph->field_dictionary_word_recording = array();
+            $paragraph->field_definition = array();
+            $paragraph->field_part_of_speech = array();
+        }
+    }
+}
+
+/**
+ * Implements hook_node_update
+ */
+function ma_dictionary_node_presave($node) {
+    if($node->type == 'dictionary_word') {
+        // We always want the dictionary word's language community to be set to the language community that has the corresponding
+        // related language taxonomy term. Language community is a hidden field.
+        $lang_nid = _ma_dictionary_get_language_community_from_tid($node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid']);
+        if($lang_nid) {
+            $node->field_language_community['und'][0]['target_id'] = $lang_nid;
+        }
+    }
+}
+
+// Helper function to return an array of roles a user has per language community
+function _ma_dictionary_get_user_language_communities($account = NULL) {
+    $user_language_communities = array();
+
+    if(empty($account)) {
+        global $user;
+        $account = $user;
+    }
+    
+    $groups = og_get_groups_by_user($account, 'node');
+    foreach($groups as $group) {
+        $group_node = node_load($group);
+        if($group_node->type == 'language_community') {
+            $roles = og_get_user_roles('node', $group, $account->uid);
+            foreach($roles as $role) {
+                if($role == 'language contributor' || $role == 'language steward') {
+                    $user_language_communities[$group_node->field_language[LANGUAGE_NONE][0]['tid']][] = $role;
+                }
+            }
+        }
+    }
+
+    return $user_language_communities;
+}
+
+// Helper function to lookup language community nid from language taxonomy id
+function _ma_dictionary_get_language_community_from_tid($tid) {
+    if(is_numeric($tid) & $tid > 0) {
+        $query = new EntityFieldQuery();
+
+        $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', 'language_community')
+            ->fieldCondition('field_language', 'tid', $tid)
+            ->range(0,1);
+
+        $result = $query->execute();
+
+        if(isset($result['node'])) {
+            return array_keys($result['node'])[0];
+        }
+    }
+    return NULL;
+}
