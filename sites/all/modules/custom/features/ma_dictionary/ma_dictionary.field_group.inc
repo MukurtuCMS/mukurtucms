@@ -8,7 +8,7 @@
  * Implements hook_field_group_info().
  */
 function ma_dictionary_field_group_info() {
-  $export = array();
+  $field_groups = array();
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -39,7 +39,7 @@ function ma_dictionary_field_group_info() {
       ),
     ),
   );
-  $export['group_dictionary_word_basic|node|dictionary_word|form'] = $field_group;
+  $field_groups['group_dictionary_word_basic|node|dictionary_word|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -69,7 +69,7 @@ function ma_dictionary_field_group_info() {
       ),
     ),
   );
-  $export['group_dictionary_word_relations|node|dictionary_word|form'] = $field_group;
+  $field_groups['group_dictionary_word_relations|node|dictionary_word|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -99,7 +99,7 @@ function ma_dictionary_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_list_view_fields|node|dictionary_word|search_result'] = $field_group;
+  $field_groups['group_list_view_fields|node|dictionary_word|search_result'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -126,7 +126,7 @@ function ma_dictionary_field_group_info() {
       ),
     ),
   );
-  $export['group_tabs|node|dictionary_word|form'] = $field_group;
+  $field_groups['group_tabs|node|dictionary_word|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -160,7 +160,7 @@ function ma_dictionary_field_group_info() {
       'formatter' => 'open',
     ),
   );
-  $export['group_word_bundle|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
+  $field_groups['group_word_bundle|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -187,7 +187,16 @@ function ma_dictionary_field_group_info() {
       ),
     ),
   );
-  $export['group_word_group|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
+  $field_groups['group_word_group|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
 
-  return $export;
+  // Translatables
+  // Included for use with string extractors like potx.
+  t('Basic');
+  t('List View Fields');
+  t('New Word Entry');
+  t('Relations');
+  t('Tabs');
+  t('Word Group');
+
+  return $field_groups;
 }

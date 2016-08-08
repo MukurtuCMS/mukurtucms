@@ -312,21 +312,13 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_related_dictionary_words'
+  // Exported field_base: 'field_related_dictionary_words'.
   $field_bases['field_related_dictionary_words'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_related_dictionary_words',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -358,7 +350,7 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_summary'
+  // Exported field_base: 'field_summary'.
   $field_bases['field_summary'] = array(
     'active' => 1,
     'cardinality' => 1,

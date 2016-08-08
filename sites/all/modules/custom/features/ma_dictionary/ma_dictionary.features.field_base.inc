@@ -10,21 +10,13 @@
 function ma_dictionary_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_additional_media'
+  // Exported field_base: 'field_additional_media'.
   $field_bases['field_additional_media'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_additional_media',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -37,21 +29,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_definition'
+  // Exported field_base: 'field_definition'.
   $field_bases['field_definition'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_definition',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -64,21 +48,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'text_long',
   );
 
-  // Exported field_base: 'field_dictionary_word_language'
+  // Exported field_base: 'field_dictionary_word_language'.
   $field_bases['field_dictionary_word_language'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_dictionary_word_language',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -98,14 +74,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_dictionary_word_recording'
+  // Exported field_base: 'field_dictionary_word_recording'.
   $field_bases['field_dictionary_word_recording'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_dictionary_word_recording',
-    'foreign keys' => array(),
     'indexes' => array(
       'sid' => array(
         0 => 'sid',
@@ -118,21 +93,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'atom_reference',
   );
 
-  // Exported field_base: 'field_dictionary_word_related_dh'
+  // Exported field_base: 'field_dictionary_word_related_dh'.
   $field_bases['field_dictionary_word_related_dh'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_dictionary_word_related_dh',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -161,21 +128,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_dictionary_word_synonyms'
+  // Exported field_base: 'field_dictionary_word_synonyms'.
   $field_bases['field_dictionary_word_synonyms'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_dictionary_word_synonyms',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -205,21 +164,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_language_community'
+  // Exported field_base: 'field_language_community'.
   $field_bases['field_language_community'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_language_community',
-    'foreign keys' => array(
-      'node' => array(
-        'columns' => array(
-          'target_id' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'target_id' => array(
         0 => 'target_id',
@@ -253,21 +204,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
-  // Exported field_base: 'field_part_of_speech'
+  // Exported field_base: 'field_part_of_speech'.
   $field_bases['field_part_of_speech'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_part_of_speech',
-    'foreign keys' => array(
-      'tid' => array(
-        'columns' => array(
-          'tid' => 'tid',
-        ),
-        'table' => 'taxonomy_term_data',
-      ),
-    ),
     'indexes' => array(
       'tid' => array(
         0 => 'tid',
@@ -287,21 +230,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
-  // Exported field_base: 'field_sample_sentence'
+  // Exported field_base: 'field_sample_sentence'.
   $field_bases['field_sample_sentence'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_sample_sentence',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -316,21 +251,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_translation'
+  // Exported field_base: 'field_translation'.
   $field_bases['field_translation'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_translation',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -345,21 +272,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_transliteration'
+  // Exported field_base: 'field_transliteration'.
   $field_bases['field_transliteration'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_transliteration',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -374,14 +293,13 @@ function ma_dictionary_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_word_entry'
+  // Exported field_base: 'field_word_entry'.
   $field_bases['field_word_entry'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_word_entry',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'paragraphs',

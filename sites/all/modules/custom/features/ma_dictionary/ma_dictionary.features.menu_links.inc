@@ -10,7 +10,7 @@
 function ma_dictionary_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_-dictionary-word:node/add/dictionary-word
+  // Exported menu link: main-menu_-dictionary-word:node/add/dictionary-word.
   $menu_links['main-menu_-dictionary-word:node/add/dictionary-word'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'node/add/dictionary-word',
@@ -30,10 +30,10 @@ function ma_dictionary_menu_default_menu_links() {
     'weight' => -45,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('+ Dictionary Word');
-
 
   return $menu_links;
 }

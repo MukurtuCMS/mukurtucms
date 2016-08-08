@@ -10,7 +10,7 @@
 function ma_dictionary_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-dictionary_word-field_additional_media'
+  // Exported field_instance: 'node-dictionary_word-field_additional_media'.
   $field_instances['node-dictionary_word-field_additional_media'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -61,7 +61,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_community_ref'
+  // Exported field_instance: 'node-dictionary_word-field_community_ref'.
   $field_instances['node-dictionary_word-field_community_ref'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -123,7 +123,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_language'
+  // Exported field_instance:
+  // 'node-dictionary_word-field_dictionary_word_language'.
   $field_instances['node-dictionary_word-field_dictionary_word_language'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => array(),
@@ -169,7 +170,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_related_dh'
+  // Exported field_instance:
+  // 'node-dictionary_word-field_dictionary_word_related_dh'.
   $field_instances['node-dictionary_word-field_dictionary_word_related_dh'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -220,7 +222,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_dictionary_word_synonyms'
+  // Exported field_instance:
+  // 'node-dictionary_word-field_dictionary_word_synonyms'.
   $field_instances['node-dictionary_word-field_dictionary_word_synonyms'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -286,7 +289,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_item_privacy_setting'
+  // Exported field_instance: 'node-dictionary_word-field_item_privacy_setting'.
   $field_instances['node-dictionary_word-field_item_privacy_setting'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => array(
@@ -333,7 +336,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_language_community'
+  // Exported field_instance: 'node-dictionary_word-field_language_community'.
   $field_instances['node-dictionary_word-field_language_community'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -395,7 +398,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_tags'
+  // Exported field_instance: 'node-dictionary_word-field_tags'.
   $field_instances['node-dictionary_word-field_tags'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -454,10 +457,10 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-field_word_entry'
+  // Exported field_instance: 'node-dictionary_word-field_word_entry'.
   $field_instances['node-dictionary_word-field_word_entry'] = array(
     'bundle' => 'dictionary_word',
-    'default_value' => array(),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -514,7 +517,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-dictionary_word-og_group_ref'
+  // Exported field_instance: 'node-dictionary_word-og_group_ref'.
   $field_instances['node-dictionary_word-og_group_ref'] = array(
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
@@ -592,7 +595,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-language_community-field_language'
+  // Exported field_instance: 'node-language_community-field_language'.
   $field_instances['node-language_community-field_language'] = array(
     'bundle' => 'language_community',
     'default_value' => array(),
@@ -634,7 +637,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-language_community-group_group'
+  // Exported field_instance: 'node-language_community-group_group'.
   $field_instances['node-language_community-group_group'] = array(
     'bundle' => 'language_community',
     'default_value' => array(
@@ -692,7 +695,7 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-language_community-og_group_ref'
+  // Exported field_instance: 'node-language_community-og_group_ref'.
   $field_instances['node-language_community-og_group_ref'] = array(
     'bundle' => 'language_community',
     'default_value' => NULL,
@@ -751,7 +754,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_definition'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_definition'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_definition'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
@@ -802,7 +806,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_dictionary_word_recording'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_dictionary_word_recording'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_dictionary_word_recording'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
@@ -859,7 +864,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_part_of_speech'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_part_of_speech'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_part_of_speech'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
@@ -906,7 +912,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_sample_sentence'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_sample_sentence'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_sample_sentence'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
@@ -957,7 +964,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_source'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_source'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_source'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
@@ -1008,7 +1016,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_translation'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_translation'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_translation'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
@@ -1060,7 +1069,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'paragraphs_item-dictionary_word_bundle-field_transliteration'
+  // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_transliteration'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_transliteration'] = array(
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,

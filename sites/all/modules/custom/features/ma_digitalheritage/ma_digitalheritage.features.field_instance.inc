@@ -2512,7 +2512,8 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_related_dictionary_words'
+  // Exported field_instance:
+  // 'node-digital_heritage-field_related_dictionary_words'.
   $field_instances['node-digital_heritage-field_related_dictionary_words'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
@@ -2594,7 +2595,7 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-digital_heritage-field_rights'
+  // Exported field_instance: 'node-digital_heritage-field_rights'.
   $field_instances['node-digital_heritage-field_rights'] = array(
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
