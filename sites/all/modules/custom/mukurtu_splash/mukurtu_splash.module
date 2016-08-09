@@ -203,6 +203,9 @@ function mukurtu_splash_block_info() {
   $blocks['manage_community'] = array(
     'info' => t('Mukurtu Dashboard: Manage Communities'),
   );
+  $blocks['manage_dictionary'] = array(
+    'info' => t('Mukurtu Dashboard: Manage Dictionary'),
+  );
   $blocks['support'] = array(
     'info' => t('Mukurtu Dashboard: Support'),
   );
@@ -226,6 +229,7 @@ function mukurtu_splash_block_info() {
  */
 function mukurtu_splash_block_view($delta = '') {
   $block = array();
+
   switch ($delta) {
     case 'site_welcome':
       $block['subject'] = t('You have successfully installed Mukurtu.');
@@ -262,6 +266,10 @@ function mukurtu_splash_block_view($delta = '') {
     case 'manage_community':
       $block['subject'] = t('Communities and Protocols');
       $block['content'] = mukurtu_splash_block_manage_community();
+      break;
+  case 'manage_dictionary':
+      $block['subject'] = t('Dictionary');
+      $block['content'] = mukurtu_splash_block_manage_dictionary();
       break;
     case 'support':
       $block['subject'] = t('Support');
@@ -469,23 +477,6 @@ function mukurtu_splash_block_manage_content() {
 
   $markup = '';
 
-  if (user_access('administer site configuration')) {
-    if (module_exists('ma_dictionary')) {
-      $title = 'Disable Dictionary';
-      $description = 'The dictionary can be re-enabled later without losing any content.';
-    }
-    else {
-      $title = "Enable Dictionary";
-      $description = 'Any previously added content will be restored.';
-    }
-    $items[] = array(
-      'title' => $title,
-      'href' => 'admin/toggle-dictionary',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t($description),
-    );
-  }
-
   if (node_access('create','digital_heritage')) {
     $items[] = array(
       'title' => 'Add a Digital Heritage item',
@@ -541,24 +532,6 @@ function mukurtu_splash_block_manage_content() {
     );
   }
 
-  if (user_access('administer taxonomy')) {
-    $items[] = array(
-      'title' => 'Manage Languages',
-      'href' => 'admin/structure/taxonomy/language',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Manage the languages that are selectable in dictionary words and digital heritage items.'),
-    );
-  }
-
-  if (user_access('administer taxonomy')) {
-    $items[] = array(
-      'title' => 'Set Default Language',
-      'href' => 'dashboard/set-default-language',
-      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-      'description' => t('Set the default language used when creating dictionary words.'),
-    );
-  }
-
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
 
@@ -568,6 +541,61 @@ function mukurtu_splash_block_manage_content() {
   return $block;
 }
 
+/**
+ * Helper function to assemble the dictionary management block.
+ */
+function mukurtu_splash_block_manage_dictionary() {
+    $items = array();
+    $markup = '';
+
+    $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
+    $drupal_admin =  user_role_load_by_name('administrator');
+
+    if (user_access('administer site configuration')) {
+        if (module_exists('ma_dictionary')) {
+            $title = 'Disable Dictionary';
+            $description = 'The dictionary can be re-enabled later without losing any content.';
+        }
+        else {
+            $title = "Enable Dictionary";
+            $description = 'Any previously added content will be restored.';
+        }
+        $items[] = array(
+            'title' => $title,
+            'href' => 'admin/toggle-dictionary',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t($description),
+        );
+    }
+
+    if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+        $items[] = array(
+            'title' => 'Manage Language Communities',
+            'href' => 'dashboard/manage-dictionaries',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Manage the language communities that control access to the dictionaries.'),
+        );
+    }
+
+    if (user_access('administer taxonomy')) {
+        $items[] = array(
+            'title' => 'Set Default Language',
+            'href' => 'dashboard/set-default-language',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Set the default language used when creating dictionary words.'),
+        );
+    }
+
+
+
+    $content = array ('content' => $items);
+    $markup = theme('admin_block_content', $content);
+
+    $block = array(
+        '#markup' => $markup,
+    );
+    return $block;
+}
 
 /**
  * Helper function to assemble the initial site configuration block.
