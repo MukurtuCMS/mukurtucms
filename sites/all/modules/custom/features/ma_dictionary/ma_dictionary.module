@@ -129,6 +129,14 @@ function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_st
         }
     }
 
+    // If this is a pre-existing language community, don't remove its own language tid from the list
+    if(!empty($form['#node']->field_community_language)) {
+        $existing_key = array_search($form['#node']->field_community_language[LANGUAGE_NONE][0]['tid'], $existing_language_tids);
+        if($existing_key >= 0) {
+            unset($existing_language_tids[$existing_key]);
+        }
+    }
+
     // Remove those tids from the form options
     foreach($existing_language_tids as $language_tid) {
         if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
