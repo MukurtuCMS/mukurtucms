@@ -22,7 +22,10 @@ function ma_dictionary_user_default_permissions() {
   // Exported permission: 'administer part_of_speech vocabulary terms'.
   $permissions['administer part_of_speech vocabulary terms'] = array(
     'name' => 'administer part_of_speech vocabulary terms',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'vppr',
   );
 
@@ -116,7 +119,10 @@ function ma_dictionary_user_default_permissions() {
   // Exported permission: 'delete terms in part_of_speech'.
   $permissions['delete terms in part_of_speech'] = array(
     'name' => 'delete terms in part_of_speech',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'taxonomy',
   );
 
@@ -163,14 +169,20 @@ function ma_dictionary_user_default_permissions() {
   // Exported permission: 'edit terms in part_of_speech'.
   $permissions['edit terms in part_of_speech'] = array(
     'name' => 'edit terms in part_of_speech',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'taxonomy',
   );
 
   // Exported permission: 'merge part_of_speech terms'.
   $permissions['merge part_of_speech terms'] = array(
     'name' => 'merge part_of_speech terms',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'term_merge',
   );
 
