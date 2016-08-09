@@ -94,6 +94,7 @@ features[field_group][] = group_scald_atom_metadata|scald_atom|file|ma_colorbox
 features[field_group][] = group_scald_atom_metadata|scald_atom|image|ma_colorbox
 features[field_group][] = group_scald_atom_metadata|scald_atom|video|ma_colorbox
 features[field_instance][] = og_membership-og_membership_type_default-og_membership_invitation
+features[field_instance][] = scald_atom-audio-field_contributor
 features[field_instance][] = scald_atom-audio-field_scald_protocol
 features[field_instance][] = scald_atom-audio-og_group_ref
 features[field_instance][] = scald_atom-audio-scald_authors
