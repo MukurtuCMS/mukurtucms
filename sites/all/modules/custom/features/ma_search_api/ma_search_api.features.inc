@@ -196,6 +196,7 @@ function ma_search_api_default_search_api_index() {
         "field_transcription" : { "type" : "text" },
         "field_word_entry:field_definition" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_part_of_speech" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_word_entry:field_sample_sentence" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E", "boost" : "0.8" },
         "field_word_entry:field_source" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_translation" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_transliteration" : { "type" : "list\\u003Ctext\\u003E" },
@@ -645,6 +646,11 @@ function ma_search_api_default_search_api_server() {
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
+          },
+          "field_word_entry:field_sample_sentence" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "0.8"
           }
         }
       }
