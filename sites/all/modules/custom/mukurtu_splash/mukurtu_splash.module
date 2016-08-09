@@ -568,12 +568,13 @@ function mukurtu_splash_block_manage_dictionary() {
         );
     }
 
-    if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+    $vocabulary = taxonomy_vocabulary_machine_name_load('language');
+    if (user_access('edit terms in '. $vocabulary->vid)) {
         $items[] = array(
-            'title' => 'Manage Language Communities',
-            'href' => 'dashboard/manage-dictionaries',
+            'title' => 'Manage Languages',
+            'href' => 'admin/structure/taxonomy/language',
             'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-            'description' => t('Manage the language communities that control access to the dictionaries.'),
+            'description' => t('Manage the terms in the Language taxonomy. A language must exist in this taxonomy before a dictionary or language community can be added.'),
         );
     }
 
@@ -583,6 +584,15 @@ function mukurtu_splash_block_manage_dictionary() {
             'href' => 'dashboard/set-default-language',
             'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
             'description' => t('Set the default language used when creating dictionary words.'),
+        );
+    }
+
+    if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+        $items[] = array(
+            'title' => 'Manage Language Communities',
+            'href' => 'dashboard/manage-dictionaries',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Manage the language communities that control access to the dictionaries.'),
         );
     }
 
