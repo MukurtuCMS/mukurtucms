@@ -213,3 +213,5 @@ features[variable][] = pathauto_node_language_community_pattern
 features[views_view][] = dh_nodes_available_to_dictionary_word
 features[views_view][] = dictionary_word_related_dh_items_teasers
 features[views_view][] = dictionary_words
+features[views_view][] = language_communities
+features[views_view][] = manage_dictionaries
