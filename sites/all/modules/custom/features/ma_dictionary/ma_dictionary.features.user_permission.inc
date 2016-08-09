@@ -19,6 +19,13 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'paragraphs',
   );
 
+  // Exported permission: 'administer part_of_speech vocabulary terms'.
+  $permissions['administer part_of_speech vocabulary terms'] = array(
+    'name' => 'administer part_of_speech vocabulary terms',
+    'roles' => array(),
+    'module' => 'vppr',
+  );
+
   // Exported permission: 'bypass paragraphs bundle content access'.
   $permissions['bypass paragraphs bundle content access'] = array(
     'name' => 'bypass paragraphs bundle content access',
@@ -106,6 +113,13 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'paragraphs_bundle_permissions',
   );
 
+  // Exported permission: 'delete terms in part_of_speech'.
+  $permissions['delete terms in part_of_speech'] = array(
+    'name' => 'delete terms in part_of_speech',
+    'roles' => array(),
+    'module' => 'taxonomy',
+  );
+
   // Exported permission: 'edit any dictionary_word content'.
   $permissions['edit any dictionary_word content'] = array(
     'name' => 'edit any dictionary_word content',
@@ -144,6 +158,20 @@ function ma_dictionary_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
+  );
+
+  // Exported permission: 'edit terms in part_of_speech'.
+  $permissions['edit terms in part_of_speech'] = array(
+    'name' => 'edit terms in part_of_speech',
+    'roles' => array(),
+    'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'merge part_of_speech terms'.
+  $permissions['merge part_of_speech terms'] = array(
+    'name' => 'merge part_of_speech terms',
+    'roles' => array(),
+    'module' => 'term_merge',
   );
 
   // Exported permission: 'update paragraph content dictionary_word_bundle'.

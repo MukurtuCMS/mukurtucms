@@ -217,12 +217,12 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-5';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-No3AfhFEwxTt1RF0r0eaYbSweZ4rxXYn';
+    $pane->subtype = 'facetapi-IPaCM7H1dF7Clj1WBtiZQw516MCvTYka';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Related Words',
+      'override_title_text' => 'Keywords',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -239,12 +239,12 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-6';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-jys1QaqWIE5dgw5rfAlsY67rstk8JRZU';
+    $pane->subtype = 'facetapi-K69pQqakWYP7PdiK9WmOOmTW3V5z0fxx';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Related Digital Heritage Items',
+      'override_title_text' => 'Part of Speech',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
