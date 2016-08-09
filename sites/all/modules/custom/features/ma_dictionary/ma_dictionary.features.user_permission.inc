@@ -63,6 +63,7 @@ function ma_dictionary_user_default_permissions() {
     'name' => 'create paragraph content dictionary_word_bundle',
     'roles' => array(
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'paragraphs_bundle_permissions',
   );
@@ -112,6 +113,7 @@ function ma_dictionary_user_default_permissions() {
     'name' => 'delete paragraph content dictionary_word_bundle',
     'roles' => array(
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'paragraphs_bundle_permissions',
   );
@@ -191,6 +193,7 @@ function ma_dictionary_user_default_permissions() {
     'name' => 'update paragraph content dictionary_word_bundle',
     'roles' => array(
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'paragraphs_bundle_permissions',
   );
