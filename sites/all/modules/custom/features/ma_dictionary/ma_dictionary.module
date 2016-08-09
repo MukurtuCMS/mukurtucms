@@ -122,17 +122,17 @@ function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_st
     if(isset($result['node'])) {
         foreach($result['node'] as $result_node) {
             $existing_language_community = node_load($result_node->nid);
-            if($existing_language_community && !empty($existing_language_community->field_language[LANGUAGE_NONE])) {
+            if($existing_language_community && !empty($existing_language_community->field_community_language[LANGUAGE_NONE])) {
                 // Language communities only have one language association
-                $existing_language_tids[] = $existing_language_community->field_language[LANGUAGE_NONE][0]['tid'];
+                $existing_language_tids[] = $existing_language_community->field_community_language[LANGUAGE_NONE][0]['tid'];
             }
         }
     }
 
     // Remove those tids from the form options
     foreach($existing_language_tids as $language_tid) {
-        if(isset($form['field_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
-            unset($form['field_language'][LANGUAGE_NONE]['#options'][$language_tid]);
+        if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
+            unset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid]);
         }
     }
 
@@ -142,8 +142,8 @@ function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_st
     if(is_numeric($passed_tid) && $passed_tid > 0) {
         $passed_term = taxonomy_term_load($passed_tid);
         if(!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
-            if(isset($form['field_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
-                $form['field_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
+            if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
+                $form['field_community_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
                 $form['title']['#default_value'] = $passed_term->name . ' '. t('Language Community');
             }
         }
@@ -353,7 +353,7 @@ function _ma_dictionary_get_user_language_communities($account = NULL) {
             $roles = og_get_user_roles('node', $group, $account->uid);
             foreach($roles as $role) {
                 if($role == 'language contributor' || $role == 'language steward') {
-                    $user_language_communities[$group_node->field_language[LANGUAGE_NONE][0]['tid']][] = $role;
+                    $user_language_communities[$group_node->field_community_language[LANGUAGE_NONE][0]['tid']][] = $role;
                 }
             }
         }
@@ -369,7 +369,7 @@ function _ma_dictionary_get_language_community_from_tid($tid) {
 
         $query->entityCondition('entity_type', 'node')
             ->entityCondition('bundle', 'language_community')
-            ->fieldCondition('field_language', 'tid', $tid)
+            ->fieldCondition('field_community_language', 'tid', $tid)
             ->range(0,1);
 
         $result = $query->execute();

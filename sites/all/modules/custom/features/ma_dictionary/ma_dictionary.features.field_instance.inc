@@ -595,10 +595,11 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-language_community-field_language'.
-  $field_instances['node-language_community-field_language'] = array(
+  // Exported field_instance:
+  // 'node-language_community-field_community_language'.
+  $field_instances['node-language_community-field_community_language'] = array(
     'bundle' => 'language_community',
-    'default_value' => array(),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -607,7 +608,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 2,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -618,8 +619,8 @@ function ma_dictionary_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_language',
-    'label' => 'Language',
+    'field_name' => 'field_community_language',
+    'label' => 'Community Language',
     'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -631,7 +632,7 @@ function ma_dictionary_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 0,
+      'weight' => 1,
     ),
   );
 
@@ -689,7 +690,7 @@ function ma_dictionary_field_default_field_instances() {
         'og_hide' => TRUE,
       ),
       'type' => 'options_onoff',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -748,7 +749,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -1123,6 +1124,7 @@ function ma_dictionary_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('Additional Media');
   t('Community');
+  t('Community Language');
   t('Definition');
   t('Determine if this is an OG group.');
   t('Group');

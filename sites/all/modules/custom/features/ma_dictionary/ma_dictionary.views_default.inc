@@ -138,7 +138,7 @@ function ma_dictionary_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Assets */
+  /* Field: Content: Media Asset */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -421,11 +421,11 @@ function ma_dictionary_views_default_views() {
   $handler->display->display_options['relationships']['tid_representative']['id'] = 'tid_representative';
   $handler->display->display_options['relationships']['tid_representative']['table'] = 'taxonomy_term_data';
   $handler->display->display_options['relationships']['tid_representative']['field'] = 'tid_representative';
-  $handler->display->display_options['relationships']['tid_representative']['subquery_sort'] = 'field_data_field_language.field_language_tid';
+  $handler->display->display_options['relationships']['tid_representative']['subquery_sort'] = 'field_data_field_community_language.field_community_language_tid';
   $handler->display->display_options['relationships']['tid_representative']['subquery_order'] = 'ASC';
   $handler->display->display_options['relationships']['tid_representative']['subquery_regenerate'] = TRUE;
   $handler->display->display_options['relationships']['tid_representative']['subquery_view'] = 'language_communities';
-  $handler->display->display_options['relationships']['tid_representative']['subquery_namespace'] = 'VERYSPECIAL';
+  $handler->display->display_options['relationships']['tid_representative']['subquery_namespace'] = '';
   /* Field: Taxonomy term: Term ID */
   $handler->display->display_options['fields']['tid']['id'] = 'tid';
   $handler->display->display_options['fields']['tid']['table'] = 'taxonomy_term_data';

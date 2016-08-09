@@ -195,13 +195,13 @@ function ma_dictionary_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '1',
+          'weight' => '2',
         ),
         'path' => array(
-          'weight' => '4',
+          'weight' => '5',
         ),
         'redirect' => array(
-          'weight' => '3',
+          'weight' => '4',
         ),
       ),
       'display' => array(),
