@@ -105,12 +105,59 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
   $form['field_word_entry'][LANGUAGE_NONE]['add_more']['add_more']['#value'] = t('Add new word entry');
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_state) {
+    // Remove any languages that already have language communities
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', 'language_community')
+        ->addMetaData('account', user_load(1)); // Run the query as user 1.
+
+    $result = $query->execute();
+
+    // Building list of language tids for existing communities
+    $existing_language_tids = array();
+    if(isset($result['node'])) {
+        foreach($result['node'] as $result_node) {
+            $existing_language_community = node_load($result_node->nid);
+            if($existing_language_community && !empty($existing_language_community->field_language[LANGUAGE_NONE])) {
+                // Language communities only have one language association
+                $existing_language_tids[] = $existing_language_community->field_language[LANGUAGE_NONE][0]['tid'];
+            }
+        }
+    }
+
+    // Remove those tids from the form options
+    foreach($existing_language_tids as $language_tid) {
+        if(isset($form['field_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
+            unset($form['field_language'][LANGUAGE_NONE]['#options'][$language_tid]);
+        }
+    }
+
+    // If a tid is passed as an argument, try and pre-populate fields
+    $args = arg();
+    $passed_tid = $args[count($args) - 1];
+    if(is_numeric($passed_tid) && $passed_tid > 0) {
+        $passed_term = taxonomy_term_load($passed_tid);
+        if(!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
+            if(isset($form['field_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
+                $form['field_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
+                $form['title']['#default_value'] = $passed_term->name . ' '. t('Language Community');
+            }
+        }
+    }
+
+    // Hide the group element
+    $form['og_group_ref']['#access'] = FALSE;
+}
 
 /**
  * Implements hook_field_widget_form_alter.
  */
 function ma_dictionary_field_widget_form_alter(&$element, &$form_state, $context) {
-    if($element['#field_name'] == 'field_word_entry') {
+    if(isset($element['#field_name']) && $element['#field_name'] == 'field_word_entry') {
         $n_entries = 0;
         if(is_numeric($element['#max_delta']) && $element['#max_delta'] > -1) {
             $n_entries = $element['#max_delta'];
