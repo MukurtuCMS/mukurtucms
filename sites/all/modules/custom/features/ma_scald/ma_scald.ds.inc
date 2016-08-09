@@ -271,19 +271,19 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'audio';
   $ds_layout->view_mode = 'mukurtu_scald_recording';
-  $ds_layout->layout = 'ds_2col';
+  $ds_layout->layout = 'ds_3col_equal_width';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
         0 => 'atom',
       ),
-      'right' => array(
-        1 => 'scald_authors',
+      'middle' => array(
+        1 => 'field_contributor',
       ),
     ),
     'fields' => array(
       'atom' => 'left',
-      'scald_authors' => 'right',
+      'field_contributor' => 'middle',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -292,6 +292,7 @@ function ma_scald_ds_layout_settings_info() {
     ),
     'wrappers' => array(
       'left' => 'div',
+      'middle' => 'div',
       'right' => 'div',
     ),
     'layout_wrapper' => 'div',
