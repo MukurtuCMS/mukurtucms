@@ -586,7 +586,15 @@ function mukurtu_splash_block_manage_dictionary() {
         );
     }
 
-
+    $vocabulary = taxonomy_vocabulary_machine_name_load('part_of_speech');
+    if (user_access('edit terms in '. $vocabulary->vid)) {
+        $items[] = array(
+            'title' => 'Manage Part of Speech',
+            'href' => 'admin/structure/taxonomy/part_of_speech',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Manage the terms in the Part of Speech taxonomy.'),
+        );
+    }
 
     $content = array ('content' => $items);
     $markup = theme('admin_block_content', $content);
