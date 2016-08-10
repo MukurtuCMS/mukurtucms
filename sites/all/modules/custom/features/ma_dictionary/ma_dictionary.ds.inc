@@ -46,6 +46,11 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_word_list' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|dictionary_word|default'] = $ds_fieldsetting;
 
@@ -140,6 +145,7 @@ function ma_dictionary_ds_layout_settings_info() {
         4 => 'field_community_ref',
         5 => 'og_group_ref',
         6 => 'field_tags',
+        9 => 'field_word_list',
       ),
       'footer' => array(
         7 => 'field_additional_media',
@@ -155,6 +161,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_tags' => 'right',
       'field_additional_media' => 'footer',
       'field_word_entry' => 'left',
+      'field_word_list' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
