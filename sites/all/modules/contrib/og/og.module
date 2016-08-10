@@ -549,7 +549,7 @@ function og_node_access($node, $op, $account) {
     // Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
     // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
     if ($op == 'update' && $node->type=='digital_heritage') {
-      return mukurtu_protocol_field_update_dh_access($node);
+        return mukurtu_protocol_field_update_dh_dw_access($node);
     }
     // end patch
 
