@@ -606,7 +606,7 @@ function mukurtu_splash_block_manage_dictionary() {
         );
     }
 
-    if(user_access('Word List: Create new content')) {
+    if(user_access('create word_list content')) {
         $items[] = array(
             'title' => 'Create a Word List',
             'href' => 'node/add/word-list',
