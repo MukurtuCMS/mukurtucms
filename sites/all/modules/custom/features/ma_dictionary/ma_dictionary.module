@@ -332,7 +332,7 @@ function ma_dictionary_node_prepare($node) {
 }
 
 /**
- * Implements hook_node_update
+ * Implements hook_node_presave.
  */
 function ma_dictionary_node_presave($node) {
     if($node->type == 'dictionary_word') {
@@ -343,6 +343,115 @@ function ma_dictionary_node_presave($node) {
             $node->field_language_community['und'][0]['target_id'] = $lang_nid;
         }
     }
+}
+
+/**
+ * Implements hook_node_update.
+ */
+function ma_dictionary_node_update($node) {
+    if($node->type == 'dictionary_word') {
+        // If the word had any changes in word lists, sync those up here
+        $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        $old_word_lists = _ma_dictionary_flatten_reference_field($node->original->field_word_list);
+        $no_change = array_intersect($current_word_lists, $old_word_lists);
+
+        $added = array_diff($current_word_lists, $no_change);
+        $removed = array_diff($old_word_lists, $no_change);
+
+        // These are the word lists the word is being added to. Load each word list and create the opposite relationship
+        foreach($added as $added_word_list_nid) {
+            entity_get_controller('node')->resetCache(array($added_word_list_nid));
+            $word_list = node_load($added_word_list_nid);
+            $already_exists = FALSE;
+            if($word_list) {
+                // Check all existing words, don't add the node reference if it already exists
+                foreach($word_list->field_words[LANGUAGE_NONE] as $word_list_word) {
+                    if($word_list_word['target_id'] == $node->nid) {
+                        $already_exists = TRUE;
+                    }
+                }
+
+                // Add the reference
+                if(!$already_exists) {
+                    $word_list->field_words[LANGUAGE_NONE][] = array('target_id' => $node->nid);
+                    node_save($word_list);
+                }
+            }
+        }
+
+        // These are the word lists the word is being removed from. Load each and remove the reference
+        foreach($removed as $removed_word_list_nid) {
+            entity_get_controller('node')->resetCache(array($removed_word_list_nid));
+            $word_list = node_load($removed_word_list_nid);
+
+            if($word_list) {
+                foreach($word_list->field_words[LANGUAGE_NONE] as $key => $word_list_word) {
+                    if($word_list_word['target_id'] == $node->nid) {
+                        unset($word_list->field_words[LANGUAGE_NONE][$key]);
+                        node_save($word_list);
+                    }
+                }
+            }
+        }
+    }
+
+    if($node->type == 'word_list') {
+        $current_words = _ma_dictionary_flatten_reference_field($node->field_words);
+        $old_words = _ma_dictionary_flatten_reference_field($node->original->field_words);
+        $no_change = array_intersect($current_words, $old_words);
+
+        $added = array_diff($current_words, $no_change);
+        $removed = array_diff($old_words, $no_change);
+
+        // Add words to the word list
+        foreach($added as $added_word_nid) {
+            entity_get_controller('node')->resetCache(array($added_word_nid));
+            $word = node_load($added_word_nid);
+            $already_exists = FALSE;
+            if($word) {
+                // Check all existing word lists, don't add the node reference if it already exists
+                if(!empty($word->field_word_list)) {
+                    foreach($word->field_word_list[LANGUAGE_NONE] as $word_list) {
+                        if($word_list['target_id'] == $node->nid) {
+                            $already_exists = TRUE;
+                        }
+                    }
+                }
+
+                // Add the reference
+                if(!$already_exists) {
+                    $word->field_word_list[LANGUAGE_NONE][] = array('target_id' => $node->nid);
+                    node_save($word);
+                }
+            }
+        }
+
+        // Remove words
+        foreach($removed as $removed_word_nid) {
+            entity_get_controller('node')->resetCache(array($removed_word_nid));
+            $word = node_load($removed_word_nid);
+            if($word) {
+                foreach($word->field_word_list[LANGUAGE_NONE] as $key => $word_list) {
+                    if($word_list['target_id'] == $node->nid) {
+                        unset($word->field_word_list[LANGUAGE_NONE][$key]);
+                        node_save($word);
+                    }
+                }
+            }
+        }
+    }
+}
+
+function _ma_dictionary_flatten_reference_field($field, $lang = LANGUAGE_NONE) {
+    $result = array();
+
+    if(isset($field[$lang])) {
+        foreach($field[$lang] as $element) {
+            $result[] = $element['target_id'];
+        }
+    }
+
+    return $result;
 }
 
 // Helper function to return an array of roles a user has per language community

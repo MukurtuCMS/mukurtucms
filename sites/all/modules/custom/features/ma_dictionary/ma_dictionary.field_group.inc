@@ -13,6 +13,37 @@ function ma_dictionary_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_basic|node|word_list|form';
+  $field_group->group_name = 'group_basic';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'word_list';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Basic',
+    'weight' => '6',
+    'children' => array(
+      0 => 'field_collection_summary',
+      1 => 'field_description',
+      2 => 'field_collection_image',
+      3 => 'field_collection_credit',
+      4 => 'title',
+    ),
+    'format_type' => 'htab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-basic field-group-htab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_basic|node|word_list|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_dictionary_word_basic|node|dictionary_word|form';
   $field_group->group_name = 'group_dictionary_word_basic';
   $field_group->entity_type = 'node';
@@ -58,6 +89,7 @@ function ma_dictionary_field_group_info() {
       1 => 'field_dictionary_word_synonyms',
       2 => 'field_item_privacy_setting',
       3 => 'og_group_ref',
+      4 => 'field_word_list',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -131,6 +163,33 @@ function ma_dictionary_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_tabs|node|word_list|form';
+  $field_group->group_name = 'group_tabs';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'word_list';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Tabs',
+    'weight' => '0',
+    'children' => array(
+      0 => 'group_basic',
+      1 => 'group_words',
+    ),
+    'format_type' => 'htabs',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'classes' => 'group-tabs field-group-htabs',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_tabs|node|word_list|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_word_bundle|paragraphs_item|dictionary_word_bundle|form';
   $field_group->group_name = 'group_word_bundle';
   $field_group->entity_type = 'paragraphs_item';
@@ -189,6 +248,33 @@ function ma_dictionary_field_group_info() {
   );
   $field_groups['group_word_group|paragraphs_item|dictionary_word_bundle|form'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_words|node|word_list|form';
+  $field_group->group_name = 'group_words';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'word_list';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Words',
+    'weight' => '7',
+    'children' => array(
+      0 => 'field_words',
+    ),
+    'format_type' => 'htab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-words field-group-htab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_words|node|word_list|form'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Basic');
@@ -197,6 +283,7 @@ function ma_dictionary_field_group_info() {
   t('Relations');
   t('Tabs');
   t('Word Group');
+  t('Words');
 
   return $field_groups;
 }

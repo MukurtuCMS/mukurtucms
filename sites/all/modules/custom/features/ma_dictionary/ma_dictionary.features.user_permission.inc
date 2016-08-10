@@ -68,6 +68,17 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'paragraphs_bundle_permissions',
   );
 
+  // Exported permission: 'create word_list content'.
+  $permissions['create word_list content'] = array(
+    'name' => 'create word_list content',
+    'roles' => array(
+      'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'delete any dictionary_word content'.
   $permissions['delete any dictionary_word content'] = array(
     'name' => 'delete any dictionary_word content',
@@ -88,6 +99,17 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'delete any word_list content'.
+  $permissions['delete any word_list content'] = array(
+    'name' => 'delete any word_list content',
+    'roles' => array(
+      'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'delete own dictionary_word content'.
   $permissions['delete own dictionary_word content'] = array(
     'name' => 'delete own dictionary_word content',
@@ -102,6 +124,17 @@ function ma_dictionary_user_default_permissions() {
   $permissions['delete own language_community content'] = array(
     'name' => 'delete own language_community content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'delete own word_list content'.
+  $permissions['delete own word_list content'] = array(
+    'name' => 'delete own word_list content',
+    'roles' => array(
+      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -148,6 +181,17 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'edit any word_list content'.
+  $permissions['edit any word_list content'] = array(
+    'name' => 'edit any word_list content',
+    'roles' => array(
+      'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'edit own dictionary_word content'.
   $permissions['edit own dictionary_word content'] = array(
     'name' => 'edit own dictionary_word content',
@@ -162,6 +206,17 @@ function ma_dictionary_user_default_permissions() {
   $permissions['edit own language_community content'] = array(
     'name' => 'edit own language_community content',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'edit own word_list content'.
+  $permissions['edit own word_list content'] = array(
+    'name' => 'edit own word_list content',
+    'roles' => array(
+      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),

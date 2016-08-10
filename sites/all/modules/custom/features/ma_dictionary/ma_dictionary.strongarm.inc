@@ -27,6 +27,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_word_list';
+  $strongarm->value = 0;
+  $export['comment_anonymous_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_default_mode_dictionary_word';
   $strongarm->value = 1;
   $export['comment_default_mode_dictionary_word'] = $strongarm;
@@ -41,6 +48,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_word_list';
+  $strongarm->value = 1;
+  $export['comment_default_mode_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_default_per_page_dictionary_word';
   $strongarm->value = '50';
   $export['comment_default_per_page_dictionary_word'] = $strongarm;
@@ -51,6 +65,13 @@ function ma_dictionary_strongarm() {
   $strongarm->name = 'comment_default_per_page_language_community';
   $strongarm->value = '50';
   $export['comment_default_per_page_language_community'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_word_list';
+  $strongarm->value = '50';
+  $export['comment_default_per_page_word_list'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -76,6 +97,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_word_list';
+  $strongarm->value = 1;
+  $export['comment_form_location_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_language_community';
   $strongarm->value = '1';
   $export['comment_language_community'] = $strongarm;
@@ -97,6 +125,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_word_list';
+  $strongarm->value = '1';
+  $export['comment_preview_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'comment_subject_field_dictionary_word';
   $strongarm->value = 1;
   $export['comment_subject_field_dictionary_word'] = $strongarm;
@@ -107,6 +142,20 @@ function ma_dictionary_strongarm() {
   $strongarm->name = 'comment_subject_field_language_community';
   $strongarm->value = 1;
   $export['comment_subject_field_language_community'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_word_list';
+  $strongarm->value = 1;
+  $export['comment_subject_field_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_word_list';
+  $strongarm->value = '2';
+  $export['comment_word_list'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -212,6 +261,29 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_node__word_list';
+  $strongarm->value = array(
+    'view_modes' => array(),
+    'extra_fields' => array(
+      'form' => array(
+        'title' => array(
+          'weight' => '1',
+        ),
+        'path' => array(
+          'weight' => '3',
+        ),
+        'redirect' => array(
+          'weight' => '2',
+        ),
+      ),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_node__word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_paragraphs_item__dictionary_word_bundle';
   $strongarm->value = array(
     'view_modes' => array(
@@ -259,6 +331,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'language_content_type_word_list';
+  $strongarm->value = '0';
+  $export['language_content_type_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'menu_options_dictionary_word';
   $strongarm->value = array();
   $export['menu_options_dictionary_word'] = $strongarm;
@@ -275,6 +354,15 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'menu_options_word_list';
+  $strongarm->value = array(
+    0 => 'main-menu',
+  );
+  $export['menu_options_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'menu_parent_dictionary_word';
   $strongarm->value = 'main-menu:0';
   $export['menu_parent_dictionary_word'] = $strongarm;
@@ -285,6 +373,13 @@ function ma_dictionary_strongarm() {
   $strongarm->name = 'menu_parent_language_community';
   $strongarm->value = 'main-menu:0';
   $export['menu_parent_language_community'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_parent_word_list';
+  $strongarm->value = 'main-menu:0';
+  $export['menu_parent_word_list'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -308,6 +403,16 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_options_word_list';
+  $strongarm->value = array(
+    0 => 'status',
+    1 => 'revision',
+  );
+  $export['node_options_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_preview_dictionary_word';
   $strongarm->value = '1';
   $export['node_preview_dictionary_word'] = $strongarm;
@@ -322,6 +427,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_preview_word_list';
+  $strongarm->value = '1';
+  $export['node_preview_word_list'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'node_submitted_dictionary_word';
   $strongarm->value = 1;
   $export['node_submitted_dictionary_word'] = $strongarm;
@@ -332,6 +444,13 @@ function ma_dictionary_strongarm() {
   $strongarm->name = 'node_submitted_language_community';
   $strongarm->value = 1;
   $export['node_submitted_language_community'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_submitted_word_list';
+  $strongarm->value = 1;
+  $export['node_submitted_word_list'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

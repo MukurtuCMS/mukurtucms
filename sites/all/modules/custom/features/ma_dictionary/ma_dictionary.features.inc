@@ -82,6 +82,14 @@ function ma_dictionary_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'word_list' => array(
+      'name' => t('Word List'),
+      'base' => 'node_content',
+      'description' => t('A collection of dictionary words.'),
+      'has_title' => '1',
+      'title_label' => t('Word List Name'),
+      'help' => '',
+    ),
   );
   drupal_alter('node_info', $items);
   return $items;
