@@ -9567,6 +9567,14 @@ a:hover {
 .pane-block .pane-content .view-content {
   line-height: 25px;
 }
+.panel-panel .right-pane .pane-content ul.search-api-sorts,
+.pane-block .pane-content ul.search-api-sorts {
+  padding-left: 0px;
+}
+.panel-panel .right-pane .pane-content ul.search-api-sorts li,
+.pane-block .pane-content ul.search-api-sorts li {
+  list-style: none;
+}
 .management-links {
   margin-top: 15px;
 }
