@@ -108,3 +108,37 @@ function ma_dictionary_paragraphs_info() {
   );
   return $items;
 }
+
+/**
+ * Implements hook_default_search_api_sort().
+ */
+function ma_dictionary_default_search_api_sort() {
+  $items = array();
+  $items['default_node_index__search_api_aggregation_1'] = entity_import('search_api_sort', '{
+    "index_id" : "default_node_index",
+    "field" : "search_api_aggregation_1",
+    "name" : "Translation",
+    "enabled" : "1",
+    "weight" : "0",
+    "identifier" : "default_node_index__search_api_aggregation_1",
+    "default_sort" : "0",
+    "default_sort_no_terms" : "0",
+    "default_order" : "desc",
+    "options" : { "field_name" : "Translation Sort" },
+    "rdf_mapping" : []
+  }');
+  $items['default_node_index__title_az_glossary'] = entity_import('search_api_sort', '{
+    "index_id" : "default_node_index",
+    "field" : "title_az_glossary",
+    "name" : "Term",
+    "enabled" : "1",
+    "weight" : "-100",
+    "identifier" : "default_node_index__title_az_glossary",
+    "default_sort" : "1",
+    "default_sort_no_terms" : "1",
+    "default_order" : "asc",
+    "options" : { "field_name" : "Title A-Z Glossary" },
+    "rdf_mapping" : []
+  }');
+  return $items;
+}
