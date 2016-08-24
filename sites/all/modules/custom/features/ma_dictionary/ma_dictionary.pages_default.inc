@@ -122,6 +122,7 @@ function ma_dictionary_default_page_manager_pages() {
       'left' => NULL,
       'right' => NULL,
       'center_' => NULL,
+      'sort' => NULL,
     ),
   );
   $display->cache = array();
@@ -173,12 +174,12 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-3';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-j4ofkY8Mm2DXhtD0cJlPexdUQ4v5sH7l';
+    $pane->subtype = 'search_api_sorts-search-sorts';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Title',
+      'override_title_text' => 'Sort by',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -195,12 +196,12 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-4';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-ouKoXsqCwerg0QTUdl8QMqWGs15NtJKc';
+    $pane->subtype = 'facetapi-j4ofkY8Mm2DXhtD0cJlPexdUQ4v5sH7l';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Language',
+      'override_title_text' => 'Title',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -217,12 +218,12 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-5';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-IPaCM7H1dF7Clj1WBtiZQw516MCvTYka';
+    $pane->subtype = 'facetapi-ouKoXsqCwerg0QTUdl8QMqWGs15NtJKc';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Keywords',
+      'override_title_text' => 'Language',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -239,12 +240,12 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-6';
     $pane->panel = 'right';
     $pane->type = 'block';
-    $pane->subtype = 'facetapi-K69pQqakWYP7PdiK9WmOOmTW3V5z0fxx';
+    $pane->subtype = 'facetapi-IPaCM7H1dF7Clj1WBtiZQw516MCvTYka';
     $pane->shown = TRUE;
     $pane->access = array();
     $pane->configuration = array(
       'override_title' => 1,
-      'override_title_text' => 'Part of Speech',
+      'override_title_text' => 'Keywords',
       'override_title_heading' => 'h2',
     );
     $pane->cache = array();
@@ -261,6 +262,28 @@ function ma_dictionary_default_page_manager_pages() {
     $pane->pid = 'new-7';
     $pane->panel = 'right';
     $pane->type = 'block';
+    $pane->subtype = 'facetapi-K69pQqakWYP7PdiK9WmOOmTW3V5z0fxx';
+    $pane->shown = TRUE;
+    $pane->access = array();
+    $pane->configuration = array(
+      'override_title' => 1,
+      'override_title_text' => 'Part of Speech',
+      'override_title_heading' => 'h2',
+    );
+    $pane->cache = array();
+    $pane->style = array(
+      'settings' => NULL,
+    );
+    $pane->css = array();
+    $pane->extras = array();
+    $pane->position = 5;
+    $pane->locks = array();
+    $display->content['new-7'] = $pane;
+    $display->panels['right'][5] = 'new-7';
+    $pane = new stdClass();
+    $pane->pid = 'new-8';
+    $pane->panel = 'right';
+    $pane->type = 'block';
     $pane->subtype = 'facetapi-hllvj31fytBpciVb7gPV1cfmTaoRBjC0';
     $pane->shown = TRUE;
     $pane->access = array();
@@ -275,10 +298,10 @@ function ma_dictionary_default_page_manager_pages() {
     );
     $pane->css = array();
     $pane->extras = array();
-    $pane->position = 5;
+    $pane->position = 6;
     $pane->locks = array();
-    $display->content['new-7'] = $pane;
-    $display->panels['right'][5] = 'new-7';
+    $display->content['new-8'] = $pane;
+    $display->panels['right'][6] = 'new-8';
   $display->hide_title = PANELS_TITLE_FIXED;
   $display->title_pane = '0';
   $handler->conf['display'] = $display;

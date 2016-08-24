@@ -253,6 +253,19 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'paragraphs_bundle_permissions',
   );
 
+  // Exported permission: 'use search_api_sorts'.
+  $permissions['use search_api_sorts'] = array(
+    'name' => 'use search_api_sorts',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Curator' => 'Curator',
+      'administrator' => 'administrator',
+      'anonymous user' => 'anonymous user',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'search_api_sorts',
+  );
+
   // Exported permission: 'view paragraph content dictionary_word_bundle'.
   $permissions['view paragraph content dictionary_word_bundle'] = array(
     'name' => 'view paragraph content dictionary_word_bundle',
