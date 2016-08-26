@@ -43,9 +43,9 @@ function ma_search_api_default_search_api_index() {
           "weight" : "0",
           "settings" : { "fields" : { "search_api_aggregation_1" : {
                 "name" : "Translation Sort",
-                "type" : "fulltext",
+                "type" : "first",
                 "fields" : [ "field_word_entry:field_translation" ],
-                "description" : "A Fulltext aggregation of the following fields: Word Entry \\u00bb Translation."
+                "description" : "A First aggregation of the following fields: Word Entry \\u00bb Translation."
               }
             }
           }
@@ -60,6 +60,7 @@ function ma_search_api_default_search_api_index() {
               "field_summary" : true,
               "field_collection_credit" : true,
               "field_collection_summary" : true,
+              "search_api_aggregation_1" : true,
               "body:value" : true,
               "field_description:value" : true,
               "field_tk_body:value" : true
