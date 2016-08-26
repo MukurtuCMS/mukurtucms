@@ -63,7 +63,12 @@ function ma_search_api_default_search_api_index() {
               "search_api_aggregation_1" : true,
               "body:value" : true,
               "field_description:value" : true,
-              "field_tk_body:value" : true
+              "field_tk_body:value" : true,
+              "field_word_entry:field_source" : true,
+              "field_word_entry:field_definition" : true,
+              "field_word_entry:field_sample_sentence" : true,
+              "field_word_entry:field_translation" : true,
+              "field_word_entry:field_transliteration" : true
             }
           }
         },
