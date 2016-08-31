@@ -27,11 +27,6 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'field_community_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -44,11 +39,6 @@ function ma_dictionary_ds_field_settings_info() {
         'ft' => array(
           'func' => 'theme_field',
         ),
-      ),
-    ),
-    'field_word_list' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
   );
@@ -134,25 +124,23 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
-        0 => 'title',
-        8 => 'field_word_entry',
-      ),
       'right' => array(
-        1 => 'field_dictionary_word_language',
-        2 => 'dictionary_word_related_dh_tease',
-        3 => 'field_dictionary_word_synonyms',
-        4 => 'field_community_ref',
-        5 => 'og_group_ref',
-        6 => 'field_tags',
-        9 => 'field_word_list',
+        0 => 'field_dictionary_word_language',
+        1 => 'dictionary_word_related_dh_tease',
+        2 => 'field_dictionary_word_synonyms',
+        3 => 'field_community_ref',
+        4 => 'og_group_ref',
+        5 => 'field_tags',
+        8 => 'field_word_list',
       ),
       'footer' => array(
-        7 => 'field_additional_media',
+        6 => 'field_additional_media',
+      ),
+      'left' => array(
+        7 => 'field_word_entry',
       ),
     ),
     'fields' => array(
-      'title' => 'left',
       'field_dictionary_word_language' => 'right',
       'dictionary_word_related_dh_tease' => 'right',
       'field_dictionary_word_synonyms' => 'right',
@@ -295,24 +283,26 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'header' => array(
-        0 => 'field_source',
+        0 => 'field_alternate_spelling',
+        1 => 'field_source',
       ),
       'left' => array(
-        1 => 'field_translation',
+        2 => 'field_translation',
       ),
       'middle' => array(
-        2 => 'field_transliteration',
+        3 => 'field_transliteration',
       ),
       'right' => array(
-        3 => 'field_part_of_speech',
+        4 => 'field_part_of_speech',
       ),
       'footer' => array(
-        4 => 'field_dictionary_word_recording',
-        5 => 'field_definition',
-        6 => 'field_sample_sentence',
+        5 => 'field_dictionary_word_recording',
+        6 => 'field_definition',
+        7 => 'field_sample_sentence',
       ),
     ),
     'fields' => array(
+      'field_alternate_spelling' => 'header',
       'field_source' => 'header',
       'field_translation' => 'left',
       'field_transliteration' => 'middle',

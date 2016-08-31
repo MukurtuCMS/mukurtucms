@@ -268,7 +268,7 @@ function ma_dictionary_strongarm() {
         'custom_settings' => TRUE,
       ),
       'full' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'rss' => array(
         'custom_settings' => FALSE,
@@ -334,6 +334,9 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'dictionary_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'word_entry_in_word_list' => array(
         'custom_settings' => TRUE,
       ),
     ),
@@ -469,7 +472,7 @@ function ma_dictionary_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'node_submitted_dictionary_word';
-  $strongarm->value = 1;
+  $strongarm->value = 0;
   $export['node_submitted_dictionary_word'] = $strongarm;
 
   $strongarm = new stdClass();

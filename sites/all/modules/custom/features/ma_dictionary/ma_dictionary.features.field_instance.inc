@@ -34,7 +34,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 10,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -99,7 +99,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 6,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -148,7 +148,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 7,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -195,7 +195,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 8,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -262,7 +262,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 9,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -316,7 +316,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -360,7 +360,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 2,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -431,7 +431,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -480,9 +480,12 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 1,
       ),
       'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'word_entry_in_word_list',
+        ),
+        'type' => 'paragraphs_view',
         'weight' => 0,
       ),
     ),
@@ -553,7 +556,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -619,7 +622,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 4,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -830,6 +833,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 3,
       ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -874,8 +884,17 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(
           'link' => 0,
         ),
-        'type' => 'title',
-        'weight' => 2,
+        'type' => 'ma_colorbox',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -921,7 +940,14 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 1,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -966,7 +992,14 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 2,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1013,9 +1046,20 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'link' => 1,
+          'links' => 1,
+          'view_mode' => 'teaser',
         ),
-        'type' => 'entityreference_label',
+        'type' => 'entityreference_entity_view',
+        'weight' => 4,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => 1,
+          'view_mode' => 'teaser',
+        ),
+        'type' => 'entityreference_entity_view',
         'weight' => 4,
       ),
       'teaser' => array(
@@ -1052,6 +1096,64 @@ function ma_dictionary_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'paragraphs_item-dictionary_word_bundle-field_alternate_spelling'.
+  $field_instances['paragraphs_item-dictionary_word_bundle-field_alternate_spelling'] = array(
+    'bundle' => 'dictionary_word_bundle',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'dictionary_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'paragraphs_editor_preview' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'word_entry_in_word_list' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'paragraphs_item',
+    'field_name' => 'field_alternate_spelling',
+    'label' => 'Alternate Spelling',
+    'required' => 0,
+    'settings' => array(
+      'context' => 'debug',
+      'context_default' => 'sdl_editor_representation',
+      'dnd_enabled' => 0,
+      'mee_enabled' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 9,
+    ),
+  );
+
+  // Exported field_instance:
   // 'paragraphs_item-dictionary_word_bundle-field_definition'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_definition'] = array(
     'bundle' => 'dictionary_word_bundle',
@@ -1078,6 +1180,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 18,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1099,7 +1208,7 @@ function ma_dictionary_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 7,
+      'weight' => 15,
     ),
   );
 
@@ -1135,6 +1244,15 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+        ),
+        'type' => 'mukurtu_scald_dictionary_media',
+        'weight' => 17,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1157,7 +1275,7 @@ function ma_dictionary_field_default_field_instances() {
         'context' => 'sdl_editor_representation',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 5,
+      'weight' => 13,
     ),
   );
 
@@ -1188,6 +1306,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 16,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1205,7 +1330,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 6,
+      'weight' => 14,
     ),
   );
 
@@ -1236,6 +1361,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 19,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1257,7 +1389,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 16,
     ),
   );
 
@@ -1288,6 +1420,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 14,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1309,7 +1448,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 10,
     ),
   );
 
@@ -1341,6 +1480,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 13,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1362,7 +1508,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 3,
+      'weight' => 11,
     ),
   );
 
@@ -1393,6 +1539,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'word_entry_in_word_list' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 15,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1414,13 +1567,14 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 4,
+      'weight' => 12,
     ),
   );
 
   // Translatables
   // Included for use with string extractors like potx.
   t('Additional Media');
+  t('Alternate Spelling');
   t('Community');
   t('Community Language');
   t('Credit');

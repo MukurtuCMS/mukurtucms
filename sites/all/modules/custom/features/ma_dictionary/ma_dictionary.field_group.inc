@@ -190,6 +190,38 @@ function ma_dictionary_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_teaser|paragraphs_item|dictionary_word_bundle|word_entry_in_word_list';
+  $field_group->group_name = 'group_teaser';
+  $field_group->entity_type = 'paragraphs_item';
+  $field_group->bundle = 'dictionary_word_bundle';
+  $field_group->mode = 'word_entry_in_word_list';
+  $field_group->parent_name = 'group_word_teasers';
+  $field_group->data = array(
+    'label' => 'Term Teaser',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_translation',
+      1 => 'field_transliteration',
+      2 => 'field_dictionary_word_recording',
+      3 => 'field_definition',
+      4 => 'field_sample_sentence',
+      5 => 'field_part_of_speech',
+      6 => 'field_source',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Term Teaser',
+      'instance_settings' => array(
+        'classes' => 'group-teaser field-group-accordion-item',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $field_groups['group_teaser|paragraphs_item|dictionary_word_bundle|word_entry_in_word_list'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_word_bundle|paragraphs_item|dictionary_word_bundle|form';
   $field_group->group_name = 'group_word_bundle';
   $field_group->entity_type = 'paragraphs_item';
@@ -207,6 +239,7 @@ function ma_dictionary_field_group_info() {
       4 => 'field_sample_sentence',
       5 => 'field_part_of_speech',
       6 => 'field_source',
+      7 => 'field_alternate_spelling',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -251,6 +284,34 @@ function ma_dictionary_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_word_teasers|paragraphs_item|dictionary_word_bundle|word_entry_in_word_list';
+  $field_group->group_name = 'group_word_teasers';
+  $field_group->entity_type = 'paragraphs_item';
+  $field_group->bundle = 'dictionary_word_bundle';
+  $field_group->mode = 'word_entry_in_word_list';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Word Entry Teasers',
+    'weight' => '0',
+    'children' => array(
+      0 => 'group_teaser',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-word-teasers field-group-accordion',
+        'effect' => 'bounceslide',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_word_teasers|paragraphs_item|dictionary_word_bundle|word_entry_in_word_list'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_words|node|word_list|form';
   $field_group->group_name = 'group_words';
   $field_group->entity_type = 'node';
@@ -282,6 +343,8 @@ function ma_dictionary_field_group_info() {
   t('New Word Entry');
   t('Relations');
   t('Tabs');
+  t('Term Teaser');
+  t('Word Entry Teasers');
   t('Word Group');
   t('Words');
 

@@ -274,6 +274,41 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
 
 function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
     if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        // If no alternate spelling is given, put the standard term in
+        if(empty($entity->field_alternate_spelling)) {
+            // Lookup the parent dictionary word node
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', 'dictionary_word')
+                ->propertyCondition('status', 1) // published? yes
+                ->fieldCondition('field_word_entry', 'revision_id', $entity->revision_id)
+                ->range(0, 10);
+            $result = $query->execute();
+
+            // If there is more than one result, the paragraph was re-used somewhere, so don't load the title
+            if (isset($result['node']) && count($result['node']) == 1) {
+                $nid = key($result['node']);
+
+                $word_node = node_load($nid);
+                if($word_node) {
+                    $entity->field_alternate_spelling[LANGUAGE_NONE][]['value'] = $word_node->title;
+                    $rendered_field = field_view_field($type, $entity, 'field_alternate_spelling', $view_mode);
+                    $entity->content['field_alternate_spelling'] = $rendered_field;
+                }
+            }
+        }
+
+        if($view_mode == 'word_entry_in_word_list') {
+            // Replace the field group header label with specific word entry info
+            $term_name = $entity->field_alternate_spelling[LANGUAGE_NONE][0]['value'];
+            $term_translation = (!empty($entity->field_translation)) ? " - " . $entity->field_translation[LANGUAGE_NONE][0]['value'] : "";
+            $term_source = (!empty($entity->field_source)) ? " (" . $entity->field_source[LANGUAGE_NONE][0]['value'] . ")" : "";
+            $label = $term_name . $term_translation . $term_source;
+            $group_clone = (object) (array) $entity->content['#groups']['group_teaser'];
+            $group_clone->label = $label;
+            $entity->content['#fieldgroups']['group_teaser'] = $group_clone;
+        }
+
         // Wrap sample sentences in a div
         if(isset($entity->content['field_sample_sentence'])) {
             foreach($entity->content['field_sample_sentence']['#items'] as $key => $value) {

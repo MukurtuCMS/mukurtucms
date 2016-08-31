@@ -9223,33 +9223,44 @@ table .checkbox input[type="checkbox"] {
   display: none;
 }
 .node-dictionary-word.view-mode-full .scald-atom,
+.node-word-list.view-mode-full .scald-atom,
 .node-dictionary-word.view-mode-full .scald_video,
-.node-dictionary-word.view-mode-full .fluid-width-video-wrapper {
+.node-word-list.view-mode-full .scald_video,
+.node-dictionary-word.view-mode-full .fluid-width-video-wrapper,
+.node-word-list.view-mode-full .fluid-width-video-wrapper {
   margin-bottom: 10px;
 }
 .node-dictionary-word.view-mode-full #dewplayer-2,
-.node-dictionary-word.view-mode-full #dewplayer-1 {
+.node-word-list.view-mode-full #dewplayer-2,
+.node-dictionary-word.view-mode-full #dewplayer-1,
+.node-word-list.view-mode-full #dewplayer-1 {
   height: 20px;
 }
-.node-dictionary-word.view-mode-full .group-left {
+.node-dictionary-word.view-mode-full .group-left,
+.node-word-list.view-mode-full .group-left {
   width: 66%;
 }
-.node-dictionary-word.view-mode-full .group-right {
+.node-dictionary-word.view-mode-full .group-right,
+.node-word-list.view-mode-full .group-right {
   width: 30%;
   background: #f8f7f7 none repeat scroll 0 0;
   border-radius: 4px;
   padding: 30px;
 }
-.node-dictionary-word.view-mode-full .group-right .fluid-width-video-wrapper {
+.node-dictionary-word.view-mode-full .group-right .fluid-width-video-wrapper,
+.node-word-list.view-mode-full .group-right .fluid-width-video-wrapper {
   padding-bottom: 3.5%;
 }
-.node-dictionary-word.view-mode-full .group-footer {
+.node-dictionary-word.view-mode-full .group-footer,
+.node-word-list.view-mode-full .group-footer {
   padding-top: 20px;
 }
-.node-dictionary-word.view-mode-full .group-footer .label-above {
+.node-dictionary-word.view-mode-full .group-footer .label-above,
+.node-word-list.view-mode-full .group-footer .label-above {
   font-size: 14px;
 }
-.node-dictionary-word.view-mode-full .sample-sentence {
+.node-dictionary-word.view-mode-full .sample-sentence,
+.node-word-list.view-mode-full .sample-sentence {
   padding-bottom: 10px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full {
@@ -9261,6 +9272,9 @@ table .checkbox input[type="checkbox"] {
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .group-header div {
   margin-bottom: 0px;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .group-header .field-name-field-alternate-spelling {
+  font-size: 24px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .group-left,
 .paragraphs-item-dictionary-word-bundle.view-mode-full .group-middle,
@@ -9451,6 +9465,12 @@ a:hover {
 }
 .view-dictionary-words.grid-view .field-name-field-translation {
   display: none;
+}
+.node-word-list .field-name-field-translation {
+  width: 100%;
+}
+.node-word-list .view-mode-mukurtu_scald_dictionary_media {
+  height: 20px;
 }
 .facetapi-facet-title-az-glossary {
   overflow: hidden;

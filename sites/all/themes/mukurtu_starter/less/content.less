@@ -199,7 +199,7 @@
 
 }
 // Dictionary Word full node view
-.node-dictionary-word.view-mode-full {
+.node-dictionary-word.view-mode-full, .node-word-list.view-mode-full {
 
   .scald-atom, .scald_video, .fluid-width-video-wrapper {
     margin-bottom: 10px;
@@ -240,6 +240,13 @@
 	div {
 	    margin-bottom: 0px;
 	}
+
+	.field-name-field-alternate-spelling {
+	    font-size: 24px;
+        }
+
+	.field-name-field-source {
+        }
     }    
     
     .group-left, .group-middle, .group-right {
@@ -443,6 +450,17 @@ a:hover {
       display: none;
     }
   }
+}
+
+// Word Lists
+.node-word-list {
+    .field-name-field-translation {
+       width: 100%;
+    }
+
+    .view-mode-mukurtu_scald_dictionary_media {
+       height: 20px;
+     }
 }
 
 // facets on the dictionary grid/list view
