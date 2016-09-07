@@ -9466,6 +9466,9 @@ a:hover {
 .view-dictionary-words.grid-view .field-name-field-translation {
   display: none;
 }
+.node-word-list .paragraphs-item-dictionary-word-bundle .ui-accordion-header {
+  background: none;
+}
 .node-word-list .field-name-field-translation {
   width: 100%;
 }
