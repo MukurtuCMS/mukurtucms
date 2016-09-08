@@ -216,10 +216,10 @@ function ma_search_api_default_search_api_index() {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
           "entity_type" : "taxonomy_term"
         },
+        "field_word_entry:field_pronunciation:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_sample_sentence" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E", "boost" : "0.8" },
         "field_word_entry:field_source" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_translation" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_word_entry:field_transliteration" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_list" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "language" : { "type" : "string" },
@@ -660,11 +660,6 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0",
             "column" : "value"
           },
-          "field_word_entry:field_transliteration" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
           "field_word_entry:field_part_of_speech" : {
             "table" : "search_api_db_default_node_index_field_word_entry_field_part_o",
             "column" : "value",
@@ -692,6 +687,11 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "search_api_aggregation_1",
             "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_pronunciation:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           }
         }
