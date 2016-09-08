@@ -201,12 +201,12 @@ function ma_dictionary_field_group_info() {
     'weight' => '1',
     'children' => array(
       0 => 'field_translation',
-      1 => 'field_transliteration',
-      2 => 'field_dictionary_word_recording',
-      3 => 'field_definition',
-      4 => 'field_sample_sentence',
-      5 => 'field_part_of_speech',
-      6 => 'field_source',
+      1 => 'field_dictionary_word_recording',
+      2 => 'field_definition',
+      3 => 'field_sample_sentence',
+      4 => 'field_part_of_speech',
+      5 => 'field_source',
+      6 => 'field_pronunciation',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(
@@ -240,6 +240,7 @@ function ma_dictionary_field_group_info() {
       5 => 'field_part_of_speech',
       6 => 'field_source',
       7 => 'field_alternate_spelling',
+      8 => 'field_pronunciation',
     ),
     'format_type' => 'accordion-item',
     'format_settings' => array(

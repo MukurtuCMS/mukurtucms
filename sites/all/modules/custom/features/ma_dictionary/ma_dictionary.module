@@ -358,7 +358,7 @@ function ma_dictionary_node_prepare($node) {
             $paragraph->setHostEntity('node', $node);
             $paragraph->field_source = array();
             $paragraph->field_translation = array();
-            $paragraph->field_transliteration = array();
+            $paragraph->field_pronunciation = array();
             $paragraph->field_dictionary_word_recording = array();
             $paragraph->field_definition = array();
             $paragraph->field_part_of_speech = array();

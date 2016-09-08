@@ -290,7 +290,7 @@ function ma_dictionary_ds_layout_settings_info() {
         2 => 'field_translation',
       ),
       'middle' => array(
-        3 => 'field_transliteration',
+        3 => 'field_pronunciation',
       ),
       'right' => array(
         4 => 'field_part_of_speech',
@@ -305,7 +305,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_alternate_spelling' => 'header',
       'field_source' => 'header',
       'field_translation' => 'left',
-      'field_transliteration' => 'middle',
+      'field_pronunciation' => 'middle',
       'field_part_of_speech' => 'right',
       'field_dictionary_word_recording' => 'footer',
       'field_definition' => 'footer',
