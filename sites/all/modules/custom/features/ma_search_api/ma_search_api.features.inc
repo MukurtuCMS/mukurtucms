@@ -195,7 +195,6 @@ function ma_search_api_default_search_api_index() {
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
-        "field_dictionary_word_synonyms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
@@ -204,6 +203,7 @@ function ma_search_api_default_search_api_index() {
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_source" : { "type" : "text" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
@@ -638,12 +638,6 @@ function ma_search_api_default_search_api_server() {
             "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           },
-          "field_dictionary_word_synonyms" : {
-            "table" : "search_api_db_default_node_index_field_dictionary_word_synonym",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
           "field_word_entry:field_source" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
@@ -692,6 +686,12 @@ function ma_search_api_default_search_api_server() {
           "field_word_entry:field_pronunciation:value" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_related_dictionary_words" : {
+            "table" : "search_api_db_default_node_index_field_related_dictionary_word",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }
