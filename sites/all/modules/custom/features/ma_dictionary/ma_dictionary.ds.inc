@@ -79,6 +79,11 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_part_of_speech' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_fieldsetting;
 
