@@ -5,9 +5,10 @@ dependencies[] = cer
 dependencies[] = commerce_product_reference
 
 files[] = commerce_product_reference.inc
-; Information added by Drupal.org packaging script on 2015-01-19
-version = "7.x-3.0-alpha7+7-dev"
+
+; Information added by Drupal.org packaging script on 2016-02-12
+version = "7.x-3.0-alpha7+25-dev"
 core = "7.x"
 project = "cer"
-datestamp = "1421691709"
+datestamp = "1455299962"
 

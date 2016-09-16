@@ -113,11 +113,11 @@ function cer_node_insert(StdClass $node) {
   // This tricky bug can easily rear its ugly head if you have an Entity Reference field,
   // referencing nodes, and a node access module enabled.
   //
-  // Entity Reference's bundled selection handlers will use either EntityFieldQuery or
-  // Views, both of which are affected by node access grants (and rightfully so).
-  // However, when creating a node, core invokes hook_node_save() *before* it writes the
-  // grants to the database, which can cause EntityFieldQuery (or Views, unless
-  // configured to disable SQL rewriting) to return no results if the user isn't the
+  // Entity Reference's bundled selection handlers will use either EntityFieldQuery or 
+  // Views, both of which are affected by node access grants (and rightfully so). 
+  // However, when creating a node, core invokes hook_node_save() *before* it writes the 
+  // grants to the database, which can cause EntityFieldQuery (or Views, unless 
+  // configured to disable SQL rewriting) to return no results if the user isn't the 
   // superuser. Since CER asks the field backend to validate the reference, this can
   // cause the reference to not be validated, and the cross-reference to fail.
   //
@@ -163,7 +163,7 @@ function cer_entity_delete($entity, $type) {
 /**
  * Process a entity's corresponding entity references.
  *
- * @param string $op
+ * @param string $op 
  *  The operation being performed on the entity (insert, update, or delete).
  *
  * @param object $entity
@@ -187,7 +187,31 @@ function cer_processing_entity($op, $entity, $entity_type = NULL, array &$contex
     return;
   }
 
+  // Don't process anything that hasn't got the cer data structure: this provides an
+  // opportunity for other modules to opt their entities out of CER processing.
+  if ($entity instanceof EntityStructureWrapper) {
+    try {
+      // If there is no such a property an exception will be thrown.
+      $entity->getPropertyInfo('cer');
+    }
+    catch (EntityMetadataWrapperException $e) {
+      return;
+    }
+  }
+
   if ($entity instanceof EntityDrupalWrapper) {
+    // Under certain circumstances, the cer struct may not be known to Entity
+    // API. So check for that before doing any actual processing. If it's not
+    // known yet, rebuild the property info cache and re-instantiate the
+    // wrapper with all the latest property definitions.
+    try {
+      $entity->getPropertyInfo('cer');
+    }
+    catch (EntityMetadataWrapperException $e) {
+      entity_property_info_cache_clear();
+      $entity = new EntityDrupalWrapper($entity->type(), $entity->value());
+    }
+
     $finder = new CerPresetFinder($entity);
 
     foreach ($finder->execute() as $preset) {
@@ -207,7 +231,7 @@ function cer_processing_entity($op, $entity, $entity_type = NULL, array &$contex
       $entity = entity_object_load($entity, $entity_type);
     }
 
-    if (is_object($entity)) {
+    if (is_object($entity) && empty($entity->cer_processed)) {
       cer_processing_entity($op, new EntityDrupalWrapper($entity_type, $entity), NULL, $context);
     }
   }
@@ -272,6 +296,24 @@ function cer_weight_options() {
   }
 
   return $options;
+}
+
+/**
+ * Implements hook_features_ignore().
+ */
+function cer_features_ignore($component) {
+  $ignores = array();
+  if ($component == 'cer') {
+    $ignores['wrapper'] = 0;
+  }
+  return $ignores;
+}
+
+/**
+ * Implements hook_features_override_ignore().
+ */
+function cer_features_override_ignore($component) {
+  return cer_features_ignore($component);
 }
 
 /**
@@ -356,7 +398,7 @@ function cer_entity_property_info_alter(array &$info) {
   );
 
   // Field collections are special. Because they live inside other entities (to
-  // potentially infinite levels of recursion), their CER property callbacks must be
+  // potentially infinite levels of recursion), their CER property callbacks must be 
   // able to recurse upwards through the chain of embedding.
   if (module_exists('field_collection')) {
     $struct = &$info['field_collection_item']['properties']['cer']['property info'];
