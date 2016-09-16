@@ -73,10 +73,10 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
   $facet->api_version = 1;
-  $facet->name = 'search_api@default_node_index::field_dictionary_word_synonyms';
+  $facet->name = 'search_api@default_node_index::field_related_dictionary_words';
   $facet->searcher = 'search_api@default_node_index';
   $facet->realm = '';
-  $facet->facet = 'field_dictionary_word_synonyms';
+  $facet->facet = 'field_related_dictionary_words';
   $facet->enabled = FALSE;
   $facet->settings = array(
     'operator' => 'and',
@@ -97,7 +97,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
     'exclude' => 0,
     'pretty_paths_alias' => 'related-words',
   );
-  $export['search_api@default_node_index::field_dictionary_word_synonyms'] = $facet;
+  $export['search_api@default_node_index::field_related_dictionary_words'] = $facet;
 
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
@@ -331,10 +331,10 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */
   $facet->api_version = 1;
-  $facet->name = 'search_api@default_node_index:block:field_dictionary_word_synonyms';
+  $facet->name = 'search_api@default_node_index:block:field_related_dictionary_words';
   $facet->searcher = 'search_api@default_node_index';
   $facet->realm = 'block';
-  $facet->facet = 'field_dictionary_word_synonyms';
+  $facet->facet = 'field_related_dictionary_words';
   $facet->enabled = TRUE;
   $facet->settings = array(
     'weight' => 0,
@@ -374,7 +374,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
       'format' => 'filtered_html',
     ),
   );
-  $export['search_api@default_node_index:block:field_dictionary_word_synonyms'] = $facet;
+  $export['search_api@default_node_index:block:field_related_dictionary_words'] = $facet;
 
   $facet = new stdClass();
   $facet->disabled = FALSE; /* Edit this to true to make a default facet disabled initially */

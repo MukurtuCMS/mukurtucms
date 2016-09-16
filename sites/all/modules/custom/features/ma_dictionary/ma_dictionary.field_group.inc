@@ -90,6 +90,7 @@ function ma_dictionary_field_group_info() {
       2 => 'field_item_privacy_setting',
       3 => 'og_group_ref',
       4 => 'field_word_list',
+      5 => 'field_related_dictionary_words',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
