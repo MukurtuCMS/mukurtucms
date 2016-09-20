@@ -23,7 +23,7 @@ function ma_search_api_node_update($node) {
     ),
     'dictionary_word' => array(
       'relationships' => array(
-        'field_dictionary_word_synonyms' => 'not dh',
+        'field_related_dictionary_words' => 'not dh',
         'field_dictionary_word_related_dh' => 'dh',
       ),
       'triggers' => array(),

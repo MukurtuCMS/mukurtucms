@@ -86,11 +86,10 @@ function ma_dictionary_field_group_info() {
     'weight' => '16',
     'children' => array(
       0 => 'field_dictionary_word_related_dh',
-      1 => 'field_dictionary_word_synonyms',
-      2 => 'field_item_privacy_setting',
-      3 => 'og_group_ref',
-      4 => 'field_word_list',
-      5 => 'field_related_dictionary_words',
+      1 => 'field_item_privacy_setting',
+      2 => 'og_group_ref',
+      3 => 'field_word_list',
+      4 => 'field_related_dictionary_words',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

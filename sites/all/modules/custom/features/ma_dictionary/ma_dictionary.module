@@ -477,6 +477,179 @@ function ma_dictionary_node_update($node) {
     }
 }
 
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'dictionary_word') {
+        $targets['field_related_dictionary_words:guid_or_nid'] = array(
+            'name' => t('Related Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Related Dictionary Words of field_related_dictionary_words matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_related_dictionary_words',
+        );
+        $targets['field_dictionary_word_related_dh:guid_or_nid'] = array(
+            'name' => t('Related Digital Heritage Items (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Related Digital Heritage Items of field_dictionary_word_related_dh matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_dictionary_word_related_dh',
+        );
+        $targets['field_word_list:guid_or_nid'] = array(
+            'name' => t('Word List (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Word List of field_word_list matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_word_list',
+        );
+        $targets['og_group_ref:guid_or_nid'] = array(
+            'name' => t('Protocol (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Protocol of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'og_group_ref',
+        );
+
+        // Word entry/paragraph fields
+        $targets['field_alternate_spelling'] = array(
+            'name' => t('Alternate Spelling for the first word entry (field_alternate_spelling)'),
+            'description' => t('The field instance Alternate Spelling of field_alternate_spelling for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_alternate_spelling',
+        );
+        $targets['field_source'] = array(
+            'name' => t('Source for the first word entry (field_source)'),
+            'description' => t('The field instance Source of field_source for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_source',
+        );
+        $targets['field_translation'] = array(
+            'name' => t('Translation for the first word entry (field_translation)'),
+            'description' => t('The field instance Translation of field_translation for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_translation',
+        );
+        $targets['field_definition'] = array(
+            'name' => t('Definition for the first word entry (field_definition)'),
+            'description' => t('The field instance Definition of field_definition for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_definition',
+        );
+        $targets['field_pronunciation'] = array(
+            'name' => t('Pronunciation for the first word entry (field_pronunciation)'),
+            'description' => t('The field instance Pronunciation of field_pronunciation for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_pronunciation',
+        );
+        $targets['field_sample_sentence'] = array(
+            'name' => t('Sample sentences for the first word entry (field_sample_sentence)'),
+            'description' => t('The field instance Sample Sentences of field_sample_sentence for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_sample_sentence',
+        );
+        $targets['field_part_of_speech'] = array(
+            'name' => t('Part of speech for the first word entry (field_part_of_speech)'),
+            'description' => t('The field instance Part of Speech of field_part_of_speech for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_part_of_speech',
+        );
+        $targets['field_dictionary_word_recording'] = array(
+            'name' => t('Recordings for the first word entry (field_dictionary_word_recording)'),
+            'description' => t('The field instance Recording of field_dictionary_word_recording for the first word entry.'),
+            'callback' => 'ma_dictionary_set_target',
+            'real_target' => 'field_dictionary_word_recording',
+        );
+    }
+}
+
+
+/**
+ * Callback for ma_dictionary_feeds_processor_targets_alter
+ */
+function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
+{
+    // Load the first word entry.
+    $first_word_entry = NULL;
+    $save_paragraph = FALSE;
+    
+    // If this is an existing item, it will already have a word entry, so reuse that
+    if(isset($entity->field_word_entry[LANGUAGE_NONE][0]['value'])) {
+        $first_word_entry = entity_load_single('paragraphs_item', $entity->field_word_entry[LANGUAGE_NONE][0]['value']);
+        $save_paragraph = TRUE;
+    }
+
+    // If not, Drupal will have created us an empty word entry, so we just need to fill in the values
+    if($first_word_entry == NULL) {
+        $first_word_entry = $entity->field_word_entry[LANGUAGE_NONE][0]['entity'];
+    }
+
+    $first_word_entry_wrapper = entity_metadata_wrapper('paragraphs_item', $first_word_entry);
+
+    switch ($target) {
+        // Simple text fields, single value
+    case 'field_alternate_spelling':
+    case 'field_source':
+    case 'field_translation':
+        $first_word_entry_wrapper->{$target}->set($value[0]);
+        break;
+        // Long text fields, single value
+    case 'field_pronunciation':
+        $first_word_entry_wrapper->{$target}->format = 'filtered_html';
+        $first_word_entry_wrapper->{$target}->value = $value[0];
+        break;
+    case 'field_definition':
+        $first_word_entry_wrapper->{$target}->set($value[0]);
+        break;
+        // Multi-value text
+    case 'field_sample_sentence':
+        $i = 0;
+        foreach($value as $v) {
+            if(!empty($v)) {
+                $first_word_entry_wrapper->{$target}[$i++] = $v;
+            }
+        }
+        break;
+    case 'field_part_of_speech':
+        $i = 0;
+        foreach($value as $part_of_speech) {
+            if(!empty($part_of_speech)) {
+                $part_of_speech_term = array_shift(taxonomy_get_term_by_name($part_of_speech, 'part_of_speech'));
+                if($part_of_speech_term) {
+                    $first_word_entry_wrapper->{$target}[$i++] = $part_of_speech_term->tid;
+                }
+            }
+        }
+        break;
+    case 'field_dictionary_word_recording':
+        $i = 0;
+        foreach($value as $audio_atom) {
+            // Try Recording as a GUID first
+            $sid = ma_importexport_feeds_lookup_atom_by_guid($audio_atom);
+            if(!empty($sid) && is_numeric($sid)) {
+                $atom = scald_atom_load($sid);
+            }
+
+            // If using Recording as a GUID didn't work, try it as an atom SID
+            if(!$atom) {
+                $atom = scald_atom_load($audio_atom);
+            }
+
+            // If we found a valid atom, use it as the recording
+            if(!empty($atom) && $atom->sid > 0 && $atom->type == 'audio') {
+                $first_word_entry_wrapper->{$target}[$i++] = $atom->sid;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    // We only need to save if this was an existing word entry. New word entries will get saved with the host node.
+    if($save_paragraph) {
+        $first_word_entry->revision = TRUE;
+        $first_word_entry->save(TRUE);
+        $entity->field_word_entry['und'][0]['revision_id'] = $first_word_entry->revision_id;
+    }
+}
+
+
 function _ma_dictionary_flatten_reference_field($field, $lang = LANGUAGE_NONE) {
     $result = array();
 
