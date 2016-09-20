@@ -692,6 +692,15 @@ function mukurtu_splash_block_batch_import() {
   $drupal_admin =  user_role_load_by_name('administrator');
 
   if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+      if(module_exists('ma_dictionary')) {
+          $items[] = array(
+              'title' => 'Import Dictionary Words',
+              'href' => 'import/import_dictionary_words',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Batch import many dictionary words.'),
+          );
+      }
+
       $items[] = array(
           'title' => 'Export Digital Heritage Metadata',
           'href' => 'manage/digital-heritage',
