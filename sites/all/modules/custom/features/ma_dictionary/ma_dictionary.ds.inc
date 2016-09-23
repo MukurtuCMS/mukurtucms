@@ -142,7 +142,7 @@ function ma_dictionary_ds_layout_settings_info() {
         7 => 'field_word_list',
       ),
       'footer' => array(
-        9 => 'field_additional_media',
+        8 => 'field_additional_media',
       ),
     ),
     'fields' => array(
