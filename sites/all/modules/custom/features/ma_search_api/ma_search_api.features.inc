@@ -38,7 +38,18 @@ function ma_search_api_default_search_api_index() {
         "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
         "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
         "search_api_alter_add_url" : { "status" : 0, "weight" : "0", "settings" : [] },
-        "search_api_alter_add_aggregation" : { "status" : 0, "weight" : "0", "settings" : [] }
+        "search_api_alter_add_aggregation" : {
+          "status" : 1,
+          "weight" : "0",
+          "settings" : { "fields" : { "search_api_aggregation_1" : {
+                "name" : "Translation Sort",
+                "type" : "first",
+                "fields" : [ "field_word_entry:field_translation" ],
+                "description" : "A First aggregation of the following fields: Word Entry \\u00bb Translation."
+              }
+            }
+          }
+        }
       },
       "processors" : {
         "search_api_case_ignore" : {
@@ -49,9 +60,15 @@ function ma_search_api_default_search_api_index() {
               "field_summary" : true,
               "field_collection_credit" : true,
               "field_collection_summary" : true,
+              "search_api_aggregation_1" : true,
               "body:value" : true,
               "field_description:value" : true,
-              "field_tk_body:value" : true
+              "field_tk_body:value" : true,
+              "field_word_entry:field_source" : true,
+              "field_word_entry:field_definition" : true,
+              "field_word_entry:field_sample_sentence" : true,
+              "field_word_entry:field_translation" : true,
+              "field_word_entry:field_transliteration" : true
             }
           }
         },
@@ -176,6 +193,8 @@ function ma_search_api_default_search_api_index() {
         "field_date" : { "type" : "text" },
         "field_description:value" : { "type" : "text" },
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "text" },
@@ -184,6 +203,7 @@ function ma_search_api_default_search_api_index() {
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_source" : { "type" : "text" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
@@ -191,14 +211,27 @@ function ma_search_api_default_search_api_index() {
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
         "field_transcription" : { "type" : "text" },
+        "field_word_entry:field_definition" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_word_entry:field_part_of_speech" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "taxonomy_term"
+        },
+        "field_word_entry:field_pronunciation:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_word_entry:field_sample_sentence" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E", "boost" : "0.8" },
+        "field_word_entry:field_source" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_word_entry:field_translation" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_word_list" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "language" : { "type" : "string" },
         "nid" : { "type" : "integer" },
         "promote" : { "type" : "boolean" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
+        "search_api_aggregation_1" : { "type" : "string" },
         "search_api_language" : { "type" : "string" },
         "status" : { "type" : "boolean" },
         "sticky" : { "type" : "boolean" },
         "title" : { "type" : "text", "boost" : "5.0" },
+        "title_az_glossary" : { "type" : "string" },
         "type" : { "type" : "string" }
       }
     },
@@ -585,6 +618,80 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_book_children_field_peo",
             "column" : "value",
             "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_dictionary_word_language" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_dictionary_word_language",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "title_az_glossary" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "title_az_glossary",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_dictionary_word_related_dh" : {
+            "table" : "search_api_db_default_node_index_field_dictionary_word_related",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_source" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_definition" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_translation" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0",
+            "column" : "value"
+          },
+          "field_word_entry:field_part_of_speech" : {
+            "table" : "search_api_db_default_node_index_field_word_entry_field_part_o",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_sample_sentence" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
+            "boost" : "0.8"
+          },
+          "field_words" : {
+            "table" : "search_api_db_default_node_index_field_words",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_word_list" : {
+            "table" : "search_api_db_default_node_index_field_word_list",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "search_api_aggregation_1" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "search_api_aggregation_1",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_pronunciation:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_related_dictionary_words" : {
+            "table" : "search_api_db_default_node_index_field_related_dictionary_word",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }
