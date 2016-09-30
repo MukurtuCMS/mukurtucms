@@ -632,7 +632,7 @@ return FALSE;';
   $handler->display->display_options['fields']['field_creator']['table'] = 'field_data_field_creator';
   $handler->display->display_options['fields']['field_creator']['field'] = 'field_creator';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Contributor */
+  /* Field: Field: Contributor */
   $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';

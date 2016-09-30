@@ -81,15 +81,20 @@ function ma_digitalheritage_strongarm() {
     'tags' => array(
       'is_enabled' => 1,
       'types' => array(
-        'page' => array(
+        'article' => array(
           'is_valid' => TRUE,
           'display_handler' => 'links',
-          'opmode' => 0,
+          'opmode' => 1,
         ),
         'digital_heritage' => array(
           'is_valid' => TRUE,
           'display_handler' => 'links',
           'opmode' => 2,
+        ),
+        'dictionary_word' => array(
+          'is_valid' => TRUE,
+          'display_handler' => 'none',
+          'opmode' => 0,
         ),
       ),
     ),
