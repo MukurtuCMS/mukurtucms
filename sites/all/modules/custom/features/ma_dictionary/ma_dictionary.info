@@ -264,6 +264,7 @@ features[variable][] = comment_subject_field_dictionary_word
 features[variable][] = comment_subject_field_language_community
 features[variable][] = comment_subject_field_word_list
 features[variable][] = comment_word_list
+features[variable][] = community_tags_display_dictionary_word
 features[variable][] = field_bundle_settings_node__dictionary_word
 features[variable][] = field_bundle_settings_node__language_community
 features[variable][] = field_bundle_settings_node__word_list

@@ -160,6 +160,13 @@ function ma_dictionary_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'community_tags_display_dictionary_word';
+  $strongarm->value = '0';
+  $export['community_tags_display_dictionary_word'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__dictionary_word';
   $strongarm->value = array(
     'view_modes' => array(
