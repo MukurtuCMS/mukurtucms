@@ -270,6 +270,13 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
         $language_alias = drupal_get_path_alias('taxonomy/term/' . $node->field_dictionary_word_language['und'][0]['tid']);
         $language = substr($language_alias, strripos($language_alias, '/') + 1);
         $node->content['field_dictionary_word_language'][0]['#href'] = '/dictionary/language/' . $language;
+
+        // Replace links for keywords to link to the dictionary browse page with keyword pre-selected
+        if(isset($node->content['field_tags'])) {
+            foreach($node->content['field_tags']['#items'] as $key => $value) {
+                $node->content['field_tags'][0]['#items'][$key] = str_replace('/tags/','/dictionary/keywords/' , $node->content['field_tags'][0]['#items'][$key]);
+            }
+        }
     }
 
     // Only render the first word entry per term in the search results
