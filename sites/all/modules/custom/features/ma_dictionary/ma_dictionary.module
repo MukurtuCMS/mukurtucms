@@ -664,6 +664,16 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
 }
 
 
+function ma_dictionary_node_insert($node) {
+    if($node->type == 'language_community') {
+        if($node->is_new) {
+            // For newly created language communities, make the creator a language steward by default.
+            $rid = array_search ('language steward', og_roles('node', 'language_community', $node->nid));
+            og_role_grant('node', $node->nid, $node->uid, $rid);
+        }
+    }
+}
+
 function _ma_dictionary_flatten_reference_field($field, $lang = LANGUAGE_NONE) {
     $result = array();
 
