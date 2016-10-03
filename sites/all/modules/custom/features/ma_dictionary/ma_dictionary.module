@@ -323,6 +323,15 @@ function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
             $entity->content['#fieldgroups']['group_teaser'] = $group_clone;
         }
 
+        // Rewrite links to part of speech taxonomy to link to dictionary browse page with part of speech pre-selected
+        if(isset($entity->content['field_part_of_speech'])) {
+            foreach($entity->content['field_part_of_speech']['#items'] as $key => $value) {
+                $part_tid = $entity->content['field_part_of_speech']['#items'][$key]['tid'];
+                $entity->content['field_part_of_speech'][0]['#items'][$key] = str_replace('/part-speech/','/dictionary/field_word_entry:field_part_of_speech/' , $entity->content['field_part_of_speech'][0]['#items'][$key]);
+                $entity->content['field_part_of_speech'][0]['#items'][$key] = str_replace('">','-' . $part_tid . '">' , $entity->content['field_part_of_speech'][0]['#items'][$key]);
+            }
+        }
+
         // Wrap sample sentences in a div
         if(isset($entity->content['field_sample_sentence'])) {
             foreach($entity->content['field_sample_sentence']['#items'] as $key => $value) {
