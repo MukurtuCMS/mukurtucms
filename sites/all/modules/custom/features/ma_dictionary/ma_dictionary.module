@@ -745,3 +745,131 @@ function _ma_dictionary_get_language_community_from_tid($tid) {
     }
     return NULL;
 }
+
+// Alter the display of contributor taxonomy term pages to include dictionary nodes that reference the term.
+// TODO: This should be generalized for any taxonomy terms used in scald atoms
+function ma_dictionary_page_alter(&$page) {
+    if(isset($page['content']['system_main']['term_heading']['term']['#bundle'])) {
+        if($page['content']['system_main']['term_heading']['term']['#bundle'] == 'contributor') {
+            if(isset($page['content']['system_main']['term_heading']['term']['#term'])) {
+                $tid = $page['content']['system_main']['term_heading']['term']['#term']->tid;
+                $dictionary_nids = _ma_dictionary_taxonomy_select_nodes($tid);
+                $standard_nids = taxonomy_select_nodes($tid, TRUE);
+
+                $all_nids = array_merge($standard_nids,$dictionary_nids);
+                $all_nids = array_unique($all_nids);
+
+                $term = taxonomy_term_load($tid);
+
+                // Some of this is copied from taxonomy_term_page
+                $build['term_heading'] = array(
+                    '#prefix' => '<div class="term-listing-heading">',
+                    '#suffix' => '</div>',
+                    'term' => taxonomy_term_view($term, 'full'),
+                );
+
+                if(!empty($all_nids)) {
+                    $nodes = node_load_multiple($all_nids);
+                    $build += node_view_multiple($nodes);
+                    $build['pager'] = array(
+                        '#theme' => 'pager',
+                        '#weight' => 5,
+                    );
+                }
+                else {
+                    $build['no_content'] = array(
+                        '#prefix' => '<p>',
+                        '#markup' => t('There is currently no content classified with this term.'),
+                        '#suffix' => '</p>',
+                    );
+                }
+
+                $page['content']['system_main'] = $build;
+            }
+        }
+    }
+
+}
+
+
+/**
+ * Implement scald_index_node_atoms to index scald atoms that are within paragraphs, that are within nodes
+ */
+function ma_dictionary_scald_index_node_atoms_alter($node, &$sid_all) {
+    $atom_ref_fields = array('field_dictionary_word_recording');
+
+    $dnd_fields = array('field_translation',
+                        'field_pronunciation',
+                        'field_definition',
+                        'field_sample_sentence',);
+
+
+    // Scald index doesn't index paragraphs in nodes, so we'll search the dictionary word's
+    // paragraphs and add the scald atoms to the list
+    if($node->type == 'dictionary_word') {
+        if(!empty($node->field_word_entry) && isset($node->field_word_entry[LANGUAGE_NONE])) {
+            foreach($node->field_word_entry[LANGUAGE_NONE] as $word_entry) {
+                $word_entry_paragraph = entity_load_single('paragraphs_item', $word_entry);
+                if($word_entry_paragraph) {
+
+                    // Check atom reference fields
+                    foreach($atom_ref_fields as $atom_ref_field) {
+                        if(!empty($word_entry_paragraph->{$atom_ref_field}) && isset($word_entry_paragraph->{$atom_ref_field}[LANGUAGE_NONE])) {
+                            foreach($word_entry_paragraph->{$atom_ref_field}[LANGUAGE_NONE] as $atom_ref_atom) {
+                                if(!in_array($atom_ref_atom['sid'], $sid_all)) {
+                                    $sid_all[$atom_ref_atom['sid']]['sid'] = $atom_ref_atom['sid'];
+                                    $sid_all[$atom_ref_atom['sid']]['field_name'] = 'field_word_entry';
+                                }
+                            }
+
+                        }
+                    }
+
+                    // Check DND enabled fields
+                    $scald_pattern = '/\[scald=(\d+):/';
+
+                    foreach($dnd_fields as $dnd_field) {
+                        if(!empty($word_entry_paragraph->{$dnd_field}) && isset($word_entry_paragraph->{$dnd_field}[LANGUAGE_NONE])) {
+                            foreach($word_entry_paragraph->{$dnd_field}[LANGUAGE_NONE] as $dnd_text) {
+                                preg_match_all($scald_pattern, $dnd_text['value'], $matches);
+                                if(!empty($matches) && count($matches) > 1) {
+                                    foreach($matches[1] as $sid) {
+                                        if(!in_array($sid, $sid_all)) {
+                                            $sid_all[$sid]['sid'] = $sid;
+                                            $sid_all[$sid]['field_name'] = 'field_word_entry';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// For a given taxonomy id, find all the scald atoms that reference that contributor
+function _ma_dictionary_taxonomy_select_nodes($tid) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'scald_atom')
+        ->fieldCondition('field_contributor', 'tid', $tid)
+        ->range(0, 10)
+        ->addMetaData('account', user_load(1));
+    $result = $query->execute();
+
+    $nids = array();
+    if(!empty($result) && isset($result['scald_atom'])) {
+        foreach($result['scald_atom'] as $atom) {
+            $nodes = scald_index_get_nodes($atom->sid);
+            if(!empty($nodes)) {
+                foreach($nodes as $node) {
+                    $nids[] = $node;
+                }
+            }
+        }
+    }
+
+    return $nids;
+}
