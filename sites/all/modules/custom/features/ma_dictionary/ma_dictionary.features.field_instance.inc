@@ -15,7 +15,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Include any media or additional information that does not fit in the other fields here. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (e.g., audio, YouTube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -127,9 +127,9 @@ function ma_dictionary_field_default_field_instances() {
   // 'node-dictionary_word-field_dictionary_word_language'.
   $field_instances['node-dictionary_word-field_dictionary_word_language'] = array(
     'bundle' => 'dictionary_word',
-    'default_value' => array(),
+    'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'A dictionary word must be associated with a single language on the site.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -177,7 +177,7 @@ function ma_dictionary_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'A reference to one or many related digital heritage items.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -335,7 +335,7 @@ function ma_dictionary_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'A reference to one or many related dictionary words.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -400,7 +400,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. Separate multiple keywords with semicolons.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -523,7 +523,7 @@ function ma_dictionary_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'A word list is an collection of dictionary words.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1101,7 +1101,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'If the spelling of an entry differs from the term, enter it here. Leave blank otherwise.',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
@@ -1285,7 +1285,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Choose one or more parts of speech that best matches your word entry. This field can be used for content browsing. Separate multiple entries with a semi-colon.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1364,7 +1364,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'This field is for making pronunciation guides for word entries. By default this field supports some HTML tags such as "<strong>" and "<em>" if bold or italics are desired.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1424,7 +1424,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'One or more example sentences that demonstrate use of the word entry.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1483,7 +1483,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Reference to a resource from which the dictionary entry is derived, for example if the entry comes from specific reference material, a regional dialect, etc.',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
@@ -1542,7 +1542,7 @@ function ma_dictionary_field_default_field_instances() {
     'bundle' => 'dictionary_word_bundle',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'The word entry term translated (if appropriate) to the primary language of the site.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1598,8 +1598,13 @@ function ma_dictionary_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('A dictionary word must be associated with a single language on the site.');
+  t('A reference to one or many related dictionary words.');
+  t('A reference to one or many related digital heritage items.');
+  t('A word list is an collection of dictionary words.');
   t('Additional Media');
   t('Alternate Spelling');
+  t('Choose one or more parts of speech that best matches your word entry. This field can be used for content browsing. Separate multiple entries with a semi-colon.');
   t('Community');
   t('Community Language');
   t('Credit');
@@ -1608,20 +1613,27 @@ function ma_dictionary_field_default_field_instances() {
   t('Determine if this is an OG group.');
   t('Group');
   t('Groups audience');
+  t('If the spelling of an entry differs from the term, enter it here. Leave blank otherwise.');
   t('Image');
+  t('Include any media or additional information that does not fit in the other fields here. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (e.g., audio, YouTube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Item Sharing Settings');
   t('Keywords');
+  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. Separate multiple keywords with semicolons.');
   t('Language');
   t('Language Community');
+  t('One or more example sentences that demonstrate use of the word entry.');
   t('Part of Speech');
   t('Pronunciation');
   t('Protocol');
   t('Recording');
+  t('Reference to a resource from which the dictionary entry is derived, for example if the entry comes from specific reference material, a regional dialect, etc.');
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Sample Sentences');
   t('Source');
   t('Summary');
+  t('The word entry term translated (if appropriate) to the primary language of the site.');
+  t('This field is for making pronunciation guides for word entries. By default this field supports some HTML tags such as "<strong>" and "<em>" if bold or italics are desired.');
   t('Translation');
   t('Word Entry');
   t('Word List');
