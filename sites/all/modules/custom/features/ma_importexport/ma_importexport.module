@@ -1890,6 +1890,14 @@ function ma_importexport_get_scald_dnd_enabled_fields()
             'field_tk_body',
             'field_description',
             'field_coverage_description'
+        ),
+        'dictionary_word' => array(
+            'field_additional_media'
+        ),
+        'paragraphs_item' => array(
+            'field_translation',
+            'field_definition',
+            'field_sample_sentence'
         )
     );
 
