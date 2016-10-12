@@ -1859,14 +1859,14 @@ function ma_importexport_scald_dnd_decode($fields) {
         $single_value = TRUE;        
     }
     
-    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/";
+    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/i";
 
     foreach($fields as $key => $field) {
         preg_match_all($guid_pattern, $field, $matches);
         foreach(array_unique($matches[1]) as $guid) {
             $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($guid);
             if($atom_sid) {
-                $field = str_replace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
+                $field = str_ireplace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
                 $fields[$key] = $field;
             }
         }
