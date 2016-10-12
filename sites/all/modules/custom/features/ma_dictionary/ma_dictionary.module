@@ -591,6 +591,26 @@ function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $b
 
 
 /**
+ * Implements hook_feeds_presave().
+ */
+function ma_dictionary_feeds_presave(FeedsSource $source, $entity, $item) {
+    $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
+    if ($entity->type == 'dictionary_word') {
+        // Replace embedded Scald atom GUIDs with local SIDs
+        if(isset($scald_dnd_enabled_fields[$entity->type])) {
+            foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
+                if(!empty($entity->{$field})) {
+                    foreach($entity->{$field}[LANGUAGE_NONE] as $key => $field_value) {
+                        $entity->{$field}[LANGUAGE_NONE][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * Callback for ma_dictionary_feeds_processor_targets_alter
  */
 function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
@@ -616,8 +636,10 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
         // Simple text fields, single value
     case 'field_alternate_spelling':
     case 'field_source':
-    case 'field_translation':
         $first_word_entry_wrapper->{$target}->set($value[0]);
+        break;
+    case 'field_translation':
+        $first_word_entry_wrapper->{$target}->set(ma_importexport_scald_dnd_decode($value[0]));
         break;
         // Long text fields, single value
     case 'field_pronunciation':
@@ -625,14 +647,14 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
         $first_word_entry_wrapper->{$target}->value = $value[0];
         break;
     case 'field_definition':
-        $first_word_entry_wrapper->{$target}->set($value[0]);
+        $first_word_entry_wrapper->{$target}->set(ma_importexport_scald_dnd_decode($value[0]));
         break;
         // Multi-value text
     case 'field_sample_sentence':
         $i = 0;
         foreach($value as $v) {
             if(!empty($v)) {
-                $first_word_entry_wrapper->{$target}[$i++] = $v;
+                $first_word_entry_wrapper->{$target}[$i++] = ma_importexport_scald_dnd_decode($v);
             }
         }
         break;

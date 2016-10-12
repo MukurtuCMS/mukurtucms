@@ -1827,6 +1827,7 @@ function ma_importexport_scald_dnd_encode($fields) {
         $fields = array($fields);
         $single_value = TRUE;
     }
+
     $sid_pattern = "/\[scald=(\d+):/";
 
     foreach($fields as $key => $field) {
@@ -1858,15 +1859,35 @@ function ma_importexport_scald_dnd_decode($fields) {
         $fields = array($fields);
         $single_value = TRUE;        
     }
-    
-    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/";
+
+    // Users wanted an easier way to embed SCALD atoms in their import files
+    // Here we will support [MUKURTU_MEDIA:ID] expanding to the scald embed code of
+    // [scald=ID:sdl_editor_representation]. ID will be tried as a GUID first, and a SID second
+    $embed_pattern = "/\[MUKURTU_MEDIA:(.+?)\]/i";
+    foreach($fields as $key => $field) {
+        preg_match_all($embed_pattern, $field, $matches);
+        foreach(array_unique($matches[1]) as $id) {
+            $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($id);
+            if(!$atom_sid) {
+                $atom_sid = $id;
+            }
+            $field = str_ireplace("[MUKURTU_MEDIA:$id]", "[scald=$atom_sid:sdl_editor_representation]", $field);
+            $fields[$key] = $field;
+        }
+    }
+
+    // The standard Scald embed code looks like [scald={sid}:sdl_editor_representation]
+    // The Mukurtu exporter will replace the {sid} with a GUID replacement token like:
+    // [scald=[MUKURTU_ATOM_GUID:{guid}]:sdl_editor_representation]
+    // The following will replace the GUID replacement token with the local SID
+    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/i";
 
     foreach($fields as $key => $field) {
         preg_match_all($guid_pattern, $field, $matches);
         foreach(array_unique($matches[1]) as $guid) {
             $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($guid);
             if($atom_sid) {
-                $field = str_replace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
+                $field = str_ireplace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
                 $fields[$key] = $field;
             }
         }
@@ -1890,6 +1911,14 @@ function ma_importexport_get_scald_dnd_enabled_fields()
             'field_tk_body',
             'field_description',
             'field_coverage_description'
+        ),
+        'dictionary_word' => array(
+            'field_additional_media'
+        ),
+        'paragraphs_item' => array(
+            'field_translation',
+            'field_definition',
+            'field_sample_sentence'
         )
     );
 
