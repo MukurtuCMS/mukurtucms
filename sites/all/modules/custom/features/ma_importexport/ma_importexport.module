@@ -1827,6 +1827,7 @@ function ma_importexport_scald_dnd_encode($fields) {
         $fields = array($fields);
         $single_value = TRUE;
     }
+
     $sid_pattern = "/\[scald=(\d+):/";
 
     foreach($fields as $key => $field) {
@@ -1858,7 +1859,27 @@ function ma_importexport_scald_dnd_decode($fields) {
         $fields = array($fields);
         $single_value = TRUE;        
     }
-    
+
+    // Users wanted an easier way to embed SCALD atoms in their import files
+    // Here we will support [MUKURTU_MEDIA:ID] expanding to the scald embed code of
+    // [scald=ID:sdl_editor_representation]. ID will be tried as a GUID first, and a SID second
+    $embed_pattern = "/\[MUKURTU_MEDIA:(.+?)\]/i";
+    foreach($fields as $key => $field) {
+        preg_match_all($embed_pattern, $field, $matches);
+        foreach(array_unique($matches[1]) as $id) {
+            $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($id);
+            if(!$atom_sid) {
+                $atom_sid = $id;
+            }
+            $field = str_ireplace("[MUKURTU_MEDIA:$id]", "[scald=$atom_sid:sdl_editor_representation]", $field);
+            $fields[$key] = $field;
+        }
+    }
+
+    // The standard Scald embed code looks like [scald={sid}:sdl_editor_representation]
+    // The Mukurtu exporter will replace the {sid} with a GUID replacement token like:
+    // [scald=[MUKURTU_ATOM_GUID:{guid}]:sdl_editor_representation]
+    // The following will replace the GUID replacement token with the local SID
     $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/i";
 
     foreach($fields as $key => $field) {
