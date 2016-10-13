@@ -699,6 +699,13 @@ function mukurtu_splash_block_batch_import() {
               'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
               'description' => t('Batch import many dictionary words.'),
           );
+
+          $items[] = array(
+              'title' => 'Import Dictionary Word Entries',
+              'href' => 'import/import_dictionary_word_additional_entries',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Batch import additional dictionary word entries.'),
+          );
       }
 
       $items[] = array(
