@@ -163,7 +163,7 @@ function ma_importexport_feeds_lookup_atom_by_guid($guid) {
  * Implements hook_feeds_after_save().
  */
 function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $entity_id) {
-    if ($entity->type == 'digital_heritage') {
+    if (isset($entity->type) && $entity->type == 'digital_heritage') {
 
         // If community record children exist, we need to set the community record parent on them.
         // This is handled by a session variable when created via the GUI, but we need to handle feeds import as a special case

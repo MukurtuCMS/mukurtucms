@@ -587,15 +587,23 @@ function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $b
             'real_target' => 'field_dictionary_word_recording',
         );
     }
-}
 
+    if($entity_type == 'paragraphs_item' && $bundle_name == 'dictionary_word_bundle') {
+        $targets['item_id:guid_or_nid'] = array(
+            'name' => t('Parent Dictionary Word (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The parent Dictionary Word of item_id matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_dictionary_paragraph_set_target',
+            'real_target' => 'item_id',
+        );
+    }
+}
 
 /**
  * Implements hook_feeds_presave().
  */
 function ma_dictionary_feeds_presave(FeedsSource $source, $entity, $item) {
     $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
-    if ($entity->type == 'dictionary_word') {
+    if (isset($entity->type) && $entity->type == 'dictionary_word') {
         // Replace embedded Scald atom GUIDs with local SIDs
         if(isset($scald_dnd_enabled_fields[$entity->type])) {
             foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
@@ -607,8 +615,55 @@ function ma_dictionary_feeds_presave(FeedsSource $source, $entity, $item) {
             }
         }
     }
+
+    if($entity->bundle == 'dictionary_word_bundle') {
+        if(isset($entity->feeds_item->entity_id) && $entity->feeds_item->entity_id > 0) {
+            $entity->item_id = $entity->feeds_item->entity_id;
+        }
+    }
 }
 
+
+function ma_dictionary_paragraph_set_target($source, $entity, $target, $value, $mapping)
+{
+    $new_target = str_replace(':guid_or_nid', '', $target);
+
+    foreach($value as $id) {
+        if($id) {
+            // Check if ID is a valid GUID.  If so, we use that.
+            $nid = ma_importexport_feeds_lookup_node_by_guid($id);
+            if(!$nid) {
+                // Otherwise we assume ID is a NID
+                $nid = $id;
+            }
+            $node = node_load($nid);
+            if($node) {
+                // If the node is not a dictionary word, skip
+                if($node->type != 'dictionary_word') {
+                    $entity->feeds_item->skip = TRUE;
+                    drupal_set_message(t('Dictionary word entry referenced a non dictionary word @id', array('@id' => $value)));
+                }
+
+                // We only want one reference per word entry. If the word entry is already referenced by another word, skip it
+                // Only old entries could be previously referenced
+                if(!$entity->feeds_item->is_new) {
+                    $word_nodes = ma_dictionary_words_with_entry($entity->feeds_item->entity_id);
+
+                    if(count($word_nodes) > 1 || (count($word_nodes) == 1 && $word_nodes[0] != $node->nid)) {
+                        $entity->feeds_item->skip = TRUE;
+                        drupal_set_message(t('Dictionary word entry is already referenced by dictionary word @id', array('@id' => $word_nodes[0])));
+                    }
+                } else {
+                    $entity->field_name = "field_word_entry";
+                    $entity->setHostEntity('node', $node);
+                }
+            } else {
+                $entity->feeds_item->skip = TRUE;
+                drupal_set_message(t('Dictionary word @id could not be found', array('@id' => $value)));
+            }
+        }
+    }
+}
 
 /**
  * Callback for ma_dictionary_feeds_processor_targets_alter
@@ -894,4 +949,35 @@ function _ma_dictionary_taxonomy_select_nodes($tid) {
     }
 
     return $nids;
+}
+
+/**
+ *  Lookup paragraph id from guid
+ */
+function ma_dictionary_lookup_paragraph_by_guid($guid) {
+  return db_select('feeds_item')
+    ->fields('feeds_item', array('entity_id'))
+    ->condition('entity_type', 'paragraphs_item')
+    ->condition('guid', $guid)
+    ->execute()
+    ->fetchField();
+}
+
+/**
+ * Lookup nodes that have a given dictionary word entry by paragraph id
+ */
+function ma_dictionary_words_with_entry($pid) {
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', 'dictionary_word')
+        ->fieldCondition('field_word_entry', 'value', $pid)
+        ->range(0,10);
+
+    $result = $query->execute();
+
+    if(isset($result['node'])) {
+        return array_keys($result['node']);
+    }
+    return array();
 }
