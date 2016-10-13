@@ -13,6 +13,118 @@ function ma_dictionary_feeds_importer_default() {
   $feeds_importer = new stdClass();
   $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
   $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_dictionary_word_additional_entries';
+  $feeds_importer->config = array(
+    'name' => 'Import Dictionary Word Additional Entries',
+    'description' => '',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'csv',
+        'direct' => 0,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          'public' => 'public',
+          'private' => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'encoding' => 'UTF-8',
+        'no_headers' => 0,
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsEntityProcessorParagraphs_item',
+      'config' => array(
+        'values' => array(),
+        'authorize' => TRUE,
+        'mappings' => array(
+          0 => array(
+            'source' => 'guid',
+            'target' => 'guid',
+            'unique' => 1,
+            'language' => 'und',
+          ),
+          1 => array(
+            'source' => 'Dictionary Word',
+            'target' => 'item_id:guid_or_nid',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          2 => array(
+            'source' => 'Alternate Spelling',
+            'target' => 'field_alternate_spelling',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          3 => array(
+            'source' => 'Source',
+            'target' => 'field_source',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          4 => array(
+            'source' => 'Translation',
+            'target' => 'field_translation',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          5 => array(
+            'source' => 'Pronunciation',
+            'target' => 'field_pronunciation',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          6 => array(
+            'source' => 'Sample Sentences',
+            'target' => 'field_sample_sentence',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          7 => array(
+            'source' => 'Part of Speech',
+            'target' => 'field_part_of_speech',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          8 => array(
+            'source' => 'Recording',
+            'target' => 'field_dictionary_word_recording',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          9 => array(
+            'source' => 'Definition',
+            'target' => 'field_definition',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+        ),
+        'insert_new' => '1',
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'input_format' => 'filtered_html',
+        'skip_hash_check' => 0,
+        'bundle' => 'dictionary_word_bundle',
+        'language' => 'und',
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_dictionary_word_additional_entries'] = $feeds_importer;
+
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
   $feeds_importer->id = 'import_dictionary_words';
   $feeds_importer->config = array(
     'name' => 'Import Dictionary Words',

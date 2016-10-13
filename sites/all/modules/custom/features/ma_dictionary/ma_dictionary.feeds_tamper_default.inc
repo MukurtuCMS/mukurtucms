@@ -13,6 +13,114 @@ function ma_dictionary_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-dictionary_word-require_valid_node';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Dictionary Word';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 0,
+    'node_type' => 'dictionary_word',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Require valid dictionary word node reference';
+  $export['import_dictionary_word_additional_entries-dictionary_word-require_valid_node'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-part_of_speech-explode';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Part of Speech';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_dictionary_word_additional_entries-part_of_speech-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-part_of_speech-trim';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Part of Speech';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_dictionary_word_additional_entries-part_of_speech-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-recording-explode';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Recording';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_dictionary_word_additional_entries-recording-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-recording-trim';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Recording';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_dictionary_word_additional_entries-recording-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-sample_sentences-explode';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Sample Sentences';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_dictionary_word_additional_entries-sample_sentences-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_additional_entries-sample_sentences-trim';
+  $feeds_tamper->importer = 'import_dictionary_word_additional_entries';
+  $feeds_tamper->source = 'Sample Sentences';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_dictionary_word_additional_entries-sample_sentences-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_dictionary_words-keywords-explode';
   $feeds_tamper->importer = 'import_dictionary_words';
   $feeds_tamper->source = 'Keywords';
