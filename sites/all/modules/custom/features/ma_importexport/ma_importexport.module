@@ -538,6 +538,13 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
   return $form;
 }
 
+function ma_importexport_form_feeds_delete_tab_form_alter(&$form, &$form_state, $form_id) {
+    $form['confirm_deletion'] = array(
+        '#type' => 'checkbox',
+        '#title' => t("I understand this will delete ALL imported items of this type. This includes items from all previous imports, from all users."),
+        '#required' => TRUE,
+  );
+}
 
 /**
  * Grabs the form for exporting from the browse DH page or DH node 
