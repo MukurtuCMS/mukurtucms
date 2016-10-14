@@ -363,6 +363,32 @@ function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
 }
 
 /**
+ * Implements hook_entity_delete
+ */
+function ma_dictionary_entity_delete($entity, $type) {
+    if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
+        if(isset($entity->item_id)) {
+            // Find all dictionary words that reference this entry (should be only 1)
+            $word_nodes = ma_dictionary_words_with_entry($entity->item_id);
+
+            // Load each dictionary word and search for the entry
+            foreach($word_nodes as $nid) {
+                $node = node_load($nid);
+                if($node && isset($node->field_word_entry)) {
+                    foreach($node->field_word_entry[LANGUAGE_NONE] as $key => $value) {
+                        // If we find the entry, remove it
+                        if($value['value'] == $entity->item_id) {
+                            unset($node->field_word_entry[LANGUAGE_NONE][$key]);
+                        }
+                    }
+                    node_save($node);
+                }
+            }
+        }
+    }
+}
+
+/**
  * Implements hook_node_access
  */
 function ma_dictionary_node_access($node, $op, $account) {
