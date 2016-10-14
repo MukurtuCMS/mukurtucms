@@ -10,15 +10,6 @@
 function ma_dictionary_user_default_permissions() {
   $permissions = array();
 
-  // Exported permission: 'administer paragraphs bundles'.
-  $permissions['administer paragraphs bundles'] = array(
-    'name' => 'administer paragraphs bundles',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'paragraphs',
-  );
-
   // Exported permission: 'administer part_of_speech vocabulary terms'.
   $permissions['administer part_of_speech vocabulary terms'] = array(
     'name' => 'administer part_of_speech vocabulary terms',
