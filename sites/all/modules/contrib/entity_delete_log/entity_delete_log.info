@@ -3,11 +3,11 @@ description = Saves custom log entry to database when an entity is deleted.
 core = 7.x
 package = Other
 dependencies[] = views
-configure = admin/config/entity-delete-log
+configure = admin/config/system/entity-delete-log
 
-; Information added by drupal.org packaging script on 2013-04-05
-version = "7.x-1.1"
+; Information added by Drupal.org packaging script on 2014-07-25
+version = "7.x-1.1+2-dev"
 core = "7.x"
 project = "entity_delete_log"
-datestamp = "1365189312"
+datestamp = "1406252930"
 
