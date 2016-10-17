@@ -70,4 +70,3 @@ dependencies[] = mukurtu_protocol_field
 dependencies[] = ma_scald
 dependencies[] = ma_importexport
 dependencies[] = ma_importexport_media
-dependencies[] = ma_dictionary
