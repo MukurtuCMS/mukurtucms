@@ -442,7 +442,11 @@ function ma_dictionary_node_presave($node) {
 function ma_dictionary_node_update($node) {
     if($node->type == 'dictionary_word') {
         // If the word had any changes in word lists, sync those up here
-        $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        if(isset($node->field_word_list)) {
+            $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        } else {
+            $current_word_lists = array();
+        }
         $old_word_lists = _ma_dictionary_flatten_reference_field($node->original->field_word_list);
         $no_change = array_intersect($current_word_lists, $old_word_lists);
 

@@ -192,9 +192,9 @@ function ma_collection_node_insert($node) {
  */
 // We need to use this hook instead of hook_node_delete because hook_node_delete runs too early
 function ma_collection_field_attach_delete ($entity_type, $entity) {
-  if ($entity->type == 'digital_heritage') {
-    ma_collection_node_update($entity, 1);
-  }
+    if (isset($entity->type) && $entity->type == 'digital_heritage') {
+        ma_collection_node_update($entity, 1);
+    }
 }
 
 /**

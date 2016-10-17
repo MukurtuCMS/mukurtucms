@@ -9,6 +9,7 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_set_misc_vars' => array(),
     'mukurtu_set_theme' => array(),
     'mukurtu_create_default_boxes' => array(),
+    'mukurtu_resolve_dependencies' => array(),
     'mukurtu_revert_features' => array(
       'display_name' => st('Finalize configuration'),
     ),
@@ -77,6 +78,13 @@ function mukurtu_create_default_boxes() {
   ));
   $box->save();
 
+}
+
+function mukurtu_resolve_dependencies() {
+    // We need the dictionary DB tables to exist, but we want
+    // the dictionary disabled by default.
+    module_enable(array('ma_dictionary'));
+    module_disable(array('ma_dictionary'));
 }
 
 function mukurtu_revert_features () {

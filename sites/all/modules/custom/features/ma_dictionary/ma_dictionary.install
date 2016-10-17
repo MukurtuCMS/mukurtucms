@@ -18,7 +18,4 @@ function ma_dictionary_install () {
     'customized' => 1,
   );
   menu_link_save($item);
-
-  // Build the initial scald index
-  scald_index_rebuild();
 }
