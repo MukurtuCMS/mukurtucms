@@ -769,7 +769,7 @@ function ma_digitalheritage_page_alter(&$data) {
     $dh_page_content = "";
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
-    if ($node->type == 'digital_heritage') {
+    if ($node && $node->type == 'digital_heritage') {
 
       // Custom build page content for DH nodes
       $nids = element_children($data['content']['system_main']['nodes']);

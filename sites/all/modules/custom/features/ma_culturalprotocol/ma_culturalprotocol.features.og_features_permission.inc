@@ -42,14 +42,6 @@ function ma_culturalprotocol_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:create dictionary_word content'
-  $permissions['node:cultural_protocol_group:create dictionary_word content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
   // Exported og permission: 'node:cultural_protocol_group:create digital_heritage content'
   $permissions['node:cultural_protocol_group:create digital_heritage content'] = array(
     'roles' => array(
@@ -68,11 +60,6 @@ function ma_culturalprotocol_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete any dictionary_word content'
-  $permissions['node:cultural_protocol_group:delete any dictionary_word content'] = array(
-    'roles' => array(),
-  );
-
   // Exported og permission: 'node:cultural_protocol_group:delete any digital_heritage content'
   $permissions['node:cultural_protocol_group:delete any digital_heritage content'] = array(
     'roles' => array(),
@@ -85,14 +72,6 @@ function ma_culturalprotocol_og_features_default_permissions() {
 
   // Exported og permission: 'node:cultural_protocol_group:delete own cultural_protocol_group content'
   $permissions['node:cultural_protocol_group:delete own cultural_protocol_group content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:delete own dictionary_word content'
-  $permissions['node:cultural_protocol_group:delete own dictionary_word content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'protocol steward' => 'protocol steward',
@@ -160,14 +139,6 @@ function ma_culturalprotocol_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update any dictionary_word content'
-  $permissions['node:cultural_protocol_group:update any dictionary_word content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
   // Exported og permission: 'node:cultural_protocol_group:update any digital_heritage content'
   $permissions['node:cultural_protocol_group:update any digital_heritage content'] = array(
     'roles' => array(),
@@ -187,14 +158,6 @@ function ma_culturalprotocol_og_features_default_permissions() {
 
   // Exported og permission: 'node:cultural_protocol_group:update own cultural_protocol_group content'
   $permissions['node:cultural_protocol_group:update own cultural_protocol_group content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:update own dictionary_word content'
-  $permissions['node:cultural_protocol_group:update own dictionary_word content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'protocol steward' => 'protocol steward',

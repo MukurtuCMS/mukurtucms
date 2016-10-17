@@ -426,7 +426,7 @@ function ma_dictionary_node_prepare($node) {
  * Implements hook_node_presave.
  */
 function ma_dictionary_node_presave($node) {
-    if($node->type == 'dictionary_word') {
+    if($node->type == 'dictionary_word' && isset($node->field_dictionary_word_language[LANGUAGE_NONE])) {
         // We always want the dictionary word's language community to be set to the language community that has the corresponding
         // related language taxonomy term. Language community is a hidden field.
         $lang_nid = _ma_dictionary_get_language_community_from_tid($node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid']);
@@ -442,7 +442,11 @@ function ma_dictionary_node_presave($node) {
 function ma_dictionary_node_update($node) {
     if($node->type == 'dictionary_word') {
         // If the word had any changes in word lists, sync those up here
-        $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        if(isset($node->field_word_list)) {
+            $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        } else {
+            $current_word_lists = array();
+        }
         $old_word_lists = _ma_dictionary_flatten_reference_field($node->original->field_word_list);
         $no_change = array_intersect($current_word_lists, $old_word_lists);
 
@@ -912,7 +916,7 @@ function ma_dictionary_scald_index_node_atoms_alter($node, &$sid_all) {
     if($node->type == 'dictionary_word') {
         if(!empty($node->field_word_entry) && isset($node->field_word_entry[LANGUAGE_NONE])) {
             foreach($node->field_word_entry[LANGUAGE_NONE] as $word_entry) {
-                $word_entry_paragraph = entity_load_single('paragraphs_item', $word_entry);
+                $word_entry_paragraph = entity_load_single('paragraphs_item', $word_entry['value']);
                 if($word_entry_paragraph) {
 
                     // Check atom reference fields
