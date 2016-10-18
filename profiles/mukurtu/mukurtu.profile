@@ -85,6 +85,12 @@ function mukurtu_resolve_dependencies() {
     // the dictionary disabled by default.
     module_enable(array('ma_dictionary'));
     module_disable(array('ma_dictionary'));
+
+    // Long term the community_tags module will probably be removed.
+    // We have removed it as a dependency from the Mukurtu features now, which
+    // allows sites to disable the module if they prefer. Here we enable the
+    // module as part of new installs for the sake of consistency.
+    module_enable(array('community_tags'));
 }
 
 function mukurtu_revert_features () {
