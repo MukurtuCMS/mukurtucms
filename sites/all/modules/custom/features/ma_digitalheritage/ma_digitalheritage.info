@@ -7,7 +7,6 @@ project = ma_digitalheritage
 dependencies[] = atom_reference
 dependencies[] = cer
 dependencies[] = comment
-dependencies[] = community_tags
 dependencies[] = ctools
 dependencies[] = defaultcontent
 dependencies[] = ds

@@ -14,7 +14,6 @@ dependencies[] = cer
 dependencies[] = chosen
 dependencies[] = ckeditor
 dependencies[] = comment
-dependencies[] = community_tags
 dependencies[] = contact
 dependencies[] = context
 dependencies[] = contextual
