@@ -60,8 +60,21 @@ function ma_dictionary_og_features_default_permissions() {
     'roles' => array(),
   );
 
+  // Exported og permission: 'node:cultural_protocol_group:create dictionary_word content'
+  $permissions['node:cultural_protocol_group:create dictionary_word content'] = array(
+    'roles' => array(
+      'contributor' => 'contributor',
+      'protocol steward' => 'protocol steward',
+    ),
+  );
+
   // Exported og permission: 'node:cultural_protocol_group:create language_community content'
   $permissions['node:cultural_protocol_group:create language_community content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:cultural_protocol_group:delete any dictionary_word content'
+  $permissions['node:cultural_protocol_group:delete any dictionary_word content'] = array(
     'roles' => array(),
   );
 
@@ -70,14 +83,38 @@ function ma_dictionary_og_features_default_permissions() {
     'roles' => array(),
   );
 
+  // Exported og permission: 'node:cultural_protocol_group:delete own dictionary_word content'
+  $permissions['node:cultural_protocol_group:delete own dictionary_word content'] = array(
+    'roles' => array(
+      'contributor' => 'contributor',
+      'protocol steward' => 'protocol steward',
+    ),
+  );
+
   // Exported og permission: 'node:cultural_protocol_group:delete own language_community content'
   $permissions['node:cultural_protocol_group:delete own language_community content'] = array(
     'roles' => array(),
   );
 
+  // Exported og permission: 'node:cultural_protocol_group:update any dictionary_word content'
+  $permissions['node:cultural_protocol_group:update any dictionary_word content'] = array(
+    'roles' => array(
+      'contributor' => 'contributor',
+      'protocol steward' => 'protocol steward',
+    ),
+  );
+
   // Exported og permission: 'node:cultural_protocol_group:update any language_community content'
   $permissions['node:cultural_protocol_group:update any language_community content'] = array(
     'roles' => array(),
+  );
+
+  // Exported og permission: 'node:cultural_protocol_group:update own dictionary_word content'
+  $permissions['node:cultural_protocol_group:update own dictionary_word content'] = array(
+    'roles' => array(
+      'contributor' => 'contributor',
+      'protocol steward' => 'protocol steward',
+    ),
   );
 
   // Exported og permission: 'node:cultural_protocol_group:update own language_community content'
@@ -292,43 +329,6 @@ function ma_dictionary_og_features_default_permissions() {
   // Exported og permission: 'node:language_community:update own language_community content'
   $permissions['node:language_community:update own language_community content'] = array(
     'roles' => array(),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:create dictionary_word content'
-  $permissions['node:cultural_protocol_group:create dictionary_word content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:delete any dictionary_word content'
-  $permissions['node:cultural_protocol_group:delete any dictionary_word content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:delete own dictionary_word content'
-  $permissions['node:cultural_protocol_group:delete own dictionary_word content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:update any dictionary_word content'
-  $permissions['node:cultural_protocol_group:update any dictionary_word content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
-  );
-
-  // Exported og permission: 'node:cultural_protocol_group:update own dictionary_word content'
-  $permissions['node:cultural_protocol_group:update own dictionary_word content'] = array(
-    'roles' => array(
-      'contributor' => 'contributor',
-      'protocol steward' => 'protocol steward',
-    ),
   );
 
   return $permissions;

@@ -30,18 +30,6 @@ function ma_dictionary_default_page_manager_pages() {
     'type' => 'none',
     'settings' => NULL,
   );
-  $page->menu = array(
-    'type' => 'none',
-    'title' => 'Browse Dictionary',
-    'name' => 'menu-browse-menu',
-    'weight' => '0',
-    'parent' => array(
-      'type' => 'none',
-      'title' => '',
-      'name' => 'navigation',
-      'weight' => '0',
-    ),
-  );
   $page->arguments = array();
   $page->conf = array(
     'admin_paths' => FALSE,
