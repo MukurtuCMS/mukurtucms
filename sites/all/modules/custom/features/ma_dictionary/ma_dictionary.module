@@ -14,6 +14,7 @@ function ma_dictionary_menu() {
       'page callback' => 'drupal_get_form',
       'page arguments' => array('ma_dictionary_set_default_language'),
       'access arguments' => array('administer taxonomy'),
+      'type' => MENU_CALLBACK,
     );
     return $items;
 }

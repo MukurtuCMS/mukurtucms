@@ -578,7 +578,7 @@ function mukurtu_splash_block_manage_dictionary() {
         );
     }
 
-    if (user_access('administer taxonomy')) {
+    if (module_exists('ma_dictionary') && user_access('administer taxonomy')) {
         $items[] = array(
             'title' => 'Set Default Language',
             'href' => 'dashboard/set-default-language',
@@ -587,7 +587,7 @@ function mukurtu_splash_block_manage_dictionary() {
         );
     }
 
-    if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+    if(module_exists('ma_dictionary') && (user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid))) {
         $items[] = array(
             'title' => 'Manage Language Communities',
             'href' => 'dashboard/manage-dictionaries',
@@ -606,7 +606,7 @@ function mukurtu_splash_block_manage_dictionary() {
         );
     }
 
-    if(user_access('create word_list content')) {
+    if(module_exists('ma_dictionary') && user_access('create word_list content')) {
         $items[] = array(
             'title' => 'Create a Word List',
             'href' => 'node/add/word-list',

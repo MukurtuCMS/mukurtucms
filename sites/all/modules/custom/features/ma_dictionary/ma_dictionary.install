@@ -9,13 +9,15 @@
  * Enable the "Browse Dictionary" browse menu item
  */
 function ma_dictionary_install () {
-  $item = array(
-    'link_path' => 'dictionary',
-    'link_title' => 'Browse Dictionary',
-    'menu_name' => 'menu-browse-menu',
-    'weight' => -40,
-    'expanded' => 0,
-    'customized' => 1,
-  );
-  menu_link_save($item);
+    /*
+        $item = array(
+        'link_path' => 'dictionary',
+        'link_title' => 'Browse Dictionary',
+        'menu_name' => 'menu-browse-menu',
+        'weight' => -40,
+        'expanded' => 0,
+        'customized' => 1,
+        );
+        menu_link_save($item);
+    */
 }
