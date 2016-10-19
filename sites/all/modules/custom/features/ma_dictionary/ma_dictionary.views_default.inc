@@ -408,6 +408,14 @@ function ma_dictionary_views_default_views() {
 
 ';
   $handler->display->display_options['header']['area']['format'] = 'filtered_html';
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['label'] = 'No Languages Available';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'There are currently no languages available. Please add a language using the <a href="/admin/structure/taxonomy/language">Manage Languages</a> page.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Relationship: Taxonomy term: Representative node */
   $handler->display->display_options['relationships']['tid_representative']['id'] = 'tid_representative';
   $handler->display->display_options['relationships']['tid_representative']['table'] = 'taxonomy_term_data';
@@ -467,6 +475,8 @@ function ma_dictionary_views_default_views() {
     t('A language community enables the dictionary for a given language and provides a group to control who can modify the dictionary.
 
 '),
+    t('No Languages Available'),
+    t('There are currently no languages available. Please add a language using the <a href="/admin/structure/taxonomy/language">Manage Languages</a> page.'),
     t('Representative node'),
     t('Term ID'),
     t('.'),
