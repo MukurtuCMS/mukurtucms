@@ -411,7 +411,7 @@ function ma_digitalheritage_add_cr_check($node) {
 function ma_digitalheritage_add_book_page_check($node) {
   if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     global $user;
-    if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
+    if ($user->uid > 0 && ($node->uid == $user->uid)) { // Only owners of nodes can create child book pages for it
       return TRUE;
     }
   }
