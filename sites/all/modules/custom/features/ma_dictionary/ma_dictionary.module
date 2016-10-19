@@ -294,6 +294,17 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
     }
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_dictionary_form_node_delete_confirm_alter(&$form, &$form_state) {
+    if($form['#node']->type == 'language_community' && isset($form['#node']->nid)) {
+        if(ma_dictionary_language_community_referenced($form['#node'])) {
+            $form['description']['#markup'] = "<p><b>WARNING: This Language Community is still actively referenced by dictionary words. Deleting the Language Community may have unintended consequences.</b></p>" . $form['description']['#markup'];
+        }
+    }
+}
+
 function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
     if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
         // If no alternate spelling is given, put the standard term in
@@ -393,15 +404,17 @@ function ma_dictionary_entity_delete($entity, $type) {
  * Implements hook_node_access
  */
 function ma_dictionary_node_access($node, $op, $account) {
-    /*    $type = is_string($node) ? $node : $node->type;
-    if($type == 'dictionary_word') {
-        $user_language_communities = _ma_dictionary_get_user_language_communities($account);
+    $type = is_string($node) ? $node : $node->type;
 
-        if($op == 'update') {
-            dpm($node);
+    // Don't delete any language communities that are still being referenced by dictionary words
+    if($type == 'language_community') {
+        if($op == 'delete') {
+            if(ma_dictionary_language_community_referenced($node)) {
+                return NODE_ACCESS_DENY;
+            }
         }
     }
-    */
+
     return NODE_ACCESS_IGNORE;
 }
 
@@ -1011,4 +1024,26 @@ function ma_dictionary_words_with_entry($pid) {
         return array_keys($result['node']);
     }
     return array();
+}
+
+// Checks if a language community is still being referenced
+function ma_dictionary_language_community_referenced($node) {
+    if(!isset($node->nid)) {
+        return FALSE;
+    }
+
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', 'dictionary_word')
+        ->fieldCondition('field_language_community', 'target_id', $node->nid)
+        ->range(0,10);
+
+    $result = $query->execute();
+
+    if(isset($result['node'])) {
+        return count($result['node']) > 0;
+    }
+
+    return FALSE;
 }
