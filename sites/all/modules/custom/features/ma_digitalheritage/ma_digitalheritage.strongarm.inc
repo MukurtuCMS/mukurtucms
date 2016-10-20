@@ -107,6 +107,10 @@ function ma_digitalheritage_strongarm() {
   $strongarm->name = 'ds_classes_fields';
   $strongarm->value = 'col-md-8 col-md-pull-4
 col-md-4 col-md-push-8
+col-md-4
+col-md-6
+col-md-8
+col-md-12
 clearfix';
   $export['ds_classes_fields'] = $strongarm;
 
