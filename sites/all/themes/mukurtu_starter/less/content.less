@@ -233,21 +233,22 @@
 
 // Dictionary Word entry (paragraphs)
 .paragraphs-item-dictionary-word-bundle.view-mode-full {
-    .group-header {
+    div {
+	margin-bottom: 0px;
+    }
+
+    .field {
+	padding-bottom: 10px;
+    }
+
+    .field-name-field-alternate-spelling {
 	margin-bottom: 10px;
 	border-bottom: 1px solid #dddddd;
+	font-size: 24px;
+    }
 
-	div {
-	    margin-bottom: 0px;
-	}
-
-	.field-name-field-alternate-spelling {
-	    font-size: 24px;
-        }
-
-	.field-name-field-source {
-        }
-    }    
+    .field-name-field-source {
+    }
     
     .group-left, .group-middle, .group-right {
 	width: 30%;
@@ -258,11 +259,6 @@
 	background: none;
 	padding: 0px;
 	border-radius: 0px;
-    }
-
-    .group-footer {
-	margin-left: 20px;
-	padding-top: 0px;
     }
 
     .label-above {
@@ -281,7 +277,7 @@
 	margin-bottom: 0px;
     }
     
-    padding-bottom: 30px;
+    padding-bottom: 20px;
 }
 
 .node-dictionary_word-form {

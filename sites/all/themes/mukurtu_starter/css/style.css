@@ -9264,16 +9264,17 @@ table .checkbox input[type="checkbox"] {
   padding-bottom: 10px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full {
-  padding-bottom: 30px;
+  padding-bottom: 20px;
 }
-.paragraphs-item-dictionary-word-bundle.view-mode-full .group-header {
-  margin-bottom: 10px;
-  border-bottom: 1px solid #dddddd;
-}
-.paragraphs-item-dictionary-word-bundle.view-mode-full .group-header div {
+.paragraphs-item-dictionary-word-bundle.view-mode-full div {
   margin-bottom: 0px;
 }
-.paragraphs-item-dictionary-word-bundle.view-mode-full .group-header .field-name-field-alternate-spelling {
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field {
+  padding-bottom: 10px;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-alternate-spelling {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #dddddd;
   font-size: 24px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .group-left,
@@ -9286,10 +9287,6 @@ table .checkbox input[type="checkbox"] {
   background: none;
   padding: 0px;
   border-radius: 0px;
-}
-.paragraphs-item-dictionary-word-bundle.view-mode-full .group-footer {
-  margin-left: 20px;
-  padding-top: 0px;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .label-above {
   font-size: 14px;

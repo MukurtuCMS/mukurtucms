@@ -72,16 +72,57 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word_bundle';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'field_alternate_spelling' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_definition' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'col-md-12',
+        ),
+      ),
+    ),
     'field_dictionary_word_recording' => array(
       'formatter_settings' => array(
         'ft' => array(
+          'classes' => 'col-md-12',
           'lb' => 'Recording(s)',
         ),
       ),
     ),
     'field_part_of_speech' => array(
       'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'col-md-4',
+        ),
+      ),
+    ),
+    'field_pronunciation' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'col-md-4',
+        ),
+      ),
+    ),
+    'field_sample_sentence' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'col-md-12',
+        ),
+      ),
+    ),
+    'field_source' => array(
+      'formatter_settings' => array(
         'ft' => array(),
+      ),
+    ),
+    'field_translation' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'col-md-4',
+        ),
       ),
     ),
   );
@@ -284,37 +325,29 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'paragraphs_item';
   $ds_layout->bundle = 'dictionary_word_bundle';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_3col_stacked_fluid';
+  $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
     'regions' => array(
-      'header' => array(
+      'ds_content' => array(
         0 => 'field_alternate_spelling',
         1 => 'field_source',
-      ),
-      'left' => array(
         2 => 'field_translation',
-      ),
-      'middle' => array(
         3 => 'field_pronunciation',
-      ),
-      'right' => array(
         4 => 'field_part_of_speech',
-      ),
-      'footer' => array(
         5 => 'field_dictionary_word_recording',
         6 => 'field_definition',
         7 => 'field_sample_sentence',
       ),
     ),
     'fields' => array(
-      'field_alternate_spelling' => 'header',
-      'field_source' => 'header',
-      'field_translation' => 'left',
-      'field_pronunciation' => 'middle',
-      'field_part_of_speech' => 'right',
-      'field_dictionary_word_recording' => 'footer',
-      'field_definition' => 'footer',
-      'field_sample_sentence' => 'footer',
+      'field_alternate_spelling' => 'ds_content',
+      'field_source' => 'ds_content',
+      'field_translation' => 'ds_content',
+      'field_pronunciation' => 'ds_content',
+      'field_part_of_speech' => 'ds_content',
+      'field_dictionary_word_recording' => 'ds_content',
+      'field_definition' => 'ds_content',
+      'field_sample_sentence' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -322,18 +355,13 @@ function ma_dictionary_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'header' => 'div',
-      'left' => 'div',
-      'middle' => 'div',
-      'right' => 'div',
-      'footer' => 'div',
+      'ds_content' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_layout;
 
