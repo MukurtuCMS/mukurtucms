@@ -706,23 +706,17 @@ function system_theme_settings_submit($form, &$form_state) {
   if (!empty($values['logo_upload'])) {
     $file = $values['logo_upload'];
     unset($values['logo_upload']);
-    $path = 'public://' . $file->filename;
-    $file->destination = $path;
-    $file->status = 1;
-    $file = file_copy($file, $file->destination);
+    $filename = file_unmanaged_copy($file->uri);
     $values['default_logo'] = 0;
-    $values['logo_path'] = $file->uri;;
+    $values['logo_path'] = $filename;
     $values['toggle_logo'] = 1;
   }
   if (!empty($values['favicon_upload'])) {
     $file = $values['favicon_upload'];
     unset($values['favicon_upload']);
-    $path = 'public://' . $file->filename;
-    $file->destination = $path;
-    $file->status = 1;
-    $file = file_copy($file, $file->destination);
+    $filename = file_unmanaged_copy($file->uri);
     $values['default_favicon'] = 0;
-    $values['favicon_path'] = $file->uri;
+    $values['favicon_path'] = $filename;
     $values['toggle_favicon'] = 1;
   }
 
@@ -2603,6 +2597,8 @@ function theme_status_report($variables) {
     if (empty($requirement['#type'])) {
       $severity = $severities[isset($requirement['severity']) ? (int) $requirement['severity'] : REQUIREMENT_OK];
       $severity['icon'] = '<div title="' . $severity['title'] . '"><span class="element-invisible">' . $severity['title'] . '</span></div>';
+      // The requirement's 'value' key is optional, provide a default value.
+      $requirement['value'] = isset($requirement['value']) ? $requirement['value'] : '';
 
       // Output table row(s)
       if (!empty($requirement['description'])) {
