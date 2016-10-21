@@ -183,8 +183,9 @@ function ma_dictionary_feeds_importer_default() {
           4 => array(
             'source' => 'Keywords',
             'target' => 'field_tags',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
+            'field_language' => 'und',
           ),
           5 => array(
             'source' => 'Additional Media',
@@ -268,6 +269,7 @@ function ma_dictionary_feeds_importer_default() {
             'source' => 'Definition',
             'target' => 'field_definition',
             'unique' => FALSE,
+            'language' => 'und',
           ),
         ),
         'insert_new' => '1',
