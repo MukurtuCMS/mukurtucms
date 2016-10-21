@@ -607,7 +607,7 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
 
     // Do not allow adding, changing, or removing of Community Records in the DH node form. The field is there only to allow users to reorder the Community Records.
     $original_community_records = array();
-    if(isset($original_node->field_community_record_children)) {
+    if(isset($original_node->field_community_record_children) && isset($original_node->field_community_record_children[LANGUAGE_NONE])) {
         foreach($original_node->field_community_record_children[LANGUAGE_NONE] as $original_child) {
             $original_community_records[] = $original_child['target_id'];
         }
@@ -633,7 +633,7 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
 
     // Do not allow adding, changing, or removing of Book Pages in the DH node form. The field is there only to allow users to reorder the Book Pages.
     $original_book_pages = array();
-    if(isset($original_node->field_book_children)) {
+    if(isset($original_node->field_book_children) && isset($original_node->field_book_children[LANGUAGE_NONE])) {
         foreach($original_node->field_book_children[LANGUAGE_NONE] as $original_child) {
             $original_book_pages[] = $original_child['target_id'];
         }
