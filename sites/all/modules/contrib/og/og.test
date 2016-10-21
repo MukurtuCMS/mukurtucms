@@ -1384,7 +1384,7 @@ class OgEntityFieldQueryTestCase extends DrupalWebTestCase {
     og_create_field('og_entity_test', 'user', 'user', $og_field);
 
 
-    // Create a non-group audience, entity-refence field.
+    // Create a non-group audience, entity reference field.
     $field = array(
       'entity_types' => array('node'),
       'settings' => array(
@@ -2460,6 +2460,46 @@ class OgAudienceFieldAccessOverrideTestCase extends DrupalWebTestCase {
     // The field should now be present.
     $this->drupalGet('user/' . $user1->uid . '/edit');
     $this->assertRaw('id="edit-og-user-node"');
+  }
+
+}
+
+/**
+ * Verify OG group ref field support delta after saving.
+ */
+class OgAudienceFieldDeltaTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'OG audience field wrapper delta',
+      'description' => 'Testing OG audience field returns the expected values when using entity metadata wrapper delta.',
+      'group' => 'Organic groups',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('og');
+
+    $this->groupType = $this->drupalCreateContentType();
+    og_create_field(OG_GROUP_FIELD, 'node', $this->groupType->type);
+
+    $this->groupConentType = $this->drupalCreateContentType();
+    og_create_field(OG_AUDIENCE_FIELD, 'node', $this->groupConentType->type);
+  }
+
+  /**
+   * Test after creation we can access values using entity metadata wrapper with
+   * the get method.
+   */
+  function testEntityMetadataWrapperForOgAudienceField() {
+    $group = $this->drupalCreateNode(array('type' => $this->groupType->type));
+    $node = $this->drupalCreateNode(array('type' => $this->groupConentType->type));
+
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->{OG_AUDIENCE_FIELD}->set(array($group));
+    $wrapper->save();
+
+    $this->assertEqual($wrapper->{OG_AUDIENCE_FIELD}->get(0)->getIdentifier(), $group->nid, 'The delta method returned the expected group ID.');
   }
 
 }
