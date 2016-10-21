@@ -125,7 +125,17 @@ class panels_layouts_ui extends ctools_export_ui {
 
   function edit_form_submit(&$form, &$form_state) {
     parent::edit_form_submit($form, $form_state);
+
+    // While we short circuited the main submit hook, we need to keep this one.
+    panels_edit_display_settings_form_submit($form, $form_state);
     $form_state['item']->settings = $form_state['display']->layout_settings;
+  }
+
+  function edit_form_validate(&$form, &$form_state) {
+    parent::edit_form_validate($form, $form_state);
+
+    // While we short circuited the main validate hook, we need to keep this one.
+    panels_edit_display_settings_form_validate($form, $form_state);
   }
 
   function list_form(&$form, &$form_state) {
