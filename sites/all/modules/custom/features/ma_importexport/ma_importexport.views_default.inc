@@ -184,7 +184,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_tk_body']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['hide_alter_empty'] = FALSE;
-  /* Field: Content: Contributor */
+  /* Field: Field: Contributor */
   $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
@@ -250,7 +250,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_rights']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['type'] = 'text_plain';
-  /* Field: Content: Source */
+  /* Field: Field: Source */
   $handler->display->display_options['fields']['field_source']['id'] = 'field_source';
   $handler->display->display_options['fields']['field_source']['table'] = 'field_data_field_source';
   $handler->display->display_options['fields']['field_source']['field'] = 'field_source';
@@ -429,6 +429,8 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['style_options']['provide_file'] = 0;
   $handler->display->display_options['style_options']['parent_sort'] = 0;
   $handler->display->display_options['style_options']['transform'] = 1;
+  $handler->display->display_options['style_options']['root_node'] = 'nodes';
+  $handler->display->display_options['style_options']['item_node'] = 'node';
   $handler->display->display_options['defaults']['header'] = FALSE;
   $handler->display->display_options['defaults']['footer'] = FALSE;
   $handler->display->display_options['defaults']['relationships'] = FALSE;
@@ -576,7 +578,7 @@ print $output;
   $handler->display->display_options['fields']['field_tk_body']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_tk_body']['hide_alter_empty'] = FALSE;
-  /* Field: Content: Contributor */
+  /* Field: Field: Contributor */
   $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
@@ -644,7 +646,7 @@ print $output;
   $handler->display->display_options['fields']['field_rights']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_rights']['type'] = 'text_plain';
-  /* Field: Content: Source */
+  /* Field: Field: Source */
   $handler->display->display_options['fields']['field_source']['id'] = 'field_source';
   $handler->display->display_options['fields']['field_source']['table'] = 'field_data_field_source';
   $handler->display->display_options['fields']['field_source']['field'] = 'field_source';
