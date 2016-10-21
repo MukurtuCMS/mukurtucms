@@ -87,10 +87,10 @@ class flag_node extends flag_entity {
   /**
    * Adjust the Content ID to find the translation parent if i18n-enabled.
    *
-   * @param $entity_id
+   * @param int $entity_id
    *   The nid for the content.
    *
-   * @return
+   * @return int
    *   The tnid if available, the nid otherwise.
    */
   function get_translation_id($entity_id) {

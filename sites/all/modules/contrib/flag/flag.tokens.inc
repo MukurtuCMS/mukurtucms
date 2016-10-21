@@ -83,6 +83,11 @@ function flag_token_info() {
   if (module_exists('token')) {
     $entity_info = entity_get_info();
     foreach (flag_get_types() as $flag_type) {
+      // If the flag type is not an entity type then skip.
+      if (!isset($entity_info[$flag_type])) {
+        continue;
+      }
+
       // The flag type is the entity type, but this is not necessarily the same
       // as the entity's token type.
       $token_type = $entity_info[$flag_type]['token type'];
@@ -201,7 +206,7 @@ function flag_tokens($type, $tokens, array $data = array(), array $options = arr
 /**
  * Returns HTML for a tokens browser.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - types: An array naming the types of tokens to show.
  *   - global_types: Whether to show global tokens.
@@ -211,7 +216,7 @@ function theme_flag_tokens_browser($variables) {
   $global_types = $variables['global_types'];
 
   if (module_exists('token')) {
-    return theme('token_tree', array('token_types' => $types, 'global_types' => $global_types));
+    return theme('token_tree', array('token_types' => $types, 'global_types' => $global_types, 'dialog' => TRUE));
   }
   else {
     return '<p><em>' . t("Note: You don't have the <a href='@token-url'>Token</a> module installed, so the list of available tokens isn't shown here. You don't have to install <a href='@token-url'>Token</a> to be able to use tokens, but if you have it installed, and enabled, you'll be able to enjoy an interactive tokens browser.", array('@token-url' => 'http://drupal.org/project/token')) . '</em></p>';

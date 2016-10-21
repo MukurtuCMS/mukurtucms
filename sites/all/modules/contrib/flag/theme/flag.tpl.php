@@ -17,8 +17,11 @@
  * - $action: The action the link is about to carry out, either "flag" or
  *   "unflag".
  * - $status: The status of the item; either "flagged" or "unflagged".
+ * - $entity_id: The id of the entity item.
  *
- * - $link_href: The URL for the flag link.
+ * - $link['href']: The path for the flag link.
+ * - $link['query']: Array of query string parameters, such as "destination".
+ * - $link_href: The URL for the flag link, query string included.
  * - $link_text: The text to show for the link.
  * - $link_title: The title attribute for the link.
  *
@@ -34,6 +37,7 @@
  *   JavaScript-based toggling of flags.
  * - $needs_wrapping_element: Determines whether the flag displays a wrapping
  *   HTML DIV element.
+ * - $errors: An array of error messages.
  *
  * Template suggestions available, listed from the most specific template to
  * the least. Drupal will use the most specific template it finds:

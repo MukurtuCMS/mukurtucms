@@ -232,7 +232,7 @@ function theme_flag_admin_page($variables) {
 /**
  * Menu callback for adding a new flag.
  *
- * @param $entity_type
+ * @param string|NULL $entity_type
  *  The entity type for the new flag, taken from the path argument. If not
  *  present (i.e., '/add'), a form showing all possible flag types is shown.
  *  Otherwise, this shows a form for adding af flag the given type.
@@ -401,7 +401,7 @@ function flag_form($form, &$form_state, $flag) {
         t('Add this [node:type] to your favorites'),
         t('Vote for this proposal ([node:flag-vote-count] people have already done so)'),
       ),
-      'attributes' => array('class' => 'token-examples'),
+      'attributes' => array('class' => array('token-examples')),
     )) .
     '<p>' . t('These tokens will be replaced with the appropriate fields from the node (or user, or comment).') . '</p>' .
     theme('flag_tokens_browser', array('types' => $flag->get_labels_token_types())),
@@ -693,19 +693,26 @@ function flag_form_submit($form, &$form_state) {
   // We clear caches more vigorously if the flag was new.
   _flag_clear_cache($flag->entity_type, !empty($flag->is_new));
 
+  if (!empty($flag->is_new)) {
+    field_attach_create_bundle('flagging', $flag->name);
+  }
+
   // Save permissions.
   // This needs to be done after the flag cache has been cleared, so that
   // the new permissions are picked up by hook_permission().
   // This may need to move to the flag class when we implement extra permissions
   // for different flag types: http://drupal.org/node/879988
 
-  // If the flag machine name as changed, clean up all the obsolete permissions.
+  // If the flag machine name as changed, clean up all the obsolete permissions
+  // and notify FieldAPI.
   if ($flag->name != $form['#flag_name']) {
     $old_name = $form['#flag_name'];
     $permissions = array("flag $old_name", "unflag $old_name");
     foreach (array_keys(user_roles()) as $rid) {
       user_role_revoke_permissions($rid, $permissions);
     }
+
+    field_attach_rename_bundle('flagging', $old_name, $flag->name);
   }
 
   foreach (array_keys(user_roles(!module_exists('session_api'))) as $rid) {
@@ -796,9 +803,9 @@ function flag_check_link_types($element) {
 /**
  * Clears various caches when one or more flags are modified.
  *
- * @param $entity_types
+ * @param string|array $entity_types
  *  The entity types for the flags. May be a single value or an array.
- * @param $is_insert_or_delete
+ * @param bool $is_insert_or_delete
  *  Whether the modified flag is being inserted (saved for the first time) or
  *  deleted. This results in a more vigorous clearing of caches. In
  *  particular, when no flags exist yet, no Field admin UI paths exist and these

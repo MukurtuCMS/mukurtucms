@@ -13,10 +13,10 @@ abstract class FlagTestCaseBase extends DrupalWebTestCase {
   /**
    * Helper to create a flag from an array of data and clear caches etc.
    *
-   * @param $flag_data
+   * @param array $flag_data
    *  An array of flag data.
    *
-   * @return
+   * @return flag_flag
    *  The flag object.
    */
   function createFlag($flag_data) {
@@ -1653,6 +1653,132 @@ class FlagHookInvocationsTestCase extends FlagTestCaseBase {
     // updated yet.
     $flag_get_user_flag_counts = $hook_data_variable['hook_entity_delete']['api_calls']['flag_get_user_flag_counts'];
     $this->assertEqual($flag_get_user_flag_counts, 1, "hook_entity_delete() gets a correct flag count from flag_get_user_flag_counts().");
+  }
+
+}
+
+/**
+ * Verifies the optimization for comment viewing.
+ */
+class FlagCommentOptimizationTestCase extends FlagTestCaseBase {
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Comment view optimization',
+      'description' => 'Tests that loading of flagging records when viewing all comments on a node works correctly.',
+      'group' => 'Flag',
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  function setUp() {
+    parent::setUp(array(
+      'flag',
+      'comment',
+      'flag_comment_flag_test',
+    ));
+
+    $flag_data = array(
+      'entity_type' => 'comment',
+      'name' => 'test_flag',
+      'title' => 'Test Flag',
+      'global' => 0,
+      'types' => array(),
+      'flag_short' => 'Flag this item',
+      'flag_long' => '',
+      'flag_message' => '',
+      'unflag_short' => 'Unflag this item',
+      'unflag_long' => '',
+      'unflag_message' => '',
+      'unflag_denied_text' => 'You may not unflag this item',
+      'link_type' => 'normal',
+      'weight' => 0,
+      'show_on_form' => 0,
+      'access_author' => '',
+      'show_contextual_link' => 0,
+      'show_in_links' => array(
+        'full' => 1,
+        'teaser' => 1,
+      ),
+      'i18n' => 0,
+      'api_version' => 3,
+    );
+    $this->flag = $this->createFlag($flag_data);
+
+    // Set up comments on article nodes.
+    variable_set('comment_form_location_article', COMMENT_FORM_BELOW);
+
+    // Create test user who can flag and unflag.
+    $this->user = $this->drupalCreateUser(array(
+      'access comments',
+      'post comments',
+      'flag test_flag',
+      'unflag test_flag',
+    ));
+    $this->drupalLogin($this->user);
+
+    // Create an article node.
+    $title = $this->randomName(8);
+    $node = array(
+      'title' => $title,
+      'body' => array(LANGUAGE_NONE => array(array('value' => $this->randomName(32)))),
+      'uid' => $this->user->uid,
+      'type' => 'article',
+      'is_new' => TRUE,
+      'comment' => COMMENT_NODE_OPEN,
+    );
+    $node = node_submit((object) $node);
+    node_save($node);
+
+    $this->nid = $node->nid;
+
+    // Create some comments on the node.
+    $this->cids = array();
+    foreach (range(1, 10) as $i) {
+      $comment = (object) array(
+        'cid' => NULL,
+        'nid' => $node->nid,
+        'pid' => 0,
+        'uid' => $this->user->uid,
+        'status' => COMMENT_PUBLISHED,
+        'subject' => $this->randomName(),
+        'language' => LANGUAGE_NONE,
+        'comment_body' => array(LANGUAGE_NONE => array($this->randomName())),
+      );
+      comment_save($comment);
+
+      $this->cids[$comment->cid] = $comment->cid;
+    }
+
+    // Flag one comment.
+    $this->flag->flag('flag', reset($this->cids));
+  }
+
+  /**
+   * Test viewing multiple comments on a node is optimized.
+   */
+  function testCommentView() {
+    // View the node.
+    $this->drupalGet('node/' . $this->nid);
+
+    // Inspect the tracking variable.
+    // Hooks in the flag_comment_flag_test module will have populated this with
+    // data at various points in the lifecycle of the loaded page.
+    $tracking_variable = variable_get('flag_comment_flag_test_user_flags_cache_tracking', array());
+
+    $this->assertNull($tracking_variable['hook_comment_load'], "The flag_get_user_flags() static cache is empty when the comments are being loaded.");
+
+    // The test module's hook_entity_view() runs after flag's implementation, so
+    // for the first comment view, the cache should be fully populated: all
+    // comments should have an entry.
+    foreach ($this->cids as $cid) {
+      $this->assertNotNull($tracking_variable['hook_entity_view_1'][$this->user->uid][0]['comment'][$cid], "The static cache contained data for comment $cid when comment 1 was being viewed.");
+    }
   }
 
 }

@@ -136,17 +136,17 @@ function flag_actions_get_actions($flag_name = NULL, $reset = FALSE) {
 /**
  * Insert a new flag action.
  *
- * @param $fid
+ * @param int $fid
  *   The flag object ID.
- * @param $event
+ * @param string $event
  *   The flag event, such as "flag" or "unflag".
- * @param $threshold
+ * @param int $threshold
  *   The flagging threshold at which this action will be executed.
- * @param $repeat_threshold
+ * @param int $repeat_threshold
  *   The number of additional flaggings after which the action will be repeated.
- * @param $callback
+ * @param string $callback
  *   The action callback to be executed.
- * @param $parameters
+ * @param array $parameters
  *   The action parameters.
  */
 function flag_actions_insert_action($fid, $event, $threshold, $repeat_threshold, $callback, $parameters) {
@@ -165,15 +165,15 @@ function flag_actions_insert_action($fid, $event, $threshold, $repeat_threshold,
 /**
  * Update an existing flag action.
  *
- * @param $aid
+ * @param int $aid
  *   The flag action ID to update.
- * @param $event
+ * @param string $event
  *   The flag event, such as "flag" or "unflag".
- * @param $threshold
+ * @param int $threshold
  *   The flagging threshold at which this action will be executed.
- * @param $repeat_threshold
+ * @param int $repeat_threshold
  *   The number of additional flaggings after which the action will be repeated.
- * @param $parameters
+ * @param array $parameters
  *   The action parameters.
  */
 function flag_actions_update_action($aid, $event, $threshold, $repeat_threshold, $parameters) {
@@ -191,7 +191,7 @@ function flag_actions_update_action($aid, $event, $threshold, $repeat_threshold,
 /**
  * Delete a flag action.
  *
- * @param $aid
+ * @param int $aid
  *   The flag action ID to delete.
  */
 function flag_actions_delete_action($aid) {
@@ -393,9 +393,9 @@ function theme_flag_actions_add_form($variables) {
  *
  * @param $form_state
  *   The form state.
- * @param $aid
+ * @param int|NULL $aid
  *   If editing an action, an action ID must be passed in.
- * @param $flag_name
+ * @param string|NULL $flag_name
  *   If adding a new action to a flag, a flag name must be specified.
  */
 function flag_actions_form($form, &$form_state, $aid = NULL, $flag_name = NULL) {

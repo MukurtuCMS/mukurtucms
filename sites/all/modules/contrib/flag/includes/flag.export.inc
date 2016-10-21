@@ -8,9 +8,9 @@
 /**
  * Export a flag to code.
  *
- * @param $flags
+ * @param array $flags
  *   An array of flag objects, or flag name.
- * @param $module
+ * @param string $module
  *   Optional. The name of the module that will be created if exporting to use
  *   in hook_flag_default_flags().
  */
@@ -247,7 +247,7 @@ function flag_update_page($flag) {
 /**
  * Update a flag before export.
  *
- * @param $flag
+ * @param flag_flag $flag
  *   The flag object passed by reference.
  */
 function flag_update_export(&$flag) {

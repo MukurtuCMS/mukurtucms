@@ -370,9 +370,9 @@ class flag_flag {
    * an object that hasn't yet been saved to the database. Subsequent calls to
    * fetch_entity() return the remembered object.
    *
-   * @param $entity_id
+   * @param int $entity_id
    *  The ID of the object to cache.
-   * @param $object
+   * @param stdClass $object
    *  The object to cache.
    */
   function remember_entity($entity_id, $object) {
@@ -430,13 +430,13 @@ class flag_flag {
   /**
    * Determines whether the user has the permission to use this flag.
    *
-   * @param $action
+   * @param string $action
    *   (optional) The action to test, either "flag" or "unflag". If none given,
    *   "flag" will be tested, which is the minimum permission to use a flag.
    * @param $account
    *   (optional) The user object. If none given, the current user will be used.
    *
-   * @return
+   * @return bool
    *   Boolean TRUE if the user is allowed to flag/unflag. FALSE otherwise.
    *
    * @see flag_permission()
@@ -461,16 +461,16 @@ class flag_flag {
    * This method typically should not be overridden by child classes. Instead
    * they should implement type_access(), which is called by this method.
    *
-   * @param $entity_id
+   * @param int $entity_id
    *   The entity ID to flag/unflag.
-   * @param $action
+   * @param string|NULL $action
    *   The action to test. Either 'flag' or 'unflag'. Leave NULL to determine
    *   by flag status.
-   * @param $account
+   * @param stdClass $account
    *   The user on whose behalf to test the flagging action. Leave NULL for the
    *   current user.
    *
-   * @return
+   * @return bool
    *   Boolean TRUE if the user is allowed to flag/unflag the given entity.
    *   FALSE otherwise.
    */
@@ -530,14 +530,14 @@ class flag_flag {
    * they should implement type_access_multiple(), which is called by this
    * method.
    *
-   * @param $entity_ids
+   * @param array $entity_ids
    *   The array of entity IDs to check. The keys are the entity IDs, the
    *   values are the actions to test: either 'flag' or 'unflag'.
-   * @param $account
+   * @param stdClass $account
    *   (optional) The account for which the actions will be compared against.
    *   If left empty, the current user will be used.
    *
-   * @return
+   * @return array
    *   An array whose keys are the object IDs and values are booleans indicating
    *   access.
    *
@@ -621,9 +621,9 @@ class flag_flag {
    * Utility function: Checks whether a flag applies to a certain type, and
    * possibly subtype, of entity.
    *
-   * @param $entity_type
+   * @param string $entity_type
    *   The type of entity being checked, such as "node".
-   * @param $content_subtype
+   * @param string|NULL $content_subtype
    *   The subtype being checked. For entities this will be the bundle name (the
    *   node type in the case of nodes).
    *
@@ -671,13 +671,13 @@ class flag_flag {
   /**
    * Flags, or unflags, an item.
    *
-   * @param $action
+   * @param string $action
    *   Either 'flag' or 'unflag'.
-   * @param $entity_id
+   * @param int $entity_id
    *   The ID of the item to flag or unflag.
-   * @param $account
+   * @param string|NULL $account
    *   The user on whose behalf to flag. Leave empty for the current user.
-   * @param $skip_permission_check
+   * @param bool $skip_permission_check
    *   Flag the item even if the $account user don't have permission to do so.
    * @param $flagging
    *   (optional) This method works in tandem with Drupal's Field subsystem.
@@ -695,7 +695,7 @@ class flag_flag {
    *  to take care of Field API validation, using either
    *  field_attach_form_validate() or field_attach_validate().
    *
-   * @return
+   * @return bool
    *   FALSE if some error occured (e.g., user has no permission, flag isn't
    *   applicable to the item, etc.), TRUE otherwise.
    */
@@ -769,21 +769,30 @@ class flag_flag {
       }
     }
 
-    // Perform the flagging or unflagging of this flag.
-    if ($action == 'unflag') {
-      if ($flagged) {
-        $this->flagging_delete($flagging, $entity_id, $account);
+    // Perform the flagging or unflagging of this flag
+    // along with a transaction mechanism.
+    $transaction = db_transaction();
+    try {
+      if ($action == 'unflag') {
+        if ($flagged) {
+          $this->flagging_delete($flagging, $entity_id, $account);
+        }
+        // We do nothing in the case of an attempt to unflag something that isn't
+        // actually flagged.
       }
-      // We do nothing in the case of an attempt to unflag something that isn't
-      // actually flagged.
+      elseif ($action == 'flag') {
+        if (!$flagged) {
+          $this->flagging_insert($flagging, $entity_id, $account);
+        }
+        else {
+          $this->flagging_update($flagging, $entity_id, $account);
+        }
+      }
     }
-    elseif ($action == 'flag') {
-      if (!$flagged) {
-        $this->flagging_insert($flagging, $entity_id, $account);
-      }
-      else {
-        $this->flagging_update($flagging, $entity_id, $account);
-      }
+    catch (Exception $e) {
+      $transaction->rollback();
+      watchdog_exception('flag', $e);
+      throw $e;
     }
 
     return TRUE;
@@ -793,11 +802,11 @@ class flag_flag {
    * Create a new Flagging to flag an entity.
    *
    * @param $flagging
-   *  The flagging entity that is to be removed.
+   *  The flagging entity that is to be saved.
    * @param $entity_id
-   *  The entity ID of entity being unflagged.
+   *  The entity ID of entity being flagged.
    * @param $account
-   *  The account performing the unflagging.
+   *  The account performing the flagging.
    */
   private function flagging_insert($flagging, $entity_id, $account) {
     if ($this->uses_anonymous_cookies()) {
@@ -842,32 +851,14 @@ class flag_flag {
   }
 
   /**
-   * Invoke a Rules event in reaction to a flagging or unflagging.
-   *
-   * @param $action
-   *   Either 'flag' or 'unflag'.
-   * @param $flagging
-   *  The flagging entity that is to be removed.
-   * @param $entity_id
-   *  The entity ID of entity being unflagged.
-   * @param $account
-   *  The account performing the unflagging.
-   */
-  protected function invoke_rules_event($action, $flagging, $entity_id, $account) {
-    // We only support flags on entities: do nothing in this class.
-    // See flag_entity::invoke_rules_event().
-    return;
-  }
-
-  /**
    * Update a Flagging.
    *
    * @param $flagging
-   *  The flagging entity that is to be removed.
+   *  The flagging entity that is being updated.
    * @param $entity_id
-   *  The entity ID of entity being unflagged.
+   *  The entity ID of entity the flagging is on.
    * @param $account
-   *  The account performing the unflagging.
+   *  The account performing the action.
    */
   private function flagging_update($flagging, $entity_id, $account) {
     // Invoke presave hooks.
@@ -946,6 +937,24 @@ class flag_flag {
   }
 
   /**
+   * Invoke a Rules event in reaction to a flagging or unflagging.
+   *
+   * @param $action
+   *   Either 'flag' or 'unflag'.
+   * @param $flagging
+   *  The flagging entity that is either newly created or about to be deleted.
+   * @param $entity_id
+   *  The entity ID of entity being flagged or unflagged.
+   * @param $account
+   *  The account performing the action.
+   */
+  protected function invoke_rules_event($action, $flagging, $entity_id, $account) {
+    // We only support flags on entities: do nothing in this class.
+    // See flag_entity::invoke_rules_event().
+    return;
+  }
+
+  /**
    * Construct a new, empty flagging entity object.
    *
    * @param mixed $entity_id
@@ -980,11 +989,11 @@ class flag_flag {
    * Thanks to using a cache, inquiring several different flags about the same
    * item results in only one SQL query.
    *
-   * @param $uid
+   * @param int $uid
    *   (optional) The user ID whose flags we're checking. If none given, the
    *   current user will be used.
    *
-   * @return
+   * @return bool
    *   TRUE if the object is flagged, FALSE otherwise.
    */
   function is_flagged($entity_id, $uid = NULL, $sid = NULL) {
@@ -1008,7 +1017,10 @@ class flag_flag {
     $uid = $this->global ? 0 : (!isset($uid) ? $GLOBALS['user']->uid : $uid);
     $sid = $this->global ? 0 : (!isset($sid) ? flag_get_sid($uid) : $sid);
 
-    // flag_get_user_flags() does caching.
+    // Get all the flaggings for this user on the entity from
+    // flag_get_user_flags(), which will statically cache them. This means that
+    // when this method is called multiple times for all the flags on an entity,
+    // only the first call incurs a database query.
     $user_flags = flag_get_user_flags($this->entity_type, $entity_id, $uid, $sid);
     return isset($user_flags[$this->name]) ? $user_flags[$this->name] : NULL;
   }
@@ -1052,9 +1064,9 @@ class flag_flag {
   /**
    * Increases the flag count for an object and clears the static counts cache.
    *
-   * @param $entity_id
+   * @param int $entity_id
    *   For which item should the count be increased.
-   * @param $number
+   * @param int $number
    *   The amount of counts to increasing. Defaults to 1.
    *
    * @private
@@ -1085,9 +1097,9 @@ class flag_flag {
   /**
    * Decreases the flag count for an object and clears the static counts cache.
    *
-   * @param $entity_id
+   * @param int $entity_id
    *   For which item should the count be descreased.
-   * @param $number
+   * @param int $number
    *   The amount of counts to decrease. Defaults to 1.
    *
    * @private
@@ -1174,13 +1186,13 @@ class flag_flag {
    * E.g., do `print $flag->get_label('title')` instead of `print
    * $flag->title`.
    *
-   * @param $label
+   * @param string $label
    *   The label to get, e.g. 'title', 'flag_short', 'unflag_short', etc.
-   * @param $entity_id
+   * @param int $entity_id
    *   The ID in whose context to interpret tokens. If not given, only global
    *   tokens will be substituted.
    *
-   * @return
+   * @return string
    *   The processed label.
    */
   function get_label($label, $entity_id = NULL) {
@@ -1408,6 +1420,8 @@ class flag_flag {
    * Deletes a flag from the database.
    */
   function delete() {
+    field_attach_delete_bundle('flagging', $this->name);
+
     db_delete('flag')->condition('fid', $this->fid)->execute();
     db_delete('flagging')->condition('fid', $this->fid)->execute();
     db_delete('flag_types')->condition('fid', $this->fid)->execute();
@@ -1520,18 +1534,18 @@ class flag_flag {
    * This is a wrapper around theme('flag') that channels the call to the right
    * template file.
    *
-   * @param $action
+   * @param string $action
    *  The action the link is about to carry out, either "flag" or "unflag".
-   * @param $entity_id
+   * @param int $entity_id
    *  The ID of the object to flag.
-   * @param $variables = array()
+   * @param array $variables
    *  An array of further variables to pass to theme('flag'). For the full list
    *  of parameters, see flag.tpl.php. Of particular interest:
    *  - after_flagging: Set to TRUE if this flag link is being displayed as the
    *    result of a flagging action.
    *  - errors: An array of error messages.
    *
-   * @return
+   * @return string
    *  The HTML for the flag link.
    */
   function theme($action, $entity_id, $variables = array()) {
