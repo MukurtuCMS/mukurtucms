@@ -29,9 +29,9 @@ files[] = includes/views/flag_handler_relationships.inc
 files[] = includes/views/flag_plugin_argument_validate_flaggability.inc
 files[] = tests/flag.test
 
-; Information added by Drupal.org packaging script on 2014-05-03
-version = "7.x-3.5"
+; Information added by Drupal.org packaging script on 2016-09-23
+version = "7.x-3.9"
 core = "7.x"
 project = "flag"
-datestamp = "1399113834"
+datestamp = "1474619065"
 

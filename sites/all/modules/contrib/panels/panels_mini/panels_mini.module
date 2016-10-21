@@ -112,9 +112,11 @@ function panels_mini_block_view($delta = 0) {
       $contexts = ctools_context_match_required_contexts($panel_mini->requiredcontexts, $current_page['contexts']);
     }
   }
+  drupal_alter('panels_mini_block_contexts', $contexts, $panel_mini);
 
   $panel_mini->context = $panel_mini->display->context =  ctools_context_load_contexts($panel_mini, FALSE, $contexts);
   $panel_mini->display->css_id = panels_mini_get_id($panel_mini->name);
+  $panel_mini->display->owner = $panel_mini;
 
   $block = array();
 
@@ -130,8 +132,8 @@ function panels_mini_block_view($delta = 0) {
  */
 function panels_mini_block_configure($delta = 0) {
   return array(
-    'admin-shortcut' => array(
-      '#value' => l(t('Manage this mini-panel'), 'admin/structure/mini-panels/' . $delta . '/edit')
+    'admin_shortcut' => array(
+      '#markup' => l(t('Manage this mini-panel'), 'admin/structure/mini-panels/list/' . $delta . '/edit')
     ),
   );
 }
@@ -145,6 +147,10 @@ function panels_mini_block_list_alter(&$blocks) {
   if (module_exists('page_manager')) {
     $current_page = page_manager_get_current_page();
   }
+
+  // Load add at once to save time.
+  panels_mini_load_all();
+
   foreach ($blocks as $key => $block) {
     if ($block->module != 'panels_mini') {
       // This block was added by a contrib module, leave it in the list.
@@ -174,6 +180,44 @@ function panels_mini_block_list_alter(&$blocks) {
           continue;
         }
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_get_pane_links_alter().
+ */
+function panels_mini_get_pane_links_alter(&$links, $pane, $content_type) {
+  if ($pane->type == 'panels_mini') {
+    $links['top']['edit_panels_mini'] = array(
+      'title' => t('Edit mini panel'),
+      'href' => url('admin/structure/mini-panels/list/' . $pane->subtype . '/edit/content', array('absolute' => TRUE)),
+      'attributes' => array('target' => array('_blank')),
+    );
+  }
+}
+
+/**
+ * Implements hook_contextual_links_view_alter().
+ */
+function panels_mini_contextual_links_view_alter(&$element, $items) {
+
+  // Add contextual links to all mini panel blocks with bid property.
+  if (isset($element['#element']['#block']) && isset($element['#element']['#block']->bid) && strpos((string) $element['#element']['#block']->bid, 'panels_mini') === 0) {
+
+    $admin_pages = array(
+      t('Configure mini panel settings') => 'basic',
+      t('Configure mini panel context') => 'context',
+      t('Configure mini panel layout') => 'layout',
+      t('Configure mini panel content') => 'content',
+    );
+
+    foreach ($admin_pages as $title => $tail) {
+      $element['#links']['mini-panels-' . $tail] = array(
+        'title' => $title,
+        'href' => 'admin/structure/mini-panels/list/' . $element['#element']['#block']->delta . '/edit/' . $tail,
+        'query' => drupal_get_destination(),
+      );
     }
   }
 }
@@ -215,22 +259,30 @@ function panels_mini_load($name) {
   // We use array_key_exists because failed loads will be NULL and
   // isset() will try to load it again.
   if (!array_key_exists($name, $cache)) {
-    ctools_include('export');
-    $result = ctools_export_load_object('panels_mini', 'names', array($name));
-    if (isset($result[$name])) {
-      if (empty($result[$name]->display)) {
-        $result[$name]->display = panels_load_display($result[$name]->did);
-        if (!empty($result[$name]->title) && empty($result[$name]->display->title)) {
-          $result[$name]->display->title = $result[$name]->title;
-        }
-      }
-      $cache[$name] = $result[$name];
-      if (!empty($result[$name]->title) && empty($result[$name]->admin_title)) {
-        $cache[$name]->admin_title = $result[$name]->title;
-      }
+    $cid = 'panels_mini_load:' . $name;
+    $result = cache_get($cid, 'cache_panels');
+    if (!empty($result->data)) {
+      $cache[$name] = $result->data;
     }
     else {
-      $cache[$name] = NULL;
+      ctools_include('export');
+      $result = ctools_export_load_object('panels_mini', 'names', array($name));
+      if (isset($result[$name])) {
+        if (empty($result[$name]->display)) {
+          $result[$name]->display = panels_load_display($result[$name]->did);
+          if (!empty($result[$name]->title) && empty($result[$name]->display->title)) {
+            $result[$name]->display->title = $result[$name]->title;
+          }
+        }
+        $cache[$name] = $result[$name];
+        if (!empty($result[$name]->title) && empty($result[$name]->admin_title)) {
+          $cache[$name]->admin_title = $result[$name]->title;
+        }
+        cache_set($cid, $cache[$name], 'cache_panels', CACHE_TEMPORARY);
+      }
+      else {
+        $cache[$name] = NULL;
+      }
     }
   }
 
@@ -252,6 +304,22 @@ function panels_mini_load_all($reset = FALSE) {
     $all_loaded = TRUE;
     if ($reset) {
       $cache = array();
+    }
+    else {
+      $panel_names = db_select('panels_mini', 'pm')
+        ->fields('pm', array('name'))
+        ->execute();
+      $cids = array();
+      foreach ($panel_names as $name) {
+        $cids[] = 'panels_mini_load:' . $name->name;
+      }
+      $output = cache_get_multiple($cids, 'cache_panels');
+      foreach ($output as $mini) {
+        if (!empty($mini->data)) {
+          $mini = $mini->data;
+          $cache[$mini->name] = $mini;
+        }
+      }
     }
 
     ctools_include('export');
@@ -285,7 +353,8 @@ function panels_mini_load_all($reset = FALSE) {
     }
   }
 
-  return $cache;
+  // Strip out NULL entries that may have been added by panels_mini_load().
+  return array_filter($cache);
 }
 
 /**
@@ -293,9 +362,13 @@ function panels_mini_load_all($reset = FALSE) {
  */
 function panels_mini_save(&$mini) {
   if (!empty($mini->display)) {
+    $mini->display->storage_id = $mini->name;
     $display = panels_save_display($mini->display);
     $mini->did = $display->did;
   }
+
+  // Clear the panels_mini_load cache.
+  cache_clear_all('panels_mini_load:', 'cache_panels', TRUE);
 
   $update = (isset($mini->pid) && $mini->pid != 'new') ? array('pid') : array();
   drupal_write_record('panels_mini', $mini, $update);
@@ -349,6 +422,24 @@ function panels_mini_ctools_plugin_directory($module, $plugin) {
   if ($module == 'ctools' && ($plugin == 'content_types' || $plugin == 'export_ui')) {
     return 'plugins/' . $plugin;
   }
+  if ($module == 'panels' && $plugin == 'panels_storage') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Implements hook_default_panels_mini_alter().
+ *
+ * If a default Panels display has no storage type, set it.
+ */
+function panels_default_panels_mini_alter(&$mini_panels) {
+  foreach ($mini_panels as &$mini_panel) {
+    $display =& $mini_panel->display;
+    if (empty($display->storage_type)) {
+      $display->storage_type = 'panels_mini';
+      $display->storage_id = $mini_panel->name;
+    }
+  }
 }
 
 /**
@@ -387,6 +478,9 @@ function panels_mini_panels_cache_get($key) {
   $cache->display = $item->display;
   $cache->display->context = ctools_context_load_contexts($item);
   $cache->display->cache_key = 'panels_mini:' . $key;
+  $cache->display->storage_type = 'panels_mini';
+  // Temporary storage id that's replaced in panels_mini_save().
+  $cache->display->storage_id = 'panels_mini';
   $cache->content_types = panels_common_get_allowed_types('panels_mini', $cache->display->context);
   $cache->display_title = TRUE;
 
@@ -428,6 +522,15 @@ function panels_mini_panels_cache_save($key, $cache) {
  * Break the lock on a panels mini page.
  */
 function panels_mini_panels_cache_break_lock($key, $cache) {
+}
+
+/**
+ * Implements hook_panels_pre_render().
+ */
+function panels_mini_panels_pre_render($display, $renderer) {
+  if (isset($display->owner->table) && $display->owner->table == 'panels_mini' && $renderer instanceof panels_renderer_standard) {
+    $renderer->show_empty_layout = FALSE;
+  }
 }
 
 /**
@@ -478,4 +581,15 @@ function panels_mini_panels_dashboard_blocks(&$vars) {
     'section' => 'left',
   );
 
+}
+
+/**
+ * Implements template_preprocess_ctools_wizard_trail().
+ *
+ * Customize the divider used in the CTools wizard to build the edit pages for
+ * Mini Panels as a stop-gap measure until the UX can be completely re-done.
+ */
+function panels_mini_preprocess_ctools_wizard_trail(&$variables) {
+  $variables['divider'] = ' | ';
+  drupal_add_css(drupal_get_path('module', 'panels_mini') . '/panels_mini.css');
 }

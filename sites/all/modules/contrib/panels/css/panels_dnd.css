@@ -175,7 +175,7 @@ div.panels-set-title-hide .panel-pane-is-title {
   margin: 0;
 }
 
-.panel-portlet .buttons input {
+.panel-portlet .buttons input, .panel-portlet .buttons button {
   margin: 0;
   padding: 0;
   display: inline;
@@ -305,9 +305,17 @@ a.close img {
   background: url(../images/bg-content-modal.png);
   height: 100%;
   margin: -1em;
-  padding-top: 1em;
+  padding-bottom: 1em;
   padding-left: 175px;
   position: relative;
+}
+
+.panels-section-columns-quickfilter {
+  padding-top: 1em;
+  padding-left: 1em;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  background-color: #EEEEEE;
 }
 
 .panels-section-columns {
@@ -369,22 +377,29 @@ a.close img {
   text-align: left;
 }
 
+.content-type-button a {
+  display: inline-block;
+  width: 99%;
+}
+
+.content-type-button a:focus {
+  border: 1px dotted black;
+}
+
 .content-type-button img {
   border: 2px solid white;
-  float: left;
 }
 
 .content-type-button img:hover {
   border: 2px solid blue;
 }
 
-.content-type-button div {
+.content-type-button div,
+.content-type-button span {
   width: 85%;
+  position: relative;
   top: -5px;
-  left: 2px;
-  float: left;
-  padding-left: 3px;
-  padding-top: 5px;
+  left: 3px;
 }
 
 #panels-preview .modal-throbber-wrapper {

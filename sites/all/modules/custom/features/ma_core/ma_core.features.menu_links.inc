@@ -10,7 +10,7 @@
 function ma_core_menu_default_menu_links() {
   $menu_links = array();
 
-  // Exported menu link: main-menu_dashboard:dashboard
+  // Exported menu link: main-menu_dashboard:dashboard.
   $menu_links['main-menu_dashboard:dashboard'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'dashboard',
@@ -28,7 +28,7 @@ function ma_core_menu_default_menu_links() {
     'weight' => -40,
     'customized' => 1,
   );
-  // Exported menu link: main-menu_log-in:user/login
+  // Exported menu link: main-menu_log-in:user/login.
   $menu_links['main-menu_log-in:user/login'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'user/login',
@@ -46,7 +46,7 @@ function ma_core_menu_default_menu_links() {
     'weight' => -41,
     'customized' => 1,
   );
-  // Exported menu link: main-menu_log-out:user/logout
+  // Exported menu link: main-menu_log-out:user/logout.
   $menu_links['main-menu_log-out:user/logout'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'user/logout',
@@ -64,7 +64,7 @@ function ma_core_menu_default_menu_links() {
     'weight' => -42,
     'customized' => 1,
   );
-  // Exported menu link: main-menu_user-account:user
+  // Exported menu link: main-menu_user-account:user.
   $menu_links['main-menu_user-account:user'] = array(
     'menu_name' => 'main-menu',
     'link_path' => 'user',
@@ -87,13 +87,13 @@ function ma_core_menu_default_menu_links() {
     'weight' => -43,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Dashboard');
   t('Log in');
   t('Log out');
   t('User account');
-
 
   return $menu_links;
 }

@@ -6,7 +6,22 @@
  * Core functionality for the Panels engine.
  */
 
-define('PANELS_REQUIRED_CTOOLS_API', '2.0-alpha');
+define('PANELS_REQUIRED_CTOOLS_API', '2.0.9');
+
+/**
+ * The current working panels version.
+ *
+ * In a release, it should be 7.x-3.x, which should match what drush make will
+ * create. In a dev format, it should be 7.x-3.(x+1)-dev, which will allow
+ * modules depending on new features in panels to depend on panels > 7.x-3.x.
+ *
+ * To define a specific version of Panels as a dependency for another module,
+ * simply include a dependency line in that module's info file, e.g.:
+ *   ; Requires Panels v7.x-3.4 or newer.
+ *   dependencies[] = panels (>=3.4)
+ */
+define('PANELS_VERSION', '7.x-3.8');
+
 
 define('PANELS_TITLE_FIXED', 0); // Hide title use to be true/false. So false remains old behavior.
 define('PANELS_TITLE_NONE', 1); // And true meant no title.
@@ -43,7 +58,7 @@ function panels_theme() {
     'variables' => array('id' => NULL, 'image' => NULL, 'title' => NULL),
   );
   $theme['panels_pane'] = array(
-    'variables' => array('output' => array(), 'pane' => array(), 'display' => array()),
+    'variables' => array('content' => array(), 'pane' => array(), 'display' => array()),
     'path' => drupal_get_path('module', 'panels') . '/templates',
     'template' => 'panels-pane',
   );
@@ -258,7 +273,6 @@ function panels_init() {
   }
 
   ctools_add_css('panels', 'panels');
-  ctools_add_js('panels', 'panels');
 }
 
 /**
@@ -270,7 +284,7 @@ function panels_permission() {
   return array(
     'use panels dashboard' => array(
       'title' => t("Use Panels Dashboard"),
-      'description' => t("Allows a user to access the !link.", array('!link' => l('Panels Dashboard', 'admin/structure/panels'))),
+      'description' => t('Allows a user to access the <a href="@url">Panels Dashboard</a>.', array('@url' => url('admin/structure/panels'))),
     ),
     'view pane admin links' => array( // @todo
       'title' => t("View administrative links on Panel panes"),
@@ -288,6 +302,11 @@ function panels_permission() {
       'title' => t("Change layouts with the Panels In-Place Editor"),
       'description' => t("Allows a user to change layouts with the IPE."),
     ),
+    'bypass access in place editing' => array(
+      'title' => t("Bypass access checks when using Panels In-Place Editor"),
+      'description' => t("Allows using IPE even if user does not have additional permissions granted by other modules."),
+      'restrict access' => TRUE,
+    ),
     'administer advanced pane settings' => array(
       'title' => t("Configure advanced settings on Panel panes"),
       'description' => t(""),
@@ -298,7 +317,19 @@ function panels_permission() {
     ),
     'administer panels styles' => array(
       'title' => t("Administer Panels styles"),
+      'description' => t("DEPRECATED: Modules using this permission should use specific style permissions. See Issue #2329419 for more info."),
+    ),
+    'administer panels display styles' => array(
+      'title' => t("Administer Panels display styles"),
+      'description' => t("Allows a user to administer the styles of Panel displays."),
+    ),
+    'administer panels pane styles' => array(
+      'title' => t("Administer Panels pane styles"),
       'description' => t("Allows a user to administer the styles of Panel panes."),
+    ),
+    'administer panels region styles' => array(
+      'title' => t("Administer Panels region styles"),
+      'description' => t("Allows a user to administer the styles of Panel regions."),
     ),
     'use panels caching features' => array(
       'title' => t("Configure caching settings on Panels"),
@@ -308,19 +339,21 @@ function panels_permission() {
       'title' => t('Use panel locks'),
       'description' => t('Allows a user to lock and unlock panes in a panel display.'),
     ),
+    'use ipe with page manager' => array(
+      'title' => t("Use the Panels In-Place Editor with Page Manager"),
+      'description' => t('Allows users with access to the In-Place editor to administer page manager pages. This permission is only needed for users without "use page manager" access.'),
+    ),
   );
 }
 
 /**
- * Implementation of hook_flush_caches().
- *
- * We implement this so that we can be sure our legacy rendering state setting
- * in $conf is updated whenever caches are cleared.
+ * Implements hook_flush_caches().
  */
-//function panels_flush_caches() {
-//  $legacy = panels_get_legacy_state();
-//  $legacy->determineStatus();
-//}
+function panels_flush_caches() {
+  if (db_table_exists('cache_panels')) {
+    return array('cache_panels');
+  }
+}
 
 // ---------------------------------------------------------------------------
 // CTools hook implementations
@@ -377,6 +410,7 @@ function panels_ctools_plugin_type() {
     'display_renderers' => array(
       'classes' => array('renderer'),
     ),
+    'panels_storage' => array(),
   );
 }
 
@@ -631,7 +665,6 @@ function panels_edit_layout($display, $finish, $destination = NULL, $allowed_lay
 
 /**
  * Forms the basis of a panel display
- *
  */
 class panels_display {
   var $args = array();
@@ -652,8 +685,10 @@ class panels_display {
       $pane->panel = $location;
     }
 
-    // Get a temporary pid for this pane.
-    $pane->pid = "new-" . $this->next_new_pid();
+    // Generate a permanent uuid for this pane, and use
+    // it as a temporary pid.
+    $pane->uuid = ctools_uuid_generate();
+    $pane->pid = 'new-' . $pane->uuid;
 
     // Add the pane to the approprate spots.
     $this->content[$pane->pid] = &$pane;
@@ -667,21 +702,8 @@ class panels_display {
 
   function clone_pane($pid) {
     $pane = clone $this->content[$pid];
+    $pane->uuid = ctools_uuid_generate();
     return $pane;
-  }
-
-  function next_new_pid() {
-    // We don't use static vars to record the next new pid because
-    // temporary pids can last for years in exports and in caching
-    // during editing.
-    $id = array(0);
-    foreach (array_keys($this->content) as $pid) {
-      if (!is_numeric($pid)) {
-        $id[] = substr($pid, 4);
-      }
-    }
-    $next_id = max($id);
-    return ++$next_id;
   }
 
   /**
@@ -754,6 +776,55 @@ class panels_display {
     }
     return $output;
   }
+
+  /**
+   * Determine if the given user can perform the requested operation.
+   *
+   * @param string $op
+   *   An operation like: create, read, update, or delete.
+   * @param object $account
+   *   (optional) The account to check access for.
+   *
+   * @return bool
+   *   TRUE if access is granted; otherwise FALSE.
+   */
+  function access($op, $account = NULL) {
+    global $user;
+
+    if (!$account) {
+      $account = $user;
+    }
+
+    // Even administrators need to go through the access system. However, to
+    // support legacy plugins, user 1 gets full access no matter what.
+    if ($account->uid == 1) {
+      return TRUE;
+    }
+
+    if (!in_array($op, array('create', 'read', 'update', 'delete', 'change layout'))) {
+      return FALSE;
+    }
+
+    if (empty($this->storage_type) || empty($this->storage_id)) {
+      return FALSE;
+    }
+
+    if ($this->storage_type == 'unknown') {
+      return FALSE;
+    }
+
+    $storage_plugin = panels_get_panels_storage_plugin($this->storage_type);
+    if (!$storage_plugin) {
+      return FALSE;
+    }
+
+    $access_callback = panels_plugin_get_function('panels_storage', $storage_plugin, 'access callback');
+    if (!$access_callback) {
+      return FALSE;
+    }
+
+    return $access_callback($this->storage_type, $this->storage_id, $op, $account);
+  }
 }
 
 /**
@@ -787,6 +858,7 @@ function panels_new_pane($type, $subtype, $set_defaults = FALSE) {
     $content_subtype = ctools_content_get_subtype($content_type, $subtype);
     $pane->configuration = ctools_content_get_defaults($content_type, $content_subtype);
   }
+  drupal_alter('panels_new_pane', $pane);
 
   return $pane;
 }
@@ -867,10 +939,13 @@ function panels_load_display($did) {
  *
  * @ingroup mainapi
  *
- * Note a new $display only receives a real did once it is run through this function.
- * Until then, it uses a string placeholder, 'new', in place of a real did. The same
- * applies to all new panes (whether on a new $display or not); in addition,
- * panes have sequential numbers appended, of the form 'new-1', 'new-2', etc.
+ * Note that a new $display only receives a real did once it is run through
+ * this function, and likewise for the pid of any new pane.
+ *
+ * Until then, a new display uses a string placeholder, 'new', in place of
+ * a real did, and a new pane (whether on a new $display or not) appends a
+ * universally-unique identifier (which is stored permanently in the 'uuid'
+ * field). This format is also used in place of the real pid for exports.
  *
  * @param object $display instanceof panels_display \n
  *  The display object to be saved. Passed by reference so the caller need not use
@@ -880,6 +955,9 @@ function panels_load_display($did) {
  */
 function panels_save_display(&$display) {
   $update = (isset($display->did) && is_numeric($display->did)) ? array('did') : array();
+  if (empty($display->uuid) || !ctools_uuid_is_valid($display->uuid)) {
+    $display->uuid = ctools_uuid_generate();
+  }
   drupal_write_record('panels_display', $display, $update);
 
   $pids = array();
@@ -910,11 +988,26 @@ function panels_save_display(&$display) {
       $pane->did = $display->did;
 
       $old_pid = $pane->pid;
+
+      if (empty($pane->uuid) || !ctools_uuid_is_valid($pane->uuid)) {
+        $pane->uuid = ctools_uuid_generate();
+      }
+
       drupal_write_record('panels_pane', $pane, is_numeric($pid) ? array('pid') : array());
 
+      // Allow other modules to take action after a pane is saved.
+      if ($pane->pid == $old_pid) {
+        module_invoke_all('panels_pane_update', $pane);
+      }
+      else {
+        module_invoke_all('panels_pane_insert', $pane);
+      }
+
       if ($pane->pid != $old_pid) {
-        // and put it back so our pids and positions can be used
-        unset($display->content[$id]);
+        // Remove the old new-* entry from the displays content.
+        unset($display->content[$pid]);
+
+        // and put it back so our pids and positions can be used.
         $display->content[$pane->pid] = $pane;
 
         // If the title pane was one of our panes that just got its ID changed,
@@ -945,6 +1038,8 @@ function panels_save_display(&$display) {
     $display->panels[$id] = $new_panes;
   }
   if (!empty($pids)) {
+    // Allow other modules to take action before a panes are deleted.
+    module_invoke_all('panels_pane_delete', $pids);
     db_delete('panels_pane')->condition('pid', $pids)->execute();
   }
 
@@ -978,6 +1073,7 @@ function panels_delete_display($display) {
   else {
     $did = $display;
   }
+  module_invoke_all('panels_delete_display', $did);
   db_delete('panels_display')->condition('did', $did)->execute();
   db_delete('panels_pane')->condition('did', $did)->execute();
 }
@@ -987,9 +1083,11 @@ function panels_delete_display($display) {
  *
  * This function is primarily intended as a mechanism for cloning displays.
  * It generates an exact replica (in code) of the provided $display, with
- * the exception that it replaces all ids (dids and pids) with 'new-*' values.
- * Only once panels_save_display() is called on the code version of $display will
- * the exported display written to the database and permanently saved.
+ * the exception that it replaces all ids (dids and pids) with place-holder
+ * values (consisting of the display or pane's uuid, with a 'new-' prefix).
+ *
+ * Only once panels_save_display() is called on the code version of $display
+ * will the exported display be written to the database and permanently saved.
  *
  * @see panels_page_export() or _panels_page_fetch_display() for sample implementations.
  *
@@ -1011,9 +1109,11 @@ function panels_delete_display($display) {
  */
 function panels_export_display($display, $prefix = '') {
   ctools_include('export');
+  if (empty($display->uuid) || !ctools_uuid_is_valid($display->uuid)) {
+    $display->uuid = ctools_uuid_generate();
+  }
+  $display->did = 'new-' . $display->uuid;
   $output = ctools_export_object('panels_display', $display, $prefix);
-
-  $pid_counter = &drupal_static(__FUNCTION__, 0);
 
   // Initialize empty properties.
   $output .= $prefix . '$display->content = array()' . ";\n";
@@ -1024,17 +1124,22 @@ function panels_export_display($display, $prefix = '') {
   if (!empty($display->content)) {
     $region_counters = array();
     foreach ($display->content as $pane) {
-      $pid = 'new-' . ++$pid_counter;
+
+      if (!isset($pane->uuid) || !ctools_uuid_is_valid($pane->uuid)) {
+        $pane->uuid = ctools_uuid_generate();
+      }
+      $pid = 'new-' . $pane->uuid;
+
       if ($pane->pid == $display->title_pane) {
         $title_pid = $pid;
       }
       $pane->pid = $pid;
-      $output .= ctools_export_object('panels_pane', $pane, $prefix . '  ');
-      $output .= "$prefix  " . '$display->content[\'' . $pane->pid . '\'] = $pane' . ";\n";
+      $output .= ctools_export_object('panels_pane', $pane, $prefix);
+      $output .= $prefix . '$display->content[\'' . $pane->pid . '\'] = $pane' . ";\n";
       if (!isset($region_counters[$pane->panel])) {
         $region_counters[$pane->panel] = 0;
       }
-      $output .= "$prefix  " . '$display->panels[\'' . $pane->panel . '\'][' . $region_counters[$pane->panel]++ .'] = \'' . $pane->pid . "';\n";
+      $output .= $prefix . '$display->panels[\'' . $pane->panel . '\'][' . $region_counters[$pane->panel]++ .'] = \'' . $pane->pid . "';\n";
     }
   }
   $output .= $prefix . '$display->hide_title = ';
@@ -1070,6 +1175,9 @@ function panels_render_display(&$display, $renderer = NULL) {
   if (!empty($display->context)) {
     if ($form_context = ctools_context_get_form($display->context)) {
       $form_context->form['#theme'] = 'panels_render_display_form';
+      if (empty($form_context->form['#theme_wrappers']) || !in_array('form', $form_context->form['#theme_wrappers'])) {
+        $form_context['#theme_wrappers'][] = 'form';
+      }
       $form_context->form['#display'] = &$display;
       return $form_context->form;
     }
@@ -1086,10 +1194,7 @@ function panels_render_display(&$display, $renderer = NULL) {
  * then operate as a theme function of the form.
  */
 function theme_panels_render_display_form($vars) {
-  // @todo this is probably broken in D7
-  $render = $vars['element']['#display']->render();
-  $vars['element']['#children'] = $render;
-  return theme('form', $vars);
+  return $vars['element']['#display']->render();
 }
 
 // @layout
@@ -1226,7 +1331,9 @@ function template_preprocess_panels_pane(&$vars) {
       }
 
       $element = contextual_pre_render_links($element);
-      $links += $element['#links'];
+      if(!empty($element['#links'])) {
+        $links += $element['#links'];
+      }
     }
 
     if ($links) {
@@ -1276,12 +1383,13 @@ function template_preprocess_panels_pane(&$vars) {
 
   // Add template file suggestion for content type and sub-type.
   $vars['theme_hook_suggestions'][] = $base . $delimiter . $content->type;
-  $vars['theme_hook_suggestions'][] = $base . $delimiter . strtr($content->type, '-', '_') . $delimiter . strtr($content->subtype, '-', '_');
+  $vars['theme_hook_suggestions'][] = $base . $delimiter . strtr(ctools_cleanstring($content->type, array('lower case' => TRUE)), '-', '_') . $delimiter . strtr(ctools_cleanstring($content->subtype, array('lower case' => TRUE)), '-', '_');
 
   $vars['pane_prefix'] = !empty($content->pane_prefix) ? $content->pane_prefix : '';
   $vars['pane_suffix'] = !empty($content->pane_suffix) ? $content->pane_suffix : '';
 
   $vars['title'] = !empty($content->title) ? $content->title : '';
+  $vars['title_heading'] = !empty($content->title_heading) ? $content->title_heading : variable_get('override_title_heading', 'h2');
   $vars['title_attributes_array']['class'][] = 'pane-title';
 
   $vars['feeds'] = !empty($content->feeds) ? implode(' ', $content->feeds) : '';
@@ -1356,6 +1464,11 @@ function panels_ajax_router() {
   $renderer->cache = &$cache;
   ctools_include('cleanstring');
   $renderer->clean_key = ctools_cleanstring($cache_key);
+
+  $op = $renderer->get_panels_storage_op_for_ajax($method);
+  if (!$cache->display->access($op)) {
+    return MENU_ACCESS_DENIED;
+  }
 
   $output = call_user_func_array(array($renderer, $method), $args);
 
@@ -1526,7 +1639,7 @@ function panels_edit_cache_break_lock($cache) {
  * Get display edit cache on behalf of panel context.
  *
  * The key is the second half of the key in this form:
- * panel_context:TASK_NAME:HANDLER_NAME;
+ * panel_context:TASK_NAME::HANDLER_NAME::args::url;
  */
 function panel_context_panels_cache_get($key) {
   ctools_include('common', 'panels');
@@ -1535,7 +1648,7 @@ function panel_context_panels_cache_get($key) {
   // this loads the panel context inc even if we don't use the plugin.
   $plugin = page_manager_get_task_handler('panel_context');
 
-  list($task_name, $handler_name) = explode(':', $key, 2);
+  list($task_name, $handler_name, $args, $q) = explode('::', $key, 4);
   $page = page_manager_get_page_cache($task_name);
   if (isset($page->display_cache[$handler_name])) {
     return $page->display_cache[$handler_name];
@@ -1549,8 +1662,20 @@ function panel_context_panels_cache_get($key) {
   }
   $cache = new stdClass();
 
+  $task = page_manager_get_task($page->task_id);
+  //ctools_context_handler_get_all_contexts($page->task, $page->subtask, $handler);
+  $arguments = array();
+  if ($args) {
+    $arguments = explode('\\', $args);
+    $contexts = ctools_context_handler_get_task_contexts($task, $page->subtask, $arguments);
+    $contexts = ctools_context_handler_get_handler_contexts($contexts, $handler);
+  }
+  else {
+    $contexts = ctools_context_handler_get_all_contexts($page->task, $page->subtask, $handler);
+  }
+
   $cache->display = &panels_panel_context_get_display($handler);
-  $cache->display->context = ctools_context_handler_get_all_contexts($page->task, $page->subtask, $handler);
+  $cache->display->context = $contexts;
   $cache->display->cache_key = 'panel_context:' . $key;
   $cache->content_types = panels_common_get_allowed_types('panels_page', $cache->display->context);
   $cache->display_title = TRUE;
@@ -1563,7 +1688,7 @@ function panel_context_panels_cache_get($key) {
  * Get the Page Manager cache for the panel_context plugin.
  */
 function _panel_context_panels_cache_get_page_cache($key, $cache) {
-  list($task_name, $handler_name) = explode(':', $key, 2);
+  list($task_name, $handler_name, $args, $q) = explode('::', $key, 4);
   $page = page_manager_get_page_cache($task_name);
   $page->display_cache[$handler_name] = $cache;
   if ($handler_name) {
@@ -1656,6 +1781,32 @@ function panels_page_wizard_panels_cache_set($key, $cache) {
   page_manager_set_wizard_cache($wizard_cache);
 }
 
+/**
+ * Implements hook_default_page_manager_handlers_alter().
+ *
+ * If a default Panels display has no storage type, set it.
+ */
+function panels_default_page_manager_handlers_alter(&$handlers) {
+  foreach ($handlers as &$handler) {
+    if ($handler->handler == 'panel_context') {
+      $display =& $handler->conf['display'];
+      if (empty($display->storage_type)) {
+        $display->storage_type = 'page_manager';
+        $display->storage_id = $handler->name;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_default_page_manager_pages_alter().
+ */
+function panels_default_page_manager_pages_alter(&$pages) {
+  foreach ($pages as &$page) {
+    panels_default_page_manager_handlers_alter($page->default_handlers);
+  }
+}
+
 // --------------------------------------------------------------------------
 // General utility functions
 
@@ -1726,6 +1877,98 @@ function _panels_builder_filter($layout) {
   return empty($layout['builder']);
 }
 
+/**
+ * Implements hook_get_pane_links_alter().
+ *
+ * add links to the Panels pane dropdown menu.
+ */
+function panels_get_pane_links_alter(&$links, $pane, $content_type) {
+  if ($pane->type === "block"){
+    $prefixed_name = $pane->subtype;
+
+    // breakup the subtype string into parts.
+    $exploded_subtype = explode('-', $pane->subtype);
+
+    // get the first part of the string.
+    $subtype_prefix = $exploded_subtype[0];
+
+    // get the first part of the string and add a hyphen.
+    $subtype_prefix_hyphen = $exploded_subtype[0] . '-';
+
+    // remove the prefix block- to get the name.
+    $name_of_block = ltrim( $prefixed_name, $subtype_prefix_hyphen);
+
+    // check for user added menus created at /admin/structure/menu/add
+    // menus of that type have a subtype that is prefixed with menu-menu-
+    if (substr($prefixed_name, 0, 10) === "menu-menu-"){
+      // remove the first prefix menu- from menu-menu- to get the name.
+      $name_of_block = substr($prefixed_name, 5);
+
+      $links['top'][] = array(
+        'title' => t('Edit block'),
+        'href' => url('admin/structure/block/manage/' . $subtype_prefix . '/' . $name_of_block . '/configure', array('absolute' => TRUE)),
+        'attributes' => array('target' => array('_blank')),
+      );
+
+      $links['top'][] = array(
+        'title' => t('Edit menu links'),
+        'href' => url('admin/structure/menu/manage/' . $name_of_block, array('absolute' => TRUE)),
+        'attributes' => array('target' => array('_blank')),
+      );
+    }
+
+    // check for module provided menu blocks like Devels or Features
+    // menus of that type have a subtype that is prefixed with menu-
+    elseif(substr($prefixed_name, 0, 5) === "menu-"){
+      // remove the first prefix menu- to get the name.
+      $name_of_block = substr($prefixed_name, 5);
+
+      $links['top'][] = array(
+        'title' => t('Edit block'),
+        'href' => url('admin/structure/block/manage/' . $subtype_prefix . '/' . $name_of_block . '/configure', array('absolute' => TRUE)),
+        'attributes' => array('target' => array('_blank')),
+      );
+
+      $links['top'][] = array(
+        'title' => t('Edit menu links'),
+        'href' => url('admin/structure/menu/manage/' . $name_of_block, array('absolute' => TRUE)),
+        'attributes' => array('target' => array('_blank')),
+      );
+    }
+
+    // check for system blocks with menu links
+    elseif(substr($prefixed_name, 0, 7) === "system-") {
+      // remove the first prefix system- to get the name
+      $name_of_block = substr($prefixed_name, 7);
+
+      $names_of_system_menus = menu_list_system_menus();
+
+      $links['top'][] = array(
+        'title' => t('Edit block'),
+        'href' => url('admin/structure/block/manage/' . $subtype_prefix . '/' . $name_of_block . '/configure', array('absolute' => TRUE)),
+        'attributes' => array('target' => array('_blank')),
+      );
+
+      if (array_key_exists($name_of_block, $names_of_system_menus)){
+        $links['top'][] = array(
+          'title' => t('Edit menu links'),
+          'href' => url('admin/structure/menu/manage/' . $name_of_block, array('absolute' => TRUE)),
+          'attributes' => array('target' => array('_blank')),
+        );
+      }
+    }
+
+    // for all other blocks without menus
+    else{
+      $links['top'][] = array(
+        'title' => t('Edit block'),
+        'href' => url('admin/structure/block/manage/' . $subtype_prefix . '/' . $name_of_block . '/configure', array('absolute' => TRUE)),
+        'attributes' => array('target' => array('_blank')),
+      );
+    }
+  }
+}
+
 // --------------------------------------------------------------------------
 // Deprecated functions
 //
@@ -1745,7 +1988,7 @@ function panels_get_path($file, $base_path = FALSE, $module = 'panels') {
 function panels_preprocess_html(&$vars) {
   $panel_body_css = &drupal_static('panel_body_css');
   if (!empty($panel_body_css['body_classes_to_remove'])) {
-    $classes_to_remove = explode(' ', $panel_body_css['body_classes_to_remove']);
+    $classes_to_remove = array_filter(explode(' ', $panel_body_css['body_classes_to_remove']), 'strlen');
     foreach ($vars['classes_array'] as $key => $css_class) {
       if (in_array($css_class, $classes_to_remove)) {
         unset($vars['classes_array'][$key]);
