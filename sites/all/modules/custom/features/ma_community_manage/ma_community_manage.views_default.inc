@@ -172,7 +172,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['nodefield']['build_mode'] = 'browse_teaser';
   $handler->display->display_options['fields']['nodefield']['links'] = 0;
   $handler->display->display_options['fields']['nodefield']['comments'] = 0;
-  /* Field: Content: Description */
+  /* Field: Content: Body */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
