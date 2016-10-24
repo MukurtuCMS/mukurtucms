@@ -166,11 +166,11 @@ class flag_entity extends flag_flag {
    * @param $action
    *   Either 'flag' or 'unflag'.
    * @param $flagging
-   *  The flagging entity that is to be removed.
+   *  The flagging entity that is either newly created or about to be deleted.
    * @param $entity_id
-   *  The entity ID of entity being unflagged.
+   *  The entity ID of entity being flagged or unflagged.
    * @param $account
-   *  The account performing the unflagging.
+   *  The account performing the action.
    */
   protected function invoke_rules_event($action, $flagging, $entity_id, $account) {
     switch ($action) {

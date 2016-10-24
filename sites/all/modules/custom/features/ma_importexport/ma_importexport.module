@@ -163,7 +163,7 @@ function ma_importexport_feeds_lookup_atom_by_guid($guid) {
  * Implements hook_feeds_after_save().
  */
 function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $entity_id) {
-    if ($entity->type == 'digital_heritage') {
+    if (isset($entity->type) && $entity->type == 'digital_heritage') {
 
         // If community record children exist, we need to set the community record parent on them.
         // This is handled by a session variable when created via the GUI, but we need to handle feeds import as a special case
@@ -538,6 +538,13 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
   return $form;
 }
 
+function ma_importexport_form_feeds_delete_tab_form_alter(&$form, &$form_state, $form_id) {
+    $form['confirm_deletion'] = array(
+        '#type' => 'checkbox',
+        '#title' => t("I understand this will delete ALL imported items of this type. This includes items from all previous imports, from all users."),
+        '#required' => TRUE,
+  );
+}
 
 /**
  * Grabs the form for exporting from the browse DH page or DH node 
@@ -640,6 +647,7 @@ function ma_importexport_dh_export(&$node, $context) {
     }
 
     $_SESSION['digital_heritage_export_list'][] = $node->nid;
+
     if($context['progress']['current'] == $context['progress']['total']) {
         $download_link = ma_importexport_digital_heritage_node_export($_SESSION['digital_heritage_export_list'], $context['format'], $context['export_options']);
         $message = t('Download your exported items: <div class="btn btn-primary export-download"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
@@ -1156,7 +1164,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   if($options['export_package'] == 'package_dh_only') {
       $export_all = FALSE;
   }
-  
+
   return ma_importexport_export_csv($export, $multivalue_delimiter, $options['export_nids'], $export_all);
 }
 
@@ -1725,7 +1733,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
           }
       }   
   }
-  
+
   // Close all node temp files
   foreach($node_output as $type) {
       fclose($type['handle']);
@@ -1767,18 +1775,20 @@ function ma_importexport_zip_download_url($files) {
     $zip = new ZipArchive();
     $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
     $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
-    
+
     foreach($files as $file) {
         $zip->addFile($file['filename'], $file['localname']);
     }
-    
     $zip->close();
 
     // Copy to a managed location that we can present for download
     $destination = 'private://batch_export/';
     file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
     $filename = 'export.zip';
-    $download_file = file_save_data(file_get_contents($tempfile), $destination . $filename, FILE_EXISTS_RENAME);
+
+    $zip_handle = fopen($tempfile, 'r');
+    $download_file = file_save_data($zip_handle, $destination . $filename, FILE_EXISTS_RENAME);
+
     unlink(drupal_realpath($tempfile));
     
     return file_create_url($download_file->uri);
@@ -1824,6 +1834,7 @@ function ma_importexport_scald_dnd_encode($fields) {
         $fields = array($fields);
         $single_value = TRUE;
     }
+
     $sid_pattern = "/\[scald=(\d+):/";
 
     foreach($fields as $key => $field) {
@@ -1855,15 +1866,35 @@ function ma_importexport_scald_dnd_decode($fields) {
         $fields = array($fields);
         $single_value = TRUE;        
     }
-    
-    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/";
+
+    // Users wanted an easier way to embed SCALD atoms in their import files
+    // Here we will support [MUKURTU_MEDIA:ID] expanding to the scald embed code of
+    // [scald=ID:sdl_editor_representation]. ID will be tried as a GUID first, and a SID second
+    $embed_pattern = "/\[MUKURTU_MEDIA:(.+?)\]/i";
+    foreach($fields as $key => $field) {
+        preg_match_all($embed_pattern, $field, $matches);
+        foreach(array_unique($matches[1]) as $id) {
+            $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($id);
+            if(!$atom_sid) {
+                $atom_sid = $id;
+            }
+            $field = str_ireplace("[MUKURTU_MEDIA:$id]", "[scald=$atom_sid:sdl_editor_representation]", $field);
+            $fields[$key] = $field;
+        }
+    }
+
+    // The standard Scald embed code looks like [scald={sid}:sdl_editor_representation]
+    // The Mukurtu exporter will replace the {sid} with a GUID replacement token like:
+    // [scald=[MUKURTU_ATOM_GUID:{guid}]:sdl_editor_representation]
+    // The following will replace the GUID replacement token with the local SID
+    $guid_pattern = "/\[MUKURTU_ATOM_GUID:(.*?)\]/i";
 
     foreach($fields as $key => $field) {
         preg_match_all($guid_pattern, $field, $matches);
         foreach(array_unique($matches[1]) as $guid) {
             $atom_sid = ma_importexport_feeds_lookup_atom_by_guid($guid);
             if($atom_sid) {
-                $field = str_replace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
+                $field = str_ireplace("[MUKURTU_ATOM_GUID:$guid]", $atom_sid, $field);
                 $fields[$key] = $field;
             }
         }
@@ -1887,6 +1918,14 @@ function ma_importexport_get_scald_dnd_enabled_fields()
             'field_tk_body',
             'field_description',
             'field_coverage_description'
+        ),
+        'dictionary_word' => array(
+            'field_additional_media'
+        ),
+        'paragraphs_item' => array(
+            'field_translation',
+            'field_definition',
+            'field_sample_sentence'
         )
     );
 

@@ -25,19 +25,7 @@ function ma_digitalheritage_node_presave($node) {
             unset ($_SESSION['community_record_parent_requesting_path']);
         }
     }
-
-    // Update the Community field according to the protocols for the DH node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet). It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
-    $communities = array();
-    foreach ($dh_emw->og_group_ref->value() as $protocol) {
-      $p_emw = entity_metadata_wrapper('node', $protocol);
-      foreach ($p_emw->og_group_ref->value() as $community) {
-        $communities[] = $community->nid;
-      }
-    }
-    if (count($communities)) {
-      $dh_emw->field_community_ref->set(array_unique($communities));
-    }
-
+    
   }
 }
 /**
@@ -423,7 +411,7 @@ function ma_digitalheritage_add_cr_check($node) {
 function ma_digitalheritage_add_book_page_check($node) {
   if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
     global $user;
-    if ($node->uid == $user->uid) { // Only owners of nodes can create child book pages for it
+    if ($user->uid > 0 && ($node->uid == $user->uid)) { // Only owners of nodes can create child book pages for it
       return TRUE;
     }
   }
@@ -619,7 +607,7 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
 
     // Do not allow adding, changing, or removing of Community Records in the DH node form. The field is there only to allow users to reorder the Community Records.
     $original_community_records = array();
-    if(isset($original_node->field_community_record_children)) {
+    if(isset($original_node->field_community_record_children) && isset($original_node->field_community_record_children[LANGUAGE_NONE])) {
         foreach($original_node->field_community_record_children[LANGUAGE_NONE] as $original_child) {
             $original_community_records[] = $original_child['target_id'];
         }
@@ -645,7 +633,7 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
 
     // Do not allow adding, changing, or removing of Book Pages in the DH node form. The field is there only to allow users to reorder the Book Pages.
     $original_book_pages = array();
-    if(isset($original_node->field_book_children)) {
+    if(isset($original_node->field_book_children) && isset($original_node->field_book_children[LANGUAGE_NONE])) {
         foreach($original_node->field_book_children[LANGUAGE_NONE] as $original_child) {
             $original_book_pages[] = $original_child['target_id'];
         }
@@ -781,7 +769,7 @@ function ma_digitalheritage_page_alter(&$data) {
     $dh_page_content = "";
     $array_keys = array_keys($data['content']['system_main']['nodes']);
     $node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
-    if ($node->type == 'digital_heritage') {
+    if ($node && $node->type == 'digital_heritage') {
 
       // Custom build page content for DH nodes
       $nids = element_children($data['content']['system_main']['nodes']);

@@ -137,8 +137,8 @@ class panels_views_plugin_row_fields extends views_plugin_row_fields {
 
     // Now that we have distributed our fields, go through the regions and
     // render them into the content array.
-    foreach ($this->region_fields as $region_id => $fields) {
-      $this->view->field = $fields;
+    foreach ($this->region_fields as $region_id => $fields_list) {
+      $this->view->field = $fields_list;
       $content[$region_id] = theme($this->theme_functions(), array('view' => $this->view, 'options' => $this->options, 'row' => $row));
     }
 

@@ -71,7 +71,7 @@ function flag_features_export_render($module, $data) {
 /**
  * Implements hook_features_revert().
  *
- * @param $module
+ * @param string $module
  *   The name of module for which to revert content.
  */
 function flag_features_revert($module = NULL) {

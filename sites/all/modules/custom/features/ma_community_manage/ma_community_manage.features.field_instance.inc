@@ -10,7 +10,7 @@
 function ma_community_manage_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-community-group_register'
+  // Exported field_instance: 'node-community-group_register'.
   $field_instances['node-community-group_register'] = array(
     'bundle' => 'community',
     'default_value' => array(
@@ -79,7 +79,7 @@ function ma_community_manage_field_default_field_instances() {
     'widget_type' => 'options_select',
   );
 
-  // Exported field_instance: 'node-community-og_roles_permissions'
+  // Exported field_instance: 'node-community-og_roles_permissions'.
   $field_instances['node-community-og_roles_permissions'] = array(
     'bundle' => 'community',
     'default_value' => array(

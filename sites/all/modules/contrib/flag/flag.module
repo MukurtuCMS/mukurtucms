@@ -37,20 +37,25 @@ function flag_entity_info() {
     ),
   );
 
-  // Add bundle info but bypass flag_get_flags() as we cannot use it here, as
-  // it calls entity_get_info().
-  $result = db_query("SELECT name, title FROM {flag}");
-  $flag_names = $result->fetchAllKeyed();
-  foreach ($flag_names as $flag_name => $flag_title) {
-    $return['flagging']['bundles'][$flag_name] = array(
-      'label' => $flag_title,
-      'admin' => array(
-        'path' => FLAG_ADMIN_PATH . '/manage/%flag',
-        'real path' => FLAG_ADMIN_PATH . '/manage/' . $flag_name,
-        'bundle argument' => FLAG_ADMIN_PATH_START + 1,
-        'access arguments' => array('administer flags'),
-      ),
-    );
+  // Check for our table before we query it. This is a workaround for a core
+  // bug: https://www.drupal.org/node/1311820
+  // TODO: Remove this when that bug is fixed.
+  if (db_table_exists('flag')) {
+    // Add bundle info but bypass flag_get_flags() as we cannot use it here, as
+    // it calls entity_get_info().
+    $result = db_query("SELECT name, title FROM {flag}");
+    $flag_names = $result->fetchAllKeyed();
+    foreach ($flag_names as $flag_name => $flag_title) {
+      $return['flagging']['bundles'][$flag_name] = array(
+        'label' => $flag_title,
+        'admin' => array(
+          'path' => FLAG_ADMIN_PATH . '/manage/%flag',
+          'real path' => FLAG_ADMIN_PATH . '/manage/' . $flag_name,
+          'bundle argument' => FLAG_ADMIN_PATH_START + 1,
+          'access arguments' => array('administer flags'),
+        ),
+      );
+    }
   }
 
   return $return;
@@ -59,12 +64,12 @@ function flag_entity_info() {
 /**
  * Loads a flagging entity.
  *
- * @param $flagging_id
+ * @param int $flagging_id
  *   The 'flagging_id' database serial column.
- * @param $reset
+ * @param bool $reset
  *   Whether to reset the DrupalDefaultEntityController cache.
  *
- * @return
+ * @return stdClass
  *   The entity object, or FALSE if it can't be found.
  */
 function flagging_load($flagging_id, $reset = FALSE) {
@@ -78,7 +83,7 @@ function flagging_load($flagging_id, $reset = FALSE) {
  *
  * Creates an unsaved flagging object for use with $flag->flag().
  *
- * @param $values
+ * @param array $values
  *   An array of values as described by the entity's property info. Only
  *   'flag_name' or 'fid' must be specified, since $flag->flag() does the rest.
  *
@@ -149,12 +154,6 @@ function flagging_save($flagging) {
 
 // @todo: Implement flagging_view(). Not extremely useful. I already have it.
 
-// @todo: When renaming a flag: Call field_attach_rename_bundle().
-
-// @todo: When creating a flag: Call field_attach_create_bundle().
-
-// @todo: When deleting a flag: Call field_attach_delete_bundle().
-
 // @tood: Discuss: Should flag deleting call flag_reset_flag()? No.
 
 // @todo: flag_reset_flag():
@@ -199,6 +198,21 @@ function flag_entity_query_alter(EntityFieldQuery $query) {
  * @see flag_entity_query_alter()
  */
 function flag_query_flagging_flag_names_alter(QueryAlterableInterface $query) {
+  // Queries with this tag need to have the {flag} table joined on so they can
+  // have a condition on the flag name.
+  // However, we need to ensure the {flagging} table is there to join from. Not
+  // all instances of EntityFieldQuery will add it; for example, with only a
+  // field condition the entity base table is not added to the SelectQuery.
+  $tables =& $query->getTables();
+  if (!isset($tables['flagging'])) {
+    // All tables that are in the query will be field tables and are equivalent,
+    // so just join on the first one.
+    $field_table = reset($tables);
+    $field_table_alias = $field_table['alias'];
+
+    $query->join('flagging', 'flagging', "$field_table_alias.entity_id = flagging.fid");
+  }
+
   // Get value and operator for bundle condition from meta data.
   $value = $query->getMetaData('flag_name_value');
   $operator = $query->getMetaData('flag_name_operator');
@@ -219,7 +233,6 @@ function flag_menu() {
     'access arguments' => array('administer flags'),
     'description' => 'Configure flags for marking content with arbitrary information (such as <em>offensive</em> or <em>bookmarked</em>).',
     'file' => 'includes/flag.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
   );
   $items[FLAG_ADMIN_PATH . '/list'] = array(
     'title' => 'List',
@@ -241,7 +254,7 @@ function flag_menu() {
     'page arguments' => array('flag_import_form'),
     'access arguments' => array('use flag import'),
     'file' => 'includes/flag.export.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
     'weight' => 2,
   );
   $items[FLAG_ADMIN_PATH . '/export'] = array(
@@ -250,7 +263,7 @@ function flag_menu() {
     'page arguments' => array('flag_export_form'),
     'access arguments' => array('administer flags'),
     'file' => 'includes/flag.export.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
     'weight' => 3,
   );
 
@@ -262,7 +275,6 @@ function flag_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('administer flags'),
     'file' => 'includes/flag.admin.inc',
-    'type' => MENU_CALLBACK,
     // Make the flag title the default title for descendant menu items.
     'title callback' => '_flag_menu_title',
     'title arguments' => array(FLAG_ADMIN_PATH_START + 1),
@@ -307,8 +319,8 @@ function flag_menu() {
     'title' => 'Flag',
     'page callback' => 'flag_page',
     'page arguments' => array(1, 2, 3),
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
+    'access callback' => 'flag_page_access',
+    'access arguments' => array(1, 2, 3),
     'file' => 'includes/flag.pages.inc',
     'type' => MENU_CALLBACK,
   );
@@ -316,13 +328,26 @@ function flag_menu() {
     'title' => 'Flag confirm',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flag_confirm', 2, 3, 4),
-    'access callback' => 'user_access',
-    'access arguments' => array('access content'),
+    'access callback' => 'flag_page_access',
+    'access arguments' => array(2, 3, 4),
     'file' => 'includes/flag.pages.inc',
     'type' => MENU_CALLBACK,
   );
 
   return $items;
+}
+
+/**
+ * Menu access callback for flagging pages.
+ *
+ * Same parameters as flag_page().
+ *
+ * @see flag_page()
+ * @see flag_confirm()
+ */
+function flag_page_access($action, $flag, $entity_id) {
+  $access = $flag->access($entity_id, $action);
+  return $access;
 }
 
 /**
@@ -343,40 +368,15 @@ function flag_admin_menu_map() {
     ),
   );
 
-  if (module_exists('field_ui')) {
-    foreach (entity_get_info() as $obj_type => $info) {
-      if ($obj_type == 'flagging') {
-        foreach ($info['bundles'] as $bundle_name => $bundle_info) {
-          if (isset($bundle_info['admin'])) {
-            $fields = array();
-
-            foreach (field_info_instances($obj_type, $bundle_name) as $field) {
-              $fields[] = $field['field_name'];
-            }
-
-            $arguments = array(
-              '%flag' => array($bundle_name),
-              '%field_ui_menu' => $fields,
-            );
-
-            $path = $bundle_info['admin']['path'];
-            $map["$path/fields/%field_ui_menu"]['parent'] = "$path/fields";
-            $map["$path/fields/%field_ui_menu"]['arguments'][] = $arguments;
-          }
-        }
-      }
-    }
-  }
-
   return $map;
 }
 
 /**
  * Menu loader for '%flag' arguments.
  *
- * @param $flag_name
+ * @param string $flag_name
  *   The machine name of the flag.
- * @param $include_disabled
+ * @param bool $include_disabled
  *   (optional) Whether to return a disabled flag too. Normally only enabled
  *   flags are returned. Some menu items operate on disabled flags and in this
  *   case you need to turn on this switch by doing:
@@ -515,7 +515,7 @@ function flag_hook_info() {
 /**
  * Get a flag type definition.
  *
- * @param $entity_type
+ * @param string $entity_type
  *   (optional) The entity type to get the definition for, or NULL to return
  *   all flag types.
  *
@@ -1412,7 +1412,7 @@ function flag_flag_access($flag, $entity_id, $action, $account) {
   if ($flag->entity_type == 'comment') {
     // For non-existent comments (such as on the comment add form), assume that
     // the current user is creating the content.
-    if (empty($entity_id) || !($comment = $flag->fetch_entity($entity_id))) {
+    if (empty($entity_id) || !($comment = $flag->fetch_entity($entity_id)) || $entity_id == 'new') {
       return $flag->access_author == 'comment_others' ? FALSE : NULL;
     }
 
@@ -1569,7 +1569,7 @@ function template_preprocess_flag(&$variables) {
   $action = $variables['action'];
   $entity_id = $variables['entity_id'];
   $errors = implode('<br />', $variables['errors']);
-  $flag_css_name = str_replace('_', '-', $flag->name);
+  $flag_name_css = str_replace('_', '-', $flag->name);
 
   // Generate the link URL.
   $link_type = $flag->get_link_type();
@@ -1605,12 +1605,12 @@ function template_preprocess_flag(&$variables) {
   $variables['link_text'] = isset($link['title']) ? $link['title'] : $flag->get_label($action . '_short', $entity_id);
   $variables['link_title'] = isset($link['attributes']['title']) ? check_plain($link['attributes']['title']) : check_plain(strip_tags($flag->get_label($action . '_long', $entity_id)));
   $variables['status'] = ($action == 'flag' ? 'unflagged' : 'flagged');
-  $variables['flag_name_css'] = $flag_css_name;
+  $variables['flag_name_css'] = $flag_name_css;
 
   $variables['flag_wrapper_classes_array'] = array();
   $variables['flag_wrapper_classes_array'][] = 'flag-wrapper';
-  $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name;
-  $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_css_name . '-' . $entity_id;
+  $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_name_css;
+  $variables['flag_wrapper_classes_array'][] = 'flag-' . $flag_name_css . '-' . $entity_id;
 
   $variables['flag_classes_array'] = array();
   $variables['flag_classes_array'][] = 'flag';
@@ -1702,7 +1702,11 @@ function _flag_link_type_descriptions() {
 // Non-Views public API
 
 /**
- * Get the count of flags for a particular entity type.
+ * Gets the count of flaggings for the given flag.
+ *
+ * For example, if you have an 'endorse' flag, this method will tell you how
+ * many endorsements have been made, rather than how many things have been
+ * endorsed.
  *
  * When called during a flagging or unflagging (such as from a hook
  * implementation or from Rules), the flagging or unflagging that is in the
@@ -1718,8 +1722,8 @@ function _flag_link_type_descriptions() {
  * @param $entity_type
  *   The entity type. For example, 'node'.
  *
- * @return
- *   The flag count with the flag name and entity type as the array key.
+ * @return int
+ *   The number of flaggings for the flag.
  */
 function flag_get_entity_flag_counts($flag, $entity_type) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1742,7 +1746,10 @@ function flag_get_entity_flag_counts($flag, $entity_type) {
 }
 
 /**
- * Get the user's flag count.
+ * Gets the count of the flaggings made by a user with a flag.
+ *
+ * For example, with a 'bookmarks' flag, this returns the number of bookmarks
+ * a user has created.
  *
  * When called during a flagging or unflagging (such as from a hook
  * implementation or from Rules), the flagging or unflagging that is in the
@@ -1753,13 +1760,15 @@ function flag_get_entity_flag_counts($flag, $entity_type) {
  * This is because this queries the {flagging} table, which only has its record
  * deleted at the very end of the unflagging process.
  *
+ * However, it should be noted that this method does not serves global flags.
+ *
  * @param $flag
  *   The flag.
  * @param $user
  *   The user object.
  *
- * @return
- *   The flag count with the flag name and the uid as the array key.
+ * @return int
+ *   The number of flaggings for the given flag and user.
  */
 function flag_get_user_flag_counts($flag, $user) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1782,7 +1791,18 @@ function flag_get_user_flag_counts($flag, $user) {
 }
 
 /**
- * Get flag counts for all flags on a node.
+ * Gets flag counts for all flags on an entity.
+ *
+ * Provides a count of all the flaggings for a single entity. Instead
+ * of a single response, this method returns an array of counts keyed by
+ * the flag ID:
+ *
+ * @code
+ * array(
+ *   my_flag => 42
+ *   another_flag => 57
+ * );
+ * @endcode
  *
  * When called during a flagging or unflagging (such as from a hook
  * implementation or from Rules), the count this returns takes into account the
@@ -1793,8 +1813,10 @@ function flag_get_user_flag_counts($flag, $user) {
  * @param $entity_id
  *   The entity ID (usually the node ID).
  *
- * @return
- *   The flag count with the entity type and id as array keys.
+ * @return array
+ *   An array giving the counts of all flaggings on the entity. The flag IDs
+ *   are the keys and the counts for each flag the values. Note that flags
+ *   that have no flaggings are not included in the array.
  */
 function flag_get_counts($entity_type, $entity_id) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1818,7 +1840,12 @@ function flag_get_counts($entity_type, $entity_id) {
 }
 
 /**
- * Get the total count of items flagged within a flag.
+ * Gets the count of entities flagged by the given flag.
+ *
+ * For example, with a 'report abuse' flag, this returns the number of
+ * entities that have been reported, not the total number of reports. In other
+ * words, an entity that has been reported multiple times will only be counted
+ * once.
  *
  * When called during a flagging or unflagging (such as from a hook
  * implementation or from Rules), the count this returns takes into account the
@@ -1828,6 +1855,9 @@ function flag_get_counts($entity_type, $entity_id) {
  *   The flag name for which to retrieve a flag count.
  * @param $reset
  *   (optional) Reset the internal cache and execute the SQL query another time.
+ *
+ * @return int
+ *   The number of entities that are flagged with the flag.
  */
 function flag_get_flag_counts($flag_name, $reset = FALSE) {
   $counts = &drupal_static(__FUNCTION__);
@@ -1879,8 +1909,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
 /**
  * List all flags available.
  *
- * If node type or account are entered, a list of all possible flags will be
- * returned.
+ * If all the parameters are omitted, a list of all flags will be returned.
  *
  * @param $entity_type
  *   (optional) The type of entity for which to load the flags. Usually 'node'.
@@ -1891,7 +1920,7 @@ function flag_get_flag($name = NULL, $fid = NULL) {
  *   flags for will this node will be returned.
  *
  * @return
- *   An array of the structure [fid] = flag_object.
+ *   An array of flag objects, keyed by the flag names.
  */
 function flag_get_flags($entity_type = NULL, $content_subtype = NULL, $account = NULL) {
   $flags = &drupal_static(__FUNCTION__);
@@ -2055,7 +2084,6 @@ function flag_get_default_flags($include_disabled = FALSE) {
  *   An array of flagging data, keyed by the flagging ID.
  */
 function flag_get_flag_flagging_data($flag_name) {
-  $return = array();
   $flag = flag_get_flag($flag_name);
   $result = db_select('flagging', 'fc')
     ->fields('fc')
@@ -2569,6 +2597,21 @@ function flag_features_api() {
 function flag_ctools_plugin_directory($module, $plugin) {
   if ($module == 'ctools' && !empty($plugin)) {
     return "plugins/$plugin";
+  }
+}
+
+/**
+ * Implements hook_field_attach_rename_bundle().
+ */
+function flag_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_new) {
+  $flags = flag_get_flags($entity_type);
+  foreach ($flags as $flag) {
+    foreach ($flag->types as $key => $type) {
+      if ($type == $bundle_old) {
+        $flag->types[$key] = $bundle_new;
+      }
+    }
+    $flag->save();
   }
 }
 

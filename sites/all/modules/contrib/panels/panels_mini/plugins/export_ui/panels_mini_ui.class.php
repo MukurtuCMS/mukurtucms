@@ -118,6 +118,13 @@ class panels_mini_ui extends ctools_export_ui {
     // Get the basic edit form
     parent::edit_form($form, $form_state);
 
+    // Set the admin title machine name length.
+    // We need to do this because the system block name length is
+    // limited to 32 chars.
+    $form['info']['name']['#maxlength'] = 32;
+    $form['info']['name']['#size'] = 34;
+    $form['info']['name']['#description'] .= ' ' . t('The machine name length is limited to 32 characters, due to a limitation in the core block system.');
+
     $form['category'] = array(
       '#type' => 'textfield',
       '#size' => 24,

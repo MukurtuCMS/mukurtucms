@@ -10,9 +10,9 @@
  *
  * Hook implementations should call this with their hook name and parameters.
  *
- * @param $hook_name
+ * @param string $hook_name
  *  The name of the hook invoked.
- * @param $function_parameters
+ * @param array $function_parameters
  *  The array of parameters the hook received.
  * @param $flagging
  *  (optional) The flagging entity that the hook received. If this is given,

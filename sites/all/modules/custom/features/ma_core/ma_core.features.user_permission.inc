@@ -352,6 +352,17 @@ function ma_core_user_default_permissions() {
     'module' => 'image',
   );
 
+  // Exported permission: 'administer language vocabulary terms'.
+  $permissions['administer language vocabulary terms'] = array(
+    'name' => 'administer language vocabulary terms',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'vppr',
+  );
+
   // Exported permission: 'administer languages'.
   $permissions['administer languages'] = array(
     'name' => 'administer languages',
@@ -762,15 +773,6 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'create panel-nodes'.
-  $permissions['create panel-nodes'] = array(
-    'name' => 'create panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
-  );
-
   // Exported permission: 'create url aliases'.
   $permissions['create url aliases'] = array(
     'name' => 'create url aliases',
@@ -820,15 +822,6 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'delete any panel-nodes'.
-  $permissions['delete any panel-nodes'] = array(
-    'name' => 'delete any panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
-  );
-
   // Exported permission: 'delete backup files'.
   $permissions['delete backup files'] = array(
     'name' => 'delete backup files',
@@ -876,15 +869,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
-  );
-
-  // Exported permission: 'delete own panel-nodes'.
-  $permissions['delete own panel-nodes'] = array(
-    'name' => 'delete own panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
   );
 
   // Exported permission: 'delete revisions'.
@@ -952,6 +936,7 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in language'] = array(
     'name' => 'delete terms in language',
     'roles' => array(
+      'Community Administrator' => 'Community Administrator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1050,15 +1035,6 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'edit any panel-nodes'.
-  $permissions['edit any panel-nodes'] = array(
-    'name' => 'edit any panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
-  );
-
   // Exported permission: 'edit boxes'.
   $permissions['edit boxes'] = array(
     'name' => 'edit boxes',
@@ -1117,15 +1093,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'node',
-  );
-
-  // Exported permission: 'edit own panel-nodes'.
-  $permissions['edit own panel-nodes'] = array(
-    'name' => 'edit own panel-nodes',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'panels_node',
   );
 
   // Exported permission: 'edit own tags'.
@@ -1193,6 +1160,7 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in language'] = array(
     'name' => 'edit terms in language',
     'roles' => array(
+      'Community Administrator' => 'Community Administrator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1322,6 +1290,17 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'features',
+  );
+
+  // Exported permission: 'merge language terms'.
+  $permissions['merge language terms'] = array(
+    'name' => 'merge language terms',
+    'roles' => array(
+      'Community Administrator' => 'Community Administrator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'term_merge',
   );
 
   // Exported permission: 'merge tags terms'.

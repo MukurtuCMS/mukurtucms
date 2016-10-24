@@ -10,12 +10,12 @@
 function ma_collection_default_cer() {
   $items = array();
   $items['node:collection:field_digital_heritage_items*node:digital_heritage:field_collection'] = entity_import('cer', '{
-    "identifier" : "node:collection:field_digital_heritage_items*node:digital_heritage:field_collection",
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
     "cer_left" : { "und" : [ { "path" : "node:collection:field_digital_heritage_items" } ] },
     "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_collection" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:collection:field_digital_heritage_items*node:digital_heritage:field_collection",
     "rdf_mapping" : []
   }');
   return $items;

@@ -46,13 +46,15 @@ function mukurtu_protocol_field_node_insert($node) {
  */
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
-  if ($form_id == 'digital_heritage_node_form') {
+  if ($form_id == 'digital_heritage_node_form' OR $form_id =='dictionary_word_node_form') {
 
     // Do not create this custom field for Book Pages
     // Also hide the Item Sharing Settings field
-    if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
-      $form['field_item_privacy_setting']['#access'] = FALSE;
-      return;
+    if (isset ($form['field_book_parent'])) {
+      if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
+        $form['field_item_privacy_setting']['#access'] = FALSE;
+        return;
+      }
     }
 
     // Gather group field info
@@ -62,15 +64,18 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
     // Build the $structure and $community_defaults_with_titles arrays
     $structure = array();
     $community_defaults_with_titles = array();
-    $cps = $form_state['node']->og_group_ref['und'];
-    foreach ($cps as $cp) {
-      $cp_nid = $cp['target_id'];
-      $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
-      $community_nodes = $cp_wrapper->og_group_ref->value();
-      $community_node = $community_nodes[0];
-      $community_nid = $community_node->nid;
-      $structure[$community_nid][] = $cp_nid;
-      $community_defaults_with_titles[$community_nid] = $community_node->title;
+    $cps = array();
+    if (isset($form_state['node']->og_group_ref['und'])) {
+      $cps = $form_state['node']->og_group_ref['und'];
+      foreach ($cps as $cp) {
+        $cp_nid = $cp['target_id'];
+        $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
+        $community_nodes = $cp_wrapper->og_group_ref->value();
+        $community_node = $community_nodes[0];
+        $community_nid = $community_node->nid;
+        $structure[$community_nid][] = $cp_nid;
+        $community_defaults_with_titles[$community_nid] = $community_node->title;
+      }
     }
 
     // Set the $first_build value
@@ -99,11 +104,14 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
     // Wrap the combo fields in an overall fieldset
     $form['oggroup_fieldset'] = array(
-      '#title' => t('Communities and Protocols *'),
+      '#title' => t('Communities and Protocols'),
       '#type' => 'fieldset',
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
     );
+    if ($form_id == 'digital_heritage_node_form') {
+      $form['oggroup_fieldset']['#title'] .= " *"; // Mark the fieldset as required, on DH nodes only
+    }
 
     // Retrieve defaults from the url (only applies to node creation)
     $community_first_default = arg(3);
@@ -191,8 +199,8 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
         '#multiple' => TRUE,
         '#attributes' => array ('class' => array('chosen-enable')),
       );
-      // DH node needs at least one protocol
-      if ($i == 0) {
+      // DH node (only) needs at least one protocol
+      if ($i == 0 AND $form_id == 'digital_heritage_node_form') {
         $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
       }
     }
@@ -303,23 +311,45 @@ function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_
 
 }
 
+/**
+ * Implements hook_node_presave().
+ */
+function mukurtu_protocol_field_node_presave($node) {
+  if ($node->type == 'digital_heritage' OR $node->type == 'dictionary_word') {
+
+    $dh_emw = entity_metadata_wrapper('node', $node);
+
+    // Update the Community field according to the protocols for the node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet). It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
+    $communities = array();
+    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+      $p_emw = entity_metadata_wrapper('node', $protocol);
+      foreach ($p_emw->og_group_ref->value() as $community) {
+        $communities[] = $community->nid;
+      }
+    }
+    if (count($communities)) {
+      $dh_emw->field_community_ref->set(array_unique($communities));
+    }
+  }
+}
+
 
 
 /**
- * HOW DIGITAL HERITAGE CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED:
+ * HOW DIGITAL HERITAGE (AND DICTIONARY WORDS) CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED:
  *
  * 1. At the node view level, via hook_node_access
  *    - mukurtu_protocol_field_node_access is used on node views but not search results. SAPI search uses a list query (from a view), and list queries are, by core implementation, not run through hook_node_access for performance reasons.
- *    - DH nodes with Item Sharing set to "ANY" are passed if user is a member of any of the CPs or any of the CPs are open groups. This is only partially handled by OG so we need to override here.
- *    - DH nodes with Item Sharing set to "ALL" are passed if user is a member of all CPs / CP is open group. This is not handled by OG at all so we override here.
+ *    - nodes with Item Sharing set to "ANY" are passed if user is a member of any of the CPs or any of the CPs are open groups. This is only partially handled by OG so we need to override here.
+ *    - nodes with Item Sharing set to "ALL" are passed if user is a member of all CPs / CP is open group. This is not handled by OG at all so we override here.
  * 2. In the search results, via the node grants system AND hook_search_api_query_alter
- *    - the grants system EXPANDS search results for DH nodes with Item Sharing set to "ANY"
- *      - mukurtu_protocol_field_node_access_records defines a custom grant 'mukurtu_dh_any_public_group' which is set on any DH node with Item Sharing set to "ANY" and also belonging to at least one Open CP
- *      - mukurtu_protocol_field_node_grants provides the 'mukurtu_dh_any_public_group' to all users
- *      - the reason we cannot, for the node views, only use the grants system not hook_node_access is because grants are OR'ed, not AND'ed (impossible to override this behaviour) whereas with the DH's set to "ALL", AND'ing is what we need
- *    - ma_search_api_search_api_query_alter RESTRICTS search results for DH nodes wih Item Sharing set to "ALL"
+ *    - the grants system EXPANDS search results for nodes with Item Sharing set to "ANY"
+ *      - mukurtu_protocol_field_node_access_records defines a custom grant 'mukurtu_dh_dw_any_public_group' which is set on any DH node with Item Sharing set to "ANY" and also belonging to at least one Open CP
+ *      - mukurtu_protocol_field_node_grants provides the 'mukurtu_dh_dw_any_public_group' to all users
+ *      - the reason we cannot, for the node views, only use the grants system not hook_node_access is because grants are OR'ed, not AND'ed (impossible to override this behaviour) whereas with the nodes with privacy set to "ALL", AND'ing is what we need
+ *    - ma_search_api_search_api_query_alter RESTRICTS search results for nodes wih Item Sharing set to "ALL"
  *
- * To summarize: 1. we need hook_node_access because the grants system cannot AND permissions. 2. We need the grants system because hook_node_access is not respected by search. 3. We need a hook_search_api_query_alter because its cleaner/simpler to restrict (DH = ALL) search results there than in the grants, 4. We cannot use hook_search_api_query_alter to expand (DH = ANY) search results so we use the grant for that.
+ * To summarize: 1. we need hook_node_access because the grants system cannot AND permissions. 2. We need the grants system because hook_node_access is not respected by search. 3. We need a hook_search_api_query_alter because its cleaner/simpler to restrict (privacy = ALL) search results there than in the grants, 4. We cannot use hook_search_api_query_alter to expand (privacy = ANY) search results so we use the grant for that.
  */
 
 /**
@@ -332,16 +362,21 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
     return NODE_ACCESS_IGNORE;
   }
 
-  if ($op == 'view' && $node->type=='digital_heritage') {
+  // Viewing a DH or DW node
+  if ($op == 'view' && ($node->type=='digital_heritage' OR $node->type=='dictionary_word')) {
 
-    // Safeguard. This should never happen. All DH items should be in a group.
     if (!$groups_on_node = og_get_entity_groups('node', $node)) {
-      return NODE_ACCESS_DENY;
+      if ($node->type == 'dictionary_word') {
+        return NODE_ACCESS_ALLOW; // Setting the protocol on Dictionary Words is optional. If no protocol is set, it is public.
+      }
+      elseif ($node->type=='digital_heritage') {
+        return NODE_ACCESS_DENY;  // Safeguard. This should never happen. All DH items should be in a group.
+      }
     }
 
     $groups_on_node = array_values($groups_on_node['node']);
 
-    // DH set to ANY
+    // privacy (Item Sharing Settings) set to ANY
     if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
       foreach ($groups_on_node as $group) {
         if (og_is_member('node', $group)) {
@@ -355,13 +390,15 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
       return NODE_ACCESS_DENY;
     }
 
-    // DH set to ALL (default)
+    // privacy (Item Sharing Settings) set to ALL. This is the default.
     else {
       foreach ($groups_on_node as $group) {
         if (!og_is_member('node', $group)) { // Pass if user is a member of the group
           $group_emw = entity_metadata_wrapper('node', $group);
-          if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
-            return NODE_ACCESS_DENY;
+          if(!empty($group_emw->group_access)) {
+              if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
+                  return NODE_ACCESS_DENY;
+              }
           }
         }
       }
@@ -375,7 +412,7 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
  */
 function mukurtu_protocol_field_node_access_records($node) {
 
-  if ($node->type == 'digital_heritage') {
+  if ($node->type == 'digital_heritage' or $node->type == 'dictionary_word') {
 
     if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
 
@@ -389,7 +426,7 @@ function mukurtu_protocol_field_node_access_records($node) {
         if ($cp_emw->group_access->value() == 0) { // Open group
           $grants = array();
           $grants[] = array(
-            'realm' => 'mukurtu_dh_any_public_group',
+            'realm' => 'mukurtu_dh_dw_any_public_group',
             'gid' => 0,
             'grant_view' => 1,
             'grant_update' => 0,
@@ -401,8 +438,8 @@ function mukurtu_protocol_field_node_access_records($node) {
       }
     }
 
-    // The DH node is not in any Open groups, so delete existing grant that says otherwise in case it once was
-    node_access_write_grants($node, $grants = array(), 'mukurtu_dh_any_public_group', TRUE);
+    // The node is not in any Open groups, so delete existing grant that says otherwise in case it once was
+    node_access_write_grants($node, $grants = array(), 'mukurtu_dh_dw_any_public_group', TRUE);
   }
 }
 
@@ -411,25 +448,29 @@ function mukurtu_protocol_field_node_access_records($node) {
  */
 function mukurtu_protocol_field_node_grants($account, $op) {
   // This grant is provided to everyone
-  $grants['mukurtu_dh_any_public_group'][] = 0;
+  $grants['mukurtu_dh_dw_any_public_group'][] = 0;
   return $grants;
 }
 
 /**
  * Called by our patched og_node_access
- * Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
+ * Edit perms on DH/DW nodes should be determined by our custom logic, same as view perms for DH nodes
  * Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
  */
-function mukurtu_protocol_field_update_dh_access ($node) {
+function mukurtu_protocol_field_update_dh_dw_access ($node) {
 
-  // Safeguard. This should never happen. All DH items should be in a group.
   if (!$groups_on_node = og_get_entity_groups('node', $node)) {
-    return NODE_ACCESS_DENY;
+    if ($node->type == 'dictionary_word') {
+      return NODE_ACCESS_ALLOW; // Setting the protocol on Dictionary Words is optional. If no protocol is set, it is public.
+    }
+    elseif ($node->type=='digital_heritage') {
+      return NODE_ACCESS_DENY;  // Safeguard. This should never happen. All DH items should be in a group.
+    }
   }
 
   $groups_on_node = array_values($groups_on_node['node']);
 
-  // DH set to ANY
+  // privacy set to ANY
   if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
     foreach ($groups_on_node as $group) {
       if (in_array('protocol steward', og_get_user_roles('node', $group))) {
@@ -439,7 +480,7 @@ function mukurtu_protocol_field_update_dh_access ($node) {
     return NODE_ACCESS_DENY;
   }
 
-  // DH set to ALL (default)
+  // privacy set to ALL (default)
   else {
     foreach ($groups_on_node as $group) {
       if (!in_array('protocol steward', og_get_user_roles('node', $group))) {

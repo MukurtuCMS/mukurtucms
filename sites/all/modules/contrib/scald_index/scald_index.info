@@ -1,0 +1,26 @@
+name = Scald Index
+description = Module maintaining datas for node/atoms relationships
+core = 7.x
+package = Scald
+version = 7.x-0.1
+dependencies[] = atom_reference
+dependencies[] = scald
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = scald_atoms_index
+features_exclude[dependencies][ctools] = ctools
+
+; Information added by Drupal.org packaging script on 2014-12-23
+version = "7.x-1.0"
+core = "7.x"
+project = "scald_index"
+datestamp = "1419324738"
+
+
+; Information added by Drupal.org packaging script on 2015-10-05
+version = "7.x-1.2"
+core = "7.x"
+project = "scald_index"
+datestamp = "1444056240"
+

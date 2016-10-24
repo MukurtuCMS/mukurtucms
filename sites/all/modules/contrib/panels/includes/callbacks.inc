@@ -172,6 +172,22 @@ function panels_admin_settings_page() {
     }
   }
 
+  ctools_include('plugins', 'panels');
+  $pipelines = panels_get_renderer_pipelines();
+  $options = array();
+  foreach ($pipelines as $key => $value) {
+    $options[$key] = $value->admin_title;
+  }
+  if (count($options) > 1) {
+    $form['panels_renderer_default'] = array(
+      '#type' => 'select',
+      '#title' => t('Default renderer'),
+      '#options' => $options,
+      '#default_value' => variable_get('panels_renderer_default', 'standard'),
+      '#description' => t('The default renderer for new panel pages.'),
+    );
+  }
+
   if (empty($form)) {
     return array('#value' => t('There are currently no settings to change, but additional plugins or modules may provide them in the future.'));
   }

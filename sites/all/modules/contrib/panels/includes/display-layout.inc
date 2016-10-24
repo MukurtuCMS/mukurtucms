@@ -94,6 +94,7 @@ function panels_choose_layout($form, &$form_state) {
     }
   }
 
+  ctools_add_js('panels-base', 'panels');
   ctools_add_js('layout', 'panels');
 
   $form['categories'] = array(
@@ -320,6 +321,8 @@ function panels_change_layout_submit($form, &$form_state) {
   $display->panels = $content;
 
   $display->layout = $form_state['layout'];
+
+  panels_edit_display_settings_form_submit($form, $form_state);
 }
 
 /**

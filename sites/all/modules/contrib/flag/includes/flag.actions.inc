@@ -179,7 +179,7 @@ function flag_user_action_submit($form, $form_state) {
  *
  * @param $context
  *   The current action context.
- * @param $entity_type
+ * @param string $entity_type
  *   The entity type applicable to this action, such as "node" or "comment".
  */
 function flag_action_form($context, $entity_type) {

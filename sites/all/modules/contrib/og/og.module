@@ -545,12 +545,13 @@ function og_node_access($node, $op, $account) {
         ($account->uid == $node->uid && og_user_access_entity("$op own $type content", 'node', $node, $account));
     }
 
-    // Mukurtu patch
+    // mukurtu patch
     // Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
     // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
     if ($op == 'update' && $node->type=='digital_heritage') {
-      return mukurtu_protocol_field_update_dh_access($node);
+        return mukurtu_protocol_field_update_dh_dw_access($node);
     }
+    // end patch
 
     if (!$access && $op == 'update' && og_is_group('node', $node)) {
       // The node is a group, so check "update group" permission.
@@ -876,7 +877,7 @@ function og_entity_update($entity, $entity_type) {
     return;
   }
 
-  list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
+  list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
   if (!empty($entity->uid) && !og_is_member($entity_type, $entity, 'user', $entity->uid)) {
     // Subscribe the group manager, in case the owner changed.
     og_group($entity_type, $id, array('entity' => $entity->uid));
@@ -942,7 +943,7 @@ function _og_update_entity_fields($entity_type, $entity) {
     else {
       $target_type = $field['settings']['target_type'];
       $gids = og_get_entity_groups($entity_type, $entity, array(), $field_name);
-      $gids = !empty($gids[$target_type]) ? $gids[$target_type] : array();
+      $gids = !empty($gids[$target_type]) ? array_values($gids[$target_type]) : array();
     }
     if ($gids) {
       $wrapper->{$field_name}->set($gids);
@@ -1466,8 +1467,16 @@ function og_query_og_membership_alter(QueryAlterableInterface $query) {
     $fields['bundle']['table'] = $base_table;
     $fields['bundle']['field'] = !empty($entity_info['entity keys']['bundle']) ? $entity_info['entity keys']['bundle'] : $id;
     $fields['entity_type']['table'] = 'ogm';
+    $fields['entity_type']['field'] = 'entity_type';
     $fields['entity_id']['table'] = 'ogm';
     $fields['entity_id']['field'] = 'etid';
+
+    // Populate the alias key, as it might be empty on COUNT queries.
+    foreach (array_keys($fields) as $key) {
+      if (empty($fields[$key]['alias'])) {
+        $fields[$key]['alias'] = $key;
+      }
+    }
 
     $ogm = array(
       'join type' => NULL,
@@ -2247,11 +2256,11 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
       return TRUE;
     }
     else {
-      // PATCH BY SHIRAZ / MUKURTU
+      // mukurtu patch
       // The following is buggy. Group admins of Community have edit permission on Community nodes, so they are then falsely given edit permission on CP nodes (a subgroup) therein that they don't own. See: http://drupal.aspcode.net/ppst/63547274810018958098124/debuging-og-access-field
       // So simply returning FALSE here instead.
       return FALSE;
-      // END PATCH
+      // end patch
 
       // An entity can be a group and group content in the same time. The group
       // didn't return TRUE, but the user still might have access to the
@@ -2358,7 +2367,6 @@ function og_get_entity_groups($entity_type = 'user', $entity = NULL, $states = a
   return $cache[$identifier];
 }
 
-
 /**
  * Return TRUE if field is a group audience type.
  *
@@ -2389,7 +2397,7 @@ function og_is_group_audience_field($field_name) {
  */
 function og_get_group_audience_fields($entity_type = 'user', $bundle_name = 'user', $group_type = NULL, $group_bundle = NULL) {
   $return = &drupal_static(__FUNCTION__, array());
-  $identifier = $entity_type . ':' . $bundle_name . ':' . $group_type;
+  $identifier = $entity_type . ':' . $bundle_name . ':' . $group_type . ':' . $group_bundle;
   if (isset($return[$identifier])) {
     return $return[$identifier];
   }
@@ -3562,7 +3570,9 @@ function og_get_groups_by_user($account = NULL, $group_type = NULL) {
   }
 
   foreach ($og_memberships as $og_membership) {
-    $gids[$og_membership->group_type][$og_membership->gid] = $og_membership->gid;
+    if (!empty($og_membership)) {
+      $gids[$og_membership->group_type][$og_membership->gid] = $og_membership->gid;
+    }
   }
 
   if (empty($group_type)) {

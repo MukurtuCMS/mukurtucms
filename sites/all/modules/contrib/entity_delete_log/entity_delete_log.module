@@ -12,7 +12,7 @@
 function entity_delete_log_menu() {
   $items = array();
   // Module setup form.
-  $items['admin/config/entity-delete-log'] = array(
+  $items['admin/config/system/entity-delete-log'] = array(
     'title' => t('Entity Delete Log'),
     'description' => t('Entity Delete Log Settings'),
     'page callback' => 'drupal_get_form',

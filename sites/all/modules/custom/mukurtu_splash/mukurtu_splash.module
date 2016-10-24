@@ -21,6 +21,14 @@ function mukurtu_splash_menu() {
     'access callback' => TRUE,
   );
 
+  // Callback that toggles the Dictionary feature
+  $items['admin/toggle-dictionary'] = array(
+    'title' => 'Toggle Dictionary',
+    'page callback' => 'ma_splash_toggle_dictionary',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -48,6 +56,32 @@ function mukurtu_splash_toggle_wizard() {
   }
 }
 
+/**
+ * Toggle the dictionary feature on and off
+ */
+function ma_splash_toggle_dictionary () {
+  if (module_exists('ma_dictionary')) {
+    module_disable(array('ma_dictionary'));
+    menu_link_delete (NULL, 'dictionary');
+    menu_link_delete (NULL, 'node/add/dictionary-word');
+    drupal_set_message ('The Dictionary has been disabled.');
+  }
+  else {
+    module_enable(array('ma_dictionary'));
+    // Re-add the menu link. Any customizations thereof would be lost by a disable and renenabling of the Dictionary
+    $item = array(
+      'link_path' => 'dictionary',
+      'link_title' => 'Browse Dictionary',
+      'menu_name' => 'menu-browse-menu',
+      'weight' => -40,
+      'expanded' => 0,
+      'customized' => 1,
+    );
+    menu_link_save($item);
+    drupal_set_message ('The Dictionary has been enabled.');
+  }
+  drupal_goto ('dashboard');
+}
 
 /**
  * Implementation of hook_init().
@@ -169,6 +203,9 @@ function mukurtu_splash_block_info() {
   $blocks['manage_community'] = array(
     'info' => t('Mukurtu Dashboard: Manage Communities'),
   );
+  $blocks['manage_dictionary'] = array(
+    'info' => t('Mukurtu Dashboard: Manage Dictionary'),
+  );
   $blocks['support'] = array(
     'info' => t('Mukurtu Dashboard: Support'),
   );
@@ -192,6 +229,7 @@ function mukurtu_splash_block_info() {
  */
 function mukurtu_splash_block_view($delta = '') {
   $block = array();
+
   switch ($delta) {
     case 'site_welcome':
       $block['subject'] = t('You have successfully installed Mukurtu.');
@@ -228,6 +266,10 @@ function mukurtu_splash_block_view($delta = '') {
     case 'manage_community':
       $block['subject'] = t('Communities and Protocols');
       $block['content'] = mukurtu_splash_block_manage_community();
+      break;
+  case 'manage_dictionary':
+      $block['subject'] = t('Dictionary');
+      $block['content'] = mukurtu_splash_block_manage_dictionary();
       break;
     case 'support':
       $block['subject'] = t('Support');
@@ -490,7 +532,6 @@ function mukurtu_splash_block_manage_content() {
     );
   }
 
-
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
 
@@ -500,6 +541,88 @@ function mukurtu_splash_block_manage_content() {
   return $block;
 }
 
+/**
+ * Helper function to assemble the dictionary management block.
+ */
+function mukurtu_splash_block_manage_dictionary() {
+    $items = array();
+    $markup = '';
+
+    $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
+    $drupal_admin =  user_role_load_by_name('administrator');
+
+    if (user_access('administer site configuration')) {
+        if (module_exists('ma_dictionary')) {
+            $title = 'Disable Dictionary';
+            $description = 'The dictionary can be re-enabled later without losing any content.';
+        }
+        else {
+            $title = "Enable Dictionary";
+            $description = 'Any previously added content will be restored.';
+        }
+        $items[] = array(
+            'title' => $title,
+            'href' => 'admin/toggle-dictionary',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t($description),
+        );
+    }
+
+    $vocabulary = taxonomy_vocabulary_machine_name_load('language');
+    if (user_access('edit terms in '. $vocabulary->vid)) {
+        $items[] = array(
+            'title' => 'Manage Languages',
+            'href' => 'admin/structure/taxonomy/language',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Manage the terms in the Language taxonomy. A language must exist in this taxonomy before a dictionary or language community can be added.'),
+        );
+    }
+
+    if (module_exists('ma_dictionary') && user_access('administer taxonomy')) {
+        $items[] = array(
+            'title' => 'Set Default Language',
+            'href' => 'dashboard/set-default-language',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Set the default language used when creating dictionary words.'),
+        );
+    }
+
+    if(module_exists('ma_dictionary') && (user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid))) {
+        $items[] = array(
+            'title' => 'Manage Language Communities',
+            'href' => 'dashboard/manage-dictionaries',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Manage the language communities that control access to the dictionaries.'),
+        );
+    }
+
+    $vocabulary = taxonomy_vocabulary_machine_name_load('part_of_speech');
+    if (user_access('edit terms in '. $vocabulary->vid)) {
+        $items[] = array(
+            'title' => 'Manage Part of Speech',
+            'href' => 'admin/structure/taxonomy/part_of_speech',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Manage the terms in the Part of Speech taxonomy.'),
+        );
+    }
+
+    if(module_exists('ma_dictionary') && user_access('create word_list content')) {
+        $items[] = array(
+            'title' => 'Create a Word List',
+            'href' => 'node/add/word-list',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Create a list of dictionary words.'),
+        );
+    }
+
+    $content = array ('content' => $items);
+    $markup = theme('admin_block_content', $content);
+
+    $block = array(
+        '#markup' => $markup,
+    );
+    return $block;
+}
 
 /**
  * Helper function to assemble the initial site configuration block.
@@ -569,6 +692,22 @@ function mukurtu_splash_block_batch_import() {
   $drupal_admin =  user_role_load_by_name('administrator');
 
   if(user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+      if(module_exists('ma_dictionary')) {
+          $items[] = array(
+              'title' => 'Import Dictionary Words',
+              'href' => 'import/import_dictionary_words',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Batch import many dictionary words.'),
+          );
+
+          $items[] = array(
+              'title' => 'Import Dictionary Word Entries',
+              'href' => 'import/import_dictionary_word_additional_entries',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Batch import additional dictionary word entries.'),
+          );
+      }
+
       $items[] = array(
           'title' => 'Export Digital Heritage Metadata',
           'href' => 'manage/digital-heritage',

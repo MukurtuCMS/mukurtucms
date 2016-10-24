@@ -1,17 +1,12 @@
 <?php
 
-define('CER_PROFILE2_PATTERN', '/^user:user:profile_/');
-
 /**
  * Implements hook_disable().
  */
 function cer_profile2_disable() {
-  ctools_include('export');
-
-  // Disable any presets, including those stored in code, which refer to profiles.
-  foreach (ctools_export_crud_load_all('cer') as $preset) {
-    if (preg_match(CER_PROFILE2_PATTERN, $preset->left) || preg_match(CER_PROFILE2_PATTERN, $preset->right)) {
-      ctools_export_crud_set_status('cer', $preset, FALSE);
+  foreach (entity_load('cer', FALSE) as $preset) {
+    if (_cer_profile2_is_profile2_preset($preset)) {
+      $preset->wrapper->cer_enabled->set(FALSE);
     }
   }
 }
@@ -20,6 +15,9 @@ function cer_profile2_disable() {
  * Implements hook_uninstall().
  */
 function cer_profile2_uninstall() {
-  cer_profile2_disable();
-  db_query('DELETE FROM {cer} WHERE a LIKE :pattern OR b LIKE :pattern', array(':pattern' => CER_PROFILE2_PATTERN));
+  foreach (entity_load('cer', FALSE) as $preset) {
+    if (_cer_profile2_is_profile2_preset($preset)) {
+      entity_delete('cer', $preset->pid);
+    }
+  }
 }
