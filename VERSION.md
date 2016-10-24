@@ -1,3 +1,37 @@
+## Mukurtu 2.0.6
+#### Initial Release of Dictionary Feature
+- This is an early offering, please provide feedback on bugs or ideas for future changes at [GitHub](https://github.com/MukurtuCMS/mukurtucms/issues) or send email to [support@mukurtu.org](mailto:support@mukurtu.org)
+- The dictionary is disabled by default, but can be enabled from the dashboard
+- The dictionary introduces several new content types
+- A “Dictionary Word” is a the basic dictionary content type
+- Each dictionary word can contain multiple “Word Entries” to list different sources, spellings, uses, etc
+- A “Language Community” is a dictionary specific community that controls which users can contribute dictionary words to a language's dictionary. Access to individual dictionary words is controlled by cultural protocols. 
+- A “Word List” is a collection of dictionary words
+
+#### Dictionary Quick Start
+- Enable the dictionary from the dashboard
+- Make sure there is at least one language in the language taxonomy. This can be done from the “Manage Language” link in the dashboard
+- Create a language community for the desired dictionary language using the “Manage Language Communities” link in the dashboard
+- Start creating dictionary words using the “+ Dictionary Word” button in the toolbar
+
+#### Other Changes
+- Scald audio atoms have a new metadata field 'contributor' which is the preferred field for the speaker of a recording
+- Fixed a bug that caused the batch exporter to fail when exporting large files
+- Fixed a bug causing the installer to fail on MySQL 5.7 platforms
+- Fixed a bug where the “Add a book page” option would be presented to unauthenticated users if the author of the content was 'anonymous'
+- Removed Mukurtu feature and module dependency on the community tags module
+- TK labels no longer show the version number in the public facing display
+- Added a warning to the "Delete Items" feeds import page informing the user that it will delete all items imported, not just the most recent batch
+- Updated Drupal to 7.51
+- Security updates for ctools, flag, google_analytics, og, panels, and views_data_export modules
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- revert features: `drush fra`. Please first review if there are any custom changes you have done that may be overwritten.
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-r && drush sapi-i`.  Some sites may need to clear indexes: `drush sapi-c`
+
 ## Mukurtu 2.0.5
 - New thumbnail carousel view for multi-page Digital Heritage items
 - Images with Exif orientation data will now generate automatically rotated thumbnails
