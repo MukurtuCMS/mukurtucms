@@ -1296,6 +1296,11 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
     $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
   }
 
+  // Mukurtu check for showing warning before displaying media representing deceased people
+  if(module_exists('ma_deceased')) {
+      $content = module_invoke('ma_deceased', 'scald_postrender', $atom, $content, $context);
+  }
+
   // Only cache the Atom if Contexts, etc. have not indicated that the rendering
   // is not cacheable (e.g. it contains the current user's username).
   if (!$atom->rendered->nocache) {
