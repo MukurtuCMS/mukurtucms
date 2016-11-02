@@ -1,0 +1,23 @@
+<?php
+
+function ma_deceased_scald_postrender($atom, $content, $context) {
+    $skipped_contexts = array('sdl_library_item',
+                              'mukurtu_scald_media_assets_edit_',
+                              'ma_scald_search_results');
+
+    if(isset($atom->field_deceased[LANGUAGE_NONE]) && $atom->field_deceased[LANGUAGE_NONE][0]['value'] == 1) {
+        if(!in_array($context, $skipped_contexts)) {
+            drupal_add_css(drupal_get_path('module', 'ma_deceased') . '/css/deceased.css');
+            drupal_add_js(drupal_get_path('module', 'ma_deceased') . '/js/deceased.js');
+
+            $message = t("Warning: One or more persons represented in this media are deceased. Click to reveal the media.");
+            $button_text = t("Reveal Media");
+
+            $atom->deceased_warning = TRUE;
+            $content['#prefix'] = $content['#prefix'] . '<div id="deceased-' . $atom->sid . '" class="deceased" onclick="reveal_deceased(' . $atom->sid . ')">';
+            $content['#suffix'] = '<div class="deceased-overlay"><div id="deceased-warning-' . $atom->sid . '" class="deceased-overlay-text">' . $message . '</div></div></div>' . $content['#suffix'];
+        }
+    }
+
+    return $content;
+}

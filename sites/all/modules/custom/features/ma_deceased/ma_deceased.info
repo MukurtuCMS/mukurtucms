@@ -1,0 +1,8 @@
+name = Mukurtu Deceased
+description = Provides warnings before presenting media of deceased persons
+core = 7.x
+package = Features
+version = 7.x-0.1
+project = ma_deceased
+dependencies[] = scald
+features[features_api][] = api:2

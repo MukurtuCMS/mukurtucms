@@ -1,0 +1,37 @@
+.deceased {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    background-color:rgba(0, 0, 0, 0.85);
+    text-align:center;
+    vertical-align:middle;
+}
+
+.deceased > div{
+    visibility: hidden;
+}
+
+.deceased-overlay-text.cleared {
+    display: none;
+}
+
+.deceased .deceased-overlay {
+    visibility: visible;
+    text-align: center;
+    position: relative;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color:rgba(0, 0, 0, 0.85);
+    color:white;
+}
+
+.deceased  .deceased-overlay-text {
+    visibility: visible;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 10px 15px;
+    position:relative;
+    font-weight:bold;
+}
