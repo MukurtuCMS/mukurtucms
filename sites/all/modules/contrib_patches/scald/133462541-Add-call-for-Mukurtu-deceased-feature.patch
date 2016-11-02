@@ -1,0 +1,28 @@
+From b34f6145b2b0417fbf7369ee96cec50ec4bc9308 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Wed, 2 Nov 2016 13:37:14 -0700
+Subject: [PATCH] Add call for Mukurtu deceased feature
+
+---
+ sites/all/modules/contrib/scald/scald.module | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/sites/all/modules/contrib/scald/scald.module b/sites/all/modules/contrib/scald/scald.module
+index 0e4affc..59848aa 100644
+--- a/sites/all/modules/contrib/scald/scald.module
++++ b/sites/all/modules/contrib/scald/scald.module
+@@ -1296,6 +1296,11 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
+     $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
+   }
+ 
++  // Mukurtu check for showing warning before displaying media representing deceased people
++  if(module_exists('ma_deceased')) {
++      $content = module_invoke('ma_deceased', 'scald_postrender', $atom, $content, $context);
++  }
++
+   // Only cache the Atom if Contexts, etc. have not indicated that the rendering
+   // is not cacheable (e.g. it contains the current user's username).
+   if (!$atom->rendered->nocache) {
+-- 
+2.1.4
+
