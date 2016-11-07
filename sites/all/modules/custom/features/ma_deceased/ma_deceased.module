@@ -21,3 +21,11 @@ function ma_deceased_scald_postrender($atom, $content, $context) {
 
     return $content;
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ **/
+function ma_deceased_form_scald_atom_add_form_options_alter(&$form, &$form_state, $form_id)
+{
+    drupal_add_css(drupal_get_path('module', 'ma_deceased') . '/css/deceased.css');
+}

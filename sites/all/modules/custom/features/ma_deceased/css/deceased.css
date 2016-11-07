@@ -35,3 +35,7 @@
     position:relative;
     font-weight:bold;
 }
+
+.atom-wrapper .field-name-field-deceased {
+    padding-left: 20px;
+}
