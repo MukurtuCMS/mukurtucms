@@ -5,7 +5,7 @@
  */
 
 define('VIMEO_ID_REGEXP',   '/^[a-zA-Z0-9]+$/');
-define('VIMEO_WEB_REGEXP',  '#^http://vimeo.com/([a-zA-Z0-9]+)(_.*)?$#');
+define('VIMEO_WEB_REGEXP',  '#^https?://vimeo.com/([a-zA-Z0-9]+)(_.*)?$#');
 define('VIMEO_API_VIDEO',   'http://vimeo.com/api/v2/video/');
 define('VIMEO_API',         'http://vimeo.com/api/v2/');
 
@@ -101,11 +101,11 @@ function scald_vimeo_scald_fetch($atom, $type) {
  */
 function scald_vimeo_scald_prerender($atom, $context, $options, $mode) {
   if ($mode == 'atom') {
-    //load context configuration to retrieve dimension data if present
+    // Load context configuration to retrieve dimension data if present.
     $context_config = scald_context_config_load($context);
     $video_width = (isset($atom->data['video_width'])) ? $atom->data['video_width'] : 480;
     $video_height = (isset($atom->data['video_height'])) ? $atom->data['video_height'] : 365;
-    //allow context configuration to override video dimension variables
+    // Allow context configuration to override video dimension variables.
     if(isset($context_config->data['width'])){
       $video_width = $context_config->data['width'];
     }
@@ -118,7 +118,8 @@ function scald_vimeo_scald_prerender($atom, $context, $options, $mode) {
           'video_id'      => $atom->base_id,
           'video_width'   => $video_width,
           'video_height'  => $video_height,
-          'thumbnail'     => $atom->thumbnail_source
+          'thumbnail'     => $atom->thumbnail_source,
+          'title'         => check_plain($atom->title),
         ),
         'atom' => $atom,
       )
@@ -150,7 +151,7 @@ function scald_vimeo_theme() {
  */
 function scald_vimeo_register($video) {
   global $user;
-  // Fetch the needed informations from Vimeo
+  // Fetch the needed informations from Vimeo.
   if (is_object($video)) {
     $infos = $video;
   }
@@ -158,7 +159,7 @@ function scald_vimeo_register($video) {
     $infos = scald_vimeo_video($video);
   }
 
-  // Check if the video has already been imported to prevent duplicate
+  // Check if the video has already been imported to prevent duplicate.
   $old = scald_vimeo_already_imported($infos->id);
   if ($old) {
     return FALSE;
@@ -173,20 +174,20 @@ function scald_vimeo_register($video) {
     $file = file_save_data($thumb->data, $dest);
   }
 
-  // Create an atom
+  // Create an atom.
   $atom = new ScaldAtom('video', 'scald_vimeo', array(
     'base_id' => $infos->id,
     'title' => $infos->title,
   ));
 
-  // Save video width and height
+  // Save video width and height.
   if (!isset($atom->data)) {
     $atom->data = array();
   }
   $atom->data['video_width'] = $infos->width;
   $atom->data['video_height'] = $infos->height;
 
-  // Set file
+  // Set file.
   if ($file) {
     $query = db_update('file_managed')
       ->condition('fid', $file->fid)
@@ -196,9 +197,9 @@ function scald_vimeo_register($video) {
     $atom->scald_thumbnail[$langcode][0] = (array) $file;
   }
 
-  // And save it
+  // And save it.
   $atom_sid = scald_atom_save($atom);
-  // Finally, return this id
+  // Finally, return this id.
   return $atom_sid;
 }
 
@@ -262,33 +263,33 @@ function scald_vimeo_parse_item($item) {
 
   $info = new stdClass();
 
-  // Fetch the video ID
+  // Fetch the video ID.
   $info->id = $item['id'];
 
-  // Video Title
+  // Video Title.
   $info->title = $item['title'];
 
-  // Video dimensions
+  // Video dimensions.
   $info->width = $item['width'];
   $info->height = $item['height'];
 
-  // Thumbnail data
+  // Thumbnail data.
   $info->thumbnail = array(
     'src'    => $item['thumbnail_large'],
     'width'  => $item['width'],
     'height' => $item['height'],
   );
 
-  // Video tags
+  // Video tags.
   $info->tags = explode(', ' , $item['tags']);
 
-  // Author
+  // Author.
   $info->author = $item['user_name'];
 
-  // Creation Date
+  // Creation Date.
   $info->pubDate = $item['upload_date'];
 
-  // License
+  // License.
   $info->license = 'VM';
   return $info;
 }
@@ -310,7 +311,7 @@ function scald_vimeo_already_imported($id) {
 }
 
 /**
- * Form element validation handler for Vimeo identifier
+ * Form element validation handler for Vimeo identifier.
  *
  */
 function scald_vimeo_validate_id($element, &$form_state) {
@@ -324,16 +325,16 @@ function scald_vimeo_validate_id($element, &$form_state) {
 }
 
 /**
- * Parse a Vimeo ID and check validity
+ * Parse a Vimeo ID and check validity.
  *
  */
 function scald_vimeo_parse_id($string, $check) {
   $id = NULL;
   $string = trim($string);
   if (!preg_match(VIMEO_ID_REGEXP, $string)) {
-    // The string ID is not easy to parse, let's try to analyze it
+    // The string ID is not easy to parse, let's try to analyze it.
     if (preg_match(VIMEO_WEB_REGEXP, $string, $m)) {
-      // This string is a full Vimeo URL
+      // This string is a full Vimeo URL.
       $id = $m[1];
     }
     elseif (preg_match("/^http/", $string)) {
@@ -349,7 +350,7 @@ function scald_vimeo_parse_id($string, $check) {
   }
 
   if ($id && $check) {
-    // Last check to confirm this video really exists on Vimeo
+    // Last check to confirm this video really exists on Vimeo.
     if (!scald_vimeo_video($id)) {
       $id = FALSE;
     }

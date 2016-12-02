@@ -8,7 +8,8 @@
  * It is automatically included when the DnD plugin is used.
  */
 
-.dnd-atom-wrapper {
+.dnd-atom-wrapper,
+.dnd-widget-wrapper{
   padding: 5px;
 }
 .dnd-atom-wrapper:hover {

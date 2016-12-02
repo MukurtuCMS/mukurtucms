@@ -21,4 +21,7 @@ function scald_dailymotion_uninstall() {
   module_load_include('inc', 'scald', 'includes/ScaldAtomController');
 
   ScaldAtomController::removeType('video');
+
+  variable_del('scald_dailymotion_imports');
+  variable_del('scald_dailymotion_imports_status');
 }

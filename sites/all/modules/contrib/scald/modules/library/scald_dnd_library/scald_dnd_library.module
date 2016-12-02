@@ -52,7 +52,7 @@ function scald_dnd_library_dnd_libraries_info() {
   else {
     $views = views_get_all_views();
     foreach ($views as $view) {
-      // disabled views get nothing.
+      // Disabled views get nothing.
       if (!empty($view->disabled)) {
         continue;
       }
@@ -87,11 +87,13 @@ function scald_dnd_library_add_item(&$library, $sid) {
     'meta' => array(
       'title' => $atom->title,
       'type' => $atom->type,
+      'data' => !empty($atom->data) ? $atom->data : array(),
       'legend' => '',
     ),
     'sas' =>  '[scald=' . $atom->sid . ':' . $context .']',
     'editor' => scald_render($atom, $context),
     'preview' => scald_render($atom, 'sdl_preview'),
+    'actions' => array_keys(scald_atom_actions_available($atom)),
   );
 
   // theme_sdl_editor_legend() requires a rendered atom. We call it only here to
@@ -100,7 +102,7 @@ function scald_dnd_library_add_item(&$library, $sid) {
     $library['atoms'][$sid]['meta']['legend'] = theme('sdl_editor_legend', array('atom' => $atom));
   }
 
-  // Allow other modules to alter this library item
+  // Allow other modules to alter this library item.
   drupal_alter('scald_dnd_library_item', $atom, $library['atoms'][$sid]);
 }
 
@@ -168,7 +170,7 @@ function scald_dnd_library_scald_render($atom, $context, $options) {
     $path = $atom->rendered->thumbnail_transcoded_url;
   }
   else {
-    $path = image_style_url('Library', $atom->thumbnail_source);
+    $path = image_style_url('library', $atom->thumbnail_source);
   }
 
   $attributes = array();
@@ -234,7 +236,7 @@ function theme_sdl_library_item($variables) {
   );
   $rendered_links = drupal_render($links_element);
 
-  // Authors
+  // Authors.
   if (!empty($informations->authors)) {
     foreach ($informations->authors as $author) {
       $author_names[] = check_plain($author->name);
@@ -347,7 +349,7 @@ function scald_dnd_library_views_api() {
  */
 function scald_dnd_library_image_default_styles() {
   $presets = array();
-  $presets['Library'] = array(
+  $presets['library'] = array(
     'effects' => array(
       array(
         'name' => 'image_scale',
@@ -363,3 +365,13 @@ function scald_dnd_library_image_default_styles() {
   return $presets;
 }
 
+/**
+ * Implements hook_admin_paths().
+ */
+function scald_dnd_library_admin_paths() {
+  if (variable_get('dnd_modal_admin', FALSE)) {
+    return array(
+      dnd_get_library() => TRUE,
+    );
+  }
+}

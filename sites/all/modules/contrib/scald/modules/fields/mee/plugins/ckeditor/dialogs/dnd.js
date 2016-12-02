@@ -60,6 +60,7 @@ CKEDITOR.dialog.add('atomProperties', function(editor) {
       Drupal.dnd.Atoms[atom.sid].meta.align = this.getValueOf('info', 'cmbAlign');
       var context = this.getValueOf('info', 'cmbContext');
       atom.options.link = this.getValueOf('info', 'txtLink');
+      atom.options.linkTarget = this.getValueOf('info', 'cmbLinkTarget');
       Drupal.dnd.fetchAtom(context, atom.sid, function() {
         var html = Drupal.theme('scaldEmbed', Drupal.dnd.Atoms[atom.sid], context, atom.options);
         CKEDITOR.dom.element.createFromHtml(html).replace(Drupal.dnd.atomCurrent);
@@ -105,15 +106,33 @@ CKEDITOR.dialog.add('atomProperties', function(editor) {
           {
             id: 'txtLink',
             type: 'text',
-            label: 'Link',
+            label: lang.properties_link,
             setup: function(atom) {
               if (Drupal.dnd.Atoms[atom.sid].meta.type === 'image') {
                 this.setValue(atom.options.link);
                 this.enable();
+                this.getElement().show();
               }
               else {
-                this.setValue(editor.lang.dnd.link_image_only);
                 this.disable();
+                this.getElement().hide();
+              }
+            }
+          },
+          {
+            id: 'cmbLinkTarget',
+            type: 'select',
+            label: lang.properties_link_target,
+            items: [[lang.link_target_none, '_self'], [lang.link_target_blank, '_blank'], [lang.link_target_parent, '_parent']],
+            setup: function (atom) {
+              if (Drupal.dnd.Atoms[atom.sid].meta.type === 'image') {
+                this.setValue(atom.options.linkTarget);
+                this.enable();
+                this.getElement().show();
+              }
+              else {
+                this.disable();
+                this.getElement().hide();
               }
             }
           }

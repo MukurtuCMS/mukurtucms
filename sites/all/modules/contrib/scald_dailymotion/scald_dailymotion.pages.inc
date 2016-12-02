@@ -45,13 +45,20 @@ function scald_dailymotion_search_form($form, &$form_state) {
       '#theme' => 'scald_dailymotion_search_results_table',
     );
 
-    $items = scald_dailymotion_feed('search', $terms);
-    if (count($items)) {
+    $params = array(
+      'fields' => _scald_dailymotion_api_fields(),
+      'limit' => SCALD_DAILYMOTION_MAX_ITEMS,
+      'search' => $terms,
+    );
+    $params['fields'][] = 'thumbnail_120_url';
+    $data = _scald_dailymotion_api_call('videos', $params);
+    if ($data && $data->list) {
+      $items = $data->list;
       // Iterate on all results.
       foreach ($items as $video) {
         // Prepare variables for theme_image().
         $image_variables = array(
-          'path' => str_replace('large', 'small', $video->thumbnail['src']),
+          'path' => str_replace('large', 'small', $video->thumbnail_120_url),
           'alt' => $video->title,
           'title' => $video->title,
         );

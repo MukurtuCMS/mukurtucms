@@ -37,6 +37,14 @@ CKEDITOR.plugins.add('dnd', {
   },
 
   init: function (editor) {
+
+    // Assign the "insert atom into editor" method to be used for this editor.
+    editor.dndInsertAtom = function(sid) {
+      var atom = Drupal.dnd.sas2array(Drupal.dnd.Atoms[sid].sas);
+      var markup = Drupal.theme('scaldEmbed', Drupal.dnd.Atoms[sid], atom.context, atom.options);
+      editor.insertElement(CKEDITOR.dom.element.createFromHtml(markup));
+    };
+
     var path = this.path;
     editor.on('mode', function (evt) {
       var editor = evt.editor;
@@ -84,6 +92,39 @@ CKEDITOR.plugins.add('dnd', {
       editorFocus: CKEDITOR.env.ie || CKEDITOR.env.webkit
     });
 
+    editor.addCommand('atomView', {
+      exec: function (editor) {
+        var data = Drupal.dnd.atomCurrent.getChild(0).getHtml()
+          .replace(/<!--\{cke_protected\}\{C\}([\s\S]+?)-->.*/, function(match, data) {
+            return decodeURIComponent(data);
+          })
+          .replace(/^<!--\s+scald=(.+?)\s+-->[\s\S]*$/, '$1');
+        var sid = data.split(':', 1)[0];
+        window.open(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/' + sid);
+      }
+    });
+
+    editor.addCommand('atomEdit', {
+      exec: function (editor) {
+        var data = Drupal.dnd.atomCurrent.getChild(0).getHtml()
+          .replace(/<!--\{cke_protected\}\{C\}([\s\S]+?)-->.*/, function(match, data) {
+            return decodeURIComponent(data);
+          })
+          .replace(/^<!--\s+scald=(.+?)\s+-->[\s\S]*$/, '$1');
+        var sid = data.split(':', 1)[0];
+        var $wrapper = $("<div></div>", {
+          'class' : 'wysiwyg-atom-edit-wrapper'
+        });
+        var $link = $("<a></a>", {
+          'target' : '_blank',
+          'href' : Drupal.settings.basePath + Drupal.settings.pathPrefix + 'atom/' + sid + '/edit/nojs',
+          'class' : 'ctools-use-modal ctools-modal-custom-style'
+        }).appendTo($wrapper);
+        Drupal.behaviors.ZZCToolsModal.attach($wrapper);
+        $link.click();
+      }
+    });
+
     // Register the toolbar button.
     editor.ui.addButton && editor.ui.addButton('ScaldAtom', {
       label: editor.lang.dnd.atom_properties,
@@ -103,6 +144,13 @@ CKEDITOR.plugins.add('dnd', {
           evt.data.preventDefault();
         }
         dnd.protectAtom($(editor.document.$).find('.dnd-atom-wrapper'));
+      });
+
+      // Prevent paste, so the new clipboard plugin will not double insert the Atom.
+      editor.on('paste', function (evt) {
+        if (typeof evt.data.dataTransfer !== 'undefined' && Drupal.dnd.sas2array(evt.data.dataTransfer.getData('Text'))) {
+          return false;
+        }
       });
 
       editor.document.on('click', function (evt) {
@@ -130,6 +178,16 @@ CKEDITOR.plugins.add('dnd', {
         command: 'atomProperties',
         group: 'dnd'
       },
+      atomview : {
+        label: editor.lang.dnd.atom_view,
+        command: 'atomView',
+        group: 'dnd'
+      },
+      atomedit : {
+        label: editor.lang.dnd.atom_edit,
+        command: 'atomEdit',
+        group: 'dnd'
+      },
       atomdelete: {
         label: editor.lang.dnd.atom_delete,
         command: 'atomDelete',
@@ -138,11 +196,13 @@ CKEDITOR.plugins.add('dnd', {
       atomcut: {
         label: editor.lang.dnd.atom_cut,
         command: 'atomCut',
+        icon: 'cut',
         group: 'dnd'
       },
       atompaste: {
         label: editor.lang.dnd.atom_paste,
         command: 'atomPaste',
+        icon: 'paste',
         group: 'dnd'
       }
     });
@@ -152,11 +212,19 @@ CKEDITOR.plugins.add('dnd', {
       element = dnd.getWrapperElement(element);
       if (element) {
         menu.atomproperties = CKEDITOR.TRISTATE_OFF;
+        menu.atomview = CKEDITOR.TRISTATE_OFF;
+        menu.atomedit = CKEDITOR.TRISTATE_OFF;
         menu.atomdelete = CKEDITOR.TRISTATE_OFF;
         menu.atomcut = CKEDITOR.TRISTATE_OFF;
+        editor.contextMenu.items = [];
       }
       else if (dnd.atomCut) {
         menu.atompaste = CKEDITOR.TRISTATE_OFF;
+        for (var index in editor.contextMenu.items) {
+          if (editor.contextMenu.items[index].name == 'paste') {
+            editor.contextMenu.items.splice(index, 1);
+          }
+        }
       }
       return menu;
     });
