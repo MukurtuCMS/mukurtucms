@@ -72,7 +72,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'image' => array(
@@ -114,7 +114,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'image' => array(
@@ -131,7 +131,7 @@ function ma_scald_default_scald_context_config() {
     ),
   );
   $context_config->data = array(
-    'width' => '100%',
+    'width' => '450px',
     'height' => '100%',
   );
   $export['ma_colorbox'] = $context_config;
@@ -156,7 +156,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(
@@ -240,7 +240,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'file' => array(
@@ -281,7 +281,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'file' => array(
@@ -322,7 +322,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'file' => array(
@@ -405,7 +405,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'image' => array(
@@ -432,35 +432,32 @@ function ma_scald_default_scald_context_config() {
   $context_config->api_version = 1;
   $context_config->context = 'sdl_library_item';
   $context_config->transcoder = array(
-    'image' => array(
-      '*' => 'style-Library',
-    ),
     'audio' => array(
       '*' => 'passthrough',
     ),
-    'video' => array(
+    'file' => array(
       '*' => 'passthrough',
     ),
-    'file' => array(
+    'image' => array(
+      '*' => 'style-Library',
+    ),
+    'video' => array(
       '*' => 'passthrough',
     ),
   );
   $context_config->player = array(
-    'image' => array(
-      '*' => 'default',
-      'settings' => array(),
-    ),
     'audio' => array(
-      '*' => 'default',
-      'settings' => array(),
-    ),
-    'video' => array(
       '*' => 'default',
       'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
-      'settings' => array(),
+    ),
+    'image' => array(
+      '*' => 'default',
+    ),
+    'video' => array(
+      '*' => 'default',
     ),
   );
   $context_config->data = array(
@@ -489,7 +486,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'image' => array(
