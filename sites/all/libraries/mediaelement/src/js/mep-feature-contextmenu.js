@@ -7,7 +7,7 @@
 (function($) {
 
 $.extend(mejs.MepDefaults,
-	contextMenuItems = [
+	{ 'contextMenuItems': [
 		// demo of a fullscreen option
 		{ 
 			render: function(player) {
@@ -17,9 +17,9 @@ $.extend(mejs.MepDefaults,
 					return null;
 			
 				if (player.isFullScreen) {
-					return "Turn off Fullscreen";
+					return mejs.i18n.t('mejs.fullscreen-off');
 				} else {
-					return "Go Fullscreen";
+					return mejs.i18n.t('mejs.fullscreen-on');
 				}
 			},
 			click: function(player) {
@@ -35,9 +35,9 @@ $.extend(mejs.MepDefaults,
 		{ 
 			render: function(player) {
 				if (player.media.muted) {
-					return "Unmute";
+					return mejs.i18n.t('mejs.unmute');
 				} else {
-					return "Mute";
+					return mejs.i18n.t('mejs.mute');
 				}
 			},
 			click: function(player) {
@@ -56,13 +56,13 @@ $.extend(mejs.MepDefaults,
 		// demo of simple download video
 		{ 
 			render: function(player) {
-				return "Download Video";
+				return mejs.i18n.t('mejs.download-video');
 			},
 			click: function(player) {
 				window.location.href = player.media.currentSrc;
 			}
 		}	
-	]
+	]}
 );
 
 
@@ -91,6 +91,10 @@ $.extend(mejs.MepDefaults,
 				player.startContextMenuTimer();
 				
 			});		
+		},
+
+		cleancontextmenu: function(player) {
+			player.contextMenu.remove();
 		},
 		
 		isContextMenuEnabled: true,
