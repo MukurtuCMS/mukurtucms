@@ -62,6 +62,11 @@ function ma_scald_form_scald_atom_add_form_add_alter(&$form, &$form_state) {
   $form['scald_authors']['#access'] = FALSE;
   $form['scald_tags']['#access'] = FALSE;
 
+  // Add m4a to allowed list of extensions for audio atoms
+  $type = $form_state['scald']['type']->type;
+  if ($type == 'audio') {
+    $form['file']['#upload_validators']['file_validate_extensions'] = array('wav ogg mp3 m4a');
+  }
 }
 
 /**
