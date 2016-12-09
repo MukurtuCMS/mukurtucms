@@ -264,7 +264,7 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
         if($atom->type <> 'image' && in_array($context, $valid_contexts)) {
             // Use the atom thumbnail if there is one
             if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
-                if($atom->type == 'file') {
+                if($atom->type == 'file' || $atom->type == 'video') {
                     $atom->rendered->player = array('#markup' => '');
                     return;
                 }

@@ -131,7 +131,7 @@ function ma_scald_default_scald_context_config() {
     ),
   );
   $context_config->data = array(
-    'width' => '450px',
+    'width' => '100%',
     'height' => '100%',
   );
   $export['ma_colorbox'] = $context_config;
