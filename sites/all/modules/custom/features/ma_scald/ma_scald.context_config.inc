@@ -164,11 +164,11 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'video' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'file' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
   );
@@ -245,6 +245,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
@@ -286,6 +287,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
@@ -326,14 +328,15 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
       'settings' => array(),
     ),
     'video' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
   );
@@ -452,12 +455,14 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
     ),
     'video' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
   );
   $context_config->data = array(

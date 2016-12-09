@@ -264,6 +264,10 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
         if($atom->type <> 'image' && in_array($context, $valid_contexts)) {
             // Use the atom thumbnail if there is one
             if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
+                if($atom->type == 'file') {
+                    $atom->rendered->player = array('#markup' => '');
+                    return;
+                }
                 $image_styles = array (
                     'ma_scald_search_results' => 'medium',
                     'mukurtu_scald_related_items' => 'related_items_teaser'
@@ -282,7 +286,7 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
                 $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$context] . '.jpg">';
             }
 
-            $atom->rendered->player =  array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
+            $atom->rendered->player = array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
         }
     }
 }
