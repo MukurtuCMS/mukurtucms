@@ -62,6 +62,11 @@ function ma_scald_form_scald_atom_add_form_add_alter(&$form, &$form_state) {
   $form['scald_authors']['#access'] = FALSE;
   $form['scald_tags']['#access'] = FALSE;
 
+  // Add m4a to allowed list of extensions for audio atoms
+  $type = $form_state['scald']['type']->type;
+  if ($type == 'audio') {
+    $form['file']['#upload_validators']['file_validate_extensions'] = array('wav ogg mp3 m4a');
+  }
 }
 
 /**
@@ -235,5 +240,53 @@ if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
      return TRUE;
 }
 return FALSE;';
+    }
+}
+
+/**
+ * Implements hook_scald_player().
+ */
+function ma_scald_scald_player() {
+  return array('mukurtu_default' => array(
+      'name' => 'Mukurtu default player',
+      'description' => 'Mukurtu default player',
+      'type' => array('*'),
+    ));
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function ma_scald_scald_prerender($atom, $context, $options, $mode) {
+    $valid_contexts = array('ma_scald_search_results', 'mukurtu_scald_related_items');
+
+    if($mode == 'player') {
+        if($atom->type <> 'image' && in_array($context, $valid_contexts)) {
+            // Use the atom thumbnail if there is one
+            if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
+                if($atom->type == 'file' || $atom->type == 'video') {
+                    $atom->rendered->player = array('#markup' => '');
+                    return;
+                }
+                $image_styles = array (
+                    'ma_scald_search_results' => 'medium',
+                    'mukurtu_scald_related_items' => 'related_items_teaser'
+                );
+                $thumbnail_image = theme_image_style (array (
+                    'style_name' => $image_styles[$context],
+                    'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
+                ));
+            }
+            // If no atom thumbnail, use our default thumbnails
+            else {
+                $image_widths = array (
+                    'ma_scald_search_results' => '220',
+                    'mukurtu_scald_related_items' => '280'
+                );
+                $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$context] . '.jpg">';
+            }
+
+            $atom->rendered->player = array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
+        }
     }
 }

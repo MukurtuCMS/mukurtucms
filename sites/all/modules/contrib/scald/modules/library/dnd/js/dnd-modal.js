@@ -1,7 +1,7 @@
 (function ($) {
   Drupal.behaviors.dndModal= {
     attach: function (context, settings) {
-      $('input[id^="edit-next"]', context).click(function(e) {
+      $('input[id^="edit-next"], button[id^="edit-next"]', context).click(function(e) {
         var form = $('#scald-atom-add-form-add');
         if (form.find('.plupload-element').length > 0) {
           var uploader = form.find('.plupload-element').first().pluploadQueue();
@@ -9,7 +9,7 @@
             uploader.start();
             uploader.bind('UploadComplete', function() {
               setTimeout(function(){
-                $('input[id^="edit-next"]', context).click();
+                $('input[id^="edit-next"], button[id^="edit-next"]', context).click();
               },500);
             });
             return false;

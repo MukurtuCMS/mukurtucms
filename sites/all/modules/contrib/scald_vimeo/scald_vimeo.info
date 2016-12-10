@@ -1,0 +1,13 @@
+name = Scald Vimeo
+description = Provides Video atoms from Vimeo.
+package = Scald Providers
+core = 7.x
+dependencies[] = scald
+
+
+; Information added by Drupal.org packaging script on 2015-05-18
+version = "7.x-1.4"
+core = "7.x"
+project = "scald_vimeo"
+datestamp = "1431938583"
+

@@ -97,6 +97,26 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
  * Implements template_preprocess_field.
  */
 function ma_digitalheritage_preprocess_field(&$variables, $hook) {
+    // Display the first image or thumbnail when viewing the media asset field rather than a default icon for any display where we are
+    // showing a single image to represent the entire field (e.g., search results). This was previously implemented as a patch to Scald.
+    if($variables['element']['#field_name'] == 'field_media_asset' && count($variables['items']) == 1) {
+        // Only process if there are more than 1 scald atoms
+        if(isset($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) && count($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) > 1 ) {
+            // Search through the scald atoms and find the first image or thumbnail
+            foreach($variables['element']['#object']->field_media_asset[LANGUAGE_NONE] as $index => $item) {
+                $atom = scald_atom_load($item['sid']);
+
+                if($atom->type == 'image' || isset($atom->scald_thumbnail[LANGUAGE_NONE][0])) {
+                    unset($variables['element']['#items'][0]);
+                    $variables['element']['#items'][] = $variables['element']['#object']->field_media_asset['und'][$index];
+                    unset($variables['items'][0]);
+                    $variables['items'][] = $variables['element'][$index];
+                    break;
+                }
+            }
+        }
+    }
+
     if ($variables['element']['#field_name'] == 'field_transcription') {
         // Convert newlines in transcription fields to html if plain text only
         if(!isset($variables['element']['#items'][0]['format']) && isset($variables['element']['#items'][0]['safe_value'])) {
@@ -105,6 +125,26 @@ function ma_digitalheritage_preprocess_field(&$variables, $hook) {
     }
 }
 
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_digitalheritage_views_pre_render(&$view) {
+    // Display the first image or thumbnail in the related items teaser rather than the default audio/file/video icon
+    if($view->name == 'dh_related_items_teasers' && isset($view->result[0]->_field_data['nid']['entity']->field_media_asset[LANGUAGE_NONE])) {
+        // Search through the scald atoms for the first image or thumbnail
+        foreach($view->result[0]->_field_data['nid']['entity']->field_media_asset[LANGUAGE_NONE] as $index => $item) {
+            $atom = scald_atom_load($item['sid']);
+
+            // Found it, render that instead
+            if($atom->type == 'image' || isset($atom->scald_thumbnail[LANGUAGE_NONE][0])) {
+                $image_atom = scald_render($atom, 'mukurtu_scald_related_items');
+                $view->result[0]->field_field_media_asset[0]['rendered']['#markup'] = $image_atom;
+                $view->result[0]->field_field_media_asset[0]['raw']['sid'] = $atom->sid;
+                break;
+            }
+        }
+    }
+}
 
 /**
  * Implements template_preprocess_views_view.

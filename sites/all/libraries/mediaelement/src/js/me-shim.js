@@ -1,86 +1,10 @@
-// Handles calls from Flash/Silverlight and reports them as native <video/audio> events and properties
-mejs.MediaPluginBridge = {
-
-	pluginMediaElements:{},
-	htmlMediaElements:{},
-
-	registerPluginElement: function (id, pluginMediaElement, htmlMediaElement) {
-		this.pluginMediaElements[id] = pluginMediaElement;
-		this.htmlMediaElements[id] = htmlMediaElement;
-	},
-
-	// when Flash/Silverlight is ready, it calls out to this method
-	initPlugin: function (id) {
-
-		var pluginMediaElement = this.pluginMediaElements[id],
-			htmlMediaElement = this.htmlMediaElements[id];
-
-		if (pluginMediaElement) {
-			// find the javascript bridge
-			switch (pluginMediaElement.pluginType) {
-				case "flash":
-					pluginMediaElement.pluginElement = pluginMediaElement.pluginApi = document.getElementById(id);
-					break;
-				case "silverlight":
-					pluginMediaElement.pluginElement = document.getElementById(pluginMediaElement.id);
-					pluginMediaElement.pluginApi = pluginMediaElement.pluginElement.Content.MediaElementJS;
-					break;
-			}
-	
-			if (pluginMediaElement.pluginApi != null && pluginMediaElement.success) {
-				pluginMediaElement.success(pluginMediaElement, htmlMediaElement);
-			}
-		}
-	},
-
-	// receives events from Flash/Silverlight and sends them out as HTML5 media events
-	// http://www.whatwg.org/specs/web-apps/current-work/multipage/video.html
-	fireEvent: function (id, eventName, values) {
-
-		var
-			e,
-			i,
-			bufferedTime,
-			pluginMediaElement = this.pluginMediaElements[id];
-
-		pluginMediaElement.ended = false;
-		pluginMediaElement.paused = true;
-
-		// fake event object to mimic real HTML media event.
-		e = {
-			type: eventName,
-			target: pluginMediaElement
-		};
-
-		// attach all values to element and event object
-		for (i in values) {
-			pluginMediaElement[i] = values[i];
-			e[i] = values[i];
-		}
-
-		// fake the newer W3C buffered TimeRange (loaded and total have been removed)
-		bufferedTime = values.bufferedTime || 0;
-
-		e.target.buffered = e.buffered = {
-			start: function(index) {
-				return 0;
-			},
-			end: function (index) {
-				return bufferedTime;
-			},
-			length: 1
-		};
-
-		pluginMediaElement.dispatchEvent(e.type, e);
-	}
-};
-
 /*
 Default options
 */
 mejs.MediaElementDefaults = {
 	// allows testing on HTML5, flash, silverlight
 	// auto: attempts to detect what the browser can do
+	// auto_plugin: prefer plugins and then attempt native HTML5
 	// native: forces HTML5 playback
 	// shim: disallows HTML5, will attempt either Flash or Silverlight
 	// none: forces fallback view
@@ -89,14 +13,24 @@ mejs.MediaElementDefaults = {
 	plugins: ['flash','silverlight','youtube','vimeo'],
 	// shows debug errors on screen
 	enablePluginDebug: false,
+	// use plugin for browsers that have trouble with Basic Authentication on HTTPS sites
+	httpsBasicAuthSite: false,
 	// overrides the type specified, useful for dynamic instantiation
 	type: '',
 	// path to Flash and Silverlight plugins
 	pluginPath: mejs.Utility.getScriptPath(['mediaelement.js','mediaelement.min.js','mediaelement-and-player.js','mediaelement-and-player.min.js']),
 	// name of flash file
 	flashName: 'flashmediaelement.swf',
+	// streamer for RTMP streaming
+	flashStreamer: '',
+	// set to 'always' for CDN version
+	flashScriptAccess: 'sameDomain',	
 	// turns on the smoothing filter in Flash
 	enablePluginSmoothing: false,
+	// enabled pseudo-streaming (seek) on .mp4 files
+	enablePseudoStreaming: false,
+	// start query parameter sent to server for pseudo-streaming
+	pseudoStreamingStartQueryParam: 'start',
 	// name of silverlight file
 	silverlightName: 'silverlightmediaelement.xap',
 	// default if the <video width> is not specified
@@ -114,6 +48,9 @@ mejs.MediaElementDefaults = {
 	timerRate: 250,
 	// initial volume for player
 	startVolume: 0.8,
+	// custom error message in case media cannot be played; otherwise, Download File
+	// link will be displayed
+	customError: "",
 	success: function () { },
 	error: function () { }
 };
@@ -131,7 +68,7 @@ mejs.HtmlMediaElementShim = {
 
 	create: function(el, o) {
 		var
-			options = mejs.MediaElementDefaults,
+			options = {},
 			htmlMediaElement = (typeof(el) == 'string') ? document.getElementById(el) : el,
 			tagName = htmlMediaElement.tagName.toLowerCase(),
 			isMediaTag = (tagName === 'audio' || tagName === 'video'),
@@ -144,9 +81,13 @@ mejs.HtmlMediaElementShim = {
 			prop;
 
 		// extend options
+		for (prop in mejs.MediaElementDefaults) {
+			options[prop] = mejs.MediaElementDefaults[prop];
+		}
 		for (prop in o) {
 			options[prop] = o[prop];
-		}
+		}		
+		
 
 		// clean up attributes
 		src = 		(typeof src == 'undefined' 	|| src === null || src == '') ? null : src;		
@@ -158,6 +99,7 @@ mejs.HtmlMediaElementShim = {
 		// test for HTML5 and plugin capabilities
 		playback = this.determinePlayback(htmlMediaElement, options, mejs.MediaFeatures.supportsMediaTag, isMediaTag, src);
 		playback.url = (playback.url !== null) ? mejs.Utility.absolutizeUrl(playback.url) : '';
+        	playback.scheme = mejs.Utility.determineScheme(playback.url);
 
 		if (playback.method == 'native') {
 			// second fix for android
@@ -191,11 +133,12 @@ mejs.HtmlMediaElementShim = {
 			l,
 			n,
 			type,
-			result = { method: '', url: '', htmlMediaElement: htmlMediaElement, isVideo: (htmlMediaElement.tagName.toLowerCase() != 'audio')},
+			result = { method: '', url: '', htmlMediaElement: htmlMediaElement, isVideo: (htmlMediaElement.tagName.toLowerCase() !== 'audio'), scheme: ''},
 			pluginName,
 			pluginVersions,
 			pluginInfo,
-			dummy;
+			dummy,
+			media;
 			
 		// STEP 1: Get URL and type from <video src> or <source src>
 
@@ -225,7 +168,11 @@ mejs.HtmlMediaElementShim = {
 				if (n.nodeType == 1 && n.tagName.toLowerCase() == 'source') {
 					src = n.getAttribute('src');
 					type = this.formatType(src, n.getAttribute('type'));
-					mediaFiles.push({type:type, url:src});
+					media = n.getAttribute('media');
+
+					if (!media || !window.matchMedia || (window.matchMedia && window.matchMedia(media).matches)) {
+						mediaFiles.push({type:type, url:src});
+					}
 				}
 			}
 		}
@@ -240,15 +187,21 @@ mejs.HtmlMediaElementShim = {
 		// STEP 2: Test for playback method
 		
 		// special case for Android which sadly doesn't implement the canPlayType function (always returns '')
-		if (mejs.MediaFeatures.isBustedAndroid) {
+		if (result.isVideo && mejs.MediaFeatures.isBustedAndroid) {
 			htmlMediaElement.canPlayType = function(type) {
 				return (type.match(/video\/(mp4|m4v)/gi) !== null) ? 'maybe' : '';
 			};
 		}		
 		
+		// special case for Chromium to specify natively supported video codecs (i.e. WebM and Theora) 
+		if (result.isVideo && mejs.MediaFeatures.isChromium) {
+			htmlMediaElement.canPlayType = function(type) { 
+				return (type.match(/video\/(webm|ogv|ogg)/gi) !== null) ? 'maybe' : '';
+			}; 
+		}
 
 		// test for native playback first
-		if (supportsMediaTag && (options.mode === 'auto' || options.mode === 'native')) {
+		if (supportsMediaTag && (options.mode === 'auto' || options.mode === 'auto_plugin' || options.mode === 'native')  && !(mejs.MediaFeatures.isBustedNativeHTTPS && options.httpsBasicAuthSite === true)) {
 						
 			if (!isMediaTag) {
 
@@ -263,9 +216,11 @@ mejs.HtmlMediaElementShim = {
 				
 			for (i=0; i<mediaFiles.length; i++) {
 				// normal check
-				if (htmlMediaElement.canPlayType(mediaFiles[i].type).replace(/no/, '') !== '' 
+				if (mediaFiles[i].type == "video/m3u8" || htmlMediaElement.canPlayType(mediaFiles[i].type).replace(/no/, '') !== ''
 					// special case for Mac/Safari 5.0.3 which answers '' to canPlayType('audio/mp3') but 'maybe' to canPlayType('audio/mpeg')
-					|| htmlMediaElement.canPlayType(mediaFiles[i].type.replace(/mp3/,'mpeg')).replace(/no/, '') !== '') {
+					|| htmlMediaElement.canPlayType(mediaFiles[i].type.replace(/mp3/,'mpeg')).replace(/no/, '') !== ''
+					// special case for m4a supported by detecting mp4 support
+					|| htmlMediaElement.canPlayType(mediaFiles[i].type.replace(/m4a/,'mp4')).replace(/no/, '') !== '') {
 					result.method = 'native';
 					result.url = mediaFiles[i].url;
 					break;
@@ -277,12 +232,15 @@ mejs.HtmlMediaElementShim = {
 					htmlMediaElement.src = result.url;
 				}
 			
-				return result;
+				// if `auto_plugin` mode, then cache the native result but try plugins.
+				if (options.mode !== 'auto_plugin') {
+					return result;
+				}
 			}
 		}
 
 		// if native playback didn't work, then test plugins
-		if (options.mode === 'auto' || options.mode === 'shim') {
+		if (options.mode === 'auto' || options.mode === 'auto_plugin' || options.mode === 'shim') {
 			for (i=0; i<mediaFiles.length; i++) {
 				type = mediaFiles[i].type;
 
@@ -307,7 +265,7 @@ mejs.HtmlMediaElementShim = {
 							// test for plugin playback types
 							for (l=0; l<pluginInfo.types.length; l++) {
 								// find plugin that can play the type
-								if (type == pluginInfo.types[l]) {
+								if (type.toLowerCase() == pluginInfo.types[l].toLowerCase()) {
 									result.method = pluginName;
 									result.url = mediaFiles[i].url;
 									return result;
@@ -319,6 +277,12 @@ mejs.HtmlMediaElementShim = {
 			}
 		}
 		
+		// at this point, being in 'auto_plugin' mode implies that we tried plugins but failed.
+		// if we have native support then return that.
+		if (options.mode === 'auto_plugin' && result.method === 'native') {
+			return result;
+		}
+
 		// what if there's nothing to play? just grab the first available
 		if (result.method === '' && mediaFiles.length > 0) {
 			result.url = mediaFiles[0].url;
@@ -328,8 +292,6 @@ mejs.HtmlMediaElementShim = {
 	},
 
 	formatType: function(url, type) {
-		var ext;
-
 		// if no type is supplied, fake it with the extension
 		if (url && !type) {		
 			return this.getTypeFromFile(url);
@@ -347,14 +309,47 @@ mejs.HtmlMediaElementShim = {
 	},
 	
 	getTypeFromFile: function(url) {
-		var ext = url.substring(url.lastIndexOf('.') + 1);
-		return (/(mp4|m4v|ogg|ogv|webm|flv|wmv|mpeg|mov)/gi.test(ext) ? 'video' : 'audio') + '/' + ext;
+		url = url.split('?')[0];
+		var
+			ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase(),
+			av = /(mp4|m4v|ogg|ogv|m3u8|webm|webmv|flv|wmv|mpeg|mov)/gi.test(ext) ? 'video/' : 'audio/';
+		return this.getTypeFromExtension(ext, av);
+	},
+	
+	getTypeFromExtension: function(ext, av) {
+		av = av || '';
+		
+		switch (ext) {
+			case 'mp4':
+			case 'm4v':
+			case 'm4a':
+			case 'f4v':
+			case 'f4a':
+				return av + 'mp4';
+			case 'flv':
+				return av + 'x-flv';
+			case 'webm':
+			case 'webma':
+			case 'webmv':	
+				return av + 'webm';
+			case 'ogg':
+			case 'oga':
+			case 'ogv':	
+				return av + 'ogg';
+			case 'm3u8':
+				return 'application/x-mpegurl';
+			case 'ts':
+				return av + 'mp2t';
+			default:
+				return av + ext;
+		}
 	},
 
 	createErrorMessage: function(playback, options, poster) {
 		var 
 			htmlMediaElement = playback.htmlMediaElement,
-			errorContainer = document.createElement('div');
+			errorContainer = document.createElement('div'),
+			errorContent = options.customError;
 			
 		errorContainer.className = 'me-cannotplay';
 
@@ -363,9 +358,17 @@ mejs.HtmlMediaElementShim = {
 			errorContainer.style.height = htmlMediaElement.height + 'px';
 		} catch (e) {}
 
-		errorContainer.innerHTML = (poster !== '') ?
-			'<a href="' + playback.url + '"><img src="' + poster + '" /></a>' :
-			'<a href="' + playback.url + '"><span>Download File</span></a>';
+		if (!errorContent) {
+			errorContent = '<a href="' + playback.url + '">';
+
+			if (poster !== '') {
+				errorContent += '<img src="' + poster + '" width="100%" height="100%" alt="" />';
+			}
+
+			errorContent += '<span>' + mejs.i18n.t('mejs.download-file') + '</span></a>';
+		}
+
+		errorContainer.innerHTML = errorContent;
 
 		htmlMediaElement.parentNode.insertBefore(errorContainer, htmlMediaElement);
 		htmlMediaElement.style.display = 'none';
@@ -385,10 +388,23 @@ mejs.HtmlMediaElementShim = {
 			node,
 			initVars;
 
+		// copy tagName from html media element
+		pluginMediaElement.tagName = htmlMediaElement.tagName;
+
+		// copy attributes from html media element to plugin media element
+		for (var i = 0; i < htmlMediaElement.attributes.length; i++) {
+			var attribute = htmlMediaElement.attributes[i];
+			if (attribute.specified) {
+				pluginMediaElement.setAttribute(attribute.name, attribute.value);
+			}
+		}
+
 		// check for placement inside a <p> tag (sometimes WYSIWYG editors do this)
 		node = htmlMediaElement.parentNode;
-		while (node !== null && node.tagName.toLowerCase() != 'body') {
-			if (node.parentNode.tagName.toLowerCase() == 'p') {
+
+		while (node !== null && node.tagName != null && node.tagName.toLowerCase() !== 'body' && 
+				node.parentNode != null && node.parentNode.tagName != null && node.parentNode.constructor != null && node.parentNode.constructor.name === "ShadowRoot") {
+			if (node.parentNode.tagName.toLowerCase() === 'p') {
 				node.parentNode.parentNode.insertBefore(node, node.parentNode);
 				break;
 			}
@@ -396,8 +412,8 @@ mejs.HtmlMediaElementShim = {
 		}
 
 		if (playback.isVideo) {
-			width = (options.videoWidth > 0) ? options.videoWidth : (htmlMediaElement.getAttribute('width') !== null) ? htmlMediaElement.getAttribute('width') : options.defaultVideoWidth;
-			height = (options.videoHeight > 0) ? options.videoHeight : (htmlMediaElement.getAttribute('height') !== null) ? htmlMediaElement.getAttribute('height') : options.defaultVideoHeight;
+			width = (options.pluginWidth > 0) ? options.pluginWidth : (options.videoWidth > 0) ? options.videoWidth : (htmlMediaElement.getAttribute('width') !== null) ? htmlMediaElement.getAttribute('width') : options.defaultVideoWidth;
+			height = (options.pluginHeight > 0) ? options.pluginHeight : (options.videoHeight > 0) ? options.videoHeight : (htmlMediaElement.getAttribute('height') !== null) ? htmlMediaElement.getAttribute('height') : options.defaultVideoHeight;
 		
 			// in case of '%' make sure it's encoded
 			width = mejs.Utility.encodeUrl(width);
@@ -412,8 +428,7 @@ mejs.HtmlMediaElementShim = {
 
 		// register plugin
 		pluginMediaElement.success = options.success;
-		mejs.MediaPluginBridge.registerPluginElement(pluginid, pluginMediaElement, htmlMediaElement);
-
+		
 		// add container (must be added to DOM before inserting HTML for IE)
 		container.className = 'me-plugin';
 		container.id = pluginid + '_container';
@@ -423,42 +438,116 @@ mejs.HtmlMediaElementShim = {
 		} else {
 				document.body.insertBefore(container, document.body.childNodes[0]);
 		}
+		
+		if (playback.method === 'flash' || playback.method === 'silverlight') {
 
-		// flash/silverlight vars
-		initVars = [
-			'id=' + pluginid,
-			'isvideo=' + ((playback.isVideo) ? "true" : "false"),
-			'autoplay=' + ((autoplay) ? "true" : "false"),
-			'preload=' + preload,
-			'width=' + width,
-			'startvolume=' + options.startVolume,
-			'timerrate=' + options.timerRate,
-			'height=' + height];
+			var canPlayVideo = htmlMediaElement.getAttribute('type') === 'audio/mp4',
+				childrenSources = htmlMediaElement.getElementsByTagName('source');
 
-		if (playback.url !== null) {
-			if (playback.method == 'flash') {
-				initVars.push('file=' + mejs.Utility.encodeUrl(playback.url));
-			} else {
-				initVars.push('file=' + playback.url);
+			if (childrenSources && !canPlayVideo) {
+				for (var i = 0, total = childrenSources.length; i < total; i++) {
+					if (childrenSources[i].getAttribute('type') === 'audio/mp4') {
+						canPlayVideo = true;
+					}
+				}
 			}
+
+			// flash/silverlight vars
+			initVars = [
+				'id=' + pluginid,
+				'isvideo=' + ((playback.isVideo || canPlayVideo) ? "true" : "false"),
+				'autoplay=' + ((autoplay) ? "true" : "false"),
+				'preload=' + preload,
+				'width=' + width,
+				'startvolume=' + options.startVolume,
+				'timerrate=' + options.timerRate,
+				'flashstreamer=' + options.flashStreamer,
+				'height=' + height,
+				'pseudostreamstart=' + options.pseudoStreamingStartQueryParam];
+	
+			if (playback.url !== null) {
+				if (playback.method == 'flash') {
+					initVars.push('file=' + mejs.Utility.encodeUrl(playback.url));
+				} else {
+					initVars.push('file=' + playback.url);
+				}
+			}
+			if (options.enablePluginDebug) {
+				initVars.push('debug=true');
+			}
+			if (options.enablePluginSmoothing) {
+				initVars.push('smoothing=true');
+			}
+			if (options.enablePseudoStreaming) {
+				initVars.push('pseudostreaming=true');
+			}
+			if (controls) {
+				initVars.push('controls=true'); // shows controls in the plugin if desired
+			}
+			if (options.pluginVars) {
+				initVars = initVars.concat(options.pluginVars);
+			}		
+			
+			// call from plugin
+			window[pluginid + '_init'] = function() {
+				switch (pluginMediaElement.pluginType) {
+					case 'flash':
+						pluginMediaElement.pluginElement = pluginMediaElement.pluginApi = document.getElementById(pluginid);
+						break;
+					case 'silverlight':
+						pluginMediaElement.pluginElement = document.getElementById(pluginMediaElement.id);
+						pluginMediaElement.pluginApi = pluginMediaElement.pluginElement.Content.MediaElementJS;
+						break;
+				}
+	
+				if (pluginMediaElement.pluginApi != null && pluginMediaElement.success) {
+					pluginMediaElement.success(pluginMediaElement, htmlMediaElement);
+				}
+			};
+			
+			// event call from plugin
+			window[pluginid + '_event'] = function(eventName, values) {
+		
+				var
+					e,
+					i,
+					bufferedTime;
+		        
+				// fake event object to mimic real HTML media event.
+				e = {
+					type: eventName,
+					target: pluginMediaElement
+				};
+		
+				// attach all values to element and event object
+				for (i in values) {
+					pluginMediaElement[i] = values[i];
+					e[i] = values[i];
+				}
+		
+				// fake the newer W3C buffered TimeRange (loaded and total have been removed)
+				bufferedTime = values.bufferedTime || 0;
+		
+				e.target.buffered = e.buffered = {
+					start: function(index) {
+						return 0;
+					},
+					end: function (index) {
+						return bufferedTime;
+					},
+					length: 1
+				};
+		
+				pluginMediaElement.dispatchEvent(e);
+			}			
+			
+			
 		}
-		if (options.enablePluginDebug) {
-			initVars.push('debug=true');
-		}
-		if (options.enablePluginSmoothing) {
-			initVars.push('smoothing=true');
-		}
-		if (controls) {
-			initVars.push('controls=true'); // shows controls in the plugin if desired
-		}
-		if (options.pluginVars) {
-			initVars = initVars.concat(options.pluginVars);
-		}		
 
 		switch (playback.method) {
 			case 'silverlight':
 				container.innerHTML =
-'<object data="data:application/x-silverlight-2," type="application/x-silverlight-2" id="' + pluginid + '" name="' + pluginid + '" width="' + width + '" height="' + height + '">' +
+'<object data="data:application/x-silverlight-2," type="application/x-silverlight-2" id="' + pluginid + '" name="' + pluginid + '" width="' + width + '" height="' + height + '" class="mejs-shim">' +
 '<param name="initParams" value="' + initVars.join(',') + '" />' +
 '<param name="windowless" value="true" />' +
 '<param name="background" value="black" />' +
@@ -475,14 +564,15 @@ mejs.HtmlMediaElementShim = {
 					container.appendChild(specialIEContainer);
 					specialIEContainer.outerHTML =
 '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="//download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab" ' +
-'id="' + pluginid + '" width="' + width + '" height="' + height + '">' +
-'<param name="movie" value="' + options.pluginPath + options.flashName + '?x=' + (new Date()) + '" />' +
+'id="' + pluginid + '" width="' + width + '" height="' + height + '" class="mejs-shim">' +
+'<param name="movie" value="' + options.pluginPath + options.flashName + '?' + (new Date().getTime()) + '" />' +
 '<param name="flashvars" value="' + initVars.join('&amp;') + '" />' +
 '<param name="quality" value="high" />' +
 '<param name="bgcolor" value="#000000" />' +
 '<param name="wmode" value="transparent" />' +
-'<param name="allowScriptAccess" value="always" />' +
+'<param name="allowScriptAccess" value="' + options.flashScriptAccess + '" />' +
 '<param name="allowFullScreen" value="true" />' +
+'<param name="scale" value="default" />' + 
 '</object>';
 
 				} else {
@@ -494,60 +584,154 @@ mejs.HtmlMediaElementShim = {
 'quality="high" ' +
 'bgcolor="#000000" ' +
 'wmode="transparent" ' +
-'allowScriptAccess="always" ' +
+'allowScriptAccess="' + options.flashScriptAccess + '" ' +
 'allowFullScreen="true" ' +
 'type="application/x-shockwave-flash" pluginspage="//www.macromedia.com/go/getflashplayer" ' +
 'src="' + options.pluginPath + options.flashName + '" ' +
 'flashvars="' + initVars.join('&') + '" ' +
 'width="' + width + '" ' +
-'height="' + height + '"></embed>';
+'height="' + height + '" ' +
+'scale="default"' + 
+'class="mejs-shim"></embed>';
 				}
 				break;
 			
 			case 'youtube':
 			
 				
-				var
-					videoId = playback.url.substr(playback.url.lastIndexOf('=')+1);
-					youtubeSettings = {
+				var videoId;
+				// youtu.be url from share button
+				if (playback.url.lastIndexOf("youtu.be") != -1) {
+					videoId = playback.url.substr(playback.url.lastIndexOf('/')+1);
+					if (videoId.indexOf('?') != -1) {
+						videoId = videoId.substr(0, videoId.indexOf('?'));
+					}
+				}
+				else {
+					// https://www.youtube.com/watch?v=
+					var videoIdMatch = playback.url.match( /[?&]v=([^&#]+)|&|#|$/ );
+					if ( videoIdMatch ) {
+						videoId = videoIdMatch[1];
+					}
+				}
+				youtubeSettings = {
 						container: container,
 						containerId: container.id,
 						pluginMediaElement: pluginMediaElement,
 						pluginId: pluginid,
 						videoId: videoId,
 						height: height,
-						width: width	
+						width: width,
+                        scheme: playback.scheme,
+						variables: options.youtubeIframeVars
 					};				
 				
-				if (mejs.PluginDetector.hasPluginVersion('flash', [10,0,0]) ) {
-					mejs.YouTubeApi.createFlash(youtubeSettings);
-				} else {
+				// favor iframe version of YouTube
+				if (window.postMessage) {
 					mejs.YouTubeApi.enqueueIframe(youtubeSettings);		
+				} else if (mejs.PluginDetector.hasPluginVersion('flash', [10,0,0]) ) {
+					mejs.YouTubeApi.createFlash(youtubeSettings, options);
 				}
-				
 				break;
 			
 			// DEMO Code. Does NOT work.
 			case 'vimeo':
-				console.log('vimeoid');
-				
+				var player_id = pluginid + "_player";
 				pluginMediaElement.vimeoid = playback.url.substr(playback.url.lastIndexOf('/')+1);
 				
-				container.innerHTML =
-					'<object width="' + width + '" height="' + height + '">' +
-						'<param name="allowfullscreen" value="true" />' +
-						'<param name="allowscriptaccess" value="always" />' +
-						'<param name="flashvars" value="api=1" />' + 
-						'<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=' + pluginMediaElement.vimeoid  + '&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" />' +
-						'<embed src="//vimeo.com/moogaloop.swf?api=1&amp;clip_id=' + pluginMediaElement.vimeoid + '&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="' + width + '" height="' + height + '"></embed>' +
-					'</object>';
+				container.innerHTML ='<iframe src="' + playback.scheme + 'player.vimeo.com/video/' + pluginMediaElement.vimeoid + '?api=1&portrait=0&byline=0&title=0&player_id=' + player_id + '" width="' + width +'" height="' + height +'" frameborder="0" class="mejs-shim" id="' + player_id + '" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+				if (typeof($f) == 'function') { // froogaloop available
+					var player = $f(container.childNodes[0]),
+						playerState = -1;
 					
+					player.addEvent('ready', function() {
+		
+						player.playVideo = function() {
+							player.api( 'play' );
+						};
+						player.stopVideo = function() {
+							player.api( 'unload' );
+						};
+						player.pauseVideo = function() {
+							player.api( 'pause' );
+						};
+						player.seekTo = function( seconds ) {
+							player.api( 'seekTo', seconds );
+						};
+						player.setVolume = function( volume ) {
+							player.api( 'setVolume', volume );
+						};
+						player.setMuted = function( muted ) {
+							if( muted ) {
+								player.lastVolume = player.api( 'getVolume' );
+								player.api( 'setVolume', 0 );
+							} else {
+								player.api( 'setVolume', player.lastVolume );
+								delete player.lastVolume;
+							}
+						};
+						// parity with YT player
+						player.getPlayerState = function() {
+							return playerState;
+						};
+
+						function createEvent(player, pluginMediaElement, eventName, e) {
+							var event = {
+								type: eventName,
+								target: pluginMediaElement
+							};
+							if (eventName == 'timeupdate') {
+								pluginMediaElement.currentTime = event.currentTime = e.seconds;
+								pluginMediaElement.duration = event.duration = e.duration;
+							}
+							pluginMediaElement.dispatchEvent(event);
+						}
+
+						player.addEvent('play', function() {
+							playerState = 1;
+							createEvent(player, pluginMediaElement, 'play');
+							createEvent(player, pluginMediaElement, 'playing');
+						});
+
+						player.addEvent('pause', function() {
+							playerState = 2;							
+							createEvent(player, pluginMediaElement, 'pause');
+						});
+
+						player.addEvent('finish', function() {
+							playerState = 0;							
+							createEvent(player, pluginMediaElement, 'ended');
+						});
+
+						player.addEvent('playProgress', function(e) {
+							createEvent(player, pluginMediaElement, 'timeupdate', e);
+						});
+						
+						player.addEvent('seek', function(e) {
+							playerState = 3;
+							createEvent(player, pluginMediaElement, 'seeked', e);
+						});	
+						
+						player.addEvent('loadProgress', function(e) {
+							playerState = 3;
+							createEvent(player, pluginMediaElement, 'progress', e);
+						});												
+
+						pluginMediaElement.pluginElement = container;
+						pluginMediaElement.pluginApi = player;
+
+						pluginMediaElement.success(pluginMediaElement, pluginMediaElement.pluginElement);						
+					});
+				}
+				else {
+					console.warn("You need to include froogaloop for vimeo to work");
+				}
 				break;			
 		}
 		// hide original element
 		htmlMediaElement.style.display = 'none';
-
-		// FYI: options.success will be fired by the MediaPluginBridge
+		// prevent browser from autoplaying when using a plugin
+		htmlMediaElement.removeAttribute('autoplay');
 		
 		return pluginMediaElement;
 	},
@@ -608,10 +792,10 @@ mejs.HtmlMediaElementShim = {
 mejs.YouTubeApi = {
 	isIframeStarted: false,
 	isIframeLoaded: false,
-	loadIframeApi: function() {
+	loadIframeApi: function(yt) {
 		if (!this.isIframeStarted) {
 			var tag = document.createElement('script');
-			tag.src = "http://www.youtube.com/player_api";
+			tag.src = yt.scheme + "www.youtube.com/player_api";
 			var firstScriptTag = document.getElementsByTagName('script')[0];
 			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 			this.isIframeStarted = true;
@@ -623,32 +807,45 @@ mejs.YouTubeApi = {
 		if (this.isLoaded) {
 			this.createIframe(yt);
 		} else {
-			this.loadIframeApi();
+			this.loadIframeApi(yt);
 			this.iframeQueue.push(yt);
 		}
 	},
 	createIframe: function(settings) {
-		
+
 		var
-		pluginMediaElement = settings.pluginMediaElement,	
+		pluginMediaElement = settings.pluginMediaElement,
+		defaultVars = {controls:0, wmode:'transparent'},
 		player = new YT.Player(settings.containerId, {
 			height: settings.height,
 			width: settings.width,
 			videoId: settings.videoId,
-			playerVars: {controls:0},
+			playerVars: mejs.$.extend({}, defaultVars, settings.variables),
 			events: {
-				'onReady': function() {
+				'onReady': function(e) {
+					
+					// wrapper to match
+					player.setVideoSize = function(width, height) {
+						player.setSize(width, height);
+					};
 					
 					// hook up iframe object to MEjs
 					settings.pluginMediaElement.pluginApi = player;
+					settings.pluginMediaElement.pluginElement = document.getElementById(settings.containerId);
 					
 					// init mejs
-					mejs.MediaPluginBridge.initPlugin(settings.pluginId);
+					pluginMediaElement.success(pluginMediaElement, pluginMediaElement.pluginElement);
+
+					mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'canplay');
 					
 					// create timer
 					setInterval(function() {
 						mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'timeupdate');
-					}, 250);					
+					}, 250);
+
+					if (typeof pluginMediaElement.attributes.autoplay !== 'undefined') {
+						player.playVideo();
+					}
 				},
 				'onStateChange': function(e) {
 					
@@ -660,7 +857,7 @@ mejs.YouTubeApi = {
 	},
 	
 	createEvent: function (player, pluginMediaElement, eventName) {
-		var obj = {
+		var event = {
 			type: eventName,
 			target: pluginMediaElement
 		};
@@ -668,25 +865,25 @@ mejs.YouTubeApi = {
 		if (player && player.getDuration) {
 			
 			// time 
-			pluginMediaElement.currentTime = obj.currentTime = player.getCurrentTime();
-			pluginMediaElement.duration = obj.duration = player.getDuration();
+			pluginMediaElement.currentTime = event.currentTime = player.getCurrentTime();
+			pluginMediaElement.duration = event.duration = player.getDuration();
 			
 			// state
-			obj.paused = pluginMediaElement.paused;
-			obj.ended = pluginMediaElement.ended;			
+			event.paused = pluginMediaElement.paused;
+			event.ended = pluginMediaElement.ended;			
 			
 			// sound
-			obj.muted = player.isMuted();
-			obj.volume = player.getVolume() / 100;
+			event.muted = player.isMuted();
+			event.volume = player.getVolume() / 100;
 			
 			// progress
-			obj.bytesTotal = player.getVideoBytesTotal();
-			obj.bufferedBytes = player.getVideoBytesLoaded();
+			event.bytesTotal = player.getVideoBytesTotal();
+			event.bufferedBytes = player.getVideoBytesLoaded();
 			
 			// fake the W3C buffered TimeRange
-			var bufferedTime = obj.bufferedBytes / obj.bytesTotal * obj.duration;
+			var bufferedTime = event.bufferedBytes / event.bytesTotal * event.duration;
 			
-			obj.target.buffered = obj.buffered = {
+			event.target.buffered = event.buffered = {
 				start: function(index) {
 					return 0;
 				},
@@ -695,15 +892,16 @@ mejs.YouTubeApi = {
 				},
 				length: 1
 			};
-			
+
 		}
 		
 		// send event up the chain
-		pluginMediaElement.dispatchEvent(obj.type, obj);
+		pluginMediaElement.dispatchEvent(event);
 	},	
 	
 	iFrameReady: function() {
 		
+		this.isLoaded = true;
 		this.isIframeLoaded = true;
 		
 		while (this.iframeQueue.length > 0) {
@@ -720,32 +918,32 @@ mejs.YouTubeApi = {
 		
 		/*
 		settings.container.innerHTML =
-			'<object type="application/x-shockwave-flash" id="' + settings.pluginId + '" data="//www.youtube.com/apiplayer?enablejsapi=1&amp;playerapiid=' + settings.pluginId  + '&amp;version=3&amp;autoplay=0&amp;controls=0&amp;modestbranding=1&loop=0" ' +
-				'width="' + settings.width + '" height="' + settings.height + '" style="visibility: visible; ">' +
-				'<param name="allowScriptAccess" value="always">' +
+			'<object type="application/x-shockwave-flash" id="' + settings.pluginId + '" data="' + settings.scheme + 'www.youtube.com/apiplayer?enablejsapi=1&amp;playerapiid=' + settings.pluginId  + '&amp;version=3&amp;autoplay=0&amp;controls=0&amp;modestbranding=1&loop=0" ' +
+				'width="' + settings.width + '" height="' + settings.height + '" style="visibility: visible; " class="mejs-shim">' +
+				'<param name="allowScriptAccess" value="sameDomain">' +
 				'<param name="wmode" value="transparent">' +
 			'</object>';
 		*/
 
 		var specialIEContainer,
-			youtubeUrl = 'http://www.youtube.com/apiplayer?enablejsapi=1&amp;playerapiid=' + settings.pluginId  + '&amp;version=3&amp;autoplay=0&amp;controls=0&amp;modestbranding=1&loop=0';
+			youtubeUrl = settings.scheme + 'www.youtube.com/apiplayer?enablejsapi=1&amp;playerapiid=' + settings.pluginId  + '&amp;version=3&amp;autoplay=0&amp;controls=0&amp;modestbranding=1&loop=0';
 			
 		if (mejs.MediaFeatures.isIE) {
 			
 			specialIEContainer = document.createElement('div');
 			settings.container.appendChild(specialIEContainer);
-			specialIEContainer.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="//download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab" ' +
-'id="' + settings.pluginId + '" width="' + settings.width + '" height="' + settings.height + '">' +
+			specialIEContainer.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="' + settings.scheme + 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab" ' +
+'id="' + settings.pluginId + '" width="' + settings.width + '" height="' + settings.height + '" class="mejs-shim">' +
 	'<param name="movie" value="' + youtubeUrl + '" />' +
 	'<param name="wmode" value="transparent" />' +
-	'<param name="allowScriptAccess" value="always" />' +
+	'<param name="allowScriptAccess" value="' + options.flashScriptAccess + '" />' +
 	'<param name="allowFullScreen" value="true" />' +
 '</object>';
 		} else {
 		settings.container.innerHTML =
 			'<object type="application/x-shockwave-flash" id="' + settings.pluginId + '" data="' + youtubeUrl + '" ' +
-				'width="' + settings.width + '" height="' + settings.height + '" style="visibility: visible; ">' +
-				'<param name="allowScriptAccess" value="always">' +
+				'width="' + settings.width + '" height="' + settings.height + '" style="visibility: visible; " class="mejs-shim">' +
+				'<param name="allowScriptAccess" value="' + options.flashScriptAccess + '">' +
 				'<param name="wmode" value="transparent">' +
 			'</object>';
 		}		
@@ -761,22 +959,25 @@ mejs.YouTubeApi = {
 		// hook up and return to MediaELementPlayer.success	
 		pluginMediaElement.pluginApi = 
 		pluginMediaElement.pluginElement = player;
-		mejs.MediaPluginBridge.initPlugin(id);
+		
+		settings.success(pluginMediaElement, pluginMediaElement.pluginElement);
 		
 		// load the youtube video
 		player.cueVideoById(settings.videoId);
 		
-		var callbackName = settings.containerId + '_callback'
+		var callbackName = settings.containerId + '_callback';
 		
 		window[callbackName] = function(e) {
 			mejs.YouTubeApi.handleStateChange(e, player, pluginMediaElement);
-		}
+		};
 		
 		player.addEventListener('onStateChange', callbackName);
 		
 		setInterval(function() {
 			mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'timeupdate');
 		}, 250);
+		
+		mejs.YouTubeApi.createEvent(player, pluginMediaElement, 'canplay');
 	},
 	
 	handleStateChange: function(youTubeState, player, pluginMediaElement) {
@@ -815,13 +1016,13 @@ mejs.YouTubeApi = {
 	}
 }
 // IFRAME
-function onYouTubePlayerAPIReady() {
+window.onYouTubePlayerAPIReady = function() {
 	mejs.YouTubeApi.iFrameReady();
-}
+};
 // FLASH
-function onYouTubePlayerReady(id) {
+window.onYouTubePlayerReady = function(id) {
 	mejs.YouTubeApi.flashReady(id);
-}
+};
 
 window.mejs = mejs;
 window.MediaElement = mejs.MediaElement;
