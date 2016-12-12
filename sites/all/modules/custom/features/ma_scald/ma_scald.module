@@ -247,10 +247,10 @@ return FALSE;';
  * Implements hook_scald_player().
  */
 function ma_scald_scald_player() {
-  return array('mukurtu_default' => array(
-      'name' => 'Mukurtu default player',
-      'description' => 'Mukurtu default player',
-      'type' => array('*'),
+    return array('mukurtu_default' => array(
+        'name' => 'Mukurtu default player',
+        'description' => 'Mukurtu default player',
+        'type' => array('*'),
     ));
 }
 
@@ -258,10 +258,30 @@ function ma_scald_scald_player() {
  * Implements hook_scald_prerender().
  */
 function ma_scald_scald_prerender($atom, $context, $options, $mode) {
-    $valid_contexts = array('ma_scald_search_results', 'mukurtu_scald_related_items');
+    $default_thumbnail_contexts = array('ma_scald_search_results', 'mukurtu_scald_related_items');
+
+    if($atom->type == 'audio' && !in_array($context, $default_thumbnail_contexts)) {
+        // Soundcloud already integrates the thumbnail with the display, remove it for rendering so it isn't duplicated
+        if($atom->provider == 'scald_soundcloud') {
+            if(!empty($atom->scald_thumbnail)) {
+                unset($atom->scald_thumbnail);
+            }
+        }
+
+        // Non-soundcloud audio atoms go to the HTML5 provider
+        if($atom->provider != 'scald_soundcloud') {
+            scald_audio_scald_prerender($atom, $context, $options, $mode);
+            return;
+        }
+    }
+
+    // All Soundcloud rendering should be handled by the Soundcloud module
+    if($atom->provider == 'scald_soundcloud') {
+        scald_soundcloud_scald_prerender($atom, $context, $options, $mode);
+    }
 
     if($mode == 'player') {
-        if($atom->type <> 'image' && in_array($context, $valid_contexts)) {
+        if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {
             // Use the atom thumbnail if there is one
             if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
                 if($atom->type == 'file' || $atom->type == 'video') {

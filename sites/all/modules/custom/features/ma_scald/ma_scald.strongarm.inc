@@ -130,6 +130,10 @@ function ma_scald_strongarm() {
             'weight' => '0',
             'visible' => TRUE,
           ),
+          'mukurtu_scald_media_assets_edit_' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
         ),
       ),
     ),
