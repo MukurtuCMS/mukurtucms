@@ -282,8 +282,12 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
                 // Use the Soundcloud provider's atom construction code
                 scald_soundcloud_scald_add_form_fill($atom, array(), $fake_form_state);
-                unset($atom->scald_authors);
-                unset($atom->scald_tags);
+
+                // Convert taxonomy terms into a form that can be saved
+                $soundcloud_authors = $atom->scald_authors;
+                $soundcloud_tags = $atom->scald_tags;
+                $atom->scald_authors = ma_importexport_convert_soundcloud_taxonomy_terms($soundcloud_authors, 'scald_authors');
+                $atom->scald_tags = ma_importexport_convert_soundcloud_taxonomy_terms($soundcloud_tags, 'scald_tags');
 
                 $sid = scald_atom_save($atom);
             }
@@ -2018,4 +2022,23 @@ function ma_importexport_get_embedded_dnd_scald_atoms($node)
     }
 
     return $sids;
+}
+
+/**
+ * Create or lookup taxonomy term references from the Soundcloud module and convert
+ * into a form that can be saved in a node.
+ */
+function ma_importexport_convert_soundcloud_taxonomy_terms($field, $vocabulary) {
+    $result = array();
+
+    if(isset($field[LANGUAGE_NONE])) {
+        foreach($field[LANGUAGE_NONE] as $term) {
+            $new_term = ma_core_get_create_tax_term($term['taxonomy_term']->name, $vocabulary);
+            if($new_term) {
+                $result[LANGUAGE_NONE][]['tid'] = $new_term->tid;
+            }
+        }
+    }
+
+    return $result;
 }
