@@ -1615,7 +1615,11 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
             $result[] = 'http://www.vimeo.com/' . $atom->base_id;
         }
     } elseif($atom->type == 'audio') {
-        $result[] = $media_dir . basename($atom->data['audio_file']);
+        if($atom->provider == 'scald_soundcloud') {
+            $result[] = $atom->data['permalink_url'];
+        } else {
+            $result[] = $media_dir . basename($atom->data['audio_file']);
+        }
     } else {
       $result[] = $media_dir . $atom->base_entity->filename;
     }
