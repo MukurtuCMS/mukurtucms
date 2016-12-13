@@ -183,7 +183,7 @@ function scald_soundcloud_audio($id) {
   }
 
   // Tags
-  $info->tags = explode(" ", $data->tag_list);
+  $info->tags = str_getcsv($data->tag_list, ' ');
   // License
   $info->license = 'SC';
 
