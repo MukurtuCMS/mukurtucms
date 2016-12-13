@@ -267,6 +267,28 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
           }
         }
 
+        // Soundcloud
+        if(stripos($media_asset, 'soundcloud.com') && module_exists('scald_soundcloud')) {
+            // Don't re-import if this already exists
+            $soundcloud_id = scald_soundcloud_parse_id($media_asset, TRUE);
+            $sid = scald_soundcloud_already_imported($soundcloud_id);
+
+            // It didn't exist, create a new atom
+            if(!$sid) {
+                $atom = new ScaldAtom('audio', 'scald_soundcloud');
+
+                $fake_form_state = array();
+                $fake_form_state['values']['identifier'] = $media_asset;
+
+                // Use the Soundcloud provider's atom construction code
+                scald_soundcloud_scald_add_form_fill($atom, array(), $fake_form_state);
+                unset($atom->scald_authors);
+                unset($atom->scald_tags);
+
+                $sid = scald_atom_save($atom);
+            }
+        }
+
         // No provider match
         else {
           drupal_set_message ('Skipped media asset due to no matching provider: ' . $media_asset, 'warning');
