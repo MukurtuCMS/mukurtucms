@@ -73,6 +73,13 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 5,
+      ),
       'mukurtu_scald_recording' => array(
         'label' => 'hidden',
         'module' => 'taxonomy',
@@ -145,6 +152,15 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
+      ),
       'mukurtu_scald_recording' => array(
         'label' => 'hidden',
         'settings' => array(),
@@ -214,6 +230,13 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 4,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'label' => 'above',
+        'module' => 'og_ui',
+        'settings' => array(),
+        'type' => 'og_list_default',
+        'weight' => 3,
       ),
       'mukurtu_scald_recording' => array(
         'label' => 'hidden',
@@ -305,6 +328,13 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 2,
       ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 1,
+      ),
       'mukurtu_scald_recording' => array(
         'label' => 'hidden',
         'settings' => array(),
@@ -368,6 +398,13 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 3,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 2,
       ),
       'mukurtu_scald_recording' => array(
         'label' => 'hidden',
@@ -447,6 +484,12 @@ function ma_scald_field_default_field_instances() {
         ),
         'type' => 'image',
         'weight' => 0,
+      ),
+      'mukurtu_scald_media_assets_edit_' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'mukurtu_scald_recording' => array(
         'label' => 'hidden',

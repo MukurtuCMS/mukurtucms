@@ -841,6 +841,12 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           7 => array(
+            'source' => 'Contributors',
+            'target' => 'field_contributor',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          8 => array(
             'source' => 'Tags',
             'target' => 'scald_tags',
             'term_search' => '0',

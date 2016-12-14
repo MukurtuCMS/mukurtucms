@@ -72,7 +72,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'html5_player',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(
@@ -114,7 +114,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'html5_player',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(
@@ -240,7 +240,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'html5_player',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'file' => array(
@@ -282,7 +282,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'html5_player',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'file' => array(
@@ -408,7 +408,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'html5_player',
+      '*' => 'mukurtu_default',
       'settings' => array(),
     ),
     'image' => array(

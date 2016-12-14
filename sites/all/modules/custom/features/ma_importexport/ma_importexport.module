@@ -267,6 +267,32 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
           }
         }
 
+        // Soundcloud
+        if(stripos($media_asset, 'soundcloud.com') && module_exists('scald_soundcloud')) {
+            // Don't re-import if this already exists
+            $soundcloud_id = scald_soundcloud_parse_id($media_asset, TRUE);
+            $sid = scald_soundcloud_already_imported($soundcloud_id);
+
+            // It didn't exist, create a new atom
+            if(!$sid) {
+                $atom = new ScaldAtom('audio', 'scald_soundcloud');
+
+                $fake_form_state = array();
+                $fake_form_state['values']['identifier'] = $media_asset;
+
+                // Use the Soundcloud provider's atom construction code
+                scald_soundcloud_scald_add_form_fill($atom, array(), $fake_form_state);
+
+                // Convert taxonomy terms into a form that can be saved
+                $soundcloud_authors = $atom->scald_authors;
+                $soundcloud_tags = $atom->scald_tags;
+                $atom->scald_authors = ma_importexport_convert_soundcloud_taxonomy_terms($soundcloud_authors, 'scald_authors');
+                $atom->scald_tags = ma_importexport_convert_soundcloud_taxonomy_terms($soundcloud_tags, 'scald_tags');
+
+                $sid = scald_atom_save($atom);
+            }
+        }
+
         // No provider match
         else {
           drupal_set_message ('Skipped media asset due to no matching provider: ' . $media_asset, 'warning');
@@ -344,6 +370,34 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
 
     if($entity->feeds_item->id == 'import_media_audio') {
       $type = 'audio';
+
+      // Handle Soundcloud URLs
+      if(module_exists('scald_soundcloud') && stripos($entity->{'Temporary target 1'}, 'soundcloud.com/')) {
+          // The Soundcloud provider is going to overwrite these, we want to preserve them.
+          $input_title = $entity->title;
+          $input_scald_authors = $entity->scald_authors;
+          $input_scald_tags = $entity->scald_tags;
+
+          $entity->provider = 'scald_soundcloud';
+          $fake_form_state = array();
+          $fake_form_state['values']['identifier'] = $entity->{'Temporary target 1'};
+
+          // Use the Soundcloud provider's atom construction code
+          scald_soundcloud_scald_add_form_fill($entity, array(), $fake_form_state);
+
+          // The provider's taxonomy ref fields are in the wrong format, restore the taxonomy refs from the input file
+          unset($entity->scald_authors);
+          unset($entity->scald_tags);
+          $entity->scald_authors = $input_scald_authors;
+          $entity->scald_tags = $input_scald_tags;
+
+          // Use the user specified title, if provided
+          if(!empty($input_title)) {
+              $entity->title = $input_title;
+          }
+
+          return;
+      }
     } elseif($entity->feeds_item->id == 'import_media_video') {
       $type = 'video';
 
@@ -1565,7 +1619,11 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
             $result[] = 'http://www.vimeo.com/' . $atom->base_id;
         }
     } elseif($atom->type == 'audio') {
-        $result[] = $media_dir . basename($atom->data['audio_file']);
+        if($atom->provider == 'scald_soundcloud') {
+            $result[] = $atom->data['permalink_url'];
+        } else {
+            $result[] = $media_dir . basename($atom->data['audio_file']);
+        }
     } else {
       $result[] = $media_dir . $atom->base_entity->filename;
     }
@@ -1964,4 +2022,23 @@ function ma_importexport_get_embedded_dnd_scald_atoms($node)
     }
 
     return $sids;
+}
+
+/**
+ * Create or lookup taxonomy term references from the Soundcloud module and convert
+ * into a form that can be saved in a node.
+ */
+function ma_importexport_convert_soundcloud_taxonomy_terms($field, $vocabulary) {
+    $result = array();
+
+    if(isset($field[LANGUAGE_NONE])) {
+        foreach($field[LANGUAGE_NONE] as $term) {
+            $new_term = ma_core_get_create_tax_term($term['taxonomy_term']->name, $vocabulary);
+            if($new_term) {
+                $result[LANGUAGE_NONE][]['tid'] = $new_term->tid;
+            }
+        }
+    }
+
+    return $result;
 }
