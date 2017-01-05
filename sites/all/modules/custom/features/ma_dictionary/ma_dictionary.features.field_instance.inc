@@ -883,6 +883,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'ma_colorbox',
         'weight' => 0,
@@ -892,6 +893,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'ma_colorbox',
         'weight' => 0,
@@ -1225,6 +1227,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_recording',
         'weight' => 5,
@@ -1234,6 +1237,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_dictionary_media',
         'weight' => 5,
@@ -1249,6 +1253,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_dictionary_media',
         'weight' => 17,
