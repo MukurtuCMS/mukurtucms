@@ -100,16 +100,16 @@ function ma_digitalheritage_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_format' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
     'field_licence_trad' => array(
       'formatter_settings' => array(
         'ft' => array(
           'classes' => 'clearfix',
         ),
-      ),
-    ),
-    'field_related_dictionary_words' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
   );
