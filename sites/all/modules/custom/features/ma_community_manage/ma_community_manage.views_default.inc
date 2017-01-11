@@ -301,7 +301,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'community' => 'community',
   );
-  /* Filter criterion: Content: Thumbnail Image (field_community_image_thumbnail) */
+  /* Filter criterion: Content: Thumbnail Image (field_community_image_thumbnail:sid) */
   $handler->display->display_options['filters']['field_community_image_thumbnail_sid']['id'] = 'field_community_image_thumbnail_sid';
   $handler->display->display_options['filters']['field_community_image_thumbnail_sid']['table'] = 'field_data_field_community_image_thumbnail';
   $handler->display->display_options['filters']['field_community_image_thumbnail_sid']['field'] = 'field_community_image_thumbnail_sid';
@@ -540,6 +540,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['label'] = '';
+  $handler->display->display_options['fields']['edit_node']['element_class'] = 'col-md-2';
   $handler->display->display_options['fields']['edit_node']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['edit_node']['text'] = 'Edit Protocol';
   /* Field: Content: Title */
@@ -550,11 +551,15 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['fields']['title_1']['label'] = '';
   $handler->display->display_options['fields']['title_1']['exclude'] = TRUE;
   $handler->display->display_options['fields']['title_1']['element_label_colon'] = FALSE;
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
+  $handler->display->display_options['sorts']['title']['relationship'] = 'og_membership_related_node_group';
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title_1']['id'] = 'title_1';
+  $handler->display->display_options['sorts']['title_1']['table'] = 'node';
+  $handler->display->display_options['sorts']['title_1']['field'] = 'title';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
