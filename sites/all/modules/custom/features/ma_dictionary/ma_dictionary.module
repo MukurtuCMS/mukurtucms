@@ -360,8 +360,7 @@ function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
 
         // Only render one recording in teaser
         if($view_mode == 'dictionary_teaser') {
-            unset($entity->content['field_dictionary_word_recording'][1]);
-            if(count($entity->field_dictionary_word_recording) > 1) {
+            if(isset($entity->field_dictionary_word_recording[LANGUAGE_NONE]) && count($entity->field_dictionary_word_recording[LANGUAGE_NONE]) > 1) {
                 $first = TRUE;
                 foreach($entity->content['field_dictionary_word_recording']['#items'] as $key => $item) {
                     if(!$first) {
