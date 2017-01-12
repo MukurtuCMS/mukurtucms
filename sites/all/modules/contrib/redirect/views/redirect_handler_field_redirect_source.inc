@@ -45,11 +45,6 @@ class redirect_handler_field_redirect_source extends views_handler_field {
     );
   }
 
-  function query() {
-    $this->ensure_my_table();
-    $this->add_additional_fields();
-  }
-
   function render($values) {
     $source = $values->{$this->aliases['source']};
     $source_options = unserialize($values->{$this->aliases['source_options']});

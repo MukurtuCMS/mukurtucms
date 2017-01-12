@@ -45,11 +45,6 @@ class redirect_handler_field_redirect_redirect extends views_handler_field {
     );
   }
 
-  function query() {
-    $this->ensure_my_table();
-    $this->add_additional_fields();
-  }
-
   function render($values) {
     $redirect = $values->{$this->aliases['redirect']};
     $redirect_options = unserialize($values->{$this->aliases['redirect_options']});

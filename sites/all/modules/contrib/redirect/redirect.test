@@ -229,16 +229,59 @@ class RedirectFunctionalTest extends RedirectTestHelper {
     $node = $this->drupalCreateNode(array('type' => 'article', 'path' => array('alias' => 'first-alias')));
 
     // Change the node's alias will create an automatic redirect from 'first-alias' to the node.
-    $this->drupalPost("node/{$node->nid}/edit", array('path[alias]' => 'second-alias'), 'Save');
-    //$redirect = redirect_load_by_source('first-alias');
-    //$this->assertRedirect($redirect);
+    $this->drupalPost("node/{$node->nid}/edit", array('path[alias]' => 'second-alias'), t('Save'));
+    $this->drupalGet('first-alias');
+    $this->assertText($node->title);
 
-    $this->drupalPost("node/{$node->nid}/edit", array('path[alias]' => 'first-alias'), 'Save');
-    //$redirect = redirect_load_by_source('second-alias');
-    //$this->assertRedirect($redirect);
+    $this->drupalPost("node/{$node->nid}/edit", array('path[alias]' => 'first-alias'), t('Save'));
+    $this->assertResponse(200, "Changing node's alias back to 'first-alias' does not break page load with a circular redirect.");
+    $this->assertNoText('Infinite redirect loop prevented.');
+    $this->drupalGet('second-alias');
+    $this->assertText($node->title);
 
-    $this->drupalPost("node/{$node->nid}/edit", array('path[alias]' => 'second-alias'), 'Save');
-    //$redirect = redirect_load_by_source('first-alias');
-    //$this->assertRedirect($redirect);
+    $this->drupalPost("node/{$node->nid}/edit", array('path[alias]' => 'second-alias'), t('Save'));
+    $this->assertResponse(200, "Changing node's alias back to 'second-alias' does not break page load with a circular redirect.");
+    $this->assertNoText('Infinite redirect loop prevented.');
+    // Check that first-alias redirect has been re-enabled.
+    $this->drupalGet('first-alias');
+    $this->assertText($node->title);
+  }
+
+  function testPathAddOverwriteRedirects() {
+    // Create an initial article node with a path alias.
+    $first_node = $this->drupalCreateNode(array('type' => 'article', 'path' => array('alias' => 'first-alias')));
+    // Change the node's alias will create an automatic redirect from 'first-alias' to the node.
+    $this->drupalPost("node/{$first_node->nid}/edit", array('path[alias]' => 'second-alias'), t('Save'));
+
+    // Now create a second article node with the same alias as the redirect
+    // created above.
+    $second_node = $this->drupalCreateNode(array('type' => 'article', 'path' => array('alias' => 'first-alias')));
+
+    // Visit the path 'first-alias' which should be an alias for $second_node.
+    $this->drupalGet('first-alias');
+    $this->assertNoText($first_node->title, 'Adding a new path alias that matches an existing redirect disables the redirect.');
+    $this->assertText($second_node->title, 'Adding a new path alias that matches an existing redirect disables the redirect.');
+  }
+
+  function testDisableEnableRedirect() {
+    // Add a new redirect.
+    $redirect = $this->addRedirect('redirect', 'node');
+    // Check that it is enabled.
+    $this->assertEqual($redirect->status, 1);
+
+    // Disable the redirect.
+    $edit = array('status' => FALSE);
+    $this->drupalPost("admin/config/search/redirect/edit/{$redirect->rid}", $edit, t('Save'));
+    $redirect = redirect_load($redirect->rid);
+    // Check that it has been disabled.
+    $this->assertEqual($redirect->status, 0);
+    $this->drupalGet("admin/config/search/redirect/edit/{$redirect->rid}");
+    $this->assertNoFieldChecked('edit-status', 'status is unchecked');
+    $this->assertNoRedirect($redirect);
+
+    // Re-enable the redirect.
+    $edit = array('status' => 1);
+    $this->drupalPost("admin/config/search/redirect/edit/{$redirect->rid}", $edit, t('Save'));
+    $this->assertRedirect($redirect);
   }
 }

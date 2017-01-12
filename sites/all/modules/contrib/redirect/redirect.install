@@ -86,7 +86,14 @@ function redirect_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-        'description' => 'The timestamp of when the redirect was last accessed.'
+        'description' => 'The timestamp of when the redirect was last accessed.',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'Boolean indicating whether the redirect is enabled (visible to non-administrators).',
       ),
     ),
     'primary key' => array('rid'),
@@ -95,7 +102,11 @@ function redirect_schema() {
     ),
     'indexes' => array(
       'expires' => array('type', 'access'),
-      'source_language' => array('source', 'language'),
+      'status_source_language' => array(
+        'status',
+        'source',
+        'language',
+      ),
     ),
   );
 
@@ -264,6 +275,58 @@ function redirect_update_7000(&$sandbox) {
 }
 
 /**
+ * Rebuild the registry and clear the entity info cache.
+ */
+function redirect_update_7100() {
+  if (!class_exists('RedirectController')) {
+    registry_rebuild();
+    entity_info_cache_clear();
+  }
+}
+
+/**
+ * Add status field.
+ */
+function redirect_update_7101() {
+  db_add_field('redirect', 'status', array(
+    'type' => 'int',
+    'size' => 'small',
+    'not null' => TRUE,
+    'default' => 1,
+    'description' => 'Boolean indicating whether the redirect is enabled (visible to non-administrators).',
+  ));
+  db_drop_index('redirect', 'source_language');
+  db_add_index('redirect', 'status_source_language', array(
+    'status',
+    'source',
+    'language',
+  ));
+}
+
+/**
+ * Disable redirects that could cause infinite loops.
+ */
+function redirect_update_7102() {
+  $rids = db_query("SELECT r.rid FROM {redirect} r INNER JOIN {url_alias} u ON r.source = u.alias AND r.redirect = u.source AND r.language = u.language")->fetchCol();
+  if ($rids) {
+    // Disable redirects
+    $count = db_update('redirect')
+      ->fields(array('status' => 0))
+      ->condition('rid', $rids)
+      ->execute();
+
+    $disabled_redirects_message = format_plural($count,
+      '1 circular redirect causing infinite loop was disabled.',
+      '@count circular redirects causing infinite loop were disabled.');
+
+    return $disabled_redirects_message;
+  }
+  else {
+    return t('No circular redirects were found that could cause infinite loops.');
+  }
+}
+
+/**
  * Migrate a path redirect redirect to a redirect redirect.
  */
 function _redirect_migrate_path_redirect_redirect($old_redirect) {
@@ -315,6 +378,7 @@ function _redirect_migrate_path_redirect_redirect($old_redirect) {
         'redirect_options' => serialize($redirect->redirect_options),
         'language' => $redirect->language,
         'status_code' => $redirect->status_code,
+        'status' => 1,
         'count' => 0,
         'access' => $old_redirect->last_used,
       ))
