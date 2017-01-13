@@ -33,11 +33,36 @@ function ma_digitalheritage_ds_field_settings_info() {
       'label' => 'above',
       'format' => 'author',
     ),
+    'field_dh_type' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_category' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_language' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
     'field_licence_trad' => array(
       'formatter_settings' => array(
         'ft' => array(
           'classes' => 'clearfix',
         ),
+      ),
+    ),
+    'field_subject' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_tags' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
       ),
     ),
   );
