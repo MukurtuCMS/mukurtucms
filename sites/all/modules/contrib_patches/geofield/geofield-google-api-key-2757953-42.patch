@@ -1,0 +1,295 @@
+diff --git a/modules/geofield_map/geofield_map.admin.inc b/modules/geofield_map/geofield_map.admin.inc
+new file mode 100644
+index 0000000..d57e630
+--- /dev/null
++++ b/modules/geofield_map/geofield_map.admin.inc
+@@ -0,0 +1,69 @@
++<?php
++
++/**
++ * @file
++ * Code for managing the Geofield Map settings page.
++ */
++
++/**
++ * API Key settings form callback.
++ */
++function geofield_map_admin_settings($form, &$form_state) {
++  $form['geofield_map_google_auth_method'] = array(
++    '#type' => 'select',
++    '#title' => t('Google API Authentication Method'),
++    '#description' => t(''),
++    '#default_value' => variable_get('geofield_map_google_auth_method', 1),
++    '#options' => array(
++      1 => t('API Key'),
++      2 => t('Google Maps API for Work'),
++    ),
++  );
++
++  $form['geofield_map_google_apikey'] = array(
++    '#type' => 'textfield',
++    '#title' => t('Google Maps API Key'),
++    '#description' => t('Obtain a Google Maps Javascript API key at <a href="@link">@link</a>', array(
++      '@link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key',
++    )),
++    '#default_value' => variable_get('geofield_map_google_apikey', ''),
++    '#required' => FALSE,
++    '#states' => array(
++      'visible' => array(
++        ':input[name="geofield_map_google_auth_method"]' => array('value' => 1),
++      ),
++    ),
++  );
++
++  $form['geofield_map_google_client_id'] = array(
++    '#type' => 'textfield',
++    '#title' => t('Google Maps API for Work: Client ID'),
++    '#description' => t('For more information, visit: <a href="@link">@link</a>', array(
++      '@link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key#client-id',
++    )),
++    '#default_value' => variable_get('geofield_map_google_client_id', ''),
++    '#required' => FALSE,
++    '#states' => array(
++      'visible' => array(
++        ':input[name="geofield_map_google_auth_method"]' => array('value' => 2),
++      ),
++    ),
++  );
++
++  $form['geofield_map_google_private_key'] = array(
++    '#type' => 'textfield',
++    '#title' => t('Google Maps API for Work: Private/Signing Key '),
++    '#description' => t('For more information, visit: <a href="@link">@link</a>', array(
++      '@link' => 'https://developers.google.com/maps/documentation/business/webservices/auth#how_do_i_get_my_signing_key',
++    )),
++    '#default_value' => variable_get('geofield_map_google_private_key', ''),
++    '#required' => FALSE,
++    '#states' => array(
++      'visible' => array(
++        ':input[name="geofield_map_google_auth_method"]' => array('value' => 2),
++      ),
++    ),
++  );
++
++  return system_settings_form($form);
++}
+diff --git a/modules/geofield_map/geofield_map.info b/modules/geofield_map/geofield_map.info
+index 204175a..b884aab 100644
+--- a/modules/geofield_map/geofield_map.info
++++ b/modules/geofield_map/geofield_map.info
+@@ -3,5 +3,7 @@ description = Provides a basic mapping interface for Geofields.
+ core = 7.x
+ dependencies[] = geofield
+ 
++configure = admin/config/content/geofield_map
++
+ files[] = includes/geofield_map.views.inc
+ files[] = includes/geofield_map_plugin_style_map.inc
+diff --git a/modules/geofield_map/geofield_map.install b/modules/geofield_map/geofield_map.install
+new file mode 100644
+index 0000000..f2b8634
+--- /dev/null
++++ b/modules/geofield_map/geofield_map.install
+@@ -0,0 +1,60 @@
++<?php
++
++/**
++ * @file
++ * hook_uninstall and hook_requirements implementations for Geofield Map.
++ */
++
++/**
++ * Implements hook_uninstall().
++ */
++function geofield_map_uninstall() {
++  $result = db_select('variable', 'v')
++    ->fields('v', array('name'))
++    ->condition('name', db_like('geofield_map_google_') . '%', 'LIKE')
++    ->execute();
++
++  foreach ($result as $row) {
++    variable_del($row->name);
++  }
++}
++
++/**
++ * Implementation of hook_requirements().
++ */
++function geofield_map_requirements($phase) {
++  if ($phase == 'runtime') {
++    $requirements = array();
++
++    // Whether or not an API key or client id is provided.
++    $key_provided = FALSE;
++
++    switch (variable_get('geofield_map_google_auth_method')) {
++      case 1:
++        $key = variable_get('geofield_map_google_apikey', FALSE);
++        if (!empty($key)) {
++          $key_provided = TRUE;
++        }
++        break;
++
++      case 2:
++        $client_id = variable_get('geofield_map_google_client_id', FALSE);
++        if (!empty($client_id)) {
++          $key_provided = TRUE;
++        }
++        break;
++    }
++
++    if (!$key_provided) {
++      $requirements['geofield_map'] = array(
++        'title' => t('Geofield Map'),
++        'severity' => REQUIREMENT_WARNING,
++        'value' => t('Google Maps API key or Client ID was not found. As of 2016/06/22, keyless access is no longer supported and it may impact rendering of maps. For more information visit: <a href="@link">@link</a>', array(
++          '@link' => 'http://googlegeodevelopers.blogspot.ca/2016/06/building-for-scale-updates-to-google.html',
++        )),
++      );
++    }
++
++    return $requirements;
++  }
++}
+diff --git a/modules/geofield_map/geofield_map.module b/modules/geofield_map/geofield_map.module
+index e22158c..5bf584c 100644
+--- a/modules/geofield_map/geofield_map.module
++++ b/modules/geofield_map/geofield_map.module
+@@ -5,9 +5,37 @@
+ define('GEOFIELD_MAP_MAX_ZOOM', 22);
+ 
+ /**
+- * Implements hook_views_api().
++ * Implements hook_menu().
+  */
++function geofield_map_menu() {
++  $items = array();
++  $items['admin/config/content/geofield_map'] = array(
++    'title' => 'Geofield Map',
++    'description' => 'Configuration for API keys required by the Geofield Map module.',
++    'page callback' => 'drupal_get_form',
++    'page arguments' => array('geofield_map_admin_settings'),
++    'file' => 'geofield_map.admin.inc',
++    'access arguments' => array('administer geofield_map configuration'),
++    'type' => MENU_NORMAL_ITEM,
++  );
++
++  return $items;
++}
+ 
++/**
++ * Implements hook_permission().
++ */
++function geofield_map_permission() {
++  return array(
++    'administer geofield_map configuration' => array(
++      'title' => t('Administer Geofield Map configuration'),
++    ),
++  );
++}
++
++/**
++ * Implements hook_views_api().
++ */
+ function geofield_map_views_api() {
+   return array(
+     'api' => '3.0-alpha1',
+@@ -18,7 +46,6 @@ function geofield_map_views_api() {
+ /**
+  * Implements hook_field_formatter_info().
+  */
+-
+ function geofield_map_field_formatter_info() {
+   return array(
+     'geofield_map_map' => array(
+@@ -56,7 +83,6 @@ function geofield_map_field_formatter_info() {
+ /**
+  * Implements hook_field_formatter_view().
+  */
+-
+ function geofield_map_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+   $element = array();
+ 
+@@ -99,10 +125,13 @@ function geofield_map_field_formatter_view($entity_type, $entity, $field, $insta
+       'class' => 'geofieldMap',
+     );
+ 
++    // Build API url.
++    $api_url = geofield_map_build_api_url();
++
+     $element[0] = array(
+       '#attached' => array(
+         'js' => array(
+-          '//maps.googleapis.com/maps/api/js?sensor=false' => array('type' => 'external'),
++          "$api_url" => array('type' => 'external'),
+           drupal_get_path('module', 'geofield_map') . '/js/GeoJSON.js',
+           drupal_get_path('module', 'geofield_map') . '/js/geofield_map.js',
+           array('data' => array('geofieldMap' => $js_settings), 'type' => 'setting'),
+@@ -364,7 +393,7 @@ function geofield_map_settings_form($settings, $element = array()) {
+ 
+ }
+ 
+-/*
++/**
+  * Validate geofield_map_max_zoom to prevent errors when rendering a map
+  * with a defined maxZoom lower than the defined minZoom.
+  */
+@@ -408,3 +437,42 @@ function geofield_map_settings_do($settings) {
+   return $map_settings;
+ 
+ }
++
++/**
++ * Builds the javascript maps api url based on authentication method.
++ */
++function geofield_map_build_api_url() {
++  // Google api url.
++  $api_url = '//maps.googleapis.com/maps/api/js';
++  // Array to hold query paramters for the google maps url.
++  // Including version number as it's required for Premium plans.
++  // https://developers.google.com/maps/documentation/javascript/versions
++  $query = array('v' => '3');
++
++  switch (variable_get('geofield_map_google_auth_method')) {
++    case 1:
++      $key = variable_get('geofield_map_google_apikey', FALSE);
++      if (!empty($key)) {
++        $query['key'] = $key;
++      }
++      break;
++
++    case 2:
++      $client_id = variable_get('geofield_map_google_client_id', FALSE);
++      $private_key = variable_get('geofield_map_google_private_key', FALSE);
++      if (!empty($client_id)) {
++        $query['client'] = $client_id;
++        if (!empty($private_key)) {
++          $query['signature'] = $private_key;
++        }
++      }
++      break;
++  }
++
++  // Add query params to API url.
++  if (!empty($query)) {
++    $api_url .= '?' . drupal_http_build_query($query);
++  }
++
++  return $api_url;
++}
+diff --git a/modules/geofield_map/includes/geofield_map_plugin_style_map.inc b/modules/geofield_map/includes/geofield_map_plugin_style_map.inc
+index 5aa4c67..054eda1 100644
+--- a/modules/geofield_map/includes/geofield_map_plugin_style_map.inc
++++ b/modules/geofield_map/includes/geofield_map_plugin_style_map.inc
+@@ -157,7 +157,10 @@ class geofield_map_plugin_style_map extends views_plugin_style {
+       drupal_add_js(array('geofieldMap' => $js_settings), 'setting');
+     }
+ 
+-    drupal_add_js('//maps.googleapis.com/maps/api/js?sensor=false', 'external');
++    // Build API url.
++    $api_url = geofield_map_build_api_url();
++
++    drupal_add_js($api_url, 'external');
+     drupal_add_js(drupal_get_path('module', 'geofield_map') . '/js/GeoJSON.js');
+     drupal_add_js(drupal_get_path('module', 'geofield_map') . '/js/geofield_map.js');
+     drupal_add_css(drupal_get_path('module', 'geofield_map') . '/css/geofield_map.css');
