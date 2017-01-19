@@ -22,6 +22,7 @@ dependencies[] = geofield_map
 dependencies[] = leaflet
 dependencies[] = leaflet_more_maps
 dependencies[] = leaflet_views
+dependencies[] = leaflet_widget
 dependencies[] = license
 dependencies[] = list
 dependencies[] = ma_base_theme

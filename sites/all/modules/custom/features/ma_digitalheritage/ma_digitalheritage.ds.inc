@@ -33,17 +33,7 @@ function ma_digitalheritage_ds_field_settings_info() {
       'label' => 'above',
       'format' => 'author',
     ),
-    'field_dh_type' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_category' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_language' => array(
+    'field_coverage' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
@@ -53,16 +43,6 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(
           'classes' => 'clearfix',
         ),
-      ),
-    ),
-    'field_subject' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_tags' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
   );
@@ -123,11 +103,6 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(
           'func' => 'theme_field',
         ),
-      ),
-    ),
-    'field_format' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
     'field_licence_trad' => array(
