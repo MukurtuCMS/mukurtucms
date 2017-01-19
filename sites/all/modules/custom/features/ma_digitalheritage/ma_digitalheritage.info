@@ -16,6 +16,7 @@ dependencies[] = facetapi
 dependencies[] = features
 dependencies[] = field_collection
 dependencies[] = field_group
+dependencies[] = geocoder
 dependencies[] = geofield
 dependencies[] = geofield_gmap
 dependencies[] = geofield_map

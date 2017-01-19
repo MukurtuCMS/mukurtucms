@@ -1152,8 +1152,8 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'leaflet_widget',
       'settings' => array(
         'geocoder' => array(
-          'enabled' => FALSE,
-          'handler' => NULL,
+          'enabled' => 1,
+          'handler' => 'google',
         ),
         'map' => array(
           'auto_center' => 1,
