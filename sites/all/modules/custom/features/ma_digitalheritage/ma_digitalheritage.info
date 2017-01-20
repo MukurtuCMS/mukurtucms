@@ -21,6 +21,7 @@ dependencies[] = geofield
 dependencies[] = geofield_gmap
 dependencies[] = geofield_map
 dependencies[] = leaflet
+dependencies[] = leaflet_markercluster
 dependencies[] = leaflet_more_maps
 dependencies[] = leaflet_views
 dependencies[] = leaflet_widget
