@@ -1,0 +1,10 @@
+name = Mukurtu Single Digital Heritage Browse Page
+description = A single DH browse page combining the DH browse map and a right column with tabs for DH list, search and filters, and map legend
+core = 7.x
+package = Features
+dependencies[] = ctools
+dependencies[] = page_manager
+features[ctools][] = page_manager:pages_default:1
+features[features_api][] = api:2
+features[page_manager_pages][] = single_dh_browse_page
+project path = sites/all/modules/custom/features
