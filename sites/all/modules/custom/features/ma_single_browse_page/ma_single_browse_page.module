@@ -6,4 +6,21 @@
 
 include_once 'ma_single_browse_page.features.inc';
 
+/**
+ * Implements hook_block_view_alter().
+ */
+function ma_single_browse_page_block_view_alter(&$data, $block) {
+
+  // Hide some blocks on the single browse page.
+  // Note, other content is being not rendered via page--browse.tpl.php.
+  if (current_path() == 'browse') {
+    switch ($block->bid) {
+      case 'views-communities_content-block_1';
+      case 'boxes-ma_site_header';
+        $data['content'] = '';
+        break;
+    }
+  }
+
+}
 

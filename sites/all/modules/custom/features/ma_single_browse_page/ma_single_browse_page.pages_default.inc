@@ -287,7 +287,32 @@ function ma_single_browse_page_default_page_manager_pages() {
   $pane->uuid = '1776b3c5-7697-4d48-8224-7e2c2b2de9c0';
   $display->content['new-1776b3c5-7697-4d48-8224-7e2c2b2de9c0'] = $pane;
   $display->panels['right'][5] = 'new-1776b3c5-7697-4d48-8224-7e2c2b2de9c0';
-  $display->hide_title = PANELS_TITLE_FIXED;
+  $pane = new stdClass();
+  $pane->pid = 'new-663b2429-ba94-4088-94e0-05dacc2425d3';
+  $pane->panel = 'right';
+  $pane->type = 'page_tabs';
+  $pane->subtype = 'page_tabs';
+  $pane->shown = TRUE;
+  $pane->access = array();
+  $pane->configuration = array(
+    'type' => 'both',
+    'id' => 'tabs',
+    'override_title' => 0,
+    'override_title_text' => '',
+    'override_title_heading' => 'h2',
+  );
+  $pane->cache = array();
+  $pane->style = array(
+    'settings' => NULL,
+  );
+  $pane->css = array();
+  $pane->extras = array();
+  $pane->position = 6;
+  $pane->locks = array();
+  $pane->uuid = '663b2429-ba94-4088-94e0-05dacc2425d3';
+  $display->content['new-663b2429-ba94-4088-94e0-05dacc2425d3'] = $pane;
+  $display->panels['right'][6] = 'new-663b2429-ba94-4088-94e0-05dacc2425d3';
+  $display->hide_title = PANELS_TITLE_NONE;
   $display->title_pane = '0';
   $handler->conf['display'] = $display;
   $page->default_handlers[$handler->name] = $handler;

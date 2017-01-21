@@ -13,6 +13,17 @@ function ma_core_init() {
 
   // Add the JS for jquery_ui_tooltips. Simply use the class "jquery_ui_tooltip" on any title attribute to use this
   drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/jquery_ui_tooltips.js');
+
+  // Set the frontpage
+  $current_fp = variable_get('site_frontpage');
+  $intended_fp = 'home';
+  if (module_exists('ma_single_browse_page')) {
+    $intended_fp = 'browse';
+  }
+  if ($current_fp <> $intended_fp) {
+    variable_set ('site_frontpage', $intended_fp);
+  }
+
 }
 
 /**
