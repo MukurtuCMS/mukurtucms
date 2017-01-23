@@ -287,6 +287,7 @@ function quicktabs_load($name) {
  * Load the quicktabs data.
  */
 function quicktabs_load_multiple($names = array()) {
+  drupal_add_library('system', 'jquery.cookie');
   ctools_include('export');
   $defaults = empty($names) ? ctools_export_load_object('quicktabs', 'all') : ctools_export_load_object('quicktabs', 'names', $names);
   return $defaults;
