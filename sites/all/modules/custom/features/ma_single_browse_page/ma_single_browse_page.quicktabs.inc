@@ -44,7 +44,7 @@ function ma_single_browse_page_quicktabs_default_quicktabs() {
     ),
   );
   $quicktabs->renderer = 'quicktabs';
-  $quicktabs->style = 'Basic';
+  $quicktabs->style = 'Excel';
   $quicktabs->options = array();
 
   // Translatables
