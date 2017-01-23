@@ -5,18 +5,18 @@
  * of some menu callback function as tab content.
  */
 class QuickCallbackContent extends QuickContent {
-  
+
   public static function getType() {
     return 'callback';
   }
-  
+
   public function __construct($item) {
     parent::__construct($item);
 
     if (isset($item['path'])) {
       $url_args = arg();
       $path = $item['path'];
-  
+
       foreach ($url_args as $id => $arg) {
         $path = str_replace("%$id", $arg, $path);
       }
@@ -63,7 +63,7 @@ class QuickCallbackContent extends QuickContent {
       $item['actual_path'] = rawurldecode($args[0]);
       $_GET['q'] = $item['actual_path'];
     }
-    
+
     $output = array();
     if (isset($item['actual_path'])) {
       // Retain the current page title as we'll need to set it back after
@@ -71,8 +71,8 @@ class QuickCallbackContent extends QuickContent {
       $page_title = drupal_get_title();
       $response = menu_execute_active_handler($item['actual_path'], FALSE);
       // Revert the page title.
-      if($this->settings['use_title']) {
-        $this->title = drupal_get_title();
+      if(isset($this->settings['use_title'])){
+       $this->title = drupal_get_title();
       }
       drupal_set_title($page_title);
 
