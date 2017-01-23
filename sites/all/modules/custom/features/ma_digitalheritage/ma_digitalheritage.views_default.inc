@@ -405,6 +405,12 @@ function ma_digitalheritage_views_default_views() {
   );
   $handler->display->display_options['filters']['status']['expose']['reduce'] = 0;
   $handler->display->display_options['inherit_panels_path'] = '1';
+
+  /* Display: Single Browse Page List */
+  $handler = $view->new_display('panel_pane', 'Single Browse Page List', 'single_browse_page_dh_list');
+  $handler->display->display_options['exposed_block'] = TRUE;
+  $handler->display->display_options['defaults']['header'] = FALSE;
+  $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['digital_heritage_grid_list'] = array(
     t('Master'),
     t('more'),
@@ -433,6 +439,7 @@ function ma_digitalheritage_views_default_views() {
     t('Location'),
     t('Title'),
     t('Status'),
+    t('Single Browse Page List'),
   );
   $export['digital_heritage_grid_list'] = $view;
 

@@ -85,8 +85,12 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
   // Add a button to reset search and filters
   // Search API provides a button on the view that will reset the search, but not the filters. Leaving that off and creating our own that will reset both.
   if (strpos($form['#id'], 'views-exposed-form-digital-heritage-grid-list') !== FALSE) {
+    $target_page = 'digital-heritage';
+    if ($form['#id'] == 'views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list') {
+      $target_page = '';
+    }
     if (count(arg()) > 1 OR count(drupal_get_query_parameters())) {
-      $form['reset'] = array('#markup' => l(t('Reset'),'digital-heritage', array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
+      $form['reset'] = array('#markup' => l(t('Reset'),$target_page, array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
     }
   }
 
