@@ -164,6 +164,21 @@ function ma_digitalheritage_ds_field_settings_info() {
   );
   $export['node|digital_heritage|search_result'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|single_page_right_column_dh';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'single_page_right_column_dh';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+  );
+  $export['node|digital_heritage|single_page_right_column_dh'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -591,6 +606,49 @@ function ma_digitalheritage_ds_layout_settings_info() {
   );
   $export['node|digital_heritage|search_result'] = $ds_layout;
 
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|digital_heritage|single_page_right_column_dh';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'digital_heritage';
+  $ds_layout->view_mode = 'single_page_right_column_dh';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_media_asset',
+        2 => 'field_community_ref',
+        3 => 'field_category',
+        4 => 'field_summary',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'field_media_asset' => 'ds_content',
+      'field_community_ref' => 'ds_content',
+      'field_category' => 'ds_content',
+      'field_summary' => 'ds_content',
+    ),
+    'limit' => array(
+      'field_media_asset' => '1',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+  );
+  $export['node|digital_heritage|single_page_right_column_dh'] = $ds_layout;
+
   return $export;
 }
 
@@ -617,6 +675,15 @@ function ma_digitalheritage_ds_view_modes_info() {
     'node' => 'node',
   );
   $export['map_popup'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'single_page_right_column_dh';
+  $ds_view_mode->label = 'Single Page Right Column DH';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+  );
+  $export['single_page_right_column_dh'] = $ds_view_mode;
 
   return $export;
 }

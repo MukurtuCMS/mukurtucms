@@ -261,6 +261,9 @@ col-md-4 col-md-push-8';
       'map_popup' => array(
         'custom_settings' => TRUE,
       ),
+      'single_page_right_column_dh' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

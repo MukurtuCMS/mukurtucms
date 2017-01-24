@@ -112,6 +112,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 19,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'settings' => array(),
@@ -198,6 +204,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 42,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -283,6 +295,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -392,6 +410,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ds_taxonomy_separator',
         'weight' => 3,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 0,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 3,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -472,6 +500,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 6,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -557,6 +591,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -644,6 +684,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -774,6 +820,25 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 2,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 2,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -888,6 +953,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 29,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1127,6 +1198,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 30,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1234,6 +1311,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 23,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1354,6 +1437,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 24,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1444,6 +1533,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 25,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1545,6 +1640,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 5,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -1636,6 +1737,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 14,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1739,6 +1846,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 34,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1829,6 +1942,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 33,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1927,6 +2046,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 20,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2021,6 +2146,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 31,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2112,6 +2243,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 22,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2201,6 +2338,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 26,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2313,6 +2456,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'ma_scald_search_results',
         'weight' => 0,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_scald_search_results',
+        'weight' => 1,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2396,6 +2549,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 43,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2495,6 +2654,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 27,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2575,6 +2740,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 15,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2658,6 +2829,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 44,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2754,6 +2931,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 35,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2848,6 +3031,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 32,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2950,6 +3139,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 28,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3036,6 +3231,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 0,
       ),
       'search_result' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
+      'single_page_right_column_dh' => array(
         'label' => 'inline',
         'module' => 'text',
         'settings' => array(),
@@ -3144,6 +3346,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 17,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3235,6 +3443,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 21,
       ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3317,6 +3531,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 40,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3440,6 +3660,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 16,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',

@@ -408,6 +408,13 @@ function ma_digitalheritage_views_default_views() {
 
   /* Display: Single Browse Page List */
   $handler = $view->new_display('panel_pane', 'Single Browse Page List', 'single_browse_page_dh_list');
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'entity';
+  $handler->display->display_options['row_options']['view_mode'] = 'single_page_right_column_dh';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['exposed_block'] = TRUE;
   $handler->display->display_options['defaults']['header'] = FALSE;
   $handler->display->display_options['inherit_panels_path'] = '1';

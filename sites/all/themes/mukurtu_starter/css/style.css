@@ -9994,6 +9994,10 @@ a:hover {
 .pane-quicktabs-single-browse-page-right-column .pane-content {
   padding: 0;
 }
+.pane-quicktabs-single-browse-page-right-column .pane-content .view-display-id-single_browse_page_dh_list .views-row {
+  border-bottom: 1px solid #ecebeb;
+  padding-bottom: 30px;
+}
 .pane-quicktabs-single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-exposed-widgets {
   margin-bottom: 2em;
 }
