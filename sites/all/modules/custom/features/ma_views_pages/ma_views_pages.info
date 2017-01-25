@@ -1,0 +1,10 @@
+name = Mukurtu Views & Pages
+description = Optional views and pages
+core = 7.x
+package = Features
+version = 7.x-1.0
+dependencies[] = ctools
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = browse_digital_heritage_by_category
+features_exclude[dependencies][views] = views
