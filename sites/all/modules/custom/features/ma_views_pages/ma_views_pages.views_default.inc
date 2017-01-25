@@ -22,7 +22,7 @@ function ma_views_pages_views_default_views() {
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Digital Heritage Categories';
+  $handler->display->display_options['title'] = 'Browse by Category';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['cache']['type'] = 'none';
@@ -128,13 +128,11 @@ return substr($path, strripos($path, \'/\') + 1);';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page_1');
-  $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['title'] = 'Browse By Category';
   $handler->display->display_options['enabled'] = FALSE;
   $handler->display->display_options['path'] = 'categories-browse';
   $translatables['browse_digital_heritage_by_category'] = array(
     t('Master'),
-    t('Digital Heritage Categories'),
+    t('Browse by Category'),
     t('more'),
     t('Apply'),
     t('Reset'),
@@ -148,7 +146,6 @@ return substr($path, strripos($path, \'/\') + 1);';
     t('<a href="/digital-heritage/category/[php]"><img src="/sites/all/modules/custom/features/ma_digitalheritage/images/no_media_available.jpg"/></a>'),
     t('Block'),
     t('Page'),
-    t('Browse By Category'),
   );
   $export['browse_digital_heritage_by_category'] = $view;
 
