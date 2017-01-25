@@ -1,8 +1,6 @@
 /*global module:false*/
 module.exports = function(grunt) {
 
-  grunt.loadNpmTasks('grunt-css');
-
   // Project configuration.
   grunt.initConfig({
     pkg: '<json:package.json>',
@@ -32,7 +30,6 @@ module.exports = function(grunt) {
           '<file_strip_banner:src/layer/Polygon.js>',
           '<file_strip_banner:src/layer/MultiPolyLine.js>',
           '<file_strip_banner:src/layer/MultiPolygon.js>',
-          '<file_strip_banner:src/Select.js>',
           '<file_strip_banner:src/Widget.js>'
         ],
         dest: 'dist/<%= pkg.name %>.js'
@@ -42,12 +39,6 @@ module.exports = function(grunt) {
       dist: {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
         dest: 'dist/<%= pkg.name %>.min.js'
-      }
-    },
-    cssmin: {
-      dist: {
-        src: ['<banner:meta.banner', '<file_strip_banner:dist/<%= pkg.name %>.css>', '<file_strip_banner:dist/Leaflet.select.css>'],
-        dest: 'dist/<%= pkg.name %>.min.css'
       }
     },
     watch: {
@@ -76,6 +67,6 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min cssmin');
+  grunt.registerTask('default', 'lint qunit concat min');
 
 };
