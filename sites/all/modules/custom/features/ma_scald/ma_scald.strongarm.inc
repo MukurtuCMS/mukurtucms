@@ -259,6 +259,12 @@ function ma_scald_strongarm() {
       'mukurtu_scald_dictionary_media' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -301,6 +307,10 @@ function ma_scald_strongarm() {
           ),
           'mukurtu_scald_dictionary_media' => array(
             'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_scald_taxonomy_thumbnail' => array(
+            'weight' => '0',
             'visible' => FALSE,
           ),
         ),
@@ -542,6 +552,15 @@ function ma_scald_strongarm() {
     'mukurtu_scald_recording' => array(
       'name' => 'mukurtu_scald_recording',
       'title' => 'Mukurtu Scald Recording',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+      'provider' => 'scald',
+    ),
+    'mukurtu_scald_taxonomy_thumbnail' => array(
+      'name' => 'mukurtu_scald_taxonomy_thumbnail',
+      'title' => 'Mukurtu Scald Taxonomy Thumbnail',
       'description' => '',
       'render_language' => 'XHTML',
       'parseable' => TRUE,

@@ -442,7 +442,7 @@ function ma_scald_default_scald_context_config() {
       '*' => 'passthrough',
     ),
     'image' => array(
-      '*' => 'style-Library',
+      '*' => 'style-library',
     ),
     'video' => array(
       '*' => 'passthrough',
@@ -459,6 +459,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'image' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'video' => array(
       '*' => 'default',

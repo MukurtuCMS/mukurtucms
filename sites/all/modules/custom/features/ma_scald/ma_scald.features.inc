@@ -28,3 +28,27 @@ function ma_scald_ctools_plugin_api($module = NULL, $api = NULL) {
 function ma_scald_views_api($module = NULL, $api = NULL) {
   return array("api" => "3.0");
 }
+
+/**
+ * Implements hook_image_default_styles().
+ */
+function ma_scald_image_default_styles() {
+  $styles = array();
+
+  // Exported image style: taxonomy_thumbnail_image.
+  $styles['taxonomy_thumbnail_image'] = array(
+    'label' => 'Taxonomy Thumbnail Image',
+    'effects' => array(
+      7 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 240,
+          'height' => 146,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
+  return $styles;
+}
