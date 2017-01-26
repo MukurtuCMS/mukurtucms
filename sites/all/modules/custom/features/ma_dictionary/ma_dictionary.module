@@ -86,9 +86,10 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
     ),
   );
 
+  dpm($form);
 
-  // Actions to perform when adding (not editing) dictionary words
-  if ($form['#action'] == '/node/add/dictionary-word') {
+  // Actions to perform when adding or editing dictionary words
+  if ($form['#node_edit_form'] == TRUE) {
       // Remove any languages the user isn't a member of
       $user_language_communities = _ma_dictionary_get_user_language_communities();
       foreach($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'] as $lang_id => $lang) {
@@ -96,7 +97,10 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
               unset($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'][$lang_id]);
           }
       }
+  }
 
+  // Actions to perform when adding (not editing) dictionary words
+  if ($form['#action'] == '/node/add/dictionary-word') {
     // Set the default language, if one is defined, or the first language if no default is defined
     $default_language = variable_get ('mukurtu_default_language');
     if (!$default_language) {
@@ -415,6 +419,28 @@ function ma_dictionary_node_access($node, $op, $account) {
     }
 
     return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Implements hook_node_validate.
+ */
+function ma_dictionary_node_validate($node, $form, &$form_state) {
+    if($node->type == 'dictionary_word') {
+        $user_language_communities = _ma_dictionary_get_user_language_communities();
+        $new_word_language = $node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid'];
+
+        $access = FALSE;
+        // Look for the selected language in the list of the user's language community memberships
+        foreach($user_language_communities as $language => $roles) {
+            if($language == $new_word_language) {
+                $access = TRUE;
+            }
+        }
+
+        if(!$access) {
+            form_set_error('word_language', t('You must be a member of the language community.'));
+        }
+    }
 }
 
 function ma_dictionary_node_prepare($node) {
