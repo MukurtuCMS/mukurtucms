@@ -86,8 +86,6 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
     ),
   );
 
-  dpm($form);
-
   // Actions to perform when adding or editing dictionary words
   if ($form['#node_edit_form'] == TRUE) {
       // Remove any languages the user isn't a member of
