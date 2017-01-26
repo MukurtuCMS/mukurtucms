@@ -1,0 +1,13 @@
+diff --git a/leaflet_widget.module b/leaflet_widget.module
+index baf64ae..ceab4ee 100644
+--- a/leaflet_widget.module
++++ b/leaflet_widget.module
+@@ -344,7 +344,7 @@ function leaflet_widget_library() {
+       0 => array(
+         'type' => 'setting',
+         'data' => array(
+-          'leaflet_widget' => array('defaultIconPath' => file_create_url($leaflet) . '/images'),
++          'leaflet_widget' => array('defaultIconPath' => file_create_url($leaflet) . '/images/'),
+         ),
+       ),
+     ),

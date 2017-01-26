@@ -344,7 +344,7 @@ function leaflet_widget_library() {
       0 => array(
         'type' => 'setting',
         'data' => array(
-          'leaflet_widget' => array('defaultIconPath' => file_create_url($leaflet) . '/images'),
+          'leaflet_widget' => array('defaultIconPath' => file_create_url($leaflet) . '/images/'),
         ),
       ),
     ),
