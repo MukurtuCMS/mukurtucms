@@ -172,35 +172,36 @@ L.Polygon.include({
     }
 });
 
-L.MultiPolyline.include({
-    toGeometry: function () {
-        var coords = [];
-
-        this.eachLayer(function (layer) {
-            coords.push(layer.toGeometry().coordinates);
-        });
-
-        return {
-            type: "MultiLineString",
-            coordinates: coords
-        };
-    }
-});
-
-L.MultiPolygon.include({
-    toGeometry: function () {
-        var coords = [];
-
-        this.eachLayer(function (layer) {
-            coords.push(layer.toGeometry().coordinates);
-        });
-
-        return {
-            type: "MultiPolygon",
-            coordinates: coords
-        };
-    }
-});
+// Patch by Kanopi - Leaflet JS no longer has these functions, so commenting out or else maps break.
+// L.MultiPolyline.include({
+//     toGeometry: function () {
+//         var coords = [];
+//
+//         this.eachLayer(function (layer) {
+//             coords.push(layer.toGeometry().coordinates);
+//         });
+//
+//         return {
+//             type: "MultiLineString",
+//             coordinates: coords
+//         };
+//     }
+// });
+//
+// L.MultiPolygon.include({
+//     toGeometry: function () {
+//         var coords = [];
+//
+//         this.eachLayer(function (layer) {
+//             coords.push(layer.toGeometry().coordinates);
+//         });
+//
+//         return {
+//             type: "MultiPolygon",
+//             coordinates: coords
+//         };
+//     }
+// });
 
 L.Map.mergeOptions({
     widget: false
