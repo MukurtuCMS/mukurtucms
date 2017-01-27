@@ -87,8 +87,8 @@
             }
             if (add) {
               map.fire(
-                'draw:marker-created',
-                { marker: new L.Marker(latlng, { icon: map.drawControl.handlers.marker.options.icon }) }
+                'draw:created',
+                { layerType: 'marker', layer: new L.marker(latlng, { icon: new L.Icon.Default() }) }
               );
               map.fitBounds(map.widget.vectors.getBounds());
             }

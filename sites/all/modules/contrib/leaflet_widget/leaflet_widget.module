@@ -20,6 +20,13 @@ function leaflet_widget_field_widget_info() {
     'settings' => array(
       'map' => array(
         'base_url' => array_shift($urls),
+        'draw_types' => array(
+          'polyline' => TRUE,
+          'polygon' => TRUE,
+          'rectangle' => TRUE,
+          'circle' => TRUE,
+          'marker' => TRUE,
+        ),
         'center' => array(
           'lat' => 0.0,
           'lng' => 0.0,
@@ -60,11 +67,43 @@ function leaflet_widget_field_widget_settings_form($field, $instance) {
         '#default_value' => $settings['map']['base_url'],
         '#options' => leaflet_widget_base_layers(),
       );
+      $form['map']['draw_types'] = array(
+        '#type' => 'fieldset',
+        '#collapsed' => TRUE,
+        '#collapsible' => TRUE,
+        '#title' => t('Allowed Draw Handlers')
+      );
+
+      $form['map']['draw_types']['polyline'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Polyline'),
+        '#default_value' => $settings['map']['draw_types']['polyline'],
+      );
+      $form['map']['draw_types']['polygon'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Polygon'),
+        '#default_value' => $settings['map']['draw_types']['polygon'],
+      );
+      $form['map']['draw_types']['rectangle'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Rectangle'),
+        '#default_value' => $settings['map']['draw_types']['rectangle'],
+      );
+      $form['map']['draw_types']['circle'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Circle'),
+        '#default_value' => $settings['map']['draw_types']['circle'],
+      );
+      $form['map']['draw_types']['marker'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Marker'),
+        '#default_value' => $settings['map']['draw_types']['marker'],
+      );
       $form['map']['center'] = array(
         '#type' => 'fieldset',
         '#collapsed' => TRUE,
         '#collapsible' => TRUE,
-        '#title' => 'Default map center',
+        '#title' => t('Default map center'),
       );
       $form['map']['center']['lat'] = array(
         '#type' => 'textfield',
@@ -152,6 +191,14 @@ function leaflet_widget_field_widget_form(&$form, &$form_state, $field, $instanc
       $settings['map']['widget']['attach'] = "$id-input";
       $settings['map']['widget']['multiple'] = FALSE;
       $settings['map']['widget']['autoCenter'] = $settings['map']['auto_center'];
+
+      // Set allowed draw handlers.
+      $settings['map']['widget']['polyline']  = $settings['map']['draw_types']['polyline'];
+      $settings['map']['widget']['polygon']   = $settings['map']['draw_types']['polygon'];
+      $settings['map']['widget']['rectangle'] = $settings['map']['draw_types']['rectangle'];
+      $settings['map']['widget']['circle']    = $settings['map']['draw_types']['circle'];
+      $settings['map']['widget']['marker']    = $settings['map']['draw_types']['marker'];
+
       if ($field['cardinality'] != 1) {
         $settings['map']['widget']['multiple'] = TRUE;
         // Leaflet.widget treats multiple == true && !cardinality as

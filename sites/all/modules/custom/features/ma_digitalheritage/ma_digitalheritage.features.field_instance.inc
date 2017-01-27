@@ -1239,6 +1239,13 @@ function ma_digitalheritage_field_default_field_instances() {
             'lat' => 0,
             'lng' => 0,
           ),
+          'draw_types' => array(
+            'circle' => 1,
+            'marker' => 1,
+            'polygon' => 1,
+            'polyline' => 1,
+            'rectangle' => 1,
+          ),
           'zoom' => 10,
         ),
       ),
