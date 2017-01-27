@@ -1,0 +1,31 @@
+
+.leaflet-control-container .leaflet-control-reset,
+.leaflet-control-container .leaflet-control-zoom-indicator {
+  background-color: white;
+  color: black;
+  height: 26px;
+  width: 26px !important; /* for Bootstrap glyphs */
+  line-height: 26px;
+  opacity: 0.8;
+  text-align: center;
+  text-decoration: none;
+}
+.leaflet-control-container .leaflet-control-reset,
+.leaflet-control-container .leaflet-control-cluster {
+  cursor: pointer;
+  font-size: larger;
+}
+.leaflet-control-container .leaflet-control-reset:hover {
+  background-color: #f4f4f4;
+}
+
+.leaflet-control-container .leaflet-control-cluster {
+  background: white url("../markers/red-cluster.png") 5px 4px no-repeat;
+  background-size: 26px 28px;
+  height: 36px;
+  width: 36px !important;
+  opacity: 0.8;
+}
+.leaflet-control-container .leaflet-control-cluster:hover {
+  background-color: #f4f4f4;
+}

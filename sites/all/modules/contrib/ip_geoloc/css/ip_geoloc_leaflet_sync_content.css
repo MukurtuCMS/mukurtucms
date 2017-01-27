@@ -1,0 +1,56 @@
+
+/* Views Table format */
+tr.synced-marker-hover > td,
+tr.odd.synced-marker-hover > td,
+tr.even.synced-marker-hover > td,
+tr.synced-marker-hover > td.active,
+tr.odd.synced-marker-hover > td.active,
+tr.even.synced-marker-hover > td.active {
+  background-color: lightcyan;
+}
+/* For Views Unformatted, HTML-list */
+.views-row.synced-marker-hover  {
+  background-color: lightcyan;
+}
+/* For Views Grid */
+.views-view-grid td.synced-marker-hover {
+  background-color: lightcyan;
+}
+
+/* Default markers, normal size 41x25, increase h and w by 50% each */
+img.leaflet-marker-icon.synced-content-hover {
+  height: 61px !important;
+  width: 37px !important;
+  margin-top: -61px !important;
+  margin-left: -18px !important;
+  transition: all 0.25s ease-in;
+  -ms-transition: all 0.25s ease-in;
+  z-index: 9999;
+}
+/* Special markers 42x32, increase h and w by 50% each */
+.leaflet-tagged-marker.synced-content-hover > img {
+  height: 63px !important;
+  width: 48px !important;
+  margin-top: -63px !important;
+  margin-left: -24px !important;
+  transition: all 0.25s ease-in;
+  -ms-transition: all 0.25s ease-in;
+  z-index: 9999;
+}
+.leaflet-tagged-marker.synced-content-hover > i {
+  font-size: 30px;
+  top: -54px;
+  transition: all 0.25s ease-in;
+  -ms-transition: all 0.25s ease-in;
+  z-index: 10000;
+}
+
+img.leaflet-marker-hidden,
+div.leaflet-marker-hidden > img,
+div.leaflet-marker-hidden > i {
+  display: none;
+}
+
+g.synced-content-hover > path {
+  stroke: red;
+}

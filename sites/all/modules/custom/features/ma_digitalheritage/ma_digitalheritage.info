@@ -20,6 +20,7 @@ dependencies[] = geocoder
 dependencies[] = geofield
 dependencies[] = geofield_gmap
 dependencies[] = geofield_map
+dependencies[] = ip_geoloc
 dependencies[] = leaflet
 dependencies[] = leaflet_markercluster
 dependencies[] = leaflet_more_maps

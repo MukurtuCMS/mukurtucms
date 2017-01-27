@@ -428,6 +428,144 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['nid']['separator'] = '';
   $handler->display->display_options['fields']['nid']['link_to_entity'] = 0;
   $handler->display->display_options['inherit_panels_path'] = '1';
+
+  /* Display: All (Single Browse Page Map) */
+  $handler = $view->new_display('panel_pane', 'All (Single Browse Page Map)', 'all_single_browse_page_map');
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'ip_geoloc_leaflet';
+  $handler->display->display_options['style_options']['grouping'] = array(
+    0 => array(
+      'field' => '',
+      'rendered' => 1,
+      'rendered_strip' => 0,
+    ),
+  );
+  $handler->display->display_options['style_options']['map'] = 'osm-landscape';
+  $handler->display->display_options['style_options']['map_height'] = '600';
+  $handler->display->display_options['style_options']['ip_geoloc_views_plugin_latitude'] = array(
+    'field_coverage' => 'field_coverage',
+  );
+  $handler->display->display_options['style_options']['ip_geoloc_views_plugin_longitude'] = '';
+  $handler->display->display_options['style_options']['visitor_marker']['visitor_marker_accuracy_circle'] = 0;
+  $handler->display->display_options['style_options']['center_option'] = '0';
+  $handler->display->display_options['style_options']['sync']['2'] = 1;
+  $handler->display->display_options['style_options']['sync']['4'] = 1;
+  $handler->display->display_options['style_options']['sync']['8'] = 0;
+  $handler->display->display_options['style_options']['sync']['16'] = 1;
+  $handler->display->display_options['style_options']['full_screen'] = 1;
+  $handler->display->display_options['style_options']['scale_metric'] = 0;
+  $handler->display->display_options['style_options']['scale_imperial'] = 0;
+  $handler->display->display_options['style_options']['zoom_indicator'] = 1;
+  $handler->display->display_options['style_options']['open_balloons_on_click'] = 0;
+  $handler->display->display_options['style_options']['open_balloons_on_hover'] = 0;
+  $handler->display->display_options['style_options']['goto_content_on_click'] = 0;
+  $handler->display->display_options['style_options']['map_reset'] = 0;
+  $handler->display->display_options['style_options']['map_cluster_toggle'] = 1;
+  $handler->display->display_options['style_options']['mini_map']['on'] = 0;
+  $handler->display->display_options['style_options']['mini_map']['height'] = '100';
+  $handler->display->display_options['style_options']['mini_map']['width'] = '150';
+  $handler->display->display_options['style_options']['mini_map']['toggle'] = 1;
+  $handler->display->display_options['style_options']['mini_map']['zoom_delta'] = '-5';
+  $handler->display->display_options['style_options']['cluster_radius'] = '0';
+  $handler->display->display_options['style_options']['cluster_differentiator']['cluster_differentiator_fields'] = array(
+    '' => '',
+  );
+  $handler->display->display_options['style_options']['cluster_differentiator']['zoom_ranges'] = array(
+    1 => '',
+  );
+  $handler->display->display_options['style_options']['cluster_differentiator']['cluster_tooltips'] = 1;
+  $handler->display->display_options['style_options']['cluster_differentiator']['cluster_outline'] = '0';
+  $handler->display->display_options['style_options']['cluster_differentiator']['cluster_touch_mode'] = '1';
+  $handler->display->display_options['style_options']['cluster_aggregation']['aggregation_function'] = 'average';
+  $handler->display->display_options['style_options']['cluster_aggregation']['ranges']['small'] = '10';
+  $handler->display->display_options['style_options']['cluster_aggregation']['ranges']['medium'] = '100';
+  $handler->display->display_options['style_options']['cluster_aggregation']['ranges']['large'] = '1000';
+  $handler->display->display_options['style_options']['map_options']['maxzoom'] = '18';
+  $handler->display->display_options['style_options']['map_options']['zoom'] = '2';
+  $handler->display->display_options['style_options']['map_options']['scrollwheelzoom'] = '1';
+  $handler->display->display_options['style_options']['map_options']['dragging'] = '1';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
+  $handler->display->display_options['exposed_block'] = TRUE;
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Indexed Node: Node ID */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  /* Field: Indexed Node: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['link_to_entity'] = 0;
+  /* Field: Indexed Node: Location */
+  $handler->display->display_options['fields']['field_coverage']['id'] = 'field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['fields']['field_coverage']['field'] = 'field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['click_sort_column'] = 'geom';
+  $handler->display->display_options['fields']['field_coverage']['settings'] = array(
+    'data' => 'full',
+  );
+  $handler->display->display_options['fields']['field_coverage']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_coverage']['multi_type'] = 'ul';
+  $handler->display->display_options['defaults']['sorts'] = FALSE;
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Search: Fulltext search */
+  $handler->display->display_options['filters']['search_api_views_fulltext']['id'] = 'search_api_views_fulltext';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['field'] = 'search_api_views_fulltext';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['operator_id'] = 'search_api_views_fulltext_op';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['operator'] = 'search_api_views_fulltext_op';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['identifier'] = 'search_api_views_fulltext';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+    5 => 0,
+    6 => 0,
+    8 => 0,
+    7 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: Indexed Node: Content type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'digital_heritage' => 'digital_heritage',
+  );
+  /* Filter criterion: Location: Geo Type (indexed) */
+  $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
+  /* Filter criterion: Indexed Node: Status */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = array(
+    1 => '1',
+  );
+  $handler->display->display_options['filters']['status']['expose']['operator_id'] = 'status_op';
+  $handler->display->display_options['filters']['status']['expose']['label'] = 'Status';
+  $handler->display->display_options['filters']['status']['expose']['operator'] = 'status_op';
+  $handler->display->display_options['filters']['status']['expose']['identifier'] = 'status';
+  $handler->display->display_options['filters']['status']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['status']['expose']['reduce'] = 0;
+  $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['digital_heritage_grid_list'] = array(
     t('Master'),
     t('more'),
@@ -457,6 +595,7 @@ function ma_digitalheritage_views_default_views() {
     t('Title'),
     t('Status'),
     t('Single Browse Page List'),
+    t('All (Single Browse Page Map)'),
   );
   $export['digital_heritage_grid_list'] = $view;
 
