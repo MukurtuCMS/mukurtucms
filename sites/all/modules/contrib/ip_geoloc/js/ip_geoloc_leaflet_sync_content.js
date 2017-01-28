@@ -58,7 +58,7 @@ L.Sync =  L.Class.extend({
   },
 
   syncContentToMarker: function(contentSelector, marker) {
-    marker.on('mouseover', function(event) {
+    marker.on('click', function(event) {
       jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
     });
     marker.on('mouseout', function(event) {
@@ -82,7 +82,7 @@ L.Sync =  L.Class.extend({
     });
 
     // Using bind() as D7 core's jQuery is old and does not support on()
-    jQuery(contentSelector).bind('mouseover', function(event) {
+    jQuery(contentSelector).bind('click', function(event) {
       sync.handleContentMouseOver(marker);
     });
   },
@@ -99,30 +99,35 @@ L.Sync =  L.Class.extend({
     }
     marker.addedViaSync = addedViaSync || marker.addedViaSync;
 
-    var point = marker.getLatLngs ? marker.getLatLngs()[0] : marker.getLatLng();
-    if (!this.map.getBounds().contains(point)) {
-      this.map.panTo(point);
-    }
-    // Make geometry visible, in case it was hidden.
-    this.show(marker);
-    this.highlight(marker);
+    // This section re-worked by Kanopi
+    var point = marker.getLatLngs ? marker.getLatLngs()[0][0] : marker.getLatLng();
+    this.map.setView(point, 15); // 15 zoom level for points
 
-    if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT_WITH_POPUP) {
-      if (marker._icon) {
-        // Adjust popup position for markers, not other geometries.
-        if (!this.popupOffsetY) {
-          this.popupOffsetY = marker._popup.options.offset.y;
-        }
-        marker._popup.options.offset.y = this.popupOffsetY - 20;
-      }
-      marker.openPopup();
+    if (marker.getBounds) {
+      var bounds = marker.getBounds();
+      this.map.fitBounds(bounds); // non-points get zoomed to fitbounds
     }
-    if (marker._icon && marker._icon.style) {
-      // This does NOT work in most browsers.
-      marker._bringToFront();
-      marker.setZIndexOffset(9999);
-    }
-    this.lastMarker = marker;
+
+    // Make geometry visible, in case it was hidden.
+    //this.show(marker);
+    //this.highlight(marker);
+
+    // if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT_WITH_POPUP) {
+    //   if (marker._icon) {
+    //     // Adjust popup position for markers, not other geometries.
+    //     if (!this.popupOffsetY) {
+    //       this.popupOffsetY = marker._popup.options.offset.y;
+    //     }
+    //     marker._popup.options.offset.y = this.popupOffsetY - 20;
+    //   }
+    //   marker.openPopup();
+    // }
+    // if (marker._icon && marker._icon.style) {
+    //   // This does NOT work in most browsers.
+    //   marker._bringToFront();
+    //   marker.setZIndexOffset(9999);
+    // }
+    // this.lastMarker = marker;
   },
 
   addClass: function(marker, className) {
