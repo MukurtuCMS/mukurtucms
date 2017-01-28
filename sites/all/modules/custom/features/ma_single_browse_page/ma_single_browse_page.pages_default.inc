@@ -139,10 +139,10 @@ function ma_single_browse_page_default_page_manager_pages() {
   $display->content = array();
   $display->panels = array();
   $pane = new stdClass();
-  $pane->pid = 'new-bb3451b9-027e-415e-9dc8-926a7680ddcb';
+  $pane->pid = 'new-1b3fca68-b5f8-4527-8bbd-c90a1f511dc4';
   $pane->panel = 'center';
   $pane->type = 'views_panes';
-  $pane->subtype = 'digital_heritage_grid_list-all_map';
+  $pane->subtype = 'digital_heritage_grid_list-all_single_browse_page_map';
   $pane->shown = TRUE;
   $pane->access = array();
   $pane->configuration = array();
@@ -154,9 +154,9 @@ function ma_single_browse_page_default_page_manager_pages() {
   $pane->extras = array();
   $pane->position = 0;
   $pane->locks = array();
-  $pane->uuid = 'bb3451b9-027e-415e-9dc8-926a7680ddcb';
-  $display->content['new-bb3451b9-027e-415e-9dc8-926a7680ddcb'] = $pane;
-  $display->panels['center'][0] = 'new-bb3451b9-027e-415e-9dc8-926a7680ddcb';
+  $pane->uuid = '1b3fca68-b5f8-4527-8bbd-c90a1f511dc4';
+  $display->content['new-1b3fca68-b5f8-4527-8bbd-c90a1f511dc4'] = $pane;
+  $display->panels['center'][0] = 'new-1b3fca68-b5f8-4527-8bbd-c90a1f511dc4';
   $pane = new stdClass();
   $pane->pid = 'new-fe63fb67-3038-41b0-a2a4-ff1c73ae9bed';
   $pane->panel = 'right';
