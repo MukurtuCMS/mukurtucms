@@ -598,12 +598,6 @@ function ma_search_api_default_search_api_server() {
             "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           },
-          "field_coverage:geo_type" : {
-            "table" : "search_api_db_default_node_index_field_coverage_geo_type_3",
-            "column" : "field_coverage_geo_type",
-            "type" : "list\\u003Cstring\\u003E",
-            "boost" : "1.0"
-          },
           "field_people" : {
             "table" : "search_api_db_default_node_index_field_people",
             "column" : "value",
@@ -698,6 +692,12 @@ function ma_search_api_default_search_api_server() {
           "field_coverage:geom" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_coverage:geo_type" : {
+            "table" : "search_api_db_default_node_index_field_coverage_geo_type_3",
+            "column" : "value",
+            "type" : "list\\u003Cstring\\u003E",
             "boost" : "1.0"
           }
         }
