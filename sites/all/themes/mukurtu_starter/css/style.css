@@ -9998,6 +9998,9 @@ a:hover {
   border-bottom: 1px solid #ecebeb;
   padding-bottom: 30px;
 }
+.pane-quicktabs-single-browse-page-right-column .pane-content .views-row.synced-marker-hover {
+  background-color: #d7e6f4;
+}
 .pane-quicktabs-single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-exposed-widgets {
   margin-bottom: 2em;
 }
