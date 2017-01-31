@@ -229,6 +229,7 @@ function ma_search_api_default_search_api_index() {
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
         "search_api_aggregation_1" : { "type" : "string" },
         "search_api_language" : { "type" : "string" },
+        "sort_title" : { "type" : "string" },
         "status" : { "type" : "boolean" },
         "sticky" : { "type" : "boolean" },
         "title" : { "type" : "text", "boost" : "5.0" },
@@ -698,6 +699,12 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_coverage_geo_type_3",
             "column" : "value",
             "type" : "list\\u003Cstring\\u003E",
+            "boost" : "1.0"
+          },
+          "sort_title" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "sort_title",
+            "type" : "string",
             "boost" : "1.0"
           }
         }

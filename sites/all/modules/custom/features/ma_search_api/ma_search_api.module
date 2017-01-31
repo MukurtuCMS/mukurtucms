@@ -332,3 +332,25 @@ function ma_search_api_list_of_indexed_fields() {
   return $output;
 
 }
+
+
+/**
+ * Implements hook_entity_property_info_alter().
+ *
+ * Custom index fields.
+ * Some of these are already indexed as different type (eg. text), whereas here we another instance
+ * of the field to the index to be indexed as a different type (eg. string) for different purposes.
+ */
+function ma_search_api_entity_property_info_alter(&$info) {
+  $info['node']['properties']['sort_title'] = array(
+    'type'            => 'text',
+    'label'           => t('Title (sort)'),
+    'sanitized'       => TRUE,
+    'getter callback' => 'ma_search_api_getter_callback',
+  );
+}
+
+function ma_search_api_getter_callback($item) {
+  return $item->title;
+}
+
