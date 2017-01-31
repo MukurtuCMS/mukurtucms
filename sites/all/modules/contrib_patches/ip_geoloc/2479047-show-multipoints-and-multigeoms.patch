@@ -1,0 +1,94 @@
+diff --git a/views/ip_geoloc_plugin_style.inc b/views/ip_geoloc_plugin_style.inc
+index fa0d019..4961c1a 100644
+--- a/views/ip_geoloc_plugin_style.inc
++++ b/views/ip_geoloc_plugin_style.inc
+@@ -749,8 +749,8 @@ function ip_geoloc_plugin_style_extract_locations($views_plugin_style, $enable_b
+           $base = _ip_geoloc_plugin_style_get_base1($row, $loc_field_name, $loc_field_alias);
+           $location = new stdClass();
+           $is_location = FALSE;
+-
+-          if (_ip_geoloc_plugin_style_extract_lat_lng($location, $row, $latitude, $longitude, $base)) {
++          $multiple_locations = array();
++          if (_ip_geoloc_plugin_style_extract_lat_lng($location, $row, $latitude, $longitude, $base, $multiple_locations)) {
+             $is_location = TRUE;
+           }
+           // Search API support [#2603450]
+@@ -767,20 +767,24 @@ function ip_geoloc_plugin_style_extract_locations($views_plugin_style, $enable_b
+             }
+           }
+           if ($is_location) {
+-            // Remaining row values go into the balloon.
+-            if ($enable_balloons && !empty($views_plugin_style->rendered_fields[$i])) {
+-              $location->balloon_text = implode($separator, $views_plugin_style->rendered_fields[$i]);
+-            }
+-            if (!empty($diff_color_ass[$display_id][$differentiator])) {
+-              _ip_geoloc_plugin_style_set_marker_color($location, $row, $differentiator, $is_tax_term, $view->args, $diff_color_ass[$display_id][$differentiator]);
+-            }
+-            _ip_geoloc_plugin_style_decorate($location, $row, $tooltip_field, $tag_field);
+-            if (isset($aggregation_field)) {
+-              $value = ip_geoloc_get_view_result($views_plugin_style, $aggregation_field, $i);
+-              $location->aggregation_value = empty($is_count) ? reset($value) : count($value);
++            if (count($multiple_locations)) {
++              foreach ($multiple_locations as $location) {
++                // Remaining row values go into the balloon.
++                if ($enable_balloons && !empty($views_plugin_style->rendered_fields[$i])) {
++                  $location->balloon_text = implode($separator, $views_plugin_style->rendered_fields[$i]);
++                }
++                if (!empty($diff_color_ass[$display_id][$differentiator])) {
++                  _ip_geoloc_plugin_style_set_marker_color($location, $row, $differentiator, $is_tax_term, $view->args, $diff_color_ass[$display_id][$differentiator]);
++                }
++                _ip_geoloc_plugin_style_decorate($location, $row, $tooltip_field, $tag_field);
++                if (isset($aggregation_field)) {
++                  $value = ip_geoloc_get_view_result($views_plugin_style, $aggregation_field, $i);
++                  $location->aggregation_value = empty($is_count) ? reset($value) : count($value);
++                }
++                $locations[$j ? "$i.$j" : $i] = $location;
++                $j++;
++              }
+             }
+-            $locations[$j ? "$i.$j" : $i] = $location;
+-            $j++;
+           }
+           $loc_field_name = next($loc_field_names);
+           $loc_field_alias = next($loc_field_aliases);
+@@ -899,7 +903,7 @@ function _ip_geoloc_plugin_style_get_base2($row, $field_name, $delta) {
+  * @return object|NULL
+  *   location -- @todo return array for consistency with Leaflet?
+  */
+-function _ip_geoloc_plugin_style_extract_lat_lng(&$location, $row, $latitude, $longitude, $loc_field_value = NULL) {
++function _ip_geoloc_plugin_style_extract_lat_lng(&$location, $row, $latitude, $longitude, $loc_field_value = NULL, &$multiple_locations = array()) {
+ 
+   $delta = &drupal_static(__FUNCTION__);
+   if (isset($delta)) {
+@@ -951,17 +955,21 @@ function _ip_geoloc_plugin_style_extract_lat_lng(&$location, $row, $latitude, $l
+         // Support WKT lines and polygons in Leaflet. Call requires:
+         // $base['geo_type'] eg 'point' or 'linestring'
+         // $base['geom'] eg. 'POINT(145 -37)' or 'LINESTRING(145 -37, 146, -38)'
+-        $loc = leaflet_process_geofield(array($base));
+-        $location = (object) reset($loc);
++        $locs = leaflet_process_geofield(array($base));
++        foreach ($locs as $loc) {
+ 
+-        // @todo get rid of this duality, use lat/lon throughout
+-        if (isset($location->lat)) {
+-          $location->latitude = $location->lat;
+-          unset($location->lat);
+-        }
+-        if (isset($location->lon)) {
+-          $location->longitude = $location->lon;
+-          unset($location->lon);
++          $location = (object) $loc;
++
++          // @todo get rid of this duality, use lat/lon throughout
++          if (isset($location->lat)) {
++            $location->latitude = $location->lat;
++            unset($location->lat);
++          }
++          if (isset($location->lon)) {
++            $location->longitude = $location->lon;
++            unset($location->lon);
++          }
++          $multiple_locations[] = $location;
+         }
+       }
+       else {
