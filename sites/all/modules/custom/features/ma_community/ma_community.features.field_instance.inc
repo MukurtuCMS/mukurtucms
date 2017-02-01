@@ -127,6 +127,10 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'colorbox_node_classes' => '',
+          'colorbox_node_height' => 600,
+          'colorbox_node_link' => FALSE,
+          'colorbox_node_width' => 600,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
@@ -208,6 +212,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
@@ -281,6 +286,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_thumbnail_image',
         'weight' => 1,
@@ -323,6 +329,10 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'colorbox_node_classes' => '',
+          'colorbox_node_height' => 600,
+          'colorbox_node_link' => FALSE,
+          'colorbox_node_width' => 600,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
