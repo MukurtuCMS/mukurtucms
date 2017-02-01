@@ -35,6 +35,9 @@ function ma_single_browse_page_block_info() {
   $blocks['single_browse_page_filters'] = array(
     'info' => t('Single Browse Page Filters'),
   );
+  $blocks['single_browse_page_list_and_sort'] = array(
+    'info' => t('Single Browse Page List View with sort Form'),
+  );
   return $blocks;
 }
 
@@ -47,37 +50,94 @@ function ma_single_browse_page_block_view($delta = '') {
 
   switch ($delta) {
     case 'single_browse_page_legend':
-    $block['subject'] = t('Legend');
-    $block['content'] = "content";
-    break;
+      $block['subject'] = t('Legend');
+      $block['content'] = "content";
+      break;
 
-  case 'single_browse_page_filters':
-    $block['subject'] = t('Filters');
+    case 'single_browse_page_filters':
+      $block['subject'] = t('Filters');
 
-    $search_form_block  = module_invoke('views', 'block_view','-exp-digital_heritage_grid_list-single_browse_page_dh_list');
-    $block['content'] = '<h4>' . 'Search' . '</h4>' . render($search_form_block['content']);
+      $search_form_block  = module_invoke('views', 'block_view','-exp-digital_heritage_grid_list-single_browse_page_dh_list');
+      $block['content'] = '<h4>' . 'Search' . '</h4>' . render($search_form_block['content']);
 
-    $facets_map = array_flip(facetapi_get_delta_map());
-    $facet_name_prefix = 'search_api@default_node_index:block:field_';
-    $facets_to_render = array (
-      'community_ref' => 'Community',
-      'collection' => 'Collection',
-      'category' => 'Category',
-      'media_asset%3Atype' => 'Media Type',
-      'tags' => 'Keywords'
-    );
-    foreach ($facets_to_render as $facet => $facet_title) {
-      $facet_block = module_invoke('facetapi', 'block_view', $facets_map[$facet_name_prefix . $facet]);
-      if ($facet_block['content']) {
-        $block['content'] .= '<h4>' . $facet_title . '</h4>' . render($facet_block['content']);
+      $facets_map = array_flip(facetapi_get_delta_map());
+      $facet_name_prefix = 'search_api@default_node_index:block:field_';
+      $facets_to_render = array (
+        'community_ref' => 'Community',
+        'collection' => 'Collection',
+        'category' => 'Category',
+        'media_asset%3Atype' => 'Media Type',
+        'tags' => 'Keywords'
+      );
+      foreach ($facets_to_render as $facet => $facet_title) {
+        $facet_block = module_invoke('facetapi', 'block_view', $facets_map[$facet_name_prefix . $facet]);
+        if ($facet_block['content']) {
+          $block['content'] .= '<h4>' . $facet_title . '</h4>' . render($facet_block['content']);
+        }
       }
+      break;
 
-
-    }
-
-    break;
+    case 'single_browse_page_list_and_sort':
+      $block['content'] = '<h4>Sort by</h4>';
+      $block['content'] .= drupal_render(drupal_get_form('ma_single_browse_page_dh_list_sort_form'));
+      $block['content'] .= views_embed_view('digital_heritage_grid_list', 'single_browse_page_dh_list');
+      break;
 
   }
   return $block;
 }
 
+/**
+ * Returns the render array for the form.
+ */
+function ma_single_browse_page_dh_list_sort_form($form, &$form_state) {
+  $sort_options = array('changed' => t('Date changed'), 'title' => t('Title'));
+  $form['sort'] = array(
+    '#type' => 'select',
+    '#default_value' => $_SESSION['dh_sort_order'] ?: 'changed',
+    '#options' => $sort_options,
+    '#attributes' => array('onchange' => 'this.form.submit();'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes' => array('class' => array('element-invisible')),
+  );
+  return $form;
+}
+
+function ma_single_browse_page_dh_list_sort_form_submit($form, $form_state){
+  if (isset ($form_state['values']['sort'])) {
+    $_SESSION['dh_sort_order'] = $form_state['values']['sort'];
+  }
+}
+
+/*
+ * Implements hook_search_api_query_alter().
+ */
+function ma_single_browse_page_search_api_query_alter(SearchApiQueryInterface $query) {
+  $search_id = $query->getOption('search id');
+
+  // Single Browse Page List View
+  if ($search_id == "search_api_views:digital_heritage_grid_list:single_browse_page_dh_list") {
+
+    // Sort according to the session var, otherwise fallback to default
+    $arg_sort = $_SESSION['dh_sort_order'];
+    if (isset ($arg_sort)) {
+
+      // Unset existing sorts
+      $sort =& $query->getSort();
+      $sort = array();
+
+      // Sort map
+      $sort_map = array(
+        'title' => array(
+          'sort_title' => 'ASC',
+        ),
+        'changed' => array(
+          'changed' => 'DESC'
+        ),
+      );
+      $query->sort(key($sort_map[$arg_sort]), $sort_map[$arg_sort]);
+    }
+  }
+}

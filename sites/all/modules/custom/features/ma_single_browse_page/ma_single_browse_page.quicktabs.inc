@@ -20,13 +20,11 @@ function ma_single_browse_page_quicktabs_default_quicktabs() {
   $quicktabs->title = 'Single Browse Page Right Column';
   $quicktabs->tabs = array(
     0 => array(
-      'vid' => 'digital_heritage_grid_list',
-      'display' => 'single_browse_page_dh_list',
-      'args' => '',
-      'use_title' => 0,
+      'bid' => 'ma_single_browse_page_delta_single_browse_page_list_and_sort',
+      'hide_title' => 1,
       'title' => 'Items',
       'weight' => '-100',
-      'type' => 'view',
+      'type' => 'block',
     ),
     1 => array(
       'bid' => 'ma_single_browse_page_delta_single_browse_page_filters',
