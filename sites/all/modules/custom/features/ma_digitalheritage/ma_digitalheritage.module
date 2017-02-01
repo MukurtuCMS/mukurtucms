@@ -25,6 +25,23 @@ function ma_digitalheritage_node_presave($node) {
             unset ($_SESSION['community_record_parent_requesting_path']);
         }
     }
+
+    // If DH Category is a child of a parent Category, also add the parent Category to the DH.
+    // Note *all* ancestors are added (eg. Grandparent categories for double-nested Categories)
+    if ($categories = $dh_emw->field_category->value()) {
+      $all_tids = array();
+      $existing_tids = array_map(create_function('$o', 'return $o->tid;'), $categories);
+      foreach ($existing_tids as $existing_tid) {
+        $parents = taxonomy_get_parents_all($existing_tid);
+        $parent_tids = array_map(create_function('$o', 'return $o->tid;'), $parents);
+        $all_tids = array_unique(array_merge ($all_tids, $parent_tids));
+      }
+      if (array_diff($existing_tids, $all_tids) OR array_diff($all_tids, $existing_tids)) {
+        $dh_emw->field_category->set($all_tids);
+        $dh_emw->save();
+      }
+    }
+
     
   }
 }
