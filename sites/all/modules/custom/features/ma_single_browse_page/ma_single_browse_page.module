@@ -141,3 +141,30 @@ function ma_single_browse_page_search_api_query_alter(SearchApiQueryInterface $q
     }
   }
 }
+
+/**
+ * Implements hook_ds_fields_info().
+ */
+function ma_single_browse_page_ds_fields_info($entity_type) {
+  $fields = array();
+
+  $fields['node']['more_link_to_modal_node'] = array(
+    'title' => t('More link to modal node'),
+    'ui_limit' =>  array('digital_heritage|single_page_right_column_dh'),
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function' => 'ma_single_browse_page_more_link_to_modal_node',
+  );
+
+  return $fields;
+}
+
+function ma_single_browse_page_more_link_to_modal_node($field) {
+  $entity = $field['entity'];
+  return l ('More', 'node/' . $entity->nid . '', array(
+    'attributes' => array(
+      'class' => 'colorbox-node',
+      'data-inner-width' => "100%",
+      'data-inner-height' => "100%"
+    )
+  ));
+}

@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the colorbox node module.
+ */
+
+/*
+ * Implements hook_install().
+ */
+function colorbox_node_install() {
+  variable_set('colorbox_load', TRUE);
+}
