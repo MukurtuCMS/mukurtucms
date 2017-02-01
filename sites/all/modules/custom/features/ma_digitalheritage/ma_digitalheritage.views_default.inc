@@ -456,18 +456,18 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['style_options']['full_screen'] = 1;
   $handler->display->display_options['style_options']['scale_metric'] = 0;
   $handler->display->display_options['style_options']['scale_imperial'] = 0;
-  $handler->display->display_options['style_options']['zoom_indicator'] = 1;
+  $handler->display->display_options['style_options']['zoom_indicator'] = 0;
   $handler->display->display_options['style_options']['open_balloons_on_click'] = 0;
   $handler->display->display_options['style_options']['open_balloons_on_hover'] = 0;
   $handler->display->display_options['style_options']['goto_content_on_click'] = 0;
   $handler->display->display_options['style_options']['map_reset'] = 0;
-  $handler->display->display_options['style_options']['map_cluster_toggle'] = 1;
+  $handler->display->display_options['style_options']['map_cluster_toggle'] = 0;
   $handler->display->display_options['style_options']['mini_map']['on'] = 0;
   $handler->display->display_options['style_options']['mini_map']['height'] = '100';
   $handler->display->display_options['style_options']['mini_map']['width'] = '150';
   $handler->display->display_options['style_options']['mini_map']['toggle'] = 1;
   $handler->display->display_options['style_options']['mini_map']['zoom_delta'] = '-5';
-  $handler->display->display_options['style_options']['cluster_radius'] = '0';
+  $handler->display->display_options['style_options']['cluster_radius'] = '15';
   $handler->display->display_options['style_options']['cluster_differentiator']['cluster_differentiator_fields'] = array(
     '' => '',
   );
