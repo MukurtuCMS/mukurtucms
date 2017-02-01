@@ -60,6 +60,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 31,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'text',
@@ -159,6 +166,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 43,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -255,6 +268,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 42,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -355,6 +374,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 16,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 15,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -461,6 +490,19 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'A collection is an aggregation of digital heritage items.',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'colorbox_node_classes' => '',
+          'colorbox_node_height' => 600,
+          'colorbox_node_link' => FALSE,
+          'colorbox_node_width' => 600,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 17,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -563,6 +605,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 44,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -660,6 +708,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 45,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -756,6 +810,27 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'node_reference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 13,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -903,6 +978,25 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 32,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 20,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -1023,6 +1117,62 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 24,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'leaflet',
+        'settings' => array(
+          'height' => 400,
+          'icon' => array(
+            'html' => '',
+            'htmlClass' => '',
+            'iconAnchor' => array(
+              'x' => '',
+              'y' => '',
+            ),
+            'iconImageStyle' => '',
+            'iconSize' => array(
+              'x' => '',
+              'y' => '',
+            ),
+            'iconType' => 'marker',
+            'iconUrl' => '',
+            'popupAnchor' => array(
+              'x' => '',
+              'y' => '',
+            ),
+            'shadowAnchor' => array(
+              'x' => '',
+              'y' => '',
+            ),
+            'shadowUrl' => '',
+          ),
+          'leaflet_map' => 'osm-landscape',
+          'popup' => array(
+            'show' => 0,
+            'text' => '',
+          ),
+          'vector_display' => array(
+            'clickable' => 0,
+            'color' => '',
+            'dashArray' => '',
+            'fill' => 0,
+            'fillColor' => '',
+            'fillOpacity' => '',
+            'opacity' => '',
+            'stroke' => 0,
+            'stroke_override' => 0,
+            'weight' => '',
+          ),
+          'zoom' => array(
+            'initialZoom' => -1,
+            'maxZoom' => -1,
+            'minZoom' => 1,
+            'scrollWheelZoom' => 1,
+          ),
+        ),
+        'type' => 'geofield_leaflet',
+        'weight' => 7,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -1292,6 +1442,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 25,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 8,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'text',
@@ -1392,6 +1549,25 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 34,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 19,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -1514,6 +1690,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 36,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 18,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'text',
@@ -1614,6 +1797,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 30,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -1718,6 +1908,16 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 29,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -1814,6 +2014,25 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 33,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 30,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -1923,6 +2142,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 28,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 27,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'text',
@@ -2028,6 +2254,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 9,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 46,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2119,6 +2351,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 29,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 21,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -2223,6 +2465,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 21,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'license',
+        'settings' => array(),
+        'type' => 'license_formatter',
+        'weight' => 24,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'license',
@@ -2319,6 +2568,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 22,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'license',
+        'settings' => array(),
+        'type' => 'license_formatter',
+        'weight' => 23,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'license',
@@ -2414,6 +2670,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'colorbox' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 1,
       ),
       'community_record' => array(
         'label' => 'hidden',
@@ -2536,6 +2802,16 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 5,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -2626,6 +2902,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 26,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
         'weight' => 26,
       ),
       'community_record' => array(
@@ -2726,6 +3012,13 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'A reference to one or many related digital heritage items.',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(),
+        'type' => 'entityreference_entity_id',
+        'weight' => 9,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2822,6 +3115,16 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'A reference to one or many related dictionary words.',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => 1,
+          'view_mode' => 'search_result',
+        ),
+        'type' => 'entityreference_entity_view',
+        'weight' => 10,
+      ),
       'community_record' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2918,6 +3221,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 37,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 22,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -3020,6 +3330,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 27,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 25,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'text',
@@ -3120,6 +3437,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 23,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 28,
       ),
       'community_record' => array(
         'label' => 'above',
@@ -3222,6 +3549,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
         'weight' => 0,
       ),
       'community_record' => array(
@@ -3327,6 +3661,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 15,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'ds',
+        'settings' => array(
+          'taxonomy_term_link' => 1,
+          'taxonomy_term_separator' => ', ',
+        ),
+        'type' => 'ds_taxonomy_separator',
+        'weight' => 16,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -3431,6 +3775,13 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 19,
       ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'community_record' => array(
         'label' => 'above',
         'module' => 'text',
@@ -3526,6 +3877,13 @@ function ma_digitalheritage_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'colorbox' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 10,
+      ),
       'community_record' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -3620,6 +3978,27 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'colorbox' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 14,
       ),
       'community_record' => array(
         'label' => 'above',

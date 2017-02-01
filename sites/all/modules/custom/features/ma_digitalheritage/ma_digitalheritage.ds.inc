@@ -12,6 +12,21 @@ function ma_digitalheritage_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|colorbox';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'colorbox';
+  $ds_fieldsetting->settings = array(
+    'author' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'author',
+    ),
+  );
+  $export['node|digital_heritage|colorbox'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|digital_heritage|community_record';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'digital_heritage';
@@ -216,6 +231,100 @@ function ma_digitalheritage_ds_custom_fields_info() {
  */
 function ma_digitalheritage_ds_layout_settings_info() {
   $export = array();
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|digital_heritage|colorbox';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'digital_heritage';
+  $ds_layout->view_mode = 'colorbox';
+  $ds_layout->layout = 'ds_2col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_summary',
+        2 => 'field_media_asset',
+        3 => 'field_description',
+        4 => 'body',
+        5 => 'field_tk_body',
+        6 => 'field_people',
+        7 => 'field_coverage',
+        8 => 'field_coverage_description',
+        9 => 'field_related_dh_items',
+        10 => 'field_transcription',
+        11 => 'field_related_dictionary_words',
+      ),
+      'right' => array(
+        1 => 'author',
+        12 => 'field_community_ref',
+        13 => 'og_group_ref',
+        14 => 'field_category',
+        15 => 'field_tags',
+        16 => 'field_collection',
+        17 => 'field_date',
+        18 => 'field_creator',
+        19 => 'field_contributor',
+        20 => 'field_language',
+        21 => 'field_rights',
+        22 => 'field_licence_trad',
+        23 => 'field_licence_std_cc',
+        24 => 'field_source',
+        25 => 'field_publisher',
+        26 => 'field_identifier',
+        27 => 'field_subject',
+        28 => 'field_dh_type',
+        29 => 'field_format',
+      ),
+    ),
+    'fields' => array(
+      'field_summary' => 'left',
+      'author' => 'right',
+      'field_media_asset' => 'left',
+      'field_description' => 'left',
+      'body' => 'left',
+      'field_tk_body' => 'left',
+      'field_people' => 'left',
+      'field_coverage' => 'left',
+      'field_coverage_description' => 'left',
+      'field_related_dh_items' => 'left',
+      'field_transcription' => 'left',
+      'field_related_dictionary_words' => 'left',
+      'field_community_ref' => 'right',
+      'og_group_ref' => 'right',
+      'field_category' => 'right',
+      'field_tags' => 'right',
+      'field_collection' => 'right',
+      'field_date' => 'right',
+      'field_creator' => 'right',
+      'field_contributor' => 'right',
+      'field_language' => 'right',
+      'field_rights' => 'right',
+      'field_licence_trad' => 'right',
+      'field_licence_std_cc' => 'right',
+      'field_source' => 'right',
+      'field_publisher' => 'right',
+      'field_identifier' => 'right',
+      'field_subject' => 'right',
+      'field_dh_type' => 'right',
+      'field_format' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['node|digital_heritage|colorbox'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
