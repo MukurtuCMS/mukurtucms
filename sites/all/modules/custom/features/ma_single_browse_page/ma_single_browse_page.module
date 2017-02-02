@@ -131,13 +131,18 @@ function ma_single_browse_page_search_api_query_alter(SearchApiQueryInterface $q
       // Sort map
       $sort_map = array(
         'title' => array(
-          'sort_title' => 'ASC',
+          'sort' => 'sort_title',
         ),
         'changed' => array(
-          'changed' => 'DESC'
+          'sort' => 'changed',
+          'reverse' => TRUE,
         ),
       );
-      $query->sort(key($sort_map[$arg_sort]), $sort_map[$arg_sort]);
+      $sort_direction = 'ASC';
+      if ($sort_map[$arg_sort]['reverse']) {
+        $sort_direction = 'DESC';
+      }
+      $query->sort($sort_map[$arg_sort]['sort'], $sort_direction);
     }
   }
 }
