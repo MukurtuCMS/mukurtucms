@@ -5,7 +5,7 @@
 * [What is Mukurtu?] (#whatis)
 * [License](#license)
 * [Availability](#availability)
-  * [Hosted through Mukurtu.net] (#mukurtu-hosted)
+  * [Vendor Hosted] (#vendor-hosted)
   * [Self-Hosted] (#self-hosted)
     * [System Requirements] (#system-requirements)
     * [Installation] (#installation)
@@ -42,8 +42,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ### <a name="availability"></a>Availability
 
-#### <a name="mukurtu-hosted">Hosted through Mukurtu.net
-Mukurtu is available through Mukurtu.net’s MAAS (Mukurtu as a service) for an out-of-the-box hosted Mukurtu CMS website that is completely yours. To get in touch with Mukurtu.net and check out our other services, including training and configuration, go to http://mukurtu.net.
+#### <a name="vendor-hosted"></a> Vendor Hosted
+Most commercial webhosting companies will be able to host a Mukurtu CMS site but Reclaim Hosting (http://reclaimhosting.com) has a simple one-touch install option for Mukurtu CMS.
 
 #### <a name="self-hosted"></a>Self-Hosted
 Mukurtu CMS is available as an open source distribution through https://github.com/mukurtucms/mukurtucms to run on a local server or install on your preferred web platform.
