@@ -18,15 +18,20 @@ function _partial_date_field_info() {
       // Includes each component and any, any_form, and any_to.
       'minimum_components' => array(),
     ),
+    'property_callbacks' => array(
+      'partial_date_property_info_callback',
+    ),
   );
   return array(
     'partial_date' => $base + array(
       'label' => t('Partial date and time'),
       'description' => t('This field stores and renders partial dates.'),
+      'property_type' => 'partial_date',
     ),
     'partial_date_range' => $base + array(
       'label' => t('Partial date and time range'),
       'description' => t('This field stores and renders partial dates.'),
+      'property_type' => 'partial_date_range',
     ),
   );
 }
