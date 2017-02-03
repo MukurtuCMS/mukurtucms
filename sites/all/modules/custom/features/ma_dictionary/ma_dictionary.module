@@ -402,6 +402,35 @@ function ma_dictionary_entity_delete($entity, $type) {
 }
 
 /**
+ * Implements hook_node_delete
+ */
+function ma_dictionary_node_delete($node) {
+    // CER isn't removing references from Word Lists when dictionary words are deleted, do that here
+    if($node->type == 'dictionary_word') {
+        if(isset($node->field_word_list)) {
+            $word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        } else {
+            $word_lists = array();
+        }
+
+        // These are the word lists the word is being removed from. Load each and remove the reference
+        foreach($word_lists as $removed_word_list_nid) {
+            entity_get_controller('node')->resetCache(array($removed_word_list_nid));
+            $word_list = node_load($removed_word_list_nid);
+
+            if($word_list) {
+                foreach($word_list->field_words[LANGUAGE_NONE] as $key => $word_list_word) {
+                    if($word_list_word['target_id'] == $node->nid) {
+                        unset($word_list->field_words[LANGUAGE_NONE][$key]);
+                        node_save($word_list);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * Implements hook_node_access
  */
 function ma_dictionary_node_access($node, $op, $account) {
@@ -474,110 +503,18 @@ function ma_dictionary_node_presave($node) {
 }
 
 /**
- * Implements hook_node_update.
- */
-function ma_dictionary_node_update($node) {
-    if($node->type == 'dictionary_word') {
-        // If the word had any changes in word lists, sync those up here
-        if(isset($node->field_word_list)) {
-            $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
-        } else {
-            $current_word_lists = array();
-        }
-        $old_word_lists = _ma_dictionary_flatten_reference_field($node->original->field_word_list);
-        $no_change = array_intersect($current_word_lists, $old_word_lists);
-
-        $added = array_diff($current_word_lists, $no_change);
-        $removed = array_diff($old_word_lists, $no_change);
-
-        // These are the word lists the word is being added to. Load each word list and create the opposite relationship
-        foreach($added as $added_word_list_nid) {
-            entity_get_controller('node')->resetCache(array($added_word_list_nid));
-            $word_list = node_load($added_word_list_nid);
-            $already_exists = FALSE;
-            if($word_list) {
-                // Check all existing words, don't add the node reference if it already exists
-                foreach($word_list->field_words[LANGUAGE_NONE] as $word_list_word) {
-                    if($word_list_word['target_id'] == $node->nid) {
-                        $already_exists = TRUE;
-                    }
-                }
-
-                // Add the reference
-                if(!$already_exists) {
-                    $word_list->field_words[LANGUAGE_NONE][] = array('target_id' => $node->nid);
-                    node_save($word_list);
-                }
-            }
-        }
-
-        // These are the word lists the word is being removed from. Load each and remove the reference
-        foreach($removed as $removed_word_list_nid) {
-            entity_get_controller('node')->resetCache(array($removed_word_list_nid));
-            $word_list = node_load($removed_word_list_nid);
-
-            if($word_list) {
-                foreach($word_list->field_words[LANGUAGE_NONE] as $key => $word_list_word) {
-                    if($word_list_word['target_id'] == $node->nid) {
-                        unset($word_list->field_words[LANGUAGE_NONE][$key]);
-                        node_save($word_list);
-                    }
-                }
-            }
-        }
-    }
-
-    if($node->type == 'word_list') {
-        $current_words = _ma_dictionary_flatten_reference_field($node->field_words);
-        $old_words = _ma_dictionary_flatten_reference_field($node->original->field_words);
-        $no_change = array_intersect($current_words, $old_words);
-
-        $added = array_diff($current_words, $no_change);
-        $removed = array_diff($old_words, $no_change);
-
-        // Add words to the word list
-        foreach($added as $added_word_nid) {
-            entity_get_controller('node')->resetCache(array($added_word_nid));
-            $word = node_load($added_word_nid);
-            $already_exists = FALSE;
-            if($word) {
-                // Check all existing word lists, don't add the node reference if it already exists
-                if(!empty($word->field_word_list)) {
-                    foreach($word->field_word_list[LANGUAGE_NONE] as $word_list) {
-                        if($word_list['target_id'] == $node->nid) {
-                            $already_exists = TRUE;
-                        }
-                    }
-                }
-
-                // Add the reference
-                if(!$already_exists) {
-                    $word->field_word_list[LANGUAGE_NONE][] = array('target_id' => $node->nid);
-                    node_save($word);
-                }
-            }
-        }
-
-        // Remove words
-        foreach($removed as $removed_word_nid) {
-            entity_get_controller('node')->resetCache(array($removed_word_nid));
-            $word = node_load($removed_word_nid);
-            if($word) {
-                foreach($word->field_word_list[LANGUAGE_NONE] as $key => $word_list) {
-                    if($word_list['target_id'] == $node->nid) {
-                        unset($word->field_word_list[LANGUAGE_NONE][$key]);
-                        node_save($word);
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
  * Implements hook_feeds_processor_targets_alter().
  */
 function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'word_list') {
+        $targets['field_words:guid_or_nid'] = array(
+            'name' => t('Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Words of field_words matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_words',
+        );
+    }
+
     if($entity_type == 'node' && $bundle_name == 'dictionary_word') {
         $targets['field_related_dictionary_words:guid_or_nid'] = array(
             'name' => t('Related Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
