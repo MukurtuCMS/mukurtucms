@@ -57,17 +57,18 @@ function ma_single_browse_page_block_view($delta = '') {
     case 'single_browse_page_filters':
       $block['subject'] = t('Filters');
 
-      $search_form_block  = module_invoke('views', 'block_view','-exp-digital_heritage_grid_list-single_browse_page_dh_list');
+      $search_form_block = module_invoke('views', 'block_view', '-exp-digital_heritage_grid_list-single_browse_page_dh_list');
       $block['content'] = '<h4>' . 'Search' . '</h4>' . render($search_form_block['content']);
 
       $facets_map = array_flip(facetapi_get_delta_map());
-      $facet_name_prefix = 'search_api@default_node_index:block:field_';
-      $facets_to_render = array (
-        'community_ref' => 'Community',
-        'collection' => 'Collection',
-        'category' => 'Category',
-        'media_asset%3Atype' => 'Media Type',
-        'tags' => 'Keywords'
+      $facet_name_prefix = 'search_api@default_node_index:block:';
+      $facets_to_render = array(
+        'field_community_ref' => 'Community',
+        'field_collection' => 'Collection',
+        'field_category' => 'Category',
+        'dh_original_year' => 'Original Year',
+        'field_media_asset%3Atype' => 'Media Type',
+        'field_tags' => 'Keywords'
       );
       foreach ($facets_to_render as $facet => $facet_title) {
         $facet_block = module_invoke('facetapi', 'block_view', $facets_map[$facet_name_prefix . $facet]);
