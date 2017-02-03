@@ -310,7 +310,7 @@ function ma_dictionary_form_node_delete_confirm_alter(&$form, &$form_state) {
 function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
     if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
         // If no alternate spelling is given, put the standard term in
-        if(empty($entity->field_alternate_spelling)) {
+        if(empty($entity->field_alternate_spelling) || $entity->field_alternate_spelling[LANGUAGE_NONE][0]['value'] == '') {
             // Lookup the parent dictionary word node
             $query = new EntityFieldQuery();
             $query->entityCondition('entity_type', 'node')
@@ -750,6 +750,11 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
     // If not, Drupal will have created us an empty word entry, so we just need to fill in the values
     if($first_word_entry == NULL) {
         $first_word_entry = $entity->field_word_entry[LANGUAGE_NONE][0]['entity'];
+
+        // For brand new words, we can safely exit now on empty values
+        if(empty($value) || empty($value[0])) {
+            return;
+        }
     }
 
     $first_word_entry_wrapper = entity_metadata_wrapper('paragraphs_item', $first_word_entry);
