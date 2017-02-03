@@ -346,11 +346,22 @@ function ma_search_api_entity_property_info_alter(&$info) {
     'type'            => 'text',
     'label'           => t('Title (sort)'),
     'sanitized'       => TRUE,
-    'getter callback' => 'ma_search_api_getter_callback',
+    'getter callback' => 'ma_search_api_getter_callback_title',
+  );
+  $info['node']['properties']['dh_original_year'] = array(
+    'type'            => 'integer',
+    'label'           => t('DH Original Year'),
+    'sanitized'       => TRUE,
+    'getter callback' => 'ma_search_api_getter_callback_dh_original_year',
   );
 }
 
-function ma_search_api_getter_callback($item) {
+function ma_search_api_getter_callback_title($item) {
   return $item->title;
 }
 
+function ma_search_api_getter_callback_dh_original_year($item) {
+  if (isset($item->field_original_date[LANGUAGE_NONE][0]['from']['year'])) {
+    return $item->field_original_date[LANGUAGE_NONE][0]['from']['year'];
+  }
+}
