@@ -125,6 +125,106 @@ function ma_dictionary_feeds_importer_default() {
   $feeds_importer = new stdClass();
   $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
   $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_dictionary_word_lists';
+  $feeds_importer->config = array(
+    'name' => 'Import Dictionary Word Lists',
+    'description' => '',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'txt csv tsv xml opml',
+        'direct' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'encoding' => 'UTF-8',
+        'no_headers' => 0,
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsNodeProcessor',
+      'config' => array(
+        'expire' => '-1',
+        'author' => 0,
+        'authorize' => 1,
+        'mappings' => array(
+          0 => array(
+            'source' => 'NID',
+            'target' => 'nid',
+            'unique' => 1,
+            'language' => 'und',
+          ),
+          1 => array(
+            'source' => 'GUID',
+            'target' => 'guid',
+            'unique' => 1,
+            'language' => 'und',
+          ),
+          2 => array(
+            'source' => 'Title',
+            'target' => 'title',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          3 => array(
+            'source' => 'Summary',
+            'target' => 'field_collection_summary',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          4 => array(
+            'source' => 'Description',
+            'target' => 'field_description',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          5 => array(
+            'source' => 'Image',
+            'target' => 'field_collection_image',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          6 => array(
+            'source' => 'Credit',
+            'target' => 'field_collection_credit',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          7 => array(
+            'source' => 'Words',
+            'target' => 'field_words:guid_or_nid',
+            'unique' => FALSE,
+          ),
+        ),
+        'insert_new' => '1',
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'input_format' => 'plain_text',
+        'skip_hash_check' => 0,
+        'bundle' => 'word_list',
+        'language' => 'und',
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_dictionary_word_lists'] = $feeds_importer;
+
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
   $feeds_importer->id = 'import_dictionary_words';
   $feeds_importer->config = array(
     'name' => 'Import Dictionary Words',

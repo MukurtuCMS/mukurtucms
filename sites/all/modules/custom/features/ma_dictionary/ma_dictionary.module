@@ -578,6 +578,15 @@ function ma_dictionary_node_update($node) {
  * Implements hook_feeds_processor_targets_alter().
  */
 function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'word_list') {
+        $targets['field_words:guid_or_nid'] = array(
+            'name' => t('Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Words of field_words matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_words',
+        );
+    }
+
     if($entity_type == 'node' && $bundle_name == 'dictionary_word') {
         $targets['field_related_dictionary_words:guid_or_nid'] = array(
             'name' => t('Related Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
