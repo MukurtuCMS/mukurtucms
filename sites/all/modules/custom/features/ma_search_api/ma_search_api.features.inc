@@ -208,6 +208,7 @@ function ma_search_api_default_search_api_index() {
         "changed" : { "type" : "date" },
         "comment_count" : { "type" : "integer" },
         "created" : { "type" : "date" },
+        "dh_original_year" : { "type" : "integer" },
         "field_book_children:author" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "user" },
         "field_book_children:body:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_category" : {
@@ -266,6 +267,7 @@ function ma_search_api_default_search_api_index() {
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
+        "field_original_date:timestamp" : { "type" : "integer" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
@@ -770,6 +772,18 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "search_api_aggregation_2",
             "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_original_date:timestamp" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_original_date_timestamp",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "dh_original_year" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "dh_original_year",
+            "type" : "integer",
             "boost" : "1.0"
           }
         }
