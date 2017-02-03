@@ -144,7 +144,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Assets */
+  /* Field: Content: Media Asset */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -376,7 +376,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
-  /* Filter criterion: Location: Geo Type (indexed) */
+  /* Filter criterion: Broken/missing handler */
   $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
   $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
   $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
@@ -538,7 +538,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
-  /* Filter criterion: Location: Geo Type (indexed) */
+  /* Filter criterion: Broken/missing handler */
   $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
   $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
   $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
@@ -759,7 +759,7 @@ return FALSE;';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: Media Assets */
+  /* Field: Content: Media Asset */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
@@ -799,7 +799,7 @@ return FALSE;';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date old */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -1000,14 +1000,14 @@ return FALSE;';
     t('Select All'),
     t('- Choose an operation -'),
     t('Title'),
-    t('Media Assets'),
+    t('Media Asset'),
     t('Updated date'),
     t('Summary'),
     t('Community'),
     t('Category'),
     t('Creator'),
     t('Contributor'),
-    t('Original Date'),
+    t('Original Date old'),
     t('Collection'),
     t('Category (field_category)'),
     t('Community Record Parent (field_community_record_parent)'),
