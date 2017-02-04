@@ -92,7 +92,13 @@ function ma_single_browse_page_block_view($delta = '') {
  * Returns the render array for the form.
  */
 function ma_single_browse_page_dh_list_sort_form($form, &$form_state) {
-  $sort_options = array('changed' => t('Date changed'), 'title' => t('Title'));
+  $sort_options = array(
+    'newest' => t('Newest'),
+    'oldest' => t('Oldest'),
+    'added' => t('Date Added'),
+    'changed' => t('Date Changed'),
+    'title' => t('Title'),
+  );
   $form['sort'] = array(
     '#type' => 'select',
     '#default_value' => $_SESSION['dh_sort_order'] ?: 'changed',
@@ -136,6 +142,17 @@ function ma_single_browse_page_search_api_query_alter(SearchApiQueryInterface $q
         ),
         'changed' => array(
           'sort' => 'changed',
+          'reverse' => TRUE,
+        ),
+        'added' => array(
+          'sort' => 'created',
+          'reverse' => TRUE,
+        ),
+        'oldest' => array(
+          'sort' => 'field_original_date:timestamp',
+        ),
+        'newest' => array(
+          'sort' => 'field_original_date:timestamp',
           'reverse' => TRUE,
         ),
       );
