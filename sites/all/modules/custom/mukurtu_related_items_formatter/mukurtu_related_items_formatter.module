@@ -54,7 +54,7 @@ function mukurtu_related_items_formatter_field_formatter_settings_summary($field
 */
 function mukurtu_related_items_formatter_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
     $element = array();
-    $output = "";
+    $output = '';
     $settings = $display['settings'];
     $items_per_page = $settings['items_per_page'];
 
@@ -105,7 +105,9 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
         }
     }
 
-    $element[0]['#markup'] = $output;
+    if($output != '') {
+        $element[0]['#markup'] = $output;
+    }
 
     return $element;
 }
