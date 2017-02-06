@@ -1,0 +1,110 @@
+<?php
+/**
+* @file
+* Define Mukurtu specific field formatters
+*
+*/
+
+/**
+* Implements hook_field_formatter_info().
+*/
+function mukurtu_related_items_formatter_field_formatter_info() {
+    return array(
+        'mukurtu_related_items_formatter' => array(
+            'label' => t('Mukurtu Paged Related Items'),
+            'field types' => array('entityreference'),
+            'settings' => array(
+                'items_per_page' => '5',
+            ),
+        ),
+    );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function mukurtu_related_items_formatter_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $element = array();
+    $element['items_per_page'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Items per page'),
+        '#description' => t('Items per page'),
+        '#default_value' => $settings['items_per_page'],
+        '#element_validate' => array('element_validate_integer_positive'),
+    );
+    return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function mukurtu_related_items_formatter_field_formatter_settings_summary($field, $instance, $view_mode) {
+    $display = $instance['display'][$view_mode];
+    $settings = $display['settings'];
+    $summary = t('Display related items using a pager, with @items per page.', array(
+        '@items' => $settings['items_per_page'],
+    ));
+    return $summary;
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function mukurtu_related_items_formatter_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+    $element = array();
+    $output = "";
+    $settings = $display['settings'];
+    $items_per_page = $settings['items_per_page'];
+
+    $options = array(
+        'html' => TRUE,
+        'attributes' => array(
+            'title' => $instance['label'],
+        ),
+    );
+
+    if(!empty($entity->{$field['field_name']})) {
+        $item_count = count($entity->{$field['field_name']}[LANGUAGE_NONE]);
+        $is_community_record = FALSE;
+
+        // Right now the default pager only supports a single pager per page. This can be a problem for
+        // community records, because there are likely multiple records on a page. Until we can write a
+        // custom pager, we will display all related items on community records.
+        if(isset($entity->field_community_record_parent) && !empty($entity->field_community_record_parent[LANGUAGE_NONE])) {
+            $current_page = 0;
+            $page_limit = $item_count;
+            $is_community_record = TRUE;
+        } else {
+            // Total number of referenced entities
+            $current_page = pager_default_initialize($item_count, $items_per_page);
+            $page_limit = $i + $items_per_page;
+        }
+
+        $i = $current_page * $items_per_page;
+
+        // Render each related item
+        while(isset($entity->{$field['field_name']}[LANGUAGE_NONE][$i]) && $i < $page_limit) {
+            $related_item = $entity->{$field['field_name']}[LANGUAGE_NONE][$i];
+            if(node_access('view', $related_item)) {
+                $column = key($field['columns']);
+                $related_item_node = node_load($related_item[$column]);
+                if($related_item_node) {
+                    $render = drupal_render(node_view($related_item_node, 'search_result'));
+                    $output .= $render;
+                }
+            }
+            $i = $i + 1;
+        }
+
+        // Print the pager controls, if it isn't a community record
+        if(!$is_community_record) {
+            $output .= theme('pager', array('quantity', count($items_per_page)));
+        }
+    }
+
+    $element[0]['#markup'] = $output;
+
+    return $element;
+}
