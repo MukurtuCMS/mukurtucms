@@ -31,44 +31,7 @@ function ma_collection_preprocess_views_view(&$vars) {
 function ma_collection_node_view($node, $view_mode) {
   if ($node->type == 'collection') {
 
-    if ($view_mode == 'full') {
-
-      // Rewrite the DH Items reference field as paged, since there can be hundreds. I could find no way to do this (add a pager to a multivalued field) without custom code. I did try using a custom DS field of a view of referenced DH nodes, thus leveraging the view pager, but I was unable to get the view to sort according to the DH item order (and sort order here matters). This seems efficient enough. The one loss is that the pager isn't AJAX, whereas the views pager is. If we need that, switch back to that method and do a view alter to reorder the items in code.
-
-      $dh_items_per_page = 10;
-
-      // Build the array of all DH items
-      if (isset($node->field_digital_heritage_items[LANGUAGE_NONE])) {
-        $all_dh_items = array();
-        foreach ($node->field_digital_heritage_items[LANGUAGE_NONE] as $index => $dh_item) {
-          unset ($node->content['field_digital_heritage_items'][$index]); // Start rewriting the field by removing the existing DH items
-          if (node_access('view', $dh_item['entity'])) {
-            $dh_node = node_view($dh_item['entity'], 'search_result');
-            $all_dh_items[] = drupal_render($dh_node); // Need to render here as opposed to using "rendered entity" in the DS display, as that will attemt to render them *after* this hook runs
-          }
-        }
-
-        // Initialise the pager
-        $current_page = pager_default_initialize(count($all_dh_items), $dh_items_per_page);
-
-        // Split all DH items into pages
-        $pages = array_chunk($all_dh_items, $dh_items_per_page, TRUE);
-
-        // Print the DH items for the current page
-        $output = "";
-        foreach ($pages[$current_page] as $dh_item_to_display) {
-          $output .= $dh_item_to_display;
-        }
-
-        // Print the pager
-        $output .= theme('pager', array('quantity', count($dh_items_per_page)));
-
-        // Rewrite the field output
-        $node->content['field_digital_heritage_items'][0]['#markup'] = $output;
-      }
-    }
-
-    elseif ($view_mode == 'search_result') {
+      if ($view_mode == 'search_result') {
 
       // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use the first available image atom from the Digital Heritage items in that Collection. If none of the DH items have an image atom, use the thumbnail from the first available non-image atom from the DH items in that Collection. If that atom does not have an uploaded thumbnail, use the default thumbnail for that atom type.
 
