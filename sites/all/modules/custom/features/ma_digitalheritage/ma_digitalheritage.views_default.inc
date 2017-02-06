@@ -406,6 +406,9 @@ function ma_digitalheritage_views_default_views() {
 
   /* Display: Single Browse Page List */
   $handler = $view->new_display('panel_pane', 'Single Browse Page List', 'single_browse_page_dh_list');
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['style_options']['row_class'] = 'sync-id-[nid]';
@@ -442,7 +445,7 @@ function ma_digitalheritage_views_default_views() {
     ),
   );
   $handler->display->display_options['style_options']['map'] = 'osm-landscape';
-  $handler->display->display_options['style_options']['map_height'] = '600';
+  $handler->display->display_options['style_options']['map_height'] = '100vh';
   $handler->display->display_options['style_options']['ip_geoloc_views_plugin_latitude'] = array(
     'field_coverage' => 'field_coverage',
   );
