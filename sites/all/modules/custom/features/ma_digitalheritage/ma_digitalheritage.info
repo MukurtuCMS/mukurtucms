@@ -31,6 +31,7 @@ dependencies[] = mediafield
 dependencies[] = menu
 dependencies[] = mukurtu_custom
 dependencies[] = mukurtu_mods
+dependencies[] = mukurtu_related_items_formatter
 dependencies[] = node
 dependencies[] = node_reference
 dependencies[] = og

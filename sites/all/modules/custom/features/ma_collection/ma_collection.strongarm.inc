@@ -92,6 +92,12 @@ function ma_collection_strongarm() {
       'thumbed' => array(
         'custom_settings' => FALSE,
       ),
+      'community_record' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
