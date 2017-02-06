@@ -76,13 +76,13 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
             $current_page = 0;
             $page_limit = $item_count;
             $is_community_record = TRUE;
+            $i = 0;
         } else {
             // Total number of referenced entities
             $current_page = pager_default_initialize($item_count, $items_per_page);
+            $i = $current_page * $items_per_page;
             $page_limit = $i + $items_per_page;
         }
-
-        $i = $current_page * $items_per_page;
 
         // Render each related item
         while(isset($entity->{$field['field_name']}[LANGUAGE_NONE][$i]) && $i < $page_limit) {
