@@ -2455,9 +2455,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'display' => array(
       'community_record' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 41,
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 9,
       ),
       'default' => array(
         'label' => 'above',
@@ -2470,9 +2473,11 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(),
-        'type' => 'entityreference_entity_id',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 9,
       ),
       'map_popup' => array(
@@ -2541,9 +2546,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'display' => array(
       'community_record' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 10,
       ),
       'default' => array(
         'label' => 'above',
@@ -2556,12 +2564,11 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'links' => 1,
-          'view_mode' => 'search_result',
+          'items_per_page' => 5,
         ),
-        'type' => 'entityreference_entity_view',
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 10,
       ),
       'map_popup' => array(
