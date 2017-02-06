@@ -67,6 +67,7 @@ function ma_single_browse_page_block_view($delta = '') {
         'field_collection' => 'Collection',
         'field_category' => 'Category',
         'dh_original_year' => 'Original Year',
+        'field_dh_type' => 'Type',
         'field_media_asset%3Atype' => 'Media Type',
         'field_tags' => 'Keywords'
       );

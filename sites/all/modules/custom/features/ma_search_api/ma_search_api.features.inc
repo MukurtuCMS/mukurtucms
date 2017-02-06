@@ -193,6 +193,7 @@ function ma_search_api_default_search_api_index() {
         "field_creator:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_date" : { "type" : "text" },
         "field_description:value" : { "type" : "text" },
+        "field_dh_type" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
@@ -712,6 +713,12 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "dh_original_year",
             "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_dh_type" : {
+            "table" : "search_api_db_default_node_index_field_dh_type",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }
