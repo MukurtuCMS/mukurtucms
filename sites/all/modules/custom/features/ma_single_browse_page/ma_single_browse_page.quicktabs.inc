@@ -40,13 +40,21 @@ function ma_single_browse_page_quicktabs_default_quicktabs() {
       'weight' => '-98',
       'type' => 'block',
     ),
+    3 => array(
+      'bid' => 'ma_single_browse_page_delta_single_browse_page_content_tab',
+      'hide_title' => 1,
+      'title' => 'Content',
+      'weight' => '-97',
+      'type' => 'block',
+    ),
   );
   $quicktabs->renderer = 'quicktabs';
-  $quicktabs->style = 'Excel';
+  $quicktabs->style = 'default';
   $quicktabs->options = array();
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Content');
   t('Filters');
   t('Items');
   t('Legend');

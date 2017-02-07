@@ -38,6 +38,9 @@ function ma_single_browse_page_block_info() {
   $blocks['single_browse_page_list_and_sort'] = array(
     'info' => t('Single Browse Page List View with sort Form'),
   );
+  $blocks['single_browse_page_content_tab'] = array(
+    'info' => t('Single Browse Page Content Tab'),
+  );
   return $blocks;
 }
 
@@ -84,6 +87,37 @@ function ma_single_browse_page_block_view($delta = '') {
       $block['content'] .= drupal_render(drupal_get_form('ma_single_browse_page_dh_list_sort_form'));
       $block['content'] .= views_embed_view('digital_heritage_grid_list', 'single_browse_page_dh_list');
       break;
+
+    case 'single_browse_page_content_tab':
+      $content = '';
+
+      $options =  array(
+        'query' =>  array(
+          'destination' => '',
+        ),
+        'attributes' => array(
+          'class' => 'colorbox-node',
+          //'data-inner-width' => "100%",
+          //'data-inner-height' => "100%"
+        )
+      );
+
+      global $user;
+      if (!$user->uid) {
+        
+        $content .= l ('Register', 'user/register', $options);
+        $content .= "<br />" . l ('Login', 'user/login', $options);
+        $content .= "<br />" . l ('Request new password', 'user/login', $options);
+
+      }
+      else {
+        $content .= l ('Logout', 'user/logout');
+        $content .= "<br />" . l ('Profile', 'user/' . $user->uid, $options);
+      }
+
+      $block['content'] = $content;
+      break;
+
 
   }
   return $block;
