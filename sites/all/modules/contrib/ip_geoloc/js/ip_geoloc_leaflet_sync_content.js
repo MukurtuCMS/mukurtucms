@@ -57,16 +57,23 @@ L.Sync =  L.Class.extend({
     this.removeClass(marker, L.Sync.SYNCED_CONTENT_HOVER);
   },
 
-  syncContentToMarker: function(contentSelector, marker) {
+  syncContentToMarker: function(contentSelector, marker, contentClass) {
     marker.on('click', function(event) {
+      // Apply highlight to list view item
       jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
+      // Jump to list view item
+      var dhItem = document.getElementsByClassName(contentClass);
+      var topPos = dhItem[0].offsetTop;
+      document.getElementById('single-browse-page-right-column').scrollTop = topPos;
+
     });
     marker.on('mouseout', function(event) {
+      // Remove highlight of list view item
       jQuery(contentSelector).removeClass(L.Sync.SYNCED_MARKER_HOVER);
     });
   },
 
-  syncMarkerToContent: function(contentSelector, marker) {
+  syncMarkerToContent: function(contentSelector, marker, contentClass) {
     var sync = this;
 
     marker.on('popupclose', function(event) {
@@ -219,13 +226,14 @@ jQuery(document).bind('leaflet.map', function(event, map, lMap) {
     var marker = allMarkers[i];
     if (marker.flags) {
       // A CSS class, not an ID as multiple markers may be attached to same node.
-      var contentSelector = ".sync-id-" + marker.feature_id;
+      var contentClass = "sync-id-" + marker.feature_id
+      var contentSelector = "." + contentClass;
 
       if (marker.flags & L.Sync.SYNC_CONTENT_TO_MARKER) {
-        sync.syncContentToMarker(contentSelector, marker);
+        sync.syncContentToMarker(contentSelector, marker, contentClass);
       }
       if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT) {
-        sync.syncMarkerToContent(contentSelector, marker);
+        sync.syncMarkerToContent(contentSelector, marker, contentClass);
       }
       marker.on('add', function(event) {
         event.target.addedViaSync = false;
