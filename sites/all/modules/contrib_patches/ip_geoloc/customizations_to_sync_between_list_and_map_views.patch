@@ -1,0 +1,118 @@
+diff --git a/js/ip_geoloc_leaflet_sync_content.js b/js/ip_geoloc_leaflet_sync_content.js
+index 7090bed..785b585 100644
+--- a/js/ip_geoloc_leaflet_sync_content.js
++++ b/js/ip_geoloc_leaflet_sync_content.js
+@@ -57,16 +57,25 @@ L.Sync =  L.Class.extend({
+     this.removeClass(marker, L.Sync.SYNCED_CONTENT_HOVER);
+   },
+ 
+-  syncContentToMarker: function(contentSelector, marker) {
+-    marker.on('mouseover', function(event) {
++  syncContentToMarker: function(contentSelector, marker, contentClass) {
++    marker.on('click', function(event) {
++      // Switch to list view tab in case not already on it
++      jQuery('#quicktabs-tab-single_browse_page_right_column-0').click();
++      // Apply highlight to list view item
+       jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
++      // Jump to list view item
++      var dhItem = document.getElementsByClassName(contentClass);
++      var topPos = dhItem[0].offsetTop;
++      document.getElementById('single-browse-page-right-column').scrollTop = topPos;
++
+     });
+     marker.on('mouseout', function(event) {
++      // Remove highlight of list view item
+       jQuery(contentSelector).removeClass(L.Sync.SYNCED_MARKER_HOVER);
+     });
+   },
+ 
+-  syncMarkerToContent: function(contentSelector, marker) {
++  syncMarkerToContent: function(contentSelector, marker, contentClass) {
+     var sync = this;
+ 
+     marker.on('popupclose', function(event) {
+@@ -82,7 +91,7 @@ L.Sync =  L.Class.extend({
+     });
+ 
+     // Using bind() as D7 core's jQuery is old and does not support on()
+-    jQuery(contentSelector).bind('mouseover', function(event) {
++    jQuery(contentSelector).bind('click', function(event) {
+       sync.handleContentMouseOver(marker);
+     });
+   },
+@@ -99,30 +108,35 @@ L.Sync =  L.Class.extend({
+     }
+     marker.addedViaSync = addedViaSync || marker.addedViaSync;
+ 
+-    var point = marker.getLatLngs ? marker.getLatLngs()[0] : marker.getLatLng();
+-    if (!this.map.getBounds().contains(point)) {
+-      this.map.panTo(point);
+-    }
+-    // Make geometry visible, in case it was hidden.
+-    this.show(marker);
+-    this.highlight(marker);
++    // This section re-worked by Kanopi
++    var point = marker.getLatLngs ? marker.getLatLngs()[0][0] : marker.getLatLng();
++    this.map.setView(point, 15); // 15 zoom level for points
+ 
+-    if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT_WITH_POPUP) {
+-      if (marker._icon) {
+-        // Adjust popup position for markers, not other geometries.
+-        if (!this.popupOffsetY) {
+-          this.popupOffsetY = marker._popup.options.offset.y;
+-        }
+-        marker._popup.options.offset.y = this.popupOffsetY - 20;
+-      }
+-      marker.openPopup();
+-    }
+-    if (marker._icon && marker._icon.style) {
+-      // This does NOT work in most browsers.
+-      marker._bringToFront();
+-      marker.setZIndexOffset(9999);
++    if (marker.getBounds) {
++      var bounds = marker.getBounds();
++      this.map.fitBounds(bounds); // non-points get zoomed to fitbounds
+     }
+-    this.lastMarker = marker;
++
++    // Make geometry visible, in case it was hidden.
++    //this.show(marker);
++    //this.highlight(marker);
++
++    // if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT_WITH_POPUP) {
++    //   if (marker._icon) {
++    //     // Adjust popup position for markers, not other geometries.
++    //     if (!this.popupOffsetY) {
++    //       this.popupOffsetY = marker._popup.options.offset.y;
++    //     }
++    //     marker._popup.options.offset.y = this.popupOffsetY - 20;
++    //   }
++    //   marker.openPopup();
++    // }
++    // if (marker._icon && marker._icon.style) {
++    //   // This does NOT work in most browsers.
++    //   marker._bringToFront();
++    //   marker.setZIndexOffset(9999);
++    // }
++    // this.lastMarker = marker;
+   },
+ 
+   addClass: function(marker, className) {
+@@ -214,13 +228,14 @@ jQuery(document).bind('leaflet.map', function(event, map, lMap) {
+     var marker = allMarkers[i];
+     if (marker.flags) {
+       // A CSS class, not an ID as multiple markers may be attached to same node.
+-      var contentSelector = ".sync-id-" + marker.feature_id;
++      var contentClass = "sync-id-" + marker.feature_id
++      var contentSelector = "." + contentClass;
+ 
+       if (marker.flags & L.Sync.SYNC_CONTENT_TO_MARKER) {
+-        sync.syncContentToMarker(contentSelector, marker);
++        sync.syncContentToMarker(contentSelector, marker, contentClass);
+       }
+       if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT) {
+-        sync.syncMarkerToContent(contentSelector, marker);
++        sync.syncMarkerToContent(contentSelector, marker, contentClass);
+       }
+       marker.on('add', function(event) {
+         event.target.addedViaSync = false;
