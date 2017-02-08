@@ -59,6 +59,8 @@ L.Sync =  L.Class.extend({
 
   syncContentToMarker: function(contentSelector, marker, contentClass) {
     marker.on('click', function(event) {
+      // Switch to list view tab in case not already on it
+      jQuery('#quicktabs-tab-single_browse_page_right_column-0').click();
       // Apply highlight to list view item
       jQuery(contentSelector).addClass(L.Sync.SYNCED_MARKER_HOVER);
       // Jump to list view item
