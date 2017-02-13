@@ -28,6 +28,7 @@ dependencies[] = entity_delete_log
 dependencies[] = entity_delete_log_og
 dependencies[] = exif
 dependencies[] = features
+dependencies[] = features_override
 dependencies[] = feeds
 dependencies[] = feeds_tamper
 dependencies[] = feeds_tamper_ui

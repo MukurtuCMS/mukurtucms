@@ -303,6 +303,7 @@ function ma_core_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 1,
