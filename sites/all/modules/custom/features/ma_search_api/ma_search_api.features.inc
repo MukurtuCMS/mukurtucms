@@ -18,6 +18,145 @@ function ma_search_api_ctools_plugin_api($module = NULL, $api = NULL) {
  */
 function ma_search_api_default_search_api_index() {
   $items = array();
+  $items['community_record_index'] = entity_import('search_api_index', '{
+    "name" : "Community Record Index",
+    "machine_name" : "community_record_index",
+    "description" : null,
+    "server" : "search_api_db_server",
+    "item_type" : "node",
+    "options" : {
+      "datasource" : { "bundles" : [ "digital_heritage" ] },
+      "index_directly" : 0,
+      "cron_limit" : "50",
+      "fields" : {
+        "author" : { "type" : "integer", "entity_type" : "user" },
+        "changed" : { "type" : "date" },
+        "created" : { "type" : "date" },
+        "field_category" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_community_record_parent" : { "type" : "integer", "entity_type" : "node" },
+        "field_contributor" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_creator" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_date" : { "type" : "text" },
+        "field_dh_type" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_format" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_identifier" : { "type" : "text" },
+        "field_item_privacy_setting" : { "type" : "string" },
+        "field_language" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_publisher" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_rights" : { "type" : "text" },
+        "field_source" : { "type" : "text" },
+        "field_subject" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_summary" : { "type" : "text" },
+        "field_tags" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_transcription" : { "type" : "text" },
+        "language" : { "type" : "string" },
+        "nid" : { "type" : "integer" },
+        "promote" : { "type" : "boolean" },
+        "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
+        "search_api_language" : { "type" : "string" },
+        "status" : { "type" : "boolean" },
+        "title" : { "type" : "text" },
+        "title_az_glossary" : { "type" : "string" }
+      },
+      "data_alter_callbacks" : {
+        "search_api_alter_bundle_filter" : {
+          "status" : 0,
+          "weight" : "-10",
+          "settings" : { "default" : "1", "bundles" : [] }
+        },
+        "search_api_alter_node_access" : { "status" : 1, "weight" : "0", "settings" : [] },
+        "search_api_alter_node_status" : { "status" : 0, "weight" : "0", "settings" : [] },
+        "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
+        "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
+        "search_api_alter_add_url" : { "status" : 0, "weight" : "0", "settings" : [] },
+        "search_api_alter_add_aggregation" : { "status" : 0, "weight" : "0", "settings" : [] }
+      },
+      "processors" : {
+        "search_api_case_ignore" : {
+          "status" : 1,
+          "weight" : "0",
+          "settings" : { "fields" : {
+              "title" : true,
+              "field_summary" : true,
+              "field_transcription" : true,
+              "field_date" : true,
+              "field_identifier" : true,
+              "field_rights" : true,
+              "field_source" : true
+            }
+          }
+        },
+        "search_api_html_filter" : {
+          "status" : 1,
+          "weight" : "10",
+          "settings" : {
+            "fields" : {
+              "title" : true,
+              "field_summary" : true,
+              "field_transcription" : true,
+              "field_date" : true,
+              "field_identifier" : true,
+              "field_rights" : true,
+              "field_source" : true
+            },
+            "title" : 0,
+            "alt" : 1,
+            "tags" : "h1 = 5\\r\\nh2 = 3\\r\\nh3 = 2\\r\\nstrong = 2\\r\\nb = 2\\r\\nem = 1.5\\r\\nu = 1.5"
+          }
+        },
+        "search_api_tokenizer" : {
+          "status" : 1,
+          "weight" : "20",
+          "settings" : {
+            "fields" : {
+              "title" : true,
+              "field_summary" : true,
+              "field_transcription" : true,
+              "field_date" : true,
+              "field_identifier" : true,
+              "field_rights" : true,
+              "field_source" : true
+            },
+            "spaces" : "[^[:alnum:]]",
+            "ignorable" : "[\\u0027]"
+          }
+        },
+        "search_api_stopwords" : {
+          "status" : 0,
+          "weight" : "30",
+          "settings" : {
+            "fields" : {
+              "title" : true,
+              "field_summary" : true,
+              "field_transcription" : true,
+              "field_date" : true,
+              "field_identifier" : true,
+              "field_rights" : true,
+              "field_source" : true
+            },
+            "file" : "",
+            "stopwords" : "but\\r\\ndid\\r\\nthe this that those\\r\\netc"
+          }
+        },
+        "search_api_highlighting" : {
+          "status" : 0,
+          "weight" : "35",
+          "settings" : {
+            "prefix" : "\\u003Cstrong\\u003E",
+            "suffix" : "\\u003C\\/strong\\u003E",
+            "excerpt" : 1,
+            "excerpt_length" : "256",
+            "exclude_fields" : [],
+            "highlight" : "always"
+          }
+        }
+      }
+    },
+    "enabled" : "1",
+    "read_only" : "0",
+    "rdf_mapping" : []
+  }');
   $items['default_node_index'] = entity_import('search_api_index', '{
     "name" : "Default node index",
     "machine_name" : "default_node_index",
@@ -162,7 +301,7 @@ function ma_search_api_default_search_api_index() {
         "field_book_children:field_date" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_description:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_dh_type:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_format:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
         "field_book_children:field_identifier" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_language:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
         "field_book_children:field_people" : {
@@ -197,7 +336,7 @@ function ma_search_api_default_search_api_index() {
         "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
-        "field_format:name" : { "type" : "text" },
+        "field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
@@ -256,7 +395,8 @@ function ma_search_api_default_search_api_server() {
       "database" : "default:default",
       "min_chars" : "3",
       "partial_matches" : 0,
-      "indexes" : { "default_node_index" : {
+      "indexes" : {
+        "default_node_index" : {
           "type" : {
             "table" : "search_api_db_default_node_index",
             "column" : "type",
@@ -423,7 +563,7 @@ function ma_search_api_default_search_api_server() {
           },
           "field_format:name" : {
             "table" : "search_api_db_default_node_index_text",
-            "type" : "text",
+            "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           },
           "field_subject:name" : {
@@ -574,7 +714,7 @@ function ma_search_api_default_search_api_server() {
           },
           "field_book_children:field_format:name" : {
             "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
             "boost" : "1.0"
           },
           "field_book_children:field_language:name" : {
@@ -692,6 +832,175 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_related_dictionary_word",
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          }
+        },
+        "community_record_index" : {
+          "nid" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "nid",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "title" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "language" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "language",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "status" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "status",
+            "type" : "boolean",
+            "boost" : "1.0"
+          },
+          "promote" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "promote",
+            "type" : "boolean",
+            "boost" : "1.0"
+          },
+          "created" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "created",
+            "type" : "date",
+            "boost" : "1.0"
+          },
+          "changed" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "changed",
+            "type" : "date",
+            "boost" : "1.0"
+          },
+          "author" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "author",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "title_az_glossary" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "title_az_glossary",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_community_record_parent" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "field_community_record_parent",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_dh_type" : {
+            "table" : "search_api_db_community_record_index_field_dh_type",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_people" : {
+            "table" : "search_api_db_community_record_index_field_people",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_summary" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_transcription" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_category" : {
+            "table" : "search_api_db_community_record_index_field_category",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_contributor" : {
+            "table" : "search_api_db_community_record_index_field_contributor",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_creator" : {
+            "table" : "search_api_db_community_record_index_field_creator",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_date" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_format" : {
+            "table" : "search_api_db_community_record_index_field_format",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_identifier" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_item_privacy_setting" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "field_item_privacy_setting",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_language" : {
+            "table" : "search_api_db_community_record_index_field_language",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_publisher" : {
+            "table" : "search_api_db_community_record_index_field_publisher",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_rights" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_source" : {
+            "table" : "search_api_db_community_record_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_subject" : {
+            "table" : "search_api_db_community_record_index_field_subject",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_tags" : {
+            "table" : "search_api_db_community_record_index_field_tags",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "search_api_language" : {
+            "table" : "search_api_db_community_record_index",
+            "column" : "search_api_language",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "search_api_access_node" : {
+            "table" : "search_api_db_community_record_index_search_api_access_node",
+            "column" : "value",
+            "type" : "list\\u003Cstring\\u003E",
             "boost" : "1.0"
           }
         }

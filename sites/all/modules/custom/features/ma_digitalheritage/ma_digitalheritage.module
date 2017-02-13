@@ -811,8 +811,8 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
   foreach($items as $id => $item){
 
     // Exclude Community Record DH nodes from being indexed
-    if (isset($item->field_community_record_parent[LANGUAGE_NONE])) {
-     unset($items[$id]);
+    if (isset($item->field_community_record_parent[LANGUAGE_NONE]) && $index->machine_name != 'community_record_index') {
+        unset($items[$id]);
     }
 
     // Exclude DH Child pages from being indexed

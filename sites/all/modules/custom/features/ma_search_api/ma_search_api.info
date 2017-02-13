@@ -14,6 +14,7 @@ dependencies[] = search_api_views
 dependencies[] = strongarm
 features[ctools][] = strongarm:strongarm:1
 features[features_api][] = api:2
+features[search_api_index][] = community_record_index
 features[search_api_index][] = default_node_index
 features[search_api_server][] = search_api_db_server
 features[user_permission][] = administer facetapi pretty paths

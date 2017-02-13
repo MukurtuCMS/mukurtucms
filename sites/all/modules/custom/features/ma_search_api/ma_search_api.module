@@ -176,6 +176,15 @@ function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
  * @param type $query
  */
 function ma_search_api_search_api_query_alter($sapi_query) {
+    $keys = $sapi_query->getKeys();
+    $index = $sapi_query->getIndex();
+    if(!isset($index->community_record_search) && !empty($keys)) {
+        $cr_results = ma_search_api_search_community_records($sapi_query);
+        // Clear keys, we want entire result set for this
+        $sapi_query->keys(array());
+    } else {
+        return;
+    }
 
   if (!user_access('bypass content access control')) {
 
@@ -211,19 +220,90 @@ function ma_search_api_search_api_query_alter($sapi_query) {
           ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
           ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
         $result = $dh_query->execute();
-
+        //    dpm($result);
         // Filter our the DH/DW items the user should not see
         if (isset($result['node'])) {
           $dh_dw_nids = array_keys($result['node']);
           # dpm($dh_dw_nids, 'dh/dw nids excluded');
           $filter = $sapi_query->createFilter('AND');
           $filter->condition('nid', $dh_dw_nids, 'NOT IN');
-          $sapi_query->filter($filter);
+          //          $filter->condition('field_community_record_children:nid', $dh_dw_nids, 'NOT IN');
+          //          $sapi_query->filter($filter);
         }
       }
 
     }
   }
+
+  if(!empty($filter)) {
+      if(!empty($cr_results)) {
+          // Both strict/all filter and community record filter
+          $community_record_filter = $sapi_query->createFilter('AND');
+          $community_record_filter->condition('nid', $cr_results, 'IN');
+          $primary_filter = $sapi_query->createFilter('AND');
+          $primary_filter->filter($community_record_filter);
+          $primary_filter->filter($filter);
+          $sapi_query->filter($primary_filter);
+      } else {
+          // Only strict/all filter
+          $sapi_query->filter($filter);
+      }
+  } else {
+      if(!empty($cr_results)) {
+          // Only community record filter
+          $community_record_filter = $sapi_query->createFilter('OR');
+          $community_record_filter->condition('nid', $cr_results, 'IN');
+          $sapi_query->filter($community_record_filter);
+      }
+  }
+}
+
+function ma_search_api_search_community_records($sapi_query) {
+    //    $index = $sapi_query->getIndex();
+    //    $cr_index = search_api_index_load($index->machine_name);
+    $keys = $sapi_query->getKeys();
+
+
+    // Run the normal search, with keys
+    $index = search_api_index_load("default_node_index");
+    $index->community_record_search = TRUE;
+    $query = new SearchApiQuery($index);
+    $query->keys($keys);
+    $standard_data = $query->execute();
+    $standard_results = $standard_data['results'];
+    $standard_nids = array_keys($standard_results);
+
+    // Run the search on community records, this returns ANY matching community records regardless of protocol
+    $cr_index = search_api_index_load("community_record_index");
+    $cr_index->community_record_search = TRUE;
+    $cr_query = new SearchApiQuery($cr_index);
+    $cr_query->keys($keys);
+    $data = $cr_query->execute();
+    $results = array_keys($data['results']);
+
+    // Check CR results for protocol permissions
+    foreach($results as $key => $nid) {
+        $check_node = node_load($nid);
+        if(!node_access('view', $check_node)) {
+            unset($results[$key]);
+        }
+    }
+
+    // Take community record NIDs and look up parents
+    $cr_query = new EntityFieldQuery();
+    $cr_query->entityCondition('entity_type', 'node')
+        ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+        ->entityCondition('bundle', 'digital_heritage')
+        ->fieldCondition('field_community_record_children', 'target_id', $results, 'IN');
+    $cr_result = $cr_query->execute();
+    $cr_nids = array();
+    if (isset($cr_result['node'])) {
+        $cr_nids = array_keys($cr_result['node']);
+    }
+
+    $result = array_merge($standard_nids, $cr_nids);
+
+    return $result;
 }
 
 /**
