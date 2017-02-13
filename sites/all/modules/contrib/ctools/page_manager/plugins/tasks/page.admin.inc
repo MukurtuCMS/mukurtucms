@@ -113,6 +113,9 @@ function page_manager_page_menu(&$items, $task) {
 
     $menu_path = implode('/', $path);
 
+    if(!isset($subtask->menu)) {
+        $subtask->menu = array();
+    }
     $items[$menu_path] = page_manager_page_menu_item($task, $subtask->menu, $access_arguments, $page_arguments, $load_arguments);
 
     // Add a parent menu item if one is configured.
