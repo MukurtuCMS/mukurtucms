@@ -687,52 +687,6 @@ function ma_core_user_default_permissions() {
     'module' => 'user',
   );
 
-  // Exported permission: 'clear import_categories feeds'.
-  $permissions['clear import_categories feeds'] = array(
-    'name' => 'clear import_categories feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_communities feeds'.
-  $permissions['clear import_communities feeds'] = array(
-    'name' => 'clear import_communities feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_cultural_protocols feeds'.
-  $permissions['clear import_cultural_protocols feeds'] = array(
-    'name' => 'clear import_cultural_protocols feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_digital_heritage_metadata_xml feeds'.
-  $permissions['clear import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'clear import_digital_heritage_metadata_xml feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_users feeds'.
-  $permissions['clear import_users feeds'] = array(
-    'name' => 'clear import_users feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
   // Exported permission: 'create article content'.
   $permissions['create article content'] = array(
     'name' => 'create article content',
@@ -1228,52 +1182,6 @@ function ma_core_user_default_permissions() {
     'module' => 'taxonomy',
   );
 
-  // Exported permission: 'import import_categories feeds'.
-  $permissions['import import_categories feeds'] = array(
-    'name' => 'import import_categories feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_communities feeds'.
-  $permissions['import import_communities feeds'] = array(
-    'name' => 'import import_communities feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_cultural_protocols feeds'.
-  $permissions['import import_cultural_protocols feeds'] = array(
-    'name' => 'import import_cultural_protocols feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_digital_heritage_metadata_xml feeds'.
-  $permissions['import import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'import import_digital_heritage_metadata_xml feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_users feeds'.
-  $permissions['import import_users feeds'] = array(
-    'name' => 'import import_users feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
   // Exported permission: 'import media'.
   $permissions['import media'] = array(
     'name' => 'import media',
@@ -1429,51 +1337,6 @@ function ma_core_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'community_tags',
-  );
-
-  // Exported permission: 'tamper import_categories'.
-  $permissions['tamper import_categories'] = array(
-    'name' => 'tamper import_categories',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_communities'.
-  $permissions['tamper import_communities'] = array(
-    'name' => 'tamper import_communities',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_cultural_protocols'.
-  $permissions['tamper import_cultural_protocols'] = array(
-    'name' => 'tamper import_cultural_protocols',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_digital_heritage_metadata_xml'.
-  $permissions['tamper import_digital_heritage_metadata_xml'] = array(
-    'name' => 'tamper import_digital_heritage_metadata_xml',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_users'.
-  $permissions['tamper import_users'] = array(
-    'name' => 'tamper import_users',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
   );
 
   // Exported permission: 'translate content'.
