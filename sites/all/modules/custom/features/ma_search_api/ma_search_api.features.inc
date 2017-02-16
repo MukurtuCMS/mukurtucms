@@ -162,7 +162,7 @@ function ma_search_api_default_search_api_index() {
         "field_book_children:field_date" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_description:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_dh_type:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_children:field_format:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
         "field_book_children:field_identifier" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_language:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
         "field_book_children:field_people" : {
@@ -197,7 +197,7 @@ function ma_search_api_default_search_api_index() {
         "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
-        "field_format:name" : { "type" : "text" },
+        "field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
@@ -211,6 +211,7 @@ function ma_search_api_default_search_api_index() {
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
         "field_transcription" : { "type" : "text" },
+        "field_word_entry:field_alternate_spelling" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_definition" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_part_of_speech" : {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
@@ -423,7 +424,7 @@ function ma_search_api_default_search_api_server() {
           },
           "field_format:name" : {
             "table" : "search_api_db_default_node_index_text",
-            "type" : "text",
+            "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           },
           "field_subject:name" : {
@@ -574,7 +575,7 @@ function ma_search_api_default_search_api_server() {
           },
           "field_book_children:field_format:name" : {
             "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
+            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
             "boost" : "1.0"
           },
           "field_book_children:field_language:name" : {
@@ -692,6 +693,11 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_related_dictionary_word",
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_word_entry:field_alternate_spelling" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           }
         }
