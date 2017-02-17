@@ -726,7 +726,7 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
         $i = 0;
         foreach($value as $part_of_speech) {
             if(!empty($part_of_speech)) {
-                $part_of_speech_term = array_shift(taxonomy_get_term_by_name($part_of_speech, 'part_of_speech'));
+                $part_of_speech_term = ma_core_get_create_tax_term($part_of_speech, 'part_of_speech');
                 if($part_of_speech_term) {
                     $first_word_entry_wrapper->{$target}[$i++] = $part_of_speech_term->tid;
                 }
