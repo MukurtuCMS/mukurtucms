@@ -88,8 +88,8 @@ function ma_dictionary_feeds_importer_default() {
           7 => array(
             'source' => 'Part of Speech',
             'target' => 'field_part_of_speech',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           8 => array(
             'source' => 'Recording',
