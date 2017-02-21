@@ -8,6 +8,17 @@
 include_once 'ma_scald.features.inc';
 
 /**
+ * Implements hook_boot().
+ */
+function ma_scald_boot() {
+  global $conf;
+  // The default scald deletion message doesn't make sense because we hide the fetch checkbox, so we remove that message.
+  $conf['locale_custom_strings_en'][''] = array(
+   '<p>Note that unchecking the Fetch checkbox in the "<em>Openly available actions</em>" field of this atom <a href="!url">edit form</a> makes the atom disappear for everyone but Scald administrators, and is usually a better idea.</p><p>This action cannot be undone.</p>'      => '<p>This action cannot be undone.</p>',
+   );
+}
+
+/**
  * Implements hook_ds_fields_info().
  */
 function ma_scald_ds_fields_info($entity_type) {
