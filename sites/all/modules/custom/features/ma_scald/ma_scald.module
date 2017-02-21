@@ -68,6 +68,8 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
 }
 
 // Return an array of content where the given atom is referenced
+// TODO: This can be an expensive function. We might be able to extend the scald_index module to catch the
+// elements it misses.
 function ma_scald_get_atom_references($atom) {
     if(is_string($atom) && is_numeric($atom)) {
         $atom = scald_atom_load($atom);
