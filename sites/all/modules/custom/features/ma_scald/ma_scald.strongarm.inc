@@ -442,7 +442,7 @@ function ma_scald_strongarm() {
   $strongarm->name = 'scald_atom_defaults';
   $strongarm->value = array(
     'video' => (object) array(
-      'actions' => 7,
+      'actions' => 15,
       'upload_type' => 'plupload',
       'description' => '',
       'thumbnail_source' => 'public://atoms/video.png',
@@ -451,19 +451,19 @@ function ma_scald_strongarm() {
       'thumbnail_source' => 'public://atoms/image.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
     'audio' => (object) array(
       'thumbnail_source' => 'public://atoms/audio.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
     'file' => (object) array(
       'thumbnail_source' => 'public://atoms/thumbnail_default.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
   );
   $export['scald_atom_defaults'] = $strongarm;
