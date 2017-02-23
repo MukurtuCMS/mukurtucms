@@ -28,7 +28,10 @@ function paragraphs_admin_bundle_overview() {
 
     $row = array(
       array(
-        'data' => $bundle->name . ' (' . $bundle->bundle . ')',
+        'data' => format_string('@bundle_name (@bundle_machine_name)', array(
+          '@bundle_name' => $bundle->name,
+          '@bundle_machine_name' => $bundle->bundle,
+        )),
       )
     );
 
@@ -192,7 +195,7 @@ function paragraphs_admin_bundle_form_submit($form, &$form_state) {
   }
   elseif ($status == SAVED_NEW) {
     drupal_set_message(t('The paragraph bundle %name has been added.', $t_args));
-    watchdog('paragraphs', 'Added paragraph bundle %name.', $t_args, WATCHDOG_NOTICE, l(t('view'), 'admin/structure/paragraphs'));
+    watchdog('node', 'Added paragraph bundle %name.', $t_args, WATCHDOG_NOTICE, l(t('view'), 'admin/structure/paragraphs'));
   }
 
   $form_state['redirect'] = 'admin/structure/paragraphs';
@@ -229,7 +232,7 @@ function paragraphs_admin_bundle_delete_form_submit($form, &$form_state) {
 
   $t_args = array('%name' => $form_state['values']['name']);
   drupal_set_message(t('The paragraph bundle %name has been deleted.', $t_args));
-  watchdog('paragraphs', 'Deleted paragraph bundle %name.', $t_args, WATCHDOG_NOTICE);
+  watchdog('node', 'Deleted paragraph bundle %name.', $t_args, WATCHDOG_NOTICE);
 
   $form_state['redirect'] = 'admin/structure/paragraphs';
   return;
