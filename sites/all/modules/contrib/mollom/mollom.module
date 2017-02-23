@@ -45,6 +45,7 @@ function mollom_hook_info() {
     'mollom_data_insert',
     'mollom_data_update',
     'mollom_data_delete',
+    'mollom_content_alter',
   );
   $hooks = array_fill_keys($hooks, array(
     'group' => 'mollom',
@@ -84,9 +85,9 @@ function mollom_help($path, $arg) {
   if ($path == 'admin/help#mollom') {
     $output = '<p>';
     $output .= t('Allowing users to react, participate and contribute while still keeping your site\'s content under control can be a huge challenge. <a href="@mollom-website">Mollom</a> is a web service that helps you identify content quality and, most importantly, helps you stop spam. When content moderation becomes easier, you have more time and energy to interact with your site visitors and community. For more information, see <a href="@mollom-works">How Mollom Works</a> and the <a href="@mollom-faq">Mollom FAQ</a>.', array(
-      '@mollom-website' => 'https://mollom.com',
-      '@mollom-works' => 'https://mollom.com/how-mollom-works',
-      '@mollom-faq' => 'https://mollom.com/faq',
+      '@mollom-website' => 'https://www.mollom.com',
+      '@mollom-works' => 'https://www.mollom.com/how-mollom-works',
+      '@mollom-faq' => 'https://www.mollom.com/faq',
     ));
     $output .= '</p><p>';
     $output .= t('Mollom can protect forms your site from unwanted posts. Each form can be set to one of the following options:');
@@ -103,9 +104,9 @@ function mollom_help($path, $arg) {
     $output .= '</p></li>';
     $output .= '</ul><p>';
     $output .= t('Data is processed and stored as explained in the <a href="@mollom-privacy">Mollom Web Service Privacy Policy</a>. It is your responsibility to provide necessary notices and obtain the appropriate consent regarding Mollom\'s use of submitted data.', array(
-      '@mollom-privacy' => 'https://mollom.com/web-service-privacy-policy',
-      '@mollom-works' => 'https://mollom.com/how-mollom-works',
-      '@mollom-faq' => 'https://mollom.com/faq',
+      '@mollom-privacy' => 'https://www.mollom.com/web-service-privacy-policy',
+      '@mollom-works' => 'https://www.mollom.com/how-mollom-works',
+      '@mollom-faq' => 'https://www.mollom.com/faq',
     ));
     $output .= '</p>';
     $output .= '<p>';
@@ -166,14 +167,6 @@ function mollom_menu() {
     'file' => 'mollom.pages.inc',
     'type' => MENU_CALLBACK,
   );
-  $items['mollom/moderate/%mollom_content/%'] = array(
-    'page callback' => 'mollom_moderate',
-    'page arguments' => array(2, 3),
-    'access callback' => 'mollom_moderate_access',
-    'access arguments' => array(2, 3),
-    'type' => MENU_CALLBACK,
-  );
-
   $items['admin/config/content/mollom'] = array(
     'title' => 'Mollom content moderation',
     'description' => 'Configure how the Mollom service moderates user-submitted content such as spam and profanity.',
@@ -705,7 +698,7 @@ function mollom_data_delete_form_alter(&$form, &$form_state) {
       '' => t('Do not report'),
     ),
     '#default_value' => 'spam',
-    '#description' => t('Sending feedback to <a href="@mollom-url">Mollom</a> improves the automated moderation of new submissions.', array('@mollom-url' => 'https://mollom.com')),
+    '#description' => t('Sending feedback to <a href="@mollom-url">Mollom</a> improves the automated moderation of new submissions.', array('@mollom-url' => 'https://www.mollom.com')),
   );
 }
 
@@ -869,7 +862,7 @@ function mollom_form_alter(&$form, &$form_state, $form_id) {
           '#prefix' => '<div class="description mollom-privacy">',
           '#suffix' => '</div>',
           '#markup' => t('By submitting this form, you accept the <a href="@privacy-policy-url" class="mollom-target" rel="nofollow">Mollom privacy policy</a>.', array(
-            '@privacy-policy-url' => 'https://mollom.com/web-service-privacy-policy',
+            '@privacy-policy-url' => 'https://www.mollom.com/web-service-privacy-policy',
           )),
           '#weight' => 10,
         );
@@ -1523,7 +1516,7 @@ function _mollom_get_openid($account) {
  *   The type of entity to check.
  * @param $bundle
  *   An array of bundle names to check.
- * 
+ *
  * @return array
  *   An array of protected bundles for this entity type.
  */
@@ -1719,7 +1712,7 @@ function _mollom_fallback() {
  */
 function _mollom_format_message_falsepositive($form_state, $data) {
   $mollom = mollom();
-  $report_url = 'https://mollom.com/false-positive';
+  $report_url = 'https://www.mollom.com/false-positive';
   $params = array(
     'public_key' => $mollom->loadConfiguration('publicKey'),
   );
@@ -1761,14 +1754,14 @@ function mollom_theme() {
         'captcha_url' => NULL,
         'flash_fallback_player' => $base_path . '/mollom-captcha-player.swf',
       ),
-      'template' => 'mollom.captcha.audio',
+      'template' => 'mollom-captcha-audio',
     ),
     'mollom_captcha_image' => array(
       'variables' => array(
         'captcha_url' => NULL,
         'audio_enabled' => TRUE,
       ),
-      'template' => 'mollom.captcha.image',
+      'template' => 'mollom-captcha-image',
     ),
   );
 }
@@ -2059,6 +2052,9 @@ function mollom_process_mollom($element, &$form_state, $complete_form) {
   //   causing false-positive spam classifications.
   $element['homepage'] = array(
     '#type' => 'textfield',
+    // Include the title field for accessibility scanners but it will not be
+    // shown due to the prefix.
+    '#title' => t('Home page'),
     // Wrap the entire honeypot form element markup into a hidden container, so
     // robots cannot simply check for a style attribute, but instead have to
     // implement advanced DOM processing to figure out whether they are dealing
@@ -2163,6 +2159,8 @@ function mollom_validate_analysis(&$form, &$form_state) {
       $data['trackingImageId'] = $form_state['values']['mollom']['fba'];
     }
   }
+  // Allow modules to alter data sent.
+  drupal_alter('mollom_content', $data);
   $result = mollom()->checkContent($data);
 
   // Use all available data properties for log messages below.
@@ -2510,8 +2508,10 @@ function mollom_form_submit($form, &$form_state) {
  * @param $class
  *   (optional) The name of a Mollom client implementation class to instantiate.
  *   Overrides the 'mollom_class' configuration variable. Debug use only.
+ * @param $force
+ *   (optional) If true, then a new class is always instantiated.
  */
-function mollom($class = NULL) {
+function mollom($class = NULL, $force = FALSE) {
   $instances = &drupal_static(__FUNCTION__, array());
   if (!isset($class)) {
     if (variable_get('mollom_testing_mode', 0)) {
@@ -2523,7 +2523,7 @@ function mollom($class = NULL) {
   }
   // If there is no instance yet or if it is not of the desired class, create a
   // new one.
-  if (!isset($instances[$class]) || !($instances[$class] instanceof $class)) {
+  if ($force || !isset($instances[$class]) || !($instances[$class] instanceof $class)) {
     $instances[$class] = new $class();
   }
   return $instances[$class];
@@ -3210,12 +3210,6 @@ function mollom_mollom_data_insert($data) {
   $params['id'] = $data->contentId;
   $params['finalized'] = 1;
 
-  // Mark the content as stored for moderation-enabled content.
-  $mollom_form = mollom_form_load($data->form_id);
-  if (!empty($mollom_form['moderation'])) {
-    $params['stored'] = 1;
-  }
-
   // Get additional information for submissions that result in a locally stored
   // entity.
   if ($data->entity != 'mollom_content' && $data->entity != 'mollom_captcha') {
@@ -3248,361 +3242,6 @@ function mollom_mollom_data_insert($data) {
 
   $result = mollom()->checkContent($params);
 }
-
-/**
- * Implements hook_mollom_data_delete().
- */
-function mollom_mollom_data_delete($data) {
-  // Only content can be deleted.
-  if (empty($data->contentId)) {
-    return;
-  }
-  // Exclude data for form submissions not resulting in a locally stored entity.
-  // These usually map to mails and similar things, but not in content that can
-  // be moderated.
-  if ($data->entity == 'mollom_content' || $data->entity == 'mollom_captcha') {
-    return;
-  }
-  // Skip forms for which Mollom moderation integration is not enabled.
-  $mollom_form = mollom_form_load($data->form_id);
-  if (empty($mollom_form['moderation'])) {
-    return;
-  }
-
-  // Mark the content as discarded (not stored).
-  $params['id'] = $data->contentId;
-  $params['stored'] = 0;
-
-  $result = mollom()->checkContent($params);
-}
-
-/**
- * Menu access callback; Validates an inbound Mollom Moderation request.
- *
- * @param object $data
- *   The Mollom data record associated with the content to moderate.
- * @param string $action
- *   The moderation action to perform; e.g., 'spam', 'delete', 'approve'.
- *
- * @return bool
- *   Whether the moderation request is valid and authorized.
- *
- * @see mollom_moderate()
- */
-function mollom_moderate_access($data, $action) {
-  static $access;
-
-  // Drupal invokes _menu_translate() once more when rendering local tasks for
-  // the page, which breaks the OAuth nonce validation.
-  // @see http://drupal.org/node/1373072
-  if (isset($access)) {
-    return $access;
-  }
-  $access = TRUE;
-  // Check global opt-in configuration setting.
-  $mollom_form = mollom_form_load($data->form_id);
-  if (empty($mollom_form['moderation'])) {
-    $access = FALSE;
-  }
-  // Check required request parameters.
-  if (empty($data) || empty($action)) {
-    $access = FALSE;
-  }
-  // Validate authentication protocol parameters.
-  if (!mollom_moderate_validate_oauth()) {
-    $access = FALSE;
-  }
-  return $access;
-}
-
-/**
- * Returns whether the OAuth request signature is valid.
- */
-function mollom_moderate_validate_oauth() {
-  // For inbound moderation requests, only the production API keys are valid.
-  // The testing mode API keys cannot be trusted. Therefore, this validation
-  // is based on the the stored variables only.
-  $publicKey = variable_get('mollom_public_key', '');
-  $privateKey = variable_get('mollom_private_key', '');
-  if ($publicKey === '' || $privateKey === '') {
-    mollom_log(array(
-      'message' => 'Missing module configuration',
-    ), WATCHDOG_WARNING);
-    return FALSE;
-  }
-
-  $data = MollomDrupal::getServerParameters();
-  $header = MollomDrupal::getServerAuthentication();
-
-  // Validate protocol parameters.
-  if (!isset($header['oauth_consumer_key'], $header['oauth_nonce'], $header['oauth_timestamp'], $header['oauth_signature_method'], $header['oauth_signature'])) {
-    mollom_log(array(
-      'message' => 'Missing protocol parameters',
-      'Request:' => $_SERVER['REQUEST_METHOD'] . ' ' . $_GET['q'],
-      'Request headers:' => $header,
-    ), WATCHDOG_WARNING);
-    return FALSE;
-  }
-
-  $sent_signature = $header['oauth_signature'];
-  unset($header['oauth_signature']);
-
-  $allowed_timeframe = 900;
-
-  // Validate consumer key.
-  if ($header['oauth_consumer_key'] !== $publicKey) {
-    mollom_log(array(
-      'message' => 'Invalid public/consumer key',
-      'Request:' => $_SERVER['REQUEST_METHOD'] . ' ' . $_GET['q'],
-      'Request headers:' => $header,
-      'My public key:' => $publicKey,
-    ), WATCHDOG_WARNING);
-    return FALSE;
-  }
-
-  // Validate timestamp.
-  if ($header['oauth_timestamp'] <= REQUEST_TIME - $allowed_timeframe) {
-    $diff = $header['oauth_timestamp'] - REQUEST_TIME;
-    $diff_sign = ($diff < 0 ? '-' : '+');
-    if ($diff < 0) {
-      $diff *= -1;
-    }
-    mollom_log(array(
-      'message' => 'Outdated authentication timestamp',
-      'Request:' => $_SERVER['REQUEST_METHOD'] . ' ' . $_GET['q'],
-      'Request headers:' => $header,
-      'Time difference:' => $diff_sign . format_interval($diff),
-    ), WATCHDOG_WARNING);
-    return FALSE;
-  }
-
-  // Validate nonce.
-  if (empty($header['oauth_nonce'])) {
-    mollom_log(array(
-      'message' => 'Missing authentication nonce',
-      'Request:' => $_SERVER['REQUEST_METHOD'] . ' ' . $_GET['q'],
-      'Request headers:' => $header,
-    ), WATCHDOG_WARNING);
-    return FALSE;
-  }
-  if ($cached = cache_get('mollom_moderation_nonces', 'cache')) {
-    $nonces = $cached->data;
-  }
-  else {
-    $nonces = array();
-  }
-  if (isset($nonces[$header['oauth_nonce']])) {
-    mollom_log(array(
-      'message' => 'Replay attack',
-      'Request:' => $_SERVER['REQUEST_METHOD'] . ' ' . $_GET['q'],
-      'Request headers:' => $header,
-    ), WATCHDOG_WARNING);
-    return FALSE;
-  }
-  foreach ($nonces as $nonce => $created) {
-    if ($created < REQUEST_TIME - $allowed_timeframe) {
-      unset($nonces[$nonce]);
-    }
-  }
-  $nonces[$header['oauth_nonce']] = REQUEST_TIME;
-  cache_set('mollom_moderation_nonces', $nonces, 'cache');
-
-  // Validate signature.
-  $base_string = implode('&', array(
-    $_SERVER['REQUEST_METHOD'],
-    Mollom::rawurlencode($GLOBALS['base_url'] . '/' . $_GET['q']),
-    Mollom::rawurlencode(Mollom::httpBuildQuery($data + $header)),
-  ));
-  $key = Mollom::rawurlencode($privateKey) . '&' . '';
-  $signature = rawurlencode(base64_encode(hash_hmac('sha1', $base_string, $key, TRUE)));
-
-  $valid = ($signature === $sent_signature);
-  if (!$valid) {
-    mollom_log(array(
-      'message' => 'Invalid authentication signature',
-      'Request:' => $_SERVER['REQUEST_METHOD'] . ' ' . $_GET['q'],
-      'Request headers:' => $header + array('oauth_signature' => $sent_signature),
-      'Base string:' => $base_string,
-      'Expected signature:' => $signature,
-      //'Expected key:' => $key,
-    ), WATCHDOG_WARNING);
-  }
-  return $valid;
-}
-
-/**
- * Menu callback; Performs an inbound Mollom Moderation request action.
- *
- * @param object $data
- *   The Mollom data record associated with the content to moderate.
- * @param string $action
- *   The moderation action to perform; e.g., 'spam', 'delete', 'approve'.
- *
- * @return void
- *   The request is terminated.
- *
- * @see mollom_moderate_access()
- */
-function mollom_moderate($data, $action) {
-  $result = FALSE;
-  $messages = array();
-
-  // Verify that action is supported or respond with a 404.
-  if (!in_array($action, array('approve', 'spam', 'delete'))) {
-    return MENU_NOT_FOUND;
-  }
-
-  // Retrieve 'delete form' id from registered information.
-  $form_info = mollom_form_load($data->form_id);
-
-  if ($form_info) {
-    if (isset($form_info['entity delete callback'])) {
-      $delete_callback = $form_info['entity delete callback'];
-      $messages[] = "May delete $form_info[entity] entity via {$delete_callback}().";
-    }
-    elseif (isset($form_info['entity delete multiple callback'])) {
-      $delete_multiple_callback = $form_info['entity delete multiple callback'];
-      $messages[] = "May delete $form_info[entity] entity via {$delete_multiple_callback}().";
-    }
-    elseif (function_exists($data->entity . '_delete')) {
-      $delete_callback = $data->entity . '_delete';
-      $messages[] = "May delete $form_info[entity] entity via {$delete_callback}().";
-    }
-    elseif (isset($form_info['delete form'])) {
-      $messages[] = "May delete $form_info[entity] entity via {$form_info['delete form']} form.";
-    }
-
-    // Programmatically invoke publish action.
-    if ($action == 'approve') {
-      $messages[] = "Attempt to load $form_info[entity] entity via entity_load().";
-      // @todo Abstract this. Possibly requires Entity module as dependency.
-      $entity = entity_load($data->entity, array($data->id));
-      if (isset($entity[$data->id])) {
-        $entity = $entity[$data->id];
-        $entity->status = 1;
-        $function = $data->entity . '_save';
-        $messages[] = "Attempt to save $form_info[entity] entity via {$data->entity}_save().";
-        if (function_exists($function)) {
-          $function($entity);
-          $messages[] = "Updated status of $form_info[entity] entity via {$data->entity}_save().";
-          $result = TRUE;
-        }
-      }
-    }
-    // Invoke entity delete callback.
-    elseif (isset($delete_callback)) {
-      $messages[] = "Attempt to delete $form_info[entity] entity via $delete_callback({$data->id}).";
-      if (function_exists($delete_callback)) {
-        $delete_callback($data->id);
-        $messages[] = "Deleted $form_info[entity] entity via $delete_callback({$data->id}).";
-
-        // Entity delete callbacks do not return success or failure, so we can
-        // only assume success.
-        $result = TRUE;
-      }
-    }
-    // Invoke entity delete multiple callback.
-    // @todo Remove 'entity delete multiple' callback support later.
-    elseif (isset($delete_multiple_callback)) {
-      $messages[] = "Attempt to delete $form_info[entity] entity via $delete_multiple_callback(array({$data->id})).";
-      if (function_exists($delete_multiple_callback)) {
-        $delete_multiple_callback(array($data->id));
-        $messages[] = "Deleted $form_info[entity] entity via $delete_multiple_callback(array({$data->id})).";
-
-        // Entity delete callbacks do not return success or failure, so we can
-        // only assume success.
-        $result = TRUE;
-      }
-    }
-    // Programmatically invoke delete confirmation form.
-    elseif (isset($form_info['delete form'])) {
-      $messages[] = "Attempt to delete $form_info[entity] entity {$data->id} via {$form_info['delete form']} form.";
-      if (isset($form_info['delete form file'])) {
-        $file = $form_info['delete form file'] + array(
-          'type' => 'inc',
-          'module' => $form_info['module'],
-          'name' => NULL,
-        );
-        module_load_include($file['type'], $file['module'], $file['name']);
-        $messages[] = "Loaded {$file['name']}.{$file['type']} in {$file['module']} module.";
-      }
-      // Programmatic form submissions are not able to automatically use the
-      // primary form submit button/action, so we need to resemble
-      // drupal_form_submit().
-      $form_id = $form_info['delete form'];
-      $form_state = form_state_defaults();
-      // We assume that all delete confirmation forms take the fully loaded
-      // entity as (only) argument.
-      $messages[] = "Attempt to load $form_info[entity] entity via entity_load().";
-      $entities = entity_load($data->entity, array($data->id));
-      $form_state['build_info']['args'][] = $entities[$data->id];
-      $form = drupal_retrieve_form($form_id, $form_state);
-
-      $form_state['values'] = array();
-      $form_state['values']['mollom']['feedback'] = '';
-      // Take over the primary submit button of confirm_form().
-      $form_state['values']['op'] = $form['actions']['submit']['#value'];
-
-      $form_state['input'] = $form_state['values'];
-      $form_state['programmed'] = TRUE;
-      // Programmed forms are always submitted.
-      $form_state['submitted'] = TRUE;
-
-      // Reset form validation.
-      $form_state['must_validate'] = TRUE;
-      form_clear_error();
-
-      drupal_prepare_form($form_id, $form, $form_state);
-      drupal_process_form($form_id, $form, $form_state);
-
-      $result = $form_state['executed'];
-    }
-  }
-
-  $messages = implode("\n", $messages);
-
-  // Double-check for error messages, since entity delete callbacks typically do
-  // not return any status.
-  $drupal_messages = drupal_get_messages();
-
-  if ($result && !isset($drupal_messages['error'])) {
-    mollom_log(array(
-      'message' => '%action moderation success for @entity @id',
-      'arguments' => array(
-        '%action' => $action,
-        '@entity' => $data->entity,
-        '@id' => $data->id,
-      ),
-//      'Actions:' => $messages,
-    ));
-  }
-  else {
-    // 400 is not really appropriate, but comes closest.
-    drupal_add_http_header('Status', '400 Unable to process moderation request');
-
-    $errors = array();
-    if (isset($drupal_messages['error'])) {
-      $errors['Error messages:'] = implode("\n", $drupal_messages['error']);
-    }
-
-    mollom_log(array(
-      'message' => '%action moderation failure for @entity @id',
-      'arguments' => array(
-        '%action' => $action,
-        '@entity' => $data->entity,
-        '@id' => $data->id,
-      ),
-      'Actions:' => $messages,
-    ) + $errors + array(
-      'Mollom data:' => (array) $data,
-      'Mollom form:' => $form_info,
-    ), WATCHDOG_ERROR);
-  }
-
-  // Report back result as success status.
-  echo (int) $result;
-}
-
 /**
  * @} End of "name mollom_moderation".
  */

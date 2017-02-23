@@ -16,7 +16,12 @@ class MollomDrupal extends Mollom {
    * @see Mollom::__construct().
    */
   public function __construct() {
+    // Set any configured endpoint that may be different from the default.
     parent::__construct();
+    $configured_server = $this->loadConfiguration('server');
+    if (!empty($configured_server)) {
+      $this->server = $configured_server;
+    }
     $this->requestTimeout = variable_get('mollom_connection_timeout', 3);
   }
 
@@ -29,6 +34,7 @@ class MollomDrupal extends Mollom {
     'publicKey' => 'mollom_public_key',
     'privateKey' => 'mollom_private_key',
     'expectedLanguages' => 'mollom_languages_expected',
+    'server' => 'mollom_api_endpoint',
   );
 
   /**
@@ -43,6 +49,11 @@ class MollomDrupal extends Mollom {
    * Implements Mollom::saveConfiguration().
    */
   public function saveConfiguration($name, $value) {
+    // Set local variable.
+    if (property_exists('MollomDrupal', $name)) {
+      $this->{$name} = $value;
+    }
+    // Persist in Drupal.
     $name = $this->configuration_map[$name];
     return variable_set($name, $value);
   }
@@ -223,6 +234,7 @@ class MollomDrupalTest extends MollomDrupal {
       // Do not destroy production variables when testing mode is enabled.
       $this->configuration_map['publicKey'] = 'mollom_test_public_key';
       $this->configuration_map['privateKey'] = 'mollom_test_private_key';
+      $this->configuration_map['server'] = 'mollom_test_api_endpoint';
     }
 
     // Load and set publicKey and privateKey configuration values.
@@ -339,6 +351,9 @@ class MollomDrupalTestLocal extends MollomDrupalTest {
     list(, $server) = explode('://', $GLOBALS['base_url'], 2);
     $this->server = $server . '/mollom-test/rest';
 
+    // Do not destroy production server variables when testing mode is enabled.
+    $this->configuration_map['server'] = 'mollom_test_local_api_endpoint';
+
     parent::__construct();
   }
 
@@ -413,9 +428,11 @@ class MollomDrupalTestInvalid extends MollomDrupalTest {
    * Overrides MollomDrupalTest::__construct().
    */
   function __construct() {
-    $this->originalServer = $this->server;
-    $this->server = 'fake-host';
     parent::__construct();
+    $this->originalServer = $this->server;
+    $this->configuration_map['server'] = 'mollom_test_invalid_api_endpoint';
+    $this->saveConfiguration('server', 'fake-host');
+    $this->server = 'fake-host';
   }
 
   /**

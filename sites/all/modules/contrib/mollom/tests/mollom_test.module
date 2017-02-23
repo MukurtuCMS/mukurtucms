@@ -349,3 +349,4 @@ function mollom_test_delete_form_submit($form, &$form_state) {
   drupal_set_message('The record has been deleted.');
   $form_state['redirect'] = 'mollom-test/form';
 }
+

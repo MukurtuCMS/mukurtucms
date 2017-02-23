@@ -26,5 +26,5 @@ $refresh_alt = t('Refresh');
 <span class="mollom-captcha-container">
   <a href="javascript:void(0);" class="mollom-refresh-captcha mollom-refresh-image"><?php print $refresh_image_output; ?></a>
   <span class="mollom-captcha-content mollom-image-captcha"><?php print $captcha_output; ?></span>
-  <div class="mollom-image-captcha-instructions"><?php print $instructions; ?><?php if ($audio_enabled) { ?>&nbsp;&nbsp;<a href="#" class="mollom-switch-captcha mollom-audio-captcha"><?php print $switch_verify; ?></a><?php } ?></div>
+  <span class="mollom-image-captcha-instructions"><?php print $instructions; ?><?php if ($audio_enabled) { ?>&nbsp;&nbsp;<a href="#" class="mollom-switch-captcha mollom-audio-captcha"><?php print $switch_verify; ?></a><?php } ?></span>
 </span>
