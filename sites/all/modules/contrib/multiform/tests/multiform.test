@@ -4,7 +4,7 @@
  *
  *
  *
- * @author Kálmán Hosszu - hosszu.kalman@gmail.com - http://premiumcmsthemes.com http://www.kalman-hosszu.com
+ * @author Kálmán Hosszu - http://drupal.org/user/267481
  */
 
 class MultiformTestCase extends DrupalWebTestCase {
@@ -91,8 +91,8 @@ class MultiformTestCase extends DrupalWebTestCase {
     $this->assertNoText('test2 field is required.');
 
     // Send first form's required field.
-    $this->drupalPost(NULL, $first_text, 'save');
-    $this->assertNoText('multiform_test2_1multiform_test2_submit_button');
+    $this->drupalPost(NULL,array_merge($first_text,array()), 'save');
+    $this->assertNoText('multiform_test2_2multiform_test2_submit_button');
     $this->assertText('test2 field is required.');
 
     // Send second form's required field.

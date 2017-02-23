@@ -10,9 +10,6 @@
 .ui-tabs {
   padding: 0;
 }
-.ui-front {
-  z-index: 10001 !important;
-}
 
 .ui-dialog.media-wrapper .ui-dialog-content {
   padding: 0;
@@ -144,4 +141,10 @@
   display: inline-block;
   margin-right: 10px;
   vertical-align: middle;
+}
+
+/* Exposed filter field */
+/* Use similar look and feel of a disabled field */
+.media-ajaxing-disabled {
+  background-color: #EBEBE4;
 }
