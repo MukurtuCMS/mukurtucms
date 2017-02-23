@@ -1023,7 +1023,7 @@ function taxonomy_get_parents($tid) {
     $query->join('taxonomy_term_hierarchy', 'h', 'h.parent = t.tid');
     $query->addField('t', 'tid');
     $query->condition('h.tid', $tid);
-    $query->addTag('term_access');
+    $query->addTag('taxonomy_term_access');
     $query->orderBy('t.weight');
     $query->orderBy('t.name');
     $tids = $query->execute()->fetchCol();
@@ -1081,7 +1081,7 @@ function taxonomy_get_children($tid, $vid = 0) {
     if ($vid) {
       $query->condition('t.vid', $vid);
     }
-    $query->addTag('term_access');
+    $query->addTag('taxonomy_term_access');
     $query->orderBy('t.weight');
     $query->orderBy('t.name');
     $tids = $query->execute()->fetchCol();
@@ -1129,7 +1129,7 @@ function taxonomy_get_tree($vid, $parent = 0, $max_depth = NULL, $load_entities 
     $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
     $result = $query
       ->addTag('translatable')
-      ->addTag('term_access')
+      ->addTag('taxonomy_term_access')
       ->fields('t')
       ->fields('h', array('parent'))
       ->condition('t.vid', $vid)
@@ -1249,7 +1249,7 @@ class TaxonomyTermController extends DrupalDefaultEntityController {
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
     $query = parent::buildQuery($ids, $conditions, $revision_id);
     $query->addTag('translatable');
-    $query->addTag('term_access');
+    $query->addTag('taxonomy_term_access');
     // When name is passed as a condition use LIKE.
     if (isset($conditions['name'])) {
       $query_conditions = &$query->conditions();
@@ -1418,13 +1418,17 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
     if (!isset($vid) || $tag->vid == $vid) {
       // Make sure we have a completed loaded taxonomy term.
       if (isset($tag->name)) {
-        // Mukurtu patch -- no special treatment for commas and quotes
-        $typed_tags[] = $tag->name;
+        // Commas and quotes in tag names are special cases, so encode 'em.
+        if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {
+          $typed_tags[] = '"' . str_replace('"', '""', $tag->name) . '"';
+        }
+        else {
+          $typed_tags[] = $tag->name;
+        }
       }
     }
   }
-  // Mukurtu patch -- delimit by the semicolon instead of comma
-  return implode('; ', $typed_tags);
+  return implode(', ', $typed_tags);
 }
 
 /**
@@ -1761,7 +1765,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     }
 
     // Translate term names into actual terms.
-    $typed_terms = ma_core_taxonomy_explode_tags($tags);
+    $typed_terms = drupal_explode_tags($tags);
     foreach ($typed_terms as $typed_term) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.
