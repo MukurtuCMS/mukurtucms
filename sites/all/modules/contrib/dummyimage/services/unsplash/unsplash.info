@@ -1,9 +1,8 @@
-name = Place Zombie service
-description = Integrates the placezombies service with the dummyimage module.
+name = Unsplash service
+description = Integrates the unsplash service with the dummyimage module.
 core = 7.x
 package = Dummy image
 dependencies[] = dummyimage
-
 
 ; Information added by Drupal.org packaging script on 2016-03-06
 version = "7.x-1.6"

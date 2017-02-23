@@ -117,7 +117,7 @@ function dummyimage_preprocess_image(&$variables) {
       // Reconstruct the original uri to check if it exist.
       $path_parts = explode('/', strstr($variables['path'], '/styles/' . $variables['style_name']), 5);
       $original_uri = strtok($path_parts[3] . '://' . $path_parts[4], '?');
-      if (file_exists(urldecode($original_uri))) {
+      if (is_file($original_uri)) {
         break;
       }
     case DUMMYIMAGE_GENERATE_ALL:
