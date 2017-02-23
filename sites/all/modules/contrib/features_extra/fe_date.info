@@ -1,14 +1,10 @@
-name = FE Nodequeue
-description = Build nodequeues as features.
+name = FE Date
+description = Build date format as features.
 core = 7.x
 package = Features extra
 
 dependencies[] = ctools
 dependencies[] = features
-dependencies[] = nodequeue
-
-files[] = tests/features_extra_test_case.test
-files[] = tests/fe_nodequeue.test
 
 ; Information added by Drupal.org packaging script on 2015-08-12
 version = "7.x-1.0"
