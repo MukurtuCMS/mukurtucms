@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * @file
+ * Contains FeedsContentTypeTest.
+ */
+
+/**
+ * Tests for when an importer is attached to a content type.
+ */
+class FeedsContentTypeTest extends FeedsWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Feed content type',
+      'description' => 'Tests behavior for when an importer is attached to a content type.',
+      'group' => 'Feeds',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp();
+
+    // Create an importer configuration.
+    $this->createImporterConfiguration('Syndication', 'syndication');
+    $this->addMappings('syndication',
+      array(
+        0 => array(
+          'source' => 'title',
+          'target' => 'title',
+          'unique' => FALSE,
+        ),
+        1 => array(
+          'source' => 'description',
+          'target' => 'body',
+        ),
+        2 => array(
+          'source' => 'timestamp',
+          'target' => 'created',
+        ),
+        3 => array(
+          'source' => 'url',
+          'target' => 'url',
+          'unique' => TRUE,
+        ),
+        4 => array(
+          'source' => 'guid',
+          'target' => 'guid',
+          'unique' => TRUE,
+        ),
+      )
+    );
+  }
+
+  /**
+   * Tests if titles can be retrieved from a feed.
+   */
+  public function testRetrieveTitleFromFeed() {
+    // The Common syndication parser supports retrieving title from feed.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/developmentseed.rss2',
+    );
+    $this->drupalPost('node/add/page', $edit, 'Save');
+
+    $node = node_load(1);
+    $this->assertEqual('Development Seed - Technological Solutions for Progressive Organizations', $node->title, 'The title was retrieved from the feed.');
+  }
+
+  /**
+   * Tests if the node title is required when the CSV parser is used.
+   */
+  public function testRequiredNodeTitleWithCSVParser() {
+    // Set parser to CSV.
+    $this->setPlugin('syndication', 'FeedsCSVParser');
+
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/content.csv',
+    );
+    $this->drupalPost('node/add/page', $edit, 'Save');
+
+    $this->assertText('Title field is required.');
+  }
+
+  /**
+   * Tests that the feed node gets no title if the content type does not use the
+   * node title field.
+   */
+  public function testWithContentTypeWithoutTitle() {
+    // Set that the content type 'page' has no title.
+    db_update('node_type')
+      ->fields(array(
+        'has_title' => 0,
+      ))
+      ->condition('type', 'page')
+      ->execute();
+
+    // Flush caches so this change is picked up.
+    drupal_flush_all_caches();
+
+    // And import a RSS feed with a title.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/developmentseed.rss2',
+    );
+    $this->drupalPost('node/add/page', $edit, 'Save');
+
+    // Assert that the feed node didn't got a title from the source.
+    $node = node_load(1);
+    $this->assertEqual('', $node->title, 'The feed node has no title.');
+  }
+
+}

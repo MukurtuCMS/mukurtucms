@@ -171,7 +171,7 @@ class ParserCSV {
   /**
    * Get the byte number where the parser left off after last parse() call.
    *
-   * @return
+   * @return int
    *  0 if all lines or no line has been parsed, the byte position of where a
    *  timeout or the line limit has been reached otherwise. This position can be
    *  used to set the start byte for the next iteration after parse() has
@@ -198,11 +198,8 @@ class ParserCSV {
    *
    * @param Iterator $lineIterator
    *   An Iterator object that yields line strings, e.g. ParserCSVIterator.
-   * @param $start
-   *   The byte number from where to start parsing the file.
-   * @param $lines
-   *   The number of lines to parse, 0 for all lines.
-   * @return
+   *
+   * @return array
    *   Two dimensional array that contains the data in the CSV file.
    */
   public function parse(Iterator $lineIterator) {

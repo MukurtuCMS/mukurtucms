@@ -56,12 +56,14 @@ class FeedsCSVParser extends FeedsParser {
   /**
    * Get first line and use it for column names, convert them to lower case.
    * Be aware that the $parser and iterator objects can be modified in this
-   * function since they are passed in by reference
+   * function since they are passed in by reference.
    *
    * @param ParserCSV $parser
    * @param ParserCSVIterator $iterator
-   * @return
-   *   An array of lower-cased column names to use as keys for the parsed items.
+   *
+   * @return array|false
+   *   An array of lower-cased column names to use as keys for the parsed items
+   *   or FALSE if the document was empty.
    */
   protected function parseHeader(ParserCSV $parser, ParserCSVIterator $iterator) {
     $parser->setLineLimit(1);
@@ -81,8 +83,13 @@ class FeedsCSVParser extends FeedsParser {
    *
    * @param ParserCSV $parser
    * @param ParserCSVIterator $iterator
-   * @return
-   *   An array of rows of the CSV keyed by the column names previously set
+   * @param int $start
+   *   The byte number from where to start parsing the file.
+   * @param int $limit
+   *   The number of lines to parse, 0 for all lines.
+   *
+   * @return array
+   *   An array of rows of the CSV keyed by the column names previously set.
    */
   protected function parseItems(ParserCSV $parser, ParserCSVIterator $iterator, $start = 0, $limit = 0) {
     $parser->setLineLimit($limit);
@@ -149,7 +156,18 @@ class FeedsCSVParser extends FeedsParser {
 
     $output = t('Import !csv_files with one or more of these columns: @columns.', array('!csv_files' => l(t('CSV files'), 'http://en.wikipedia.org/wiki/Comma-separated_values'), '@columns' => implode(', ', $sources)));
     $items = array();
-    $items[] = format_plural(count($uniques), 'Column <strong>@columns</strong> is mandatory and considered unique: only one item per @columns value will be created.', 'Columns <strong>@columns</strong> are mandatory and values in these columns are considered unique: only one entry per value in one of these column will be created.', array('@columns' => implode(', ', $uniques)));
+    if ($uniques) {
+      $items[] = format_plural(count($uniques),
+        'Column <strong>@columns</strong> is mandatory and considered unique: only one item per @columns value will be created.',
+        'Columns <strong>@columns</strong> are mandatory and values in these columns are considered unique: only one entry per value in one of these column will be created.',
+        array(
+          '@columns' => implode(', ', $uniques),
+        )
+      );
+    }
+    else {
+      $items[] = t('No columns are unique. The import will only create new items, no items will be updated.');
+    }
     $items[] = l(t('Download a template'), 'import/' . $this->id . '/template');
     $form['help'] = array(
       '#prefix' => '<div class="help">',

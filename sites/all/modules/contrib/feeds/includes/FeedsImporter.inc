@@ -150,7 +150,7 @@ class FeedsImporter extends FeedsConfigurable {
   /**
    * Copy a FeedsImporter configuration into this importer.
    *
-   * @param FeedsImporter $importer
+   * @param FeedsConfigurable $configurable
    *   The feeds importer object to copy from.
    */
    public function copy(FeedsConfigurable $configurable) {

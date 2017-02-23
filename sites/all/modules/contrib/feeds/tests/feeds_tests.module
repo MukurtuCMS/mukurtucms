@@ -61,6 +61,32 @@ function feeds_tests_theme() {
 }
 
 /**
+ * Implements hook_node_load().
+ */
+function feeds_tests_node_load($nodes) {
+  // Eventually keep track of nodes that get loaded.
+  if (variable_get('feeds_track_node_loads', FALSE)) {
+    $loads = variable_get('feeds_loaded_nodes', array());
+    $loads = array_merge($loads, array_keys($nodes));
+    variable_set('feeds_loaded_nodes', $loads);
+  }
+}
+
+/**
+ * Implements hook_cron_queue_alter().
+ *
+ * Changes runtime limit for feeds_source_import queue.
+ *
+ * @see FeedsFileFetcherTestCase::testRemoveFileAfterImportInBackground()
+ */
+function feeds_tests_cron_queue_info_alter(&$queues) {
+  $feeds_source_import_queue_time = variable_get('feeds_tests_feeds_source_import_queue_time', FALSE);
+  if ($feeds_source_import_queue_time && isset($queues['feeds_source_import'])) {
+    $queues['feeds_source_import']['time'] = $feeds_source_import_queue_time;
+  }
+}
+
+/**
  * Outputs flickr test feed.
  */
 function feeds_tests_flickr() {
@@ -352,19 +378,46 @@ function feeds_tests_mapper_unique(FeedsSource $source, $entity_type, $bundle, $
 
 /**
  * Implements hook_feeds_after_parse().
- *
- * Empties the list of items to import in case the test says that there are
- * items in there with encoding issues. These items can not be processed during
- * tests without having a test failure because in < PHP 5.4 that would produce
- * the following warning:
- *   htmlspecialchars(): Invalid multibyte sequence in argument
- *
- * @see FeedsCSVParserTestCase::testMbstringExtensionDisabled()
  */
 function feeds_tests_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  // Empties the list of items to import in case the test says that there are
+  // items in there with encoding issues. These items can not be processed
+  // during tests without having a test failure because in < PHP 5.4 that would
+  // produce the following warning:
+  //   htmlspecialchars(): Invalid multibyte sequence in argument
+  // @see FeedsCSVParserTestCase::testMbstringExtensionDisabled()
   if (variable_get('feeds_tests_feeds_after_parse_empty_items', FALSE)) {
     // Remove all items. No items will be processed.
     $result->items = array();
+  }
+
+  if ($source->id == 'user_import') {
+    foreach ($result->items as &$item) {
+      if (!empty($item['roles']) && strpos($item['roles'], '|')) {
+        // Convert roles value to multiple values.
+        // @see FeedsCSVtoUsersTest::testRoleTargetWithoutRoleCreation()
+        // @see FeedsCSVtoUsersTest::testRoleTargetWithRoleCreation()
+        // @see FeedsCSVtoUsersTest::testRoleTargetWithAllowedRoles()
+        $item['roles'] = explode('|', $item['roles']);
+      }
+      if (!empty($item['rids']) && strpos($item['rids'], '|')) {
+        // Convert roles value to multiple values.
+        // @see FeedsCSVtoUsersTest::testRoleTargetRids()
+        $item['rids'] = explode('|', $item['rids']);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_feeds_after_save().
+ *
+ * @see FeedsFileFetcherTestCase::testRemoveFileAfterImportInBackground()
+ */
+function feeds_tests_feeds_after_save() {
+  $sleep = variable_get('feeds_tests_feeds_after_save_sleep', FALSE);
+  if ($sleep) {
+    sleep($sleep);
   }
 }
 

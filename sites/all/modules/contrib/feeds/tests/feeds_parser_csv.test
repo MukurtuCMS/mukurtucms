@@ -97,4 +97,199 @@ class FeedsCSVParserTestCase extends FeedsWebTestCase {
     $this->assertNoText('Failed importing 4 nodes.');
     $this->assertText('Source file is not in UTF-8 encoding.');
   }
+
+  /**
+   * Tests if a CSV template is generated properly using various settings.
+   *
+   * @see ::getTemplateDataProvider()
+   */
+  public function testGetTemplate() {
+    // Create node type.
+    $node_type = $this->drupalCreateContentType();
+
+    foreach ($this->getTemplateDataProvider() as $key => $testdata) {
+      // Prepend 'csv' to importer machine name as '0' is not a valid machine
+      // name.
+      $key = 'csv' . $key;
+
+      // Create and configure importer.
+      $this->createImporterConfiguration('Content CSV', $key);
+      $this->setPlugin($key, 'FeedsCSVParser');
+      $this->setSettings($key, 'FeedsCSVParser', array(
+        'delimiter' => $testdata['delimiter'],
+      ));
+      $this->setSettings($key, 'FeedsNodeProcessor', array('bundle' => $node_type->type));
+      $this->addMappings($key, $testdata['mapping']);
+
+      // Get CSV template and assert result.
+      $this->drupalGet('import/' . $key . '/template');
+      $this->assertRaw($testdata['expected']);
+    }
+  }
+
+  /**
+   * Data provider for ::testGetTemplate().
+   */
+  protected function getTemplateDataProvider() {
+    return array(
+      // Delimiter ',' test. Source keys containing a ',' should be wrapped in
+      // quotes.
+      array(
+        'delimiter' => ',',
+        'mapping' => array(
+          array(
+            'source' => 'title+;|',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'alpha, beta + gamma',
+            'target' => 'body',
+          ),
+          array(
+            'source' => 'guid',
+            'target' => 'guid',
+          ),
+        ),
+        'expected' => 'title+;|,"alpha, beta + gamma",guid',
+      ),
+
+      // Delimiter ';' test. Source keys containing a ';' should be wrapped in
+      // quotes.
+      array(
+        'delimiter' => ';',
+        'mapping' => array(
+          array(
+            'source' => 'title;)',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'alpha, beta + gamma',
+            'target' => 'body',
+          ),
+          array(
+            'source' => 'guid',
+            'target' => 'guid',
+          ),
+        ),
+        'expected' => '"title;)";alpha, beta + gamma;guid',
+      ),
+
+      // Delimiter 'TAB' test.
+      array(
+        'delimiter' => 'TAB',
+        'mapping' => array(
+          array(
+            'source' => 'title,;|',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'alpha, beta + gamma',
+            'target' => 'body',
+          ),
+          array(
+            'source' => 'guid',
+            'target' => 'guid',
+          ),
+        ),
+        'expected' => 'title,;|	alpha, beta + gamma	guid',
+      ),
+
+      // Delimiter '|' test. Source keys containing a '|' should be wrapped in
+      // quotes.
+      array(
+        'delimiter' => '|',
+        'mapping' => array(
+          array(
+            'source' => 'title+;,',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'alpha|beta|gamma',
+            'target' => 'body',
+          ),
+          array(
+            'source' => 'guid',
+            'target' => 'guid',
+          ),
+        ),
+        'expected' => 'title+;,|"alpha|beta|gamma"|guid',
+      ),
+
+      // Delimiter '+' test. Source keys containing a '+' should be wrapped in
+      // quotes.
+      array(
+        'delimiter' => '+',
+        'mapping' => array(
+          array(
+            'source' => 'title,;|',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'alpha, beta + gamma',
+            'target' => 'body',
+          ),
+          array(
+            'source' => 'guid',
+            'target' => 'guid',
+          ),
+        ),
+        'expected' => 'title,;|+"alpha, beta + gamma"+guid',
+      ),
+
+      // Ensure that when a source key is used multiple times in mapping, the
+      // key is only printed once in the CSV template.
+      array(
+        'delimiter' => ',',
+        'mapping' => array(
+          array(
+            'source' => 'text',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'guid',
+            'target' => 'guid',
+          ),
+          array(
+            'source' => 'date',
+            'target' => 'created',
+          ),
+          array(
+            'source' => 'date',
+            'target' => 'changed',
+          ),
+          array(
+            'source' => 'text',
+            'target' => 'body',
+          ),
+        ),
+        'expected' => 'text,guid,date',
+      ),
+
+      // Special characters. Things like '&' shouldn't be converted to '&amp;'
+      // for example.
+      array(
+        'delimiter' => ',',
+        'mapping' => array(
+          array(
+            'source' => '&',
+            'target' => 'title',
+          ),
+          array(
+            'source' => 'alpha&beta',
+            'target' => 'body',
+          ),
+          array(
+            'source' => '<created>',
+            'target' => 'created',
+          ),
+          array(
+            'source' => '\'guid\'',
+            'target' => 'guid',
+          ),
+        ),
+        'expected' => '&,alpha&beta,<created>,\'guid\'',
+      ),
+    );
+  }
+
 }
