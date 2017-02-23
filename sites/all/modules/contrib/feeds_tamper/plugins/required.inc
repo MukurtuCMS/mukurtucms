@@ -39,14 +39,14 @@ function feeds_tamper_required_form($importer, $element_key, $settings) {
 
 function feeds_tamper_required_callback($result, $item_key, $element_key, &$field, $settings, $source) {
   if (!empty($settings['invert'])) {
-    if (!empty($field) || $field == '0') {
+    if (!empty($field)) {
       unset($result->items[$item_key]);
     }
 
     return;
   }
 
-  if (!empty($field) || $field == '0') {
+  if (!empty($field)) {
     return;
   }
 
