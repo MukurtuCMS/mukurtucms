@@ -180,13 +180,11 @@ function search_api_sorts_search_sorts($index_id, $enabled = 1, $reset = FALSE) 
  */
 function search_api_sorts_block_search_sorts_view() {
   $query = drupal_static('search_api_sorts_search_api_query_alter', array());
-
   if (!$query) {
     return;
   }
 
   $search_sorts = search_api_sorts_search_sorts($query->getIndex()->machine_name);
-
   if (empty($search_sorts)) {
     return;
   }
@@ -332,9 +330,9 @@ function search_api_sorts_search_api_query_alter(SearchApiQueryInterface $query)
   }
 
   // There's already an existing sort, so abort!
-  $existing = $query->getSort();  
+  $existing = $query->getSort();
   if (!empty($existing)) {
-      return;
+    return;
   }
 
   $search_sorts = search_api_sorts_search_sorts($query->getIndex()->machine_name);
@@ -364,7 +362,6 @@ function search_api_sorts_search_api_query_alter(SearchApiQueryInterface $query)
 
   // Static save current search query.
   $_query = &drupal_static(__FUNCTION__, array());
-
   $_query = $query;
 }
 
