@@ -29,7 +29,7 @@ function multiform_get_form() {
     '#name' => 'form_id',
     '#attributes' => array(),
   );
-  $build_id = 'form-' . md5(uniqid(mt_rand(), TRUE));
+  $build_id = 'form-' . drupal_random_key();
   // We need a $form_build_id because the buttons are cached and the values
   // belonging to them in $_POST are handed to each form so those can recognize
   // the buttons pressed.
@@ -43,10 +43,11 @@ function multiform_get_form() {
   // This is where buttons will be collected.
   $form['buttons'] = array();
   $form['buttons']['#weight'] = 1000;
+  $form['buttons']['#build_id'] = $build_id;
   $form_state_save = array();
   $button_names = array();
   // The only way to support $_GET would be to accept $form_state. Maybe later.
-  if ($_POST && $_POST['form_id'] == 'multiform' && !empty($_POST['form_build_id'])) {
+  if ($_POST && isset($_POST['form_id']) && $_POST['form_id'] == 'multiform' && !empty($_POST['form_build_id'])) {
     $form_state_save['input'] = $_POST;
     $_files_save = $_FILES;
     // Retrieve buttons.
@@ -90,7 +91,10 @@ function multiform_get_form() {
     // Build and process this form.
     $current_form = drupal_build_form($form_id, $form_state);
     // Do not render the <form> tags. Instead we render the <form> as a <div>.
-    $current_form['#theme_wrappers'] = array('container');
+    $form_wrapper_index = array_search('form', $current_form['#theme_wrappers']);
+    if ($form_wrapper_index !== FALSE) {
+      $current_form['#theme_wrappers'][$form_wrapper_index] = 'container';
+    }
     _multiform_get_form($current_form, $form['buttons'], $index);
     // Unset any attributes specifics to form tags.
     $disallowed_attributes = array('enctype', 'action', 'method');
@@ -105,6 +109,9 @@ function multiform_get_form() {
     }
   }
   form_set_cache($build_id, $form['buttons'], $form_state_save);
+
+  drupal_alter('multiform_get_form', $form_state_save, $redirect, $all_args);
+
   if (!empty($form_state_save['input'])) {
     // We forced $form_state['no_redirect'] to TRUE above, so unset it in order
     // to allow the redirection to proceed.
@@ -129,12 +136,19 @@ function _multiform_get_form(&$element, &$buttons, $form_id) {
     $buttons[$element['#value']] = $element;
     $element['#access'] = FALSE;
   }
-  // By only changing $element['#name'] form API is not affected but the
-  // browser will put the element values into _POST where multiform_get_form
-  // expects them.
-  elseif (isset($element['#name'])) {
-    // If the name was op then we want multiform[$form_id][op]. If it was
-    // foo[bar] then we want multiform[$form_id][foo][bar].
-    $element['#name'] = "multiform[$form_id]" . preg_replace('/^[^[]+/', '[\0]', $element['#name']);
+  else {
+    // By only changing $element['#name'] form API is not affected but the
+    // browser will put the element values into _POST where multiform_get_form
+    // expects them.
+    if (isset($element['#name'])) {
+      // If the name was op then we want multiform[$form_id][op]. If it was
+      // foo[bar] then we want multiform[$form_id][foo][bar].
+      $element['#name'] = "multiform[$form_id]" . preg_replace('/^[^[]+/', '[\0]', $element['#name']);
+    }
+    // We repeat this for any $element['#attributes']['name'], which show up in
+    // the rendering arrays of certain multi-value select elements.
+    if (isset($element['#attributes']['name'])) {
+      $element['#attributes']['name'] = "multiform[$form_id]" . preg_replace('/^[^[]+/', '[\0]', $element['#attributes']['name']);
+    }
   }
 }
