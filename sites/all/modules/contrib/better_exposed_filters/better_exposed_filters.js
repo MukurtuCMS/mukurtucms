@@ -89,7 +89,12 @@
       // Check for and initialize datepickers
       var befSettings = Drupal.settings.better_exposed_filters;
       if (befSettings && befSettings.datepicker && befSettings.datepicker_options && $.fn.datepicker) {
-        var opt = befSettings.datepicker_options.dateformat ? {dateFormat: befSettings.datepicker_options.dateformat} : {};
+        var opt = [];
+        $.each(befSettings.datepicker_options, function(key, val) {
+          if (key && val) {
+            opt[key] = JSON.parse(val);
+          }
+        });
         $('.bef-datepicker').datepicker(opt);
       }
 
@@ -103,7 +108,15 @@
           // To respect term depth, check/uncheck child term checkboxes.
           .find('input.form-checkboxes:first')
           .click(function() {
-            $(this).parents('li:first').find('ul input.form-checkboxes').attr('checked', $(this).attr('checked'));
+            var checkedParent = $(this).attr('checked');
+            if (!checkedParent) {
+              // Uncheck all children if parent is unchecked.
+              $(this).parents('li:first').find('ul input.form-checkboxes').removeAttr('checked');
+            }
+            else {
+              // Check all children if parent is checked.
+              $(this).parents('li:first').find('ul input.form-checkboxes').attr('checked', $(this).attr('checked'));
+            }
           })
           .end()
           // When a child term is checked or unchecked, set the parent term's
@@ -111,25 +124,43 @@
           .find('ul input.form-checkboxes')
           .click(function() {
             var checked = $(this).attr('checked');
+
             // Determine the number of unchecked sibling checkboxes.
             var ct = $(this).parents('ul:first').find('input.form-checkboxes:not(:checked)').size();
+
             // If the child term is unchecked, uncheck the parent.
+            if (!checked) {
+              // Uncheck parent if any of the childres is unchecked.
+              $(this).parents('li:first').parents('li:first').find('input.form-checkboxes:first').removeAttr('checked');
+            }
+
             // If all sibling terms are checked, check the parent.
-            if (!checked || !ct) {
+            if (!ct) {
+              // Check the parent if all the children are checked.
               $(this).parents('li:first').parents('li:first').find('input.form-checkboxes:first').attr('checked', checked);
             }
           });
       });
     }
-  }
+  };
 
   Drupal.behaviors.better_exposed_filters_slider = {
     attach: function(context, settings) {
       var befSettings = settings.better_exposed_filters;
       if (befSettings && befSettings.slider && befSettings.slider_options) {
         $.each(befSettings.slider_options, function(i, sliderOptions) {
+          var containing_parent = "#" + sliderOptions.viewId + " #edit-" + sliderOptions.id + "-wrapper .views-widget";
+          var $filter = $(containing_parent);
+
+          // If the filter is placed in a secondary fieldset, we may not have
+          // the usual wrapper element.
+          if (!$filter.length) {
+            containing_parent = "#" + sliderOptions.viewId + " .bef-slider-wrapper";
+            $filter = $(containing_parent);
+          }
+
           // Only make one slider per filter.
-          $("#" + sliderOptions.viewId + " #edit-" + sliderOptions.id + "-wrapper").once('slider-filter', function() {
+          $filter.once('slider-filter', function() {
             var $input = $(this).find('input[type=text]');
 
             // This is a "between" or "not between" filter with two values.
@@ -151,7 +182,7 @@
               $min.val(default_min);
               $max.val(default_max);
 
-              $min.parents('div.views-widget').after(
+              $min.parents(containing_parent).after(
                 $('<div class="bef-slider"></div>').slider({
                   range: true,
                   min: parseFloat(sliderOptions.min, 10),
@@ -202,7 +233,7 @@
               // Set the element value in case we are using the slider min.
               $input.val(default_value);
 
-              $input.parents('div.views-widget').after(
+              $input.parents(containing_parent).after(
                 $('<div class="bef-slider"></div>').slider({
                   min: parseFloat(sliderOptions.min, 10),
                   max: parseFloat(sliderOptions.max, 10),
@@ -244,6 +275,105 @@
       }
     }
   };
+
+  // This is only needed to provide ajax functionality
+  Drupal.behaviors.better_exposed_filters_select_as_links = {
+    attach: function(context, settings) {
+
+      $('.bef-select-as-links', context).once(function() {
+        var $element = $(this);
+
+        // Check if ajax submission is enabled. If it's not enabled then we
+        // don't need to attach our custom submission handling, because the
+        // links are already properly built.
+
+        // First check if any ajax views are contained in the current page.
+        if (typeof settings.views == 'undefined' || typeof settings.views.ajaxViews == 'undefined') {
+          return;
+        }
+
+        // Now check that the view for which the current filter block is used,
+        // is part of the configured ajax views.
+        var $uses_ajax = false;
+        $.each(settings.views.ajaxViews, function(i, item) {
+          var $view_name = item.view_name.replace(/_/g, '-');
+          var $view_display_id = item.view_display_id.replace(/_/g, '-');
+          var $id = 'views-exposed-form-' + $view_name + '-' + $view_display_id;
+          var $form_id = $element.parents('form').attr('id');
+          if ($form_id == $id) {
+            $uses_ajax = true;
+            return;
+          }
+        });
+
+        // If no ajax is used for form submission, we quit here.
+        if (!$uses_ajax) {
+          return;
+        }
+
+        // Attach selection toggle and form submit on click to each link.
+        $(this).find('a').click(function(event) {
+          var $wrapper = $(this).parents('.bef-select-as-links');
+          var $options = $wrapper.find('select option');
+          // We have to prevent the page load triggered by the links.
+          event.preventDefault();
+          event.stopPropagation();
+          // Un select old select value.
+          $wrapper.find('select option').removeAttr('selected');
+
+          // Set the corresponding option inside the select element as selected.
+          var link_text = $(this).text();
+          $selected = $options.filter(function() {
+            return $(this).text() == link_text;
+          });
+          $selected.attr('selected', 'selected');
+          $wrapper.find('.bef-new-value').val($selected.val());
+          $wrapper.find('a').removeClass('active');
+          $(this).addClass('active');
+          // Submit the form.
+          $wrapper.parents('form').find('.views-submit-button *[type=submit]').click();
+        });
+      });
+    }
+  };
+
+  Drupal.behaviors.betterExposedFiltersRequiredFilter = {
+    attach: function(context, settings) {
+      // Required checkboxes should re-check all inputs if a user un-checks
+      // them all.
+      $('.bef-select-as-checkboxes', context).once('bef-required-filter').ajaxComplete(function (e, xhr, s) {
+        var $element = $(this);
+
+        if (typeof settings.views == 'undefined' || typeof settings.views.ajaxViews == 'undefined') {
+          return;
+        }
+
+        // Now check that the view for which the current filter block is used,
+        // is part of the configured ajax views.
+        var $view_name;
+        var $view_display_id;
+        var $uses_ajax = false;
+        $.each(settings.views.ajaxViews, function(i, item) {
+          $view_name = item.view_name;
+          $view_display_id = item.view_display_id;
+          var $id = 'views-exposed-form-' + $view_name.replace(/_/g, '-') + '-' + $view_display_id.replace(/_/g, '-');
+          var $form_id = $element.parents('form').attr('id');
+          if ($form_id == $id) {
+            $uses_ajax = true;
+            return false;
+          }
+        });
+
+        //Check if we have any filters at all because of Views Selective Filter
+        if($('input', this).length > 0) {
+          var $filter_name = $('input', this).attr('name').slice(0, -2);
+          if (Drupal.settings.better_exposed_filters.views[$view_name].displays[$view_display_id].filters[$filter_name].required && $('input:checked', this).length == 0) {
+            $('input', this).prop('checked', true);
+          }
+        }
+      });
+    }
+  }
 
   /*
    * Helper functions
