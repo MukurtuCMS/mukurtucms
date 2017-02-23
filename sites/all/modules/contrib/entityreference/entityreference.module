@@ -210,6 +210,23 @@ function entityreference_field_load($entity_type, $entities, $field, $instances,
  * Implements hook_field_validate().
  */
 function entityreference_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+
+  // Avoid duplicates if it's was enabled in field settings.
+  if (!empty($field['settings']['duplicates']) && $field['settings']['duplicates'] == 1) {
+    $tmp_items = array();
+    foreach ($items as $key => $item) {
+      // Check that entity is already used.
+      if (!empty($tmp_items[$item['target_id']])) {
+        $errors[$field['field_name']][$langcode][$key][] = array(
+          'error' => 'entityreference_invalid_entity',
+          'message' => t('The referenced entity (@type: @id) is already used in this field.', array('@type' => $field['settings']['target_type'], '@id' => $item['target_id'])),
+        );
+        break;
+      }
+      $tmp_items[$item['target_id']] = $item['target_id'];
+    }
+  }
+
   $ids = array();
   foreach ($items as $delta => $item) {
     if (!entityreference_field_is_empty($item, $field) && $item['target_id'] !== NULL) {
@@ -427,6 +444,13 @@ function _entityreference_field_settings_process($form, $form_state) {
     '#limit_validation_errors' => array(),
   );
 
+  $form['duplicates'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Forbid duplicates'),
+    '#description' => t('This option forbid to use duplicate entities in field with multiple values.'),
+    '#default_value' => (!empty($settings['duplicates'])) ? $settings['duplicates'] : 0,
+  );
+
   ctools_include('plugins');
   $handlers = ctools_get_plugins('entityreference', 'selection');
   uasort($handlers, 'ctools_plugin_sort');
@@ -451,6 +475,7 @@ function _entityreference_field_settings_process($form, $form_state) {
     '#ajax' => TRUE,
     '#limit_validation_errors' => array(),
   );
+
   $form['handler_submit'] = array(
     '#type' => 'submit',
     '#value' => t('Change handler'),
