@@ -119,6 +119,18 @@ function _user_resource_definition() {
               'default value' => variable_get('services_user_index_page_size', 20),
               'source' => array('param' => 'pagesize'),
             ),
+            array(
+              'name' => 'options',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Additional query options.',
+              'default value' => array(
+                'orderby' => array(
+                  'created' => 'DESC'
+                )
+              ),
+              'source' => array('param' => 'options'),
+            ),
           ),
           'access arguments' => array('access user profiles'),
           'access arguments append' => FALSE,
@@ -169,6 +181,35 @@ function _user_resource_definition() {
               'description' => 'A valid user name or e-mail address',
               'source' => array('data' => 'name'),
               'optional' => FALSE,
+            ),
+          ),
+          'access callback' => 'services_access_menu',
+          'file' => array('type' => 'inc', 'module' => 'services', 'name' => 'resources/user_resource'),
+        ),
+        'user_pass_reset' => array(
+          'help' => 'Process one time login link and return the pass_reset_{uid} token to be used on user update operation',
+          'callback' => '_user_resource_user_pass_reset_login',
+          'args' => array(
+            array(
+              'name' => 'uid',
+              'optional' => FALSE,
+              'type' => 'int',
+              'description' => 'The uid of the user in the operation.',
+              'source' => array('data' => 'uid'),
+            ),
+            array(
+              'name' => 'timestamp',
+              'optional' => FALSE,
+              'type' => 'int',
+              'description' => 'The timestamp value from the reset password link.',
+              'source' => array('data' => 'timestamp'),
+            ),
+            array(
+              'name' => 'hashed_pass',
+              'optional' => FALSE,
+              'type' => 'string',
+              'description' => 'The hashed pass value from the reset password link.',
+              'source' => array('data' => 'hashed_pass'),
             ),
           ),
           'access callback' => 'services_access_menu',
@@ -320,8 +361,9 @@ function _user_resource_create($account) {
   // Set the form state op.
   $form_state['values']['op'] = variable_get('services_user_create_button_resource_create', t('Create new account'));
 
-  // execute the register form
+  // Execute the register form.
   $form_state['programmed_bypass_access_check'] = FALSE;
+
   drupal_form_submit('user_register_form', $form_state);
   // find and store the new user into the form_state
   if(isset($form_state['values']['uid'])) {
@@ -374,6 +416,28 @@ function _user_resource_update($uid, $account) {
   if (isset($account['category'])) {
     $category = $account['category'];
     unset($account['category']);
+  }
+
+  // Prepare values for the user profile image.
+  if (array_key_exists('picture_upload', $account)) {
+    if (is_array($account['picture_upload'])) {
+      // Check if it's an array and convert to object.
+      $account['picture_upload'] = (object) $account['picture_upload'];
+    }
+    elseif (is_int($account['picture_upload'])) {
+      // Check if it's an integer and get the file object.
+      $file_validate = file_validate_is_image($file = file_load($account['picture_upload']));
+      if (empty($file_validate)) {
+        $account['picture_upload'] = $file;
+      }
+    }
+    elseif (is_string($account['picture_upload'])) {
+      // Check if it's an string and get the file object.
+      $file_validate = file_validate_is_image($file = file_load((int) $account['picture_upload']));
+      if (empty($file_validate)) {
+        $account['picture_upload'] = $file;
+      }
+    }
   }
 
   // Drop any passed in values into the $account var. Anything
@@ -431,7 +495,7 @@ function _user_resource_update_services_user($uid, $time) {
   //If so that means we are updating it.
   $result = db_select('services_user', 'su')
     ->fields('su')
-    ->condition('uid', $uid,'=')
+    ->condition('uid', $uid, '=')
     ->execute()
     ->fetchAssoc();
   //check the result
@@ -450,6 +514,7 @@ function _user_resource_update_services_user($uid, $time) {
           'changed' => $time,
         )
       )
+      ->condition('uid', $uid, '=')
       ->execute();
   }
 }
@@ -595,12 +660,17 @@ function _user_resource_logout() {
 
   watchdog('user', 'Session closed for %name.', array('%name' => $user->name));
 
+  $original_session_state = drupal_save_session();
+  drupal_save_session(TRUE);
+
   // Destroy the current session.
   module_invoke_all('user_logout', $user);
   session_destroy();
 
   // Load the anonymous user.
   $user = drupal_anonymous_user();
+
+  drupal_save_session($original_session_state);
 
   return TRUE;
 }
@@ -669,6 +739,64 @@ function _user_resource_request_new_password($name) {
   }
   else {
     return FALSE;
+  }
+}
+
+function _user_resource_user_pass_reset_login($uid, $timestamp, $hashed_pass) {
+  global $user;
+
+  // When processing the one-time login link, we have to make sure that a user
+  // isn't already logged in.
+  if ($user->uid) {
+    // The existing user is already logged in.
+    if ($user->uid == $uid) {
+      return services_error(t('You are logged in as %user. Please edit your profile to update your password.', array('%user' => $user->name)), 403);
+    }
+    // A different user is already logged in on the computer.
+    else {
+      $reset_link_account = user_load($uid);
+      if (!empty($reset_link_account)) {
+        return services_error(t('Another user (%other_user) is already logged into the site on this computer, but you tried to use a one-time link for user %resetting_user. Please logout and try using the link again.', array('%other_user' => $user->name, '%resetting_user' => $reset_link_account->name)), 405);
+      }
+      else {
+        // Invalid one-time link specifies an unknown user.
+       return services_error(t('The one-time login link you clicked is invalid.'), 406);
+      }
+    }
+  }
+  else {
+    // Time out, in seconds, until login URL expires. Defaults to 24 hours =
+    // 86400 seconds.
+    $timeout = variable_get('user_password_reset_timeout', 86400);
+    $current = REQUEST_TIME;
+    // Some redundant checks for extra security ?
+    $users = user_load_multiple(array($uid), array('status' => '1'));
+    if ($timestamp <= $current && $account = reset($users)) {
+      // No time out for first time login.
+      if ($account->login && $current - $timestamp > $timeout) {
+        return services_error(t('You have tried to use a one-time login link that has expired. Please request a new one.'), 406);
+      }
+      elseif ($account->uid && $timestamp >= $account->login && $timestamp <= $current && $hashed_pass == user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid)) {
+        // Set the new user.
+        $user = $account;
+        // user_login_finalize() also updates the login timestamp of the
+        // user, which invalidates further use of the one-time login link.
+        user_login_finalize();
+        watchdog('user', 'User %name used one-time login link at time %timestamp.', array('%name' => $account->name, '%timestamp' => $timestamp));
+        // Let the user's password be changed without the current password check.
+        $token = drupal_random_key();
+        $_SESSION ['pass_reset_' . $user->uid] = $token;
+        return array('pass_reset_token' => $token, 'message' => t('You have just used your one-time login link. It is no longer necessary to use this link to log in. <strong>Please change your password</strong>.'));
+      }
+      else {
+        return services_error(t('You have tried to use a one-time login link that has either been used or is no longer valid. Please request a new one.'), 406);
+      }
+    }
+    else {
+      // Deny access, no more clues.
+      // Everything will be in the watchdog's URL for the administrator to check.
+      return services_error(t('Access denied.'), 403);
+    }
   }
 }
 
@@ -754,11 +882,10 @@ function _user_resource_resend_welcome_email($uid) {
  *
  * @see _node_resource_index() for more notes
  */
-function _user_resource_index($page, $fields, $parameters, $page_size) {
-  $user_select = db_select('users', 't')
-    ->orderBy('created', 'DESC');
+function _user_resource_index($page, $fields, $parameters, $page_size, $options = array()) {
+  $user_select = db_select('users', 't');
 
-  services_resource_build_index_query($user_select, $page, $fields, $parameters, $page_size, 'user');
+  services_resource_build_index_query($user_select, $page, $fields, $parameters, $page_size, 'user', $options);
 
   $results = services_resource_execute_index_query($user_select);
 
@@ -778,7 +905,7 @@ function _user_resource_access($op = 'view', $args = array()) {
   if ($op != 'create' && $op != 'register' ) {
     $account = user_load($args[0]);
     if (!$account) {
-      return services_error(t('There is no user with ID @uid.', array('@uid' => $args[0])), 406);
+      return services_error(t('There is no user with ID @uid.', array('@uid' => $args[0])), 404);
     }
   }
 
