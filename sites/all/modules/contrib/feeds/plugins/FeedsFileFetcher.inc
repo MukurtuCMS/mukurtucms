@@ -213,6 +213,7 @@ class FeedsFileFetcher extends FeedsFetcher {
 
     return array(
       'allowed_extensions' => 'txt csv tsv xml opml',
+      'delete_uploaded_file' => FALSE,
       'direct' => FALSE,
       'directory' => $scheme . '://feeds',
       'allowed_schemes' => $schemes,
@@ -229,6 +230,19 @@ class FeedsFileFetcher extends FeedsFetcher {
       '#title' => t('Allowed file extensions'),
       '#description' => t('Allowed file extensions for upload.'),
       '#default_value' => $this->config['allowed_extensions'],
+    );
+    $form['delete_uploaded_file'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Immediately delete uploaded file after import'),
+      '#description' => t('Useful if the file contains private information. If not selected, the file will remain on the server, allowing the import to be re-run without having to upload it again. This setting has no effect when the option "@direct" is enabled.', array(
+        '@direct' => t('Supply path to file or directory directly'),
+      )),
+      '#default_value' => $this->config['delete_uploaded_file'],
+      '#states' => array(
+        'disabled' => array(
+          ':input[name="direct"]' => array('checked' => TRUE),
+        ),
+      ),
     );
     $form['direct'] = array(
       '#type' => 'checkbox',
@@ -296,6 +310,20 @@ class FeedsFileFetcher extends FeedsFetcher {
       // Ensure that the upload directory exists.
       if (!file_prepare_directory($values['directory'], FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS)) {
         form_set_error('directory', t('The chosen directory does not exist and attempts to create it failed.'));
+      }
+    }
+  }
+
+  /**
+   * Overrides FeedsFetcher::afterImport().
+   */
+  public function afterImport(FeedsSource $source) {
+    // Immediately delete the file after import, if requested.
+    if (!empty($this->config['delete_uploaded_file'])) {
+      $source_config = $source->getConfigFor($this);
+      if (!empty($source_config['fid'])) {
+        $this->deleteFile($source_config['fid'], $source->feed_nid);
+        $source->setConfigFor($this, $this->sourceDefaults());
       }
     }
   }

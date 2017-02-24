@@ -38,14 +38,23 @@ class RESTServer {
     $formatter = $this->getResponseFormatter();
 
     services_set_server_info('resource_uri_formatter', array(&$this, 'uri_formatter'));
-
+    // Initializing $arguments because an exception can be thrown for required
+    // arguments and before $arguments is initialized for the exception handler.
+    $arguments = array();
     try {
       // Parse the request data
       $arguments = $this->getControllerArguments($controller);
       $result = services_controller_execute($controller, $arguments);
     }
     catch (ServicesException $e) {
-      $result = $this->handleException($e);
+      $result = $this->handleException($e, $controller, $arguments);
+
+      $no_body = variable_get('services_no_body_responses', array(204, 304));
+      $generate_body = variable_get('services_generate_error_body', TRUE);
+
+      if (in_array($e->getCode(), $no_body) && !$generate_body) {
+        return '';
+      }
     }
 
     return $this->render($formatter, $result);
@@ -670,6 +679,7 @@ class RESTServer {
           $error_header_status_message = $this->formatHttpHeaderStatusMessage($error_code, $error_message);
         }
         else {
+          watchdog_exception('Services', $exception);
           $error_header_status_message = $this->formatHttpHeaderStatusMessage('500 Internal Server Error', "An error occurred ({$error_code}): {$error_message}");
         }
         break;

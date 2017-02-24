@@ -73,7 +73,7 @@ function _file_resource_definition() {
           'access arguments append' => TRUE,
           'args' => array(
             array(
-              'name' => 'cid',
+              'name' => 'fid',
               'type' => 'int',
               'description' => 'The id of the file to delete',
               'source' => array('path' => '0'),
@@ -117,6 +117,18 @@ function _file_resource_definition() {
               'description' => 'Number of records to get per page.',
               'default value' => variable_get('services_file_index_page_size', 20),
               'source' => array('param' => 'pagesize'),
+            ),
+            array(
+              'name' => 'options',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Additional query options.',
+              'default value' => array(
+                'orderby' => array(
+                  'timestamp' => 'DESC'
+                )
+              ),
+              'source' => array('param' => 'options'),
             ),
           ),
           'access callback' => '_file_resource_access',
@@ -204,7 +216,12 @@ function _file_resource_create_raw() {
     // file_save_upload() validates the file extension and name's length. File
     // size is limited by the upload_max_filesize directive in php.ini.
     $scheme = file_default_scheme();
-    $file = file_save_upload($field_name, array(), "$scheme://");
+    // Set file validators: allowed extension
+    $validators = array();
+    if ($extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS)) {
+      $validators['file_validate_extensions'] = $extensions;
+    }
+    $file = file_save_upload($field_name, $validators, "$scheme://");
 
     if (!empty($file->fid)) {
       // Change the file status from temporary to permanent.
@@ -253,7 +270,7 @@ function _file_resource_retrieve($fid, $include_file_contents, $get_image_style)
 
     $file->image_styles = array();
     // Add image style information if available.
-    if ($get_image_style) {
+    if ($get_image_style && !empty($file->uri) && strpos($file->filemime, 'image') === 0) {
       foreach (image_styles() as $style) {
         $style_name = $style['name'];
         $file->image_styles[$style_name] = image_style_url($style_name, $file->uri);
@@ -298,16 +315,17 @@ function _file_resource_delete($fid) {
  *   indicating items to retrieve.
  * @param $page_size
  *   Integer number of items to be returned.
+ * @param $options
+ *   Additional query options.
  * @return
  *   An array of file objects.
  *
  * @see _node_resource_index() for more notes
  **/
-function _file_resource_index($page, $fields, $parameters, $page_size) {
-  $file_select = db_select('file_managed', 't')
-    ->orderBy('timestamp', 'DESC');
+function _file_resource_index($page, $fields, $parameters, $page_size, $options = array()) {
+  $file_select = db_select('file_managed', 't');
 
-  services_resource_build_index_query($file_select, $page, $fields, $parameters, $page_size, 'file');
+  services_resource_build_index_query($file_select, $page, $fields, $parameters, $page_size, 'file', $options);
 
   $results = services_resource_execute_index_query($file_select);
 
@@ -420,8 +438,8 @@ function _services_file_check_destination($destination) {
  *   A safe file name and extension.
  */
 function _services_file_check_name_extension($name) {
-  // This whitelist is copied from file_save_upload().
-  $extensions = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp m4a';
+  //Fetch the file extensions set in the variable at the time module is enabled
+  $extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS);
 
   // Get the part of the name after the last period (".").
   $name = explode('.', $name);

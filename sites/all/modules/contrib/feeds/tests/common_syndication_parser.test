@@ -33,6 +33,7 @@ class CommonSyndicationParserTestCase extends DrupalWebTestCase {
     $this->_testRSS2();
     $this->_testAtomGeoRSS();
     $this->_testAtomGeoRSSWithoutAuthor();
+    $this->_testAtomEntriesWithoutBaseUrl();
   }
 
   /**
@@ -89,6 +90,32 @@ class CommonSyndicationParserTestCase extends DrupalWebTestCase {
   protected function _testAtomGeoRSSWithoutAuthor() {
     $string = $this->readFeed('earthquake-georss-noauthor.atom');
     $feed = common_syndication_parser_parse($string);
+  }
+
+  /**
+   * Tests if the base url is prepended for entries without base url.
+   *
+   * For example, the url in the following entry should be parsed as
+   * 'http://www.example.com/node/123' and not as 'node/123'.
+   * @code
+   * <entry>
+   *   <link href="node/123"/>
+   * </entry>
+   * @endcode
+   */
+  protected function _testAtomEntriesWithoutBaseUrl() {
+    $string = $this->readFeed('entries-without-base-url.atom');
+    $feed = common_syndication_parser_parse($string);
+
+    // Assert that all items got the base url assigned.
+    $expected = array(
+      'http://www.example.com/node/1281496#comment-11669575',
+      'http://www.example.com/node/1281496#comment-10080648',
+      'http://www.example.com/node/1281496#comment-10062564',
+    );
+    foreach ($feed['items'] as $key => $item) {
+      $this->assertEqual($expected[$key], $item['url']);
+    }
   }
 
   /**

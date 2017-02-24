@@ -6,10 +6,18 @@ dependencies[] = feeds (7.x-2.x-dev)
 dependencies[] = entity
 
 files[] = tests/src/FeedsEntityProcessorBasicTest.test
+files[] = tests/src/FeedsEntityProcessorPropertyTest.test
 
-; Information added by Drupal.org packaging script on 2016-01-31
+; Entity property classes.
+files[] = src/Property/FeedsEntityProcessorPropertyBoolean.php
+files[] = src/Property/FeedsEntityProcessorPropertyDate.php
+files[] = src/Property/FeedsEntityProcessorPropertyDefault.php
+files[] = src/Property/FeedsEntityProcessorPropertyEntity.php
+files[] = src/Property/FeedsEntityProcessorPropertyInterface.php
+
+; Information added by Drupal.org packaging script on 2016-02-21
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "feeds_entity_processor"
-datestamp = "1454258340"
+datestamp = "1456071845"
 

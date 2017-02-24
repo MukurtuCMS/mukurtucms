@@ -78,6 +78,7 @@ function token_menu() {
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
     'file' => 'token.pages.inc',
+    'theme callback' => 'ajax_base_page_theme',
   );
 
   // Devel token pages.
@@ -179,7 +180,7 @@ function token_theme() {
       'text' => NULL,
       'options' => array(),
       'dialog' => TRUE,
-    ),
+    ) + $info['token_tree']['variables'],
     'file' => 'token.pages.inc',
   );
 
@@ -265,15 +266,19 @@ function token_form_block_admin_configure_alter(&$form, $form_state) {
   $form['settings']['title']['#description'] .= ' ' . t('This field supports tokens.');
   // @todo Figure out why this token validation does not seem to be working here.
   $form['settings']['title']['#element_validate'][] = 'token_element_validate';
-  $form['settings']['title']['#token_types'] = array();
+  $form['settings']['title'] += array('#token_types' => array());
 }
 
 /**
  * Implements hook_widget_form_alter().
  */
 function token_field_widget_form_alter(&$element, &$form_state, $context) {
-  if (!empty($element['#description']) && is_string($element['#description'])) {
-    $element['#description'] = filter_xss_admin(token_replace($element['#description']));
+  if (!empty($element['#description']) && !empty($context['instance']['description'])) {
+    $instance = $context['instance'];
+    if (module_exists('i18n_field')) {
+      $instance = i18n_string_object_translate('field_instance', $instance);
+    }
+    $element['#description'] = field_filter_xss(token_replace($instance['description']));
   }
 }
 
@@ -377,23 +382,26 @@ function token_clear_cache() {
  * @see token_entity_info_alter()
  * @see http://drupal.org/node/737726
  */
-function token_get_entity_mapping($value_type = 'token', $value = NULL) {
+function token_get_entity_mapping($value_type = 'token', $value = NULL, $fallback = FALSE) {
   $mapping = &drupal_static(__FUNCTION__, array());
 
   if (empty($mapping)) {
     foreach (entity_get_info() as $entity_type => $info) {
       $mapping[$entity_type] = !empty($info['token type']) ? $info['token type'] : $entity_type;
     }
+    // Allow modules to alter the mapping array.
+    drupal_alter('token_entity_mapping', $mapping);
   }
 
   if (!isset($value)) {
-    return $mapping;
+    return $value_type == 'token' ? array_flip($mapping) : $mapping;
   }
   elseif ($value_type == 'token') {
-    return array_search($value, $mapping);
+    $return = array_search($value, $mapping);
+    return $return !== FALSE ? $return : ($fallback ? $value : FALSE);
   }
   elseif ($value_type == 'entity') {
-    return isset($mapping[$value]) ? $mapping[$value] : FALSE;
+    return isset($mapping[$value]) ? $mapping[$value] : ($fallback ? $value : FALSE);
   }
 }
 
@@ -408,12 +416,18 @@ function token_get_entity_mapping($value_type = 'token', $value = NULL) {
  */
 function token_entity_info_alter(&$info) {
   foreach (array_keys($info) as $entity_type) {
-    // Add a token view mode if it does not already exist.
-    if (!empty($info[$entity_type]['view modes']) && !isset($info[$entity_type]['view modes']['token'])) {
-      $info[$entity_type]['view modes']['token'] = array(
-        'label' => t('Tokens'),
-        'custom settings' => FALSE,
-      );
+    // Add a token view mode if it does not already exist. Only work with
+    // fieldable entities.
+    if (!empty($info[$entity_type]['fieldable'])) {
+      if (!isset($info[$entity_type])) {
+        $info[$entity_type]['view modes'] = array();
+      }
+      if (!isset($info[$entity_type]['view modes']['token'])) {
+        $info[$entity_type]['view modes']['token'] = array(
+          'label' => t('Tokens'),
+          'custom settings' => FALSE,
+        );
+      }
     }
 
     if (!empty($info[$entity_type]['token type'])) {
@@ -643,6 +657,10 @@ function token_get_invalid_tokens($type, $tokens) {
   $invalid_tokens = array();
 
   foreach ($tokens as $token => $full_token) {
+    if (isset($token_info['tokens'][$type][$token])) {
+      continue;
+    }
+
     // Split token up if it has chains.
     $parts = explode(':', $token, 2);
 
@@ -705,15 +723,13 @@ function token_element_validate(&$element, &$form_state) {
 
   // Validate if an element must have a minimum number of tokens.
   if (isset($element['#min_tokens']) && count($tokens) < $element['#min_tokens']) {
-    // @todo Change this error message to include the minimum number.
-    $error = format_plural($element['#min_tokens'], 'The %element-title cannot contain fewer than one token.', 'The %element-title must contain at least @count tokens.', array('%element-title' => $title));
+    $error = format_plural($element['#min_tokens'], '%name must contain at least one token.', '%name must contain at least @count tokens.', array('%name' => $title));
     form_error($element, $error);
   }
 
   // Validate if an element must have a maximum number of tokens.
   if (isset($element['#max_tokens']) && count($tokens) > $element['#max_tokens']) {
-    // @todo Change this error message to include the maximum number.
-    $error = format_plural($element['#max_tokens'], 'The %element-title must contain as most one token.', 'The %element-title must contain at most @count tokens.', array('%element-title' => $title));
+    $error = format_plural($element['#max_tokens'], '%name must contain at most one token.', '%name must contain at most @count tokens.', array('%name' => $title));
     form_error($element, $error);
   }
 
@@ -721,7 +737,7 @@ function token_element_validate(&$element, &$form_state) {
   if (isset($element['#token_types'])) {
     $invalid_tokens = token_get_invalid_tokens_by_context($tokens, $element['#token_types']);
     if ($invalid_tokens) {
-      form_error($element, t('The %element-title is using the following invalid tokens: @invalid-tokens.', array('%element-title' => $title, '@invalid-tokens' => implode(', ', $invalid_tokens))));
+      form_error($element, t('%name is using the following invalid tokens: @invalid-tokens.', array('%name' => $title, '@invalid-tokens' => implode(', ', $invalid_tokens))));
     }
   }
 
@@ -739,24 +755,28 @@ function token_element_validate_token_context(&$element, &$form_state) {
  * Implements hook_form_FORM_ID_alter().
  */
 function token_form_field_ui_field_edit_form_alter(&$form, $form_state) {
-  if (!isset($form['instance'])) {
+  if (!isset($form['instance']) || !empty($form['#field']['locked'])) {
     return;
   }
 
   if (($form['#field']['type'] == 'file' || $form['#field']['type'] == 'image') && isset($form['instance']['settings']['file_directory']) && !module_exists('filefield_paths')) {
     // GAH! We can only support global tokens in the upload file directory path.
     $form['instance']['settings']['file_directory']['#element_validate'][] = 'token_element_validate';
-    $form['instance']['settings']['file_directory']['#token_types'] = array();
-    $form['instance']['settings']['token_tree'] = array(
-      '#theme' => 'token_tree',
-      '#token_types' => array(),
-      '#weight' => $form['instance']['settings']['file_directory']['#weight'] + 0.5,
-    );
+    $form['instance']['settings']['file_directory'] += array('#token_types' => array());
     $form['instance']['settings']['file_directory']['#description'] .= ' ' . t('This field supports tokens.');
   }
 
   // Note that the description is tokenized via token_field_widget_form_alter().
   $form['instance']['description']['#description'] .= '<br />' . t('This field supports tokens.');
+  $form['instance']['description']['#element_validate'][] = 'token_element_validate';
+  $form['instance']['description'] += array('#token_types' => array());
+
+  $form['instance']['settings']['token_tree'] = array(
+    '#theme' => 'token_tree',
+    '#token_types' => array(),
+    '#dialog' => TRUE,
+    '#weight' => $form['instance']['description']['#weight'] + 0.5,
+  );
 }
 
 /**
@@ -775,6 +795,7 @@ function token_form_system_actions_configure_alter(&$form, $form_state) {
       $form['token_tree'] = array(
         '#theme' => 'token_tree',
         '#token_types' => 'all',
+        '#dialog' => TRUE,
         '#weight' => 100,
       );
       // @todo Add token validation to the action fields that can use tokens.
@@ -836,10 +857,11 @@ function token_form_user_admin_settings_alter(&$form, &$form_state) {
   }
 
   // Add the token tree UI.
-  $form['token_tree'] = array(
+  $form['email']['token_tree'] = array(
     '#theme' => 'token_tree',
     '#token_types' => array('user'),
     '#show_restricted' => TRUE,
+    '#dialog' => TRUE,
     '#weight' => 90,
   );
 }
@@ -963,7 +985,7 @@ function _token_build_tree($token_type, array $options) {
       // parent.
       $token_parents[] = $token_type;
     }
-    elseif (in_array($token, array_slice($token_parents, 1))) {
+    elseif (in_array($token, array_slice($token_parents, 1), TRUE)) {
       // Prevent duplicate recursive tokens. For example, this will prevent
       // the tree from generating the following tokens or deeper:
       // [comment:parent:parent]

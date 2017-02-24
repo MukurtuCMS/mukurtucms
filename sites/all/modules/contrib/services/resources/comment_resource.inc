@@ -122,6 +122,18 @@ function _comment_resource_definition() {
               'default value' => variable_get('services_comment_index_page_size', 20),
               'source' => array('param' => 'pagesize'),
             ),
+            array(
+              'name' => 'options',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Additional query options.',
+              'default value' => array(
+                'orderby' => array(
+                  'created' => 'DESC'
+                )
+              ),
+              'source' => array('param' => 'options'),
+            ),
           ),
           'access callback' => '_comment_resource_access',
           'access arguments' => array('view'),
@@ -233,13 +245,10 @@ function _comment_resource_create($comment) {
  *   The comment object
  */
 function _comment_resource_retrieve($cid) {
-
   $comment = comment_load($cid);
-
-  //Lets check field_permissions
-  $comment = services_field_permissions_clean('view', 'comment', $comment);
-
-  return $comment;
+  return $comment ?
+    services_field_permissions_clean('view', 'comment', $comment) :
+    services_error(t('Comment @cid not found', array('@cid' => $cid)), 404);
 }
 
 /**
@@ -321,16 +330,17 @@ function _comment_resource_delete($cid) {
  *   indicating items to retrieve.
  * @param $page_size
  *   Integer number of items to be returned.
+ * @param $options
+ *   Additional query options.
  * @return
  *   An array of comment objects.
  *
  * @see _node_resource_index() for more notes
  **/
-function _comment_resource_index($page, $fields, $parameters, $page_size) {
-  $comment_select = db_select('comment', 't')
-    ->orderBy('created', 'DESC');
+function _comment_resource_index($page, $fields, $parameters, $page_size, $options = array()) {
+  $comment_select = db_select('comment', 't');
 
-  services_resource_build_index_query($comment_select, $page, $fields, $parameters, $page_size, 'comment');
+  services_resource_build_index_query($comment_select, $page, $fields, $parameters, $page_size, 'comment', $options);
 
   if (!user_access('administer comments')) {
     $comment_select->condition('status', COMMENT_PUBLISHED);

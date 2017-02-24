@@ -1,0 +1,16 @@
+<?php
+/**
+ * @file
+ * ma_services.install
+ */
+
+/**
+ * Add m4a to list of allowed extensions
+ */
+function ma_services_update_7500() {
+    $extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS);
+    if(stripos($extensions, 'm4a') == FALSE) {
+        $extensions = $extensions . ' m4a';
+        variable_set('services_allowed_extensions', $extensions);
+    }
+}

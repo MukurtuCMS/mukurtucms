@@ -14,9 +14,9 @@ files[]=exif_unittests.test
 configure = admin/config/media/exif
 
 
-; Information added by drupal.org packaging script on 2013-09-30
-version = "7.x-1.2+5-dev"
+; Information added by Drupal.org packaging script on 2016-03-08
+version = "7.x-1.8"
 core = "7.x"
 project = "exif"
-datestamp = "1380577481"
+datestamp = "1457475255"
 

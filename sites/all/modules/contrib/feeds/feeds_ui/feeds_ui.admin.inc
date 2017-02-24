@@ -48,7 +48,7 @@ function feeds_ui_mapping_help() {
 /**
  * Build overview of available configurations.
  */
-function feeds_ui_overview_form($form, &$form_status) {
+function feeds_ui_overview_form($form, array &$form_state) {
   $form = $form['enabled'] = $form['disabled'] = array();
 
   $form['#header'] = array(
@@ -651,6 +651,9 @@ function feeds_ui_mapping_settings_form($form, $form_state, $i, $mapping, $targe
 
     return array(
       '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('feeds-target-config'),
+      ),
       'settings' => $settings_form,
       'save_settings' => $base_button + array(
         '#type' => 'submit',
@@ -1198,9 +1201,7 @@ function feeds_ui_importer_import_validate($form, &$form_state) {
   $exists = feeds_ui_importer_machine_name_exists($feeds_importer->id);
 
   if ($exists && !$form_state['values']['id_override']) {
-    if (feeds_importer($feeds_importer->id)->export_type != EXPORT_IN_CODE) {
-      return form_error($form['id'], t('Feeds importer already exists with that id.'));
-    }
+    return form_error($form['id'], t('Feeds importer already exists with that id.'));
   }
 
   if (!$form_state['values']['bypass_validation']) {

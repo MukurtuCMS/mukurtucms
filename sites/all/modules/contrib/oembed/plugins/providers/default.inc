@@ -54,7 +54,6 @@ function oembed_default_provider_scheme() {
  * Default provider callback makes HTTP requests using drupal_http_request().
  */
 function oembed_default_callback($plugin, $url, $matches, $parameters) {
-  $embed = FALSE;
 
   // Remote oEmbed endpoint request.
   $parameters['url'] = $url;
@@ -63,37 +62,45 @@ function oembed_default_callback($plugin, $url, $matches, $parameters) {
 
   //TODO: Add alternative ways of fetching the content - like http client?
   $response = drupal_http_request($fetch_url);
-  if (!isset($response->error)) {
 
-    // JSON or XML data might be returned, so be agnostic about decoding it.
-    $embed = json_decode($response->data, TRUE);
-    if (!is_array($embed)) {
-      try {
-        $xml = @new SimpleXMLElement($response->data);
-        $embed = array();
-        foreach ($xml as $key => $value) {
-          $embed[$key] = (string) $value;
+  if (isset($response->error)) {
+    watchdog('oembed', 'Error fetching data from %url.', array('%url' => $fetch_url), WATCHDOG_ERROR);
+    throw new RuntimeException($response->error, $response->code);
+  }
+
+  // JSON or XML data might be returned, so be agnostic about decoding it.
+  $embed = drupal_json_decode($response->data);
+
+  // json_decode returns null when the input is unparseable.
+  if (is_null($embed)) {
+    try {
+      $xml = @new SimpleXMLElement($response->data);
+      $embed = array();
+      foreach ($xml as $key => $value) {
+        $embed[$key] = (string) $value;
+      }
+    }
+    catch (Exception $e) {
+      $msg = 'Could not parse response from %url.';
+      if (function_exists('json_last_error')) {
+        $msg .= ' json='. json_last_error();
+        if (function_exists('json_last_error_msg')) {
+          $msg .= ' ('. json_last_error_msg() .')';
         }
       }
-      catch (Exception $e) {
-        watchdog('oembed', 'Could not parse response from %url.', array('%url' => $fetch_url), WATCHDOG_ERROR);
-      }
-    }
-
-    if (empty($embed['version']) || empty($embed['type']) || intval($embed['version']) != 1) {
-      $embed = FALSE;
-    }
-
-    if ($embed && !isset($embed['title'])) {
-      $embed['title'] = '';
-    }
-
-    if (!$embed) {
-      watchdog('oembed', 'Response from %url not a valid oEmbed response.', array('%url' => $fetch_url), WATCHDOG_ERROR);
+      watchdog_exception('oembed', $e, $msg, array('%url' => $fetch_url), WATCHDOG_ERROR);
+      throw new RuntimeException(t($msg, array('%url' => $fetch_url)), WATCHDOG_ERROR, $e);
     }
   }
-  else {
-    watchdog('oembed', 'Error fetching data from %url.', array('%url' => $fetch_url), WATCHDOG_ERROR);
+
+  if (!is_array($embed) || empty($embed['version']) || empty($embed['type']) || intval($embed['version']) != 1) {
+    watchdog('oembed', 'Response from %url not a valid oEmbed response.', array('%url' => $fetch_url), WATCHDOG_ERROR);
+    throw new RuntimeException(t('Response from %url not a valid oEmbed response.', array('%url' => $fetch_url)), WATCHDOG_ERROR);
   }
+
+  if (!isset($embed['title'])) {
+    $embed['title'] = '';
+  }
+
   return $embed;
 }

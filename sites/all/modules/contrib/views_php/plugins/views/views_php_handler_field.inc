@@ -220,8 +220,13 @@ class views_php_handler_field extends views_handler_field {
       $value = ob_get_clean();
     }
     else {
-      $value = check_plain($values->{$this->field_alias});
+      if (isset($values->{$this->field_alias})) {
+        $value = check_plain($values->{$this->field_alias});
+      }
     }
-    return $value;
+
+    if (isset($value)) {
+      return $value;
+    }
   }
 }

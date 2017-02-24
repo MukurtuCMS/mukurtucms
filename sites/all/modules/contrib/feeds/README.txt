@@ -32,7 +32,7 @@ Features
 Requirements
 ============
 
-- CTools 1.x
+- CTools 7.x-1.x
   http://drupal.org/project/ctools
 - Job Scheduler
   http://drupal.org/project/job_scheduler
@@ -92,14 +92,6 @@ What's neat about Feeds News is that it comes with a configured View that shows
 a list of news items with every feed on the feed node's "View items" tab. It
 also comes with an OPML importer filter that can be accessed under /import.
 
-- Feeds Fast News -
-
-This feature is very similar to Feeds News. The big difference is that instead
-of aggregating a node for every item on a feed, it creates a database record
-in a single table, thus significantly improving performance. This approach
-especially starts to save resources when many items are being aggregated and
-expired (= deleted) on a site.
-
 - Feeds Import -
 
 This feature is an example illustrating Feeds' import capabilities. It contains
@@ -111,7 +103,7 @@ PubSubHubbub support
 
 Feeds supports the PubSubHubbub publish/subscribe protocol. Follow these steps
 to set it up for your site.
-http://code.google.com/p/pubsubhubbub/
+https://github.com/pubsubhubbub/
 
 - Go to admin/build/feeds and edit (override) the importer configuration you
   would like to use for PubSubHubbub.
@@ -146,12 +138,6 @@ API Overview
 See "The developer's guide to Feeds":
 http://drupal.org/node/622700
 
-Testing
-=======
-
-See "The developer's guide to Feeds":
-http://drupal.org/node/622700
-
 Debugging
 =========
 
@@ -178,6 +164,12 @@ Default:     FALSE
 Description: Set to TRUE for enabling debug output to
              /DRUPALTMPDIR/feeds_[sitename].log
 
+Name:        feeds_library_dir
+Default:     FALSE
+Description: The location where Feeds should look for libraries that it uses.
+             You can use this variable to override the libraries that are in
+             the Feeds libraries folder, for example "http_request.inc".
+
 Name:        feeds_importer_class
 Default:     'FeedsImporter'
 Description: The class to use for importing feeds.
@@ -185,13 +177,6 @@ Description: The class to use for importing feeds.
 Name:        feeds_source_class
 Default:     'FeedsSource'
 Description: The class to use for handling feed sources.
-
-Name:        feeds_data_$importer_id
-Default:     feeds_data_$importer_id
-Description: The table used by FeedsDataProcessor to store feed items. Usually a
-             FeedsDataProcessor builds a table name from a prefix (feeds_data_)
-             and the importer's id ($importer_id). This default table name can
-             be overridden by defining a variable with the same name.
 
 Name:        feeds_process_limit
 Default:     50

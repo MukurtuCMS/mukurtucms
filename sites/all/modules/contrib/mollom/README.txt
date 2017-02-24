@@ -1,7 +1,7 @@
 
 -- SUMMARY --
 
-Integrates with the Mollom content moderation service: https://mollom.com
+Integrates with the Mollom service: https://www.mollom.com
 
 For a full description of the module, visit the project page:
   http://drupal.org/project/mollom
@@ -10,7 +10,7 @@ To submit bug reports and feature suggestions, or to track changes:
   http://drupal.org/project/issues/mollom
 
 For issues pertaining to the Mollom service, contact Mollom Support:
-  https://mollom.com/contact
+  https://www.mollom.com/contact
   - e.g., inappropriately blocked posts, spam posts getting through, etc.
   - Ensure to include the Mollom session/content IDs of affected posts; find
     them in Drupal's Recent log messages by filtering by the "mollom" category.
@@ -26,7 +26,7 @@ None.
 * Install as usual:
   http://drupal.org/documentation/install/modules-themes/modules-7
 
-* Go to https://mollom.com,
+* Go to https://www.mollom.com,
 
   - sign up or log in with your account
   - go to your Site manager ("Manage sites" link in the upper right)
@@ -55,6 +55,13 @@ None.
     RewriteEngine On
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+-- OPTIONAL INSTALLATION --
+ * Download and enable the libraries module: http://drupal.org/project/libraries
+ * Download the chosen JavaScript plugin into your libraries location
+   - Download from https://github.com/harvesthq/chosen/releases
+     and save in your libraries location in a new "chosen" folder.
+   - See instructions from the libraries module for details:
+     https://www.drupal.org/node/1440066
 
 -- CONFIGURATION --
 
@@ -114,13 +121,20 @@ A: Out of the box, the Mollom module allows to protect Drupal core forms only.
    - https://github.com/Mollom/guide
    - https://github.com/Mollom/guide/tree/master/examples/php52
 
+Q: What happened to the Mollom Content Moderation Platform?
+
+A: On Thursday, 1 October 2015, Acquia is ending support for the Content
+   Moderation Platform (CMP) feature of Mollom, which was originally added as a
+   feature in 2013.  Users who activated their CMP accounts before June 1, 2015
+   will have access until that time.
+
+   - https://docs.acquia.com/mollom/faq/platform
+
 
 -- CONTACT --
 
-For questions pertaining to the Mollom service go to https://mollom.com/support
+For questions pertaining to the Mollom service go to https://www.mollom.com/support
 
 Current maintainers:
-* Lisa Backer (eshta) - http://drupal.org/user/1951462
-* Daniel F. Kudwien (sun) - http://drupal.org/user/54136
-* Dries Buytaert (Dries) - http://drupal.org/user/1
-
+* Lisa Backer (eshta) - https://www.drupal.org/u/eshta
+* Nick Veenhof (Nick_vh) - https://www.drupal.org/u/nick_vh

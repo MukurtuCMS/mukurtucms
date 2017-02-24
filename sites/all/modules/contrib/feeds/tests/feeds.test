@@ -90,6 +90,7 @@ class FeedsWebTestCase extends DrupalWebTestCase {
     $permissions[] = 'administer users';
     $permissions[] = 'administer feeds';
     $permissions[] = 'administer filters';
+    $permissions[] = 'administer fields';
 
     // Create an admin user and log in.
     $this->admin_user = $this->drupalCreateUser($permissions);
@@ -468,7 +469,14 @@ class FeedsWebTestCase extends DrupalWebTestCase {
         // Set some settings.
         $edit = array();
         foreach ($config as $key => $value) {
-          $edit["config[$i][settings][$key]"] = $value;
+          if (is_array($value)) {
+            foreach ($value as $subkey => $subvalue) {
+              $edit["config[$i][settings][$key][$subkey]"] = $subvalue;
+            }
+          }
+          else {
+            $edit["config[$i][settings][$key]"] = $value;
+          }
         }
         $this->drupalPostAJAX(NULL, $edit, 'mapping_settings_update_' . $i);
         $this->drupalPost(NULL, array(), t('Save'));
@@ -583,12 +591,23 @@ class FeedsWebTestCase extends DrupalWebTestCase {
 
   /**
    * Copies a directory.
+   *
+   * @param string $source
+   *   The path of the source directory, from which files should be copied.
+   * @param string $dest
+   *   The path of the destination directory, where files should be copied to.
+   * @param array $mapping
+   *   (optional) The files to rename in the process.
+   *   To skip files from being copied, map filename to FALSE.
    */
-  public function copyDir($source, $dest) {
+  public function copyDir($source, $dest, array $mapping = array()) {
     $result = file_prepare_directory($dest, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
     foreach (@scandir($source) as $file) {
       if (is_file("$source/$file")) {
-        $file = file_unmanaged_copy("$source/$file", "$dest/$file");
+        $new_name = isset($mapping[$file]) ? $mapping[$file] : $file;
+        if ($new_name !== FALSE) {
+          $file = file_unmanaged_copy("$source/$file", "$dest/$new_name");
+        }
       }
     }
   }

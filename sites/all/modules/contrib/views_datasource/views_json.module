@@ -1,18 +1,4 @@
 <?php
-
-/**
- * @file
- * Module definition for views_json
- *
- * @see views_json.views.inc
- */
-
-function views_json_init() {
-  if (isset($_GET['sort_order'])) {
-    $_GET['sort_order'] = strtoupper($_GET['sort_order']);
-  }
-}
-
 /**
  * Implements hook_views_api().
  */
@@ -27,16 +13,16 @@ function views_json_views_api() {
  * Implements hook_views_pre_render().
  */
 function views_json_views_pre_render(&$view) {
-  if(isset($view->plugin_name) && $view->plugin_name == 'views_json') {
+  if (isset($view->plugin_name) && $view->plugin_name == 'views_json') {
     // Support for Video field.
-    if(!empty($view->result)) {
+    if (!empty($view->result)) {
       // Process each View result.
-      foreach($view->result as $row => $result) {
+      foreach ($view->result as $row => $result) {
         // Only process the entity fields defined by the View.
-        foreach($view->field as $field_name => $field) {
-          if($field instanceof views_handler_field_field) {
-            if($field->field_info['type'] == 'video') {
-              
+        foreach ($view->field as $field_name => $field) {
+          if ($field instanceof views_handler_field_field) {
+            if ($field->field_info['type'] == 'video') {
+
               // Get the Video URL.
               $video = $field->get_value($view->result[$row]);
               $url = file_create_url($video[0]['uri']);
@@ -45,7 +31,7 @@ function views_json_views_pre_render(&$view) {
                 '#markup' => filter_xss($url),
               );
               // Substitute embed code with URL. @todo Add support for escaped embed codes.
-              $view->result[$row]->{'field_'. $field_name}[0]['rendered'] = $render_array;
+              $view->result[$row]->{'field_' . $field_name}[0]['rendered'] = $render_array;
             }
           }
         }
@@ -153,7 +139,7 @@ function _views_json_render_fields($view, $row) {
     $field = $view->field[$id];
     $field_is_multiple = FALSE;
     $field_raw = array();
-    if ((isset($field->options['multiple']['group']))&& isset($field->field_values)) {
+    if ((isset($field->options['multiple']['group'])) && isset($field->field_values)) {
       $field_output = _views_json_render_multiple_field($field, $row);
       $n = 0;
       if (is_array($field_output)) {
@@ -162,38 +148,87 @@ function _views_json_render_fields($view, $row) {
         }
         $field_is_multiple = TRUE;
       }
-      else $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+      else {
+        $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+      }
     }
     else {
       $field_output = $view->field[$field->options['id']]->advanced_render($row);
       $field_raw = (isset($view->field[$id]->field_alias) && isset($row->{$view->field[$id]->field_alias})) ? $row->{$view->field[$id]->field_alias} : NULL;
+      // Check if this is field is the entity's label.
+      if (empty($field->base_table)) {
+        $entity_info = entity_get_info($field->table);
+        if (isset($entity_info['entity keys'])) {
+          $label_field = $entity_info['entity keys']['label'];
+          if ($field->real_field == $label_field) {
+            // Decode html entities in label field as views does this by default for those fields.
+            $field_output = html_entity_decode($field_output, ENT_QUOTES);
+            $field_output = mb_check_encoding($field_output, 'UTF-8') ? $field_output : utf8_encode($field_output);
+          }
+        }
+      }
     }
 
     $img_match = array();
     $src_match = array();
-    if (is_array($field_output)) {
-      foreach ($field_output as $i => $f) {
-        if (preg_match("/<img[^>]+>/i", $f, $img_match)) {
-          if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
-          $field_output[$i] = ($src_match[2]);
+    if (isset($field->options['type'])) {
+      if (is_array($field_output) && $field->options['type'] == 'image') {
+        foreach ($field_output as $i => $f) {
+          if (preg_match("/<img[^>]+>/i", $f, $img_match)) {
+            if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match)) {
+              $field_output[$i]['src'] = $src_match[2];
+              $field_output[$i]['alt'] = '';
+
+              if (preg_match('/(alt)="([^"]*)"/i', $img_match[0], $alt_match)) {
+                $field_output[$i]['alt'] = $alt_match[2];
+              }
+            }
+          }
+        }
+      }
+      else {
+        if ($field->options['type'] == 'image') {
+          // if field's type was an image. we just get the path.
+          if (preg_match_all("/<img[^>]+>/i", $field_output, $img_matches)) {
+            $field_output = array();
+
+            if (sizeof($img_matches[0]) > 1) {
+              $field_is_multiple = TRUE;
+              foreach ($img_matches[0] as $i => $img_match) {
+                if (preg_match('/(src)="([^"]*)"/i', $img_match, $src_match)) {
+                  $field_output[$i]['src'] = $src_match[2];
+                  $field_output[$i]['alt'] = '';
+
+                  if (preg_match('/(alt)="([^"]*)"/i', $img_match, $alt_match)) {
+                    $field_output[$i]['alt'] = $alt_match[2];
+                  }
+                }
+              }
+            }
+            else {
+              if (preg_match('/(src)="([^"]*)"/i', $img_matches[0][0], $src_match)) {
+                $field_output['src'] = $src_match[2];
+                $field_output['alt'] = '';
+
+                if (preg_match('/(alt)="([^"]*)"/i', $img_matches[0][0], $alt_match)) {
+                  $field_output['alt'] = $alt_match[2];
+                }
+              }
+            }
+          }
         }
       }
     }
-    else {
-      if (preg_match("/<img[^>]+>/i", $field_output, $img_match)) {
-        if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
-          $field_output = ($src_match[2]);
-      }
-    }
 
-    if(empty($field->options['exclude'])) {
+    if (empty($field->options['exclude'])) {
       if (empty($field->options['exclude']) && !($field->options['hide_empty'] && (empty($field_output)))) {
         $object = new stdClass();
         $object->id = $id;
         // Respect the 'empty' value if empty and "No results text" is given.
         if (empty($field_output) && $field->options['empty']) {
           $object->content = $field->options['empty'];
-        } else {
+        }
+        else {
           $object->content = $field_output;
         }
         $object->raw = $field_raw;
@@ -216,12 +251,23 @@ function _views_json_render_fields($view, $row) {
  *   Identifier string with illegal characters stripped away.
  */
 function _views_json_check_label($input) {
-  $output = str_replace(array('{', '}', '[', ']', ':', ',', '"', "'", chr(47), chr(92)), '', $input);
+  $output = str_replace(array(
+      '{',
+      '}',
+      '[',
+      ']',
+      ':',
+      ',',
+      '"',
+      "'",
+      chr(47),
+      chr(92)
+    ), '', $input);
   $output = preg_replace(
-              '/[\x{80}-\x{A0}' .      // Non-printable ISO-8859-1 + NBSP
-              '\x{01}-\x{1F}' .        // Non-printable ASCII characters
-              '\x{0}]/u',             // NULL byte
-            '', $output);
+    '/[\x{80}-\x{A0}' .      // Non-printable ISO-8859-1 + NBSP
+    '\x{01}-\x{1F}' .        // Non-printable ASCII characters
+    '\x{0}]/u',             // NULL byte
+    '', $output);
 
   return check_plain(strip_tags($output));
 }
@@ -246,13 +292,15 @@ function _views_json_check_label($input) {
  */
 function views_json_get($name, $display_id = 'default', $args = array(), $raw = FALSE) {
   $view = views_get_view($name);
-  if (!is_object($view)) return NULL;
+  if (!is_object($view)) {
+    return NULL;
+  }
 
-  $preview    = $view->preview($display_id, $args);
-  $start_pos  = strpos($preview, '{');
+  $preview = $view->preview($display_id, $args);
+  $start_pos = strpos($preview, '{');
   $finish_pos = strrpos($preview, '}');
-  $length     = $finish_pos - $start_pos + 1;
-  $json       = trim(substr($preview, $start_pos, $length));
+  $length = $finish_pos - $start_pos + 1;
+  $json = trim(substr($preview, $start_pos, $length));
 
   if ($raw) {
     return $json;
@@ -279,10 +327,10 @@ function views_json_get($name, $display_id = 'default', $args = array(), $raw = 
  *
  * @see _views_json_json_encode
  */
-function _views_json_encode_formatted($v, $depth = 0) {
-  $base_indent  = '&nbsp;&nbsp;';
-  $eol          = '<br />';
-  $indent       = str_repeat($base_indent, $depth);
+function _views_json_encode_formatted($v, $options, $depth = 0) {
+  $base_indent = '&nbsp;&nbsp;';
+  $eol = '<br />';
+  $indent = str_repeat($base_indent, $depth);
 
   // This is based on the drupal_to_js() function.
   switch (gettype($v)) {
@@ -296,14 +344,28 @@ function _views_json_encode_formatted($v, $depth = 0) {
 
     case 'resource':
     case 'string':
-      $search   = array('"', chr(92), chr(8), chr(12), chr(13) . chr(10), chr(10), chr(13), chr(9));
-      $replace  = array('\"', '\\', '\b', '\f', '\n', '\n', '\r', '\t');
-      $output   = str_replace($search, $replace, $v);
-/* *
-      $output = str_replace(array("\r", "\n", "<", ">", "&"),
-                           array('\r', '\n', '\x3c', '\x3e', '\x26'),
-                           addslashes($output));
-/* */
+      $search = array(
+        '"',
+        chr(92),
+        chr(8),
+        chr(12),
+        chr(13) . chr(10),
+        chr(10),
+        chr(13),
+        chr(9)
+      );
+      $replace = array('\"', '\\', '\b', '\f', '\n', '\n', '\r', '\t');
+      $output = str_replace($search, $replace, $v);
+
+      // Convert string to numeric if need.
+      if (!empty($options['numeric_strings']) && is_numeric($output)) {
+        return (strpos($output, '.') !== FALSE) ? floatval($output) : intval($output);
+      }
+      /* *
+            $output = str_replace(array("\r", "\n", "<", ">", "&"),
+                                 array('\r', '\n', '\x3c', '\x3e', '\x26'),
+                                 addslashes($output));
+      /* */
       return '"' . check_plain($output) . '"';
 
     case 'array':
@@ -313,16 +375,16 @@ function _views_json_encode_formatted($v, $depth = 0) {
       if (empty($v) || array_keys($v) === range(0, sizeof($v) - 1)) {
         $output = array();
         foreach ($v as $val) {
-          $output[] = $indent . $base_indent . _views_json_encode_formatted($val, $depth + 1);
+          $output[] = $indent . $base_indent . _views_json_encode_formatted($val, $options, $depth + 1);
         }
         return '[' . (!empty($output) ? $eol . implode(',' . $eol, $output) . $eol . $indent : '') . ']';
       }
-      // Otherwise, fall through to convert the array as an object.
+    // Otherwise, fall through to convert the array as an object.
 
     case 'object':
       $output = array();
       foreach ($v as $key => $val) {
-        $output[] = $indent . $base_indent . _views_json_encode_formatted(strval($key)) . ' : ' . _views_json_encode_formatted($val, $depth + 1);
+        $output[] = $indent . $base_indent . _views_json_encode_formatted(strval($key), $options) . ' : ' . _views_json_encode_formatted($val, $options, $depth + 1);
       }
       return '{' . (!empty($output) ? $eol . implode(',' . $eol, $output) . $eol . $indent : '') . '}';
 
@@ -351,13 +413,15 @@ function _views_json_debug_stop($var, $location) {
  *   Integer to use as the $bitmask parameter for json_encode().
  */
 function _views_json_json_encode($rows, $bitmask = NULL) {
-  if(PHP_MAJOR_VERSION >= 5 && PHP_MINOR_VERSION >= 3) {
+  if(defined('PHP_MAJOR_VERSION') && PHP_MAJOR_VERSION >= 5 && PHP_MINOR_VERSION >= 3) {
     $json = json_encode($rows, $bitmask);
     // Encoding features not supported before 5.4.x.
-    if(PHP_MINOR_VERSION <= 4) {
-       $json = str_replace(array('\/'), array('/'), $json);
+    if (PHP_MINOR_VERSION <= 4) {
+      $json = str_replace(array('\/'), array('/'), $json);
     }
-  } else {
+  }
+  // For php 5.2 and below
+  else {
     $json = json_encode($rows);
     // Fix for issue #1613344.
     $json = str_replace(array('\/'), array('/'), $json);

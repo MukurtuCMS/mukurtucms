@@ -264,3 +264,21 @@ function scald_index_views_default_views() {
 
   return $export;
 }
+
+/**
+ * Implements hook_views_default_views_alter().
+ */
+function scald_index_views_default_views_alter(&$views) {
+  if (!module_exists('locale')) {
+    foreach ($views as $view) {
+      if ($view->name != 'scald_atoms_index') {
+        continue;
+      }
+      $handler = $view->display['default']->handler;
+      unset($handler->display->display_options['style_options']['columns']['language']);
+      unset($handler->display->display_options['style_options']['info']['language']);
+      unset($handler->display->display_options['fields']['language']);
+      unset($handler->display->display_options['filters']['language']);
+    }
+  }
+}

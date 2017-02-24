@@ -59,6 +59,11 @@ CKEDITOR.editorConfig = function(config) {
     config.bodyClass = 'singlepage';
     config.bodyId = 'primary';
   }
+
+  // Make CKEditor's edit area as high as the textarea would be.
+  if (this.element.$.rows > 0) {
+    config.height = this.element.$.rows * 20 + 'px';
+  }
 }
 
 /*

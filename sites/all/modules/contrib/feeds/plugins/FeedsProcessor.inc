@@ -465,7 +465,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
    */
   protected function clean(FeedsState $state) {
     // We clean only if needed.
-    if ($this->config['update_non_existent'] == FEEDS_SKIP_NON_EXISTENT) {
+    if ($this->config['update_non_existent'] != FEEDS_DELETE_NON_EXISTENT) {
       return;
     }
 
@@ -883,14 +883,15 @@ abstract class FeedsProcessor extends FeedsPlugin {
     $form['update_existing'] = array(
       '#type' => 'radios',
       '#title' => t('Update existing @entities', $tokens),
-      '#description' =>
-        t('Existing @entities will be determined using mappings that are a "unique target".', $tokens),
+      '#description' => t('Existing @entities will be determined using mappings that are a "unique target".', $tokens),
       '#options' => array(
         FEEDS_SKIP_EXISTING => t('Do not update existing @entities', $tokens),
         FEEDS_REPLACE_EXISTING => t('Replace existing @entities', $tokens),
         FEEDS_UPDATE_EXISTING => t('Update existing @entities', $tokens),
       ),
       '#default_value' => $this->config['update_existing'],
+      '#after_build' => array('feeds_processor_config_form_update_existing_after_build'),
+      '#tokens' => $tokens,
     );
     global $user;
     $formats = filter_formats($user);
@@ -1263,6 +1264,9 @@ abstract class FeedsProcessor extends FeedsPlugin {
 
     foreach ($out as $key => $value) {
       if (is_string($value)) {
+        if (function_exists('mb_check_encoding') && !mb_check_encoding($value, 'UTF-8')) {
+          $value = utf8_encode($value);
+        }
         $out[$key] = truncate_utf8($value, 100, FALSE, TRUE);
       }
     }
@@ -1292,3 +1296,14 @@ abstract class FeedsProcessor extends FeedsPlugin {
 }
 
 class FeedsProcessorBundleNotDefined extends Exception {}
+
+/**
+ * Form after build callback for the field "update_existing".
+ *
+ * Adds descriptions to options of this field.
+ */
+function feeds_processor_config_form_update_existing_after_build($field) {
+  $field[FEEDS_REPLACE_EXISTING]['#description'] =  t('Loads records directly from the database, bypassing the Entity API. Faster, but use with caution.');
+  $field[FEEDS_UPDATE_EXISTING]['#description'] =  t('Loads complete @entities using the Entity API for full integration with other modules. Slower, but most reliable.', $field['#tokens']);
+  return $field;
+}

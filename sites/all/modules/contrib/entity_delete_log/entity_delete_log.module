@@ -32,17 +32,17 @@ function entity_delete_log_menu() {
  * The module's settings form.
  */
 function entity_delete_log_settings() {
-  
+
   // Build the settings form.
   $form = array();
-  
+
   // Add some helpful links.
   $items = array(
     l('View the Entity Delete Log README', drupal_get_path('module', 'entity_delete_log') . '/README.txt'),
     l('View the Entity Delete Logs', 'admin/reports/entity-delete-log')
   );
   $form['#prefix'] = theme('item_list', array('items' => $items));
-  
+
   // Provide a list of checkboxes for the user to choose which entity types
   // will have delete logging enabled.
   $entity_keys = array_keys(entity_get_info());
@@ -53,7 +53,7 @@ function entity_delete_log_settings() {
     '#default_value' => variable_get('entity_delete_log_entity_types', array()),
     '#description' => t('Select which entity types will be logged when deleted.'),
   );
-  
+
   return system_settings_form($form);
 }
 
@@ -61,28 +61,28 @@ function entity_delete_log_settings() {
  * Implements hook_entity_delete().
  */
 function entity_delete_log_entity_delete($entity, $type) {
-  
+
   // Grab the entity types chosen for logging.
   $entity_types = array_values(variable_get('entity_delete_log_entity_types', array()));
-  
+
   // If the incoming entity type is enabled for logging, let's log it.
   if (in_array($type, $entity_types, true)) {
-    
+
     // Let's set up the variables and their values to insert.
     $variables = array();
-    
+
     // The user id.
     global $user;
     $variables['uid'] = $user->uid;
-    
+
     // Grab the entity id and bundle (we don't care about the vid).
     list($entity_id, $vid, $entity_bundle) = entity_extract_ids($type, $entity);
     $variables['entity_id'] = $entity_id;
     $variables['entity_bundle'] = $entity_bundle;
-    
+
     // The entity type is the same as the incoming type.
     $variables['entity_type'] = $type;
-    
+
     // If there is an entity user id, we'll use that as the author, otherwise
     // we'll just use user #1. We don't want to use the deleted user's entity id
     // as the author, since they will lo longer exist, so we'll just use #1.
@@ -90,31 +90,31 @@ function entity_delete_log_entity_delete($entity, $type) {
     if (isset($entity->uid) && $type != 'user') {
       $variables['author'] = $entity->uid;
     }
-    
+
     // If there is an entity created date, we'll use it, otherwise we'll use null.
     $variables['created'] = null;
     if (isset($entity->created)) {
       $variables['created'] = $entity->created;
     }
-    
+
     // We'll set the deleted time to right now.
     $variables['deleted'] = time();
-    
+
     // For some entities, we need to dynamically set some of the log entry data,
     // let's do that...
-    
+
     // Define the remaining log variables we need to determine.
     $variables['entity_title'] = null;
     $variables['revisions'] = null;
-    
+
     // Depending on the entity type, let's fill in the remaining log variables.
     switch ($type) {
-      
+
       // For comments, use the comment subject for the title.
       case 'comment':
         $variables['entity_title'] = $entity->subject;
         break;
-        
+
       // For files, use the file name for the title and the timestamp for the
       // created date.
       case 'file':
@@ -128,8 +128,9 @@ function entity_delete_log_entity_delete($entity, $type) {
         $variables['revisions'] = db_select('node_revision', 'nr')
           ->fields('nr', array('nid'))
           ->condition('nid', $variables['entity_id'])
+          ->countQuery()
           ->execute()
-          ->rowCount();
+          ->fetchField();
         break;
 
       // For vocabularies, terms and users, use the name for the title.
@@ -138,20 +139,20 @@ function entity_delete_log_entity_delete($entity, $type) {
       case 'user':
         $variables['entity_title'] = $entity->name;
         break;
-        
+
     }
-    
+
     // Give other modules an opportunity via hook_entity_delete_log_alter() to
     // make any changes to the log data variables before insertion.
     if (sizeof(module_implements('entity_delete_log_alter')) > 0) {
       $variables = module_invoke_all('entity_delete_log_alter', $entity, $type, $variables);
     }
-    
+
     // If nobody could determine a title, let's just use 'N/A'.
     if (!isset($variables['entity_title'])) {
       $variables['entity_title'] = t('N/A');
     }
-    
+
     // Make sure the required variables have been provided, otherwise don't
     // insert anything and throw a warning. We don't need to check the
     // entity_title since it will have been set above.
@@ -177,7 +178,7 @@ function entity_delete_log_entity_delete($entity, $type) {
       $proceed = false;
       $msgs[] = t('Missing Acting User ID');
     }
-    
+
     // If we are ready to proceed, insert the log entry data, otherwise show
     // the warning(s) in a message.
     if (!$proceed) {
@@ -200,12 +201,12 @@ function entity_delete_log_entity_delete($entity, $type) {
           'uid' => $variables['uid'],
         )
       )->execute();
-      
+
       // Now that we've logged this entity's deletion, let's let others do any
       // extra stuff they need with hook_entity_delete_log_post_process().
       module_invoke_all('entity_delete_log_post_process', $entity, $type, $variables);
     }
-    
+
   }
 }
 
@@ -214,9 +215,8 @@ function entity_delete_log_entity_delete($entity, $type) {
  */
 function entity_delete_log_views_api() {
   return array(
-    'api' => 3, 
-    'path' => drupal_get_path('module', 'entity_delete_log'), 
+    'api' => 3,
+    'path' => drupal_get_path('module', 'entity_delete_log'),
     'template path' => drupal_get_path('module', 'entity_delete_log'),
   );
 }
-

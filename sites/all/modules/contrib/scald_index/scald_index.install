@@ -36,6 +36,11 @@ function scald_index_schema() {
   $schema = array();
   $schema['scald_index'] = array(
     'fields' => array(
+      'id' => array(
+        'description' => 'Extra auto increment field so we can have a PRIMARY key',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
       'sid' => array(
         'type' => 'int',
         'not null' => TRUE,
@@ -62,6 +67,7 @@ function scald_index_schema() {
         'size' => 'tiny',
       ),
     ),
+    'primary key' => array('id'),
     'indexes' => array(
       'nid' => array('nid'),
       'sid' => array('sid'),
@@ -69,4 +75,19 @@ function scald_index_schema() {
     ),
   );
   return $schema;
+}
+
+/**
+ * Add column id and primary key to scald_index table.
+ */
+function scald_index_update_7001() {
+  // If you have a "All parts of a PRIMARY KEY must be NOT NULL" error,
+  // see https://www.drupal.org/node/2665362 issue.
+  db_add_field('scald_index', 'id', array(
+      'description' => 'Extra auto increment field so we can have a PRIMARY key',
+      'type' => 'serial',
+      'not null' => TRUE,
+    ),
+    array('primary key' => array('id'))
+  );
 }

@@ -166,7 +166,7 @@ function feeds_tamper_load_by_importer($importer, $disabled = FALSE) {
     }
     // Filter disabled and only pull plugins that actually have a corresponding
     // source since we don't delete them with a mapping.
-    if (($disabled || empty($i->disabled)) && in_array($i->source, $sources) && function_exists($plugins[$i->plugin_id]['callback'])) {
+    if (($disabled || empty($i->disabled)) && in_array($i->source, $sources) && isset($plugins[$i->plugin_id]) && function_exists($plugins[$i->plugin_id]['callback'])) {
       $instances[$i->source][] = $i;
     }
   }

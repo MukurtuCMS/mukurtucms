@@ -1,5 +1,5 @@
 <?php
-
+include_once drupal_get_path('module', 'exif') .'/ExifFactory.php';
 /**
  * Just some help page. Gives you an overview over the available tags
  * @return string html
@@ -64,22 +64,28 @@ function exif_admin_settings() {
   if(is_array($fullmetadata)){
     foreach ($fullmetadata as $section => $section_data) {
       $rows[] = array('data'=>array($section,$help), 'class' => array('tag_type'));
-      foreach ($section_data as $key => $value) {
-        if ($value != NULL && $value != '' && !$exif->startswith($key,'undefinedtag')) {
-          $resultTag = "";
-          if (is_array($value)) {
-            foreach($value as $innerkey => $innervalue) {
-              if( ($innerkey+1) != count($value) ) {
-                $resultTag.=$innervalue."; ";
-              } else {
-                $resultTag.=$innervalue;
+      if (is_array($section_data)) {
+        foreach ($section_data as $key => $value) {
+          if ($value != NULL && $value != '' && !startswith($key,'undefinedtag')) {
+            $resultTag = "";
+            if (is_array($value)) {
+              foreach($value as $innerkey => $innervalue) {
+                if( ($innerkey+1) != count($value) ) {
+                  $resultTag.=$innervalue."; ";
+                } else {
+                  $resultTag.=$innervalue;
+                }
               }
+            } else {
+              $resultTag=check_plain($value);
             }
-          } else {
-            $resultTag=check_plain($value);
+            if ($section !== "xmp" && $key!=="nativedigest") {
+              $rows[] = array('data'=>array("field_".$section."_".$key,$resultTag), 'class' => array('tag'));
+            }
           }
-          $rows[] = array('data'=>array("field_".$section."_".$key,$resultTag), 'class' => array('tag'));
         }
+      } else {
+        watchdog(WATCHDOG_NOTICE, "section ".$section." does not contains an array. can not extract metadata for this section.");
       }
     }
   }
@@ -91,7 +97,9 @@ function exif_admin_settings() {
   return $output;
 }
 
-
+  function startswith($hay, $needle) {
+    return substr($hay, 0, strlen($needle)) === $needle;
+  }
 
 /**
  * The form definition for the admin settings
@@ -121,7 +129,7 @@ function exif_admin_settings_form() {
     '#description' => t('Select nodetypes which should be checked for itpc & exif data. In case the nodetypes contains more than one image field, the module will use the first one.'),
   );
 
-  if (module_exists("media")) {
+  if (module_exists("file_entity")) {
     $all_mt = array();
     // Setup media types
     if (function_exists('file_type_get_enabled_types')) {
@@ -151,6 +159,21 @@ function exif_admin_settings_form() {
     '#title' => t('Refresh on node update'),
     '#default_value' => variable_get('exif_update', TRUE),
     '#description' => t('If you enable this option, Exif data is being updated when the node is being updated.'),
+  );
+
+  $forms['exif_extraction_solution'] = array(
+    '#type' => 'select',
+    '#title' => t('metadata extraction solution to use on node update'),
+    '#options' => \Drupal\exif\ExifFactory::getExtractionSolutions(),
+    '#default_value' => variable_get('exif_extraction_solution', "php_extensions"),
+    '#description' => t('Choose between Exif PHP Extension or call to external tool <a href="http://www.sno.phy.queensu.ca/~phil/exiftool/">exiftool</a>.'),
+  );
+
+  $forms['exif_exiftool_location'] = array(
+    '#type' => 'textfield',
+    '#title' => t('location of exiftool binary'),
+    '#default_value' => variable_get('exif_exiftool_location', "exiftool"),
+    '#description' => t('where is the exiftool binaries (only needed if extraction solution chosen is exiftool)'),
   );
 
   $forms['exif_empty_values'] = array(

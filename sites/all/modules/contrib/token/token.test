@@ -137,6 +137,7 @@ class TokenUnitTestCase extends TokenTestHelper {
         '[node:created:short]',
         '[node:created:custom:invalid]',
         '[node:created:custom:mm-YYYY]',
+        '[node:colons:in:name]',
         '[site:name]',
         '[site:slogan]',
         '[current-date:short]',
@@ -147,6 +148,7 @@ class TokenUnitTestCase extends TokenTestHelper {
         '[node:title:invalid]',
         '[node:created:invalid]',
         '[node:created:short:invalid]',
+        '[node:colons:in:name:invalid]',
         '[invalid:title]',
         '[site:invalid]',
         '[user:ip-address]',
@@ -166,6 +168,7 @@ class TokenUnitTestCase extends TokenTestHelper {
         '[node:created:short]',
         '[node:created:custom:invalid]',
         '[node:created:custom:mm-YYYY]',
+        '[node:colons:in:name]',
         '[site:name]',
         '[site:slogan]',
         '[user:uid]',
@@ -176,6 +179,7 @@ class TokenUnitTestCase extends TokenTestHelper {
         '[node:title:invalid]',
         '[node:created:invalid]',
         '[node:created:short:invalid]',
+        '[node:colons:in:name:invalid]',
         '[invalid:title]',
         '[site:invalid]',
         '[user:ip-address]',
@@ -676,10 +680,12 @@ class TokenEntityTestCase extends TokenTestHelper {
     $this->assertIdentical(token_get_entity_mapping('token', 'term'), 'taxonomy_term');
     $this->assertIdentical(token_get_entity_mapping('token', 'vocabulary'), 'taxonomy_vocabulary');
     $this->assertIdentical(token_get_entity_mapping('token', 'invalid'), FALSE);
+    $this->assertIdentical(token_get_entity_mapping('token', 'invalid', TRUE), 'invalid');
     $this->assertIdentical(token_get_entity_mapping('entity', 'node'), 'node');
     $this->assertIdentical(token_get_entity_mapping('entity', 'taxonomy_term'), 'term');
     $this->assertIdentical(token_get_entity_mapping('entity', 'taxonomy_vocabulary'), 'vocabulary');
     $this->assertIdentical(token_get_entity_mapping('entity', 'invalid'), FALSE);
+    $this->assertIdentical(token_get_entity_mapping('entity', 'invalid', TRUE), 'invalid');
 
     // Test that when we send the mis-matched entity type into token_replace()
     // that we still get the tokens replaced.
