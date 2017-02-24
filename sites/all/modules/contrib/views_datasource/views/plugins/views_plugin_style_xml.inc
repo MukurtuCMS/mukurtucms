@@ -15,17 +15,44 @@ class views_plugin_style_xml extends views_plugin_style {
     $options = parent::option_definition();
     $author_default = isset($GLOBALS['user']->name) ? $GLOBALS['user']->name : variable_get('anonymous', t('Anonymous'));
     $options['schema'] = array('default' => 'raw', 'translatable' => FALSE);
-    $options['root_element'] = array('default' => 'node', 'translatable' => FALSE);
-    $options['top_child_object'] = array('default' => 'node', 'translatable' => FALSE);
-    $options['field_output'] = array('default' => 'normal', 'translatable' => FALSE);
-    $options['plaintext_output'] = array('default' => TRUE, 'translatable' => FALSE);
+    $options['root_element'] = array(
+      'default' => 'node',
+      'translatable' => FALSE
+    );
+    $options['top_child_object'] = array(
+      'default' => 'node',
+      'translatable' => FALSE
+    );
+    $options['field_output'] = array(
+      'default' => 'normal',
+      'translatable' => FALSE
+    );
+    $options['plaintext_output'] = array(
+      'default' => TRUE,
+      'translatable' => FALSE
+    );
     //$options['skip_empty_fields'] = array('default' => TRUE, 'translatable' => FALSE);
-    $options['element_output'] = array('default' => 'nested', 'translatable' => FALSE);
-    $options['escape_as_CDATA'] = array('default' => 'no', 'translatable' => FALSE);
-    $options['content_type'] = array('default' => 'text/xml', 'translatable' => FALSE);
+    $options['element_output'] = array(
+      'default' => 'nested',
+      'translatable' => FALSE
+    );
+    $options['escape_as_CDATA'] = array(
+      'default' => 'no',
+      'translatable' => FALSE
+    );
+    $options['content_type'] = array(
+      'default' => 'text/xml',
+      'translatable' => FALSE
+    );
     $options['header'] = array('default' => NULL, 'translatable' => FALSE);
-    $options['author'] = array('default' => $author_default, 'translatable' => FALSE);
-    $options['using_views_api_mode'] = array('default' => FALSE, 'translatable' => FALSE);
+    $options['author'] = array(
+      'default' => $author_default,
+      'translatable' => FALSE
+    );
+    $options['using_views_api_mode'] = array(
+      'default' => FALSE,
+      'translatable' => FALSE
+    );
     //$options['action_on_missing_field'] = array('default' => 'none', 'translatable' => FALSE);
     return $options;
   }
@@ -55,7 +82,7 @@ class views_plugin_style_xml extends views_plugin_style {
       '#default_value' => $this->options['top_child_object'],
       '#description' => t('The name of each top-level child object in a raw XML document. e.g node or user or forum_post'),
     );
-    $form['field_output']  = array(
+    $form['field_output'] = array(
       '#type' => 'radios',
       '#title' => t('Field output'),
       '#description' => t('For each row in the view, fields can be output as either the field rendered by Views, or by the raw content of the field.'),
@@ -75,14 +102,17 @@ class views_plugin_style_xml extends views_plugin_style {
       '#default_value'  => $this->options['skip_empty_fields'],
       '#description'    => t('For each row in the view, skip adding a field if the field value is NULL or blank.'),
     );*/
-    $form['element_output']  = array(
+    $form['element_output'] = array(
       '#type' => 'radios',
       '#title' => t('Element output'),
       '#description' => t('For each row in the view, fields can be output as either nested XML child elements, or attributes of the raw XML element.'),
-      '#options' => array('nested' => t('Nested'), 'attributes' => t('Attributes')),
+      '#options' => array(
+        'nested' => t('Nested'),
+        'attributes' => t('Attributes')
+      ),
       '#default_value' => $this->options['element_output'],
     );
-    $form['escape_as_CDATA']  = array(
+    $form['escape_as_CDATA'] = array(
       '#type' => 'radios',
       '#title' => t('Escape row content as CDATA'),
       '#description' => t('For each row in the view, escape the row field content as XML CDATA sections.'),
@@ -99,7 +129,7 @@ class views_plugin_style_xml extends views_plugin_style {
     );
     $form['content_type'] = array(
       '#type' => 'radios',
-      '#title'  => t('Content-Type'),
+      '#title' => t('Content-Type'),
       '#options' => array(
         'default' => t('Default: text/xml for raw documents, text/html for OPML, application/atom+xml for Atom.'),
         'text/xml' => t('text/xml'),
@@ -114,7 +144,7 @@ class views_plugin_style_xml extends views_plugin_style {
       '#title' => t('View author'),
       '#description' => t('The Drupal user name of the person who authored this view.'),
       '#default_value' => $this->options['author'],
-      );
+    );
     $form['using_views_api_mode'] = array(
       '#type' => 'checkbox',
       '#title' => t('Views API mode'),
@@ -165,6 +195,10 @@ class views_plugin_style_xml extends views_plugin_style {
     }
     unset($view->row_index);
 
-    return theme($this->theme_functions(), array('view' => $view, 'options' => $options, 'rows' => $rows));
+    return theme($this->theme_functions(), array(
+        'view' => $view,
+        'options' => $options,
+        'rows' => $rows
+      ));
   }
 }
