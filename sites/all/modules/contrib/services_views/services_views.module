@@ -81,7 +81,7 @@ function services_views_services_resources() {
       'filters' => array(
         'name' => 'filters',
         'type' => 'array',
-        'description' => 'A list of filters to pass to the view.  These are defined by the exposed filters on your view.  Example call: <code>/views/your_view?filters[nid]=12345</code>',
+        'description' => 'A list of filters to pass to the view.  These are defined by the exposed filters on your view.  Example call: <code>/views/your_view?nid=12345</code>',
         'source' => array('param' => 'filters'),
         'optional' => TRUE,
         'default value' => array(),
@@ -182,6 +182,10 @@ function services_views_views_plugins() {
 function services_views_services_request_preprocess_alter($controller, &$args, $options) {
   if (isset($controller['view info'])) {
     array_unshift($args, $controller['view info']);
+    $args[0]['args'] = array();
+    if (!empty($_GET['args'])) {
+      $args[0]['args'] = $_GET['args'];
+    }
   }
 }
 
@@ -210,21 +214,32 @@ function services_views_form_views_ui_config_item_form_alter(&$form, $form_state
 /**
  * Implements hook_field_formatter_info().
  */
+function services_views_field_formatter_info() {
+  $formatters['services'] = array(
+    'label' => t('Services Raw'),
+    'field types' => array(),
+    'module' => 'services_views',
+    'settings' => array(
+      'data_element_key' => '',
+      'skip_safe' => 0,
+      'skip_empty_values' => 0,
+      'skip_text_format' => 1,
+      'term_name' => 1,
+    ),
+  );
+
+  return $formatters;
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
 function services_views_field_formatter_info_alter(&$formatters) {
   $field_types = array();
   foreach ($formatters as $formatter) {
     $field_types = array_merge($field_types, $formatter['field types']);
   }
-  // Remove duplicates.
-  $field_types = array_unique($field_types);
-
-  $formatters['services'] = array(
-    'label' => t('Services Raw'),
-    'description' => t('Formatter for Services to provide value as it is in entity object.'),
-    'field types' => $field_types,
-    'module' => 'services_views',
-    'settings' => array(),
-  );
+  $formatters['services']['field types'] = array_unique($field_types);
 }
 
 /**
@@ -235,6 +250,13 @@ function services_views_field_formatter_settings_form($field, $instance, $view_m
   $settings = $display['settings'];
 
   if ($display['type'] == 'services') {
+    $element['data_element_key'] = array(
+      '#title' => t('Override Element Key'),
+      '#description' => t('Defaults to field label.'),
+      '#type' => 'textfield',
+      '#size' => 20,
+      '#default_value' => $settings['data_element_key'],
+    );
     $element['skip_safe'] = array(
       '#type' => 'checkbox',
       '#title' => t('Skip safe values'),
@@ -245,22 +267,115 @@ function services_views_field_formatter_settings_form($field, $instance, $view_m
       '#title' => t('Skip empty values'),
       '#default_value' => $settings['skip_empty_values'],
     );
+
+    // Add text field settings
+    if ($field['module'] == 'text') {
+      $element['skip_text_format'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Skip text formats'),
+        '#default_value' => $settings['skip_text_format'],
+      );
+    }
+
+    // Add taxonomy reference field settings
+    if ($field['module'] == 'taxonomy') {
+      $element['term_name'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use term name instead of ID'),
+        '#default_value' => $settings['term_name'],
+      );
+    }
   }
 
   return $element;
 }
 
+/**
+ * Implements hook_field_formatter_info().
+ */
+function services_views_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $output = array();
+
+  $key        = (!empty($settings['data_element_key']) ? $settings['data_element_key'] : $instance['label']);
+  $skipsafe   = (isset($settings['skip_safe']) && $settings['skip_safe'] ? t('Yes') : t('No'));
+  $skipempty  = (isset($settings['skip_empty_values']) && $settings['skip_empty_values'] ? t('Yes') : t('No'));
+  $skipformat = (isset($settings['skip_text_format']) && $settings['skip_text_format'] ? t('Yes') : t('No'));
+  $termname   = (isset($settings['term_name']) && $settings['term_name'] ? t('Yes') : t('No'));
+
+  if ($display['type'] == 'services') {
+    $output[] = t('Element key: %key', array("%key" => $key));
+    $output[] = t('Skip safe values: %key', array("%key" => $skipsafe));
+    $output[] = t('Skip empty values: %key', array("%key" => $skipempty));
+
+    // Add text field settings
+    if ($field['module'] == 'text') {
+      $output[] = t('Skip text format: %key', array("%key" => $skipformat));
+    }
+
+    // Add taxonomy reference field settings
+    if ($field['module'] == 'taxonomy') {
+      $output[] = t('Use term name: %key', array("%key" => $termname));
+    }
+
+    return implode('<br />', $output);
+  }
+  else {
+    return '';
+  }
+}
 
 /**
  * Implements hook_field_formatter_view().
  */
 function services_views_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $settings = $display['settings'];
   $element = array();
+  static $i = 0;
+
   if ($display['type'] == 'services') {
     foreach ($items as $delta => $item) {
-      $element[$delta] = $item;
+      // Apply the settings filters
+      $filtered_item = array();
+      foreach ($item as $key => $val) {
+        if ($settings['skip_safe'] && $key == 'safe_value') {
+          continue;
+        }
+
+        if ($settings['skip_empty_values'] && empty($val)) {
+          continue;
+        }
+
+        if ($settings['skip_text_format'] && $key == 'format') {
+          continue;
+        }
+
+        if ($settings['term_name'] && $key == 'tid') {
+          $term = taxonomy_term_load($val);
+          $val = $term->name;
+          $key = count($filtered_item);
+        }
+
+        $filtered_item[$key] = $val;
+      }
+
+      $element[$delta] = $filtered_item;
     }
   }
 
   return $element;
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function services_views_entity_info_alter(&$info) {
+  // Add a view_mode to field_collections called Services
+  if (isset($info['field_collection_item'])) {
+    $info['field_collection_item']['view modes']['services'] = array(
+      'label' => t('Services'),
+      'custom settings' => FALSE,
+    );
+  }
 }
