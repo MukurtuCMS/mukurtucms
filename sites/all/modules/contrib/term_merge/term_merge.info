@@ -7,10 +7,11 @@ files[] = term_merge.test
 
 dependencies[] = taxonomy
 dependencies[] = entity
+dependencies[] = ctools
 
-; Information added by Drupal.org packaging script on 2015-01-14
-version = "7.x-1.2"
+; Information added by Drupal.org packaging script on 2015-11-29
+version = "7.x-1.3"
 core = "7.x"
 project = "term_merge"
-datestamp = "1421194982"
+datestamp = "1448826550"
 

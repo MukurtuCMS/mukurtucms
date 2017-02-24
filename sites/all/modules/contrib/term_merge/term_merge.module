@@ -15,16 +15,6 @@
 define('TERM_MERGE_NO_REDIRECT', -1);
 
 /**
- * Constant to use in term merge action.
- *
- * Constant denotes "Create a new term and use it as the term trunk" logic
- * for term merge action.
- *
- * @var int
- */
-define('TERM_MERGE_NEW_TERM_TRUNK', -1);
-
-/**
  * Implements hook_menu().
  */
 function term_merge_menu() {
@@ -145,6 +135,38 @@ function term_merge_help($path, $arg) {
     // Main module help for the Term Merge module.
     case 'admin/help#term_merge':
       return '<p>' . t('Allows you to merge multiple terms into one and and at the same time update all fields referencing to the old ones.') . '</p>';
+      break;
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function term_merge_ctools_plugin_type() {
+  $plugins = array();
+
+  $plugins['duplicate_suggestion'] = array(
+    'defaults' => array(
+      'title' => NULL,
+      'description' => NULL,
+      'hash callback' => NULL,
+      'weight' => 0,
+    ),
+  );
+
+  return $plugins;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function term_merge_ctools_plugin_directory($owner, $plugin_type) {
+  switch ($owner) {
+    case 'term_merge':
+      switch ($plugin_type) {
+        case 'duplicate_suggestion':
+          return 'plugins/' . $plugin_type;
+      }
       break;
   }
 }
@@ -297,7 +319,14 @@ function term_merge_action($object, $context) {
         if (!isset($term_branch->{$field_name}[$language])) {
           $term_branch->{$field_name}[$language] = array();
         }
-        $term_trunk->{$field_name}[$language] = array_merge($term_trunk->{$field_name}[$language], $term_branch->{$field_name}[$language]);
+        $items = array_merge($term_trunk->{$field_name}[$language], $term_branch->{$field_name}[$language]);
+        $unique_items = array();
+        foreach ($items as $item) {
+          $unique_items[serialize($item)] = $item;
+        }
+        $items = array_values($unique_items);
+
+        $term_trunk->{$field_name}[$language] = $items;
       }
     }
 
@@ -306,36 +335,26 @@ function term_merge_action($object, $context) {
     taxonomy_term_save($term_trunk);
   }
 
-  // Updating all the links to $term_branch to point now to $term_trunk
-  // firstly we go through the list of all fields searching for
-  // taxonomy_term_reference field type because potentially some of these fields
-  // values will have to be updated after merging terms.
-  $fields = field_info_field_map();
   $result = array();
-  foreach ($fields as $field_name => $v) {
-    // Additionally we group by field_name to know what field has to be updated
-    // in each found entity.
-    // @todo: Here would be nice to throw in a hook, allowing other modules to
-    // supply meta data about their field types if they also use taxonomy
-    // references, defining it in their own field types.
-    if ($v['type'] == 'taxonomy_term_reference') {
-      $result[$field_name] = array();
-      $query = new EntityFieldQuery();
-      // Making sure we search in the entire scope of entities.
-      $query->addMetaData('account', user_load(1));
-      $query->fieldCondition($field_name, 'tid', $term_branch->tid);
-      $_result = $query->execute();
-      $result[$field_name] = array_merge_recursive($result[$field_name], $_result);
-    }
+  foreach (term_merge_fields_with_foreign_key('taxonomy_term_data', 'tid') as $field) {
+    $result[$field['field_name']] = array();
+    $query = new EntityFieldQuery();
+    // Making sure we search in the entire scope of entities.
+    $query->addMetaData('account', user_load(1));
+
+    $query->fieldCondition($field['field_name'], $field['term_merge_field_column'], $term_branch->tid);
+    $_result = $query->execute();
+    $result[$field['field_name']]['entities'] = $_result;
+    $result[$field['field_name']]['column'] = $field['term_merge_field_column'];
   }
-  // Now we load all entities that have taxonomy_term_reference pointing to
-  // $term_branch.
-  foreach ($result as $field_name => $entity_types) {
-    foreach ($entity_types as $entity_type => $v) {
+
+  // Now we load all entities that have fields pointing to $term_branch.
+  foreach ($result as $field_name => $field_data) {
+    $column = $field_data['column'];
+    foreach ($field_data['entities'] as $entity_type => $v) {
       $ids = array_keys($v);
       $entities = entity_load($entity_type, $ids);
-      // After we have loaded it, we alter the taxonomy_term_reference
-      // to point to $term_trunk.
+      // After we have loaded it, we alter the field to point to $term_trunk.
       foreach ($entities as $entity) {
         // What is more, we have to do it for every available language.
         foreach ($entity->$field_name as $language => $items) {
@@ -344,7 +363,7 @@ function term_merge_action($object, $context) {
           // 'keep_only_unique'.
           $is_trunk_added = FALSE;
           foreach ($entity->{$field_name}[$language] as $delta => $item) {
-            if ($context['keep_only_unique'] && $is_trunk_added && in_array($item['tid'], array($term_trunk->tid, $term_branch->tid))) {
+            if ($context['keep_only_unique'] && $is_trunk_added && in_array($item[$column], array($term_trunk->tid, $term_branch->tid))) {
               // We are instructed to keep only unique references and we already
               // have term trunk in this field, so we just unset value for this
               // delta.
@@ -353,14 +372,14 @@ function term_merge_action($object, $context) {
             else {
               // Merging term references if necessary, and keep an eye on
               // whether we already have term trunk among this field values.
-              switch ($item['tid']) {
+              switch ($item[$column]) {
                 case $term_trunk->tid:
                   $is_trunk_added = TRUE;
                   break;
 
                 case $term_branch->tid:
                   $is_trunk_added = TRUE;
-                  $entity->{$field_name}[$language][$delta]['tid'] = $term_trunk->tid;
+                  $entity->{$field_name}[$language][$delta][$column] = $term_trunk->tid;
                   break;
               }
             }
@@ -371,6 +390,16 @@ function term_merge_action($object, $context) {
           // numbers, because it is what it is supposed to be.
           $entity->{$field_name}[$language] = array_values($entity->{$field_name}[$language]);
         }
+
+        // Integration with workbench_moderation module. Without this code, if
+        // we save the node for which workbench moderation is enabled, then
+        // it will go from "published" state into "draft". Though in fact we do
+        // not change anything in the node and therefore it should persist in
+        // published state.
+        if (module_exists('workbench_moderation') && $entity_type == 'node') {
+          $entity->workbench_moderation['updating_live_revision'] = TRUE;
+        }
+
         // After updating all the references, save the entity.
         entity_save($entity_type, $entity);
       }
@@ -571,6 +600,28 @@ function term_merge($term_branch, $term_trunk, $merge_settings = array()) {
 }
 
 /**
+ * Retrieve information about ctools plugin of type 'duplicate suggestion'.
+ *
+ * @param string $id
+ *   Supply here ID of the cTool plugin information about which you want to
+ *   retrieve. You may omit this argument and then information on all duplicate
+ *   suggestion plugins will be returned
+ *
+ * @return array
+ *   Array of information on all available duplicate suggestion plugins or if
+ *   $id was provided, then information on that plugin
+ */
+function term_merge_duplicate_suggestion($id = NULL) {
+  ctools_include('plugins');
+  $plugins = ctools_get_plugins('term_merge', 'duplicate_suggestion', $id);
+  if (!$id) {
+    // Sort the list of plugins by their weight.
+    uasort($plugins, 'drupal_sort_weight');
+  }
+  return $plugins;
+}
+
+/**
  * Generate and return form elements that control behavior of merge action.
  *
  * Output of this function should be used in any form that merges terms,
@@ -610,7 +661,7 @@ function term_merge_merge_options_elements($vocabulary) {
     $form['merge_fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Merge Term Fields'),
-      '#description' => t('Check the fields whose values from branch terms you want to add to the values of corresponding fields of the trunk term. <b>Important note:</b> the values will be added until the cardinality limit for the selected fields is reached.'),
+      '#description' => t('Check the fields whose values from branch terms you want to add to the values of corresponding fields of the trunk term. <b>Important note:</b> the values will be added until the cardinality limit for the selected fields is reached and only unique values for each field will be saved.'),
       '#options' => $options,
     );
   }
@@ -619,6 +670,7 @@ function term_merge_merge_options_elements($vocabulary) {
     '#type' => 'checkbox',
     '#title' => t('Keep only unique terms after merging'),
     '#description' => t('Sometimes after merging you may end up having a node (or any other entity) pointing twice to the same taxonomy term, tick this checkbox if want to keep only unique terms in other entities after merging.'),
+    '#default_value' => TRUE,
   );
 
   if (module_exists('redirect')) {
@@ -708,4 +760,37 @@ function term_merge_merge_options_submit($merge_settings_element, &$form_state, 
     'step' => (int) $merge_settings_element['step']['#value'],
   );
   return $merge_settings;
+}
+
+/**
+ * Fetch all fields that have a foreign key to provided column.
+ *
+ * @param string $foreign_table
+ *   Name of the table for which to look among foreign keys of all the fields
+ * @param string $foreign_column
+ *   Name of the column for which to look among foreign keys of all the fields
+ *
+ * @return array
+ *   Array of all fields that have the specified table and column within their
+ *   foreign keys. Each of the fields array will be extended to include the
+ *   following additional keys:
+ *   - term_merge_field_column: (string) Name of the field column that holds
+ *     foreign key to the provided table and column
+ */
+function term_merge_fields_with_foreign_key($foreign_table, $foreign_column) {
+  $fields = field_info_fields();
+  $result = array();
+  foreach ($fields as $field_name => $field_info) {
+    foreach ($field_info['foreign keys'] as $foreign_key) {
+      if ($foreign_key['table'] == $foreign_table) {
+        $column = array_search($foreign_column, $foreign_key['columns']);
+        if ($column) {
+          $field_info['term_merge_field_column'] = $column;
+          $result[] = $field_info;
+        }
+      }
+    }
+  }
+
+  return $result;
 }
