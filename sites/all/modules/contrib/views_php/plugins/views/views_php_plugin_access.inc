@@ -53,7 +53,7 @@ class views_php_plugin_access extends views_plugin_access {
    */
   function access($account) {
     if (!empty($this->options['php_access'])) {
-      return views_php_check_access($this->options['php_access'], $this->view->name, $this->view->current_display, $account);
+      return views_php_check_access($this->options['php_access'], $this->view->name, $this->display->id, $account);
     }
     return TRUE;
   }
@@ -63,7 +63,7 @@ class views_php_plugin_access extends views_plugin_access {
    */
   function get_access_callback() {
     if (!empty($this->options['php_access'])) {
-      return array('views_php_check_access', array($this->options['php_access'], $this->view->name, $this->view->current_display));
+      return array('views_php_check_access', array($this->options['php_access'], $this->view->name, $this->display->id));
     }
     return TRUE;
   }

@@ -148,3 +148,13 @@ function views_php_views_post_execute($view) {
     $view->query->php_unwrap();
   }
 }
+
+/**
+ * Implements hook_views_post_build().
+ */
+function views_php_views_post_build($view) {
+  // Clear the limit and offset
+  if (!empty($view->views_php) && !empty($view->build_info['query']) && is_object($view->build_info['query'])) {
+    $view->build_info['query']->range();
+  }
+}
