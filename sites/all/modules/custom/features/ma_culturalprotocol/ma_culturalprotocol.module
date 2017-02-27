@@ -180,10 +180,22 @@ function _ma_culturalprotocol_is_active($node) {
 function ma_culturalprotocol_node_access($node, $op, $account) {
     $type = is_string($node) ? $node : $node->type;
 
-    if($type == 'cultural_protocol_group' && $op == 'delete') {
-        // Don't let a user delete a cultural protocol if it is being actively referenced
-        if(_ma_culturalprotocol_is_active($node)) {
-            return NODE_ACCESS_DENY;
+    if($type == 'cultural_protocol_group') {
+        switch($op) {
+        case 'create':
+            // OG node_access doesn't know what to do for users with no community memberships yet.
+            // This causes users like Language Stewards to be presented with the option to create protocols, which we don't want.
+            // Here we explicitly check for the ability to create protocols
+            if(!user_access('create cultural_protocol_group content')) {
+                return NODE_ACCESS_DENY;
+            }
+            break;
+        case 'delete':
+            // Don't let a user delete a cultural protocol if it is being actively referenced
+            if(_ma_culturalprotocol_is_active($node)) {
+                return NODE_ACCESS_DENY;
+            }
+            break;
         }
     }
 }

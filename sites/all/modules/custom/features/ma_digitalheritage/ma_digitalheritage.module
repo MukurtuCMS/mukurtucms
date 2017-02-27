@@ -28,6 +28,30 @@ function ma_digitalheritage_node_presave($node) {
     
   }
 }
+
+/**
+ * Implements hook_node_access().
+ */
+function ma_digitalheritage_node_access($node, $op, $account) {
+    $type = is_string($node) ? $node : $node->type;
+
+    if($type == 'digital_heritage') {
+        switch($op) {
+        case 'create':
+            // OG node_access doesn't know what to do for users with no community memberships yet.
+            // This causes users like Language Stewards to be presented with the option to create DH items, which we don't want.
+            // Get the list of CPs a user can use, if none, don't let them create DH
+            $cps = ma_cultural_protocol_get_cps_user_can_post_to();
+            if(empty($cps)) {
+                return NODE_ACCESS_DENY;
+            }
+        }
+
+    }
+
+    return NODE_ACCESS_IGNORE;
+}
+
 /**
  * Implements hook_node_update().
  */
