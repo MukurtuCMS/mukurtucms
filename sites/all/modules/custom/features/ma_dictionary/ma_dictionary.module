@@ -434,6 +434,7 @@ function ma_dictionary_node_delete($node) {
  * Implements hook_node_access
  */
 function ma_dictionary_node_access($node, $op, $account) {
+    global $user;
     $type = is_string($node) ? $node : $node->type;
 
     // Don't delete any language communities that are still being referenced by dictionary words
@@ -441,6 +442,30 @@ function ma_dictionary_node_access($node, $op, $account) {
         if($op == 'delete') {
             if(ma_dictionary_language_community_referenced($node)) {
                 return NODE_ACCESS_DENY;
+            }
+        }
+    }
+
+    // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
+    // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
+    if($type == 'dictionary_word') {
+        $groups = og_get_groups_by_user(NULL, 'node');
+        foreach($groups as $group) {
+            $og_node = node_load($group);
+            if($og_node->type == 'language_community') {
+                if($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
+                    if(!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
+                        return NODE_ACCESS_ALLOW;
+                    }
+                }
+
+                if($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
+                    return NODE_ACCESS_ALLOW;
+                }
+
+                if($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
+                    return NODE_ACCESS_ALLOW;
+                }
             }
         }
     }
