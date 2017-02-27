@@ -21,7 +21,27 @@ function _set_community_manager_on_community_create ($node) {
   og_role_grant('node', $node->nid, $user->uid, $rid);
 }
 
+/**
+ * Implements hook_node_access().
+ */
+function ma_community_node_access($node, $op, $account) {
+    $type = is_string($node) ? $node : $node->type;
 
+    if($type == 'community') {
+        switch($op) {
+        case 'create':
+            // OG node_access doesn't know what to do for users with no community memberships yet.
+            // This causes users like Language Stewards to be presented with the option to create communities, which we don't want.
+            // Here we explicitly check for the ability to create communities
+            if(!user_access('create community content')) {
+                return NODE_ACCESS_DENY;
+            }
+        }
+
+    }
+
+    return NODE_ACCESS_IGNORE;
+}
 
 /**
  * Implements hook_form_FORM_ID_alter().
