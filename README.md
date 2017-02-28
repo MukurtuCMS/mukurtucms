@@ -102,7 +102,7 @@ Mukurtu upgrades are done via its Github repository. Knowing that important secu
 
 #### <a name="code-contributing"></a>Contributing Code to Mukurtu
 Mukurtu CMS is a distribution of Drupal. You can join Mukurtu’s developer community by [forking Mukurtu CMS](https://github.com/mukurtucms/mukurtucms) on GitHub.
-Mukurtu Core is co-maintained by the [Center for Digital Scholarship and Curation (CDSC)](http://libraries.wsu.edu/cdsc) at Washington State University and the [Center for Digital Archaeology (CoDA)](http://codifi.org/). Any pull requests will be reviewed and tested before acceptance by a core committer.
+Mukurtu Core is co-maintained by the [Center for Digital Scholarship and Curation (CDSC)](http://libraries.wsu.edu/cdsc) at Washington State University. Any pull requests will be reviewed and tested before acceptance by a core committer.
 
 #### <a name="code-overview"></a>Code Overview
 
