@@ -38,6 +38,8 @@ function mukurtu_set_misc_vars () {
   variable_set ('file_private_path', 'sites/default/files/private');
   variable_set ('clean_url', 1);
   variable_set ('cron_safe_threshold', 0);
+  variable_set ('mukurtu_dh_setting_child_category_sets_ancestors', 1);
+
 }
 
 function mukurtu_set_theme () {

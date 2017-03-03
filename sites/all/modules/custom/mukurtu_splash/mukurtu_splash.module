@@ -810,6 +810,25 @@ function mukurtu_splash_block_manage_taxonomy() {
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
       'description' => t('Manage all keywords'),
     );
+
+    if (user_access('administer menu')) {
+      if (!variable_get('mukurtu_dh_setting_child_category_selects_parents')) {
+        $title = 'Select Parent Category when selecting Child Category';
+        $description = 'Set to: when creating or editing DH item, if a child category is selected, its parent category (and its parents) will be selected as well. It is generally not advised to change this setting on sites with DH items already having child categories set, as future updates of DH nodes will add the parent category without the user expecting it.';
+      }
+      else {
+        $title = 'Set to: do not select Parent Category when selecting Child Category';
+        $description = 'When creating or editing item, if a child category is selected, its parent categories are not also selected.';
+      }
+
+      $items[] = array(
+        'title' => $title,
+        'href' => 'admin/toggle-child-category-selects-parents',
+        'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+        'description' => t($description),
+      );
+    }
+
   }
 
   $content = array ('content' => $items);
