@@ -78,36 +78,6 @@ function ma_importexport_user_default_permissions() {
     'module' => 'feeds',
   );
 
-  // Exported permission: 'clear import_dictionary_word_additional_entries feeds'.
-  $permissions['clear import_dictionary_word_additional_entries feeds'] = array(
-    'name' => 'clear import_dictionary_word_additional_entries feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_dictionary_word_lists feeds'.
-  $permissions['clear import_dictionary_word_lists feeds'] = array(
-    'name' => 'clear import_dictionary_word_lists feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'clear import_dictionary_words feeds'.
-  $permissions['clear import_dictionary_words feeds'] = array(
-    'name' => 'clear import_dictionary_words feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
   // Exported permission: 'clear import_digital_heritage_community_records feeds'.
   $permissions['clear import_digital_heritage_community_records feeds'] = array(
     'name' => 'clear import_digital_heritage_community_records feeds',
@@ -245,36 +215,6 @@ function ma_importexport_user_default_permissions() {
     'module' => 'feeds',
   );
 
-  // Exported permission: 'import import_dictionary_word_additional_entries feeds'.
-  $permissions['import import_dictionary_word_additional_entries feeds'] = array(
-    'name' => 'import import_dictionary_word_additional_entries feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_dictionary_word_lists feeds'.
-  $permissions['import import_dictionary_word_lists feeds'] = array(
-    'name' => 'import import_dictionary_word_lists feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'import import_dictionary_words feeds'.
-  $permissions['import import_dictionary_words feeds'] = array(
-    'name' => 'import import_dictionary_words feeds',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
   // Exported permission: 'import import_digital_heritage_community_records feeds'.
   $permissions['import import_digital_heritage_community_records feeds'] = array(
     'name' => 'import import_digital_heritage_community_records feeds',
@@ -398,33 +338,6 @@ function ma_importexport_user_default_permissions() {
     'module' => 'feeds_tamper',
   );
 
-  // Exported permission: 'tamper import_dictionary_word_additional_entries'.
-  $permissions['tamper import_dictionary_word_additional_entries'] = array(
-    'name' => 'tamper import_dictionary_word_additional_entries',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_dictionary_word_lists'.
-  $permissions['tamper import_dictionary_word_lists'] = array(
-    'name' => 'tamper import_dictionary_word_lists',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
-  // Exported permission: 'tamper import_dictionary_words'.
-  $permissions['tamper import_dictionary_words'] = array(
-    'name' => 'tamper import_dictionary_words',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
   // Exported permission: 'tamper import_digital_heritage_community_records'.
   $permissions['tamper import_digital_heritage_community_records'] = array(
     'name' => 'tamper import_digital_heritage_community_records',
@@ -536,33 +449,6 @@ function ma_importexport_user_default_permissions() {
   // Exported permission: 'unlock import_cultural_protocols feeds'.
   $permissions['unlock import_cultural_protocols feeds'] = array(
     'name' => 'unlock import_cultural_protocols feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'unlock import_dictionary_word_additional_entries feeds'.
-  $permissions['unlock import_dictionary_word_additional_entries feeds'] = array(
-    'name' => 'unlock import_dictionary_word_additional_entries feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'unlock import_dictionary_word_lists feeds'.
-  $permissions['unlock import_dictionary_word_lists feeds'] = array(
-    'name' => 'unlock import_dictionary_word_lists feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'unlock import_dictionary_words feeds'.
-  $permissions['unlock import_dictionary_words feeds'] = array(
-    'name' => 'unlock import_dictionary_words feeds',
     'roles' => array(
       'administrator' => 'administrator',
     ),
