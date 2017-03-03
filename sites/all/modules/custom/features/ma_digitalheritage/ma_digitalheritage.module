@@ -556,7 +556,16 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
   // Always hide these fields
   $form['field_book_parent']['#access'] = FALSE;
 
-  // Grab Community Record parent on node edit and set page title
+  // Make the Custom Date field required if Dashboard setting is set
+  // This setting isn't respected, as the Partial Date validate handler checks directly against the field handler.
+  // So we patch Partial Date, but leave this setting just to create the asterix to denote required field.
+  if (variable_get('mukurtu_dh_custom_date_required') && module_exists('ma_single_browse_page')) {
+    $form['field_original_date'][LANGUAGE_NONE]['#required'] = TRUE;
+    $form['field_original_date'][LANGUAGE_NONE][0]['#required'] = TRUE;
+    $form['field_original_date'][LANGUAGE_NONE][0]['value']['#required'] = TRUE;
+  }
+
+    // Grab Community Record parent on node edit and set page title
   if (isset($form['field_community_record_parent'][LANGUAGE_NONE]['#default_value'][0])) {
     $community_record_parent_wrapper = entity_metadata_wrapper('node', $form['field_community_record_parent'][LANGUAGE_NONE]['#default_value'][0]);
 

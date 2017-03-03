@@ -6,6 +6,36 @@
 
 include_once 'ma_single_browse_page.features.inc';
 
+
+/**
+ * Implements hook_menu().
+ */
+function ma_single_browse_page_menu() {
+  $items = array();
+
+  // Callback that toggles the display of the Related Items teasers
+  $items['admin/toggle-custom-date-required'] = array(
+    'title' => 'Toggle Custom Date Required',
+    'page callback' => 'ma_single_browse_page_toggle_custom_date_required',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'weight' => 100,
+  );
+
+  return $items;
+}
+
+function ma_single_browse_page_toggle_custom_date_required () {
+  if (variable_get('mukurtu_dh_custom_date_required')) {
+    variable_set ('mukurtu_dh_custom_date_required', 0);
+  }
+  else {
+    variable_set ('mukurtu_dh_custom_date_required', 1);
+  }
+  drupal_goto ('dashboard');
+}
+
+
 /**
  * Implements hook_block_view_alter().
  */
@@ -134,11 +164,18 @@ function ma_single_browse_page_dh_list_sort_form($form, &$form_state) {
     'changed' => t('Date Changed'),
     'title' => t('Title'),
   );
+  // Only show the Newest and Oldest sorts if the DH Custom Date field is required, because if it unset, date = 0, so those DH nodes will appear at top of Oldest list.
+  // Newest still works, but Oldest without Newest will just have people asking for Oldest, so take them both out.
+  // This is a limitation of using the DB for the Search API backend. It should be resolveable when / if switching to SOLR.
+  if (!variable_get('mukurtu_dh_custom_date_required')) {
+    unset ($sort_options['newest']);
+    unset ($sort_options['oldest']);
+  }
   $form['sort'] = array(
-    '#type' => 'select',
-    '#default_value' => $_SESSION['dh_sort_order'] ?: 'changed',
-    '#options' => $sort_options,
-    '#attributes' => array('onchange' => 'this.form.submit();'),
+  '#type' => 'select',
+  '#default_value' => $_SESSION['dh_sort_order'] ?: 'changed',
+  '#options' => $sort_options,
+  '#attributes' => array('onchange' => 'this.form.submit();'),
   );
   $form['submit'] = array(
     '#type' => 'submit',

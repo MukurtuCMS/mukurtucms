@@ -373,6 +373,23 @@ function mukurtu_splash_block_site_start() {
     );
   }
 
+  if (user_access('administer menu') && module_exists('ma_single_browse_page')) { // TODO: once sort by newest or oldest facet is on main DH browwse page, remove the module_exists clause.
+    if (!variable_get('mukurtu_dh_custom_date_required')) {
+      $title = 'Make Custom Date field required';
+      $description = 'The Custom Date field in Digital Heritage items must be required to be able to sort DH items by newest or oldest.';
+    }
+    else {
+      $title = 'Make Custom Date field not required';
+      $description = 'This will remove the ability to sort DH items by newest or oldest.';
+    }
+      $items[] = array(
+      'title' => $title,
+      'href' => 'admin/toggle-custom-date-required',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t($description),
+    );
+  }
+
   if (user_access('edit boxes')) {
     $items_layout[] = array(
       'title' => 'Edit Custom Site Header',

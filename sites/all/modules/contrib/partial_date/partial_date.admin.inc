@@ -458,6 +458,13 @@ function _partial_date_field_validate($entity_type, $entity, $field, $instance, 
     }
   }
 
+  // Patch by Kanopi
+  if (variable_get('mukurtu_dh_custom_date_required') && module_exists('ma_single_browse_page')) {
+    //TODO: check additionally against field name when/if partial date fields get added.
+    $instance['required'] = TRUE;
+  }
+  // End patch
+
   if ($entity_type && $entity && !$has_data && $instance['required']) {
     if (!empty($minimum_components)) {
       $errors[$field['field_name']][$langcode][0][] = array(
