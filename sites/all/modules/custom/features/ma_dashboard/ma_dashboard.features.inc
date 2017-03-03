@@ -10,7 +10,7 @@
 function ma_dashboard_homebox() {
   $homeboxes = array();
 
-  $homeboxes['Mukurtu Dashboard'] = array(
+  $homeboxes['mukurtu_dashboard'] = array(
     'regions' => 5,
     'cache' => 0,
     'color' => 0,
