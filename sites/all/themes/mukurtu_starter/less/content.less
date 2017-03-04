@@ -1093,6 +1093,7 @@ a.tooltips span {
     }
 
     // Filters
+
     // Search
     #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list {
       .views-exposed-widgets {
@@ -1108,5 +1109,60 @@ a.tooltips span {
       }
     }
 
+    // Facets
+
+    // Original Year
+    #search-api-ranges-dh_original_year {
+
+      // Reformat the slider widget.
+      // This is taken from https://www.drupal.org/node/1999166, with some minor spacing font size changes.
+      .search-api-ranges-widget, .search-api-ranges-widget .range-box-left, .search-api-ranges-widget .range-box-right {
+        position: relative;
+      }
+      .search-api-ranges-widget .text-range {
+        display: none;
+      }
+      .search-api-ranges-widget .form-item-range-from input, .search-api-ranges-widget .form-item-range-to input {
+        float: left;
+        padding: 0;
+      }
+      .search-api-ranges-widget .form-submit {
+        display: none;
+      }
+      .search-api-ranges-widget .range-box-left .form-item, .search-api-ranges-widget .range-box-right .form-item {
+        margin-top: 0;
+      }
+      .search-api-ranges-widget .range-box-left, .search-api-ranges-widget .range-box-right {
+        position: absolute;
+        top: -30px;
+      }
+      .search-api-ranges-widget .range-box-left label, .search-api-ranges-widget .range-box-right label {
+        display: none;
+      }
+      .search-api-ranges-widget .range-box-left {
+        left: 0;
+      }
+      .search-api-ranges-widget .range-box-right {
+        right: 0;
+      }
+      .search-api-ranges-widget .range-box-right .form-item-range-to input {
+        text-align: right;
+      }
+      .search-api-ranges-widget .range-slider-box {
+        display: block;
+        margin-top: 35px;
+        margin-bottom: 30px;
+        padding: 0 10px;
+      }
+      .search-api-ranges-widget .form-item-range-from input, .search-api-ranges-widget .form-item-range-to input {
+        background: none repeat scroll 0 0 transparent;
+        border: none;
+        box-shadow: none;
+        width: auto;
+      }
+
+    }
+
   }
+
 }

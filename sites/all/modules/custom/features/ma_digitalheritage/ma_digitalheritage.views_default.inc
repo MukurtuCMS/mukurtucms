@@ -376,12 +376,6 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
   /* Filter criterion: Indexed Node: Status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'search_api_index_default_node_index';
@@ -402,6 +396,12 @@ function ma_digitalheritage_views_default_views() {
     4 => 0,
   );
   $handler->display->display_options['filters']['status']['expose']['reduce'] = 0;
+  /* Filter criterion: Location: Geo Type (indexed) */
+  $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
   $handler->display->display_options['inherit_panels_path'] = '1';
 
   /* Display: Single Browse Page List */
@@ -541,12 +541,6 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
-  $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
   /* Filter criterion: Indexed Node: Status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'search_api_index_default_node_index';
@@ -567,6 +561,12 @@ function ma_digitalheritage_views_default_views() {
     4 => 0,
   );
   $handler->display->display_options['filters']['status']['expose']['reduce'] = 0;
+  /* Filter criterion: Location: Geo Type (indexed) */
+  $handler->display->display_options['filters']['field_coverage_geo_type']['id'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['field'] = 'field_coverage_geo_type';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['operator'] = 'not empty';
+  $handler->display->display_options['filters']['field_coverage_geo_type']['value'] = array();
   $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['digital_heritage_grid_list'] = array(
     t('Master'),

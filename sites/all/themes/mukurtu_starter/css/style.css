@@ -9991,26 +9991,77 @@ a:hover {
   padding-left: 15px;
 }
 /* Single Page Browse */
-.pane-quicktabs-single-browse-page-right-column {
+#single-browse-page-right-column {
   height: 100vh;
   overflow: scroll;
 }
-.pane-quicktabs-single-browse-page-right-column .pane-content {
+#single-browse-page-right-column .pane-content {
   padding: 0;
 }
-.pane-quicktabs-single-browse-page-right-column .pane-content .view-display-id-single_browse_page_dh_list .views-row {
+#single-browse-page-right-column .pane-content .view-display-id-single_browse_page_dh_list .views-row {
   border-bottom: 1px solid #ecebeb;
   padding-bottom: 30px;
 }
-.pane-quicktabs-single-browse-page-right-column .pane-content .views-row.synced-marker-hover {
+#single-browse-page-right-column .pane-content .views-row.synced-marker-hover {
   background-color: #d7e6f4;
 }
-.pane-quicktabs-single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-exposed-widgets {
+#single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-exposed-widgets {
   margin-bottom: 2em;
 }
-.pane-quicktabs-single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-widget-filter-search_api_views_fulltext {
+#single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-widget-filter-search_api_views_fulltext {
   float: none;
 }
-.pane-quicktabs-single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-exposed-widget .btn {
+#single-browse-page-right-column .pane-content #views-exposed-form-digital-heritage-grid-list-single-browse-page-dh-list .views-exposed-widget .btn {
   margin-top: 0em;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-left,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-right {
+  position: relative;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .text-range {
+  display: none;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .form-item-range-from input,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .form-item-range-to input {
+  float: left;
+  padding: 0;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .form-submit {
+  display: none;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-left .form-item,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-right .form-item {
+  margin-top: 0;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-left,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-right {
+  position: absolute;
+  top: -30px;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-left label,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-right label {
+  display: none;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-left {
+  left: 0;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-right {
+  right: 0;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-box-right .form-item-range-to input {
+  text-align: right;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .range-slider-box {
+  display: block;
+  margin-top: 35px;
+  margin-bottom: 30px;
+  padding: 0 10px;
+}
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .form-item-range-from input,
+#single-browse-page-right-column .pane-content #search-api-ranges-dh_original_year .search-api-ranges-widget .form-item-range-to input {
+  background: none repeat scroll 0 0 transparent;
+  border: none;
+  box-shadow: none;
+  width: auto;
 }

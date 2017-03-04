@@ -263,3 +263,18 @@ function ma_single_browse_page_more_link_to_modal_node($field) {
     )
   ));
 }
+
+
+/**
+ * Implements hook_url_outbound_alter
+ */
+function ma_single_browse_page_url_outbound_alter(&$path, &$options, $original_path) {
+
+  // The Search API Ranges slider facet does not build "browse" into the pretty path, which is needed on the input filtering, and *does* happen correctly for the other facets.
+  if (strpos($path, 'original_year') !== FALSE) {
+    if (strpos($path, 'browse') === FALSE && strpos($path, 'admin') === FALSE) {
+      $path = 'browse' . $path;
+    }
+  }
+
+}
