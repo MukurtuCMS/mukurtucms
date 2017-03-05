@@ -19,7 +19,9 @@ L.Sync =  L.Class.extend({
     L.setOptions(this, options);
     this.map = map;
     this.lastMarker = null;
-	},
+    this.groupedFeatures = [];
+
+  },
 
   closePopup: function(marker) {
     if (marker && marker.closePopup) {
@@ -78,6 +80,12 @@ L.Sync =  L.Class.extend({
   syncMarkerToContent: function(contentSelector, marker, contentClass) {
     var sync = this;
 
+    // Group features together according to their feature_id.
+    if (!this.groupedFeatures[marker.feature_id]) {
+      this.groupedFeatures[marker.feature_id] = [];
+    }
+    this.groupedFeatures[marker.feature_id].push(marker);
+
     marker.on('popupclose', function(event) {
       var marker = event.target;
       if (marker === sync.lastMarker) {
@@ -108,35 +116,9 @@ L.Sync =  L.Class.extend({
     }
     marker.addedViaSync = addedViaSync || marker.addedViaSync;
 
-    // This section re-worked by Kanopi
-    var point = marker.getLatLngs ? marker.getLatLngs()[0][0] : marker.getLatLng();
-    this.map.setView(point, 15); // 15 zoom level for points
+    var group = new L.featureGroup(this.groupedFeatures[marker.feature_id]); // featureGroup serves two purposes: 1. allows fitBounds for multiple markers at once. 2. Makes points work with fitBounds, instead of needing to use getLatLngs.
+    this.map.fitBounds(group.getBounds());
 
-    if (marker.getBounds) {
-      var bounds = marker.getBounds();
-      this.map.fitBounds(bounds); // non-points get zoomed to fitbounds
-    }
-
-    // Make geometry visible, in case it was hidden.
-    //this.show(marker);
-    //this.highlight(marker);
-
-    // if (marker.flags & L.Sync.SYNC_MARKER_TO_CONTENT_WITH_POPUP) {
-    //   if (marker._icon) {
-    //     // Adjust popup position for markers, not other geometries.
-    //     if (!this.popupOffsetY) {
-    //       this.popupOffsetY = marker._popup.options.offset.y;
-    //     }
-    //     marker._popup.options.offset.y = this.popupOffsetY - 20;
-    //   }
-    //   marker.openPopup();
-    // }
-    // if (marker._icon && marker._icon.style) {
-    //   // This does NOT work in most browsers.
-    //   marker._bringToFront();
-    //   marker.setZIndexOffset(9999);
-    // }
-    // this.lastMarker = marker;
   },
 
   addClass: function(marker, className) {
