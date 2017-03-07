@@ -12,13 +12,6 @@
     * [Upgrading] (#upgrading)
 * [Developers] (#developers)
   * [Contributing Code to Mukurtu] (#code-contributing)
-  * [Code Overview] (#code-overview)
-    * [Code Location] (#code-location)
-    * [Features Overview] (#features-overview)
-    * [Permissions] (#permissions)
-    * [Scald] (#scald)
-    * [Search API] (#search-api)
-    * [Areas for Improvement] (#areas-improvement)
 * [Bug Reports] (#bug-reports)
 
 ### <a name="whatis"></a>What is Mukurtu?
