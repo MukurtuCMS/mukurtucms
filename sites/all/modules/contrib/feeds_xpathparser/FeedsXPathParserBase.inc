@@ -10,10 +10,33 @@
  */
 abstract class FeedsXPathParserBase extends FeedsParser {
 
-  protected $modified_queries = array();
+  /**
+   * The DOMDocument used for parsing.
+   *
+   * @var DOMDocument
+   */
+  protected $doc;
+
+  /**
+   * The return value of libxml_disable_entity_loader().
+   *
+   * @var bool
+   */
+  protected $loader;
+
+  /**
+   * The elements that should be displayed in raw XML.
+   *
+   * @var array
+   */
   protected $rawXML = array();
-  protected $doc = NULL;
-  protected $xpath = NULL;
+
+  /**
+   * The DOMXPath objet used for parsing.
+   *
+   * @var DOMXPath
+   */
+  protected $xpath;
 
   /**
    * Classes that use FeedsXPathParserBase must implement this.
@@ -29,10 +52,22 @@ abstract class FeedsXPathParserBase extends FeedsParser {
   abstract protected function setup($source_config, FeedsFetcherResult $fetcher_result);
 
   /**
+   * Helper callback to return the raw value.
+   *
+   * @param DOMNode $node
+   *   The DOMNode to convert to a string.
+   *
+   * @return string
+   *   The string representation of the DOMNode.
+   */
+  abstract protected function getRaw(DOMNode $node);
+
+  /**
    * Implements FeedsParser::parse().
    */
   public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result) {
     $source_config = $source->getConfigFor($this);
+    $state = $source->state(FEEDS_PARSE);
 
     if (empty($source_config)) {
       $source_config = $this->getConfig();
@@ -46,7 +81,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     $this->rawXML = array_keys(array_filter($source_config['rawXML']));
     // Set link.
     $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-    $parser_result->link = $fetcher_config['source'];
+    $parser_result->link = isset($fetcher_config['source']) ? $fetcher_config['source'] : '';
 
     $this->xpath = new FeedsXPathParserDOMXPath($this->doc);
     $config = array();
@@ -54,29 +89,49 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     $config['errors'] = $source_config['exp']['errors'];
 
     $this->xpath->setConfig($config);
-    $all_nodes = $this->xpath->namespacedQuery($source_config['context'], NULL, 'context');
+
+    $context_query = '(' . $source_config['context'] . ')';
+    if (empty($state->total)) {
+      $state->total = $this->xpath->namespacedQuery('count(' . $context_query . ')', $this->doc, 'count');
+    }
+
+    $start = $state->pointer ? $state->pointer : 0;
+    $limit = $start + $source->importer->getLimit();
+    $end = ($limit > $state->total) ? $state->total : $limit;
+    $state->pointer = $end;
+
+    $context_query .= "[position() > $start and position() <= $end]";
+
+    $progress = $state->pointer ? $state->pointer : 0;
+
+    $all_nodes = $this->xpath->namespacedQuery($context_query, NULL, 'context');
+
+    // The source config could have old values that don't exist in the importer.
+    $sources = array_intersect_key($source_config['sources'], $mappings);
 
     foreach ($all_nodes as $node) {
+      // Invoke a hook to check whether the domnode should be skipped.
+      if (in_array(TRUE, module_invoke_all('feeds_xpathparser_filter_domnode', $node, $this->doc, $source), TRUE)) {
+        continue;
+      }
+
       $parsed_item = $variables = array();
-      foreach ($source_config['sources'] as $source => $query) {
+      foreach ($sources as $element_key => $query) {
         // Variable substitution.
         $query = strtr($query, $variables);
         // Parse the item.
-        $result = $this->parseSourceElement($query, $node, $source);
+        $result = $this->parseSourceElement($query, $node, $element_key);
         if (isset($result)) {
-          if (!is_array($result)) {
-            $variables['$' . $mappings[$source]] = $result;
-          }
-          else {
-            $variables['$' . $mappings[$source]] = '';
-          }
-          $parsed_item[$source] = $result;
+          $variables['$' . $mappings[$element_key]] = is_array($result) ? reset($result) : $result;
+          $parsed_item[$element_key] = $result;
         }
       }
       if (!empty($parsed_item)) {
         $parser_result->items[] = $parsed_item;
       }
     }
+
+    $state->progress($state->total, $progress);
     unset($this->doc);
     unset($this->xpath);
     return $parser_result;
@@ -85,13 +140,11 @@ abstract class FeedsXPathParserBase extends FeedsParser {
   /**
    * Parses one item from the context array.
    *
-   * @param $item
-   *   A  SimpleXMLElement from the context array.
-   *
-   * @param $query
+   * @param string $query
    *   An XPath query.
-   *
-   * @param $source
+   * @param DOMNode $context
+   *   The current context DOMNode .
+   * @param string $source
    *   The name of the source for this query.
    *
    * @return array
@@ -104,15 +157,14 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     }
 
     $node_list = $this->xpath->namespacedQuery($query, $context, $source);
-    /**
-     * Iterate through the results of the XPath query.  If this source is
-     * configured to return raw xml, make it so.
-     */
+
+    // Iterate through the results of the XPath query.  If this source is
+    // configured to return raw xml, make it so.
     if ($node_list instanceof DOMNodeList) {
       $results = array();
       if (in_array($source, $this->rawXML)) {
         foreach ($node_list as $node) {
-          $results[] = $this->doc->savexML($node);
+          $results[] = $this->getRaw($node);
         }
       }
       else {
@@ -132,20 +184,20 @@ abstract class FeedsXPathParserBase extends FeedsParser {
         return $results;
       }
     }
-    // A value was returned directly.
-    elseif (!empty($node_list)) {
+    // A value was returned directly from namespacedQuery().
+    else {
       return $node_list;
     }
   }
 
   /**
-   * Source form.
+   * Overrides parent::sourceForm().
    */
   public function sourceForm($source_config) {
     $form = array();
     $importer = feeds_importer($this->id);
     $importer_config = $importer->getConfig();
-    $mappings_ = $importer_config['processor']['config']['mappings'];
+    $mappings_ = $importer->processor->getMappings();
 
     if (empty($source_config)) {
       $source_config = $this->getConfig();
@@ -165,15 +217,10 @@ abstract class FeedsXPathParserBase extends FeedsParser {
       }
     }
 
-    $uniques = $mappings = array();
-    foreach ($mappings_ as $mapping) {
-      if (strpos($mapping['source'], 'xpathparser:') === 0) {
-        $mappings[$mapping['source']] = $mapping['target'];
-        if ($mapping['unique']) {
-          $uniques[] = $mapping['target'];
-        }
-      }
-    }
+    $uniques = $this->getUniques();
+    $mappings = $this->getOwnMappings();
+    $targets = $importer->processor->getMappingTargets();
+
     $form['xpath'] = array(
       '#type' => 'fieldset',
       '#tree' => TRUE,
@@ -182,8 +229,8 @@ abstract class FeedsXPathParserBase extends FeedsParser {
       '#collapsed' => TRUE,
     );
     if (empty($mappings)) {
-      // Detect if Feeds menu structure has changed. This will take a while to be
-      // released, but since I run dev it needs to work.
+      // Detect if Feeds menu structure has changed. This will take a while to
+      // be released, but since I run dev it needs to work.
       $feeds_menu = feeds_ui_menu();
       if (isset($feeds_menu['admin/structure/feeds/list'])) {
         $feeds_base = 'admin/structure/feeds/edit/';
@@ -221,7 +268,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     foreach ($mappings as $source => $target) {
       $form['xpath']['sources'][$source] = array(
         '#type' => 'textfield',
-        '#title' => check_plain($target),
+        '#title' => isset($targets[$target]['name']) ? check_plain($targets[$target]['name']) : check_plain($target),
         '#description' => t('The XPath query to run.'),
         '#default_value' => isset($source_config['sources'][$source]) ? $source_config['sources'][$source] : '',
         '#maxlength' => 1024,
@@ -229,8 +276,8 @@ abstract class FeedsXPathParserBase extends FeedsParser {
       );
       if (!empty($variables)) {
         $variable_text = format_plural(count($variables),
-          t('The variable ' . implode(', ', $variables) . ' is availliable for replacement.'),
-          t('The variables ' . implode(', ', $variables) . ' are availliable for replacement.')
+          t('The variable %variable is available for replacement.', array('%variable' => implode(', ', $variables))),
+          t('The variables %variable are available for replacement.', array('%variable' => implode(', ', $variables)))
         );
         $form['xpath']['sources'][$source]['#description'] .= '<br />' . $variable_text;
       }
@@ -239,7 +286,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     $form['xpath']['rawXML'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Select the queries you would like to return raw XML or HTML'),
-      '#options' => $mappings,
+      '#options' => $this->getOwnMappings(TRUE),
       '#default_value' => isset($source_config['rawXML']) ? $source_config['rawXML'] : array(),
     );
     $form['xpath']['exp'] = array(
@@ -279,14 +326,14 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     $form['xpath']['exp']['debug'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Debug query'),
-      '#options' => array_merge(array('context' => 'context'), $mappings),
+      '#options' => array_merge(array('context' => t('Context')), $this->getOwnMappings(TRUE)),
       '#default_value' => isset($source_config['exp']['debug']) ? $source_config['exp']['debug'] : array(),
     );
     return $form;
   }
 
   /**
-   * Override parent::configForm().
+   * Overrides parent::configForm().
    */
   public function configForm(&$form_state) {
     $config = $this->getConfig();
@@ -300,18 +347,19 @@ abstract class FeedsXPathParserBase extends FeedsParser {
       '#description' => t('This setting allows feed nodes to specify their own XPath values for the context and sources.'),
       '#default_value' => $config['allow_override'],
     );
+
     return $form;
   }
 
   /**
-   * Define defaults.
+   * Overrides parent::sourceDefaults().
    */
   public function sourceDefaults() {
     return array();
   }
 
   /**
-   * Define defaults.
+   * Overrides parent::configDefaults().
    */
   public function configDefaults() {
     return array(
@@ -329,13 +377,10 @@ abstract class FeedsXPathParserBase extends FeedsParser {
   }
 
   /**
-   * Override parent::sourceFormValidate().
+   * Overrides parent::sourceFormValidate().
    *
    * If the values of this source are the same as the base config we set them to
-   * blank to that the values will be inherited from the importer defaults.
-   *
-   * @param &$values
-   *   The values from the form to validate, passed by reference.
+   * blank so that the values will be inherited from the importer defaults.
    */
   public function sourceFormValidate(&$values) {
     $config = $this->getConfig();
@@ -353,7 +398,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
   }
 
   /**
-   * Override parent::sourceFormValidate().
+   * Overrides parent::sourceFormValidate().
    */
   public function configFormValidate(&$values) {
     $mappings = $this->getOwnMappings();
@@ -366,7 +411,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
     }
     $class = get_class($this);
     $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>' . "\n<items></items>");
-    $use_errors = libxml_use_internal_errors(TRUE);
+    $use_errors = $this->errorStart();
 
     $values['context'] = trim($values['context']);
     if (!empty($values['context'])) {
@@ -399,6 +444,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
             foreach ($mappings as $target) {
               if (strpos($query, '$' . $target) !== FALSE) {
                 $variable_present = TRUE;
+                break;
               }
             }
           }
@@ -413,20 +459,24 @@ abstract class FeedsXPathParserBase extends FeedsParser {
         }
       }
     }
-    libxml_use_internal_errors($use_errors);
+    $this->errorStop($use_errors, FALSE);
   }
 
   /**
-  * Override parent::getMappingSources().
-  */
+   * Overrides parent::getMappingSources().
+   */
   public function getMappingSources() {
-    $mappings = $this->filterMappings(feeds_importer($this->id)->processor->config['mappings']);
+    $mappings = $this->getOwnMappings();
     $next = 0;
     if (!empty($mappings)) {
-      $keys = array_keys($mappings);
-      $last_mapping = end($keys);
-      $next = explode(':', $last_mapping);
-      $next = $next[1] + 1;
+      // Mappings can be re-ordered, so find the max.
+      foreach (array_keys($mappings) as $key) {
+        list(, $index) = explode(':', $key);
+        if ($index > $next) {
+          $next = $index;
+        }
+      }
+      $next++;
     }
     return array(
       'xpathparser:' . $next => array(
@@ -437,15 +487,44 @@ abstract class FeedsXPathParserBase extends FeedsParser {
   }
 
   /**
-   * Get the mappings that belong to us i.e. mappings that begin with
-   * "xpathparser:".
+   * Gets the unique mappings targets that are used by this parser.
    *
    * @return array
    *   An array of mappings keyed source => target.
    */
-  protected function getOwnMappings() {
-    $importer_config = feeds_importer($this->id)->getConfig();
-    return $this->filterMappings($importer_config['processor']['config']['mappings']);
+  protected function getUniques() {
+    $uniques = array();
+    $importer = feeds_importer($this->id);
+
+    $targets = $importer->processor->getMappingTargets();
+    foreach ($importer->processor->getMappings() as $mapping) {
+      if (!empty($mapping['unique'])) {
+        $uniques[$mapping['source']] = $targets[$mapping['target']]['name'];
+      }
+    }
+
+    return $uniques;
+  }
+
+  /**
+   * Gets the mappings that are defined by this parser.
+   *
+   * The mappings begin with "xpathparser:".
+   *
+   * @return array
+   *   An array of mappings keyed source => target.
+   */
+  protected function getOwnMappings($label = FALSE) {
+    $importer = feeds_importer($this->id);
+    $mappings = $this->filterMappings($importer->processor->getMappings());
+    if ($label) {
+      $targets = $importer->processor->getMappingTargets();
+      foreach ($mappings as $source => $target) {
+        $mappings[$source] = isset($targets[$target]['name']) ? $targets[$target]['name'] : $target;
+      }
+    }
+
+    return $mappings;
   }
 
   /**
@@ -457,7 +536,7 @@ abstract class FeedsXPathParserBase extends FeedsParser {
    * @return array
    *   An array of mappings keyed source => target.
    */
-  protected function filterMappings($mappings) {
+  protected function filterMappings(array $mappings) {
     $our_mappings = array();
     foreach ($mappings as $mapping) {
       if (strpos($mapping['source'], 'xpathparser:') === 0) {
@@ -468,17 +547,22 @@ abstract class FeedsXPathParserBase extends FeedsParser {
   }
 
   /**
-   * Start custom error handling.
+   * Starts custom error handling.
    *
    * @return bool
    *   The previous value of use_errors.
    */
   protected function errorStart() {
+    libxml_clear_errors();
+    if (function_exists('libxml_disable_entity_loader')) {
+      $this->loader = libxml_disable_entity_loader(TRUE);
+    }
+
     return libxml_use_internal_errors(TRUE);
   }
 
   /**
-   * Stop custom error handling.
+   * Stops custom error handling.
    *
    * @param bool $use
    *   The previous value of use_errors.
@@ -493,16 +577,36 @@ abstract class FeedsXPathParserBase extends FeedsParser {
           case LIBXML_ERR_ERROR:
             $type = 'warning';
             break;
+
           case LIBXML_ERR_FATAL:
             $type = 'error';
             break;
-
         }
-        $message = t('%error on line %num. Error code: %code', array('%error' => trim($error->message), '%num' => $error->line, '%code' => $error->code));
+        $args = array(
+          '%error' => trim($error->message),
+          '%num' => $error->line,
+          '%code' => $error->code,
+        );
+        $message = t('%error on line %num. Error code: %code', $args);
         drupal_set_message($message, $type, FALSE);
       }
     }
     libxml_clear_errors();
     libxml_use_internal_errors($use);
+
+    if (function_exists('libxml_disable_entity_loader') && isset($this->loader)) {
+      libxml_disable_entity_loader($this->loader);
+      unset($this->loader);
+    }
   }
+
+  /**
+   * Overrides parent::hasSourceConfig().
+   *
+   * Stop Feeds from building our form over and over again.
+   */
+  public function hasSourceConfig() {
+    return TRUE;
+  }
+
 }

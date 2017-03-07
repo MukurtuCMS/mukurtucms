@@ -222,4 +222,12 @@ abstract class FeedsFetcher extends FeedsPlugin {
    *   $source, NULL otherwise.
    */
   public function importPeriod(FeedsSource $source) {}
+
+  /**
+   * Invoked after an import is finished.
+   *
+   * @param $source
+   *   A FeedsSource object.
+   */
+  public function afterImport(FeedsSource $source) {}
 }

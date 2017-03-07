@@ -91,15 +91,18 @@ class FeedsEntityProcessor extends FeedsProcessor {
   /**
    * Returns the entity wrapper metadata for the processor's entity type.
    *
+   * @param object $entity
+   *   (optional) The entity object to wrap.
+   *
    * @return EntityMetadataWrapper
    *  An entity metadata wrapper.
    */
-  protected function entityWrapper() {
+  protected function entityWrapper($entity = NULL) {
     if ($this->bundleKey()) {
-      return entity_metadata_wrapper($this->entityType(), NULL, array('bundle' => $this->bundle()));
+      return entity_metadata_wrapper($this->entityType(), $entity, array('bundle' => $this->bundle()));
     }
 
-    return entity_metadata_wrapper($this->entityType());
+    return entity_metadata_wrapper($this->entityType(), $entity);
   }
 
   /**
@@ -107,10 +110,25 @@ class FeedsEntityProcessor extends FeedsProcessor {
    */
   protected function newEntity(FeedsSource $source) {
     if ($bundle_key = $this->bundleKey()) {
-      return entity_create($this->entityType(), array($bundle_key => $this->bundle()) + $this->config['values']);
+      $entity = entity_create($this->entityType(), array($bundle_key => $this->bundle()) + $this->config['values']);
+    }
+    else {
+      $entity = entity_create($this->entityType(), $this->config['values']);
     }
 
-    return entity_create($this->entityType(), $this->config['values']);
+    // Set created/changed date. The entity type may support these values.
+    $entity->created = REQUEST_TIME;
+    $entity->changed = REQUEST_TIME;
+
+    // Set properties on the entity.
+    foreach ($this->entityProperties() as $name => $property) {
+      if (isset($this->config['values'][$name]) && $this->config['values'][$name] !== '') {
+        $plugin = feeds_entity_processor_plugin($name, $property, $this->entityWrapper($entity), $this);
+        $plugin->setValue($this->config['values'][$name], array());
+      }
+    }
+
+    return $entity;
   }
 
   /**
@@ -172,6 +190,13 @@ class FeedsEntityProcessor extends FeedsProcessor {
   }
 
   /**
+   * Overrides FeedsConfigurable::hasConfigForm().
+   */
+  public function hasConfigForm() {
+    return TRUE;
+  }
+
+  /**
    * Overrides parent::configForm().
    */
   public function configForm(&$form_state) {
@@ -192,32 +217,9 @@ class FeedsEntityProcessor extends FeedsProcessor {
     $form['input_format']['#description'] = t('Select the default input format for the %entity to be created.', array('%entity' => $label_plural));
 
     foreach ($this->entityProperties() as $name => $property) {
-
-      $form['values'][$name] = array(
-        '#type' => 'textfield',
-        '#title' => check_plain($property['label']),
-        '#description' => isset($property['description']) ? check_plain($property['description']) : '',
-        '#default_value' => isset($this->config['values'][$name]) ? $this->config['values'][$name] : NULL,
-        '#required' => !empty($property['required']),
-      );
-
-      if (!empty($property['options list'])) {
-        $form['values'][$name]['#type'] = 'select';
-
-        if (!is_array($form['values'][$name]['#default_value'])) {
-          $form['values'][$name]['#default_value'] = array($form['values'][$name]['#default_value']);
-        }
-
-        if (isset($property['type']) && entity_property_list_extract_type($property['type'])) {
-          $form['values'][$name]['#type'] = 'checkboxes';
-        }
-
-        $form['values'][$name]['#options'] = $this->entityWrapper()->$name->optionsList();
-      }
-
-      elseif (!empty($property['type']) && $property['type'] === 'boolean') {
-        $form['values'][$name]['#type'] = 'checkbox';
-      }
+      $default = isset($this->config['values'][$name]) ? $this->config['values'][$name] : NULL;
+      $plugin = feeds_entity_processor_plugin($name, $property, $this->entityWrapper(), $this);
+      $form['values'][$name] = $plugin->getFormField($form, $form_state, $default);
     }
 
     return $form;
@@ -231,31 +233,26 @@ class FeedsEntityProcessor extends FeedsProcessor {
     $form = parent::configFormValidate($values);
 
     foreach ($this->entityProperties() as $name => $property) {
-
-      // Entity api won't accept empty date values.
-      if (!empty($property['type']) && $property['type'] === 'date') {
-        if (empty($values['values'][$name])) {
-          unset($values['values'][$name]);
-          continue;
-        }
-      }
-
       if (!isset($property['type']) || !array_key_exists($name, $values['values'])) {
         continue;
       }
 
-      $value = $values['values'][$name];
+      // Validate the value.
+      $plugin = feeds_entity_processor_plugin($name, $property, $this->entityWrapper(), $this);
+      $errors = $plugin->validate($values['values'][$name]);
 
-      if (entity_property_list_extract_type($property['type']) && !is_array($value)) {
-        $values['values'][$name] = array($value);
+      if (count($errors) === 1) {
+        $error = reset($errors);
+        form_set_error("values][$name", $error);
       }
-
-      if ($value === '') {
-        continue;
-      }
-
-      if (!entity_property_verify_data_type($value, $property['type'])) {
-        form_set_error("values][$name", t('Invalid data value given. Be sure it matches the required data type and format.'));
+      elseif (count($errors) > 1) {
+        $errors = theme('item_list', array(
+          'items' => $errors,
+        ));
+        form_set_error("values][$name", t('The field %field has the following errors: !errors', array(
+          '%field' => $property['label'],
+          '!errors' => $errors,
+        )));
       }
     }
   }
@@ -267,10 +264,8 @@ class FeedsEntityProcessor extends FeedsProcessor {
     $targets = parent::getMappingTargets();
 
     foreach ($this->entityProperties() as $name => $property) {
-      $targets[$name] = array(
-        'name' => check_plain($property['label']),
-        'description' => isset($property['description']) ? check_plain($property['description']) : '',
-      );
+      $plugin = feeds_entity_processor_plugin($name, $property, $this->entityWrapper(), $this);
+      $targets[$name] = $plugin->getMappingTarget();
     }
 
     $entity_info = $this->entityInfo();
@@ -280,6 +275,20 @@ class FeedsEntityProcessor extends FeedsProcessor {
     $this->getHookTargets($targets);
 
     return $targets;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTargetElement(FeedsSource $source, $target_item, $target_element, $value, array $mapping = array()) {
+    $properties = $this->entityProperties();
+    if (isset($properties[$target_element])) {
+      $plugin = feeds_entity_processor_plugin($target_element, $properties[$target_element], $this->entityWrapper($target_item), $this);
+      $plugin->setValue($value, $mapping);
+    }
+    else {
+      parent::setTargetElement($source, $target_item, $target_element, $value);
+    }
   }
 
   /**

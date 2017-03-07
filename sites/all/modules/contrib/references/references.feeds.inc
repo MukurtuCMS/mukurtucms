@@ -185,18 +185,17 @@ function user_reference_feeds_processor_targets_alter(&$targets, $entity_type, $
  *   The entity to map to.
  * @param $target
  *   The target key on $entity to map to.
- * @param $values
+ * @param $value
  *   The value to map. Can be an array or a string.
  */
-
-function references_feeds_set_target($source, $entity, $target, $values, $config = array()) {
-  if (empty($values)) {
+function references_feeds_set_target($source, $entity, $target, $value) {
+  if (empty($value)) {
     return;
   }
 
   // Handle comma delimited or non-multiple values.
-  if (!is_array($values)) {
-    $values = array($values);
+  if (!is_array($value)) {
+    $value = array($value);
   }
 
   // Determine the field we are matching against, and whether duplicates are allowed.
@@ -228,7 +227,7 @@ function references_feeds_set_target($source, $entity, $target, $values, $config
   }
 
   // Match values against nodes and add to field.
-  foreach ($values as $v) {
+  foreach ($value as $v) {
     // Create options.
     $options = array(
       'string' => $v,
@@ -302,6 +301,5 @@ function references_feeds_set_target($source, $entity, $target, $values, $config
       }
     }
   }
-
   $entity->{$target} = $field;
 }

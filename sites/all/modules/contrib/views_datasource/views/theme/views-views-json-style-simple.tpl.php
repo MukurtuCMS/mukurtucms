@@ -15,7 +15,7 @@ $jsonp_prefix = $options['jsonp_prefix'];
 
 if ($view->override_path) {
   // We're inside a live preview where the JSON is pretty-printed.
-  $json = _views_json_encode_formatted($rows);
+  $json = _views_json_encode_formatted($rows, $options);
   if ($jsonp_prefix) $json = "$jsonp_prefix($json)";
   print "<code>$json</code>";
 }
@@ -24,8 +24,11 @@ else {
   if ($options['remove_newlines']) {
      $json = preg_replace(array('/\\\\n/'), '', $json);
   }
-  
-  if ($jsonp_prefix) $json = "$jsonp_prefix($json)";
+
+  if (isset($_GET[$jsonp_prefix]) && $jsonp_prefix) {
+    $json = check_plain($_GET[$jsonp_prefix]) . '(' . $json . ')';
+  }
+
   if ($options['using_views_api_mode']) {
     // We're in Views API mode.
     print $json;
@@ -36,7 +39,7 @@ else {
     $content_type = ($options['content_type'] == 'default') ? 'application/json' : $options['content_type'];
     drupal_add_http_header("Content-Type", "$content_type; charset=utf-8");
     print $json;
-    //Don't think this is needed in .tpl.php files: module_invoke_all('exit');
+    drupal_page_footer();
     exit;
   }
 }

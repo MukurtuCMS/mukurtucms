@@ -1,3 +1,36 @@
+## Mukurtu 2.0.7
+- Now defaulting to HTML5 player for Scald atoms, rather than dewplayer
+- Scald has been updated, with many usability improvements
+- SoundCloud support for Scald has been added
+- Added the “Features Override” module, which can be used to preserve local customizations during Mukurtu upgrades [(Overview)](https://github.com/MukurtuCMS/mukurtucms/wiki/Using-Features-Override-to-Capture-Local-Site-Customization)
+- The local tasks tab interface (e.g. view, edit, export) has been moved below the community record tab interface, and now correctly controls the viewed record
+- A optional “Browse by Category” page has been added [(How-to)](https://github.com/MukurtuCMS/mukurtucms/wiki/Changing-the-Front-Page-to-Display-Categories)
+- Fixed styling of the front page where the browse community section would overlap with the footer
+- Taxonomy terms are displayed as links in community records
+- Community records can now have related items
+- The grouping on the manage communities/protocols page has been improved
+- Format field has been made a multi-value field
+- Fixed a bug that prevented Contributors from editing their own items
+- Fixed a bug where renaming a digital heritage item, then renaming it back to the original title, created an infinite redirect loop
+- Fixed bug where some users would lose group memberships after hiding the Wizard
+- Fixed bug in dictionary importer that would result in some unused fields being populated with empty values
+- Fixed bug in dictionary that would present invalid language options for new words for some users
+- Added an importer for Word Lists
+- Parts of Speech terms will now auto-create on import
+- Alternate spelling in dictionary words is now included in search
+- Updated Scald Atom importers to use semi-colon delimiters for protocol field
+- Fixed bug where some Scald atom permissions for edit and delete were not being respected
+- Fixed bug where users with no assigned communities would be incorrectly presented with the content creation buttons
+- Updated Font-Awesome in default theme
+- Security and module updates
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- revert features: `drush fra`. Please first review if there are any custom changes you have done that may be overwritten.
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-c && drush sapi-i`.
+
 ## Mukurtu 2.0.6
 #### Initial Release of Dictionary Feature
 - This is an early offering, please provide feedback on bugs or ideas for future changes at [GitHub](https://github.com/MukurtuCMS/mukurtucms/issues) or send email to [support@mukurtu.org](mailto:support@mukurtu.org)

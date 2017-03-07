@@ -253,6 +253,9 @@ function scald_schema() {
 function scald_install() {
   // Get Scald hooks to run earlier than other modules.
   db_query("UPDATE {system} SET weight = -50 WHERE name = 'scald'");
+
+  // By default, the context export will not be handled by Features.
+  variable_set('scald_switch_feature_export', FALSE);
 }
 
 /**
@@ -274,6 +277,7 @@ function scald_uninstall() {
   variable_del('scald_custom_contexts');
   variable_del('scald_author_vocabulary');
   variable_del('scald_tags_vocabulary');
+  variable_del('scald_switch_feature_export');
 }
 
 /**

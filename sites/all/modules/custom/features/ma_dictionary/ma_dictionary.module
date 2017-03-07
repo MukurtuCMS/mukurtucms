@@ -86,9 +86,8 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
     ),
   );
 
-
-  // Actions to perform when adding (not editing) dictionary words
-  if ($form['#action'] == '/node/add/dictionary-word') {
+  // Actions to perform when adding or editing dictionary words
+  if ($form['#node_edit_form'] == TRUE) {
       // Remove any languages the user isn't a member of
       $user_language_communities = _ma_dictionary_get_user_language_communities();
       foreach($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'] as $lang_id => $lang) {
@@ -96,7 +95,10 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
               unset($form['field_dictionary_word_language'][LANGUAGE_NONE]['#options'][$lang_id]);
           }
       }
+  }
 
+  // Actions to perform when adding (not editing) dictionary words
+  if ($form['#action'] == '/node/add/dictionary-word') {
     // Set the default language, if one is defined, or the first language if no default is defined
     $default_language = variable_get ('mukurtu_default_language');
     if (!$default_language) {
@@ -308,7 +310,7 @@ function ma_dictionary_form_node_delete_confirm_alter(&$form, &$form_state) {
 function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
     if($type == 'paragraphs_item' && $entity->bundle == 'dictionary_word_bundle') {
         // If no alternate spelling is given, put the standard term in
-        if(empty($entity->field_alternate_spelling)) {
+        if(empty($entity->field_alternate_spelling) || $entity->field_alternate_spelling[LANGUAGE_NONE][0]['value'] == '') {
             // Lookup the parent dictionary word node
             $query = new EntityFieldQuery();
             $query->entityCondition('entity_type', 'node')
@@ -360,8 +362,7 @@ function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
 
         // Only render one recording in teaser
         if($view_mode == 'dictionary_teaser') {
-            unset($entity->content['field_dictionary_word_recording'][1]);
-            if(count($entity->field_dictionary_word_recording) > 1) {
+            if(isset($entity->field_dictionary_word_recording[LANGUAGE_NONE]) && count($entity->field_dictionary_word_recording[LANGUAGE_NONE]) > 1) {
                 $first = TRUE;
                 foreach($entity->content['field_dictionary_word_recording']['#items'] as $key => $item) {
                     if(!$first) {
@@ -401,9 +402,39 @@ function ma_dictionary_entity_delete($entity, $type) {
 }
 
 /**
+ * Implements hook_node_delete
+ */
+function ma_dictionary_node_delete($node) {
+    // CER isn't removing references from Word Lists when dictionary words are deleted, do that here
+    if($node->type == 'dictionary_word') {
+        if(isset($node->field_word_list)) {
+            $word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
+        } else {
+            $word_lists = array();
+        }
+
+        // These are the word lists the word is being removed from. Load each and remove the reference
+        foreach($word_lists as $removed_word_list_nid) {
+            entity_get_controller('node')->resetCache(array($removed_word_list_nid));
+            $word_list = node_load($removed_word_list_nid);
+
+            if($word_list) {
+                foreach($word_list->field_words[LANGUAGE_NONE] as $key => $word_list_word) {
+                    if($word_list_word['target_id'] == $node->nid) {
+                        unset($word_list->field_words[LANGUAGE_NONE][$key]);
+                        node_save($word_list);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * Implements hook_node_access
  */
 function ma_dictionary_node_access($node, $op, $account) {
+    global $user;
     $type = is_string($node) ? $node : $node->type;
 
     // Don't delete any language communities that are still being referenced by dictionary words
@@ -415,7 +446,53 @@ function ma_dictionary_node_access($node, $op, $account) {
         }
     }
 
+    // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
+    // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
+    if($type == 'dictionary_word') {
+        $groups = og_get_groups_by_user(NULL, 'node');
+        foreach($groups as $group) {
+            $og_node = node_load($group);
+            if($og_node->type == 'language_community') {
+                if($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
+                    if(!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
+                        return NODE_ACCESS_ALLOW;
+                    }
+                }
+
+                if($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
+                    return NODE_ACCESS_ALLOW;
+                }
+
+                if($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
+                    return NODE_ACCESS_ALLOW;
+                }
+            }
+        }
+    }
+
     return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Implements hook_node_validate.
+ */
+function ma_dictionary_node_validate($node, $form, &$form_state) {
+    if($node->type == 'dictionary_word') {
+        $user_language_communities = _ma_dictionary_get_user_language_communities();
+        $new_word_language = $node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid'];
+
+        $access = FALSE;
+        // Look for the selected language in the list of the user's language community memberships
+        foreach($user_language_communities as $language => $roles) {
+            if($language == $new_word_language) {
+                $access = TRUE;
+            }
+        }
+
+        if(!$access) {
+            form_set_error('word_language', t('You must be a member of the language community.'));
+        }
+    }
 }
 
 function ma_dictionary_node_prepare($node) {
@@ -451,110 +528,18 @@ function ma_dictionary_node_presave($node) {
 }
 
 /**
- * Implements hook_node_update.
- */
-function ma_dictionary_node_update($node) {
-    if($node->type == 'dictionary_word') {
-        // If the word had any changes in word lists, sync those up here
-        if(isset($node->field_word_list)) {
-            $current_word_lists = _ma_dictionary_flatten_reference_field($node->field_word_list);
-        } else {
-            $current_word_lists = array();
-        }
-        $old_word_lists = _ma_dictionary_flatten_reference_field($node->original->field_word_list);
-        $no_change = array_intersect($current_word_lists, $old_word_lists);
-
-        $added = array_diff($current_word_lists, $no_change);
-        $removed = array_diff($old_word_lists, $no_change);
-
-        // These are the word lists the word is being added to. Load each word list and create the opposite relationship
-        foreach($added as $added_word_list_nid) {
-            entity_get_controller('node')->resetCache(array($added_word_list_nid));
-            $word_list = node_load($added_word_list_nid);
-            $already_exists = FALSE;
-            if($word_list) {
-                // Check all existing words, don't add the node reference if it already exists
-                foreach($word_list->field_words[LANGUAGE_NONE] as $word_list_word) {
-                    if($word_list_word['target_id'] == $node->nid) {
-                        $already_exists = TRUE;
-                    }
-                }
-
-                // Add the reference
-                if(!$already_exists) {
-                    $word_list->field_words[LANGUAGE_NONE][] = array('target_id' => $node->nid);
-                    node_save($word_list);
-                }
-            }
-        }
-
-        // These are the word lists the word is being removed from. Load each and remove the reference
-        foreach($removed as $removed_word_list_nid) {
-            entity_get_controller('node')->resetCache(array($removed_word_list_nid));
-            $word_list = node_load($removed_word_list_nid);
-
-            if($word_list) {
-                foreach($word_list->field_words[LANGUAGE_NONE] as $key => $word_list_word) {
-                    if($word_list_word['target_id'] == $node->nid) {
-                        unset($word_list->field_words[LANGUAGE_NONE][$key]);
-                        node_save($word_list);
-                    }
-                }
-            }
-        }
-    }
-
-    if($node->type == 'word_list') {
-        $current_words = _ma_dictionary_flatten_reference_field($node->field_words);
-        $old_words = _ma_dictionary_flatten_reference_field($node->original->field_words);
-        $no_change = array_intersect($current_words, $old_words);
-
-        $added = array_diff($current_words, $no_change);
-        $removed = array_diff($old_words, $no_change);
-
-        // Add words to the word list
-        foreach($added as $added_word_nid) {
-            entity_get_controller('node')->resetCache(array($added_word_nid));
-            $word = node_load($added_word_nid);
-            $already_exists = FALSE;
-            if($word) {
-                // Check all existing word lists, don't add the node reference if it already exists
-                if(!empty($word->field_word_list)) {
-                    foreach($word->field_word_list[LANGUAGE_NONE] as $word_list) {
-                        if($word_list['target_id'] == $node->nid) {
-                            $already_exists = TRUE;
-                        }
-                    }
-                }
-
-                // Add the reference
-                if(!$already_exists) {
-                    $word->field_word_list[LANGUAGE_NONE][] = array('target_id' => $node->nid);
-                    node_save($word);
-                }
-            }
-        }
-
-        // Remove words
-        foreach($removed as $removed_word_nid) {
-            entity_get_controller('node')->resetCache(array($removed_word_nid));
-            $word = node_load($removed_word_nid);
-            if($word) {
-                foreach($word->field_word_list[LANGUAGE_NONE] as $key => $word_list) {
-                    if($word_list['target_id'] == $node->nid) {
-                        unset($word->field_word_list[LANGUAGE_NONE][$key]);
-                        node_save($word);
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
  * Implements hook_feeds_processor_targets_alter().
  */
 function ma_dictionary_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'word_list') {
+        $targets['field_words:guid_or_nid'] = array(
+            'name' => t('Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
+            'description' => t('The field instance Words of field_words matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
+            'callback' => 'ma_importexport_set_target',
+            'real_target' => 'field_words',
+        );
+    }
+
     if($entity_type == 'node' && $bundle_name == 'dictionary_word') {
         $targets['field_related_dictionary_words:guid_or_nid'] = array(
             'name' => t('Related Dictionary Words (Entity reference by Feeds GUID, failover to NID)'),
@@ -727,6 +712,11 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
     // If not, Drupal will have created us an empty word entry, so we just need to fill in the values
     if($first_word_entry == NULL) {
         $first_word_entry = $entity->field_word_entry[LANGUAGE_NONE][0]['entity'];
+
+        // For brand new words, we can safely exit now on empty values
+        if(empty($value) || empty($value[0])) {
+            return;
+        }
     }
 
     $first_word_entry_wrapper = entity_metadata_wrapper('paragraphs_item', $first_word_entry);
@@ -761,7 +751,7 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
         $i = 0;
         foreach($value as $part_of_speech) {
             if(!empty($part_of_speech)) {
-                $part_of_speech_term = array_shift(taxonomy_get_term_by_name($part_of_speech, 'part_of_speech'));
+                $part_of_speech_term = ma_core_get_create_tax_term($part_of_speech, 'part_of_speech');
                 if($part_of_speech_term) {
                     $first_word_entry_wrapper->{$target}[$i++] = $part_of_speech_term->tid;
                 }

@@ -109,6 +109,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'ma_colorbox',
         'weight' => 1,
@@ -118,6 +119,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
         'weight' => 0,
@@ -267,14 +269,8 @@ function ma_collection_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'number',
-        'settings' => array(
-          'decimal_separator' => '.',
-          'prefix_suffix' => TRUE,
-          'scale' => 0,
-          'thousand_separator' => ' ',
-        ),
-        'type' => 'number_integer',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 6,
       ),
       'search_result' => array(
@@ -320,9 +316,11 @@ function ma_collection_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(),
-        'type' => 'entityreference_entity_id',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 10,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 5,
       ),
       'search_result' => array(

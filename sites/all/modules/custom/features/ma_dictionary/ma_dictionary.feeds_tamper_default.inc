@@ -121,6 +121,82 @@ function ma_dictionary_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_lists-nid-require_valid_node';
+  $feeds_tamper->importer = 'import_dictionary_word_lists';
+  $feeds_tamper->source = 'NID';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'word_list',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Require valid Word List';
+  $export['import_dictionary_word_lists-nid-require_valid_node'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_lists-nid-trim';
+  $feeds_tamper->importer = 'import_dictionary_word_lists';
+  $feeds_tamper->source = 'NID';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Trim';
+  $export['import_dictionary_word_lists-nid-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_lists-words-explode';
+  $feeds_tamper->importer = 'import_dictionary_word_lists';
+  $feeds_tamper->source = 'Words';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_dictionary_word_lists-words-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_lists-words-require_valid_node';
+  $feeds_tamper->importer = 'import_dictionary_word_lists';
+  $feeds_tamper->source = 'Words';
+  $feeds_tamper->plugin_id = 'require_valid_node';
+  $feeds_tamper->settings = array(
+    'allow_empty' => 1,
+    'node_type' => 'dictionary_word',
+  );
+  $feeds_tamper->weight = 2;
+  $feeds_tamper->description = 'Require valid node reference';
+  $export['import_dictionary_word_lists-words-require_valid_node'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_dictionary_word_lists-words-trim';
+  $feeds_tamper->importer = 'import_dictionary_word_lists';
+  $feeds_tamper->source = 'Words';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_dictionary_word_lists-words-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_dictionary_words-keywords-explode';
   $feeds_tamper->importer = 'import_dictionary_words';
   $feeds_tamper->source = 'Keywords';

@@ -176,6 +176,7 @@ class SearchApiDbService extends SearchApiAbstractService {
       'search_api_autocomplete' => TRUE,
       'search_api_facets' => TRUE,
       'search_api_facets_operator_or' => TRUE,
+      'search_api_random_sort' => TRUE,
       'search_api_service_extra' => TRUE,
     );
     return isset($supported[$feature]);
@@ -436,11 +437,18 @@ class SearchApiDbService extends SearchApiAbstractService {
       $db_field['not null'] = TRUE;
     }
     $this->connection->schema()->addField($db['table'], $db['column'], $db_field);
-    if ($db_field['type'] === 'varchar') {
-      $this->connection->schema()->addIndex($db['table'], $db['column'], array(array($db['column'], 10)));
+    try {
+      if ($db_field['type'] === 'varchar') {
+        $this->connection->schema()->addIndex($db['table'], $db['column'], array(array($db['column'], 10)));
+      }
+      else {
+        $this->connection->schema()->addIndex($db['table'], $db['column'], array($db['column']));
+      }
     }
-    else {
-      $this->connection->schema()->addIndex($db['table'], $db['column'], array($db['column']));
+    catch (PDOException $e) {
+      $variables['%field'] = $field['name'];
+      $variables['%index'] = $index->name;
+      watchdog_exception('search_api_db', $e, '%type while trying to add DBMS index for the column of field %field on index %index: !message in %function (line %line of %file).', $variables, WATCHDOG_WARNING);
     }
     if ($new_table) {
       if (search_api_is_list_type($field['type'])) {
@@ -503,11 +511,19 @@ class SearchApiDbService extends SearchApiAbstractService {
       $cleared = FALSE;
       $change = FALSE;
       $text_table = NULL;
+      $missing_text_tables = array();
 
       foreach ($fields as $name => $field) {
         if (!isset($text_table) && search_api_is_text_type($field['type'])) {
-          // Stash the shared text table name for the index.
-          $text_table = $field['table'];
+          // Stash the shared text table name for the index, if it exists.
+          // Otherwise, there was some error previously and we have to remember
+          // to later come back and set the correct table here.
+          if ($this->connection->schema()->tableExists($field['table'])) {
+            $text_table = $field['table'];
+          }
+          else {
+            $missing_text_tables[$name] = $name;
+          }
         }
 
         if (!isset($new_fields[$name])) {
@@ -552,14 +568,22 @@ class SearchApiDbService extends SearchApiAbstractService {
             $reindex = TRUE;
           }
         }
-        elseif ($new_inner_type == 'text' && $field['boost'] != $new_fields[$name]['boost']) {
+        elseif ($text_table && $new_inner_type == 'text' && $field['boost'] != $new_fields[$name]['boost']) {
           $change = TRUE;
           if (!$reindex) {
-            $multiplier = $new_fields[$name]['boost'] / $field['boost'];
-            $this->connection->update($text_table)
-              ->expression('score', 'score * :mult', array(':mult' => $multiplier))
-              ->condition('field_name', self::getTextFieldName($name))
-              ->execute();
+            // If there was a non-zero boost set previously, we can just update
+            // all scores with a single UPDATE query. Otherwise, no way around
+            // re-indexing.
+            if ($field['boost']) {
+              $multiplier = $new_fields[$name]['boost'] / $field['boost'];
+              $this->connection->update($text_table)
+                ->expression('score', 'score * :mult', array(':mult' => $multiplier))
+                ->condition('field_name', self::getTextFieldName($name))
+                ->execute();
+            }
+            else {
+              $reindex = TRUE;
+            }
           }
         }
         // Make sure the table and column now exist. (Especially important when
@@ -571,6 +595,13 @@ class SearchApiDbService extends SearchApiAbstractService {
           if (!$storageExists) {
             $this->createFieldTable($index, $new_fields[$name], $field);
           }
+        }
+        // People have reported that sometimes a text field has a different
+        // table set than the combined fulltext table, so we try to fix that
+        // here as well.
+        elseif ($text_table && $fields[$name]['table'] != $text_table) {
+          $fields[$name]['table'] = $text_table;
+          $change = TRUE;
         }
         unset($new_fields[$name]);
       }
@@ -584,21 +615,38 @@ class SearchApiDbService extends SearchApiAbstractService {
             // If we have not encountered a text table, assign a name for it.
             $text_table = $this->findFreeTable($prefix . '_', 'text');
           }
-          $fields[$name]['table'] = $text_table;
+          $fields[$name] = array(
+            'table' => $text_table,
+          );
         }
         else {
           if ($this->canDenormalize($field)) {
-            $fields[$name]['table'] = $prefix;
-            $fields[$name]['column'] = $this->findFreeColumn($fields[$name]['table'], $name);
+            $fields[$name] = array(
+              'table' => $prefix,
+              'column' => $this->findFreeColumn($prefix, $name),
+            );
           }
           else {
-            $fields[$name]['table'] = $this->findFreeTable($prefix . '_', $name);
+            $fields[$name] = array(
+              'table' => $this->findFreeTable($prefix . '_', $name),
+            );
           }
           $this->createFieldTable($index, $field, $fields[$name]);
         }
         $fields[$name]['type'] = $field['type'];
         $fields[$name]['boost'] = $field['boost'];
         $change = TRUE;
+      }
+
+      // If there were fulltext fields without valid table set, set it now.
+      if ($missing_text_tables) {
+        if (!isset($text_table)) {
+          // If we have not encountered a text table, assign a name for it.
+          $text_table = $this->findFreeTable($prefix . '_', 'text');
+        }
+        foreach ($missing_text_tables as $name) {
+          $fields[$name]['table'] = $text_table;
+        }
       }
 
       // If needed, make sure the text table exists.
@@ -612,7 +660,7 @@ class SearchApiDbService extends SearchApiAbstractService {
               'not null' => TRUE,
             ),
             'field_name' => array(
-              'description' => "The name of the field in which the token appears, or an MD5 hash of the field.",
+              'description' => "The name of the field in which the token appears, or a base-64 encoded sha-256 hash of the field.",
               'not null' => TRUE,
               'type' => 'varchar',
               'length' => 255,
@@ -648,7 +696,7 @@ class SearchApiDbService extends SearchApiAbstractService {
 
         // Some DBMSs will need a character encoding and collation set. Since
         // this largely circumvents Drupal's database layer (but isn't integral
-        // enough to failing completely when it doesn't work, we wrap it in a
+        // enough to fail completely when it doesn't work), we wrap it in a
         // try/catch, to be on the safe side.
         try {
           switch ($this->connection->databaseType()) {
@@ -711,6 +759,11 @@ class SearchApiDbService extends SearchApiAbstractService {
    *   Server-internal information about the field.
    */
   protected function removeFieldStorage($name, $field) {
+    // This might, in some instances, be called when the necessary table hasn't
+    // even been created yet.
+    if (!$this->connection->schema()->tableExists($field['table'])) {
+      return;
+    }
     if (search_api_is_text_type($field['type'])) {
       $this->connection->delete($field['table'])
         ->condition('field_name', self::getTextFieldName($name))
@@ -769,7 +822,9 @@ class SearchApiDbService extends SearchApiAbstractService {
       }
       catch (Exception $e) {
         // We just log the error, hoping we can index the other items.
-        watchdog('search_api_db', check_plain($e->getMessage()), NULL, WATCHDOG_WARNING);
+        $vars['%item_id'] = $id;
+        $vars['%index'] = $index->name;
+        watchdog_exception('search_api_db', $e, '%type while trying to index item %item_id on index %index: !message in %function (line %line of %file).', $vars);
       }
     }
     return $indexed;
@@ -854,11 +909,15 @@ class SearchApiDbService extends SearchApiAbstractService {
           if ($words) {
             $field_name = self::getTextFieldName($name);
             foreach ($words as $word) {
+              $score = round($word['score'] * $boost * self::SCORE_MULTIPLIER);
+              // Take care that the score doesn't exceed the maximum value for
+              // the database column (2^32-1).
+              $score = min((int) $score, 4294967295);
               $text_inserts[$table][] = array(
                 'item_id'    => $id,
                 'field_name' => $field_name,
                 'word'       => $word['value'],
-                'score'      => (int) round($word['score'] * $boost * self::SCORE_MULTIPLIER),
+                'score'      => $score,
               );
             }
           }
@@ -924,7 +983,7 @@ class SearchApiDbService extends SearchApiAbstractService {
   protected static function getTextFieldName($name) {
     if (strlen($name) > 255) {
       // Replace long field names with something unique and predictable.
-      return md5($name);
+      return drupal_hash_base64($name);
     }
     else {
       return $name;
@@ -995,9 +1054,9 @@ class SearchApiDbService extends SearchApiAbstractService {
             // Check for over-long tokens.
             $score = $v['score'];
             $v = $v['value'];
-            if (strlen($v) > 50) {
+            if (drupal_strlen($v) > 50) {
               $words = preg_split('/[^\p{L}\p{N}]+/u', $v, -1, PREG_SPLIT_NO_EMPTY);
-              if (count($words) > 1 && max(array_map('strlen', $words)) <= 50) {
+              if (count($words) > 1 && max(array_map('drupal_strlen', $words)) <= 50) {
                 // Overlong token is due to bad tokenizing.
                 // Check for "Tokenizer" preprocessor on index.
                 if (empty($index->options['processors']['search_api_tokenizer']['status'])) {
@@ -1014,11 +1073,11 @@ class SearchApiDbService extends SearchApiAbstractService {
 
               $tokens = array();
               foreach ($words as $word) {
-                if (strlen($word) > 50) {
+                if (drupal_strlen($word) > 50) {
                   watchdog('search_api_db', 'An overlong word (more than 50 characters) was encountered while indexing: %word.<br />' .
                       'Database search servers currently cannot index such words correctly – the word was therefore trimmed to the allowed length.',
                       array('%word' => $word), WATCHDOG_WARNING);
-                  $word = self::mbStrcut($word, 0, 50);
+                  $word = drupal_substr($word, 0, 50);
                 }
                 $tokens[] = array(
                   'value' => $word,
@@ -1039,8 +1098,8 @@ class SearchApiDbService extends SearchApiAbstractService {
         if ($original_type == 'date') {
           return date('c', $value);
         }
-        if (strlen($value) > 255) {
-          $value = self::mbStrcut($value, 0, 255);
+        if (drupal_strlen($value) > 255) {
+          $value = drupal_substr($value, 0, 255);
           watchdog('search_api_db', 'An overlong value (more than 255 characters) was encountered while indexing: %value.<br />' .
               'Database search servers currently cannot index such values correctly – the value was therefore trimmed to the allowed length.',
               array('%value' => $value), WATCHDOG_WARNING);
@@ -1122,13 +1181,10 @@ class SearchApiDbService extends SearchApiAbstractService {
 
     $db_query = $this->createDbQuery($query, $fields);
 
-    // Allow subclasses and other modules to alter the query (before a count
-    // query is constructed from it).
-    drupal_alter('search_api_db_query', $db_query, $query);
-    $this->preQuery($db_query, $query);
-
     $time_processing_done = microtime(TRUE);
-    $results = array();
+    $results = array(
+      'results' => array(),
+    );
 
     $skip_count = $query->getOption('skip result count');
     if (!$skip_count) {
@@ -1151,7 +1207,6 @@ class SearchApiDbService extends SearchApiAbstractService {
       $this->setQuerySort($query, $db_query, $fields);
 
       $result = $db_query->execute();
-      $time_queries_done = microtime(TRUE);
 
       foreach ($result as $row) {
         $results['results'][$row->item_id] = array(
@@ -1163,10 +1218,7 @@ class SearchApiDbService extends SearchApiAbstractService {
         $results['result count'] = !empty($results['results']);
       }
     }
-    else {
-      $time_queries_done = microtime(TRUE);
-      $results['results'] = array();
-    }
+    $time_queries_done = microtime(TRUE);
 
     $results['warnings'] = array_keys($this->warnings);
     $results['ignored'] = array_keys($this->ignored);
@@ -1269,6 +1321,10 @@ class SearchApiDbService extends SearchApiAbstractService {
     $db_query->addMetaData('search_api_query', $query);
     $db_query->addMetaData('search_api_db_fields', $fields);
 
+    // Allow subclasses and other modules to alter the query.
+    drupal_alter('search_api_db_query', $db_query, $query);
+    $this->preQuery($db_query, $query);
+
     return $db_query;
   }
 
@@ -1345,7 +1401,12 @@ class SearchApiDbService extends SearchApiAbstractService {
       $words = preg_split('/[^\p{L}\p{N}]+/u', $proc, -1, PREG_SPLIT_NO_EMPTY);
       if (count($words) > 1) {
         $proc = $this->splitKeys($words);
-        $proc['#conjunction'] = 'AND';
+        if ($proc) {
+          $proc['#conjunction'] = 'AND';
+        }
+        else {
+          $proc = NULL;
+        }
       }
       return $proc;
     }
@@ -1463,13 +1524,13 @@ class SearchApiDbService extends SearchApiAbstractService {
       elseif ($not_nested) {
         $db_query->fields('t', array('item_id'));
         $db_query->addExpression('SUM(score)', 'score');
-        $db_query->groupBy('item_id');
+        $db_query->groupBy('t.item_id');
       }
       else {
         $db_query->fields('t', array('item_id', 'word'));
         $db_query->addExpression('SUM(score)', 'score');
-        $db_query->groupBy('item_id');
-        $db_query->groupBy('word');
+        $db_query->groupBy('t.item_id');
+        $db_query->groupBy('t.word');
       }
 
       if (empty($this->options['partial_matches'])) {
@@ -1481,12 +1542,13 @@ class SearchApiDbService extends SearchApiAbstractService {
         // "word", which we remove since it will be useless to us in this case.
         $columns = &$db_query->getFields();
         unset($columns['word']);
-        foreach (array_keys($columns) as $column) {
-          $db_query->groupBy($column);
+        foreach ($columns as $column => $info) {
+          $db_query->groupBy($info['table'] . '.' . $column);
         }
 
         foreach ($words as $i => $word) {
-          $db_or->condition('t.word', '%' . $this->connection->escapeLike($word) . '%', 'LIKE');
+          $like = '%' . $this->connection->escapeLike($word) . '%';
+          $db_or->condition('t.word', $like, 'LIKE');
 
           // Add an expression for each keyword that shows whether the indexed
           // word matches that particular keyword. That way we don't return a
@@ -1494,7 +1556,7 @@ class SearchApiDbService extends SearchApiAbstractService {
           // multiple keywords. We also remember the column name so we can
           // afterwards verify that each word matched at least once.
           $alias = 'w' . $i;
-          $alias = $db_query->addExpression("t.word LIKE '%" . $this->connection->escapeLike($word) . "%'", $alias);
+          $alias = $db_query->addExpression("CASE WHEN t.word LIKE :like_$alias THEN 1 ELSE 0 END", $alias, array(":like_$alias" => $like));
           $db_query->groupBy($alias);
           $word_hits[] = $alias;
         }
@@ -1611,7 +1673,7 @@ class SearchApiDbService extends SearchApiAbstractService {
    */
   protected function createFilterCondition(SearchApiQueryFilterInterface $filter, array $fields, SelectQueryInterface $db_query) {
     $cond = db_condition($filter->getConjunction());
-    // Store whether a JOIN alrady occurred for a field, so we don't JOIN
+    // Store whether a JOIN already occurred for a field, so we don't JOIN
     // repeatedly for OR filters.
     $first_join = array();
     // Store the table aliases for the fields in this condition group.
@@ -1628,15 +1690,20 @@ class SearchApiDbService extends SearchApiAbstractService {
           throw new SearchApiException(t('Unknown field in filter clause: @field.', array('@field' => $f[0])));
         }
         $field = $fields[$f[0]];
+        $not_equals = $f[2] == '<>' || $f[2] == '!=';
+        $text_type = search_api_is_text_type($field['type']);
         // If the field is in its own table, we have to check for NULL values in
         // a special way (i.e., check for missing entries in that table).
-        if ($f[1] === NULL && $field['column'] === 'value') {
+        if ($f[1] === NULL && ($field['column'] === 'value' || $text_type)) {
           $query = $this->connection->select($field['table'], 't')
             ->fields('t', array('item_id'));
-          $cond->condition('t.item_id', $query, $f[2] == '<>' || $f[2] == '!=' ? 'IN' : 'NOT IN');
+          if ($text_type) {
+            $query->condition('t.field_name', $f[0]);
+          }
+          $cond->condition('t.item_id', $query, $not_equals ? 'IN' : 'NOT IN');
           continue;
         }
-        if (search_api_is_text_type($field['type'])) {
+        if ($text_type) {
           $keys = $this->prepareKeys($f[1]);
           if (!isset($keys)) {
             continue;
@@ -1644,7 +1711,7 @@ class SearchApiDbService extends SearchApiAbstractService {
           $query = $this->createKeysQuery($keys, array($f[0] => $field), $fields);
           // We only want the item IDs, so we use the keys query as a nested query.
           $query = $this->connection->select($query, 't')->fields('t', array('item_id'));
-          $cond->condition('t.item_id', $query, $f[2] == '<>' || $f[2] == '!=' ? 'NOT IN' : 'IN');
+          $cond->condition('t.item_id', $query, $not_equals ? 'NOT IN' : 'IN');
         }
         else {
           $new_join = search_api_is_list_type($field['type'])
@@ -1655,12 +1722,21 @@ class SearchApiDbService extends SearchApiAbstractService {
             $first_join[$f[0]] = TRUE;
           }
           $column = $tables[$f[0]] . '.' . $field['column'];
-          if ($f[1] !== NULL) {
-            $cond->condition($column, $f[1], $f[2]);
-          }
-          else {
+          if ($f[1] === NULL) {
             $method = ($f[2] == '=') ? 'isNull' : 'isNotNull';
             $cond->$method($column);
+          }
+          elseif ($not_equals && search_api_is_list_type($field['type'])) {
+            // The situation is more complicated for multi-valued fields, since
+            // we must make sure that results are excluded if ANY of the field's
+            // values equals the one given in this condition.
+            $query = $this->connection->select($field['table'], 't')
+              ->fields('t', array('item_id'))
+              ->condition($field['column'], $f[1]);
+            $cond->condition('t.item_id', $query, 'NOT IN');
+          }
+          else {
+            $cond->condition($column, $f[1], $f[2]);
           }
         }
       }
@@ -1761,6 +1837,10 @@ class SearchApiDbService extends SearchApiAbstractService {
           $db_query->orderBy('item_id', $order);
           continue;
         }
+        if ($field_name == 'search_api_random') {
+          $db_query->orderRandom();
+          continue;
+        }
         if (!isset($fields[$field_name])) {
           throw new SearchApiException(t('Trying to sort on unknown field @field.', array('@field' => $field_name)));
         }
@@ -1848,9 +1928,13 @@ class SearchApiDbService extends SearchApiAbstractService {
 
         // If "Include missing facet" is disabled, we use an INNER JOIN and add
         // IS NOT NULL for shared tables.
+        $is_text_type = search_api_is_text_type($field['type']);
         $alias = $this->getTableAlias($field, $select, TRUE, $facet['missing'] ? 'leftJoin' : 'innerJoin');
-        $select->addField($alias, search_api_is_text_type($field['type']) ? 'word' : $field['column'], 'value');
-        if (!$facet['missing'] && !search_api_is_text_type($field['type'])) {
+        $select->addField($alias, $field['column'], 'value');
+        if ($is_text_type) {
+          $select->condition("$alias.field_name", $this->getTextFieldName($facet['field']));
+        }
+        if (!$facet['missing'] && !$is_text_type) {
           $select->isNotNull($alias . '.' . $field['column']);
         }
         $select->addExpression('COUNT(DISTINCT t.item_id)', 'num');
@@ -1892,7 +1976,12 @@ class SearchApiDbService extends SearchApiAbstractService {
           if ($values) {
             $select->condition($field['column'], $values, 'NOT IN');
           }
-          $select->isNotNull($field['column']);
+          if ($is_text_type) {
+            $select->condition('t.field_name', $this->getTextFieldName($facet['field']));
+          }
+          else {
+            $select->isNotNull($field['column']);
+          }
 
           // Add tags and metadata.
           $select->addTag('search_api_db_facet_all');
@@ -1937,7 +2026,7 @@ class SearchApiDbService extends SearchApiAbstractService {
    *   The name of the temporary table, or FALSE on failure.
    */
   protected function getTemporaryResultsTable(SelectQueryInterface $db_query) {
-    // We only need the id field, not the score.
+    // We only need the ID column, not the score.
     $fields = &$db_query->getFields();
     unset($fields['score']);
     if (count($fields) != 1 || !isset($fields['item_id'])) {
@@ -1952,6 +2041,11 @@ class SearchApiDbService extends SearchApiAbstractService {
     // discarded.
     $group_by = &$db_query->getGroupBy();
     $group_by = array_intersect_key($group_by, array('t.item_id' => TRUE));
+
+    // The order of results also doesn't matter here. Also, this might lead to
+    // errors if the ORDER BY clause references any expressions we removed.
+    $sort = &$db_query->getOrderBy();
+    $sort = array();
 
     $db_query->distinct();
     if (!$db_query->preExecute()) {
@@ -1999,9 +2093,14 @@ class SearchApiDbService extends SearchApiAbstractService {
       $passes[] = 2;
     }
 
+    if (!$passes) {
+      return array();
+    }
+
     // We want about half of the suggestions from each enabled method.
     $limit = $query->getOption('limit', 10);
     $limit /= count($passes);
+    $limit = ceil($limit);
 
     // Also collect all keywords already contained in the query so we don't
     // suggest them.
@@ -2014,7 +2113,13 @@ class SearchApiDbService extends SearchApiAbstractService {
       if ($pass == 2 && $incomplete_key) {
         $query->keys($user_input);
       }
+      // To avoid suggesting incomplete words, we have to temporarily disable
+      // the "partial_matches" option. (There should be no way we'll save the
+      // server during the createDbQuery() call, so this should be safe.)
+      $options = $this->options;
+      $this->options['partial_matches'] = FALSE;
       $db_query = $this->createDbQuery($query, $fields);
+      $this->options = $options;
 
       // Add additional tags and metadata.
       $db_query->addTag('search_api_db_autocomplete');
@@ -2025,23 +2130,40 @@ class SearchApiDbService extends SearchApiAbstractService {
         'pass' => $pass,
       ));
 
-      // We need a list of all current results to match the suggestions against.
-      // However, since MySQL doesn't allow using a temporary table multiple
-      // times in one query, we regrettably have to do it this way.
-      if (count($query->getFields()) > 1) {
-        $all_results = $db_query->execute()->fetchCol();
-        // Compute the total number of results so we can later sort out matches
-        // that occur too often.
-        $total = count($all_results);
+      $text_fields = array();
+      foreach ($query->getFields() as $field) {
+        if (isset($fields[$field]) && search_api_is_text_type($fields[$field]['type'])) {
+          $text_fields[] = $field;
+        }
       }
-      else {
+      if (empty($text_fields)) {
+        return array();
+      }
+
+      // For each text field that will be searched, store the item IDs in a
+      // temporary table. This is unfortunately necessary since MySQL doesn't
+      // allow using a temporary table multiple times in a single query.
+      $all_results = array();
+      $total = NULL;
+      $first_temp_table = TRUE;
+      foreach ($text_fields as $field) {
         $table = $this->getTemporaryResultsTable($db_query);
         if (!$table) {
-          return NULL;
+          return array();
         }
-        $all_results = $this->connection->select($table, 't')
+        if ($first_temp_table) {
+          // For subsequent temporary tables, just use a plain SELECT over the
+          // first to fill them, instead of the (potentially very complex)
+          // search query.
+          $first_temp_table = FALSE;
+          $db_query = $this->connection->select($table)
+            ->fields($table, array('item_id'));
+        }
+        $all_results[$field] = $this->connection->select($table, 't')
           ->fields('t', array('item_id'));
-        $total = $this->connection->query("SELECT COUNT(item_id) FROM {{$table}}")->fetchField();
+        if ($total === NULL) {
+          $total = $this->connection->query("SELECT COUNT(item_id) FROM {{$table}}")->fetchField();
+        }
       }
       $max_occurrences = max(1, floor($total * variable_get('search_api_db_autocomplete_max_occurrences', 0.9)));
 
@@ -2052,13 +2174,12 @@ class SearchApiDbService extends SearchApiAbstractService {
         continue;
       }
 
-      foreach ($query->getFields() as $field) {
-        if (!isset($fields[$field]) || !search_api_is_text_type($fields[$field]['type'])) {
-          continue;
-        }
+      $word_query = NULL;
+      foreach ($text_fields as $field) {
         $field_query = $this->connection->select($fields[$field]['table'], 't')
           ->fields('t', array('word', 'item_id'))
-          ->condition('item_id', $all_results, 'IN');
+          ->condition('item_id', $all_results[$field], 'IN')
+          ->condition('field_name', $this->getTextFieldName($field));
         if ($pass == 1) {
           $field_query->condition('word', $incomplete_like, 'LIKE')
             ->condition('word', $keys, 'NOT IN');
@@ -2070,13 +2191,16 @@ class SearchApiDbService extends SearchApiAbstractService {
           $word_query->union($field_query);
         }
       }
+      if (!$word_query) {
+        return array();
+      }
       $db_query = $this->connection->select($word_query, 't');
       $db_query->addExpression('COUNT(DISTINCT item_id)', 'results');
       $db_query->fields('t', array('word'))
         ->groupBy('word')
         ->having('COUNT(DISTINCT item_id) <= :max', array(':max' => $max_occurrences))
         ->orderBy('results', 'DESC')
-        ->range(0, ceil($limit));
+        ->range(0, $limit);
       $incomp_len = strlen($incomplete_key);
       foreach ($db_query->execute() as $row) {
         $suffix = ($pass == 1) ? substr($row->word, $incomp_len) : ' ' . $row->word;
@@ -2105,7 +2229,7 @@ class SearchApiDbService extends SearchApiAbstractService {
     foreach ($fields as $key => $field) {
       // Legacy fields do not have column set.
       if (!isset($field['column'])) {
-        $fields[$key]['column'] = 'value';
+        $fields[$key]['column'] = search_api_is_text_type($field['type']) ? 'word' : 'value';
       }
     }
     return $fields;

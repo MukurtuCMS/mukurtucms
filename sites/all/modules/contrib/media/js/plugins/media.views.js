@@ -25,6 +25,36 @@ Drupal.behaviors.mediaViews = {
       return false;
     });
 
+    // Return focus to the correct part of the form.
+    $('.ctools-auto-submit-full-form .ctools-auto-submit-click', context).click(function () {
+      settings.lastFocus = document.activeElement.id;
+
+      // Add custom class to allow customize look and feel of the field while processing ajax
+      // This way user can have a better user expierence using the exposed filters
+      $(document.activeElement).addClass('media-ajaxing-disabled');
+      // Remove focus to the active element
+      $(document.activeElement).blur();
+
+      // Before go with ajax, suppress key events
+      $('body').bind('keydown keyup', suppressKeyEvents);
+    });
+    if (settings.lastFocus) {
+      // Note, we just use each() so we can declare variables in a new scope.
+      $('#' + settings.lastFocus, context).each(function () {
+        var $this = $(this),
+            val = $this.val();
+
+        $this.focus();
+
+        // Clear and reset the value to put the cursor at the end.
+        $this.val('');
+        $this.val(val);
+
+        // After input recover focus, remove suppression of key events
+        $('body').unbind('keydown keyup', suppressKeyEvents);
+      });
+    }
+
     // We loop through the views listed in Drupal.settings.media.browser.views
     // and set them up individually.
     var views_ids = [];
@@ -168,6 +198,16 @@ Drupal.media.browser.views.setup = function(view) {
 
   // Add the processed class, so we dont accidentally process the same element twice..
   $(view).addClass('media-browser-views-processed');
+}
+
+/**
+ * Helper callback to supress propagation and default behaviour of an event
+ *
+ * This function is used in this way to make private and accesible only for the current scope
+ */
+var suppressKeyEvents = function(e) {
+  e.stopImmediatePropagation();
+  e.preventDefault();
 }
 
 }(jQuery));

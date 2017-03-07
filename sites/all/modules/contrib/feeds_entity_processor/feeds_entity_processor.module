@@ -6,6 +6,72 @@
  */
 
 /**
+ * Implements hook_hook_info().
+ */
+function feeds_entity_processor_hook_info() {
+  $hooks = array(
+    'feeds_entity_processor_properties',
+  );
+
+  return array_fill_keys($hooks, array('group' => 'feeds'));
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function feeds_entity_processor_ctools_plugin_api($owner, $api) {
+  if ($owner == 'feeds_entity_processor' && $api == 'properties') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function feeds_entity_processor_ctools_plugin_type() {
+  return array(
+    'properties' => array(
+      'cache' => TRUE,
+      'use hooks' => TRUE,
+      'classes' => array('handler'),
+    ),
+  );
+}
+
+/**
+ * Gets an instance of a class for a given plugin.
+ *
+ * @param string $name
+ *   A string that is the key of the plugin to load.
+ * @param array $property
+ *   The info about the property.
+ * @param EntityMetadataWrapper $wrapper
+ *   Metadata about the entity being created/updated.
+ * @param FeedsProcessor $processor
+ *   The Feeds processor that is processing.
+ *
+ * @return FeedsEntityProcessorPropertyInterface
+ *   A FeedsPlugin object.
+ *
+ * @throws RuntimeException
+ *   In case a class for the default plugin could not be found.
+ */
+function feeds_entity_processor_plugin($name, array $property, EntityMetadataWrapper $wrapper, FeedsProcessor $processor) {
+  ctools_include('plugins');
+  $type = !empty($property['type']) ? $property['type'] : 'default';
+
+  if ($class = ctools_plugin_load_class('feeds_entity_processor', 'properties', $type, 'handler')) {
+    return new $class($name, $property, $wrapper, $processor);
+  }
+
+  $class = ctools_plugin_load_class('feeds_entity_processor', 'properties', 'default', 'handler');
+  if (!$class) {
+    throw new RuntimeException('Default Feeds entity processor properties handler not found. Please flush caches and try again.');
+  }
+  return new $class($name, $property, $wrapper, $processor);
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function node_form_feedsentityprocessor_feeds_form_alter(&$form, &$form_state) {

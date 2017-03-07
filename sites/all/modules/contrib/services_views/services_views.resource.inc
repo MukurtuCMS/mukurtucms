@@ -110,11 +110,11 @@ function services_views_execute_view($view_info, $view = NULL, $display_id = NUL
   if (!empty($view_info)) {
     $view_name = $view_info['view_name'];
     $display_id = $view_info['display_id'];
-
-    $args = array();
+    $args = $view_info['args'];
 
     $view = views_get_view($view_name);
     $view->set_arguments($args);
+    $view->execute_display($display_id, $args);
   }
 
   // Avoid translation of the field labels.
@@ -127,10 +127,13 @@ function services_views_execute_view($view_info, $view = NULL, $display_id = NUL
   foreach ($view->result as $index => $row) {
     foreach ($view->field as $field_key => $field) {
       $f_key = 'field_' . $field_key;
+      $entity_property = FALSE;
+      if (!isset($row->$f_key)) {
+        $f_key = $field->field_alias;
+        $entity_property = TRUE;
+      }
       if (isset($row->$f_key)) {
-
         $target_key = $field_key;
-        $format = ($field->options['type'] == 'services') ? 'raw' : 'rendered';
 
         // Skip this field?
         if (isset($field->options['exclude']) && $field->options['exclude'] == TRUE) {
@@ -141,8 +144,17 @@ function services_views_execute_view($view_info, $view = NULL, $display_id = NUL
           $target_key = $field->options['label'];
         }
 
+        // Move key if we have an entity property and the target_key was changed via label
+        if ($entity_property) {
+          unset($output[$index]->$f_key);
+          $output[$index]->$target_key = $field->theme($row); // @todo: Do not render twice; use view->execute_display and consolidate functions
+          continue;
+        }
+
+        // Create helper variables
         $output[$index]->$target_key = array();
         $obj = &$output[$index]->$target_key;
+        $format = ($field->options['type'] == 'services') ? 'raw' : 'rendered';
 
         foreach ($row->$f_key as $idx => $res) {
 
@@ -151,19 +163,56 @@ function services_views_execute_view($view_info, $view = NULL, $display_id = NUL
 
             // If this is raw formatter.
             if ($format == 'raw') {
-              foreach ($data as $key => $val) {
-                if ($field->options['settings']['skip_safe'] && strpos($key, 'safe_') === 0) {
-                  unset($data[$key]);
-                }
-                if ($field->options['settings']['skip_empty_values'] && empty($val)) {
-                  unset($data[$key]);
+              if (is_array($data)) {
+                foreach ($data as $key => $val) {
+                  if ($field->options['settings']['skip_safe'] && strpos($key, 'safe_') === 0) {
+                    unset($data[$key]);
+                  }
+                  if ($field->options['settings']['skip_empty_values'] && empty($val)) {
+                    unset($data[$key]);
+                  }
                 }
               }
               $obj[$idx] = $data;
             }
             // Rendered output.
             elseif (isset($data['#access']) && $data['#access'] == TRUE) {
-              $obj[$idx] = render($data);
+              // Check for a field collection
+              if (isset($data['entity']['field_collection_item'])) {
+                foreach ($data['entity']['field_collection_item'] as $fcid => $entity) {
+                  // If the field collection is using the services view mode,
+                  // add each child separately.
+                  if ($entity['#view_mode'] == 'services') {
+                    $instances = field_info_instances($entity['#entity_type'], $entity['#bundle']);
+                    foreach (element_children($entity, TRUE) as $child) {
+                      $instance = $instances[$child];
+                      $element_key = $instance['display']['services']['settings']['data_element_key'];
+                      $element_key = ($element_key ? $element_key : $instance['label']);
+
+                      // Get the formatted values for the field and add them to
+                      // the data array, using any preset element keys.
+                      foreach (element_children($entity[$child]) as $field_item) {
+                        $fi = &$entity[$child][$field_item];
+                        if (is_array($fi) && count($fi) == 1 && isset($fi['value'])) {
+                          $obj[$idx][$element_key] = $fi['value'];
+                        }
+                        else {
+                          $obj[$idx][$element_key] = $fi;
+                        }
+                      }
+                    }
+
+                    // Allow modules to alter the data before it is sent.
+                    drupal_alter('services_field_collection_data', $obj[$idx], $entity, $f_key);
+                  }
+                  else {
+                    $obj[$idx] = render($data);
+                  }
+                }
+              }
+              else {
+                $obj[$idx] = render($data);
+              }
             }
             else {
               $obj[$idx] = array('error' => t('Access denied or format unknown on field.'));

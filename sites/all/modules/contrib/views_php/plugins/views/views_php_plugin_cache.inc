@@ -44,6 +44,13 @@ class views_php_plugin_cache extends views_plugin_cache {
   }
 
   /**
+   * Implements views_plugin#options_submit()
+   */
+  function options_submit(&$form, &$form_state) {
+    $form_state['values']['cache_options'] += $form_state['values']['options'];
+  }
+
+  /**
    * Implements views_plugin_cache#cache_get()
    */
   function cache_get($type) {

@@ -40,12 +40,12 @@ function scald_file_scald_add_form(&$form, &$form_state) {
   $validators = array(
     'file_validate_extensions' => array(0 => 'ppt pptx xls xlsx doc docx odt pdf txt csv odg sxw ods rtf zip rar gz 7z tar'),
   );
-  $location = 'public://atoms/files/';
+  $location = 'public://atoms/files';
   if ($field && $instance) {
     $validators = file_field_widget_upload_validators($field, $instance);
     $directory = file_field_widget_uri($field, $instance);
     if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
-      $location = $directory . '/';
+      $location = $directory;
     }
   }
   $form['file'] = array(
@@ -74,17 +74,95 @@ function scald_file_scald_add_form_fill(&$atoms, $form, $form_state) {
   foreach ($atoms as $delta => $atom) {
     if (is_array($form_state['values']['file']) && module_exists('plupload')) {
       module_load_include('inc', 'scald', 'includes/scald.plupload');
-      $file = scald_plupload_save_file($form_state['values']['file'][$delta]['tmppath'],
-        $form['file']['#upload_location'] . $form_state['values']['file'][$delta]['name']);
+      $destination = $form['file']['#upload_location'] . '/' . $form_state['values']['file'][$delta]['name'];
+      $file = scald_plupload_save_file($form_state['values']['file'][$delta]['tmppath'], $destination);
     }
     else {
       $file = file_load($form_state['values']['file']);
     }
-    if (!empty($file)) {
-      $atom->title = $file->filename;
-      $atom->base_id = $file->fid;
+    foreach (array('author', 'tag') as $name) {
+      // hacky, because variable and field name do not really match.
+      $field_name = 'scald_' . $name . 's';
+      $langcode = field_language('scald_atom', $atom, $field_name);
+      if (empty($form_state['values'][$field_name])) {
+        continue;
+      }
+
+      // Borrowed from taxonomy_autocomplete_validate().
+      $typed_terms = drupal_explode_tags($form_state['values'][$field_name]);
+      $vocabulary = taxonomy_vocabulary_machine_name_load(variable_get('scald_' . $name . '_vocabulary', $field_name));
+      foreach ($typed_terms as $typed_term) {
+        if ($possibilities = taxonomy_term_load_multiple(array(), array('name' => trim($typed_term), 'vid' => $vocabulary->vid))) {
+          $term = array_pop($possibilities);
+        }
+        else {
+          $term = (object) array(
+            'vid' => $vocabulary->vid,
+            'name' => $typed_term,
+            'vocabulary_machine_name' => $vocabulary->machine_name,
+          );
+          taxonomy_term_save($term);
+        }
+        $atom->{$field_name}[$langcode][] = array('tid' => $term->tid);
+      }
     }
-    $atom->scald_file[LANGUAGE_NONE][0] = (array) $file;
+    $atom->title = $file->filename;
+    $langcode = field_language('scald_atom', $atom, 'scald_file');
+    $atom->scald_file[$langcode][0] = (array) $file;
+
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function scald_file_form_scald_atom_add_form_options_alter(&$form, &$form_state, $form_id) {
+  $scald = $form_state['scald'];
+  if (isset($scald['type'])) {
+    $type = $scald['type']->type;
+  }
+  else {
+    $type = $scald['atoms'][0]->type;
+  }
+  if ($type !== 'file') {
+    return;
+  }
+  foreach($form as $key => $data) {
+    if (strpos($key, 'atom') === 0) {
+      $index = intval(substr($key, 4));
+      if (isset($scald['atoms'][$index]->data['scald_thumbnail_default'])) {
+        $scald_thumbnail_default = $scald['atoms'][$index]->data['scald_thumbnail_default'];
+      }
+      else {
+        $scald_thumbnail_default = TRUE;
+      }
+      $form[$key]['scald_thumbnail_default'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $scald_thumbnail_default,
+        '#title' => t('Automatically generate thumbnail'),
+        '#description' => t('A thumbnail will be generated automatically, if possible, if the thumbnail field is empty.'),
+        '#weight' => $form[$key]['scald_thumbnail']['#weight'] + .5,
+        '#tree' => TRUE,
+        '#parents' => array($key, 'scald_thumbnail_default'),
+      );
+    }
+  }
+  $form['#attached']['js'][drupal_get_path('module', 'scald_file') . '/scald_file_edit_form.js'] = array(
+    'type' => 'file',
+  );
+
+  array_unshift($form['#submit'], 'scald_file_default_thumbnail_handler');
+}
+
+/**
+ * Handler to store the default thumbnail generation option in the atom Entity.
+ */
+function scald_file_default_thumbnail_handler(&$form, &$form_state) {
+  foreach($form as $key => $data) {
+    if (strpos($key, 'atom') === 0) {
+      $index = intval(substr($key, 4));
+      $form_state['scald']['atoms'][$index]->data['scald_thumbnail_default'] = $form_state['values'][$key]['scald_thumbnail_default'];
+    }
   }
 }
 
@@ -98,17 +176,21 @@ function _scald_file_pdf_thumbnail($atom, $file) {
       $temp = file_directory_temp() . '/pdf_thumb.png';
       if (scald_file_is_exec_available()) {
         if (scald_file_command_exists('pdfdraw')) {
-          exec('pdfdraw -o ' . $temp . ' "' . $uri . '" 1');
+          exec('pdfdraw -o ' . escapeshellarg($temp) . ' ' . escapeshellarg($uri) . ' 1');
         }
-        else if (scald_file_command_exists('convert')) {
-          exec('convert "' . $uri . '"[0] ' . $temp);
+        elseif (scald_file_command_exists('mudraw')) {
+          exec('mudraw -o ' . escapeshellarg($temp) . ' ' . escapeshellarg($uri) . ' 1');
+        }
+        elseif (scald_file_command_exists('convert')) {
+          $uri = $uri . '[0]';
+          exec('convert ' . escapeshellarg($uri) . ' ' . escapeshellarg($temp));
         }
       }
-      if (!file_exists($temp) && extension_loaded('imagick') && class_exists("Imagick")) {
+      elseif (extension_loaded('imagick') && class_exists("Imagick")) {
         $im = new Imagick($uri . '[0]');
         $im = $im->flattenImages();
         $im->setImageFormat("png");
-        $im->thumbnailImage(500, 0);
+        $im->thumbnailImage(400, 0);
         $im->writeImage($temp);
       }
       if (file_exists($temp)) {
@@ -118,8 +200,6 @@ function _scald_file_pdf_thumbnail($atom, $file) {
           $thumb = file_save_data($handle, $dest);
           $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
           $atom->scald_thumbnail[$langcode][0] = (array) $thumb;
-          scald_atom_save($atom);
-          $atom->thumbnail_source = $thumb->uri;
         }
         fclose($handle);
         unlink($temp);
@@ -143,7 +223,6 @@ function scald_file_scald_fetch($atom, $type) {
     }
     else {
       $atom->thumbnail_source = _scald_file_get_default_icon($file);
-      _scald_file_pdf_thumbnail($atom, $file);
     }
   }
 }
@@ -174,8 +253,9 @@ function _scald_file_get_default_icon($file) {
  *   Atom.
  */
 function _scald_file_sync_file($atom) {
-  if ($atom->scald_file) {
-    $atom->base_id = $atom->scald_file[LANGUAGE_NONE][0]['fid'];
+  if (!empty($atom->scald_file)) {
+    $items = field_get_items('scald_atom', $atom, 'scald_file');
+    $atom->base_id = $items[0]['fid'];
   }
 }
 
@@ -198,6 +278,20 @@ function scald_file_scald_register_atom($atom, $mode) {
 }
 
 /**
+ * Implements hook_scald_atom_presave().
+ */
+function scald_file_scald_atom_presave($atom) {
+  if ($atom->type == 'file' && !empty($atom->data['scald_thumbnail_default'])) {
+    $scald_thumbnail = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+    if (!$scald_thumbnail) {
+      $langcode = field_language('scald_atom', $atom, 'scald_file');
+      $file = file_load($atom->scald_file[$langcode][0]['fid']);
+      _scald_file_pdf_thumbnail($atom, $file);
+    }
+  }
+}
+
+/**
  * Implements hook_scald_prerender().
  */
 function scald_file_scald_prerender($atom, $context, $options, $mode) {
@@ -211,19 +305,31 @@ function scald_file_scald_prerender($atom, $context, $options, $mode) {
     else {
       $config = scald_context_config_load($context);
       $file = isset($atom->base_entity) ? $atom->base_entity : file_load($atom->base_id);
-      if (isset($config->transcoder[$atom->type]['*']) && $config->transcoder[$atom->type]['*'] !== 'passthrough' && $file->filemime === 'application/pdf') {
+      $transcoder = '';
+      if (isset($config->transcoder[$atom->type]['*'])) {
         $transcoder = $config->transcoder[$atom->type]['*'];
+      }
+      if (module_exists('pdf') && !empty($transcoder) && strpos($transcoder, 'pdf') !== FALSE && $file->filemime === 'application/pdf') {
         $theme = preg_match('/^file_field_pdf_/', $transcoder) ? str_replace('file_field_pdf_', 'pdf_formatter_', $transcoder) : 'pdf_formatter_default';
         $atom->rendered->player = theme($theme, array('file' => $file));
       }
       else {
+        $scald_thumbnail = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+        if (!empty($transcoder) && !empty($scald_thumbnail) && preg_match('/^style-(.*)$/', $transcoder, $match)) {
+          $style_name = $match[1];
+          $preset = image_style_load($style_name);
+          $thumbnail_source = image_style_url($preset['name'], $atom->thumbnail_source);
+        }
+        else {
+          $thumbnail_source = $atom->thumbnail_source;
+        }
         $atom->rendered->player = theme('scald_file_render',
           array(
             'vars' => array(
               'context' => $context,
               'file_source' => $atom->file_source,
               'file_size' => format_size($atom->base_entity->filesize),
-              'thumbnail_source' => $atom->thumbnail_source,
+              'thumbnail_source' => $thumbnail_source,
               'file_title' => check_plain($atom->title),
             ),
           )
@@ -273,20 +379,21 @@ function scald_file_views_api() {
  */
 function scald_file_scald_transcoders() {
   $transcoders = array();
-  $info = module_invoke_all('field_formatter_info');
+  if (module_exists('pdf')) {
+    $info = module_invoke_all('field_formatter_info');
 
-  foreach ($info as $name => $formatter) {
-    if (!preg_match('/^pdf_/', $name)) {
-      continue;
+    foreach ($info as $name => $formatter) {
+      if (!preg_match('/^pdf_/', $name)) {
+        continue;
+      }
+
+      $transcoders[$name] = array(
+        'title' => $formatter['label'],
+        'description' => $formatter['label'],
+        'formats' => array('file' => 'passthrough'),
+      );
     }
-
-    $transcoders[$name] = array(
-      'title' => $formatter['label'],
-      'description' => $formatter['label'],
-      'formats' => array('file' => 'passthrough'),
-    );
   }
-
   return $transcoders;
 }
 
@@ -330,6 +437,31 @@ function scald_file_scald_render($atom, $context, $options = array()) {
         ),
       )
     );
+  }
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function scald_file_action_info() {
+  return array(
+    'scald_file_generate_thumbnail' => array(
+      'type' => 'scald_atom',
+      'label' => t('Generate Thumbnail'),
+      'configurable' => FALSE,
+      'behavior' => array('changes_property'),
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
+ * Action callback for the thumbnail generation action.
+ */
+function scald_file_generate_thumbnail($entity, $context) {
+  if ($entity->provider === 'scald_file') {
+    $entity->data['scald_thumbnail_default'] = TRUE;
+    scald_atom_save($entity);
   }
 }
 

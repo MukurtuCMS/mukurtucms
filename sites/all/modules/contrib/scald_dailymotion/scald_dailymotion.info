@@ -1,0 +1,13 @@
+name = Scald Dailymotion
+description = Provides Video atoms from Dailymotion.
+package = Scald Providers
+core = 7.x
+dependencies[] = scald
+
+
+; Information added by Drupal.org packaging script on 2016-03-30
+version = "7.x-1.5"
+core = "7.x"
+project = "scald_dailymotion"
+datestamp = "1459322340"
+

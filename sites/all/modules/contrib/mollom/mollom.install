@@ -302,7 +302,7 @@ function mollom_schema() {
         'default' => 1,
       ),
       'moderation' => array(
-        'description' => 'Whether to integrate with Mollom moderation.',
+        'description' => 'Whether to integrate with Mollom moderation - DEPRECATED',
         'type' => 'int',
         'size' => 'tiny',
         'not null' => TRUE,
@@ -1302,4 +1302,28 @@ function mollom_update_7213() {
       'not null' => FALSE,
     ));
   }
+}
+
+/**
+ * Restrict access to the Mollom Content Moderation Platform to current users.
+ */
+function mollom_update_7214() {
+  $uses_cmp = FALSE;
+  $result = db_query('SELECT moderation FROM {mollom_form}')->fetchCol();
+  foreach ($result as $moderation) {
+    if (!empty($moderation)) {
+      $uses_cmp = TRUE;
+      break;
+    }
+  }
+  if ($uses_cmp) {
+    variable_set('mollom_cmp_enabled', TRUE);
+  }
+}
+
+/**
+ * Remove Mollom Content Moderation Platform variables.
+ */
+function mollom_update_7215() {
+  variable_del('mollom_cmp_enabled');
 }

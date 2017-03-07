@@ -334,7 +334,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -1513,7 +1513,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -1621,9 +1621,21 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
-        'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
         'weight' => 30,
       ),
       'map_popup' => array(
@@ -1879,7 +1891,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -2157,6 +2169,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'ma_colorbox',
         'weight' => 1,
@@ -2166,6 +2179,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 27,
@@ -2181,6 +2195,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'ma_colorbox',
         'weight' => 1,
@@ -2190,6 +2205,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
         'weight' => 1,
@@ -2199,6 +2215,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 1,
@@ -2214,6 +2231,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
         'weight' => 0,
@@ -2437,9 +2455,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'display' => array(
       'community_record' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 41,
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 9,
       ),
       'default' => array(
         'label' => 'above',
@@ -2452,9 +2473,11 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(),
-        'type' => 'entityreference_entity_id',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 9,
       ),
       'map_popup' => array(
@@ -2523,9 +2546,12 @@ function ma_digitalheritage_field_default_field_instances() {
     'display' => array(
       'community_record' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 10,
       ),
       'default' => array(
         'label' => 'above',
@@ -2538,12 +2564,11 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'links' => 1,
-          'view_mode' => 'search_result',
+          'items_per_page' => 5,
         ),
-        'type' => 'entityreference_entity_view',
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 10,
       ),
       'map_popup' => array(
@@ -2802,7 +2827,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -2995,7 +3020,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'ds',
         'settings' => array(
-          'taxonomy_term_link' => 0,
+          'taxonomy_term_link' => 1,
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
@@ -3395,6 +3420,46 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'taxonomy_term-category-field_thumbnail_image'.
+  $field_instances['taxonomy_term-category-field_thumbnail_image'] = array(
+    'bundle' => 'category',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_thumbnail_image',
+    'label' => 'Thumbnail Image',
+    'required' => 0,
+    'settings' => array(
+      'allow_override' => 0,
+      'referencable_types' => array(
+        'audio' => 0,
+        'file' => 0,
+        'image' => 'image',
+        'video' => 0,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'atom_reference',
+      'settings' => array(
+        'context' => 'sdl_editor_representation',
+      ),
+      'type' => 'atom_reference_textfield',
+      'weight' => 5,
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. More than one Contributor may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
@@ -3455,6 +3520,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('There are different licensing options available to you for your content if you have copyright of the materials. ');
   t('This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('This is the primary field for providing in-depth knowledge about this piece of content. This field is an open field to provide you with maximum flexibility to express your knowledge in the most appropriate way. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
+  t('Thumbnail Image');
   t('Traditional Knowledge');
   t('Traditional Knowledge Labels');
   t('Transcription');

@@ -381,6 +381,9 @@ class FeedsSource extends FeedsConfigurable {
       // If fetcher result is empty, we are starting a new import, log.
       if (empty($this->fetcher_result)) {
         module_invoke_all('feeds_before_import', $this);
+        if (module_exists('rules')) {
+          rules_invoke_event('feeds_before_import', $this);
+        }
         $this->state[FEEDS_START] = time();
       }
 
@@ -414,7 +417,11 @@ class FeedsSource extends FeedsConfigurable {
     if ($result == FEEDS_BATCH_COMPLETE || isset($e)) {
       $this->imported = time();
       $this->log('import', 'Imported in @s seconds.', array('@s' => $this->imported - $this->state[FEEDS_START]), WATCHDOG_INFO);
+      $this->importer->fetcher->afterImport($this);
       module_invoke_all('feeds_after_import', $this);
+      if (module_exists('rules')) {
+        rules_invoke_event('feeds_after_import', $this);
+      }
       unset($this->fetcher_result, $this->state);
     }
     $this->save();

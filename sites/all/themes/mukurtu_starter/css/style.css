@@ -9133,6 +9133,12 @@ table .checkbox input[type="checkbox"] {
 .page-node-add .ctools-modal-content #scald-atom-add-form-options .atom-protocol-desc {
   margin-bottom: 1em;
 }
+.mejs-container {
+  background: #E3E2E1;
+}
+.scald-atom.view-mode-mukurtu_scald_dictionary_media .mejs-container {
+  width: 180px !important;
+}
 .popup-element-title {
   background: none;
 }

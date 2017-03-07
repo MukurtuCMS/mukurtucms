@@ -79,6 +79,9 @@ function file_entity_hook_info_alter(&$info) {
     // Miscellaneous hooks
     'file_mimetype_mapping_alter',
     'file_url_alter',
+    // Stream wrappers
+    'stream_wrappers',
+    'stream_wrappers_alter',
   );
   $info += array_fill_keys($hooks, array('group' => 'file'));
 }
@@ -383,6 +386,24 @@ function file_entity_menu() {
         'weight' => 5,
       );
     }
+  }
+
+  // Devel generate integration.
+  if (module_exists('devel_generate')) {
+    $items['admin/config/development/generate/file'] = array(
+      'title' => 'Generate files',
+      'description' => 'Generate a given number of files. Optionally delete current files.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('file_entity_generate_file_form'),
+      'access arguments' => array('administer files'),
+      'file' => 'file_entity.devel_generate.inc',
+    );
+    $items['admin/content/file/generate'] = $items['admin/config/development/generate/file'];
+    $items['admin/content/file/generate']['type'] = MENU_LOCAL_ACTION;
+    $items['file/add/generate'] = $items['admin/config/development/generate/file'];
+    $items['file/add/generate']['title'] = 'Generate';
+    $items['file/add/generate']['type'] = MENU_LOCAL_TASK;
+    $items['file/add/generate']['weight'] = 50;
   }
 
   return $items;
@@ -875,6 +896,7 @@ function file_entity_theme() {
         'controls' => TRUE,
         'autoplay' => FALSE,
         'loop' => FALSE,
+        'preload' => NULL,
       ),
       'file' => 'file_entity.theme.inc',
     ),
@@ -887,6 +909,7 @@ function file_entity_theme() {
         'muted' => FALSE,
         'width' => NULL,
         'height' => NULL,
+        'preload' => NULL,
       ),
       'file' => 'file_entity.theme.inc',
     ),
@@ -945,6 +968,7 @@ function file_entity_entity_info_alter(&$entity_info) {
         'path' => 'admin/structure/file-types/manage/%file_type',
         'real path' => 'admin/structure/file-types/manage/' . $type->type,
         'bundle argument' => 4,
+        'access arguments' => array('administer file types'),
       ),
     );
   }
@@ -954,8 +978,8 @@ function file_entity_entity_info_alter(&$entity_info) {
 
   // Ensure some of the Entity API callbacks are supported.
   $entity_info['file']['creation callback'] = 'entity_metadata_create_object';
-  $entity_info['file']['view callback'] = 'file_view_multiple';
-  $entity_info['file']['edit callback'] = 'file_entity_metadata_form_file';
+  $entity_info['file']['view callback'] = 'file_entity_metadata_view_file';
+  $entity_info['file']['form callback'] = 'file_entity_metadata_form_file';
   $entity_info['file']['access callback'] = 'file_entity_access';
 
   // Add integration with the Title module for file name replacement support.
@@ -1024,6 +1048,15 @@ function file_entity_uri($file) {
 }
 
 /**
+ * Entity API callback to view files.
+ */
+function file_entity_metadata_view_file($entities, $view_mode = 'full', $langcode = NULL) {
+  $result = file_view_multiple($entities, $view_mode, 0, $langcode);
+  // Make sure to key the result with 'file' instead of 'files'.
+  return array('file' => reset($result));
+}
+
+/**
  * Entity API callback to get the form of a file entity.
  */
 function file_entity_metadata_form_file($file) {
@@ -1036,10 +1069,9 @@ function file_entity_metadata_form_file($file) {
 /**
  * Implements hook_ctools_plugin_directory().
  */
-
-function file_entity_ctools_plugin_directory($module, $type) {
-  if ($module == 'ctools' && $type == 'content_types') {
-    return 'plugins/' . $type;
+function file_entity_ctools_plugin_directory($module, $plugin) {
+  if (in_array($module, array('panelizer', 'ctools', 'page_manager'))) {
+    return 'plugins/' . $plugin;
   }
 }
 
@@ -1190,7 +1222,7 @@ function file_entity_file_formatter_file_field_settings($form, &$form_state, $se
     // Invoke hook_field_formatter_settings_form(). We are reusing field
     // formatter functions, but we are not working with a Field API field, so
     // set $field accordingly. Unfortunately, the API is for $settings to be
-    // transfered via the $instance parameter, so we must mock it.
+    // transferred via the $instance parameter, so we must mock it.
     if (isset($field_formatter_info['module']) && ($function = ($field_formatter_info['module'] . '_field_formatter_settings_form')) && function_exists($function)) {
       $field = NULL;
       $mock_instance = array(
@@ -1491,6 +1523,7 @@ function file_entity_type_get_names() {
   $names = &drupal_static(__FUNCTION__);
 
   if (!isset($names)) {
+    $names = array();
     $info = entity_get_info('file');
     foreach ($info['bundles'] as $bundle => $bundle_info) {
       $names[$bundle] = $bundle_info['label'];
@@ -1563,11 +1596,11 @@ function file_entity_stream_wrappers_alter(&$wrappers) {
 /**
  * Implements hook_ctools_plugin_api().
  */
-function file_entity_ctools_plugin_api($owner, $api) {
-  if ($owner == 'file_entity' && $api == 'file_type') {
+function file_entity_ctools_plugin_api($module, $api) {
+  if (($module == 'file_entity' && $api == 'file_type') || ($module == 'page_manager' && $api == 'pages_default') || $module == 'panelizer') {
     return array('version' => 1);
   }
-  if ($owner == 'file_entity' && $api == 'file_default_displays') {
+  if ($module == 'file_entity' && $api == 'file_default_displays') {
     return array('version' => 1);
   }
 }
@@ -1955,7 +1988,7 @@ function file_entity_file_download($uri) {
     return file_get_content_headers($file);
   }
 
-  return -1;
+  return NULL;
 }
 
 /**
@@ -2557,4 +2590,13 @@ function file_entity_get_public_and_private_stream_wrapper_names($flag = STREAM_
     }
   }
   return $wrappers;
+}
+
+/**
+ * Implements hook_features_pipe_alter() for the file type component.
+ */
+function file_entity_features_pipe_file_type_alter(&$pipe, $data, $export) {
+  foreach ($data as $file_type) {
+    $pipe['variable'][] = "pathauto_file_{$file_type}_pattern";
+  }
 }

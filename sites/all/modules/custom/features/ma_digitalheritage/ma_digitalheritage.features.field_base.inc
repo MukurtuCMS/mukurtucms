@@ -371,6 +371,25 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'text',
   );
 
+  // Exported field_base: 'field_thumbnail_image'.
+  $field_bases['field_thumbnail_image'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_thumbnail_image',
+    'indexes' => array(
+      'sid' => array(
+        0 => 'sid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'atom_reference',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'atom_reference',
+  );
+
   // Exported field_base: 'field_transcription'.
   $field_bases['field_transcription'] = array(
     'active' => 1,

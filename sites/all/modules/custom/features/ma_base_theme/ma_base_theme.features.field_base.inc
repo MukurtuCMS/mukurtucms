@@ -284,7 +284,7 @@ function ma_base_theme_field_default_field_bases() {
   // Exported field_base: 'field_format'.
   $field_bases['field_format'] = array(
     'active' => 1,
-    'cardinality' => 1,
+    'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_format',
@@ -458,6 +458,8 @@ function ma_base_theme_field_default_field_bases() {
         'http://localcontexts.org/tk/wg/1.0' => 'TK Women General Label (TK WG)',
         'http://localcontexts.org/tk/ss/1.0' => 'TK Secret/Sacred Label (TK SS)',
         'http://localcontexts.org/tk/co/1.0' => 'TK Community Use Only Label (TK CO)',
+        'http://localcontexts.org/tk/cv/1.0' => 'TK Community Voice (TK CV)',
+        'http://localcontexts.org/tk/cs/1.0' => 'TK Culturally Sensitive (TK CS)',
         'http://localcontexts.org/tk/v/1.0' => 'TK Verified Label (TK V)',
       ),
       'allowed_values_function' => '',

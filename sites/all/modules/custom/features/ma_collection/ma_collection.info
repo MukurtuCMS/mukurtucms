@@ -16,6 +16,7 @@ dependencies[] = field_group
 dependencies[] = ma_base_theme
 dependencies[] = ma_core
 dependencies[] = menu
+dependencies[] = mukurtu_related_items_formatter
 dependencies[] = node
 dependencies[] = node_reference
 dependencies[] = number

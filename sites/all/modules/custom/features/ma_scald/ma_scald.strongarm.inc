@@ -130,6 +130,10 @@ function ma_scald_strongarm() {
             'weight' => '0',
             'visible' => TRUE,
           ),
+          'mukurtu_scald_media_assets_edit_' => array(
+            'weight' => '0',
+            'visible' => TRUE,
+          ),
         ),
       ),
     ),
@@ -255,6 +259,12 @@ function ma_scald_strongarm() {
       'mukurtu_scald_dictionary_media' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_recording' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -297,6 +307,10 @@ function ma_scald_strongarm() {
           ),
           'mukurtu_scald_dictionary_media' => array(
             'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_scald_taxonomy_thumbnail' => array(
+            'weight' => '0',
             'visible' => FALSE,
           ),
         ),
@@ -428,7 +442,7 @@ function ma_scald_strongarm() {
   $strongarm->name = 'scald_atom_defaults';
   $strongarm->value = array(
     'video' => (object) array(
-      'actions' => 7,
+      'actions' => 15,
       'upload_type' => 'plupload',
       'description' => '',
       'thumbnail_source' => 'public://atoms/video.png',
@@ -437,19 +451,19 @@ function ma_scald_strongarm() {
       'thumbnail_source' => 'public://atoms/image.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
     'audio' => (object) array(
       'thumbnail_source' => 'public://atoms/audio.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
     'file' => (object) array(
       'thumbnail_source' => 'public://atoms/thumbnail_default.png',
       'description' => '',
       'upload_type' => 'plupload',
-      'actions' => 7,
+      'actions' => 15,
     ),
   );
   $export['scald_atom_defaults'] = $strongarm;
@@ -538,6 +552,15 @@ function ma_scald_strongarm() {
     'mukurtu_scald_recording' => array(
       'name' => 'mukurtu_scald_recording',
       'title' => 'Mukurtu Scald Recording',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+      'provider' => 'scald',
+    ),
+    'mukurtu_scald_taxonomy_thumbnail' => array(
+      'name' => 'mukurtu_scald_taxonomy_thumbnail',
+      'title' => 'Mukurtu Scald Taxonomy Thumbnail',
       'description' => '',
       'render_language' => 'XHTML',
       'parseable' => TRUE,

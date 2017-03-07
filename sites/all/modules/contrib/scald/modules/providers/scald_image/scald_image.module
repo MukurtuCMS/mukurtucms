@@ -22,17 +22,29 @@ function scald_image_scald_atom_providers() {
 }
 
 /**
+ * Implements hook_scald_wysiwyg_context_list_alter().
+ */
+function scald_image_scald_wysiwyg_context_list_alter(&$contexts) {
+  drupal_add_js(drupal_get_path('module', 'scald_image') . '/scald_image.js');
+}
+
+/**
  * Implements hook_scald_add_form().
  */
 function scald_image_scald_add_form(&$form, &$form_state) {
   $defaults = scald_atom_defaults('image');
+  $defaults->description = ScaldAtomController::getFieldDescription('image');
+  $defaults->upload_validators = ScaldAtomController::getFieldUploadValidators('image');
   $type = scald_type_load('image');
   $form['file'] = array(
     '#type' => $defaults->upload_type,
     '#title' => check_plain(scald_type_property_translate($type)),
     '#upload_location' => ScaldAtomController::getThumbnailPath('image'),
-    '#upload_validators' => array('file_validate_extensions' => array('jpg jpeg png gif')),
+    '#upload_validators' => $defaults->upload_validators,
   );
+  if ($defaults->upload_type === 'managed_file') {
+    $form['file']['#description'] = theme('file_upload_help', array('description' => $defaults->description, 'upload_validators' => $defaults->upload_validators));
+  }
   if ($defaults->upload_type == 'plupload') {
     $form['scald_authors'] = array(
       '#type' => 'textfield',
@@ -81,7 +93,7 @@ function scald_image_scald_add_form_fill(&$atoms, $form, $form_state) {
     $atom->title = $file->filename;
     $atom->base_id = $file->fid;
     foreach (array('author', 'tag') as $name) {
-      // hacky, because variable and field name do not really match.
+      // Hacky, because variable and field name do not really match.
       $field_name = 'scald_' . $name . 's';
       $langcode = field_language('scald_atom', $atom, $field_name);
       if (empty($form_state['values'][$field_name])) {
@@ -283,7 +295,15 @@ function scald_image_scald_prerender($atom, $context, $options, $mode) {
     }
 
     if (!empty($options['link'])) {
-      $atom->rendered->player = l($atom->rendered->player, $options['link'], array('html' => TRUE));
+      $link_options = array('html' => TRUE);
+      if (!empty($options['linkTarget'])) {
+        $link_options += array(
+          'attributes' => array(
+            'target' => $options['linkTarget'],
+          ),
+        );
+      }
+      $atom->rendered->player = l($atom->rendered->player, urldecode($options['link']), $link_options);
     }
   }
 }

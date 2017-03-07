@@ -458,6 +458,7 @@ function mukurtu_protocol_field_node_grants($account, $op) {
  * Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
  */
 function mukurtu_protocol_field_update_dh_dw_access ($node) {
+    global $user;
 
   if (!$groups_on_node = og_get_entity_groups('node', $node)) {
     if ($node->type == 'dictionary_word') {
@@ -471,11 +472,18 @@ function mukurtu_protocol_field_update_dh_dw_access ($node) {
   $groups_on_node = array_values($groups_on_node['node']);
 
   // privacy set to ANY
-  if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
+  if ($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == 'any') {
     foreach ($groups_on_node as $group) {
-      if (in_array('protocol steward', og_get_user_roles('node', $group))) {
-        return NODE_ACCESS_ALLOW; // Pass if user is a Protocol Steward of the CP
-      }
+        $user_roles = og_get_user_roles('node', $group);
+
+        if (in_array('protocol steward', $user_roles)) {
+            return NODE_ACCESS_ALLOW; // Pass if user is a Protocol Steward of the CP
+        }
+
+        // User is a contributor for the protocol AND the owner of the node
+        if(in_array('contributor', $user_roles) && $user->uid == $node->uid) {
+            return NODE_ACCESS_ALLOW;
+        }
     }
     return NODE_ACCESS_DENY;
   }
@@ -483,11 +491,14 @@ function mukurtu_protocol_field_update_dh_dw_access ($node) {
   // privacy set to ALL (default)
   else {
     foreach ($groups_on_node as $group) {
-      if (!in_array('protocol steward', og_get_user_roles('node', $group))) {
-        return NODE_ACCESS_DENY; // Deny if user is not a Protocol Steward of the CP
-      }
+        $user_roles = og_get_user_roles('node', $group);
+
+        if (!(in_array('protocol steward', $user_roles) || (in_array('contributor', $user_roles) && $user->uid == $node->uid))) {
+            return NODE_ACCESS_DENY; // Deny if user is not a Protocol Steward of the CP, or a contributor AND the owner
+        }
     }
     return NODE_ACCESS_ALLOW;
   }
 
+  return NODE_ACCESS_IGNORE;
 }

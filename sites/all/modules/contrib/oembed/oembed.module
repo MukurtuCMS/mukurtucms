@@ -86,6 +86,7 @@ function oembed_cron() {
  * Implements hook_menu().
  */
 function oembed_menu() {
+  $items = array();
   $items['admin/config/media/oembed'] = array(
     'title' => 'oEmbed',
     'description' => 'Settings for oEmbed',
@@ -243,35 +244,73 @@ function oembed_get_data($url, $parameters = array()) {
 }
 
 /**
+ * Helper function generates a cache key based on url and request parameters.
+ *
+ * @param $url
+ * @param array $parameters
+ * @return string
+ */
+function oembed_cache_key($url, $parameters = array()) {
+  $cache_keys = array();
+
+  // Remove trailing slash to normalize URLs.
+  $cache_keys[] = hash('sha256', substr($url, -1) == '/' ? substr($url, 0, -1) : $url);
+
+  // Hash and serialize request parameters and display options.
+  if (!empty($parameters)) {
+    // Normalize the parameters and attributes for better cache performance.
+    ksort($parameters);
+    $parameters = array_filter($parameters);
+
+    $cache_keys[] = hash('sha256', serialize($parameters));
+  }
+
+  $cache_key = implode(':', $cache_keys);
+
+  return $cache_key;
+}
+
+/**
+ * Helper function to calculate expire based on lifetime and cache age.
+ *
+ * @param $embed
+ * @return mixed|null
+ */
+function oembed_cache_expire($embed) {
+  // If expire is not set, use default value and adjust for request time.
+  $lifetime = variable_get('oembed_cache_lifetime', 3600);
+
+  // Recalculate cache expire time based on response.
+  if ($lifetime != CACHE_PERMANENT && isset($embed['cache_age'])) {
+    $lifetime = max($lifetime, intval($embed['cache_age']));
+  }
+
+  if ($lifetime == CACHE_PERMANENT) {
+    $expire = $lifetime;
+  }
+  else {
+    // Twitter returns an unreasonably high cache_age of 31536000000 seconds,
+    // which is longer than the expire column in Drupal cache table supports.
+    $expire = min($lifetime + REQUEST_TIME, pow(2, 31));
+  }
+
+  return $expire;
+}
+
+/**
  * oEmbed fetcher and parser.
  *
  * This handles fetching from remote providers and local registered callbacks.
  * It does not cache the responses because they are cached when rendered.
  */
 function oembed_oembed_fetch($plugin, $url, $matches, $parameters = array()) {
-  $embed = FALSE;
-
-  // Normalize the parameters and attributes for better cache performance.
-  ksort($parameters);
-  $parameters = array_filter($parameters);
-
   if ($plugin['cache']) {
-    $cache_keys = array();
-
-    // Remove trailing slash to normalize URLs.
-    $cache_keys[] = hash('sha256', substr($url, -1) == '/' ? substr($url, 0, -1) : $url);
-
-    // Hash and serialize request parameters and display options.
-    if (!empty($parameters)) {
-      $cache_keys[] = hash('sha256', serialize($parameters));
-    }
-
-    $cache_key = implode(':', $cache_keys);
+    $cache_key = oembed_cache_key($url, $parameters);
     $cache = cache_get($cache_key, 'cache_oembed');
 
     // Cache hit.
-    if ($cache && isset($cache->data)) {
-      return $cache->data;
+    if ($cache) {
+      return isset($cache->data) ? $cache->data : FALSE;
     }
   }
 
@@ -280,50 +319,46 @@ function oembed_oembed_fetch($plugin, $url, $matches, $parameters = array()) {
 
   // Drupal oEmbed provider uses function callbacks for internal requests.
   $function = ctools_plugin_get_function($plugin, 'callback');
-  if ($function) {
-    $embed = call_user_func($function, $plugin, $url, $matches, $parameters);
+
+  if (!$function) {
+    return FALSE;
   }
 
-  // Decorate the oEmbed response object with additional properties that are
-  // handy when theming the output.
-  if ($embed) {
+  try {
+    $embed = call_user_func($function, $plugin, $url, $matches, $parameters);
+
+    // Decorate the oEmbed response object with additional properties that are
+    // handy when theming the output.
     $embed['original_url'] = $url;
     $embed['provider'] = $plugin['name'];
     drupal_alter('oembed_response', $embed);
+
+    if ($plugin['cache']) {
+      $expire = oembed_cache_expire($embed);
+      cache_set($cache_key, $embed, 'cache_oembed', $expire);
+    }
+
+    return $embed;
+  }
+  catch (RuntimeException $e) {
+    if ($plugin['cache'] && ($e->getCode() === 404 || $e->getCode() === 501 || $e->getCode() === 401)) {
+      // If expire is not set, use default value and adjust for request time.
+      $lifetime = variable_get('oembed_cache_lifetime', 3600);
+      if ($lifetime == CACHE_PERMANENT) {
+        $lifetime = 3600;
+      }
+      cache_set($cache_key, NULL, 'cache_oembed', $lifetime + REQUEST_TIME);
+    }
   }
 
-  if ($plugin['cache']) {
-
-    // If expire is not set, use default value and adjust for request time.
-    $lifetime = variable_get('oembed_cache_lifetime', 3600);
-
-    // Recalculate cache expire time based on response.
-    if ($embed && $lifetime != CACHE_PERMANENT && isset($embed['cache_age'])) {
-      $lifetime = max($lifetime, intval($embed['cache_age']));
-    }
-    else if (!$embed && $lifetime == CACHE_PERMANENT) {
-      $lifetime = 3600;
-    }
-
-    if ($embed && $lifetime == CACHE_PERMANENT) {
-      $expire = $lifetime;
-    }
-    else {
-      $expire = min($lifetime + REQUEST_TIME, 2147483647);
-    }
-
-    // Twitter returns an unreasonably high cache_age of 31536000000 seconds,
-    // which is longer than the expire column in Drupal cache table supports.
-    cache_set($cache_key, $embed, 'cache_oembed', $expire);
-  }
-
-  return $embed;
+  return FALSE;
 }
 
 /**
  * Implements hook_element_info().
  */
 function oembed_element_info() {
+  $types = array();
   // Standard oEmbed that changes its theme based on response.
   $types['oembed'] = array(
     '#theme' => 'oembed',
@@ -512,6 +547,7 @@ function oembed_ctools_plugin_api($module, $api) {
  * Implements hook_ctools_plugin_type().
  */
 function oembed_ctools_plugin_type() {
+  $plugins = array();
   $plugins['providers'] = array(
     'cache' => TRUE,
     'child plugins' => TRUE,
@@ -576,6 +612,7 @@ function oembed_file_formatter_view($file, $display, $langcode) {
   $scheme = file_uri_scheme($file->uri);
 
   if ($scheme == 'oembed') {
+    /** @var \DrupalStreamWrapperInterface $wrapper */
     $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
 
     // Build render attributes array. Prefer file-specific overrides to display settings.

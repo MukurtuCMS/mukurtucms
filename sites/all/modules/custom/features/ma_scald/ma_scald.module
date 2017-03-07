@@ -8,6 +8,17 @@
 include_once 'ma_scald.features.inc';
 
 /**
+ * Implements hook_boot().
+ */
+function ma_scald_boot() {
+  global $conf;
+  // The default scald deletion message doesn't make sense because we hide the fetch checkbox, so we remove that message.
+  $conf['locale_custom_strings_en'][''] = array(
+   '<p>Note that unchecking the Fetch checkbox in the "<em>Openly available actions</em>" field of this atom <a href="!url">edit form</a> makes the atom disappear for everyone but Scald administrators, and is usually a better idea.</p><p>This action cannot be undone.</p>'      => '<p>This action cannot be undone.</p>',
+   );
+}
+
+/**
  * Implements hook_ds_fields_info().
  */
 function ma_scald_ds_fields_info($entity_type) {
@@ -22,6 +33,121 @@ function ma_scald_ds_fields_info($entity_type) {
   );
 
   return array('scald_atom' => $fields);
+}
+
+/**
+ * Implements hook_scald_atom_access().
+ *
+ * Handle very specific scald delete access cases
+ */
+function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
+    global $user;
+
+    $user_account = $account;
+    if($user_account == NULL) {
+        $user_account = $user;
+    }
+
+    switch ($action) {
+    case 'delete':
+        // Let users delete their own atoms if they aren't being used somewhere
+        if(user_access('delete any atom') || (user_access('delete own atom') && $atom->publisher == $user->uid)) {
+            $references = ma_scald_get_atom_references($atom);
+
+            if(empty($references)) {
+                return SCALD_ATOM_ACCESS_ALLOW;
+            } else {
+                return SCALD_ATOM_ACCESS_DENY;
+            }
+        }
+        return SCALD_ATOM_ACCESS_DENY;
+        break;
+    }
+
+    return SCALD_ATOM_ACCESS_IGNORE;
+}
+
+// Return an array of content where the given atom is referenced
+// TODO: This can be an expensive function. We might be able to extend the scald_index module to catch the
+// elements it misses.
+function ma_scald_get_atom_references($atom) {
+    if(is_string($atom) && is_numeric($atom)) {
+        $atom = scald_atom_load($atom);
+    }
+
+    if(!isset($atom->sid)) {
+        return array();
+    }
+
+    // Get all atom reference field names
+    $fields = field_info_fields();
+    foreach($fields as $key => $field) {
+        if($field['type'] != 'atom_reference') {
+            unset($fields[$key]);
+        }
+    }
+    $field_names = array_keys($fields);
+
+    // For each atom reference field, check if this particular atom is being referenced
+    $references = array();
+    foreach($field_names as $field_name) {
+        $query = new EntityFieldQuery();
+        $query->fieldCondition($field_name, 'sid', $atom->sid, "=")
+            ->addMetaData('account', user_load(1));
+        $result = $query->execute();
+
+        if(!empty($result)) {
+            foreach($result as $entity_type_name => $entity_type) {
+                $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : array(), array_keys($entity_type));
+            }
+        }
+    }
+
+    // Atoms can also be references in DnD fields, check those now
+    $scald_dnd_fields = ma_scald_get_dnd_enabled_scald_fields();
+
+    foreach($scald_dnd_fields as $entity_type_name => $entity_type) {
+        foreach($entity_type as $bundle_name => $bundle) {
+            foreach($bundle as $field_name) {
+                $query = new EntityFieldQuery();
+                $query->entityCondition('entity_type', $entity_type_name)
+                    ->entityCondition('bundle', $bundle_name)
+                    ->fieldCondition($field_name, 'value', "%[scald={$atom->sid}:%", 'like')
+                    ->addMetaData('account', user_load(1));
+                $result = $query->execute();
+                if(!empty($result)) {
+                    foreach($result as $entity_type_name => $entity_type) {
+                        $references[$entity_type_name] = array_merge(isset($references[$entity_type_name]) ? $references[$entity_type_name] : array(), array_keys($entity_type));
+                    }
+                }
+            }
+        }
+    }
+
+    foreach($references as $entity_type_name => $entity_type) {
+        $references[$entity_type_name] = array_unique($references[$entity_type_name]);
+    }
+
+    return $references;
+}
+
+
+// Return an array of fields where scald drag 'n drop is enabled
+function ma_scald_get_dnd_enabled_scald_fields() {
+    $enabled_fields = array();
+    $fields = field_info_instances();
+
+    foreach($fields as $entity_type_name => $entity_type) {
+        foreach($entity_type as $bundle_name => $bundle) {
+            foreach($bundle as $field_name => $field) {
+                if(isset($field['settings']['dnd_enabled']) && $field['settings']['dnd_enabled'] == 1) {
+                    $enabled_fields[$entity_type_name][$bundle_name][] = $field['field_name'];
+                }
+            }
+        }
+    }
+
+    return $enabled_fields;
 }
 
 /**
@@ -62,6 +188,11 @@ function ma_scald_form_scald_atom_add_form_add_alter(&$form, &$form_state) {
   $form['scald_authors']['#access'] = FALSE;
   $form['scald_tags']['#access'] = FALSE;
 
+  // Add m4a to allowed list of extensions for audio atoms
+  $type = $form_state['scald']['type']->type;
+  if ($type == 'audio') {
+    $form['file']['#upload_validators']['file_validate_extensions'] = array('wav ogg mp3 m4a');
+  }
 }
 
 /**
@@ -235,5 +366,73 @@ if(user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
      return TRUE;
 }
 return FALSE;';
+    }
+}
+
+/**
+ * Implements hook_scald_player().
+ */
+function ma_scald_scald_player() {
+    return array('mukurtu_default' => array(
+        'name' => 'Mukurtu default player',
+        'description' => 'Mukurtu default player',
+        'type' => array('*'),
+    ));
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function ma_scald_scald_prerender($atom, $context, $options, $mode) {
+    $default_thumbnail_contexts = array('ma_scald_search_results', 'mukurtu_scald_related_items');
+
+    if($atom->type == 'audio' && !in_array($context, $default_thumbnail_contexts)) {
+        // Soundcloud already integrates the thumbnail with the display, remove it for rendering so it isn't duplicated
+        if($atom->provider == 'scald_soundcloud') {
+            if(!empty($atom->scald_thumbnail)) {
+                unset($atom->scald_thumbnail);
+            }
+        }
+
+        // Non-soundcloud audio atoms go to the HTML5 provider
+        if($atom->provider != 'scald_soundcloud') {
+            scald_audio_scald_prerender($atom, $context, $options, $mode);
+            return;
+        }
+    }
+
+    // All Soundcloud rendering should be handled by the Soundcloud module
+    if($atom->provider == 'scald_soundcloud') {
+        scald_soundcloud_scald_prerender($atom, $context, $options, $mode);
+    }
+
+    if($mode == 'player') {
+        if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {
+            // Use the atom thumbnail if there is one
+            if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
+                if($atom->type == 'file' || $atom->type == 'video') {
+                    $atom->rendered->player = array('#markup' => '');
+                    return;
+                }
+                $image_styles = array (
+                    'ma_scald_search_results' => 'medium',
+                    'mukurtu_scald_related_items' => 'related_items_teaser'
+                );
+                $thumbnail_image = theme_image_style (array (
+                    'style_name' => $image_styles[$context],
+                    'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
+                ));
+            }
+            // If no atom thumbnail, use our default thumbnails
+            else {
+                $image_widths = array (
+                    'ma_scald_search_results' => '220',
+                    'mukurtu_scald_related_items' => '280'
+                );
+                $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$context] . '.jpg">';
+            }
+
+            $atom->rendered->player = array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
+        }
     }
 }

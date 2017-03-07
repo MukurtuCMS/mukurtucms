@@ -4,6 +4,7 @@
  * Implements hook_file_formatter_info().
  */
 function oembed_file_formatter_info() {
+  $formatters = array();
   $formatters['oembed'] = array(
     'label' => t('oEmbed'),
     'file types' => array('audio, document, image, video'),
@@ -87,6 +88,7 @@ function oembed_file_load($files) {
     if ($scheme == 'oembed' && !isset($file->metadata['oembed'])) {
 
       // Load plain oEmbed response onto file entity.
+      /** @var \DrupalStreamWrapperInterface $wrapper */
       $wrapper = file_stream_wrapper_get_instance_by_uri($file->uri);
       $file->metadata['oembed'] = oembed_get_data($wrapper->getExternalUrl());
 
@@ -143,6 +145,7 @@ function oembed_metadata_fetch_image_dimensions($file) {
  * Implements hook_file_metadata_info().
  */
 function oembed_file_metadata_info() {
+  $info = array();
   $info['oembed'] = array('label' => t('oEmbed'), 'type' => 'array');
   return $info;
 }

@@ -75,6 +75,7 @@ Drupal.mollom.getMollomCaptcha = function (captchaType, context) {
   if (mollomContentId) {
     path += '/' + mollomContentId;
   }
+  path += '?cb=' + new Date().getTime();
 
   // Retrieve a new CAPTCHA.
   $.ajax({
@@ -86,7 +87,7 @@ Drupal.mollom.getMollomCaptcha = function (captchaType, context) {
         return;
       }
       // Inject new CAPTCHA.
-      $('.mollom-captcha-content', context).parent().html(data.content);
+      $('.mollom-captcha-content', context).parent().replaceWith(data.content);
       // Update CAPTCHA ID.
       $('input.mollom-captcha-id', context).val(data.captchaId);
       // Add an onclick-event handler for the new link.

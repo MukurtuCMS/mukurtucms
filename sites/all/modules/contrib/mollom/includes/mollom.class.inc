@@ -506,8 +506,14 @@ abstract class Mollom {
         $response->data = json_decode($response->body, TRUE);
       }
       elseif (strstr($response->headers['content-type'], 'application/xml')) {
-        $response->elements = new SimpleXmlIterator($response->body);
-        $response->data = $this->parseXML($response->elements);
+        try {
+          $response->elements = new SimpleXmlIterator($response->body);
+          $response->data = $this->parseXML($response->elements);
+        }
+        catch (Exception $e) {
+          // Invalid XML so just set the data back to blank.
+          $response->data = array();
+        }
       }
     }
 
@@ -582,8 +588,8 @@ abstract class Mollom {
       $this->lastResponseCode = TRUE;
       // No message is logged in case of success.
       $this->log[] = array(
-        'severity' => 'debug',
-      ) + $request_info;
+          'severity' => 'debug',
+        ) + $request_info;
 
       return $response->data;
     }
@@ -1148,6 +1154,10 @@ abstract class Mollom {
    *   - contextTitle: The title of the parent/context content of the stored
    *     content; e.g., the title of the article or forum thread a comment is
    *     posted on (not the parent comment that was replied to).
+   *   - contextCreated: The creation date of the parent/context content of the
+   *     stored content as a unix timestamp in seconds; e.g., the creation date
+   *     of the article or forum thread a comment is posted on (not the parent
+   *     comment that was replied to).
    *   - trackingImageId: An optional string identifier used to request an
    *     image beacon.  This is used for form behavior analysis.
    *
@@ -1284,7 +1294,7 @@ abstract class Mollom {
    *     - profanity: The content contains obscene, violent, profane language.
    *     - quality: The content is of low quality.
    *     - unwanted: The content is unwanted, taunting, off-topic.
-   *   - type (optional): A string denoting the type of feedback submitted.
+   *  - type (optional): A string denoting the type of feedback submitted.
    *     - moderate: Feedback from the admin moderation process (default).
    *     - flag: feedback from end users flagging content as inappropriate
    *   - source (optional): A string denoting the user-interface source of the feedback.

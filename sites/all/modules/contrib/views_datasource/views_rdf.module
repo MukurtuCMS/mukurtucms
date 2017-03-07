@@ -24,78 +24,78 @@ function views_rdf_views_api() {
  * @return unknown_type
  */
 function _views_rdf_render_multiple_field($field, $values) {
-    $options = $field->options;
-    // If this is not a grouped field, use content_handler_field::render().
-    if (!$field->defer_query) {
-      return $field->render($values);
-    }
-    // We're down to a single node here, so we can retrieve the actual field
-    // definition for the node type being considered.
-    $content_field = content_fields($field->content_field['field_name'], $values->{$field->aliases['type']});
-    $vid = $values->{$field->field_alias};
-    if (isset($field->field_values[$vid])) {
-      // Gather items, respecting the 'Display n values starting from m' settings.
-      $count_skipped = 0;
-      $items = array();
-      foreach ($field->field_values[$vid] as $item) {
-        if (empty($options['multiple']['multiple_from']) || ($count_skipped >= $options['multiple']['multiple_from'])) {
-          if (empty($options['multiple']['multiple_number']) || (count($items) < $options['multiple']['multiple_number'])) {
-            // Grab the nid - needed for render_link().
-            $nid = $item['_nid'];
-            unset($item['_nid']);
-            $items[] = $item;
-          }
-          else {
-            break;
-          }
-        }
-        $count_skipped++;
-      }
-
-      // Build a pseudo-node from the retrieved values.
-      $node = drupal_clone($values);
-      // content_format and formatters will need a 'type'.
-      $node->type = $values->{$field->aliases['type']};
-      $node->nid = $values->{$field->aliases['nid']};
-      $node->vid = $values->{$field->aliases['vid']};
-
-      // Some formatters need to behave differently depending on the build_mode
-      // (for instance: preview), so we provide one.
-      $node->build_mode = NODE_BUILD_NORMAL;
-
-      // Render items.
-      $formatter_name = $options['format'];
-      if ($items && ($formatter = _content_get_formatter($formatter_name, $content_field['type']))) {
-        $rendered = array();
-        if (content_handle('formatter', 'multiple values', $formatter) == CONTENT_HANDLE_CORE) {
-          // Single-value formatter.
-          $n = 0;
-          foreach ($items as $item) {
-            $output = content_format($content_field, $item, $formatter_name, $node);
-            if (!empty($output)) {
-              $rendered[++$n] = $field->render_link($output, (object) array('nid' => $nid));
-            }
-          }
+  $options = $field->options;
+  // If this is not a grouped field, use content_handler_field::render().
+  if (!$field->defer_query) {
+    return $field->render($values);
+  }
+  // We're down to a single node here, so we can retrieve the actual field
+  // definition for the node type being considered.
+  $content_field = content_fields($field->content_field['field_name'], $values->{$field->aliases['type']});
+  $vid = $values->{$field->field_alias};
+  if (isset($field->field_values[$vid])) {
+    // Gather items, respecting the 'Display n values starting from m' settings.
+    $count_skipped = 0;
+    $items = array();
+    foreach ($field->field_values[$vid] as $item) {
+      if (empty($options['multiple']['multiple_from']) || ($count_skipped >= $options['multiple']['multiple_from'])) {
+        if (empty($options['multiple']['multiple_number']) || (count($items) < $options['multiple']['multiple_number'])) {
+          // Grab the nid - needed for render_link().
+          $nid = $item['_nid'];
+          unset($item['_nid']);
+          $items[] = $item;
         }
         else {
-          // Multiple values formatter.
-          $output = content_format($content_field, $items, $formatter_name, $values);
+          break;
+        }
+      }
+      $count_skipped++;
+    }
+
+    // Build a pseudo-node from the retrieved values.
+    $node = drupal_clone($values);
+    // content_format and formatters will need a 'type'.
+    $node->type = $values->{$field->aliases['type']};
+    $node->nid = $values->{$field->aliases['nid']};
+    $node->vid = $values->{$field->aliases['vid']};
+
+    // Some formatters need to behave differently depending on the build_mode
+    // (for instance: preview), so we provide one.
+    $node->build_mode = NODE_BUILD_NORMAL;
+
+    // Render items.
+    $formatter_name = $options['format'];
+    if ($items && ($formatter = _content_get_formatter($formatter_name, $content_field['type']))) {
+      $rendered = array();
+      if (content_handle('formatter', 'multiple values', $formatter) == CONTENT_HANDLE_CORE) {
+        // Single-value formatter.
+        $n = 0;
+        foreach ($items as $item) {
+          $output = content_format($content_field, $item, $formatter_name, $node);
           if (!empty($output)) {
             $rendered[++$n] = $field->render_link($output, (object) array('nid' => $nid));
           }
         }
-        if (count($rendered) > 1) {
-          // TODO: could we use generic field display ?
-          //return theme('content_view_multiple_field', $rendered, $content_field, $values);
-          return $rendered;
-        }
-        elseif ($rendered) {
-          return $rendered[1];
+      }
+      else {
+        // Multiple values formatter.
+        $output = content_format($content_field, $items, $formatter_name, $values);
+        if (!empty($output)) {
+          $rendered[++$n] = $field->render_link($output, (object) array('nid' => $nid));
         }
       }
+      if (count($rendered) > 1) {
+        // TODO: could we use generic field display ?
+        //return theme('content_view_multiple_field', $rendered, $content_field, $values);
+        return $rendered;
+      }
+      elseif ($rendered) {
+        return $rendered[1];
+      }
     }
+  }
 
-    return '';
+  return '';
 }
 
 /**
@@ -115,7 +115,7 @@ function _views_rdf_render_fields($view, $row) {
     $field = $view->field[$id];
     $field_is_multiple = FALSE;
     $field_raw = array();
-    if ((isset($field->options['multiple']['group']))&& isset($field->field_values)) {
+    if ((isset($field->options['multiple']['group'])) && isset($field->field_values)) {
       $field_output = _views_rdf_render_multiple_field($field, $row);
       $n = 0;
       if (is_array($field_output)) {
@@ -124,7 +124,9 @@ function _views_rdf_render_fields($view, $row) {
         }
         $field_is_multiple = TRUE;
       }
-      else $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+      else {
+        $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+      }
     }
     else {
       $field_output = $view->field[$field->options['id']]->advanced_render($row);
@@ -136,15 +138,17 @@ function _views_rdf_render_fields($view, $row) {
     if (is_array($field_output)) {
       foreach ($field_output as $i => $f) {
         if (preg_match("/<img[^>]+>/i", $f, $img_match)) {
-          if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
-          $field_output[$i] = ($src_match[2]);
+          if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match)) {
+            $field_output[$i] = ($src_match[2]);
+          }
         }
       }
     }
     else {
       if (preg_match("/<img[^>]+>/i", $field_output, $img_match)) {
-        if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
+        if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match)) {
           $field_output = ($src_match[2]);
+        }
       }
     }
 

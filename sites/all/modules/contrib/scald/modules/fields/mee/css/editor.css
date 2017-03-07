@@ -1,0 +1,19 @@
+/**
+ * @file
+ * Stylesheet used by richtext editors.
+ *
+ * Include this file into your editor CSS so that Atom wrappers have a better
+ * visualisation.
+ *
+ * It is automatically included when the DnD plugin is used.
+ */
+
+.dnd-atom-wrapper,
+.dnd-widget-wrapper{
+  padding: 5px;
+}
+.dnd-atom-wrapper:hover {
+  outline: 2px #ccc solid;
+  background-color: #ddd;
+}
+

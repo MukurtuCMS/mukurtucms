@@ -336,6 +336,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-format-explode';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Format';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['digital_heritage_metadata-format-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'digital_heritage_metadata-format-trim';
+  $feeds_tamper->importer = 'digital_heritage_metadata';
+  $feeds_tamper->source = 'Format';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['digital_heritage_metadata-format-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-keywords-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
   $feeds_tamper->source = 'Keywords';
@@ -1535,9 +1566,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Protocol';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -1673,9 +1704,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Protocol';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';
@@ -1858,9 +1889,9 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->source = 'Protocol';
   $feeds_tamper->plugin_id = 'explode';
   $feeds_tamper->settings = array(
-    'separator' => ',',
+    'separator' => ';',
     'limit' => '',
-    'real_separator' => ',',
+    'real_separator' => ';',
   );
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Explode';

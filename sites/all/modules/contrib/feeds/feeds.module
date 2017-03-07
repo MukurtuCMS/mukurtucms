@@ -604,8 +604,12 @@ function feeds_node_validate($node, $form, &$form_state) {
   $last_feeds = $node->feeds;
   $source->configFormValidate($last_feeds);
 
-  // If node title is empty, try to retrieve title from feed.
-  if (trim($node->title) == '') {
+  // Check if title form element is hidden.
+  $title_hidden = (isset($form['title']['#access']) && !$form['title']['#access']);
+
+  // If the node title is empty and the title form element wasn't hidden, try to
+  // retrieve the title from the feed.
+  if (isset($node->title) && trim($node->title) == '' && !$title_hidden) {
     try {
       $source->addConfig($last_feeds);
       if (!$last_title = $source->preview()->title) {
@@ -688,11 +692,6 @@ function feeds_node_delete($node) {
  */
 function feeds_form_node_form_alter(&$form, $form_state) {
   if ($importer_id = feeds_get_importer_id($form['#node']->type)) {
-    // Set title to not required, try to retrieve it from feed.
-    if (isset($form['title'])) {
-      $form['title']['#required'] = FALSE;
-    }
-
     // Enable uploads.
     $form['#attributes']['enctype'] = 'multipart/form-data';
 
@@ -706,6 +705,14 @@ function feeds_form_node_form_alter(&$form, $form_state) {
     );
     $form['feeds'] += $source->configForm($form_state);
     $form['#feed_id'] = $importer_id;
+
+    // If the parser has support for delivering a source title, set node title
+    // to not required and try to retrieve it from the source if the node title
+    // is left empty by the user.
+    // @see feeds_node_validate()
+    if (isset($form['title']) && $source->importer()->parser->providesSourceTitle()) {
+      $form['title']['#required'] = FALSE;
+    }
   }
 }
 
@@ -844,6 +851,69 @@ function feeds_flush_caches() {
   }
   return array();
 }
+
+/**
+ * Implements hook_admin_menu_output_build().
+ *
+ * Shows available importers in the "Content" section of the admin menu.
+ * Requires the "admin_menu" module to be enabled.
+ */
+function feeds_admin_menu_output_build(array &$content) {
+  // Add new top-level item to the menu.
+  if (!isset($content['menu'])) {
+    return;
+  }
+  $access = FALSE;
+  foreach (feeds_enabled_importers() as $importer_id) {
+    if (user_access('administer feeds') || user_access("import $importer_id feeds")) {
+      $access = TRUE;
+      break;
+    }
+  }
+
+  if (!$access) {
+    return;
+  }
+
+  $content['menu']['admin/content']['admin/content/feeds_import'] = array(
+    '#title' => t('Import'),
+    '#href' => 'import',
+  );
+
+  foreach (feeds_importer_load_all() as $importer) {
+    $content['menu']['admin/content']['admin/content/feeds_import'][$importer->id] = array(
+      '#title' => t($importer->config['name']),
+      '#href' => !empty($importer->config['content_type']) ? 'node/add/' . $importer->config['content_type'] : 'import/' . check_plain($importer->id),
+      '#access' => user_access('administer feeds') || user_access("import $importer->id feeds"),
+    );
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Adds "Import" link as local action on content overview page.
+ */
+function feeds_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  if ($root_path == 'admin/content') {
+    $data['actions']['output'][] = array(
+      '#theme' => 'menu_local_task',
+      '#link' => array(
+        'title' => t('Import'),
+        'href' => 'import',
+        'localized_options' => array(
+          'attributes' => array(
+            'title' => t('Import'),
+          ),
+        ),
+      ),
+      '#access' => feeds_page_access(),
+      // Add weight so it appears after the local action "Add content".
+      '#weight' => 1,
+    );
+  }
+}
+
 
 /**
  * @}
@@ -1107,8 +1177,13 @@ function feeds_plugin($plugin, $id) {
 
   $args = array('%plugin' => $plugin, '@id' => $id);
   if (user_access('administer feeds')) {
-    $args['@link'] = url('admin/structure/feeds/' . $id);
-    drupal_set_message(t('Missing Feeds plugin %plugin. See <a href="@link">@id</a>. Check whether all required libraries and modules are installed properly.', $args), 'warning', FALSE);
+    if (module_exists('feeds_ui')) {
+      $args['@link'] = url('admin/structure/feeds/' . $id);
+      drupal_set_message(t('Missing Feeds plugin %plugin. See <a href="@link">@id</a>. Check whether all required libraries and modules are installed properly.', $args), 'warning', FALSE);
+    }
+    else {
+      drupal_set_message(t('Missing Feeds plugin %plugin used by the importer "@id". Check whether all required libraries and modules are installed properly. Enable the Feeds Admin UI module to check the importer\'s settings.', $args), 'warning', FALSE);
+    }
   }
   else {
     drupal_set_message(t('Missing Feeds plugin %plugin. Please contact your site administrator.', $args), 'warning', FALSE);

@@ -94,6 +94,39 @@ function hook_scald_atom_providers() {
 }
 
 /**
+ * Define additional information about atom providers provided by a module.
+ *
+ * @return
+ *   An array of options per provider. This array is keyed by the unified atom type.
+ *   Each provider can define any number of additional options to be used elsewhere.
+ */
+function hook_scald_atom_providers_opt() {
+  // The starting_step can be used to skip the add step
+  // when the provider does not need it.
+  return array(
+    'gallery' => array(
+      'starting_step' => 'options',
+    ),
+  );
+}
+
+/**
+ * Alters the list of providers and their labels.
+ */
+function hook_scald_atom_providers_alter(&$types) {
+  $types['image']['scald_image'] = 'Renamed Image Provider';
+}
+
+/**
+ * Alters the additional options of the providers.
+ * Do not alter the label in this hook. It is only there for simplicity.
+ */
+function hook_scald_atom_providers_opt_alter(&$types) {
+  // In case the provider changed the starting step, It can be changed back.
+  $types['gallery']['scald_gallery']['starting_step'] = 'add';
+}
+
+/**
  * Define information about atom transcoders provided by a module.
  *
  * @return array $transcoder
@@ -204,7 +237,7 @@ function hook_scald_register_atom($atom, $mode) {
 /**
  * Respond to atom update.
  *
- /* Similar to hook_scald_register_atom(), but this hook is invoked for existing
+ * Similar to hook_scald_register_atom(), but this hook is invoked for existing
  * atoms.
  *
  * @param $atom
@@ -345,6 +378,19 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
 }
 
 /**
+ * Alters links that show up in the drag and drop library.
+ *
+ * @param array $links
+ *   List of built action links.
+ *
+ * @param $atom
+ *   The atom that user action links are being built.
+ */
+function hook_scald_atom_user_build_actions_links_alter(&$links, $atom) {
+  unset($links['delete']);
+}
+
+/**
  * Control access to an atom.
  *
  * This hook can be used to grant or deny access for a specific atom and
@@ -363,6 +409,54 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
  *   The user object of the current user. This is an optional parameter.
  */
 function hook_scald_atom_access($atom, $action, $account = NULL) {
+}
+
+/**
+ * Act on an atom being inserted or updated.
+ *
+ * This hook is invoked from ScaldAtomController::save() before the atom is
+ * saved to the database. Like any other hook_ENTITY_TYPE_presave() hook, it is
+ * invoked before hook_entity_presave().
+ *
+ * @param $atom
+ */
+function hook_scald_atom_presave($atom) {
+}
+
+/**
+ * Act on an atom being inserted.
+ *
+ * This hook is invoked from ScaldAtomController::save() after a new atom is
+ * saved to the database, after field_attach_insert() and before
+ * hook_entity_insert() is called.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_insert($atom) {
+}
+
+/**
+ * Act on an atom being updated.
+ *
+ * This hook is invoked from ScaldAtomController::save() after an existing atom
+ * is saved to the database, after field_attach_update() and before
+ * hook_entity_update() is called.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_update($atom) {
+}
+
+/**
+ * Act on an atom being deleted.
+ *
+ * This hook is invoked from scald_atom_delete_multiple() after the atom is
+ * unregistered, before hook_entity_delete() is called and before the atom is
+ * removed from scald_atoms table in the database.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_delete($atom) {
 }
 
 /**
@@ -436,6 +530,28 @@ function hook_scald_add_form_fill(&$atoms, $form, $form_state) {
     $atom->base_id = $file->fid;
     $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
     $atom->scald_thumbnail[$langcode][0] = (array) $file;
+  }
+}
+
+/**
+ * Alter atoms after the data being filled by provider.
+ *
+ * Providers that do extra work to get more data (e.g. from external source) can
+ * leave the temporary data in `$atom->_info`. Other module can reuse the data
+ * to prefill atom fields to make them available in the next step.
+ *
+ * @param array $atoms
+ *   Atoms created by the source hook_scald_add_form_fill() callback. For
+ *   providers not implementing count this will still be an array but with
+ *   one atom.
+ * @param array $context
+ *   A keyed array with 'form', and 'form_state'.
+ */
+function hook_scald_add_form_fill_alter(&$atoms, $context) {
+  if ($context['form_state']['scald']['source'] == 'scald_soundcloud') {
+    foreach ($atoms as $atom) {
+      $atom->field_atom_license[LANGUAGE_NONE][0]['value'] = $atom->_info->license;
+    }
   }
 }
 

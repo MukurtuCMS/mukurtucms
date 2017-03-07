@@ -112,13 +112,10 @@ function scald_index_scald_atom_delete($atom) {
  */
 function scald_index_field_delete_instance($instance) {
   // Delete all atom associations for this field.
-  $field = field_info_field($instance['field_name']);
-  if ($field['module'] == 'atom_reference' && $field['storage']['type'] == 'field_sql_storage') {
-    db_delete('scald_index')
-      ->condition('field_name', $instance['field_name'])
-      ->condition('type', $instance['bundle'])
-      ->execute();
-  }
+  db_delete('scald_index')
+    ->condition('field_name', $instance['field_name'])
+    ->condition('type', $instance['bundle'])
+    ->execute();
 }
 
 /**
@@ -146,41 +143,46 @@ function scald_index_build_node_index($node) {
 
   // Collect a unique list of all the atom ids from all node fields.
   $sid_all = array();
-  foreach (field_info_instances('node', $node->type) as $instance) {
-    $field_name = $instance['field_name'];
+  $instances = field_info_instances('node', $node->type);
+  foreach ($instances as $field_name => $instance) {
     $field = field_info_field($field_name);
-    if (($field['module'] == 'atom_reference' && $field['storage']['type'] == 'field_sql_storage') || $field_name == 'body') {
-      // If a field value is not set in the node object when node_save() is
-      // called, the old value from $node->original is used.
-      if (isset($node->{$field_name})) {
-        $items = $node->{$field_name};
-      }
-      elseif (isset($node->original->{$field_name})) {
-        $items = $node->original->{$field_name};
-      }
-      else {
-        continue;
-      }
+    $analyse_field = FALSE;
+
+    // Detect atom in reference fields.
+    if ($field['module'] == 'atom_reference' && $field['storage']['type'] == 'field_sql_storage') {
+      $analyse_field = TRUE;
+    }
+
+    // Detect atoms embedded in text fields.
+    if ((isset($instance['settings']['mee_enabled']) && $instance['settings']['mee_enabled'])
+      or (isset($instance['settings']['dnd_enabled']) && $instance['settings']['dnd_enabled'])
+    ) {
+      $analyse_field = TRUE;
+    }
+
+    // Extract atoms used in this field.
+    if ($analyse_field) {
       foreach (field_available_languages('node', $field) as $langcode) {
-        // Body field.
-        if ($field_name == 'body') {
-          $body = field_get_items('node', $node, 'body', $langcode);
-          if (!empty($body)) {
-            foreach ($body as $item) {
-              $body_sids = scald_included($item['value']);
-              foreach ($body_sids as $sid) {
-                $sid_all[$sid]['sid'] = $sid;
-                $sid_all[$sid]['field_name'] = 'body';
-              }
+        $values = field_get_items('node', $node, $field_name, $langcode);
+        if (!empty($values)) {
+          foreach ($values as $value) {
+            // Atom references.
+            if (isset($value['sid'])) {
+              $sid_all[] = array(
+                'sid' => $value['sid'],
+                'field_name' => $field_name,
+              );
             }
-          }
-        }
-        // Atom reference fields.
-        else {
-          if (!empty($items[$langcode])) {
-            foreach ($items[$langcode] as $item) {
-              $sid_all[$item['sid']]['sid'] = $item['sid'];
-              $sid_all[$item['sid']]['field_name'] = $field_name;
+
+            // Text scanning.
+            if (isset($value['value'])) {
+              $extracted_sids = scald_index_included($value['value']);
+              foreach ($extracted_sids as $sid) {
+                $sid_all[] = array(
+                  'sid' => $sid,
+                  'field_name' => $field_name,
+                );
+              }
             }
           }
         }
@@ -234,7 +236,7 @@ function scald_index_delete_node_index($node) {
  */
 function scald_index_rebuild() {
   // Deleting old entries.
-  db_delete('scald_index')->execute();
+  db_truncate('scald_index')->execute();
 
   // Run batches of 5 nodes per batch.
   $nids = db_query('SELECT nid FROM {node}')->fetchCol();
@@ -391,4 +393,31 @@ function scald_index_rebuild_confirm_form($form, &$form_state){
  */
 function scald_index_rebuild_confirm_form_submit(array $form, array &$form_state) {
   scald_index_rebuild();
+}
+
+/**
+ * Determine atoms (expressed as SAS or DIV) embedded in a string.
+ *
+ * @param string $string
+ *   The string to search for SAS/DIV notation atoms.
+ *
+ * @return array
+ *   An array of SIDs which are included in the string in SAS/DIV notation.
+ *
+ * @see scald_included().
+ */
+function scald_index_included($string) {
+  $atoms = array();
+
+  // Detect SAS atoms.
+  if (preg_match_all(SCALD_SAS_MATCH_PATTERN, $string, $sas_atoms)) {
+    $atoms = array_merge($atoms, $sas_atoms[1]);
+  }
+
+  // Detect DIV atoms.
+  if (preg_match_all('/<div.*data-scald-sid=\"(\\d+)\".*><!-- scald embed --><\\/div>/', $string, $div_atoms)) {
+    $atoms = array_merge($atoms, $div_atoms[1]);
+  }
+
+  return $atoms;
 }

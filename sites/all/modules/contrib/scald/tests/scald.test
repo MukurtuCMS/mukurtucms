@@ -692,6 +692,13 @@ class ScaldLocalizeTestCase extends ScaldWebTestCase {
   }
 
   /**
+   * Tests if the Scald text group is successfully registered.
+   */
+  public function testScaldTextGroup() {
+    $this->assertTrue(i18n_string_group_info('scald'), 'Scald text group successfully registered.');
+  }
+
+  /**
    * Overrides ScaldWebTestCase::createAtom().
    *
    * Adds a parameter to choose the language of the add form.
