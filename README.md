@@ -58,17 +58,18 @@ To install on your own server, please find system requirements and installation 
 * [MySQL 5.0.15 (or greater)](http://www.mysql.com/)
 
 ##### <a name="installation"></a>Installation
-Mukurtu CMS is built on Drupal. More detailed installation information can be found in INSTALL.txt in the same directory as this document.
+Mukurtu CMS is built on Drupal. More detailed installation information can be found in INSTALL.txt in the same directory as this document or on the [Drupal website](https://www.drupal.org/docs/7/install).
 
+###### An Example Installation on Linux using the Apache HTTP Server
 1. Create an Apache vhost for your domain
 1. Clone the Mukurtu CMS Github repository: `git clone git@github.com:MukurtuCMS/mukurtucms.git`
 1. Rename the created mukurtucms directory to the path you set for your vhost (or set your vhost path to this directory)
 1. Navigate into your vhost directory, eg.: `cd mukurtucms`
 1. Files permissions
  * Public files
-    * This directory is already created at sites/default/files. However, you need to make sure it is writable by the Apache user. One way of doing this would be: `chmod a+w sites/default/files`
+    * This directory is already created at sites/default/files. However, you need to make sure it is writable by the Apache user (often 'apache' or 'www-data').
  * Private files
-    * This directory does not yet exist. By default, Mukurtu CMS will look for the private files directory at `sites/default/files/private`. So you can create that directory. However, this is insecure (publicly-accessible) unless special measures are taken to secure it (beyond the scope of this document). A simpler method is to create a private files directory anywhere outside of your web root, and ensure it is readable and writable by the Apache user. Take note of this path as you will need it later.
+ * This directory does not yet exist. By default, Mukurtu CMS will look for the private files directory at `sites/default/files/private`. So you can create that directory. However, this is insecure (publicly-accessible) unless special measures are taken to secure it (beyond the scope of this document). A simpler method is to create a private files directory anywhere outside of your web root, and ensure it is readable and writable by the Apache user. Take note of this path as you will need it later.
 1. Create an empty MySQL database
 1. Create the settings.php file: `cp sites/default/default.settings.php sites/default/settings.php`
 1. Edit the settings file you just created with a text editor. Near the bottom is the $databases array. At minimum, you will need to fill out 'database', 'username', and 'password' to connect to the database you just created.
