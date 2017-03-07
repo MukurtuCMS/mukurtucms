@@ -1,0 +1,13 @@
+diff --git a/geoPHP/lib/geometry/Point.class.php b/geoPHP/lib/geometry/Point.class.php
+index d6556cb..7d75ed0 100644
+--- a/geoPHP/lib/geometry/Point.class.php
++++ b/geoPHP/lib/geometry/Point.class.php
+@@ -26,6 +26,8 @@ class Point extends Geometry
+       return;
+     }
+ 
++    $x = floatval(str_replace(',', '.', $x));
++    $y = floatval(str_replace(',', '.', $y));
+     // Basic validation on x and y
+     if (!is_numeric($x) || !is_numeric($y)) {
+       throw new Exception("Cannot construct Point. x and y should be numeric");
