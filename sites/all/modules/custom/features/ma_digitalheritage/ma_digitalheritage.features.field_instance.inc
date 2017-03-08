@@ -919,15 +919,7 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_coverage'.
   $field_instances['node-digital_heritage-field_coverage'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => array(
-      0 => array(
-        'geom' => array(
-          'lat' => '-25.074083003086223',
-          'lon' => '133.13634695000007',
-        ),
-        'input_format' => 'lat/lon',
-      ),
-    ),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1067,6 +1059,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 11,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_coverage',
     'label' => 'Location',
@@ -1087,6 +1080,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'confirm_center_marker' => 0,
         'html5_geolocation' => 0,
         'map_type' => 'HYBRID',
+        'zoom_level' => 1,
       ),
       'type' => 'geofield_gmap',
       'weight' => 33,
