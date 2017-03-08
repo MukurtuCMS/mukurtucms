@@ -1110,7 +1110,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => array(),
     'deleted' => 0,
-    'description' => 'Click on a button at right to insert a map feature.  The trash can button can be used to remove individual map features currently added. Once the Digital Heritage item is saved, map features cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.',
+    'description' => 'Click on a button at right to insert a map feature.  The trash can button can be used to remove individual map features currently added, except for markers (pins). Once the Digital Heritage item is saved, map features cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -4652,7 +4652,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Category');
   t('Check this box and click the "Save" button below to remove all map features for this Digital Heritage item.');
   t('Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.');
-  t('Click on a button at right to insert a map feature.  The trash can button can be used to remove individual map features currently added. Once the Digital Heritage item is saved, map features cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.');
+  t('Click on a button at right to insert a map feature.  The trash can button can be used to remove individual map features currently added, except for markers (pins). Once the Digital Heritage item is saved, map features cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.');
   t('Collection');
   t('Comment');
   t('Community');
