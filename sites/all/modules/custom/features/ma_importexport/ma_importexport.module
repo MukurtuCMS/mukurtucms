@@ -372,6 +372,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
       $type = 'audio';
 
       // Handle Soundcloud URLs
+      dpm($entity->{'Temporary target 1'});
       if(module_exists('scald_soundcloud') && stripos($entity->{'Temporary target 1'}, 'soundcloud.com/')) {
           // The Soundcloud provider is going to overwrite these, we want to preserve them.
           $input_title = $entity->title;
@@ -1622,7 +1623,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
         if($atom->provider == 'scald_soundcloud') {
             $result[] = $atom->data['permalink_url'];
         } else {
-            $result[] = $media_dir . basename($atom->data['audio_file']);
+            $result[] = $media_dir . $atom->base_entity->filename;
         }
     } else {
       $result[] = $media_dir . $atom->base_entity->filename;
