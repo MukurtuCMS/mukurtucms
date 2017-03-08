@@ -57,6 +57,8 @@ function ma_digitalheritage_field_group_info() {
       7 => 'field_language',
       8 => 'field_source',
       9 => 'field_subject',
+      10 => 'field_gpx_file',
+      11 => 'field_remove_all_geodata',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

@@ -251,6 +251,29 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
+  // Exported field_base: 'field_gpx_file'.
+  $field_bases['field_gpx_file'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_gpx_file',
+    'indexes' => array(
+      'fid' => array(
+        0 => 'fid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'file',
+    'settings' => array(
+      'display_default' => 0,
+      'display_field' => 0,
+      'uri_scheme' => 'private',
+    ),
+    'translatable' => 0,
+    'type' => 'file',
+  );
+
   // Exported field_base: 'field_original_date'.
   $field_bases['field_original_date'] = array(
     'active' => 1,
@@ -446,6 +469,31 @@ function ma_digitalheritage_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_remove_all_geodata'.
+  $field_bases['field_remove_all_geodata'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_remove_all_geodata',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => '',
+        1 => '',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
   // Exported field_base: 'field_summary'.
   $field_bases['field_summary'] = array(
     'active' => 1,
@@ -484,6 +532,56 @@ function ma_digitalheritage_field_default_field_bases() {
     'settings' => array(),
     'translatable' => 0,
     'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_wkt_from_gpx_file'.
+  $field_bases['field_wkt_from_gpx_file'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_wkt_from_gpx_file',
+    'indexes' => array(
+      'bbox' => array(
+        0 => 'top',
+        1 => 'bottom',
+        2 => 'left',
+        3 => 'right',
+      ),
+      'bottom' => array(
+        0 => 'bottom',
+      ),
+      'centroid' => array(
+        0 => 'lat',
+        1 => 'lon',
+      ),
+      'geohash' => array(
+        0 => 'geohash',
+      ),
+      'lat' => array(
+        0 => 'lat',
+      ),
+      'left' => array(
+        0 => 'left',
+      ),
+      'lon' => array(
+        0 => 'lon',
+      ),
+      'right' => array(
+        0 => 'right',
+      ),
+      'top' => array(
+        0 => 'top',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'geofield',
+    'settings' => array(
+      'backend' => 'default',
+      'srid' => 4326,
+    ),
+    'translatable' => 0,
+    'type' => 'geofield',
   );
 
   return $field_bases;

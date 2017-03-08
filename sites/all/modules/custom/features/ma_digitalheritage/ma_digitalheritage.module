@@ -44,7 +44,27 @@ function ma_digitalheritage_node_presave($node) {
       }
     }
 
-    
+    // Merge the WKT from GPX upload with the WKT from the map widget
+    $map_wkt = $dh_emw->field_coverage->value();
+    $gpx_wkt = $node->field_wkt_from_gpx_file[LANGUAGE_NONE]; // using the EMW for this pulls only the first value for some reason
+    if ($gpx_wkt) {
+      $merged_wkt = array_merge($map_wkt, $gpx_wkt);
+      $merged_wkt = array_unique($merged_wkt, SORT_REGULAR);
+      if ($merged_wkt <> $map_wkt) {
+        $dh_emw->field_coverage->set($merged_wkt);
+        $dh_emw->field_gpx_file->set(array());
+        $dh_emw->save();
+      }
+    }
+
+    // Remove all geodata checkbox handling
+    $remove_geodata = $dh_emw->field_remove_all_geodata->value();
+    if ($remove_geodata) {
+      $dh_emw->field_remove_all_geodata->set(0);
+      $dh_emw->field_coverage->set(array());
+      $dh_emw->save();
+    }
+
   }
 }
 /**
@@ -686,6 +706,10 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
     }
 
   }
+
+  // Alter geocoder field (subfield of Location field) title and description
+  $form['field_coverage'][LANGUAGE_NONE]['geocoder']['#title'] = "Address or place name";
+  $form['field_coverage'][LANGUAGE_NONE]['geocoder']['#description'] = 'Enter an address or place name, then click "Add" to insert it as a marker on the map.';
 
 }
 

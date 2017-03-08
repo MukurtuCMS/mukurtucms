@@ -256,7 +256,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 30,
+      'weight' => 8,
     ),
   );
 
@@ -358,7 +358,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 31,
+      'weight' => 9,
     ),
   );
 
@@ -478,7 +478,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -592,7 +592,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 26,
+      'weight' => 4,
     ),
   );
 
@@ -695,7 +695,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 29,
+      'weight' => 7,
     ),
   );
 
@@ -1101,7 +1101,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -1110,7 +1110,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => array(),
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Click on a button at right to insert a map feature.  The trash can button can be used to remove individual map features currently added. Once the Digital Heritage item is saved, map features cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1414,7 +1414,7 @@ function ma_digitalheritage_field_default_field_instances() {
             'lng' => 0,
           ),
           'draw_types' => array(
-            'circle' => 1,
+            'circle' => 0,
             'marker' => 1,
             'polygon' => 1,
             'polyline' => 1,
@@ -1533,7 +1533,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 34,
+      'weight' => 36,
     ),
   );
 
@@ -1673,7 +1673,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -1778,7 +1778,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 12,
       ),
       'type' => 'text_textfield',
-      'weight' => 13,
+      'weight' => 6,
     ),
   );
 
@@ -2126,6 +2126,92 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-digital_heritage-field_gpx_file'.
+  $field_instances['node-digital_heritage-field_gpx_file'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => 'Upload GPX file(s) to have its features added to the map when the "Save" button is pressed. Once saved, the GPX map features are added to this Digital Heritage item and cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.',
+    'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'file',
+        'settings' => array(),
+        'type' => 'file_default',
+        'weight' => 46,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_gpx_file',
+    'label' => 'GPX File(s)',
+    'required' => 0,
+    'settings' => array(
+      'description_field' => 0,
+      'file_directory' => 'map_files/gpx',
+      'file_extensions' => 'gpx',
+      'max_filesize' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'file',
+      'settings' => array(
+        'progress_indicator' => 'throbber',
+      ),
+      'type' => 'file_generic',
+      'weight' => 34,
+    ),
+  );
+
   // Exported field_instance: 'node-digital_heritage-field_identifier'.
   $field_instances['node-digital_heritage-field_identifier'] = array(
     'bundle' => 'digital_heritage',
@@ -2331,7 +2417,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -2788,7 +2874,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -3020,7 +3106,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'tz_handling' => 'none',
       ),
       'type' => 'partial_date',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -3331,7 +3417,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 27,
+      'weight' => 5,
     ),
   );
 
@@ -3434,7 +3520,93 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 28,
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_remove_all_geodata'.
+  $field_instances['node-digital_heritage-field_remove_all_geodata'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Check this box and click the "Save" button below to remove all map features for this Digital Heritage item.',
+    'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 48,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_remove_all_geodata',
+    'label' => 'Remove all map features',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 35,
     ),
   );
 
@@ -3873,7 +4045,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -4195,6 +4367,108 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-digital_heritage-field_wkt_from_gpx_file'.
+  $field_instances['node-digital_heritage-field_wkt_from_gpx_file'] = array(
+    'bundle' => 'digital_heritage',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'colorbox' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'geofield',
+        'settings' => array(
+          'data' => 'full',
+        ),
+        'type' => 'geofield_wkt',
+        'weight' => 47,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'single_page_right_column_dh' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_wkt_from_gpx_file',
+    'label' => 'WKT from gpx_file',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'geocoder',
+      'settings' => array(
+        'delta_handling' => 'default',
+        'geocoder_field' => 'field_gpx_file',
+        'geocoder_handler' => 'gpx',
+        'handler_settings' => array(
+          'google' => array(
+            'all_results' => 0,
+            'biasing' => array(
+              'bounds' => '',
+              'components' => '',
+              'region' => '',
+            ),
+            'geometry_type' => 'point',
+            'reject_results' => array(
+              'APPROXIMATE' => 0,
+              'GEOMETRIC_CENTER' => 0,
+              'RANGE_INTERPOLATED' => 0,
+              'ROOFTOP' => 0,
+            ),
+          ),
+        ),
+      ),
+      'type' => 'geocoder',
+      'weight' => 7,
+    ),
+  );
+
   // Exported field_instance: 'node-digital_heritage-og_group_ref'.
   $field_instances['node-digital_heritage-og_group_ref'] = array(
     'bundle' => 'digital_heritage',
@@ -4359,7 +4633,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -4376,7 +4650,9 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Book Pages');
   t('Book Parent');
   t('Category');
+  t('Check this box and click the "Save" button below to remove all map features for this Digital Heritage item.');
   t('Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.');
+  t('Click on a button at right to insert a map feature.  The trash can button can be used to remove individual map features currently added. Once the Digital Heritage item is saved, map features cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.');
   t('Collection');
   t('Comment');
   t('Community');
@@ -4389,6 +4665,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Describe the location of this resource. If it was an event, where did it take place? If it is a document or physical object, where was it created or where can it be located now? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Description');
   t('Format');
+  t('GPX File(s)');
   t('Identifier');
   t('Item Sharing Settings');
   t('Keywords');
@@ -4409,6 +4686,7 @@ function ma_digitalheritage_field_default_field_instances() {
 ');
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
+  t('Remove all map features');
   t('Rights');
   t('Source');
   t('Subject');
@@ -4428,8 +4706,10 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Traditional Knowledge Labels');
   t('Transcription');
   t('Type');
+  t('Upload GPX file(s) to have its features added to the map when the "Save" button is pressed. Once saved, the GPX map features are added to this Digital Heritage item and cannot be individually removed. Instead, all map features for this Digital Heritage item can be removed at once with the "Remove all map features" checkbox below.');
   t('Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.');
   t('Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.');
+  t('WKT from gpx_file');
   t('Who holds the rights to the content and who should be contacted for permission to reproduce the content. You may want to add and email address or other contact information if you\'d like people to contact you for permission to use, reproduce, circulate and or cite your materials.');
 
   return $field_instances;
