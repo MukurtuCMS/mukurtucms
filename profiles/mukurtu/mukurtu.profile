@@ -21,6 +21,7 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
+    'mukurtu_cycle_search_api' => array(),
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -249,6 +250,20 @@ function mukurtu_create_default_contexts () {
   );
   $context->condition_mode = 0;
   context_save ($context);
+}
+
+function mukurtu_cycle_search_api() {
+    // Disable Search API then revert the ma_search_api feature
+    if(module_exists('search_api')) {
+        $result = search_api_server_disable('search_api_db_server');
+        if($result) {
+            $feature = features_get_features('ma_search_api');
+            if(isset($feature->info)) {
+                $components = array_keys($feature->info['features']);
+                features_revert(array('ma_search_api' => $components));
+            }
+        }
+    }
 }
 
 //function mukurtu_client_form() {

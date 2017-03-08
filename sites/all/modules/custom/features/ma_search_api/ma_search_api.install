@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Implements hook_update().
+ */
+
+/**
+ * Fix an issue with Search API tables not being created.
+ */
+function ma_search_api_update_7100() {
+    // Disable Search API then revert the ma_search_api feature
+    if(module_exists('search_api')) {
+        $result = search_api_server_disable('search_api_db_server');
+        if($result) {
+            $feature = features_get_features('ma_search_api');
+            if(isset($feature->info)) {
+                $components = array_keys($feature->info['features']);
+                features_revert(array('ma_search_api' => $components));
+            }
+        }
+    }
+}
