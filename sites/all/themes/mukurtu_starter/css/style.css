@@ -9990,6 +9990,10 @@ a:hover {
 .form-item-operation {
   padding-left: 15px;
 }
+/* Leaflet Map Widget */
+.leaflet-widget .leaflet-draw-edit-edit {
+  display: none;
+}
 /* Single Page Browse */
 #single-browse-page-right-column {
   height: 100vh;
