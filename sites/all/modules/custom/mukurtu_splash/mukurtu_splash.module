@@ -442,6 +442,13 @@ function mukurtu_splash_block_site_config() {
       );
 
       $items[] = array (
+          'title' => 'Configure Google Maps API Key',
+          'href' => 'admin/config/content/geofield_map',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('A Google Maps API key is required for some mapping features to function.'),
+      );
+
+      $items[] = array (
           'title' => 'Configure Mollom',
           'href' => 'admin/config/content/mollom/settings',
           'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
