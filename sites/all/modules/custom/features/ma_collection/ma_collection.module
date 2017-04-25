@@ -179,6 +179,9 @@ function ma_collection_node_update($node, $deleted = NULL) {
       $refs_deleted = array_diff ($old_refs, $new_refs);
       $collections_to_recount = array_merge ($refs_added, $refs_deleted);
       foreach ($collections_to_recount as $collection) {
+        if($collection == NULL) {
+           continue;
+        }
         $query = new EntityFieldQuery();
         $result = $query
           ->entityCondition('entity_type', 'node')
@@ -191,8 +194,10 @@ function ma_collection_node_update($node, $deleted = NULL) {
         $collection_presave_skip[$collection] = $collection;
         variable_set('collection_presave_skip', $collection_presave_skip);
         $collection_emw = entity_metadata_wrapper('node', $collection);
-        $collection_emw->field_digital_heritage_count->set($new_count);
-        $collection_emw->save();
+        if($collection_emw) {
+            $collection_emw->field_digital_heritage_count->set($new_count);
+            $collection_emw->save();
+        }
       }
     }
   }
