@@ -219,7 +219,7 @@ function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
             'required' => FALSE,
             'display' => array(
                 'default' => array(
-                    'label' => 'above',
+                    'label' => 'hidden',
                     'module' => 'mukurtu_display_formatters',
                     'settings' => array(),
                     'type' => 'mukurtu_records_formatter',
