@@ -204,6 +204,7 @@ function mukurtu_taxonomy_records_config_form_submit($form, &$form_state) {
             mukurtu_taxonomy_records_disable_records_for_vocabulary($vocab);
         }
     }
+    drupal_set_message(t('Configuration saved'));
 }
 
 function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
