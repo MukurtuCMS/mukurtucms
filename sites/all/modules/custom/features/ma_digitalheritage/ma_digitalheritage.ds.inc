@@ -617,5 +617,15 @@ function ma_digitalheritage_ds_view_modes_info() {
   );
   $export['map_popup'] = $ds_view_mode;
 
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'taxonomy_record_teaser';
+  $ds_view_mode->label = 'Taxonomy Record Teaser';
+  $ds_view_mode->entities = array(
+    'scald_atom' => 'scald_atom',
+    'node' => 'node',
+  );
+  $export['taxonomy_record_teaser'] = $ds_view_mode;
+
   return $export;
 }
