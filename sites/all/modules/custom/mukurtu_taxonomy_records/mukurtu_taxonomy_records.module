@@ -39,6 +39,9 @@ function mukurtu_taxonomy_records_menu() {
     return $items;
 }
 
+// TODO: This form needs:
+// 1: Pagination
+// 2. Filters and/or autocomplete
 function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     // Check if the taxonomy is enabled for records
     if(!mukurtu_taxonomy_records_are_records_enabled($term)) {
@@ -78,8 +81,8 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     );
 
     $header = array(
-        'thumbnail' => array('data' => t('Thumbnail'), 'field' => 'n.thumbnail'),
         'title' => array('data' => t('Title'), 'field' => 'n.title'),
+        'thumbnail' => array('data' => t('Thumbnail')),
         'type' => array('data' => t('Type'), 'field' => 'n.type'),
         'author' => t('Author'),
         'status' => array('data' => t('Status'), 'field' => 'n.status'),
@@ -351,11 +354,6 @@ function mukurtu_taxonomy_records_add_record_form_access($term) {
 }
 
 function mukurtu_taxonomy_records_remove_record_form($form, $form_state, $term, $record) {
-    /*    $form['remove_record_instructions'] = array(
-        '#markup' => t("Are you sure you want to detach the record \"@record\" currently attached to the \"@term\" term in the \"@vocab\" taxonomy? This will not delete the record.",
-                       array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name)),
-                       );*/
-    
     $question = t("Remove the record \"@record\" from term \"@term\"?", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
     
     $description = t("Are you sure you want to detach the record \"@record\" currently attached to the \"@term\" term in the \"@vocab\" taxonomy? This will not delete the record.", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
@@ -425,8 +423,13 @@ function mukurtu_taxonomy_records_menu_alter(&$items) {
 }
 
 function mukurtu_taxonomy_records_taxonomy_term_page($term) {
+    // Terms might still have records data after records are disabled. Don't display them if not enabled.
+    if(!mukurtu_taxonomy_records_are_records_enabled($term) && isset($term->field_mukurtu_records[LANGUAGE_NONE])) {
+        unset($term->field_mukurtu_records[LANGUAGE_NONE]);
+    }
     module_load_include('inc', 'taxonomy', 'taxonomy.pages');
     $build = taxonomy_term_page($term);
+
     if(isset($term->field_mukurtu_records) && !empty($term->field_mukurtu_records[LANGUAGE_NONE])){
         if(isset($build['nodes'])) {
             unset($build['nodes']);
@@ -469,6 +472,16 @@ function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $fo
         // Hide node/media aggregate fields when editing. Those are set programmatically.
         $form['field_node_aggregate']['#access'] = FALSE;
         $form['field_media_aggregate']['#access'] = FALSE;
+
+        // Hide the term field. We want users to use the 'add record' interface.
+        $form['field_mukurtu_terms']['#access'] = FALSE;
+    }
+}
+
+function mukurtu_taxonomy_records_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
+    // Hide record field from term form when editing. We want users to use the 'add record' interface.
+    if(isset($form['field_mukurtu_records'])) {
+        $form['field_mukurtu_records']['#access'] = FALSE;
     }
 }
 
