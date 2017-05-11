@@ -10546,6 +10546,15 @@ a:hover {
 .person.metadata .field {
   margin-bottom: 10px;
 }
+.group-person-media {
+  padding-bottom: 20px;
+}
 .node-person .field-name-field-node-aggregate {
   clear: both;
+}
+.view-mode-taxonomy_record_teaser {
+  padding-bottom: 20px;
+  border-top: #dddddd;
+  border-top-style: solid;
+  border-top-width: 1px;
 }
