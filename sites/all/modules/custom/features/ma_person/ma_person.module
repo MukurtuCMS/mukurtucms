@@ -1,0 +1,45 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Person feature.
+ */
+
+include_once 'ma_person.features.inc';
+
+function ma_person_entity_update($entity, $type) {
+    /*   
+    if($type == 'node') {
+        $fields = field_info_instances($type, $entity->type);
+        foreach($fields as $field) {
+            $field_info = field_info_field($field['field_name']);
+            if($field_info['type'] == 'taxonomy_term_reference') {
+                if(isset($entity->original->{$field['field_name']}[LANGUAGE_NONE]) && isset($entity->{$field['field_name']}[LANGUAGE_NONE])) {
+                    $field_diff = ma_core_diff_taxonomy_reference_fields($entity, $entity->original, $field['field_name']);
+                    dpm($field['field_name']);
+                    dpm($field_diff);
+
+                    if(isset($field_diff['added'])) {
+                        foreach($field_diff['added'] as $tid) {
+                            ma_person_update_mukurtu_records($tid, $entity->nid, 'add');
+                        }
+                    }
+
+                    if(isset($field_diff['removed'])) {
+                        foreach($field_diff['removed'] as $tid) {
+                            ma_person_update_mukurtu_records($tid, $entity->nid, 'remove');
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if($type == 'atom') {
+
+    }
+    */
+}
+
+//taxonomy_select_nodes
+
+
