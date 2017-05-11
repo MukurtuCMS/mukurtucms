@@ -486,41 +486,6 @@ function mukurtu_taxonomy_records_form_taxonomy_form_term_alter(&$form, &$form_s
 }
 
 /*
- * Implements hook_taxonomy_term_update().
- */
-/*function mukurtu_taxonomy_records_taxonomy_term_update($term) {
-    if(mukurtu_taxonomy_records_are_records_enabled($term)) {
-        $diff = ma_core_diff_taxonomy_reference_fields($term, $term->original, 'field_mukurtu_records');
-        if(isset($diff['added'])) {
-            foreach($diff['added'] as $record) {
-                //                mukurtu_taxonomy_records_update($term->tid, $record, 'add');
-            }
-        }
-        
-        if(isset($diff['removed'])) {
-            foreach($diff['removed'] as $record) {
-                //                mukurtu_taxonomy_records_update($term->tid, $record, 'remove');
-            }
-        }
-    }
-}
-*/
-/*
- * Implements hook_entity_insert().
- */
-/*function mukurtu_taxonomy_records_entity_insert($entity, $type) {
-   if($type == 'node') {
-        if(mukurtu_taxonomy_records_is_record($entity)) {
-            if(isset($entity->field_mukurtu_terms) && isset($entity->field_mukurtu_terms[LANGUAGE_NONE])) {
-                foreach($entity->field_mukurtu_terms[LANGUAGE_NONE] as $term) {
-                    //                    mukurtu_taxonomy_records_update($term['target_id'], $entity->nid);
-                }
-            }
-        }
-   }
-   }*/
-
-/*
  * Implements hook_entity_update().
  */
 function mukurtu_taxonomy_records_entity_update($entity, $type) {
