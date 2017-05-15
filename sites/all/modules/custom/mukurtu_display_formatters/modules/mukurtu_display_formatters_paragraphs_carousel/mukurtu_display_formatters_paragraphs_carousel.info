@@ -1,0 +1,6 @@
+name = Mukurtu Paragraphs Display Formatter
+description = Provides a paragraphs carousel display
+package = Mukurtu
+core = 7.x
+dependencies[] = owlcarousel
+files[] = mukurtu_display_formatters_paragraph_carousel.module
