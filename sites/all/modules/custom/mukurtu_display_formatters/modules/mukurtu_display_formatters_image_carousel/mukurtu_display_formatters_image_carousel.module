@@ -48,7 +48,6 @@ function mukurtu_display_formatters_image_carousel_field_formatter_view($entity_
     foreach ($items as $delta => $item) {
         if(isset($item['sid'])) {
             $images[]['row'] = scald_render($item['sid'], 'ma_colorbox');
-            //$element[0]['#markup'] .= 
         }
     }
 
@@ -60,7 +59,9 @@ function mukurtu_display_formatters_image_carousel_field_formatter_view($entity_
             'instance' => 'owlcarousel_settings_mukurtu_single_image',
             // Attributes are rendered via drupal_attributes on the wrapper element.
             'attributes' => array(
-                'class' => array('scald-atom'),
+                'id' => array(
+                    'default' => drupal_html_id('image_carousel_' . $instance['field_id'])
+                ),
             )
         )
     );
