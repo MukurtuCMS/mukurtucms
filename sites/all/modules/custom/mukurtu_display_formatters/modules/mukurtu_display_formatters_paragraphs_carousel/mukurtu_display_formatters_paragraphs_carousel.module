@@ -69,7 +69,7 @@ function mukurtu_display_formatters_paragraphs_carousel_field_formatter_view($en
         '#items' => $paragraphs,
         '#settings' => array(
             // The settings group to apply.
-            'instance' => 'owlcarousel_settings_paragraphs',
+            'instance' => 'owlcarousel_settings_mukurtu_paragraphs',
             // Attributes are rendered via drupal_attributes on the wrapper element.
             'attributes' => array(
                 'id' => array(
