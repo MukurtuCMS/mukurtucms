@@ -60,24 +60,25 @@ function mukurtu_display_formatters_paragraphs_carousel_field_formatter_view($en
         }
     }
 
-    // Blank element will render the field label
-    $element[] = array();
+    if(!empty($paragraphs)) {
+        // Blank element will render the field label
+        $element[] = array();
 
-    // Render the carousel
-    $element[] = array(
-        '#theme' => 'owlcarousel',
-        '#items' => $paragraphs,
-        '#settings' => array(
-            // The settings group to apply.
-            'instance' => 'owlcarousel_settings_mukurtu_paragraphs',
-            // Attributes are rendered via drupal_attributes on the wrapper element.
-            'attributes' => array(
-                'id' => array(
-                    'default' => drupal_html_id('paragraph_carousel_' . $instance['field_id'])
-                ),
+        // Render the carousel
+        $element[] = array(
+            '#theme' => 'owlcarousel',
+            '#items' => $paragraphs,
+            '#settings' => array(
+                // The settings group to apply.
+                'instance' => 'owlcarousel_settings_mukurtu_paragraphs',
+                // Attributes are rendered via drupal_attributes on the wrapper element.
+                'attributes' => array(
+                    'id' => array(
+                        'default' => drupal_html_id('paragraph_carousel_' . $instance['field_id'])
+                    ),
+                )
             )
-        )
-    );
-
+        );
+    }
     return $element;
 }
