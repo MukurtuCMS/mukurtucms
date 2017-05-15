@@ -1090,6 +1090,9 @@ function ma_digital_heritage_book_page_build_carousel($node) {
             'instance' => 'owlcarousel_settings_multipage',
             // Attributes are rendered via drupal_attributes on the wrapper element.
             'attributes' => array(
+                'id' => array(
+                    'default' => drupal_html_id('multipage_carousel_' . $instance['field_id'])
+                ),
                 'class' => array('owl-carousel'),
             )
         )
