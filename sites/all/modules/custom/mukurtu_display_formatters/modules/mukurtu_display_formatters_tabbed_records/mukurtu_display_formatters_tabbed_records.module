@@ -69,9 +69,11 @@ function mukurtu_display_formatters_tabbed_records_field_formatter_view($entity_
     $record_tabs = array();
     foreach($processed_nodes as $node) {
             $record_tabs[] = array(
-                'type' => 'node',
-                'nid' => $node->nid,
-                'view_mode' => 'full',
+                //                'type' => 'node',
+                //                'nid' => $node->nid,
+                //                'view_mode' => 'full',
+                // Need to pre-render the content here. Quicktabs was not pulling in layout CSS.
+                'contents' => node_view($node, 'full'),
                 'title' => $node->title,
                 'hide_title' => 0,
             );
