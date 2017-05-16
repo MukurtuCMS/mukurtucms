@@ -10552,6 +10552,17 @@ a:hover {
 .node-person .field-name-field-node-aggregate {
   clear: both;
 }
+.node-person .field-name-field-related-people {
+  clear: both;
+}
+.node-person .paragraphs-item-person-relationship-bundle {
+  clear: both;
+}
+.node-person .tableofcontents {
+  clear: both;
+  padding-bottom: 30px;
+  font-weight: bold;
+}
 .view-mode-taxonomy_record_teaser {
   padding-bottom: 20px;
   border-top: #dddddd;
