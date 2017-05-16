@@ -23,11 +23,13 @@ function ma_person_field_group_info() {
     'label' => 'Biographic Information',
     'weight' => '13',
     'children' => array(
-      0 => 'field_date_born',
-      1 => 'field_date_died',
-      2 => 'field_media_asset',
-      3 => 'field_deceased',
-      4 => 'title',
+      0 => 'body',
+      1 => 'field_date_born',
+      2 => 'field_date_died',
+      3 => 'field_media_asset',
+      4 => 'field_deceased',
+      5 => 'field_sections',
+      6 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -121,8 +123,7 @@ function ma_person_field_group_info() {
     'label' => '',
     'weight' => '0',
     'children' => array(
-      0 => 'body',
-      1 => 'field_media_asset',
+      0 => 'field_media_asset',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -144,6 +145,33 @@ function ma_person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_relations|node|person|form';
+  $field_group->group_name = 'group_relations';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Relations',
+    'weight' => '14',
+    'children' => array(
+      0 => 'field_related_people',
+    ),
+    'format_type' => 'htab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-relations field-group-htab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_relations|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_tabs|node|person|form';
   $field_group->group_name = 'group_tabs';
   $field_group->entity_type = 'node';
@@ -155,6 +183,7 @@ function ma_person_field_group_info() {
     'weight' => '0',
     'children' => array(
       0 => 'group_biographic',
+      1 => 'group_relations',
     ),
     'format_type' => 'htabs',
     'format_settings' => array(
@@ -171,6 +200,7 @@ function ma_person_field_group_info() {
   // Included for use with string extractors like potx.
   t('Biographic Information');
   t('Metadata');
+  t('Relations');
   t('Tabs');
 
   return $field_groups;

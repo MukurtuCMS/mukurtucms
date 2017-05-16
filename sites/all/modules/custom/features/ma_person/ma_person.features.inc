@@ -8,12 +8,22 @@
  * Implements hook_ctools_plugin_api().
  */
 function ma_person_ctools_plugin_api($module = NULL, $api = NULL) {
+  if ($module == "ds" && $api == "ds") {
+    return array("version" => "1");
+  }
   if ($module == "field_group" && $api == "field_group") {
     return array("version" => "1");
   }
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => "1");
   }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function ma_person_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
 }
 
 /**
@@ -31,5 +41,24 @@ function ma_person_node_info() {
     ),
   );
   drupal_alter('node_info', $items);
+  return $items;
+}
+
+/**
+ * Implements hook_paragraphs_info().
+ */
+function ma_person_paragraphs_info() {
+  $items = array(
+    'person_relationship_bundle' => array(
+      'name' => 'Related Person',
+      'bundle' => 'person_relationship_bundle',
+      'locked' => '1',
+    ),
+    'text_section' => array(
+      'name' => 'Text Section',
+      'bundle' => 'text_section',
+      'locked' => '1',
+    ),
+  );
   return $items;
 }
