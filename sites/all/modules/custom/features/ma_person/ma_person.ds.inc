@@ -336,6 +336,108 @@ function ma_person_ds_layout_settings_info() {
   );
   $export['node|person|taxonomy_record_teaser'] = $ds_layout;
 
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|text_section|default';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'text_section';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_3col_stacked_fluid';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'header' => array(
+        0 => 'field_section_title',
+      ),
+      'left' => array(
+        1 => 'field_left_media',
+      ),
+      'middle' => array(
+        2 => 'field_section_body',
+      ),
+      'right' => array(
+        3 => 'field_right_media',
+      ),
+    ),
+    'fields' => array(
+      'field_section_title' => 'header',
+      'field_left_media' => 'left',
+      'field_section_body' => 'middle',
+      'field_right_media' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'header' => 'div',
+      'left' => 'div',
+      'middle' => 'div',
+      'right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['paragraphs_item|text_section|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|text_section|form';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'text_section';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'bootstrap_4_4_4_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'field_section_title',
+      ),
+      'left' => array(
+        1 => 'field_left_media',
+      ),
+      'central' => array(
+        2 => 'field_section_body',
+      ),
+      'right' => array(
+        3 => 'field_right_media',
+      ),
+      'hidden' => array(
+        4 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'field_section_title' => 'top',
+      'field_left_media' => 'left',
+      'field_section_body' => 'central',
+      'field_right_media' => 'right',
+      '_add_existing_field' => 'hidden',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'central' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['paragraphs_item|text_section|form'] = $ds_layout;
+
   return $export;
 }
 
