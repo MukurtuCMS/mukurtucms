@@ -270,6 +270,10 @@ function mukurtu_taxonomy_records_disable_records_for_vocabulary($vocab) {
 }
 
 function mukurtu_taxonomy_records_disable_cer($left_type, $left_bundle, $right_type, $right_bundle) {
+    // All arguments are required non-null
+    if(!$left_bundle || !$left_type || !$right_bundle || !$right_type) {
+        return;
+    }
     $left_field = 'field_mukurtu_records';
     if($left_type != 'taxonomy_term') {
         $left_field = 'field_mukurtu_terms';
@@ -299,7 +303,12 @@ function mukurtu_taxonomy_records_disable_cer($left_type, $left_bundle, $right_t
     }
 }
 
-function mukurtu_taxonomy_records_enable_cer($left_type, $left_bundle, $right_type, $right_bundle) {    
+function mukurtu_taxonomy_records_enable_cer($left_type, $left_bundle, $right_type, $right_bundle) {
+    // All arguments are required non-null
+    if(!$left_bundle || !$left_type || !$right_bundle || !$right_type) {
+        return;
+    }
+
     $left_field = 'field_mukurtu_records';
     if($left_type != 'taxonomy_term') {
         $left_field = 'field_mukurtu_terms';
