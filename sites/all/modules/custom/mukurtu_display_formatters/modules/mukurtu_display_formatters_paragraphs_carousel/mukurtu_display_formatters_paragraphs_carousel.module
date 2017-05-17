@@ -61,9 +61,6 @@ function mukurtu_display_formatters_paragraphs_carousel_field_formatter_view($en
     }
 
     if(!empty($paragraphs)) {
-        // Blank element will render the field label
-        $element[] = array();
-
         // Render the carousel
         $element[] = array(
             '#theme' => 'owlcarousel',
