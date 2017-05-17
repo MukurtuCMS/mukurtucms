@@ -10,76 +10,6 @@
 function ma_person_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-person-body'.
-  $field_instances['node-person-body'] = array(
-    'bundle' => 'person',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 4,
-      ),
-      'full' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 3,
-      ),
-      'person_teaser' => array(
-        'label' => 'hidden',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 12,
-      ),
-      'taxonomy_record_teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 3,
-      ),
-      'teaser' => array(
-        'label' => 'hidden',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 600,
-        ),
-        'type' => 'text_summary_or_trimmed',
-        'weight' => 1,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'body',
-    'label' => 'Biographical Information',
-    'required' => 0,
-    'settings' => array(
-      'context' => 'title',
-      'context_default' => 'sdl_editor_representation',
-      'display_summary' => 1,
-      'dnd_enabled' => 1,
-      'mee_enabled' => 0,
-      'text_processing' => 1,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'rows' => 20,
-        'summary_rows' => 5,
-      ),
-      'type' => 'text_textarea_with_summary',
-      'weight' => 3,
-    ),
-  );
-
   // Exported field_instance: 'node-person-field_date_born'.
   $field_instances['node-person-field_date_born'] = array(
     'bundle' => 'person',
@@ -1136,7 +1066,6 @@ function ma_person_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Biographical Information');
   t('Date Born');
   t('Date Died');
   t('Deceased');

@@ -62,7 +62,6 @@ features[field_group][] = group_metadata|node|person|default
 features[field_group][] = group_person_media|node|person|default
 features[field_group][] = group_relations|node|person|form
 features[field_group][] = group_tabs|node|person|form
-features[field_instance][] = node-person-body
 features[field_instance][] = node-person-field_date_born
 features[field_instance][] = node-person-field_date_died
 features[field_instance][] = node-person-field_deceased
