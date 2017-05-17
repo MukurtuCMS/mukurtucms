@@ -172,6 +172,64 @@ function ma_person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_section_group|paragraphs_item|text_section|form';
+  $field_group->group_name = 'group_section_group';
+  $field_group->entity_type = 'paragraphs_item';
+  $field_group->bundle = 'text_section';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Section Group',
+    'weight' => '0',
+    'children' => array(
+      0 => 'group_section',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'effect' => 'none',
+        'classes' => 'group-section-group field-group-accordion',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_section_group|paragraphs_item|text_section|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_section|paragraphs_item|text_section|form';
+  $field_group->group_name = 'group_section';
+  $field_group->entity_type = 'paragraphs_item';
+  $field_group->bundle = 'text_section';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_section_group';
+  $field_group->data = array(
+    'label' => 'Section',
+    'weight' => '7',
+    'children' => array(
+      0 => 'field_section_title',
+      1 => 'field_left_media',
+      2 => 'field_right_media',
+      3 => 'field_section_body',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'label' => 'Section',
+      'instance_settings' => array(
+        'required_fields' => 0,
+        'classes' => 'group-section field-group-accordion-item',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_section|paragraphs_item|text_section|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_tabs|node|person|form';
   $field_group->group_name = 'group_tabs';
   $field_group->entity_type = 'node';
@@ -201,6 +259,8 @@ function ma_person_field_group_info() {
   t('Biographic Information');
   t('Metadata');
   t('Relations');
+  t('Section');
+  t('Section Group');
   t('Tabs');
 
   return $field_groups;

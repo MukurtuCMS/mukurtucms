@@ -391,31 +391,29 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->entity_type = 'paragraphs_item';
   $ds_layout->bundle = 'text_section';
   $ds_layout->view_mode = 'form';
-  $ds_layout->layout = 'bootstrap_4_4_4_stacked';
+  $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
     'regions' => array(
-      'top' => array(
-        0 => 'field_section_title',
-      ),
-      'left' => array(
-        1 => 'field_left_media',
-      ),
       'central' => array(
-        2 => 'field_section_body',
-      ),
-      'right' => array(
-        3 => 'field_right_media',
+        0 => 'group_section_group',
+        1 => 'field_section_title',
+        2 => 'field_left_media',
+        3 => 'field_section_body',
+        4 => 'field_right_media',
+        6 => 'group_section',
       ),
       'hidden' => array(
-        4 => '_add_existing_field',
+        5 => '_add_existing_field',
       ),
     ),
     'fields' => array(
-      'field_section_title' => 'top',
-      'field_left_media' => 'left',
+      'group_section_group' => 'central',
+      'field_section_title' => 'central',
+      'field_left_media' => 'central',
       'field_section_body' => 'central',
-      'field_right_media' => 'right',
+      'field_right_media' => 'central',
       '_add_existing_field' => 'hidden',
+      'group_section' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -423,11 +421,7 @@ function ma_person_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'top' => 'div',
-      'left' => 'div',
       'central' => 'div',
-      'right' => 'div',
-      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

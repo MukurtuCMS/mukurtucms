@@ -27,6 +27,26 @@ function ma_person_node_view_alter(&$build) {
 }
 
 /**
+ * Implements hook_field_widget_form_alter.
+ */
+function ma_person_field_widget_form_alter(&$element, &$form_state, $context) {
+    // Add section title to paragraph section type text
+    if(isset($element['#field_name']) && $element['#field_name'] == 'field_sections') {
+        $n_entries = 0;
+        if(is_numeric($element['#max_delta']) && $element['#max_delta'] > -1) {
+            $n_entries = $element['#max_delta'];
+            foreach(range(0, $n_entries) as $i) {
+                if(isset($element[$i]['#entity']->field_section_title[LANGUAGE_NONE][0]['safe_value'])) {
+                    $section_title = $element[$i]['#entity']->field_section_title[LANGUAGE_NONE][0]['safe_value'];
+                    $paragraph_title = $element[$i]['paragraph_bundle_title']['info']['#markup'];
+                    $element[$i]['paragraph_bundle_title']['info']['#markup'] = "$section_title ($paragraph_title)";
+                }
+            }
+        }
+    }
+}
+
+/**
  * Implements hook_node_view().
  */
 /*

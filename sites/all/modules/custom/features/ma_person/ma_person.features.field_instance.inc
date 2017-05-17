@@ -919,7 +919,7 @@ function ma_person_field_default_field_instances() {
         'context' => 'sdl_editor_representation',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -969,7 +969,7 @@ function ma_person_field_default_field_instances() {
         'context' => 'sdl_editor_representation',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -1014,7 +1014,7 @@ function ma_person_field_default_field_instances() {
         'rows' => 10,
       ),
       'type' => 'text_textarea',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -1060,7 +1060,7 @@ function ma_person_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 0,
+      'weight' => 1,
     ),
   );
 
