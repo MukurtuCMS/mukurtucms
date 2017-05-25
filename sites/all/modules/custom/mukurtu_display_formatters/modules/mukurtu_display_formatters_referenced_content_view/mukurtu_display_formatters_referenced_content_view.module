@@ -80,17 +80,17 @@ function mukurtu_display_formatters_referenced_content_view_field_formatter_view
 /**
 * Implements hook_views_api().
 */
-function mukurtu_records_referenced_content_view_views_api() {
+function mukurtu_display_formatters_referenced_content_view_views_api() {
     return array(
         'api' => 3.0,
-        'path' => drupal_get_path('module', 'mukurtu_records_referenced_content_view')
+        'path' => drupal_get_path('module', 'mukurtu_display_formatters_referenced_content_view')
     );
 }
 
 /**
  * Implements hook_views_default_views().
  */
-function mukurtu_records_referenced_content_view_views_default_views() {
+function mukurtu_display_formatters_referenced_content_view_views_default_views() {
     $view = new view();
     $view->name = 'mukurtu_records_referenced_content';
     $view->description = '';
