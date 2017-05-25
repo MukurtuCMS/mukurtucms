@@ -28,6 +28,36 @@ function ma_person_user_default_permissions() {
     'module' => 'paragraphs_bundle_permissions',
   );
 
+  // Exported permission: 'create person content'.
+  $permissions['create person content'] = array(
+    'name' => 'create person content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'delete any person content'.
+  $permissions['delete any person content'] = array(
+    'name' => 'delete any person content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'delete own person content'.
+  $permissions['delete own person content'] = array(
+    'name' => 'delete own person content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
   // Exported permission: 'delete paragraph content person_relationship_bundle'.
   $permissions['delete paragraph content person_relationship_bundle'] = array(
     'name' => 'delete paragraph content person_relationship_bundle',
@@ -51,6 +81,26 @@ function ma_person_user_default_permissions() {
     'name' => 'delete terms in interpersonal_relationship',
     'roles' => array(),
     'module' => 'taxonomy',
+  );
+
+  // Exported permission: 'edit any person content'.
+  $permissions['edit any person content'] = array(
+    'name' => 'edit any person content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
+  );
+
+  // Exported permission: 'edit own person content'.
+  $permissions['edit own person content'] = array(
+    'name' => 'edit own person content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node',
   );
 
   // Exported permission: 'edit terms in interpersonal_relationship'.
