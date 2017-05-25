@@ -15,6 +15,7 @@ dependencies[] = list
 dependencies[] = ma_base_theme
 dependencies[] = mukurtu_display_formatters_image_carousel
 dependencies[] = mukurtu_display_formatters_paragraphs_carousel
+dependencies[] = mukurtu_display_formatters_referenced_content_view
 dependencies[] = og
 dependencies[] = options
 dependencies[] = paragraphs

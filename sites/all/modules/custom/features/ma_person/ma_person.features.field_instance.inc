@@ -477,14 +477,10 @@ function ma_person_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
-        'module' => 'entityreference',
-        'settings' => array(
-          'links' => 1,
-          'use_content_language' => 1,
-          'view_mode' => 'taxonomy_record_teaser',
-        ),
-        'type' => 'entityreference_entity_view',
+        'label' => 'above',
+        'module' => 'mukurtu_display_formatters_referenced_content_view',
+        'settings' => array(),
+        'type' => 'mukurtu_referenced_content_formatter',
         'weight' => 6,
       ),
       'full' => array(

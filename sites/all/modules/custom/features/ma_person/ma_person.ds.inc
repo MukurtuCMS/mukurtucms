@@ -22,6 +22,16 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_node_aggregate' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_ds_field_expert',
+          'lb' => 'Referenced Content',
+          'lb-col' => TRUE,
+          'prefix' => '<a name="found-in"></a>',
+        ),
+      ),
+    ),
   );
   $export['node|person|default'] = $ds_fieldsetting;
 
@@ -147,28 +157,26 @@ function ma_person_ds_layout_settings_info() {
     'regions' => array(
       'central' => array(
         0 => 'group_person_media',
-        1 => 'group_metadata',
-        2 => 'field_date_born',
-        3 => 'table_of_contents',
-        4 => 'field_date_died',
+        1 => 'field_date_born',
+        2 => 'group_metadata',
+        3 => 'field_date_died',
+        4 => 'table_of_contents',
         5 => 'field_related_people',
-        6 => 'body',
+        6 => 'field_media_asset',
         7 => 'field_sections',
-        8 => 'field_media_asset',
-        9 => 'field_node_aggregate',
-        10 => 'field_media_aggregate',
+        8 => 'field_node_aggregate',
+        9 => 'field_media_aggregate',
       ),
     ),
     'fields' => array(
       'group_person_media' => 'central',
-      'group_metadata' => 'central',
       'field_date_born' => 'central',
-      'table_of_contents' => 'central',
+      'group_metadata' => 'central',
       'field_date_died' => 'central',
+      'table_of_contents' => 'central',
       'field_related_people' => 'central',
-      'body' => 'central',
-      'field_sections' => 'central',
       'field_media_asset' => 'central',
+      'field_sections' => 'central',
       'field_node_aggregate' => 'central',
       'field_media_aggregate' => 'central',
     ),
