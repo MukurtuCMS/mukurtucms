@@ -558,13 +558,11 @@ function mukurtu_taxonomy_records_entity_presave($entity, $type) {
     }
 }
 
-//function mukurtu_taxonomy_records_entity_view($entity, $type, $view_mode, $langcode) {
-function mukurtu_taxonomy_records_entity_prepare_view($entities, $type, $langcode) {
-    foreach($entities as $key => $entity) {
-        //        mukurtu_taxonomy_records_rebuild_record($entities[$key]);
+/*function mukurtu_taxonomy_records_entity_view($entity, $type, $view_mode, $langcode) {
+    if($view_mode == 'taxonomy_record_teaser') {
+        dpm($entity);
     }
-    //    mukurtu_taxonomy_records_rebuild_record($entity);    
-}
+    }*/
 
 function mukurtu_taxonomy_records_get_aggregate($entity) {
     $aggregate = array();
@@ -688,4 +686,44 @@ function mukurtu_taxonomy_records_contextual_links_view_alter(&$element, $items)
             }
         }
     }
+}
+
+
+function mukurtu_taxonomy_records_get_content_by_vocabulary($nid, $vocab_name) {
+    $filter_list = array();
+    $record_node = node_load($nid);
+    if($record_node) {
+        if(module_exists('mukurtu_taxonomy_records') && mukurtu_taxonomy_records_is_record($record_node)) {
+            if(isset($vocab_name) && $vocab_name != 'all') {
+                // Filtering by this vocabulary
+                $vocab = taxonomy_vocabulary_machine_name_load($vocab_name);
+
+                if($vocab) {
+                    $record_wrapper = entity_metadata_wrapper('node', $record_node);
+                    foreach($record_wrapper->field_mukurtu_terms->getIterator() as $delta => $term_wrapper) {
+                        if($term_wrapper->vocabulary->value()->vid == $vocab->vid) {
+                            $filter_list = array_merge(taxonomy_select_nodes($term_wrapper->tid->value(), FALSE), $filter_list);
+                        }
+                    }
+                    $filter_list = array_unique($filter_list);
+                }
+            }
+        }
+    }
+
+    return $filter_list;
+}
+
+function mukurtu_taxonomy_records_get_vocabulary_list($nid) {
+    $vocab_list = array();
+    $record_node = node_load($nid);
+    if($record_node) {
+        if(module_exists('mukurtu_taxonomy_records') && mukurtu_taxonomy_records_is_record($record_node)) {
+            $record_wrapper = entity_metadata_wrapper('node', $record_node);
+            foreach($record_wrapper->field_mukurtu_terms->getIterator() as $delta => $term_wrapper) {
+                $vocab_list[] = $term_wrapper->vocabulary->value();
+            }
+        }
+    }
+    return $vocab_list;
 }
