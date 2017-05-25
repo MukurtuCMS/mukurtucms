@@ -10551,6 +10551,7 @@ a:hover {
 }
 .node-person .field-name-field-node-aggregate {
   clear: both;
+  padding-top: 30px;
 }
 .node-person .field-name-field-related-people {
   clear: both;
