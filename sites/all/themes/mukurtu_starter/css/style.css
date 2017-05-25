@@ -10559,10 +10559,25 @@ a:hover {
 .node-person .paragraphs-item-person-relationship-bundle {
   clear: both;
 }
+.node-person .paragraphs-items-field-sections {
+  clear: both;
+  padding-bottom: 30px;
+}
+.node-person .view-mukurtu-records-referenced-content {
+  padding-top: 10px;
+}
 .node-person .tableofcontents {
   clear: both;
   padding-bottom: 30px;
   font-weight: bold;
+}
+.node-person .owl-nav .owl-prev,
+.node-person .owl-nav .owl-next {
+  color: #337ab7;
+}
+.node-person .owl-next {
+  float: right;
+  text-align: center;
 }
 .view-mode-taxonomy_record_teaser {
   padding-bottom: 20px;
