@@ -28,6 +28,8 @@ function ma_person_ds_field_settings_info() {
           'func' => 'theme_ds_field_expert',
           'lb' => 'Referenced Content',
           'lb-col' => TRUE,
+          'lbw' => 1,
+          'lbw-el' => 'h3',
           'prefix' => '<a name="found-in"></a>',
         ),
       ),
