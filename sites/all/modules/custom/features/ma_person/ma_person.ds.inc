@@ -352,16 +352,16 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->entity_type = 'paragraphs_item';
   $ds_layout->bundle = 'text_section';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_3col_stacked_fluid';
+  $ds_layout->layout = 'bootstrap_4_4_4_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'header' => array(
+      'top' => array(
         0 => 'field_section_title',
       ),
       'left' => array(
         1 => 'field_left_media',
       ),
-      'middle' => array(
+      'central' => array(
         2 => 'field_section_body',
       ),
       'right' => array(
@@ -369,9 +369,9 @@ function ma_person_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
-      'field_section_title' => 'header',
+      'field_section_title' => 'top',
       'field_left_media' => 'left',
-      'field_section_body' => 'middle',
+      'field_section_body' => 'central',
       'field_right_media' => 'right',
     ),
     'classes' => array(
@@ -380,18 +380,18 @@ function ma_person_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'header' => 'div',
+      'top' => 'div',
       'left' => 'div',
-      'middle' => 'div',
+      'central' => 'div',
       'right' => 'div',
-      'footer' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|text_section|default'] = $ds_layout;
 
