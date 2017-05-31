@@ -88,8 +88,8 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
         while(isset($entity->{$field['field_name']}[LANGUAGE_NONE][$i]) && $i < $page_limit) {
             $related_item = $entity->{$field['field_name']}[LANGUAGE_NONE][$i];
             $column = key($field['columns']);
-            if(node_access('view', $related_item[$column])) {
-                $related_item_node = node_load($related_item[$column]);
+            $related_item_node = node_load($related_item[$column]);
+            if(node_access('view', $related_item_node)) {
                 if($related_item_node) {
                     $related_item_node_view = node_view($related_item_node, 'search_result');
                     $render = drupal_render($related_item_node_view);
