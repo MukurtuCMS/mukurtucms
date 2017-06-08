@@ -405,7 +405,7 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_mukurtu_terms'.
   $field_instances['node-person-field_mukurtu_terms'] = array(
     'bundle' => 'person',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
@@ -459,11 +459,11 @@ function ma_person_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'mukurtu_taxonomy_records',
       'settings' => array(
         'apply_chosen' => '',
       ),
-      'type' => 'options_select',
+      'type' => 'mukurtu_record_term_connection_widget',
       'weight' => 7,
     ),
   );
