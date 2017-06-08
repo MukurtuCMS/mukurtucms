@@ -167,34 +167,17 @@ function ma_person_field_default_field_bases() {
     'module' => 'entityreference',
     'settings' => array(
       'duplicates' => 1,
-      'handler' => 'base',
+      'handler' => 'views',
       'handler_settings' => array(
         'behaviors' => array(
           'views-select-list' => array(
             'status' => 0,
           ),
         ),
-        'sort' => array(
-          'direction' => 'ASC',
-          'property' => 'name',
-          'type' => 'property',
-        ),
-        'target_bundles' => array(
-          'category' => 'category',
-          'contributor' => 'contributor',
-          'creator' => 'creator',
-          'dh_type' => 'dh_type',
-          'format' => 'format',
-          'language' => 'language',
-          'media_folders' => 'media_folders',
-          'media_type' => 'media_type',
-          'part_of_speech' => 'part_of_speech',
-          'people' => 'people',
-          'publisher' => 'publisher',
-          'scald_authors' => 'scald_authors',
-          'scald_tags' => 'scald_tags',
-          'subject' => 'subject',
-          'tags' => 'tags',
+        'view' => array(
+          'args' => array(),
+          'display_name' => 'entityreference_1',
+          'view_name' => 'mukurtu_record_allowed_taxonomy_terms',
         ),
       ),
       'target_type' => 'taxonomy_term',

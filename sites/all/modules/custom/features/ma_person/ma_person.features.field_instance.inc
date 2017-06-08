@@ -602,7 +602,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'paragraphs',
       'settings' => array(),
       'type' => 'paragraphs_embed',
-      'weight' => 8,
+      'weight' => 12,
     ),
   );
 
