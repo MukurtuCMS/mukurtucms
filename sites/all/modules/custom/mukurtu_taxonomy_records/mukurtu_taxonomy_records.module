@@ -682,7 +682,7 @@ function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $fo
         $form['field_media_aggregate']['#access'] = FALSE;
 
         // Hide the term field. We want users to use the 'add record' interface.
-        $form['field_mukurtu_terms']['#access'] = FALSE;
+        ///        $form['field_mukurtu_terms']['#access'] = FALSE;
     }
 }
 
@@ -1029,7 +1029,123 @@ function mukurtu_taxonomy_records_views_default_views() {
     return $views;
 }
 
-/*
+/**
+ * Implements hook_field_widget_info().
+ */
+function mukurtu_taxonomy_records_field_widget_info() {
+    return array(
+        'mukurtu_record_term_connection_widget' => array(
+            'label' => t('Mukurtu Records Term Selector'),
+            'field types' => array('entityreference'),
+            'behaviors' => array(
+                'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+                'default value' => FIELD_BEHAVIOR_CUSTOM,
+            ),
+        ),
+    );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function mukurtu_taxonomy_records_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+    $node = $element['#entity'];
+    $suggested_terms = mukurtu_taxonomy_records_suggested_record_terms($node);
+    $vocabs = taxonomy_get_vocabularies();
+    $options = array();
+    $default_value = array();
+
+    // Add JS
+    drupal_add_js(drupal_get_path('module', 'mukurtu_taxonomy_records') .'/js/mukurtu_records.js', 'file');
+
+    // Get terms record is attached to
+    $emw_record = entity_metadata_wrapper('node', $node);
+    $mukurtu_term_refs = array();
+    foreach($emw_record->field_mukurtu_terms->value() as $index => $term_ref) {
+        $mukurtu_term_refs[] = $term_ref->tid;
+    }
+
+    // List all suggested terms
+    foreach($suggested_terms as $suggested_term) {
+        $term = taxonomy_term_load($suggested_term->tid);
+        if($term && mukurtu_taxonomy_records_are_records_enabled($term)) {
+            $vocab = taxonomy_vocabulary_load($term->vid);
+            $vocab_name = isset($vocab->name) ? $vocab->name : $term->vocabulary_machine_name;
+            $options[$term->tid] = $term->name . " ({$vocab_name})";
+
+            // If the record is already attached to the term, the checkbox should be checked
+            if(in_array($term->tid, $mukurtu_term_refs)) {
+                $default_value[] = $term->tid;
+            }
+        }
+    }
+
+    $element['mukurtu_record']['instructions'] = array(
+        '#markup' => '<p>'. t('Attach this record to one or more taxonomy terms. This record will be shown in place of the default page for attached taxonomy terms.') . '</p>',
+    );
+    $element['mukurtu_record']['terms'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $options,
+        '#title' => t('Suggested Terms'),
+        '#default_value' => $default_value
+    );
+
+    // Get list of all vocabs that are enabled
+    $vocabs = taxonomy_get_vocabularies();
+    $enabled_vocabs = array();
+    foreach($vocabs as $vocab) {
+        if(mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab)) {
+            $enabled_vocabs[] = $vocab;
+        }
+    }
+
+    // Build the options for the select control
+    // It consists of all taxonomy terms enabled for records
+    $options = array();
+    foreach($enabled_vocabs as $enabled_vocab) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+            ->propertyCondition('vid', $enabled_vocab->vid)
+            ->propertyOrderBy('name', 'ASC');
+
+        $result = $query->execute();
+        if(isset($result['taxonomy_term'])) {
+            foreach($result['taxonomy_term'] as $term_ref) {
+                $term = taxonomy_term_load($term_ref->tid);
+                if($term) {
+                    $options[$term->tid] = $term->name . " ({$enabled_vocab->name})";
+                }
+            }
+        }
+    }
+
+    // Build select control where user can select from all available terms
+    $element['mukurtu_record']['terms_all'] = array(
+        '#title' => t('Choose from all available terms'),
+        '#type' => 'select',
+        '#multiple' => TRUE,
+        '#options' => $options,
+        '#default_value' => $mukurtu_term_refs,
+        '#element_validate' => array('_mukurtu_taxonomy_records_widget_validate'),
+        '#chosen' => TRUE,
+    );
+
+    //    $element['mukurtu_record']['#submit'][] = '_mukurtu_taxonomy_records_widget_submit';
+
+    return $element;
+}
+
+function _mukurtu_taxonomy_records_widget_validate($element, &$form_state, $form) {
+    // TODO: This has got to be the WRONG way to do this...
+    // Convert our custom form input into the expected Drupal format so that the field API can save the values
+    foreach($form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'] as $index => $tid) {
+        $form_state['input']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+        $form_state['values']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
+    }
+}
+
+    /*
 function mukurtu_taxonomy_records_term_autocomplete($input) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'taxonomy_term')
