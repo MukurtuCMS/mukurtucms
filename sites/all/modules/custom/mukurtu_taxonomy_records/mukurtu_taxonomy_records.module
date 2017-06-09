@@ -95,10 +95,10 @@ function mukurtu_taxonomy_records_block()
             $add_path = "$type/add/$bundle";
             if(drupal_valid_path($add_path)) {
                 $items[] = array(
-                    'title' => t('Create @bundle', array('@bundle' => $bundle)),
+                    'title' => t('Create @bundle', array('@bundle' => $bundle_label)),
                     'href' => $add_path,
                     'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-                    'description' => t('Create a new @bundle record.', array('@bundle' => $bundle)),
+                    'description' => t('Create a new @bundle record.', array('@bundle' => $bundle_label)),
                 );
             }
         }
