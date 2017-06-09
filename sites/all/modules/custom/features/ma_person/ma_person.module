@@ -47,6 +47,13 @@ function ma_person_field_widget_form_alter(&$element, &$form_state, $context) {
 }
 
 /**
+ * Implements hook_suggested_record_terms().
+ */
+function ma_person_suggested_record_terms($entity) {
+    return array();
+}
+
+/**
  * Implements hook_node_view().
  */
 /*

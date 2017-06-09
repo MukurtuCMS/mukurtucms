@@ -200,10 +200,11 @@ function mukurtu_taxonomy_records_manage_record_form_access($node) {
 }
 */
 
+/**
+ * Implements hook_suggested_record_terms().
+ */
 // Return the list of suggested taxonomy terms based on the given record
-function mukurtu_taxonomy_records_suggested_record_terms($entity, $terms = array()) {
-    // Get module specific suggestions, these should be better than our default
-    //$suggested_terms = module_invoke_all('suggested_record_terms', $entity, $terms);
+function mukurtu_taxonomy_records_suggested_record_terms($entity) {
 
     if(!empty($suggested_terms)) {
         return $suggested_terms;
@@ -1062,9 +1063,11 @@ function mukurtu_taxonomy_records_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function mukurtu_taxonomy_records_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-
     $node = $element['#entity'];
-    $suggested_terms = mukurtu_taxonomy_records_suggested_record_terms($node);
+
+    // Get module specific suggestions, these should be better than our default
+    $suggested_terms = module_invoke_all('suggested_record_terms', $node);
+
     $vocabs = taxonomy_get_vocabularies();
     $options = array();
     $default_value = array();
