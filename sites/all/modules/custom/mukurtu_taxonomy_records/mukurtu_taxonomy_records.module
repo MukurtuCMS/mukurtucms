@@ -55,6 +55,65 @@ function mukurtu_taxonomy_records_menu() {
 
     return $items;
 }
+
+function mukurtu_taxonomy_records_block_info() {
+    $blocks['mukurtu_records'] = array(
+        'info' => t('Mukurtu Taxonomy Records'),
+    );
+    return $blocks;
+}
+
+function mukurtu_taxonomy_records_block_view($delta = '') {
+    $block = array();
+
+    switch ($delta) {
+    case 'mukurtu_records':
+        $block['subject'] = t('Mukurtu Taxonomy Records');
+        $block['content'] = mukurtu_taxonomy_records_block();
+        break;
+    }
+    return $block;
+}
+
+function mukurtu_taxonomy_records_block()
+{
+    $items = array();
+
+    if(drupal_valid_path('dashboard/mukurtu-records')) {
+        $items[] = array(
+            'title' => t('Mukurtu Taxonomy Record Sitewide Settings'),
+            'href' => 'dashboard/mukurtu-records',
+            'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+            'description' => t('Enable/Disable Mukurtu Taxonomy Records per Taxonomy'),
+        );
+    }
+
+    // Create links for each type of record
+    $record_list = mukurtu_taxonomy_records_entity_list();
+    foreach($record_list as $type => $bundles) {
+        foreach($bundles as $bundle => $bundle_label) {
+            $add_path = "$type/add/$bundle";
+            if(drupal_valid_path($add_path)) {
+                $items[] = array(
+                    'title' => t('Create @bundle', array('@bundle' => $bundle)),
+                    'href' => $add_path,
+                    'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+                    'description' => t('Create a new @bundle record.', array('@bundle' => $bundle)),
+                );
+            }
+        }
+    }
+
+    $content = array ('content' => $items);
+    $markup = theme('admin_block_content', $content);
+
+    $block = array(
+        '#markup' => $markup,
+    );
+    return $block;
+}
+
+
 /*
 function mukurtu_taxonomy_records_manage_record_form($form, $form_state, $node) {
     $suggested_terms = mukurtu_taxonomy_records_suggested_record_terms($node);
