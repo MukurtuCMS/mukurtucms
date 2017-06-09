@@ -284,8 +284,8 @@ function ma_person_field_group_info() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Biographic Information');
-  t('Record Management');
   t('Metadata');
+  t('Record Management');
   t('Relations');
   t('Section');
   t('Section Group');

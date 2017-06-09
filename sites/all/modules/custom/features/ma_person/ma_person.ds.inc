@@ -74,6 +74,25 @@ function ma_person_ds_field_settings_info() {
   );
   $export['node|person|taxonomy_record_teaser'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'paragraphs_item|text_section|default';
+  $ds_fieldsetting->entity_type = 'paragraphs_item';
+  $ds_fieldsetting->bundle = 'text_section';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'field_section_title' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_ds_field_expert',
+          'prefix' => '<h3>',
+          'suffix' => '</h3>',
+        ),
+      ),
+    ),
+  );
+  $export['paragraphs_item|text_section|default'] = $ds_fieldsetting;
+
   return $export;
 }
 
