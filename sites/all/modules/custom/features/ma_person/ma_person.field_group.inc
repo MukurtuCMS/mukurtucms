@@ -151,7 +151,7 @@ function ma_person_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Connections',
+    'label' => 'Record Management',
     'weight' => '15',
     'children' => array(
       0 => 'field_mukurtu_terms',
@@ -284,7 +284,7 @@ function ma_person_field_group_info() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Biographic Information');
-  t('Connections');
+  t('Record Management');
   t('Metadata');
   t('Relations');
   t('Section');
