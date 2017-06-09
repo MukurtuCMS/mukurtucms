@@ -25,7 +25,7 @@ function mukurtu_taxonomy_records_menu() {
         'type' => MENU_LOCAL_TASK,
         'weight' => 100,
     );
-
+    /*
     $items['node/%node/manage-record'] = array(
         'title' => t('Manage Record'),
         'page callback' => 'drupal_get_form',
@@ -35,7 +35,7 @@ function mukurtu_taxonomy_records_menu() {
         'type' => MENU_LOCAL_TASK,
         'weight' => 100,
     );
-    
+    */
     $items['dashboard/mukurtu-records'] = array(
         'title' => t('Mukurtu Records Configuration'),
         'page callback' => 'drupal_get_form',
@@ -55,7 +55,7 @@ function mukurtu_taxonomy_records_menu() {
 
     return $items;
 }
-
+/*
 function mukurtu_taxonomy_records_manage_record_form($form, $form_state, $node) {
     $suggested_terms = mukurtu_taxonomy_records_suggested_record_terms($node);
     $vocabs = taxonomy_get_vocabularies();
@@ -142,10 +142,11 @@ function mukurtu_taxonomy_records_manage_record_form($form, $form_state, $node) 
     );
     return $form;
 }
-
+*/
 /**
  * Submit handler for a Mukurtu Record's 'Manage Record' form
  */
+/*
 function mukurtu_taxonomy_records_manage_record_form_submit($form, &$form_state) {
     if(!isset($form_state['build_info']['args'][0])) {
         return;
@@ -197,6 +198,7 @@ function mukurtu_taxonomy_records_manage_record_form_access($node) {
     }
     return FALSE;
 }
+*/
 
 // Return the list of suggested taxonomy terms based on the given record
 function mukurtu_taxonomy_records_suggested_record_terms($entity, $terms = array()) {
@@ -659,6 +661,17 @@ function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $fo
         $tid = arg(4);
         if(isset($action) && isset($tid)) {
             if($action == 'attach-record') {
+                // Set the default value for the custom widget form elements, so that the passed taxonomy term appears
+                // checked/selected in the "Record Management" tab. Ideally we'd check that they are using our custom
+                // widget first.
+                if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms'])
+                   && isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms']['#options'][$tid])) {
+                    $form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms']['#default_value'][$tid] = $tid;
+                }
+                if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'])) {
+                    $form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all']['#default_value'][] = $tid;
+                }
+                
                 if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['#default_value'])) {
                     // Make sure CER is enabled
                     mukurtu_taxonomy_records_enable_all_cer($vocab);

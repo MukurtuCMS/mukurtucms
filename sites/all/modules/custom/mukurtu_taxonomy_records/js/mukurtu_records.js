@@ -1,4 +1,5 @@
 (function ($) {
+    /*
     // Sync checkboxes -> chosen
     $(document).on("click", "#mukurtu-taxonomy-records-manage-record-form .form-item-terms .form-checkbox", function() {
 	var box = $(this);
@@ -21,7 +22,7 @@
 	    $("#edit-terms input:checkbox[value='" + params.selected + "']").prop('checked', true);
 	}
     });
-
+*/
 
 
     // Custom Widget
