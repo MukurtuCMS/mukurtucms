@@ -1101,7 +1101,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 18,
+      'weight' => 19,
     ),
   );
 
@@ -1254,7 +1254,7 @@ function ma_scald_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 17,
+      'weight' => 18,
     ),
   );
 
@@ -1430,7 +1430,7 @@ function ma_scald_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 16,
+      'weight' => 17,
     ),
   );
 
@@ -1455,6 +1455,7 @@ function ma_scald_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 6,
@@ -1683,7 +1684,7 @@ function ma_scald_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -1763,7 +1764,7 @@ function ma_scald_field_default_field_instances() {
       'module' => 'geofield',
       'settings' => array(),
       'type' => 'geofield_latlon',
-      'weight' => 14,
+      'weight' => 15,
     ),
   );
 
@@ -1845,7 +1846,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -2007,7 +2008,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -2359,7 +2360,7 @@ function ma_scald_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -2830,6 +2831,40 @@ function ma_scald_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'taxonomy_term-scald_authors-field_mukurtu_records'.
+  $field_instances['taxonomy_term-scald_authors-field_mukurtu_records'] = array(
+    'bundle' => 'scald_authors',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'mukurtu_display_formatters_tabbed_records',
+        'settings' => array(),
+        'type' => 'mukurtu_records_formatter',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'taxonomy_term',
+    'field_name' => 'field_mukurtu_records',
+    'label' => 'Records',
+    'required' => FALSE,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 32,
+    ),
+  );
+
   // Exported field_instance: 'taxonomy_term-scald_authors-scald_author_url'.
   $field_instances['taxonomy_term-scald_authors-scald_author_url'] = array(
     'bundle' => 'scald_authors',
@@ -2888,6 +2923,7 @@ function ma_scald_field_default_field_instances() {
   t('Original DNG');
   t('Protocol');
   t('Protocol (old)');
+  t('Records');
   t('Rights');
   t('Standard and Creative Commons Licensing');
   t('Tags');

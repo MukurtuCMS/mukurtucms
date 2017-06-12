@@ -451,25 +451,18 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
-      'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
-      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
-      'settings' => array(),
     ),
     'video' => array(
       '*' => 'default',
-      'settings' => array(),
     ),
   );
-  $context_config->data = array(
-    'width' => '',
-    'height' => '',
-  );
+  $context_config->data = array();
   $export['sdl_library_item'] = $context_config;
 
   $context_config = new stdClass();
