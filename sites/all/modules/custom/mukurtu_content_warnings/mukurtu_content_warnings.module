@@ -1,0 +1,104 @@
+<?php
+
+function mukurtu_content_warnings_menu() {
+    $items = array();
+    $items['admin/config/mukurtu/content-warnings'] = array(
+        'title' => 'Mukurtu Content Warning Configuration',
+        'access arguments' => array('restrict atom access'),
+        'description' => 'hey waddup',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_content_warnings_form'),
+        'type' => MENU_NORMAL_ITEM,
+        'file' => 'mukurtu_content_warnings.admin.inc',
+    );
+
+    return $items;
+}
+
+
+function mukurtu_content_warnings_scald_postrender($atom, $content, $context) {
+    $skipped_contexts = array('sdl_library_item',
+                              'mukurtu_scald_media_assets_edit_',
+                              'ma_scald_search_results');
+
+    $warning = mukurtu_content_warnings_get_warning($atom);
+
+    if($warning != "") {
+        if(!in_array($context, $skipped_contexts)) {
+            drupal_add_css(drupal_get_path('module', 'mukurtu_content_warnings') . '/css/mukurtu-content-warnings.css');
+            drupal_add_js(drupal_get_path('module', 'mukurtu_content_warnings') . '/js/mukurtu-content-warnings.js');
+
+            $button_text = t("Reveal Media");
+
+            $content['#prefix'] = $content['#prefix'] . '<div id="mukurtu-content-warning-' . $atom->sid . '" class="mukurtu-content-warning" onclick="mukurtu_remove_content_warning(' . $atom->sid . ')">';
+            $content['#suffix'] = '<div class="mukurtu-content-warning-overlay"><div id="mukurtu-content-warning-instance-' . $atom->sid . '" class="mukurtu-content-warning-overlay-text">' . $warning . '</div></div></div>' . $content['#suffix'];
+        }
+    }
+
+    return $content;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mukurtu_content_warnings_form_scald_atom_add_form_options_alter(&$form, &$form_state, $form_id)
+{
+    drupal_add_css(drupal_get_path('module', 'mukurtu_content_warnings') . '/css/mukurtu-content-warnings.css');
+}
+
+function mukurtu_content_warnings_get_warning($atom) {
+    $emw_atom = entity_metadata_wrapper('scald_atom', $atom);
+
+    // Deceased Person check
+    if(module_exists('mukurtu_taxonomy_records')) {
+        $people_warning_settings = variable_get('mukurtu_content_warning_people');
+
+        // Check if people warnings are enabled
+        if(isset($people_warning_settings['enabled']) && $people_warning_settings['enabled']) {
+            // Check each person taxonomy term the atom is tagged with
+            foreach($emw_atom->field_people->value() as $index => $person_ref) {
+                $person_term = taxonomy_term_load($person_ref->tid);
+                // Check if the term has one or more records attached to it
+                if($person_term && mukurtu_taxonomy_records_are_records_enabled($person_term)) {
+                    $emw_term = entity_metadata_wrapper('taxonomy_term', $person_term);
+                    // Check each record
+                    foreach($emw_term->field_mukurtu_records->value() as $index => $record) {
+                        if($record->type == 'person') {
+                            if($record->field_deceased[LANGUAGE_NONE][0]['value'] == 1) {
+                                // Add the person's name to the message
+                                $warning = str_ireplace('[name]', $record->title, $people_warning_settings['warning']);
+                                return $warning;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Taxonomy based warning check
+    $taxonomy_warning_settings = variable_get('mukurtu_content_warning_taxonomy');
+
+    if(!empty($taxonomy_warning_settings)) {
+        // Build a list of all term references for the atom
+        $all_fields = field_info_instances('scald_atom', $atom->type);
+        $taxonomy_refs = array();
+        foreach($all_fields as $field_name => $field_value) {
+            $field_info = field_info_field($field_name);
+            if($field_info['type'] = 'taxonomy_term_reference') {
+                foreach($emw_atom->{$field_name}->value() as $index => $ref) {
+                    $taxonomy_refs[] = $ref->tid;
+                }
+            }
+        }
+
+        // Check each warning against that list
+        foreach($taxonomy_warning_settings as $warning) {
+            if(in_array($warning['term'], $taxonomy_refs)) {
+                return $warning['warning'];
+            }
+        }
+    }
+
+    return "";
+}

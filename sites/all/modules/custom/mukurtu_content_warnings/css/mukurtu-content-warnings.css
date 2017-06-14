@@ -1,0 +1,41 @@
+.mukurtu-content-warning {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    background-color:rgba(0, 0, 0, 0.85);
+    text-align:center;
+    vertical-align:middle;
+}
+
+.mukurtu-content-warning > div{
+    visibility: hidden;
+}
+
+.mukurtu-content-warning-overlay-text.cleared {
+    display: none;
+}
+
+.mukurtu-content-warning .mukurtu-content-warning-overlay {
+    visibility: visible;
+    text-align: center;
+    position: relative;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color:rgba(0, 0, 0, 0.85);
+    color:white;
+}
+
+.mukurtu-content-warning .mukurtu-content-warning-overlay-text {
+    visibility: visible;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 10px 15px;
+    position:relative;
+    font-weight:bold;
+}
+
+.atom-wrapper .field-name-field-deceased {
+    padding-left: 20px;
+}
