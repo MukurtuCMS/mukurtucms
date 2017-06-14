@@ -56,18 +56,20 @@ function mukurtu_content_warnings_get_warning($atom) {
         // Check if people warnings are enabled
         if(isset($people_warning_settings['enabled']) && $people_warning_settings['enabled']) {
             // Check each person taxonomy term the atom is tagged with
-            foreach($emw_atom->field_people->value() as $index => $person_ref) {
-                $person_term = taxonomy_term_load($person_ref->tid);
-                // Check if the term has one or more records attached to it
-                if($person_term && mukurtu_taxonomy_records_are_records_enabled($person_term)) {
-                    $emw_term = entity_metadata_wrapper('taxonomy_term', $person_term);
-                    // Check each record
-                    foreach($emw_term->field_mukurtu_records->value() as $index => $record) {
-                        if($record->type == 'person') {
-                            if($record->field_deceased[LANGUAGE_NONE][0]['value'] == 1) {
-                                // Add the person's name to the message
-                                $warning = str_ireplace('[name]', $record->title, $people_warning_settings['warning']);
-                                return $warning;
+            if(isset($emw_atom->field_people)) {
+                foreach($emw_atom->field_people->value() as $index => $person_ref) {
+                    $person_term = taxonomy_term_load($person_ref->tid);
+                    // Check if the term has one or more records attached to it
+                    if($person_term && mukurtu_taxonomy_records_are_records_enabled($person_term)) {
+                        $emw_term = entity_metadata_wrapper('taxonomy_term', $person_term);
+                        // Check each record
+                        foreach($emw_term->field_mukurtu_records->value() as $index => $record) {
+                            if($record->type == 'person') {
+                                if($record->field_deceased[LANGUAGE_NONE][0]['value'] == 1) {
+                                    // Add the person's name to the message
+                                    $warning = str_ireplace('[name]', $record->title, $people_warning_settings['warning']);
+                                    return $warning;
+                                }
                             }
                         }
                     }
