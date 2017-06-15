@@ -40,7 +40,7 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
     // Display each taxonomy warning config
     $term_options = mukurtu_content_warnings_term_list();
     $taxonomy_defaults = variable_get('mukurtu_content_warning_taxonomy');
-    if(empty($form_state['input']['mukurtu_content_warning_taxonomy'])) {
+    if(empty($form_state['input']['mukurtu_content_warning_taxonomy']) && !$form_state['submitted']) {
         foreach($taxonomy_defaults as $index => $taxonomy_warning) {
             $form_state['input']['mukurtu_content_warning_taxonomy'][$index] = array('term' => $taxonomy_warning['term'],
                                                                                      'warning' => $taxonomy_warning['warning']);
@@ -111,6 +111,7 @@ function mukurtu_content_warnings_form_remove_taxonomy_warning($form, &$form_sta
     if(isset($form_state['input']['mukurtu_content_warning_taxonomy'][$id])) {
         unset($form_state['input']['mukurtu_content_warning_taxonomy'][$id]);
     }
+
     $form_state['rebuild'] = TRUE;
 }
 
