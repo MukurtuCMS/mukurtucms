@@ -24,7 +24,7 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
             '#title' => t('Warning Text'),
             '#type' => 'textfield',
             '#description' => t('The text that will be displayed on the media overlay. Use the replacement token "[name]" to insert the person\'s name in the message.'),
-            '#default_value' => isset($person_defaults['warning']) ? $person_defaults['warning'] : t('Warning: [name] is no longer alive.'),
+            '#default_value' => isset($person_defaults['warning']) ? $person_defaults['warning'] : t('Warning: [name] is no longer alive. Click through to access media.'),
         );
     }
 
