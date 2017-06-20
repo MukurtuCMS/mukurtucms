@@ -12,12 +12,14 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
             '#type' => 'fieldset',
             '#title' => t('People Warnings'),
             '#collapsible' => FALSE,
+            '#description' => t('Configure warnings for media pertaining to a person who is no longer alive.'),
         );
 
         $form['mukurtu_content_warning_people']['enabled'] = array(
             '#type' => 'checkbox',
-            '#title' => t('Display warning for media pertaining to a person who is no longer alive'),
+            '#title' => t('Enable People Warnings'),
             '#default_value' => isset($person_defaults['enabled']) ? $person_defaults['enabled'] : FALSE,
+            '#description' => t('This is a site-wide setting.'),
         );
 
         $form['mukurtu_content_warning_people']['warning'] = array(
@@ -35,6 +37,7 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
         '#collapsible' => FALSE,
         '#prefix' => '<div id="taxonomy-warnings-fieldset-wrapper">',
         '#suffix' => '</div>',
+        '#description' => t('Configure warnings for scald atoms tagged with a specific taxonomy term.') . ' '. t('This is a site-wide setting'),
     );
 
     // Display each taxonomy warning config
@@ -59,7 +62,7 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
             '#title' => t('Term'),
             '#options' => $term_options,
             '#default_value' => isset($taxonomy_defaults[$i]['term']) ? $taxonomy_defaults[$i]['term'] : -1,
-            '#description' => t('Select the term that will trigger the warning.'),
+            '#description' => t('Select the term attached to the scald atom that will trigger the warning.'),
         );
 
         // Warning for that taxonomy term
