@@ -112,6 +112,7 @@ features[variable][] = comment_form_location_person
 features[variable][] = comment_person
 features[variable][] = comment_preview_person
 features[variable][] = comment_subject_field_person
+features[variable][] = date_format_year_month_day
 features[variable][] = diff_enable_revisions_page_node_person
 features[variable][] = diff_show_preview_changes_node_person
 features[variable][] = diff_view_mode_preview_node_person

@@ -266,8 +266,8 @@ function ma_person_field_group_info() {
     'label' => 'Tabs',
     'weight' => '0',
     'children' => array(
-      0 => 'group_record_connections',
-      1 => 'group_biographic',
+      0 => 'group_biographic',
+      1 => 'group_record_connections',
       2 => 'group_relations',
     ),
     'format_type' => 'htabs',

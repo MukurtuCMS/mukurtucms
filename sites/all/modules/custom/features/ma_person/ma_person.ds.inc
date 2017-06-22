@@ -22,6 +22,16 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_date_born' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_date_died' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
     'field_node_aggregate' => array(
       'formatter_settings' => array(
         'ft' => array(
