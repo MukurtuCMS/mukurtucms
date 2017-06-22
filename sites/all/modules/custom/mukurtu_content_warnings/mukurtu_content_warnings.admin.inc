@@ -3,6 +3,35 @@
 function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
     $form['#tree'] = TRUE;
 
+    // Scald contexts configured for warnings
+    $scald_contexts_defaults = variable_get('mukurtu_content_warning_scald_contexts');
+    $form['mukurtu_content_warning_scald_contexts'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Enable Warnings Per Scald Context'),
+        '#collapsible' => FALSE,
+        '#description' => t('Select the Scald contexts that should be enabled to support warnings. Unchecked contexts will not display warnings configured below.'),
+    );
+
+    $all_contexts = scald_contexts();
+    foreach($all_contexts as $context) {
+        // Skip hidden contexts, can't display warnings for something hidden
+        if(isset($context['hidden']) && $context['hidden']) {
+            continue;
+        }
+
+        // Skip contexts with no machine name (built-ins)
+        if(empty($context['name'])) {
+            continue;
+        }
+
+        // Build checkbox for the context
+        $form['mukurtu_content_warning_scald_contexts'][$context['name']] = array(
+            '#type' => 'checkbox',
+            '#title' => $context['title'],
+            '#default_value' => isset($scald_contexts_defaults[$context['name']]) ? $scald_contexts_defaults[$context['name']] : TRUE,
+        );
+    }
+
     // Deceased person warning
     if(module_exists('ma_person')) {
         // Get the saved settings

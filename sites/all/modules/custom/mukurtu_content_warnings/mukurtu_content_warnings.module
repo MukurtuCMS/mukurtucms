@@ -17,14 +17,13 @@ function mukurtu_content_warnings_menu() {
 
 
 function mukurtu_content_warnings_scald_postrender($atom, $content, $context) {
-    $skipped_contexts = array('sdl_library_item',
-                              'mukurtu_scald_media_assets_edit_',
-                              'ma_scald_search_results');
+    // Get the config for which scald contexts are enabled for warnings
+    $scald_contexts_defaults = variable_get('mukurtu_content_warning_scald_contexts');
 
     $warning = mukurtu_content_warnings_get_warning($atom);
 
     if($warning != "") {
-        if(!in_array($context, $skipped_contexts)) {
+        if(isset($scald_contexts_defaults[$context]) && $scald_contexts_defaults[$context]) {
             drupal_add_css(drupal_get_path('module', 'mukurtu_content_warnings') . '/css/mukurtu-content-warnings.css');
             drupal_add_js(drupal_get_path('module', 'mukurtu_content_warnings') . '/js/mukurtu-content-warnings.js');
 
