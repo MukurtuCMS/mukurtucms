@@ -129,7 +129,14 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
     return system_settings_form($form);
 }
 
-
+function mukurtu_content_warnings_form_validate($form, &$form_state) {
+    // Check that terms were selected, not left on default
+    foreach($form_state['input']['mukurtu_content_warning_taxonomy'] as $i => $values) {
+        if($values['term'] == -1) {
+            form_set_error("mukurtu_content_warning_taxonomy][{$i}][term", t('You must select a term'));
+        }
+    }
+}
 
 function mukurtu_content_warnings_form_add_taxonomy_warning($form, &$form_state) {
     $form_state['taxonomy_warning_count'] += 1;
