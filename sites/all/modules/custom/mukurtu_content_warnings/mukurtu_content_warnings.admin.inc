@@ -157,18 +157,24 @@ function mukurtu_content_warnings_term_list() {
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'taxonomy_term')
+        ->propertyOrderBy('vid', 'ASC')
         ->propertyOrderBy('name', 'ASC');
 
-    $options = array('-1' => t('Select a term'));
     $result = $query->execute();
     if(isset($result['taxonomy_term'])) {
         foreach($result['taxonomy_term'] as $term_ref) {
             $term = taxonomy_term_load($term_ref->tid);
             if($term) {
-                $options[$term->tid] = $term->name . " ({$vocabs[$term->vid]->name})";
+                $options[$term->tid] = "{$vocabs[$term->vid]->name}: " . $term->name;
             }
         }
     }
+
+    // Sort by vocab name
+    asort($options, SORT_STRING);
+
+    // Add the default "blank" option
+    $options = array('-1' => t('Select a term')) + $options;
 
     return $options;
 }
