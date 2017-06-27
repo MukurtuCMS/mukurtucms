@@ -5,7 +5,7 @@
  */
 function mukurtu_taxonomy_records_menu() {
     $items = array();
-
+    /*
     $items['taxonomy/term/%taxonomy_term/add-record'] = array(
         'title' => t('Add Record'),
         'page callback' => 'drupal_get_form',
@@ -15,6 +15,7 @@ function mukurtu_taxonomy_records_menu() {
         'type' => MENU_LOCAL_TASK,
         'weight' => 100,
     );
+    */
 
     $items['taxonomy/term/%taxonomy_term/remove-record/%node'] = array(
         'title' => t('Remove Record'),
@@ -46,16 +47,12 @@ function mukurtu_taxonomy_records_menu() {
         'weight' => 100,
     );
 
-    $items['mukurtu-records/terms/autocomplete'] = array(
-        'title' => 'Autocomplete for cities',
-        'page callback' => 'mukurtu_taxonomy_records_term_autocomplete',
-        'access arguments' => array('use autocomplete'),
-        'type' => MENU_CALLBACK
-    );
-
     return $items;
 }
 
+/**
+ * Implements hook_block_info().
+ */
 function mukurtu_taxonomy_records_block_info() {
     $blocks['mukurtu_records'] = array(
         'info' => t('Mukurtu Taxonomy Records'),
@@ -63,6 +60,9 @@ function mukurtu_taxonomy_records_block_info() {
     return $blocks;
 }
 
+/**
+ * Implements hook_block_view().
+ */
 function mukurtu_taxonomy_records_block_view($delta = '') {
     $block = array();
 
@@ -75,8 +75,10 @@ function mukurtu_taxonomy_records_block_view($delta = '') {
     return $block;
 }
 
-function mukurtu_taxonomy_records_block()
-{
+/**
+ * Builds the taxonomy record dashboard block
+ */
+function mukurtu_taxonomy_records_block() {
     $items = array();
 
     if(drupal_valid_path('dashboard/mukurtu-records')) {
@@ -112,7 +114,6 @@ function mukurtu_taxonomy_records_block()
     );
     return $block;
 }
-
 
 /*
 function mukurtu_taxonomy_records_manage_record_form($form, $form_state, $node) {
@@ -261,26 +262,33 @@ function mukurtu_taxonomy_records_manage_record_form_access($node) {
 
 /**
  * Implements hook_suggested_record_terms().
+ *
+ * Return the list of suggested taxonomy terms based on the given record form
  */
-// Return the list of suggested taxonomy terms based on the given record
-function mukurtu_taxonomy_records_suggested_record_terms($entity) {
+function mukurtu_taxonomy_records_suggested_record_terms($form, $form_state) {
+    // Default behavior is a simple record title/taxonomy term name comparison
+    // First use any form input for title
+    $title = isset($form_state['input']['title']) ? $form_state['input']['title'] : '';
 
-    if(!empty($suggested_terms)) {
-        return $suggested_terms;
+    // If no input, check for existing value (e.g., editing an existing node)
+    if($title == '') {
+        if(isset($form['title']['#default_value'])) {
+            $title = $form['title']['#default_value'];
+        }
     }
 
-    // Default behavior is a simple record title/taxonomy term name comparison
-    $title = isset($entity->title) ? $entity->title : '';
+    // We want to return nothing if we can't find specific results
+    if($title != '') {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'taxonomy_term')
+            //->propertyCondition('name', $title)
+            ->propertyCondition('name', "%$title%", 'LIKE')
+            ->range(0, 20);
 
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'taxonomy_term')
-        //->propertyCondition('name', $title)
-        ->propertyCondition('name', "%$title%", 'LIKE')
-        ->range(0, 20);
-
-    $result = $query->execute();
-    if(isset($result['taxonomy_term'])) {
-        return $result['taxonomy_term'];
+        $result = $query->execute();
+        if(isset($result['taxonomy_term'])) {
+            return $result['taxonomy_term'];
+        }
     }
 
     return array();
@@ -290,6 +298,7 @@ function mukurtu_taxonomy_records_suggested_record_terms($entity) {
 // TODO: This form needs:
 // 1: Pagination
 // 2. Filters and/or autocomplete
+/*
 function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     // Check if the taxonomy is enabled for records
     $vocab = taxonomy_vocabulary_load($term->vid);
@@ -420,7 +429,12 @@ function mukurtu_taxonomy_records_add_record_form_submit($form, &$form_state) {
         drupal_set_message(t('Added the selected records'));
     }
 }
+*/
 
+/**
+ *  Builds the form to configure which taxonomy vocabularies are enabled
+ *  to use taxonomy records.
+ */
 function mukurtu_taxonomy_records_config_form($form, $form_state) {
     $vocabs = taxonomy_get_vocabularies();
     $options = array();
@@ -447,6 +461,9 @@ function mukurtu_taxonomy_records_config_form($form, $form_state) {
     return $form;
 }
 
+/**
+ *  Submit handler for the taxonomy record config form
+ */
 function mukurtu_taxonomy_records_config_form_submit($form, &$form_state) {
     foreach($form_state['values']['enable_vocabs'] as $index => $vid) {
         $vocab = taxonomy_vocabulary_load($index);
@@ -459,6 +476,17 @@ function mukurtu_taxonomy_records_config_form_submit($form, &$form_state) {
     drupal_set_message(t('Configuration saved'));
 }
 
+/**
+ *  Access callback for the taxonomy record config form
+ */
+function mukurtu_taxonomy_records_config_form_access() {
+    return user_access('administer taxonomy');
+}
+
+/**
+ *  Enables taxonomy records for a given taxonomy vocabulary.
+ *  $vocab needs to be the loaded vocabulary, not the vid.
+ */
 function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
     // Check if vocab has the Mukurtu Records field
     $instances = field_info_instances('taxonomy_term', $vocab->machine_name);
@@ -500,6 +528,10 @@ function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
         }*/
 }
 
+/**
+ *  Helper function to enable CER between the given taxonomy vocabulary and all record types
+ *  $vocab needs to be the loaded vocabulary, not the vid.
+ */
 function mukurtu_taxonomy_records_enable_all_cer($vocab) {
     foreach(mukurtu_taxonomy_records_entity_list() as $type_label => $type) {
         foreach($type as $bundle_label => $bundle) {
@@ -508,6 +540,10 @@ function mukurtu_taxonomy_records_enable_all_cer($vocab) {
     }
 }
 
+/**
+ *  Disables taxonomy records for a given taxonomy vocabulary.
+ *  $vocab needs to be the loaded vocabulary, not the vid.
+ */
 function mukurtu_taxonomy_records_disable_records_for_vocabulary($vocab) {
     if(mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab)) {
         foreach(mukurtu_taxonomy_records_entity_list() as $type_label => $type) {
@@ -518,6 +554,9 @@ function mukurtu_taxonomy_records_disable_records_for_vocabulary($vocab) {
     }
 }
 
+/**
+ *  Helper function to disable a specific CER
+ */
 function mukurtu_taxonomy_records_disable_cer($left_type, $left_bundle, $right_type, $right_bundle) {
     // All arguments are required non-null
     if(!$left_bundle || !$left_type || !$right_bundle || !$right_type) {
@@ -552,6 +591,9 @@ function mukurtu_taxonomy_records_disable_cer($left_type, $left_bundle, $right_t
     }
 }
 
+/**
+ *  Helper function to enable a specific CER
+ */
 function mukurtu_taxonomy_records_enable_cer($left_type, $left_bundle, $right_type, $right_bundle) {
     // All arguments are required non-null
     if(!$left_bundle || !$left_type || !$right_bundle || !$right_type) {
@@ -584,6 +626,9 @@ function mukurtu_taxonomy_records_enable_cer($left_type, $left_bundle, $right_ty
     }
 }
 
+/**
+ *  Helper function to check if a specific CER already exists
+ */
 function mukurtu_taxonomy_records_cer_exists($identifier) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'cer')
@@ -596,10 +641,6 @@ function mukurtu_taxonomy_records_cer_exists($identifier) {
         return TRUE;
     }
     return FALSE;
-}
-
-function mukurtu_taxonomy_records_config_form_access() {
-    return user_access('administer taxonomy');
 }
 
 function mukurtu_taxonomy_records_add_record_form_access($term) {
@@ -714,7 +755,7 @@ function mukurtu_taxonomy_records_taxonomy_term_page($term) {
 /*
  * Implements hook_form_BASE_FORM_ID_alter().
  */
-function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $form_id) {   
+function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $form_id) {
     if(isset($form_state['node']) && mukurtu_taxonomy_records_is_record($form_state['node'])) {
         // Check if we are attaching this record to a taxonomy term
         $action = arg(3);
@@ -754,9 +795,18 @@ function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $fo
         $form['field_node_aggregate']['#access'] = FALSE;
         $form['field_media_aggregate']['#access'] = FALSE;
 
-        // Hide the term field. We want users to use the 'add record' interface.
-        ///        $form['field_mukurtu_terms']['#access'] = FALSE;
+        // Setup ajax callback. The default suggestions only use the title. Modules implementing
+        // hook_suggested_record_terms should alter the form and add the callback to other form elements
+        // they want to include
+        $form['title']['#ajax'] = array(
+            'callback' => 'mukurtu_taxonomy_records_suggested_terms_ajax',
+            'wrapper' => 'suggested-terms-wrapper',
+        );
     }
+}
+
+function mukurtu_taxonomy_records_suggested_terms_ajax($form, $form_state) {
+    return $form['field_mukurtu_terms'];
 }
 
 function mukurtu_taxonomy_records_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
@@ -1125,7 +1175,7 @@ function mukurtu_taxonomy_records_field_widget_form(&$form, &$form_state, $field
     $node = $element['#entity'];
 
     // Get module specific suggestions, these should be better than our default
-    $suggested_terms = module_invoke_all('suggested_record_terms', $node);
+    $suggested_terms = module_invoke_all('suggested_record_terms', $form, $form_state);
 
     $vocabs = taxonomy_get_vocabularies();
     $options = array();
@@ -1159,12 +1209,19 @@ function mukurtu_taxonomy_records_field_widget_form(&$form, &$form_state, $field
     $element['mukurtu_record']['instructions'] = array(
         '#markup' => '<p>'. t('Attach this record to one or more taxonomy terms. This record will be shown in place of the default page for attached taxonomy terms.') . '</p>',
     );
-    $element['mukurtu_record']['terms'] = array(
-        '#type' => 'checkboxes',
-        '#options' => $options,
-        '#title' => t('Suggested Terms'),
-        '#default_value' => $default_value
-    );
+
+    if(!empty($options)) {
+        $element['mukurtu_record']['terms'] = array(
+            '#type' => 'checkboxes',
+            '#options' => $options,
+            '#title' => t('Suggested Terms'),
+            '#default_value' => $default_value,
+        );
+    }
+
+    // Add ajax wrapper for suggested terms
+    $element['mukurtu_record']['#prefix'] = '<div id="suggested-terms-wrapper">';
+    $element['mukurtu_record']['#suffix'] = '</div>';
 
     // Get list of all vocabs that are enabled
     $vocabs = taxonomy_get_vocabularies();
@@ -1219,24 +1276,3 @@ function _mukurtu_taxonomy_records_widget_validate($element, &$form_state, $form
         $form_state['values']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
     }
 }
-
-    /*
-function mukurtu_taxonomy_records_term_autocomplete($input) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'taxonomy_term')
-        ->propertyCondition('name', "%$input%", 'LIKE')
-        ->range(0, 10);
-
-    $matches = array();
-    $result = $query->execute();
-    if(isset($result['taxonomy_term'])) {
-
-        foreach($result['taxonomy_term'] as $term_ref) {
-            $term = taxonomy_term_load($term_ref->tid);
-            if($term) {
-                $matches[$term->tid] = $term->name;
-            }
-        }
-        return drupal_json_output($matches);
-    }
-    }*/
