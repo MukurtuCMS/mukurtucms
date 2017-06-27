@@ -5,7 +5,7 @@
  */
 function mukurtu_taxonomy_records_menu() {
     $items = array();
-    /*
+
     $items['taxonomy/term/%taxonomy_term/add-record'] = array(
         'title' => t('Add Record'),
         'page callback' => 'drupal_get_form',
@@ -15,7 +15,6 @@ function mukurtu_taxonomy_records_menu() {
         'type' => MENU_LOCAL_TASK,
         'weight' => 100,
     );
-    */
 
     $items['taxonomy/term/%taxonomy_term/remove-record/%node'] = array(
         'title' => t('Remove Record'),
@@ -295,10 +294,6 @@ function mukurtu_taxonomy_records_suggested_record_terms($form, $form_state) {
 }
 
 
-// TODO: This form needs:
-// 1: Pagination
-// 2. Filters and/or autocomplete
-/*
 function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     // Check if the taxonomy is enabled for records
     $vocab = taxonomy_vocabulary_load($term->vid);
@@ -311,8 +306,9 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     }
 
     $form['add_new_record_instructions'] = array(
-        '#markup' => t("Select the type of new record for the \"@term\" term in the \"@vocab\" taxonomy:",
-                       array('@term' => $term->name, '@vocab' => $vocab->name)),
+        //        '#markup' => t("Select the type of record for the \"@term\" term in the \"@vocab\" taxonomy:",
+        //                       array('@term' => $term->name, '@vocab' => $vocab->name)),
+        '#markup' => t("Select the type of record:"),
     );
 
     // For all the valid record types, makes links for the types the user has access to
@@ -331,7 +327,7 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
         '#theme' => 'item_list',
         '#items' => $new_record_links,
     );
-
+    /*
     // Existing Records
     $form['add_existing_record_instructions'] = array(
         '#markup' => t("Add an existing record for the \"@term\" term in the \"@vocab\" taxonomy:",
@@ -398,15 +394,16 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
       '#options' => $options,
       '#empty' => t('No records available.'),
     );
-    
     $form['submit_button'] = array(
         '#type' => 'submit',
         '#value' => t('Add Selected'),
     );
+    */
     
     return $form;
 }
 
+/*
 function mukurtu_taxonomy_records_add_record_form_submit($form, &$form_state) {
     if(!isset($form_state['build_info']['args'][0])) {
         return;
