@@ -29,8 +29,8 @@ function mukurtu_content_warnings_scald_postrender($atom, $content, $context) {
 
             $button_text = t("Reveal Media");
 
-            $content['#prefix'] = $content['#prefix'] . '<div id="mukurtu-content-warning-' . $atom->sid . '" class="mukurtu-content-warning" onclick="mukurtu_remove_content_warning(' . $atom->sid . ')">';
-            $content['#suffix'] = '<div class="mukurtu-content-warning-overlay"><div id="mukurtu-content-warning-instance-' . $atom->sid . '" class="mukurtu-content-warning-overlay-text">' . $warning . '</div></div></div>' . $content['#suffix'];
+            $content['#prefix'] = $content['#prefix'] . '<div class="mukurtu-content-warning mukurtu-content-warning-' . $atom->sid . '" onclick="mukurtu_remove_content_warning(' . $atom->sid . ')">';
+            $content['#suffix'] = '<div class="mukurtu-content-warning-overlay"><div class="mukurtu-content-warning-overlay-text mukurtu-content-warning-instance-' . $atom->sid . '">' . $warning . '</div></div></div>' . $content['#suffix'];
         }
     }
 
