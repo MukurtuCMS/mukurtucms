@@ -11,7 +11,12 @@ include_once 'ma_person.features.inc';
  */
 function ma_person_node_view_alter(&$build) {
     // Only display the first media item for the Person type, for the "Person Teaser" display mode
-    if($build['#entity_type'] == 'node' && $build['#bundle'] == 'person' && $build['#view_mode'] == 'person_teaser') {
+    // Also for the taxonomy record teasers for digital heritage
+    if($build['#entity_type'] == 'node' && (
+        ($build['#bundle'] == 'person' && $build['#view_mode'] == 'person_teaser') ||
+        ($build['#bundle'] == 'digital_heritage' && $build['#view_mode'] == 'taxonomy_record_teaser')
+    )
+    ){
         if(isset($build['field_media_asset'])) {
             $count = 0;
             foreach($build['field_media_asset']['#items'] as $index => $media_item) {
