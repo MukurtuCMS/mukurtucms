@@ -159,6 +159,27 @@ function ma_digitalheritage_ds_field_settings_info() {
   );
   $export['node|digital_heritage|search_result'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|taxonomy_record_teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'taxonomy_record_teaser';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|digital_heritage|taxonomy_record_teaser'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -605,12 +626,12 @@ function ma_digitalheritage_ds_layout_settings_info() {
         2 => 'field_media_asset',
         3 => 'group_metadata_div',
         4 => 'field_description',
-        5 => 'group_location_div',
-        6 => 'field_date',
-        7 => 'field_coverage',
-        8 => 'field_community_ref',
-        9 => 'field_category',
-        10 => 'field_coverage_description',
+        5 => 'field_date',
+        6 => 'group_location_div',
+        7 => 'field_community_ref',
+        8 => 'field_coverage',
+        9 => 'field_coverage_description',
+        10 => 'field_category',
       ),
     ),
     'fields' => array(
@@ -619,12 +640,12 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_media_asset' => 'central',
       'group_metadata_div' => 'central',
       'field_description' => 'central',
-      'group_location_div' => 'central',
       'field_date' => 'central',
-      'field_coverage' => 'central',
+      'group_location_div' => 'central',
       'field_community_ref' => 'central',
-      'field_category' => 'central',
+      'field_coverage' => 'central',
       'field_coverage_description' => 'central',
+      'field_category' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(
