@@ -100,9 +100,11 @@ function mukurtu_content_warnings_get_warning($atom) {
         $taxonomy_refs = array();
         foreach($all_fields as $field_name => $field_value) {
             $field_info = field_info_field($field_name);
-            if($field_info['type'] = 'taxonomy_term_reference') {
+            if($field_info['type'] == 'taxonomy_term_reference' && !empty($emw_atom->{$field_name}->value())) {
                 foreach($emw_atom->{$field_name}->value() as $index => $ref) {
-                    $taxonomy_refs[] = $ref->tid;
+                    if(is_object($ref)) {
+                        $taxonomy_refs[] = $ref->tid;
+                    }
                 }
             }
         }

@@ -8,7 +8,7 @@ function mukurtu_starter_preprocess_field(&$variables, $hook) {
     $element = $variables['element'];
 
     // Add anchors for Person type full view
-    if($element['#object']->type == 'person' && $element['#view_mode'] == 'full') {
+    if(!empty($element['#object']->type) && $element['#object']->type == 'person' && $element['#view_mode'] == 'full') {
 
         // Related People
         if($element['#field_name'] == 'field_related_people') {
