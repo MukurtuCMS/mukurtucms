@@ -34,7 +34,7 @@ function ma_person_node_info() {
     'person' => array(
       'name' => t('Person'),
       'base' => 'node_content',
-      'description' => '',
+      'description' => t('Add detailed information about a specific person.'),
       'has_title' => '1',
       'title_label' => t('Name'),
       'help' => '',
