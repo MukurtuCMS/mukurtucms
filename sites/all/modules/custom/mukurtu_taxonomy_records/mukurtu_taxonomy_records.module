@@ -280,7 +280,6 @@ function mukurtu_taxonomy_records_suggested_record_terms($form, $form_state) {
     if($title != '') {
         $query = new EntityFieldQuery();
         $query->entityCondition('entity_type', 'taxonomy_term')
-            //->propertyCondition('name', $title)
             ->propertyCondition('name', "%$title%", 'LIKE')
             ->range(0, 20);
 
@@ -293,7 +292,9 @@ function mukurtu_taxonomy_records_suggested_record_terms($form, $form_state) {
     return array();
 }
 
-
+/**
+ * Build form for adding a record from a taxonomy term
+ */
 function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     // Check if the taxonomy is enabled for records
     $vocab = taxonomy_vocabulary_load($term->vid);
@@ -518,11 +519,6 @@ function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
         
     // Enable CER for vocabulary <-> All record types
     mukurtu_taxonomy_records_enable_all_cer($vocab);
-    /*    foreach(mukurtu_taxonomy_records_entity_list() as $type_label => $type) {
-        foreach($type as $bundle_label => $bundle) {
-            mukurtu_taxonomy_records_enable_cer('taxonomy_term', $vocab->machine_name, $type_label, $bundle_label);
-        }
-        }*/
 }
 
 /**
@@ -640,6 +636,10 @@ function mukurtu_taxonomy_records_cer_exists($identifier) {
     return FALSE;
 }
 
+
+/**
+ * Access control for the add record (from taxonomy term) form
+ */
 function mukurtu_taxonomy_records_add_record_form_access($term) {
     // If the term is records enabled
     if(mukurtu_taxonomy_records_are_records_enabled($term)) {
@@ -649,6 +649,9 @@ function mukurtu_taxonomy_records_add_record_form_access($term) {
     return FALSE;
 }
 
+/**
+ * Form used to confirm remove a record from a taxonomy term. Triggered from record's contextual menu.
+ */
 function mukurtu_taxonomy_records_remove_record_form($form, $form_state, $term, $record) {
     $question = t("Remove the record \"@record\" from term \"@term\"?", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
     
@@ -656,6 +659,9 @@ function mukurtu_taxonomy_records_remove_record_form($form, $form_state, $term, 
     return confirm_form($form, $question, drupal_get_destination(), $description);
 }
 
+/**
+ * Access control for the remove record form
+ */
 function mukurtu_taxonomy_records_remove_record_form_access($term, $record) {
     // To reach the form to remove a record, a user must:
     // 1. Term must be records enabled
@@ -667,6 +673,10 @@ function mukurtu_taxonomy_records_remove_record_form_access($term, $record) {
     return FALSE;
 }
 
+
+/**
+ * Submit handler for the remove record form
+ */
 function mukurtu_taxonomy_records_remove_record_form_submit($form, $form_state) {
     if(isset($form_state['build_info']['args'][0])) {
         $term = $form_state['build_info']['args'][0];
@@ -697,6 +707,7 @@ function mukurtu_taxonomy_records_remove_record_from_term($term, $record_id) {
     }
 }
 
+// Add the reference to record_id from the term. CER will take care of the record to term reference.
 function mukurtu_taxonomy_records_add_record_to_term($term, $record_id) {
     // Make sure CER is enabled
     mukurtu_taxonomy_records_enable_all_cer($vocab);
@@ -720,6 +731,7 @@ function mukurtu_taxonomy_records_menu_alter(&$items) {
     unset($items['taxonomy/term/%taxonomy_term']['file']);
 }
 
+// Here we are overriding the default display of taxonomy pages
 function mukurtu_taxonomy_records_taxonomy_term_page($term) {
     $hide_records = FALSE;
     // Terms might still have records data after records are disabled. Don't display them if not enabled.
