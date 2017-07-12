@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Implements hook_menu().
+ */
 function mukurtu_content_warnings_menu() {
     $items = array();
     $items['admin/config/mukurtu/content-warnings'] = array(
@@ -16,6 +19,9 @@ function mukurtu_content_warnings_menu() {
 }
 
 
+/**
+ * Implements hook_scald_postrender().
+ */
 function mukurtu_content_warnings_scald_postrender($atom, $content, $context) {
     // Get the config for which scald contexts are enabled for warnings
     $scald_contexts_defaults = variable_get('mukurtu_content_warning_scald_contexts');
@@ -45,6 +51,14 @@ function mukurtu_content_warnings_form_scald_atom_add_form_options_alter(&$form,
     drupal_add_css(drupal_get_path('module', 'mukurtu_content_warnings') . '/css/mukurtu-content-warnings.css');
 }
 
+
+/**
+ * Get the warning for a scald atom, if any
+ *
+ * Currently the need for this content warning system is quite specific. If in the future other
+ * use cases present themselves, this function should be generalized (perhaps returning a weighted set
+ * of warnings).
+ */
 function mukurtu_content_warnings_get_warning($atom) {
     $emw_atom = entity_metadata_wrapper('scald_atom', $atom);
 
