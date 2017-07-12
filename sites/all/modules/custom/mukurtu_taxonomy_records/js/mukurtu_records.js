@@ -28,17 +28,17 @@
     // Custom Widget
     $(document).on("click", "#edit-field-mukurtu-terms-und-mukurtu-record-terms .form-checkbox", function() {
 	var box = $(this);
-	var select = $("#edit-field-mukurtu-terms-und-mukurtu-record-terms-all");
+	var select = $("[id^=edit-field-mukurtu-terms-und-mukurtu-record-terms-all]");
 
 	// User clicked checkbox. Sync that value with the select control for all terms
-	$("#edit-field-mukurtu-terms-und-mukurtu-record-terms-all option[value='" + box.val() + "']").prop('selected', box.is(':checked'));
+	$("[id^=edit-field-mukurtu-terms-und-mukurtu-record-terms-all] option[value='" + box.val() + "']").prop('selected', box.is(':checked'));
 
 	// Update chosen
-	$("#edit-field-mukurtu-terms-und-mukurtu-record-terms-all").trigger("chosen:updated");
+	$("[id^=edit-field-mukurtu-terms-und-mukurtu-record-terms-all]").trigger("chosen:updated");
     });
 
     // Sync chosen -> checkboxes
-    $(document).on("change", "select#edit-field-mukurtu-terms-und-mukurtu-record-terms-all", function(event, params) {
+    $(document).on("change", "select[id^=edit-field-mukurtu-terms-und-mukurtu-record-terms-all]", function(event, params) {
 	if(params.deselected) {
 	    $("#edit-field-mukurtu-terms-und-mukurtu-record-terms input:checkbox[value='" + params.deselected + "']").prop('checked', false);
 	}
