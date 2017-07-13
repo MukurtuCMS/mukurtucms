@@ -437,6 +437,15 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
     }
 }
 
+/**
+ * Implements scald_postrender().
+ *
+ * Provides a default implementation.
+ */
+function ma_scald_scald_postrender($atom, $content, $context) {
+    return $content;
+}
+
 function ma_scald_get_first_image_atom_content($atom_content_field) {
     if(!isset($atom_content_field['#items']) || empty($atom_content_field['#items'])) {
         return $atom_content_field;
