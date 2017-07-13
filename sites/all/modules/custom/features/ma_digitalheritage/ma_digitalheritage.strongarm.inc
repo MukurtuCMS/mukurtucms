@@ -108,6 +108,7 @@ function ma_digitalheritage_strongarm() {
   $strongarm->value = 'col-md-8 col-md-pull-4
 col-md-4 col-md-push-8
 col-md-4
+col-md-3
 col-md-6
 col-md-8
 col-md-12
@@ -259,6 +260,12 @@ col-md-4 col-md-push-8';
         'custom_settings' => TRUE,
       ),
       'map_popup' => array(
+        'custom_settings' => TRUE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
         'custom_settings' => TRUE,
       ),
     ),

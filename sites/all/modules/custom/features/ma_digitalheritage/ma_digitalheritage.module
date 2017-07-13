@@ -1038,6 +1038,7 @@ function ma_digitalheritage_owlcarousel_settings_alter(&$settings, $instance) {
     }
 }
 
+// TODO: This whole one-off carousel needs to be rebuilt in our display formatter module
 function ma_digital_heritage_book_page_build_carousel($node) {
     $active_page = 0;
     if(isset($node->field_book_children) && count($node->field_book_children) > 0) {
@@ -1090,12 +1091,19 @@ function ma_digital_heritage_book_page_build_carousel($node) {
             'instance' => 'owlcarousel_settings_multipage',
             // Attributes are rendered via drupal_attributes on the wrapper element.
             'attributes' => array(
+                'id' => array(
+                    'default' => drupal_html_id('multipage_carousel_' . $instance['field_id'])
+                ),
                 'class' => array('owl-carousel'),
             )
         )
     );
 
     $rendered_output = drupal_render($output);
+
+    // Quick and dirty fix for next/previous button styling after Owl Carousel update
+    $rendered_output = str_replace('owl-theme', '', $rendered_output);
+
     unset($_SESSION['multipage_dh_start_position']);
     return $rendered_output . $combobox;
 }

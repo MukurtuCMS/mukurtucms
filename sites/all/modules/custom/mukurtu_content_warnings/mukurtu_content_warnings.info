@@ -1,0 +1,7 @@
+name = Mukurtu Content Warnings
+description = Provides click through content warnings for sensitive or graphic content.
+package = Mukurtu
+dependencies[] = ma_core
+core = 7.x
+version = "7.x-0.1"
+configure = admin/config/mukurtu/content-warnings

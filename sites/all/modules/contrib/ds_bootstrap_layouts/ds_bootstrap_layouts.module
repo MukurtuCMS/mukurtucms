@@ -1,0 +1,239 @@
+<?php
+
+/**
+ * @file
+ * Display Suite Bootstrap Layouts module file
+ */
+function ds_bootstrap_layouts_ds_layout_info() {
+  $path = drupal_get_path('module', 'ds_bootstrap_layouts');
+  $onecol = $path . '/layouts/onecol';
+  $twocol = $path . '/layouts/twocol';
+  $threecol = $path . '/layouts/threecol';
+
+  $layouts = array();
+
+  // One column.
+  $layouts['bootstrap_12'] = array(
+    'label' => t('Bootstrap One Column: 12'),
+    'path' => $onecol . '/bootstrap_12',
+    'regions' => array(
+      'central' => t('Content'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  // Two columns.
+  $layouts['bootstrap_1_11'] = array(
+    'label' => t('Bootstrap Two Columns: 1-11'),
+    'path' => $twocol . '/bootstrap_1_11',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  $layouts['bootstrap_2_10'] = array(
+    'label' => t('Bootstrap Two Columns: 2-10'),
+    'path' => $twocol . '/bootstrap_2_10',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  
+  $layouts['bootstrap_3_9'] = array(
+    'label' => t('Bootstrap Two Columns: 3-9'),
+    'path' => $twocol . '/bootstrap_3_9',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_4_8'] = array(
+    'label' => t('Bootstrap Two Columns: 4-8'),
+    'path' => $twocol . '/bootstrap_4_8',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+    
+  $layouts['bootstrap_5_7'] = array(
+    'label' => t('Bootstrap Two Columns: 5-7'),
+    'path' => $twocol . '/bootstrap_5_7',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_6_6'] = array(
+    'label' => t('Bootstrap Two Columns: 6-6'),
+    'path' => $twocol . '/bootstrap_6_6',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_6_6_bricks'] = array(
+    'label' => t('Bootstrap Two Columns: 6-6 bricks'),
+    'path' => $twocol . '/bootstrap_6_6_bricks',
+    'regions' => array(
+      'top' => t('Top'),
+      'topleft' => t('Upper Left'),
+      'topright' => t('Upper Right'),
+      'central' => t('Middle'),
+      'bottomleft' => t('Lower Left'),
+      'bottomright' => t('Lower Right'),
+      'bottom' => t('Bottom'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_6_6_stacked'] = array(
+    'label' => t('Bootstrap Two Columns: 6-6 stacked'),
+    'path' => $twocol . '/bootstrap_6_6_stacked',
+    'regions' => array(
+      'top' => t('Top'),
+      'left' => t('Left'),
+      'right' => t('Right'),
+      'bottom' => t('Bottom'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_7_5'] = array(
+    'label' => t('Bootstrap Two Columns: 7-5'),
+    'path' => $twocol . '/bootstrap_7_5',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  
+  $layouts['bootstrap_8_4'] = array(
+    'label' => t('Bootstrap Two Columns: 8-4'),
+    'path' => $twocol . '/bootstrap_8_4',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  
+  $layouts['bootstrap_9_3'] = array(
+    'label' => t('Bootstrap Two Columns: 9-3'),
+    'path' => $twocol . '/bootstrap_9_3',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_10_2'] = array(
+    'label' => t('Bootstrap Two Columns: 10-2'),
+    'path' => $twocol . '/bootstrap_10_2',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  $layouts['bootstrap_11_1'] = array(
+    'label' => t('Bootstrap Two Columns: 11-1'),
+    'path' => $twocol . '/bootstrap_11_1',
+    'regions' => array(
+      'left' => t('Left'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  // Three columns.
+  $layouts['bootstrap_2_8_2'] = array(
+    'label' => t('Bootstrap Three Columns: 2-8-2'),
+    'path' => $threecol . '/bootstrap_2_8_2',
+    'regions' => array(
+      'left' => t('Left'),
+      'central' => t('Middle'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  
+  $layouts['bootstrap_3_6_3'] = array(
+    'label' => t('Bootstrap Three Columns: 3-6-3'),
+    'path' => $threecol . '/bootstrap_3_6_3',
+    'regions' => array(
+      'left' => t('Left'),
+      'central' => t('Middle'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  
+  $layouts['bootstrap_4_4_4'] = array(
+    'label' => t('Bootstrap Three Columns: 4-4-4'),
+    'path' => $threecol . '/bootstrap_4_4_4',
+    'regions' => array(
+      'left' => t('Left'),
+      'central' => t('Middle'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  $layouts['bootstrap_4_4_4_stacked'] = array(
+    'label' => t('Bootstrap Three Columns: 4-4-4 stacked'),
+    'path' => $threecol . '/bootstrap_4_4_4_stacked',
+    'regions' => array(
+      'top' => t('Top'),
+      'left' => t('Left'),
+      'central' => t('Middle'),
+      'right' => t('Right'),
+      'bottom' => t('Bottom'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+  
+  $layouts['bootstrap_5_5_2'] = array(
+    'label' => t('Bootstrap Three Columns: 5-5-2'),
+    'path' => $threecol . '/bootstrap_5_5_2',
+    'regions' => array(
+      'left' => t('Left'),
+      'central' => t('Middle'),
+      'right' => t('Right'),
+    ),
+    'form' => TRUE,
+    'image' => TRUE,
+  );
+
+  return $layouts;
+}

@@ -159,6 +159,27 @@ function ma_digitalheritage_ds_field_settings_info() {
   );
   $export['node|digital_heritage|search_result'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|taxonomy_record_teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'taxonomy_record_teaser';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|digital_heritage|taxonomy_record_teaser'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -590,6 +611,59 @@ function ma_digitalheritage_ds_layout_settings_info() {
   );
   $export['node|digital_heritage|search_result'] = $ds_layout;
 
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|digital_heritage|taxonomy_record_teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'digital_heritage';
+  $ds_layout->view_mode = 'taxonomy_record_teaser';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'title',
+        1 => 'group_media_div',
+        2 => 'field_media_asset',
+        3 => 'group_metadata_div',
+        4 => 'field_description',
+        5 => 'field_date',
+        6 => 'group_location_div',
+        7 => 'field_community_ref',
+        8 => 'field_coverage',
+        9 => 'field_coverage_description',
+        10 => 'field_category',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'central',
+      'group_media_div' => 'central',
+      'field_media_asset' => 'central',
+      'group_metadata_div' => 'central',
+      'field_description' => 'central',
+      'field_date' => 'central',
+      'group_location_div' => 'central',
+      'field_community_ref' => 'central',
+      'field_coverage' => 'central',
+      'field_coverage_description' => 'central',
+      'field_category' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|digital_heritage|taxonomy_record_teaser'] = $ds_layout;
+
   return $export;
 }
 
@@ -616,6 +690,16 @@ function ma_digitalheritage_ds_view_modes_info() {
     'node' => 'node',
   );
   $export['map_popup'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'taxonomy_record_teaser';
+  $ds_view_mode->label = 'Taxonomy Record Teaser';
+  $ds_view_mode->entities = array(
+    'scald_atom' => 'scald_atom',
+    'node' => 'node',
+  );
+  $export['taxonomy_record_teaser'] = $ds_view_mode;
 
   return $export;
 }
