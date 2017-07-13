@@ -22,7 +22,8 @@ function mukurtu_content_warnings_menu() {
 /**
  * Implements hook_scald_postrender().
  */
-function mukurtu_content_warnings_scald_postrender($atom, $content, $context) {
+//function mukurtu_content_warnings_scald_postrender($atom, $content, $context) {
+function mukurtu_content_warnings_scald_display_alter(&$content, $atom, $context) {
     // Get the config for which scald contexts are enabled for warnings
     $scald_contexts_defaults = variable_get('mukurtu_content_warning_scald_contexts');
 

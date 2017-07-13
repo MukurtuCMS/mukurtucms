@@ -1413,7 +1413,8 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
   }
 
   // Mukurtu added hook for content warnings
-  $content = module_invoke_all('scald_postrender', $atom, $content, $context);
+  //  $content = module_invoke_all('scald_display_alter', $atom, $content, $context);
+  drupal_alter('scald_display', $content, $atom, $context);
 
   // Only cache the Atom if Contexts, etc. have not indicated that the rendering
   // is not cacheable (e.g. it contains the current user's username).
