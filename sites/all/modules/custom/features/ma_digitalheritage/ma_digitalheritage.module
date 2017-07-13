@@ -517,12 +517,12 @@ function ma_digitalheritage_add_cr_check($node) {
 }
 
 function ma_digitalheritage_add_book_page_check($node) {
-  if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
-    global $user;
-    if ($user->uid > 0 && ($node->uid == $user->uid)) { // Only owners of nodes can create child book pages for it
-      return TRUE;
+    // Don't present the option to add a book page on community records
+    if ($node->type == 'digital_heritage' && empty($node->field_community_record_parent)) {
+        // Present the option to add a book page to anybody who has edit rights to the node
+        return node_access("update", $node);
     }
-  }
+    return FALSE;
 }
 
 function ma_digitalheritage_toggle_related_items_teasers () {
