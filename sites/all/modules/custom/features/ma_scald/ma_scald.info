@@ -144,6 +144,7 @@ features[scald_context_config][] = ma_scald_search_results
 features[scald_context_config][] = mukurtu_scald_banner_image
 features[scald_context_config][] = mukurtu_scald_dictionary_media
 features[scald_context_config][] = mukurtu_scald_media_assets_edit_
+features[scald_context_config][] = mukurtu_scald_recording
 features[scald_context_config][] = mukurtu_scald_related_items
 features[scald_context_config][] = mukurtu_scald_thumbnail_image
 features[scald_context_config][] = sdl_editor_representation
