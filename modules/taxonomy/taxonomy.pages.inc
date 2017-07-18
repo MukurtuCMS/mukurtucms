@@ -170,9 +170,11 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
     foreach ($tags_return as $tid => $name) {
       $n = $name;
       // Term names containing commas or quotes must be wrapped in quotes.
+      /*
       if (strpos($name, ';') !== FALSE || strpos($name, '"') !== FALSE) {
         $n = '"' . str_replace('"', '""', $name) . '"';
       }
+      */
       $term_matches[$prefix . $n] = check_plain($name);
     }
   }
