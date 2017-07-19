@@ -398,11 +398,11 @@ function ma_scald_views_query_alter(&$view, &$query) {
                       'type' => 'OR'
                 );
 
-        $conditions_key = end(array_keys($query->where));
+        $query_results = array_keys($query->where);
+        $conditions_key = end($query_results);
 
         // Add an 'or' condition for each protocol the user can view
         foreach($groups as $group) {
-            watchdog('php', "checking group $group");
             $query->where[$conditions_key]['conditions'][] = array(
                           'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
                           'value' => $group,
