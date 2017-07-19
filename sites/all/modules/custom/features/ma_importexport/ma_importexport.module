@@ -148,6 +148,18 @@ function ma_importexport_feeds_lookup_node_by_guid($guid) {
 }
 
 /**
+ *  Lookup nid from guid
+ */
+function ma_importexport_feeds_lookup_term_by_guid($guid) {
+  return db_select('feeds_item')
+    ->fields('feeds_item', array('entity_id'))
+    ->condition('entity_type', 'taxonomy_term')
+    ->condition('guid', $guid)
+    ->execute()
+    ->fetchField();
+}
+
+/**
  *  Lookup sid from guid
  */
 function ma_importexport_feeds_lookup_atom_by_guid($guid) {
