@@ -101,7 +101,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '7',
+          'weight' => '8',
         ),
       ),
       'display' => array(
@@ -186,7 +186,7 @@ function ma_scald_strongarm() {
           'weight' => '0',
         ),
         'redirect' => array(
-          'weight' => '7',
+          'weight' => '8',
         ),
       ),
       'display' => array(

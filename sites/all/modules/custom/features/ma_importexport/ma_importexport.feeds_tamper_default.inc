@@ -1546,6 +1546,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_audio-contributors-explode';
+  $feeds_tamper->importer = 'import_media_audio';
+  $feeds_tamper->source = 'Contributors';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_media_audio-contributors-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_audio-contributors-trim';
+  $feeds_tamper->importer = 'import_media_audio';
+  $feeds_tamper->source = 'Contributors';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_media_audio-contributors-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_media_audio-file-required';
   $feeds_tamper->importer = 'import_media_audio';
   $feeds_tamper->source = 'File';
@@ -1557,6 +1588,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Required field';
   $export['import_media_audio-file-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_audio-people-explode';
+  $feeds_tamper->importer = 'import_media_audio';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_media_audio-people-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_audio-people-trim';
+  $feeds_tamper->importer = 'import_media_audio';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_media_audio-people-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
@@ -1695,6 +1757,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 0;
   $feeds_tamper->description = 'Required field';
   $export['import_media_files-file-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_files-people-explode';
+  $feeds_tamper->importer = 'import_media_files';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_media_files-people-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_files-people-trim';
+  $feeds_tamper->importer = 'import_media_files';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_media_files-people-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
@@ -1884,6 +1977,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_images-people-explode';
+  $feeds_tamper->importer = 'import_media_images';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_media_images-people-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_images-people-trim';
+  $feeds_tamper->importer = 'import_media_images';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_media_images-people-trim'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_media_images-protocol-explode';
   $feeds_tamper->importer = 'import_media_images';
   $feeds_tamper->source = 'Protocol';
@@ -1972,6 +2096,37 @@ function ma_importexport_feeds_tamper_default() {
   $feeds_tamper->weight = 1;
   $feeds_tamper->description = 'Required field';
   $export['import_media_video-file-required'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_video-people-explode';
+  $feeds_tamper->importer = 'import_media_video';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'explode';
+  $feeds_tamper->settings = array(
+    'separator' => ';',
+    'limit' => '',
+    'real_separator' => ';',
+  );
+  $feeds_tamper->weight = 0;
+  $feeds_tamper->description = 'Explode';
+  $export['import_media_video-people-explode'] = $feeds_tamper;
+
+  $feeds_tamper = new stdClass();
+  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->api_version = 2;
+  $feeds_tamper->id = 'import_media_video-people-trim';
+  $feeds_tamper->importer = 'import_media_video';
+  $feeds_tamper->source = 'People';
+  $feeds_tamper->plugin_id = 'trim';
+  $feeds_tamper->settings = array(
+    'mask' => '',
+    'side' => 'trim',
+  );
+  $feeds_tamper->weight = 1;
+  $feeds_tamper->description = 'Trim';
+  $export['import_media_video-people-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
   $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */

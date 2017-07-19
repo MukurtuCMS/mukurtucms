@@ -783,6 +783,7 @@ function ma_importexport_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -845,8 +846,15 @@ function ma_importexport_feeds_importer_default() {
             'target' => 'field_contributor',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
           8 => array(
+            'source' => 'People',
+            'target' => 'field_people',
+            'term_search' => '0',
+            'autocreate' => 1,
+          ),
+          9 => array(
             'source' => 'Tags',
             'target' => 'scald_tags',
             'term_search' => '0',
@@ -899,6 +907,7 @@ function ma_importexport_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -957,6 +966,12 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           7 => array(
+            'source' => 'People',
+            'target' => 'field_people',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          8 => array(
             'source' => 'Tags',
             'target' => 'scald_tags',
             'term_search' => '0',
@@ -1009,6 +1024,7 @@ function ma_importexport_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -1116,36 +1132,42 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           15 => array(
+            'source' => 'People',
+            'target' => 'field_people',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          16 => array(
             'source' => 'Latitude',
             'target' => 'field_scald_geo_location:lat',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          16 => array(
+          17 => array(
             'source' => 'Longitude',
             'target' => 'field_scald_geo_location:lon',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          17 => array(
+          18 => array(
             'source' => 'Location',
             'target' => 'field_scald_location',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          18 => array(
+          19 => array(
             'source' => 'Rights',
             'target' => 'field_rights',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          19 => array(
+          20 => array(
             'source' => 'Licensing',
             'target' => 'field_licence_std_cc',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          20 => array(
+          21 => array(
             'source' => 'Categories',
             'target' => 'field_category',
             'term_search' => '0',
@@ -1198,6 +1220,7 @@ function ma_importexport_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -1261,6 +1284,12 @@ function ma_importexport_feeds_importer_default() {
             'term_search' => '0',
             'autocreate' => 1,
             'language' => 'und',
+          ),
+          8 => array(
+            'source' => 'People',
+            'target' => 'field_people',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
         ),
         'update_existing' => '2',
