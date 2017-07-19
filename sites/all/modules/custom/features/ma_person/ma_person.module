@@ -57,3 +57,17 @@ function ma_person_field_widget_form_alter(&$element, &$form_state, $context) {
 function ma_person_suggested_record_terms($entity) {
     return array();
 }
+
+/**
+ * Implements hook_feeds_processor_targets_alter().
+ */
+function ma_person_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+    if($entity_type == 'node' && $bundle_name == 'person') {
+        $targets['field_mukurtu_terms:guid_or_tid'] = array(
+            'name' => t('Mukurtu Terms (Entity reference by Feeds GUID, failover to TID)'),
+            'description' => t('The field instance Mukurtu Terms of field_mukurtu_terms matched by Feeds GUID.  If the GUID is not found, it will be used as a TID'),
+            'callback' => 'mukurtu_taxonomy_records_set_target',
+            'real_target' => 'field_mukurtu_terms',
+        );
+    }
+}

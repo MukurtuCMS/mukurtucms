@@ -10,6 +10,26 @@
 function ma_person_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: 'clear import_people feeds'.
+  $permissions['clear import_people feeds'] = array(
+    'name' => 'clear import_people feeds',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'feeds',
+  );
+
+  // Exported permission: 'clear import_people_taxonomy_terms feeds'.
+  $permissions['clear import_people_taxonomy_terms feeds'] = array(
+    'name' => 'clear import_people_taxonomy_terms feeds',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'feeds',
+  );
+
   // Exported permission: 'create paragraph content person_relationship_bundle'.
   $permissions['create paragraph content person_relationship_bundle'] = array(
     'name' => 'create paragraph content person_relationship_bundle',
@@ -110,11 +130,63 @@ function ma_person_user_default_permissions() {
     'module' => 'taxonomy',
   );
 
+  // Exported permission: 'import import_people feeds'.
+  $permissions['import import_people feeds'] = array(
+    'name' => 'import import_people feeds',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'feeds',
+  );
+
+  // Exported permission: 'import import_people_taxonomy_terms feeds'.
+  $permissions['import import_people_taxonomy_terms feeds'] = array(
+    'name' => 'import import_people_taxonomy_terms feeds',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'feeds',
+  );
+
   // Exported permission: 'merge interpersonal_relationship terms'.
   $permissions['merge interpersonal_relationship terms'] = array(
     'name' => 'merge interpersonal_relationship terms',
     'roles' => array(),
     'module' => 'term_merge',
+  );
+
+  // Exported permission: 'tamper import_people'.
+  $permissions['tamper import_people'] = array(
+    'name' => 'tamper import_people',
+    'roles' => array(),
+    'module' => 'feeds_tamper',
+  );
+
+  // Exported permission: 'tamper import_people_taxonomy_terms'.
+  $permissions['tamper import_people_taxonomy_terms'] = array(
+    'name' => 'tamper import_people_taxonomy_terms',
+    'roles' => array(),
+    'module' => 'feeds_tamper',
+  );
+
+  // Exported permission: 'unlock import_people feeds'.
+  $permissions['unlock import_people feeds'] = array(
+    'name' => 'unlock import_people feeds',
+    'roles' => array(
+      'administrator' => 'administrator',
+    ),
+    'module' => 'feeds',
+  );
+
+  // Exported permission: 'unlock import_people_taxonomy_terms feeds'.
+  $permissions['unlock import_people_taxonomy_terms feeds'] = array(
+    'name' => 'unlock import_people_taxonomy_terms feeds',
+    'roles' => array(
+      'administrator' => 'administrator',
+    ),
+    'module' => 'feeds',
   );
 
   // Exported permission: 'update paragraph content person_relationship_bundle'.

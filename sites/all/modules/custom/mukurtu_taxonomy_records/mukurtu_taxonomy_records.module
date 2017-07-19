@@ -1285,3 +1285,23 @@ function _mukurtu_taxonomy_records_widget_validate($element, &$form_state, $form
         $form_state['values']['field_mukurtu_terms'][LANGUAGE_NONE][$index]['target_id'] = $tid;
     }
 }
+
+/**
+ * Callback for Mukurtu Record implementors of hook_feeds_processor_targets_alter
+ */
+function mukurtu_taxonomy_records_set_target($source, $entity, $target, $value, $mapping)
+{
+    $new_target = str_replace(':guid_or_tid', '', $target);
+
+    foreach($value as $id) {
+        if($id) {
+            // Check if ID is a valid GUID.  If so, we use that.
+            $tid = ma_importexport_feeds_lookup_term_by_guid($id);
+            if(!$tid) {
+                // Otherwise we assume ID is a NID
+                $tid = $id;
+            }
+            $entity->{$new_target}[$entity->language][]['target_id'] = $tid;
+        }
+    }
+}
