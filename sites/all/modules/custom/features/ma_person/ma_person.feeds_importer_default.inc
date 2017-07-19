@@ -111,5 +111,75 @@ function ma_person_feeds_importer_default() {
   );
   $export['import_people'] = $feeds_importer;
 
+  $feeds_importer = new stdClass();
+  $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
+  $feeds_importer->api_version = 1;
+  $feeds_importer->id = 'import_people_taxonomy_terms';
+  $feeds_importer->config = array(
+    'name' => 'Import People Taxonomy Terms',
+    'description' => '',
+    'fetcher' => array(
+      'plugin_key' => 'FeedsFileFetcher',
+      'config' => array(
+        'allowed_extensions' => 'txt csv tsv xml opml',
+        'direct' => FALSE,
+        'delete_uploaded_file' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
+      ),
+    ),
+    'parser' => array(
+      'plugin_key' => 'FeedsCSVParser',
+      'config' => array(
+        'delimiter' => ',',
+        'no_headers' => 0,
+        'encoding' => 'UTF-8',
+      ),
+    ),
+    'processor' => array(
+      'plugin_key' => 'FeedsTermProcessor',
+      'config' => array(
+        'vocabulary' => 'category',
+        'mappings' => array(
+          0 => array(
+            'source' => 'guid',
+            'target' => 'guid',
+            'unique' => 1,
+            'language' => 'und',
+          ),
+          1 => array(
+            'source' => 'Term name',
+            'target' => 'name',
+            'unique' => 1,
+            'language' => 'und',
+          ),
+          2 => array(
+            'source' => 'Term description',
+            'target' => 'description',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+        ),
+        'update_existing' => '2',
+        'input_format' => 'full_html',
+        'insert_new' => '1',
+        'update_non_existent' => 'skip',
+        'skip_hash_check' => 0,
+        'bundle' => 'people',
+        'language' => 'und',
+      ),
+    ),
+    'content_type' => '',
+    'update' => 0,
+    'import_period' => '-1',
+    'expire_period' => 3600,
+    'import_on_create' => 1,
+    'process_in_background' => 0,
+  );
+  $export['import_people_taxonomy_terms'] = $feeds_importer;
+
   return $export;
 }
