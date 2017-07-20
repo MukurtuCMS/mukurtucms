@@ -313,6 +313,26 @@ function ma_core_user_default_permissions() {
     'module' => 'flag',
   );
 
+  // Exported permission: 'administer geofield_gmap'.
+  $permissions['administer geofield_gmap'] = array(
+    'name' => 'administer geofield_gmap',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'geofield_gmap',
+  );
+
+  // Exported permission: 'administer geofield_map configuration'.
+  $permissions['administer geofield_map configuration'] = array(
+    'name' => 'administer geofield_map configuration',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'geofield_map',
+  );
+
   // Exported permission: 'administer google analytics'.
   $permissions['administer google analytics'] = array(
     'name' => 'administer google analytics',
