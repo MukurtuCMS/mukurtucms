@@ -47,6 +47,10 @@ function mukurtu_protocol_field_node_insert($node) {
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
   if ($form_id == 'digital_heritage_node_form' OR $form_id =='dictionary_word_node_form') {
+    // Do not create this custom field for Book Pages
+    if(isset($form_state['mukurtu_book_parent'])) {
+        return;
+    }
 
     // Do not create this custom field for Book Pages
     // Also hide the Item Sharing Settings field
