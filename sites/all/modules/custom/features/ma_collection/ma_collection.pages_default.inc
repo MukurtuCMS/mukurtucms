@@ -172,28 +172,6 @@ function ma_collection_default_page_manager_pages() {
   $pane->uuid = 'd7e6f156-c2b7-4707-883e-1218ae5cadbf';
   $display->content['new-d7e6f156-c2b7-4707-883e-1218ae5cadbf'] = $pane;
   $display->panels['right'][0] = 'new-d7e6f156-c2b7-4707-883e-1218ae5cadbf';
-  $pane = new stdClass();
-  $pane->pid = 'new-590402f1-fa21-4585-a80b-7f7cf586fcce';
-  $pane->panel = 'right';
-  $pane->type = 'block';
-  $pane->subtype = 'facetapi-8FIPJ09s0OwWZePRWCc51dsaXQQONRP0';
-  $pane->shown = TRUE;
-  $pane->access = array();
-  $pane->configuration = array(
-    'override_title' => 1,
-    'override_title_text' => 'Digital Heritage Count',
-  );
-  $pane->cache = array();
-  $pane->style = array(
-    'settings' => NULL,
-  );
-  $pane->css = array();
-  $pane->extras = array();
-  $pane->position = 1;
-  $pane->locks = array();
-  $pane->uuid = '590402f1-fa21-4585-a80b-7f7cf586fcce';
-  $display->content['new-590402f1-fa21-4585-a80b-7f7cf586fcce'] = $pane;
-  $display->panels['right'][1] = 'new-590402f1-fa21-4585-a80b-7f7cf586fcce';
   $display->hide_title = PANELS_TITLE_FIXED;
   $display->title_pane = '0';
   $handler->conf['display'] = $display;
