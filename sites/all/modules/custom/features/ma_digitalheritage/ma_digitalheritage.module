@@ -675,8 +675,8 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       // Set the page title
       drupal_set_title ("<i>Create Book Page in</i> " . $book_parent->title,  PASS_THROUGH);
 
-      // Set the parent
-      $form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#value'] = $book_parent->title . ' (' . $book_parent->nid . ')'; // setting in the autocomplete widget format
+      // Save the parent
+      $form_state['mukurtu_book_parent'] = $book_parent->nid;
 
       // Set the privacy setting and protocols to that of the parent
       $book_parent_wrapper = entity_metadata_wrapper('node', $book_parent);
@@ -703,6 +703,20 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 
   }
 
+}
+
+/**
+ * Implements hook_node_submit().
+ */
+function ma_digitalheritage_node_submit($node, $form, &$form_state) {
+    // Restore saved book parent info
+    if(!empty($form_state['mukurtu_book_parent'])) {
+        $book_parent = node_load($form_state['mukurtu_book_parent']);
+        if($book_parent) {
+            $node->field_book_parent[LANGUAGE_NONE][0]['target_id'] = $book_parent->nid;
+            $node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] = $book_parent->field_item_privacy_setting[LANGUAGE_NONE][0]['value'];
+        }
+    }
 }
 
 /**
