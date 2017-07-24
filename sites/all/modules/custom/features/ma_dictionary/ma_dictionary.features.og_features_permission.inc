@@ -148,11 +148,6 @@ function ma_dictionary_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:language_community:create cultural_protocol_group content'
-  $permissions['node:language_community:create cultural_protocol_group content'] = array(
-    'roles' => array(),
-  );
-
   // Exported og permission: 'node:language_community:create dictionary_word content'
   $permissions['node:language_community:create dictionary_word content'] = array(
     'roles' => array(
@@ -176,11 +171,6 @@ function ma_dictionary_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:language_community:delete any cultural_protocol_group content'
-  $permissions['node:language_community:delete any cultural_protocol_group content'] = array(
-    'roles' => array(),
-  );
-
   // Exported og permission: 'node:language_community:delete any dictionary_word content'
   $permissions['node:language_community:delete any dictionary_word content'] = array(
     'roles' => array(
@@ -200,11 +190,6 @@ function ma_dictionary_og_features_default_permissions() {
 
   // Exported og permission: 'node:language_community:delete own community content'
   $permissions['node:language_community:delete own community content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:language_community:delete own cultural_protocol_group content'
-  $permissions['node:language_community:delete own cultural_protocol_group content'] = array(
     'roles' => array(),
   );
 
@@ -274,11 +259,6 @@ function ma_dictionary_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:language_community:update any cultural_protocol_group content'
-  $permissions['node:language_community:update any cultural_protocol_group content'] = array(
-    'roles' => array(),
-  );
-
   // Exported og permission: 'node:language_community:update any dictionary_word content'
   $permissions['node:language_community:update any dictionary_word content'] = array(
     'roles' => array(
@@ -305,11 +285,6 @@ function ma_dictionary_og_features_default_permissions() {
 
   // Exported og permission: 'node:language_community:update own community content'
   $permissions['node:language_community:update own community content'] = array(
-    'roles' => array(),
-  );
-
-  // Exported og permission: 'node:language_community:update own cultural_protocol_group content'
-  $permissions['node:language_community:update own cultural_protocol_group content'] = array(
     'roles' => array(),
   );
 
