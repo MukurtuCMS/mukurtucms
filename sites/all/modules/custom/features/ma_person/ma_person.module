@@ -51,6 +51,27 @@ function ma_person_field_widget_form_alter(&$element, &$form_state, $context) {
     }
 }
 
+/*
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function ma_person_form_node_form_alter(&$form, &$form_state, $form_id) {
+    if($form['#id'] == 'person-node-form') {
+        // Auto-populate person title field when creating record from an existing taxonomy term
+        if(empty($form['#node']->title) && isset($form_state['node']) && mukurtu_taxonomy_records_is_record($form_state['node'])) {
+            $action = arg(3);
+            $tid = arg(4);
+            if(isset($action) && isset($tid)) {
+                if($action == 'attach-record') {
+                    $term = taxonomy_term_load($tid);
+                    if($term) {
+                        $form['title']['#default_value'] = $term->name;
+                    }
+                }
+            }
+        }
+    }
+}
+
 /**
  * Implements hook_suggested_record_terms().
  */
