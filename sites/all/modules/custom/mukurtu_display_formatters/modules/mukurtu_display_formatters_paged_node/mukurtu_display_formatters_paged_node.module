@@ -84,7 +84,7 @@ function mukurtu_display_formatters_paged_node_field_formatter_view($entity_type
     }
 
     // Initialize the pager
-    $current_page = pager_default_initialize(count($nodes), $items_per_page, 7);
+    $current_page = pager_default_initialize(count($nodes), $items_per_page, 1);
     $chunks = array_chunk($nodes, $items_per_page, TRUE);
 
     // Load the nodes for only that page
@@ -99,7 +99,7 @@ function mukurtu_display_formatters_paged_node_field_formatter_view($entity_type
     $element[] = array (
         '#theme' => 'pager',
         '#quantity' => count($chunks),
-        '#element' => 7,
+        '#element' => 1,
     );
 
     return $element;
