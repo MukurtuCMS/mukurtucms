@@ -35,3 +35,15 @@ function mukurtu_starter_preprocess_field(&$variables, $hook) {
         //        dpm($variables);
     }
 }
+
+/**
+* Implements hook_node_view_alter().
+*/
+function mukurtu_starter_node_view_alter(&$build) {
+    // For DH items, only show author if user has edit rights
+    if($build['#entity_type'] == 'node' && $build['#bundle'] == 'digital_heritage' && $build['#view_mode'] == 'full') {
+        if(!user_is_logged_in() || !node_access('update', $build['#node'])) {
+            $build['author']['#access'] = FALSE;
+        }
+    }
+}
