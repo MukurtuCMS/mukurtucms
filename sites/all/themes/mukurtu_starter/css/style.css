@@ -9652,6 +9652,13 @@ table .checkbox input[type="checkbox"] {
   width: 20px;
   height: auto;
 }
+#modalContent {
+  left: 50px !important;
+  width: 80% !important;
+}
+.group-scald-addtional-fields {
+  padding-bottom: 1em;
+}
 .page-node-edit .ctools-modal-content,
 .page-node-add .ctools-modal-content {
   background: none !important;
