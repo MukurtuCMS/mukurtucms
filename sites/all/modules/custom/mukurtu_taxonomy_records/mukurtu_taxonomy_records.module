@@ -869,11 +869,13 @@ function mukurtu_taxonomy_records_update_records_cache($term) {
     // Get all the attached records
     $emw_term = entity_metadata_wrapper('taxonomy_term', $term);
     $mukurtu_record_refs = array();
-    foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
-        // Update the record's aggregate fields
-        $emw_record = entity_metadata_wrapper('node', $record_ref);
-        $emw_record->field_node_aggregate->set(mukurtu_taxonomy_records_get_aggregate($record_ref));
-        $emw_record->save();
+    if(!empty($emw_term->field_mukurtu_records)) {
+        foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
+            // Update the record's aggregate fields
+            $emw_record = entity_metadata_wrapper('node', $record_ref);
+            $emw_record->field_node_aggregate->set(mukurtu_taxonomy_records_get_aggregate($record_ref));
+            $emw_record->save();
+        }
     }
 }
 
