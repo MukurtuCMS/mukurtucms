@@ -24,15 +24,6 @@ function mukurtu_starter_preprocess_field(&$variables, $hook) {
                 }
             }
         }
-
-        // Content found in
-        if($element['#field_name'] == 'field_node_aggregate') {
-            if(!empty($variables['items'][0]['node'])) {
-                $variables['items'][0]['node'][key($variables['items'][0]['node'])]['#prefix'] = '<a name="found-in"></a>';
-            }
-        }
-        
-        //        dpm($variables);
     }
 }
 

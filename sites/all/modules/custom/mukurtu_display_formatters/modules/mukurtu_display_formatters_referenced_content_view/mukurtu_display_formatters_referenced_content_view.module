@@ -53,6 +53,7 @@ function mukurtu_display_formatters_referenced_content_view_field_formatter_view
 
     $url_parameters = drupal_get_query_parameters();
     if(isset($url_parameters['taxonomy'])) {
+        drupal_add_js(drupal_get_path('module', 'mukurtu_display_formatters_referenced_content_view') .'/js/mukurtu_referenced_content.js', 'file');
         $filter = $url_parameters['taxonomy'];
     } else {
         $filter = 'all';
@@ -140,13 +141,13 @@ if(isset($view->args[0])) {
 
     $class = $filter == \'all\' ? \'class="active"\' : \'\';
     $url_parameters[\'taxonomy\'] = \'all\';
-    $filter_link = l(\'All\', $path_alias, array(\'query\' => $url_parameters, \'fragment\' => \'found-in\'));
+    $filter_link = l(\'All\', $path_alias, array(\'query\' => $url_parameters));
     print "<li $class>$filter_link</li>";
     foreach($vocabs as $vocab) {
         $class = $filter == $vocab->machine_name ? \'class="active"\' : \'\';
         $url_parameters[\'taxonomy\'] = $vocab->machine_name;
 
-        $filter_link = l($vocab->name, $path_alias, array(\'query\' => $url_parameters, \'fragment\' => \'found-in\'));
+        $filter_link = l($vocab->name, $path_alias, array(\'query\' => $url_parameters));
         $option = "<li $class>$filter_link</li>";
         print $option;
     }
