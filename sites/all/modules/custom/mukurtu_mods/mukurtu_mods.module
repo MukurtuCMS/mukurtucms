@@ -385,21 +385,3 @@ function mukurtu_mods_feeds_set_target($source, &$entity, $target, $value) {
   }
   $entity->{$target} = $field;
 }
-
-/**
- * Invoked after a feed source has been imported.
- *
- * @param $source
- *  FeedsSource object that describes the source that has been imported.
- */
-function mukurtu_mods_feeds_after_import(FeedsSource $source) {
-  drupal_set_message('You can view and edit your content, categories, users & groups.
-  <ul>
-    <li><a href="/group-list">List of Groups</a></li>
-    <li><a href="/admin/content">Manage Content & Groups</a></li>
-    <li><a href="/admin/structure/taxonomy/category">Manage Categories</a>
-    <li><a href="/admin/people">Manage Users</a></li>
-  </ul>
-  ');
-}
-
