@@ -645,7 +645,7 @@ function ma_dictionary_feeds_presave(FeedsSource $source, $entity, $item) {
         }
     }
 
-    if($entity->bundle == 'dictionary_word_bundle') {
+    if(isset($entity->bundle) && $entity->bundle == 'dictionary_word_bundle') {
         if(isset($entity->feeds_item->entity_id) && $entity->feeds_item->entity_id > 0) {
             $entity->item_id = $entity->feeds_item->entity_id;
         }

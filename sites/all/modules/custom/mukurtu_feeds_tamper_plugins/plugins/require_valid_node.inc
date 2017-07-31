@@ -68,7 +68,8 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
 
         // Try using the reference as a GUID first
         $referenced_node_nid = _mukurtu_feeds_tamper_plugins_require_valid_node_lookup_node_by_guid($node_ref);
-        
+
+        $referenced_node = NULL;
         if(is_numeric($referenced_node_nid)) {
             $referenced_node = node_load($referenced_node_nid);
         }
