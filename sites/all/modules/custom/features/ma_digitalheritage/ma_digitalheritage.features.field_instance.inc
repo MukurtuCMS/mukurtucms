@@ -2458,7 +2458,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
-          'link' => 0,
+          'link' => 1,
           'override' => 0,
         ),
         'type' => 'ma_scald_search_results',

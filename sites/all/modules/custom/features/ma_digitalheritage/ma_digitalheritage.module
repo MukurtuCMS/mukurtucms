@@ -203,19 +203,38 @@ function ma_digitalheritage_community_record_local_tasks() {
 function ma_digitalheritage_preprocess_field(&$variables, $hook) {
     // Display the first image or thumbnail when viewing the media asset field rather than a default icon for any display where we are
     // showing a single image to represent the entire field (e.g., search results). This was previously implemented as a patch to Scald.
-    if($variables['element']['#field_name'] == 'field_media_asset' && count($variables['items']) == 1) {
+    if($variables['element']['#field_name'] == 'field_media_asset' ) {//&& count($variables['items']) == 1) {
         // Only process if there are more than 1 scald atoms
         if(isset($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) && count($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) > 1 ) {
             // Search through the scald atoms and find the first image or thumbnail
             foreach($variables['element']['#object']->field_media_asset[LANGUAGE_NONE] as $index => $item) {
                 $atom = scald_atom_load($item['sid']);
 
-                if($atom->type == 'image' || isset($atom->scald_thumbnail[LANGUAGE_NONE][0])) {
-                    unset($variables['element']['#items'][0]);
-                    $variables['element']['#items'][] = $variables['element']['#object']->field_media_asset['und'][$index];
-                    unset($variables['items'][0]);
-                    $variables['items'][] = $variables['element'][$index];
+                if($atom && ($atom->type == 'image' || isset($atom->scald_thumbnail[LANGUAGE_NONE][0]))) {
+                    if($index == 0) {
+                        break;
+                    }
+                    // Move image to first position
+                    $temp = $variables['items'][$index];
+                    unset($variables['items'][$index]);
+                    array_unshift($variables['items'], $temp);
                     break;
+                }
+            }
+        }
+    }
+
+    // Show only one media item in teaser. We really need to make a standalone display formatter for this.
+    if($variables['element']['#view_mode'] == 'teaser') {
+        if($variables['element']['#field_name'] == 'field_media_asset') {
+            if(count($variables['element']['#items']) > 1) {
+                $first_media = FALSE;
+                foreach($variables['items'] as $item_key => $item) {
+                    if(!$first_media) {
+                        $first_media = TRUE;
+                    } else {
+                        unset($variables['items'][$item_key]);
+                    }
                 }
             }
         }
