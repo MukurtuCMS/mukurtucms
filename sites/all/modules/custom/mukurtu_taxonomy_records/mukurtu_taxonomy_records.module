@@ -839,12 +839,16 @@ function mukurtu_taxonomy_records_entity_update($entity, $type) {
                 $old = array();
                 // Get the new taxonomy refs
                 foreach($emw_node->{$taxonomy_field['field_name']}->value() as $index => $ref) {
-                    $new[] = $ref->tid;
+                    if(isset($ref->tid)) {
+                        $new[] = $ref->tid;
+                    }
                 }               
 
                 // Get the old taxonomy refs
                 foreach($emw_node_original->{$taxonomy_field['field_name']}->value() as $index => $ref) {
-                    $old[] = $ref->tid;
+                    if(isset($ref->tid)) {
+                        $old[] = $ref->tid;
+                    }
                 }
 
                 $new_old_diff = array_merge(array_diff($new, $old), array_diff($old, $new));
