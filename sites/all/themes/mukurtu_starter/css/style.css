@@ -9715,6 +9715,9 @@ table .checkbox input[type="checkbox"] {
 .view-communities-structure .views-table .communities-structure-protocol a {
   padding-left: 2em;
 }
+.node-teaser .row {
+  padding-bottom: 30px;
+}
 .field .label-inline {
   float: left;
   font-weight: bold;

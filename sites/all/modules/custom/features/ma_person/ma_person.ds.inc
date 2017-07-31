@@ -22,26 +22,16 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_date_born' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_date_died' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
     'field_node_aggregate' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_ds_field_expert',
           'lb' => 'Referenced Content',
           'lb-cl' => 'field-name-field-node-aggregate',
+          'lb-at' => 'name="found-in"',
           'lb-col' => TRUE,
           'lbw' => 1,
           'lbw-el' => 'h3',
-          'prefix' => '<a name="found-in"></a>',
         ),
       ),
     ),
