@@ -22,9 +22,51 @@ function ma_profile_form_user_register_form_alter(&$form, &$form_state, $form_id
   }
 
   // Only show communities for the group ref field
-  $communities_only = $form['og_user_node'][LANGUAGE_NONE]['#options']['Community'];
-  $form['og_user_node'][LANGUAGE_NONE]['#options'] = $communities_only;
 
+  //  $communities_only = $form['og_user_node'][LANGUAGE_NONE]['#options']['Community'];
+  //  dpm($communities_only);
+  //  $form['og_user_node'][LANGUAGE_NONE]['#options'] = $communities_only;
+
+}
+
+/**
+ * Implements hook_query_og_alter().
+ */
+function ma_profile_query_og_alter(QueryAlterableInterface $query) {
+    // For some reason the 'Do not show on registration page' functionality isn't filtering our values
+    // Here we stick in the condition that makes it happen. This should be removed once we identify the actual cause
+    // of the problem.
+
+    // These conditions are taken straight from og_register_query_og_alter
+    global $user;
+    if ($user->uid) {
+        // User is authenticated.
+        return;
+    }
+
+    if (!field_info_field(OG_REGISTER_FIELD)) {
+        // No register field exists.
+        return;
+    }
+
+    $handler = $query->alterMetaData['entityreference_selection_handler'];
+    $field = $handler->field;
+    $instance = $handler->instance;
+
+    if ($instance['entity_type'] != 'user') {
+        // Field is not attached to the user entity.
+        return;
+    }
+
+    // Loop through conditions, add if necessary
+    $conditions = &$query->conditions();
+    foreach ($conditions as $key => $condition) {
+        if($condition['field'] == 'node.nid' && $condition['value'] == -1 && $condition['operator'] == '=') {
+            return;
+        }
+    }
+
+    $conditions[] = array("field" => 'node.nid', "value" => -1, "operator" => '=');
 }
 
 /**
