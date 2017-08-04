@@ -208,6 +208,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
@@ -281,6 +282,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_thumbnail_image',
         'weight' => 1,
@@ -308,6 +310,62 @@ function ma_community_field_default_field_instances() {
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-community-field_membership_list_options'.
+  $field_instances['node-community-field_membership_list_options'] = array(
+    'bundle' => 'community',
+    'default_value' => array(
+      0 => array(
+        'value' => 'all',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Controls which members, if any, are displayed on the member list on the community page.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 23,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_membership_list_options',
+    'label' => 'Membership List Options',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
     ),
   );
 
@@ -443,7 +501,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'apply_chosen' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 4,
+      'weight' => 2,
     ),
   );
 
@@ -600,8 +658,10 @@ Strict - Your community page is invisible to all site users who are not members 
   t('Child Communities');
   t('Comment');
   t('Community Parent');
+  t('Controls which members, if any, are displayed on the member list on the community page.');
   t('Description');
   t('Group type');
+  t('Membership List Options');
   t('Open - Your community page is visible to all visitors of your site. Any items under open protocols are also accessible.<br>
 Strict - Your community page is invisible to all site users who are not members or your community. All protocols created within this community are inaccessible to users outside of this community.');
   t('Parent Community');

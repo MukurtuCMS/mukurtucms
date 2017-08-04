@@ -40,18 +40,35 @@ function ma_community_views_default_views() {
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['label'] = 'No Results';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no members in this group.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Relationship: OG membership: OG membership from User */
   $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
   $handler->display->display_options['relationships']['og_membership_rel']['table'] = 'users';
   $handler->display->display_options['relationships']['og_membership_rel']['field'] = 'og_membership_rel';
+  /* Relationship: OG membership: OG Roles from membership */
+  $handler->display->display_options['relationships']['og_users_roles']['id'] = 'og_users_roles';
+  $handler->display->display_options['relationships']['og_users_roles']['table'] = 'og_membership';
+  $handler->display->display_options['relationships']['og_users_roles']['field'] = 'og_users_roles';
+  $handler->display->display_options['relationships']['og_users_roles']['relationship'] = 'og_membership_rel';
   /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['label'] = '';
+  $handler->display->display_options['fields']['name']['alter']['text'] = '[name]';
+  $handler->display->display_options['fields']['name']['element_label_colon'] = FALSE;
+  /* Field: OG membership: OG user roles in group */
+  $handler->display->display_options['fields']['og_roles']['id'] = 'og_roles';
+  $handler->display->display_options['fields']['og_roles']['table'] = 'og_membership';
+  $handler->display->display_options['fields']['og_roles']['field'] = 'og_roles';
+  $handler->display->display_options['fields']['og_roles']['relationship'] = 'og_membership_rel';
+  $handler->display->display_options['fields']['og_roles']['exclude'] = TRUE;
+  /* Sort criterion: User: Name */
+  $handler->display->display_options['sorts']['name']['id'] = 'name';
+  $handler->display->display_options['sorts']['name']['table'] = 'users';
+  $handler->display->display_options['sorts']['name']['field'] = 'name';
   /* Sort criterion: OG membership: Created */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'og_membership';
@@ -83,6 +100,23 @@ function ma_community_views_default_views() {
   $handler->display->display_options['filters']['state']['value'] = array(
     1 => '1',
   );
+  /* Filter criterion: OG user roles: Role Name */
+  $handler->display->display_options['filters']['name']['id'] = 'name';
+  $handler->display->display_options['filters']['name']['table'] = 'og_role';
+  $handler->display->display_options['filters']['name']['field'] = 'name';
+  $handler->display->display_options['filters']['name']['relationship'] = 'og_users_roles';
+  $handler->display->display_options['filters']['name']['operator'] = 'not empty';
+  $handler->display->display_options['filters']['name']['value'] = array(
+    'all' => 'all',
+    'administrator member' => 'administrator member',
+    'community manager' => 'community manager',
+    'contributor' => 'contributor',
+    'language contributor' => 'language contributor',
+    'language steward' => 'language steward',
+    'member' => 'member',
+    'non-member' => 'non-member',
+    'protocol steward' => 'protocol steward',
+  );
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block_1');
@@ -102,8 +136,11 @@ function ma_community_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('There are no members in this group.'),
+    t('No Results'),
     t('OG membership from user'),
+    t('OG Roles from OG membership'),
+    t('[name]'),
+    t('OG user roles in group'),
     t('All'),
     t('Block'),
   );
