@@ -70,7 +70,7 @@ function ma_core_views_pre_build(&$view) {
       $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
       $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
       $output .= '</div>';
-      $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html'));
+      $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html', 'empty' => 1));
     }
   }
 }
