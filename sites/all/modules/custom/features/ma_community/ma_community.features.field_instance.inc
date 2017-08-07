@@ -322,7 +322,7 @@ function ma_community_field_default_field_instances() {
       ),
     ),
     'deleted' => 0,
-    'description' => 'Controls which members, if any, are displayed on the member list on the community page.',
+    'description' => 'These options set the membership list visibility for visitors and community members. The full membership list will always be visible to community managers.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -365,7 +365,7 @@ function ma_community_field_default_field_instances() {
         'apply_chosen' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 5,
     ),
   );
 
@@ -658,7 +658,6 @@ Strict - Your community page is invisible to all site users who are not members 
   t('Child Communities');
   t('Comment');
   t('Community Parent');
-  t('Controls which members, if any, are displayed on the member list on the community page.');
   t('Description');
   t('Group type');
   t('Membership List Options');
@@ -666,6 +665,7 @@ Strict - Your community page is invisible to all site users who are not members 
 Strict - Your community page is invisible to all site users who are not members or your community. All protocols created within this community are inaccessible to users outside of this community.');
   t('Parent Community');
   t('Sharing protocol');
+  t('These options set the membership list visibility for visitors and community members. The full membership list will always be visible to community managers.');
   t('This image is used in the Community listings page. Use a 1:1 width to height ratio.
 ');
   t('Thumbnail Image');

@@ -86,7 +86,7 @@ function ma_community_field_group_info() {
   $field_group->parent_name = 'group_advanced';
   $field_group->data = array(
     'label' => 'Custom TK Label Text',
-    'weight' => '5',
+    'weight' => '6',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(

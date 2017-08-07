@@ -10,7 +10,8 @@
 function ma_culturalprotocol_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'comment-comment_node_cultural_protocol_group-comment_body'
+  // Exported field_instance:
+  // 'comment-comment_node_cultural_protocol_group-comment_body'.
   $field_instances['comment-comment_node_cultural_protocol_group-comment_body'] = array(
     'bundle' => 'comment_node_cultural_protocol_group',
     'default_value' => NULL,
@@ -46,7 +47,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-body'
+  // Exported field_instance: 'node-cultural_protocol_group-body'.
   $field_instances['node-cultural_protocol_group-body'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
@@ -106,7 +107,59 @@ function ma_culturalprotocol_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-field_protocl_signup_permissions'
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-field_membership_list_options'.
+  $field_instances['node-cultural_protocol_group-field_membership_list_options'] = array(
+    'bundle' => 'cultural_protocol_group',
+    'default_value' => array(
+      0 => array(
+        'value' => 'all',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'These options set the membership list visibility for visitors and community members. The full membership list will always be visible to protocol stewards.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 20,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_membership_list_options',
+    'label' => 'Membership List Options',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+      ),
+      'type' => 'options_select',
+      'weight' => 48,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-field_protocl_signup_permissions'.
   $field_instances['node-cultural_protocol_group-field_protocl_signup_permissions'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => array(
@@ -156,7 +209,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-field_protocol_auto_join'
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-field_protocol_auto_join'.
   $field_instances['node-cultural_protocol_group-field_protocol_auto_join'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => array(
@@ -201,11 +255,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 38,
+      'weight' => 44,
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-field_protocol_image'
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-field_protocol_image'.
   $field_instances['node-cultural_protocol_group-field_protocol_image'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
@@ -217,6 +272,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 16,
@@ -226,6 +282,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
@@ -262,7 +319,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-field_protocol_image_thumbnail'
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-field_protocol_image_thumbnail'.
   $field_instances['node-cultural_protocol_group-field_protocol_image_thumbnail'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
@@ -275,6 +333,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'title',
         'weight' => 17,
@@ -317,7 +376,7 @@ function ma_culturalprotocol_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-group_access'
+  // Exported field_instance: 'node-cultural_protocol_group-group_access'.
   $field_instances['node-cultural_protocol_group-group_access'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
@@ -379,7 +438,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
     'widget_type' => 'options_select',
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-group_group'
+  // Exported field_instance: 'node-cultural_protocol_group-group_group'.
   $field_instances['node-cultural_protocol_group-group_group'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => array(
@@ -441,12 +500,12 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'og_hide' => 1,
       ),
       'type' => 'options_buttons',
-      'weight' => 39,
+      'weight' => 45,
     ),
     'widget_type' => 'options_select',
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-group_register'
+  // Exported field_instance: 'node-cultural_protocol_group-group_register'.
   $field_instances['node-cultural_protocol_group-group_register'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => array(
@@ -504,12 +563,12 @@ Strict - This cultural protocol and the digital heritage items within are shared
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 41,
+      'weight' => 47,
     ),
     'widget_type' => 'options_select',
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-og_group_ref'
+  // Exported field_instance: 'node-cultural_protocol_group-og_group_ref'.
   $field_instances['node-cultural_protocol_group-og_group_ref'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => array(),
@@ -603,7 +662,8 @@ Strict - This cultural protocol and the digital heritage items within are shared
     ),
   );
 
-  // Exported field_instance: 'node-cultural_protocol_group-og_roles_permissions'
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-og_roles_permissions'.
   $field_instances['node-cultural_protocol_group-og_roles_permissions'] = array(
     'bundle' => 'cultural_protocol_group',
     'default_value' => array(
@@ -663,7 +723,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 40,
+      'weight' => 46,
     ),
     'widget_type' => 'options_select',
   );
@@ -679,6 +739,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Group register');
   t('Group roles and permissions');
   t('Group type');
+  t('Membership List Options');
   t('Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
 Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ');
   t('Parent Community');
@@ -687,6 +748,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Select Group if you want this content type to be a group that can be associated to users, content and used for access settings.');
   t('Sharing Protocol');
   t('Signup Permissions');
+  t('These options set the membership list visibility for visitors and community members. The full membership list will always be visible to protocol stewards.');
   t('This field determines whether the internal role of a user in the group will override his/her general user permissions especially relative to restricted content.');
   t('This image is used in the Community listings page. Use a 1:1 width to height ratio.
 ');

@@ -104,7 +104,7 @@ function ma_community_field_default_field_bases() {
       'allowed_values' => array(
         'none' => 'Do not display membership list',
         'all' => 'Display all members',
-        'managers' => 'Display only community managers',
+        'managers' => 'Display only community managers/protocol stewards',
       ),
       'allowed_values_function' => '',
     ),
