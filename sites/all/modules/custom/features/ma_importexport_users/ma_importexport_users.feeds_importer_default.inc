@@ -22,6 +22,12 @@ function ma_importexport_users_feeds_importer_default() {
       'config' => array(
         'allowed_extensions' => 'txt csv tsv xml opml',
         'direct' => FALSE,
+        'delete_uploaded_file' => FALSE,
+        'directory' => 'private://feeds',
+        'allowed_schemes' => array(
+          0 => 'public',
+          1 => 'private',
+        ),
       ),
     ),
     'parser' => array(
@@ -29,13 +35,13 @@ function ma_importexport_users_feeds_importer_default() {
       'config' => array(
         'delimiter' => ',',
         'no_headers' => 0,
+        'encoding' => 'UTF-8',
       ),
     ),
     'processor' => array(
       'plugin_key' => 'FeedsTermProcessor',
       'config' => array(
         'vocabulary' => 'category',
-        'force_update' => 1,
         'mappings' => array(
           0 => array(
             'source' => 'guid',
@@ -53,8 +59,13 @@ function ma_importexport_users_feeds_importer_default() {
             'unique' => FALSE,
           ),
         ),
-        'update_existing' => '0',
-        'input_format' => 'plain_text',
+        'update_existing' => '2',
+        'input_format' => 'full_html',
+        'insert_new' => '1',
+        'update_non_existent' => 'skip',
+        'skip_hash_check' => 0,
+        'bundle' => 'people',
+        'language' => 'und',
       ),
     ),
     'content_type' => '',
@@ -83,6 +94,7 @@ function ma_importexport_users_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -153,6 +165,11 @@ function ma_importexport_users_feeds_importer_default() {
             'unique' => FALSE,
             'language' => 'und',
           ),
+          9 => array(
+            'source' => 'Membership Display',
+            'target' => 'field_membership_list_options',
+            'unique' => FALSE,
+          ),
         ),
         'update_existing' => '2',
         'input_format' => 'filtered_html',
@@ -190,6 +207,7 @@ function ma_importexport_users_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -265,6 +283,11 @@ function ma_importexport_users_feeds_importer_default() {
             'target' => 'group_register',
             'unique' => FALSE,
             'language' => 'und',
+          ),
+          10 => array(
+            'source' => 'Membership Display',
+            'target' => 'field_membership_list_options',
+            'unique' => FALSE,
           ),
         ),
         'update_existing' => '2',
