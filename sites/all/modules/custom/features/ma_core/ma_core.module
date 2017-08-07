@@ -66,11 +66,25 @@ function ma_core_views_pre_build(&$view) {
   if ($view->name == 'group_members') {
     $gid = arg(1);
     if (og_user_access('node', $gid, 'manage members')) {
-      $output = '<div class="add-manage-members-links">';
-      $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
-      $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
-      $output .= '</div>';
-      $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html', 'empty' => 1));
+        // We always want to show the buttons to users who can use them, so we need to have an empty
+        // "no results" message so that the view is actually displayed
+        $options = array(
+            'id' => 'empty_text',
+            'table' => 'views',
+            'field' => 'area',
+            'empty' => FALSE,
+            'content' => '',
+            'format' => 'filtered_html',
+            'tokenize' => 0,
+        );
+        $view->set_item('default', 'empty', 'empty_text', $options);
+
+        // Display the user management buttons
+        $output = '<div class="add-manage-members-links">';
+        $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
+        $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
+        $output .= '</div>';
+        $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html', 'empty' => 1));
     }
   }
 }
