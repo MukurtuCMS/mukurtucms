@@ -397,7 +397,7 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
     // privacy (Item Sharing Settings) set to ALL. This is the default.
     else {
       foreach ($groups_on_node as $group) {
-        if (!og_is_member('node', $group)) { // Pass if user is a member of the group
+        if (!og_is_member('node', $group, 'user', $account)) { // Pass if user is a member of the group
           $group_emw = entity_metadata_wrapper('node', $group);
           if(!empty($group_emw->group_access)) {
               if ($group_emw->group_access->value() <> 0) { // Pass if it's an open group
