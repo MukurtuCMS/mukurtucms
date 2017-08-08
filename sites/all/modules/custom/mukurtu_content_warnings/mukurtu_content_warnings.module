@@ -68,6 +68,7 @@ function mukurtu_content_warnings_get_warning($atom) {
         $people_warning_settings = variable_get('mukurtu_content_warning_people');
 
         // Check if people warnings are enabled
+        $people_names = array();
         if(isset($people_warning_settings['enabled']) && $people_warning_settings['enabled']) {
             // Check each person taxonomy term the atom is tagged with
             if(isset($emw_atom->field_people)) {
@@ -81,8 +82,8 @@ function mukurtu_content_warnings_get_warning($atom) {
                             if($record->type == 'person') {
                                 if($record->field_deceased[LANGUAGE_NONE][0]['value'] == 1) {
                                     // Add the person's name to the message
-                                    $warning = str_ireplace('[name]', $record->title, $people_warning_settings['warning']);
-                                    return $warning;
+                                    $people_names[] = $record->title;//str_ireplace('[name]', $record->title, $people_warning_settings['warning']);
+                                    //                                    return $warning;
                                 }
                             }
                         }
@@ -90,6 +91,16 @@ function mukurtu_content_warnings_get_warning($atom) {
                 }
             }
         }
+    }
+
+    // Check if we found any deceased
+    if(!empty($people_names)) {
+        // Multiple or single?
+        if(count($people_names) == 1) {
+            return str_ireplace('[name]', $people_names[0], $people_warning_settings['warning_single']);
+        }
+        return str_ireplace('[names]', implode(', ', $people_names), $people_warning_settings['warning_multiple']);
+
     }
 
     // Taxonomy based warning check
