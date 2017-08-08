@@ -51,11 +51,18 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
             '#description' => t('This is a site-wide setting.'),
         );
 
-        $form['mukurtu_content_warning_people']['warning'] = array(
-            '#title' => t('Warning Text'),
+        $form['mukurtu_content_warning_people']['warning_single'] = array(
+            '#title' => t('Warning Text: Single Person'),
             '#type' => 'textfield',
-            '#description' => t('The text that will be displayed on the media overlay. Use the replacement token "[name]" to insert the person\'s name in the message.'),
-            '#default_value' => isset($person_defaults['warning']) ? $person_defaults['warning'] : t('Warning: [name] is deceased. Click through to access content.'),
+            '#description' => t('The text that will be displayed on the media overlay for a single deceased person. Use the replacement token "[name]" to insert the person\'s name in the message.'),
+            '#default_value' => isset($person_defaults['warning_single']) ? $person_defaults['warning_single'] : t('Warning: [name] is deceased. Click through to access content.'),
+        );
+
+        $form['mukurtu_content_warning_people']['warning_multiple'] = array(
+            '#title' => t('Warning Text: Multiple People'),
+            '#type' => 'textfield',
+            '#description' => t('The text that will be displayed on the media overlay for multiple deceased people. Use the replacement token "[names]" to insert the names in the message.'),
+            '#default_value' => isset($person_defaults['warning_multiple']) ? $person_defaults['warning_multiple'] : t('Warning: The following people are deceased. Click through to access content. [names]'),
         );
     }
 
