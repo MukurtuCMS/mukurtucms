@@ -4,10 +4,11 @@ package = Scald Providers
 core = 7.x
 dependencies[] = scald
 
+files[] = tests/scald_dailymotion.test
 
-; Information added by Drupal.org packaging script on 2016-03-30
-version = "7.x-1.5"
+; Information added by Drupal.org packaging script on 2017-06-15
+version = "7.x-1.6"
 core = "7.x"
 project = "scald_dailymotion"
-datestamp = "1459322340"
+datestamp = "1497560644"
 
