@@ -6,6 +6,90 @@
  */
 
 /**
+ * Base of the term merge action form.
+ *
+ * It is extracted into a separate function to better internal code reuse.
+ *
+ * @param object $vocabulary
+ *   Fully loaded Taxonomy vocabulary where the merge should occur
+ * @param array $term_branch_value
+ *   Array of Taxonomy term IDs that are nominated as branch terms.
+ */
+function term_merge_form_base(&$form, &$form_state, $vocabulary, $term_branch_value) {
+  $form['#vocabulary'] = $vocabulary;
+  $form['#term_merge_term_branch'] = $term_branch_value;
+
+  $tree = taxonomy_get_tree($vocabulary->vid);
+
+  $form['term_trunk'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Merge Into'),
+    '#prefix' => '<div id="term-merge-form-term-trunk">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+    '#element_validate' => array('term_merge_form_base_term_trunk_validate'),
+  );
+
+  // Array of currently available widgets for choosing term trunk.
+  $term_trunk_widget_options = array(
+    'autocomplete' => 'Autocomplete',
+  );
+  if (variable_get('taxonomy_override_selector', FALSE) && module_exists('hs_taxonomy')) {
+    $term_trunk_widget_options['hs_taxonomy'] = t('Hierarchical Select');
+    $term_trunk_widget = 'hs_taxonomy';
+  }
+  else {
+    $term_trunk_widget_options['select'] = t('Select');
+    $term_trunk_widget = 'select';
+  }
+
+  // If the vocabulary is too big, by default we want the trunk term widget to
+  // be autocomplete instead of select or hs_taxonomy.
+  if (count($tree) > 200) {
+    $term_trunk_widget = 'autocomplete';
+  }
+
+  // Override the term trunk widget if settings are found in $form_state.
+  if (isset($form_state['values']['term_trunk']['widget']) && in_array($form_state['values']['term_trunk']['widget'], array_keys($term_trunk_widget_options))) {
+    $term_trunk_widget = $form_state['values']['term_trunk']['widget'];
+  }
+
+  // TODO: the trunk term widgets should be implemented as cTools plugins.
+  $form['term_trunk']['widget'] = array(
+    '#type' => 'radios',
+    '#title' => t('Widget'),
+    '#required' => TRUE,
+    '#options' => $term_trunk_widget_options,
+    '#default_value' => $term_trunk_widget,
+    '#description' => t('Choose what widget you prefer for entering the term trunk.'),
+    '#ajax' => array(
+      'callback' => 'term_merge_form_term_trunk',
+      'wrapper' => 'term-merge-form-term-trunk',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
+  );
+
+  // @todo:
+  // There is a known bug, if user has selected something in one widget, and
+  // then changes the widget, $form_states['values'] will hold the value for
+  // term trunk form element in the format that is used in one widget, while
+  // this value will be passed to another widget. This triggers different
+  // unpleasant effects like showing tid instead of term's name or vice-versa.
+  // I think we should just empty $form_state['values'] for the term trunk
+  // form element when widget changes. Better ideas are welcome!
+  $function = 'term_merge_form_term_trunk_widget_' . $term_trunk_widget;
+  $function($form, $form_state, $vocabulary, $term_branch_value);
+
+  // Ensuring the Merge Into form element has the same title no matter what
+  // widget has been used.
+  $form['term_trunk']['tid']['#title'] = t('Merge into');
+
+  // Adding necessary options of merging.
+  $form += term_merge_merge_options_elements($vocabulary);
+}
+
+/**
  * Menu callback.
  *
  * Allow user to specify which terms to be merged into which term and any
@@ -20,21 +104,21 @@
  *
  * @return array
  *   Array of the form in Form API format
+ *
+ * TODO: accidentally this function happens to implement hook_form() which is
+ * definitely not my intention. This function must be renamed to a safer name.
  */
 function term_merge_form($form, $form_state, $vocabulary = NULL, $term = NULL) {
   if (is_null($vocabulary)) {
     $vocabulary = taxonomy_vocabulary_load($term->vid);
   }
 
-  // It's always handy to have the vocabulary by hand.
-  $form['#vocabulary'] = $vocabulary;
-
   if (!isset($form_state['storage']['confirm'])) {
     // We are at the set up step.
 
     $tree = taxonomy_get_tree($vocabulary->vid);
 
-    $term_branch_value = is_null($term) ? NULL : array($term->tid);
+    $term_branch_value = is_null($term) ? array() : array($term->tid);
     if (variable_get('taxonomy_override_selector', FALSE) && module_exists('hs_taxonomy')) {
       // We use Hierarchical Select module if it's available and configured to
       // be used for taxonomy selects.
@@ -96,74 +180,14 @@ function term_merge_form($form, $form_state, $vocabulary = NULL, $term = NULL) {
       ),
       '#default_value' => $term_branch_value,
     ) + $form['term_branch'];
-    if (is_null($form['term_branch']['#default_value'])) {
-      unset($form['term_branch']['#default_value']);
+
+    // We overwrite term branch value with the one from $form_state, if there is
+    // something there.
+    if (isset($form_state['values']['term_branch']) && is_array($form_state['values']['term_branch'])) {
+      $term_branch_value = $form_state['values']['term_branch'];
     }
 
-    $form['term_trunk'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Merge Into'),
-      '#prefix' => '<div id="term-merge-form-term-trunk">',
-      '#suffix' => '</div>',
-      '#tree' => TRUE,
-    );
-
-    // Array of currently available widgets for choosing term trunk.
-    $term_trunk_widget_options = array(
-      'autocomplete' => 'Autocomplete',
-    );
-    if (variable_get('taxonomy_override_selector', FALSE) && module_exists('hs_taxonomy')) {
-      $term_trunk_widget_options['hs_taxonomy'] = t('Hierarchical Select');
-      $term_trunk_widget = 'hs_taxonomy';
-    }
-    else {
-      $term_trunk_widget_options['select'] = t('Select');
-      $term_trunk_widget = 'select';
-    }
-
-    // If the vocabulary is too big, by default we want the trunk term widget to
-    // be autocomplete instead of select or hs_taxonomy.
-    if (count($tree) > 200) {
-      $term_trunk_widget = 'autocomplete';
-    }
-
-    // Override the term trunk widget if settings are found in $form_state.
-    if (isset($form_state['values']['term_trunk']['widget']) && in_array($form_state['values']['term_trunk']['widget'], array_keys($term_trunk_widget_options))) {
-      $term_trunk_widget = $form_state['values']['term_trunk']['widget'];
-    }
-
-    $form['term_trunk']['widget'] = array(
-      '#type' => 'radios',
-      '#title' => t('Widget'),
-      '#required' => TRUE,
-      '#options' => $term_trunk_widget_options,
-      '#default_value' => $term_trunk_widget,
-      '#description' => t('Choose what widget you prefer for entering the term trunk.'),
-      '#ajax' => array(
-        'callback' => 'term_merge_form_term_trunk',
-        'wrapper' => 'term-merge-form-term-trunk',
-        'method' => 'replace',
-        'effect' => 'fade',
-      ),
-    );
-
-    // @todo:
-    // There is a known bug, if user has selected something in one widget, and
-    // then changes the widget, $form_states['values'] will hold the value for
-    // term trunk form element in the format that is used in one widget, while
-    // this value will be passed to another widget. This triggers different
-    // unpleasant effects like showing tid instead of term's name or vice-versa.
-    // I think we should just empty $form_state['values'] for the term trunk
-    // form element when widget changes. Better ideas are welcome!
-    $function = 'term_merge_form_term_trunk_widget_' . $term_trunk_widget;
-    $function($form, $form_state, $vocabulary);
-
-    // Ensuring the Merge Into form element has the same title no matter what
-    // widget has been used.
-    $form['term_trunk']['tid']['#title'] = t('Merge into');
-
-    // Adding necessary options of merging.
-    $form += term_merge_merge_options_elements($vocabulary);
+    term_merge_form_base($form, $form_state, $vocabulary, $term_branch_value);
 
     $form['actions'] = array(
       '#type' => 'actions',
@@ -182,29 +206,6 @@ function term_merge_form($form, $form_state, $vocabulary = NULL, $term = NULL) {
   }
 
   return $form;
-}
-
-/**
- * Supportive function.
- *
- * Validate the term_merge_form(). Make sure term trunk is not among the
- * selected term branches or their children.
- */
-function term_merge_form_validate($form, &$form_state) {
-  if (!isset($form_state['storage']['confirm'])) {
-    // We only validate the 1st step of the form.
-    $prohibited_trunks = array();
-    foreach ($form_state['values']['term_branch'] as $term_branch) {
-      $children = taxonomy_get_tree($form['#vocabulary']->vid, $term_branch);
-      $prohibited_trunks[] = $term_branch;
-      foreach ($children as $child) {
-        $prohibited_trunks[] = $child->tid;
-      }
-    }
-    if (in_array($form_state['values']['term_trunk']['tid'], $prohibited_trunks)) {
-      form_error($form['term_trunk']['tid'], t('Trunk term cannot be one of the selected branch terms or their children.'));
-    }
-  }
 }
 
 /**
@@ -228,157 +229,6 @@ function term_merge_form_submit($form, &$form_state) {
 
     $form_state['redirect'] = array('taxonomy/term/' . $form_state['values']['term_trunk']['tid']);
   }
-}
-
-/**
- * Supportive function.
- *
- * Generate form elements for select widget for term trunk element of the
- * term_merge_form().
- *
- * @param object $vocabulary
- *   Fully loaded taxonomy vocabulary object
- */
-function term_merge_form_term_trunk_widget_select(&$form, &$form_state, $vocabulary) {
-  $tree = taxonomy_get_tree($vocabulary->vid);
-  $options = array();
-  foreach ($tree as $v) {
-    $options[$v->tid] = str_repeat('-', $v->depth) . $v->name . ' [tid: ' . $v->tid . ']';
-  }
-
-  $term_branch_value = array();
-  // Firstly trying to look up selected term branches in the default value of
-  // term branch form element.
-  if (isset($form['term_branch']['#default_value']) && is_array($form['term_branch']['#default_value'])) {
-    $term_branch_value = $form['term_branch']['#default_value'];
-  }
-  if (isset($form_state['values']['term_branch']) && is_array($form_state['values']['term_branch'])) {
-    $term_branch_value = $form_state['values']['term_branch'];
-  }
-
-  if (!empty($term_branch_value)) {
-    // We have to make sure among term_trunk there is no term_branch or any of
-    // their children.
-    foreach ($term_branch_value as $v) {
-      unset($options[$v]);
-      foreach (taxonomy_get_tree($vocabulary->vid, $v) as $child) {
-        unset($options[$child->tid]);
-      }
-    }
-  }
-  else {
-    // Term branch has not been selected yet.
-    $options = array();
-  }
-
-  $form['term_trunk']['tid'] = array(
-    '#type' => 'select',
-    '#required' => TRUE,
-    '#description' => t('Choose into what term you want to merge.'),
-    '#options' => $options,
-  );
-}
-
-/**
- * Supportive function.
- *
- * Generate form element for hierarchical select widget for term trunk element
- * of the term_merge_form().
- *
- * @param object $vocabulary
- *   Fully loaded taxonomy vocabulary object
- */
-function term_merge_form_term_trunk_widget_hs_taxonomy(&$form, &$form_state, $vocabulary) {
-  $form['term_trunk']['tid'] = array(
-    '#type' => 'hierarchical_select',
-    '#description' => t('Please select a term to merge into.'),
-    '#required' => TRUE,
-    '#element_validate' => array('term_merge_form_trunk_term_widget_hs_taxonomy_validate'),
-    '#config' => array(
-      'module' => 'hs_taxonomy',
-      'params' => array(
-        'vid' => $vocabulary->vid,
-        'exclude_tid' => NULL,
-        'root_term'   => FALSE,
-      ),
-      'enforce_deepest' => 0,
-      'entity_count' => 0,
-      'require_entity' => 0,
-      'save_lineage' => 0,
-      'level_labels' => array(
-        'status' => 0,
-      ),
-      'dropbox' => array(
-        'status' => 0,
-      ),
-      'editability' => array(
-        'status' => 0,
-      ),
-      'resizable' => TRUE,
-      'render_flat_select' => 0,
-    ),
-  );
-}
-
-/**
- * Supportive function.
- *
- * Generate form elements for autocomplete widget for term trunk element of the
- * term_merge_form().
- *
- * @param object $vocabulary
- *   Fully loaded taxonomy vocabulary object
- */
-function term_merge_form_term_trunk_widget_autocomplete(&$form, &$form_state, $vocabulary) {
-  $form['term_trunk']['tid'] = array(
-    '#type' => 'textfield',
-    '#description' => t("Start typing in a term's name in order to get some suggestions."),
-    '#required' => TRUE,
-    '#autocomplete_path' => 'term-merge/autocomplete/term-trunk/' . $vocabulary->machine_name,
-    '#element_validate' => array('term_merge_form_trunk_term_widget_autocomplete_validate'),
-  );
-}
-
-/**
- * Supportive function.
- *
- * Validate form element of the autocomplete widget of term trunk element of
- * the form term_merge_form(). Make sure the entered string is a name of one of
- * the existing terms in the vocabulary where the merge occurs. If term is found
- * the function substitutes the name with its {taxonomy_term_data}.tid as it is
- * what is expected from a term trunk widget to provide in its value.
- */
-function term_merge_form_trunk_term_widget_autocomplete_validate($element, &$form_state, $form) {
-  $term = taxonomy_get_term_by_name($element['#value'], $form['#vocabulary']->machine_name);
-  if (!is_array($term) || empty($term)) {
-    // Seems like the user has entered a non existing name in the autocomplete
-    // textfield.
-    form_error($element, t('There are no terms with name %name in the %vocabulary vocabulary.', array(
-      '%name' => $element['#value'],
-      '%vocabulary' => $form['#vocabulary']->name,
-    )));
-  }
-  else {
-    // We have to substitute the term's name with its tid in order to make this
-    // widget consistent with the interface.
-    $term = array_pop($term);
-    form_set_value($element, $term->tid, $form_state);
-  }
-}
-
-/**
- * Supportive function.
- *
- * Validate form element of the Hierarchical Select widget of term trunk element
- * of the form term_merge_form(). Convert the value from array to a single tid
- * integer value.
- */
-function term_merge_form_trunk_term_widget_hs_taxonomy_validate($element, &$form_state, $form) {
-  $tid = 0;
-  if (is_array($element['#value']) && !empty($element['#value'])) {
-    $tid = (int) array_pop($element['#value']);
-  }
-  form_set_value($element, $tid, $form_state);
 }
 
 /**
@@ -413,12 +263,14 @@ function term_merge_form_term_trunk_widget_autocomplete_autocomplete($vocabulary
 
   $term_matches = array();
   foreach ($tags_return as $tid => $name) {
-    $n = $name;
-    // Term names containing commas or quotes must be wrapped in quotes.
-    if (strpos($name, ',') !== FALSE || strpos($name, '"') !== FALSE) {
-      $n = '"' . str_replace('"', '""', $name) . '"';
+    // Add both term name and tid to array key in order to allow multiple terms
+    // with same name to be displayed.
+    $key = "$name ($tid)";
+    // Names containing commas or quotes must be wrapped in quotes.
+    if (strpos($key, ',') !== FALSE || strpos($key, '"') !== FALSE) {
+      $key = '"' . str_replace('"', '""', $key) . '"';
     }
-    $term_matches[$n] = check_plain($name . ' [tid: ' . $tid . ']');
+    $term_matches[$key] = check_plain($name . ' [tid: ' . $tid . ']');
   }
 
   drupal_json_output($term_matches);
@@ -818,13 +670,13 @@ function term_merge_duplicates_fieldset_preprocess($element) {
   foreach ($options as $tid => $row) {
     $element['trunk_tid'][$tid]['#title_display'] = 'invisible';
     $options[$tid] = array(
-        'trunk' => drupal_render($element['trunk_tid'][$tid]),
-      ) + $options[$tid];
+      'trunk' => drupal_render($element['trunk_tid'][$tid]),
+    ) + $options[$tid];
   }
   $element['trunk_tid']['#title_display'] = 'invisible';
   $element['duplicates']['#header'] = array(
-      'trunk' => $element['trunk_tid']['#title'],
-    ) + $element['duplicates']['#header'];
+    'trunk' => $element['trunk_tid']['#title'],
+  ) + $element['duplicates']['#header'];
 
   return $element;
 }
@@ -858,7 +710,7 @@ function term_merge_duplicates_form_settings($form, &$form_state) {
 /**
  * Supportive array_filter() callback function.
  *
- * Eliminate all array elements, whose dimension is less than 1.
+ * Eliminate all array elements, whose length is less than 1.
  */
 function term_merge_duplicates_form_filter($array_element) {
   return count($array_element) > 1;

@@ -5,13 +5,23 @@ core = 7.x
 
 files[] = term_merge.test
 
+files[] = includes/TermMergeSynonymsBehavior.interface.inc
+files[] = includes/TextTermMergeSynonymsBehavior.class.inc
+files[] = includes/TaxonomyTermReferenceTermMergeSynonymsBehavior.class.inc
+files[] = includes/EntityReferenceTermMergeSynonymsBehavior.class.inc
+
 dependencies[] = taxonomy
 dependencies[] = entity
 dependencies[] = ctools
 
-; Information added by Drupal.org packaging script on 2015-11-29
-version = "7.x-1.3"
+test_dependencies[] = synonyms:synonyms
+test_dependencies[] = entityreference:entityreference
+test_dependencies[] = views:views
+test_dependencies[] = redirect:redirect
+
+; Information added by Drupal.org packaging script on 2017-03-30
+version = "7.x-1.4"
 core = "7.x"
 project = "term_merge"
-datestamp = "1448826550"
+datestamp = "1490837287"
 

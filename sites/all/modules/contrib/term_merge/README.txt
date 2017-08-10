@@ -23,11 +23,11 @@ Currently, the module only acts on:
 
 The term merging may happen in 2 flavors. You can either manually indicate what
 terms should be merged or you can use duplicate suggestion tool for this
-purpose. This tool intends to scan your vocabulary and detect such terms that
+purpose. This tool intends to scan your vocabulary and to detect such terms that
 are likely to be duplicates. You will then only review the list of suggested
 duplicates and will schedule for merging only those that actually are
 duplicates. The heuristics through which duplicate tool determines potential
-synonymous terms are made to be extendible by other modules. Refer to Term Merge
+synonymous terms are made to be extensible by other modules. Refer to Term Merge
 advanced help if you want to write a custom one, though the module itself ships
 with the following heuristics:
 * search by the same name
