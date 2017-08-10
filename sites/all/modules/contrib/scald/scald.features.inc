@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * File name: scald.features.inc.
+ */
+
+/**
  * Implements hook_features_export_options().
  */
 function scald_context_type_features_export_options() {
@@ -11,7 +16,7 @@ function scald_context_type_features_export_options() {
   $types = scald_types();
 
   foreach ($contexts as $cname => $cdata) {
-    foreach($types as $tname => $tdata) {
+    foreach ($types as $tname => $tdata) {
       $options[$cname . '-' . $tname] = drupal_ucfirst(check_plain($cdata['title'])) . ': ' . check_plain($tdata->title);
     }
   }
@@ -44,15 +49,15 @@ function scald_context_type_features_export($data, &$export, $module_name = '') 
  * Implements hook_features_export_render().
  */
 function scald_context_type_features_export_render($module, $data) {
-  // Sanitize array if needed
-  foreach($data as $key => $name) {
+  // Sanitize array if needed.
+  foreach ($data as $key => $name) {
     unset($data[$key]);
     $data[$name] = $name;
   }
 
   // Iterate over data to export.
   $code  = '  $contexts = array();' . "\n";
-  foreach($data as $key => $name) {
+  foreach ($data as $key => $name) {
     $context_name = _scald_context_type_extract($name, 'context');
     $type_name    = _scald_context_type_extract($name, 'type');
 
@@ -70,7 +75,7 @@ function scald_context_type_features_export_render($module, $data) {
 
   // Try to find the old file "module.context_config.inc" and delete it.
   _scald_context_clean_export($module);
-  
+
   return array('scald_default_context_types' => $code);
 }
 
@@ -112,7 +117,7 @@ function scald_context_type_features_rebuild($module) {
   }
 
   // Once whole contexts are regrouped.
-  foreach($regroup as $name => $data) {
+  foreach ($regroup as $name => $data) {
     $config = scald_context_config_load($name);
 
     foreach (scald_types() as $type) {
@@ -144,7 +149,6 @@ function scald_context_type_features_rebuild($module) {
  *
  * @param string $string
  *   The array key to extract the context/type name from.
- *
  * @param string $object
  *   The object name to extract : can be type or context.
  *
@@ -158,7 +162,8 @@ function _scald_context_type_extract($string, $object = 'context') {
 
   if ($object == 'context') {
     return $matches[1];
-  } else {
+  }
+  else {
     return $matches[2];
   }
 }
@@ -168,27 +173,27 @@ function _scald_context_type_extract($string, $object = 'context') {
  *
  * @param string $name
  *   The context machine name.
- *
  * @param string $type
  *   The type machine name.
  *
  * @return array
+ *   Array with player, transcoder and data.
  */
 function _scald_context_type_clean($name, $type) {
   $config = scald_context_config_load($name);
   return array(
     'player' => array(
-      $type => $config->player[$type]
+      $type => $config->player[$type],
     ),
     'transcoder' => array(
-      $type => $config->transcoder[$type]
+      $type => $config->transcoder[$type],
     ),
     // At this point data is per-context, not per-context-per-bundle so this
     // is a little redundant to store on every bundle.  But if #2600088 is
     // resolved then this framework should support existing exports without
     // needing to change.
     'data' => array(
-      $type => $config->data
+      $type => $config->data,
     ),
   );
 }

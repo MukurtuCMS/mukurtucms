@@ -33,6 +33,7 @@ class ScaldAtomController extends DrupalDefaultEntityController {
       if (file_prepare_directory($directory, FILE_CREATE_DIRECTORY)) {
         return $directory;
       }
+      drupal_set_message(t('The directory "@directory" must be writable by the webserver. Your upload will not be saved. Please contact your server administrator to configure permissions.', array('@directory' => $directory)), 'error', FALSE);
     }
   }
 

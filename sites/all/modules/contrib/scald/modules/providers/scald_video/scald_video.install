@@ -17,6 +17,8 @@ function scald_video_install() {
  */
 function scald_video_uninstall() {
   drupal_load('module', 'scald');
+  // If Scald is disabled, its classes are not autoloaded.
+  module_load_include('inc', 'scald', 'includes/ScaldAtomController');
   ScaldAtomController::removeType('video');
   variable_del('scald_video_upload_location');
 }
