@@ -127,7 +127,7 @@ function scald_file_form_scald_atom_add_form_options_alter(&$form, &$form_state,
   if ($type !== 'file') {
     return;
   }
-  foreach($form as $key => $data) {
+  foreach ($form as $key => $data) {
     if (strpos($key, 'atom') === 0) {
       $index = intval(substr($key, 4));
       if (isset($scald['atoms'][$index]->data['scald_thumbnail_default'])) {
@@ -158,7 +158,7 @@ function scald_file_form_scald_atom_add_form_options_alter(&$form, &$form_state,
  * Handler to store the default thumbnail generation option in the atom Entity.
  */
 function scald_file_default_thumbnail_handler(&$form, &$form_state) {
-  foreach($form as $key => $data) {
+  foreach ($form as $key => $data) {
     if (strpos($key, 'atom') === 0) {
       $index = intval(substr($key, 4));
       $form_state['scald']['atoms'][$index]->data['scald_thumbnail_default'] = $form_state['values'][$key]['scald_thumbnail_default'];
@@ -170,7 +170,7 @@ function scald_file_default_thumbnail_handler(&$form, &$form_state) {
  * Generate a thumbnail for a pdf file.
  */
 function _scald_file_pdf_thumbnail($atom, $file) {
-  if ($file->filemime === 'application/pdf'){
+  if ($file->filemime === 'application/pdf') {
     $uri = drupal_realpath($file->uri);
     if (file_exists($uri)) {
       $temp = file_directory_temp() . '/pdf_thumb.png';
@@ -426,17 +426,24 @@ function scald_file_scald_contexts() {
  */
 function scald_file_scald_render($atom, $context, $options = array()) {
   if ($context == 'file_representation') {
-    return theme('scald_file_render',
-      array(
-        'vars' => array(
-          'context' => $context,
-          'file_source' => $atom->file_source,
-          'file_size' => format_size($atom->base_entity->filesize),
-          'thumbnail_source' => ($atom->type == 'image' ? drupal_get_path('module', 'scald_file') . '/icons/image_jpeg2000.png' : $atom->thumbnail_source),
-          'file_title' => check_plain($atom->title),
-        ),
-      )
-    );
+    $config = scald_context_config_load($context);
+
+    if ('default' != $config->player['file']['*']) {
+      return $atom->rendered->player;
+    }
+    else {
+      return theme('scald_file_render',
+        array(
+          'vars' => array(
+            'context' => $context,
+            'file_source' => $atom->file_source,
+            'file_size' => format_size($atom->base_entity->filesize),
+            'thumbnail_source' => ($atom->type == 'image' ? drupal_get_path('module', 'scald_file') . '/icons/image_jpeg2000.png' : $atom->thumbnail_source),
+            'file_title' => check_plain($atom->title),
+          ),
+        )
+      );
+    }
   }
 }
 
@@ -466,26 +473,35 @@ function scald_file_generate_thumbnail($entity, $context) {
 }
 
 /**
- * Determines if a command exists on the current environment
+ * Determines if a command exists on the current environment.
  *
- * @param string $command The command to check
- * @return bool True if the command has been found ; otherwise, false.
+ * @param string $command
+ *    The command to check.
+ *
+ * @return bool
+ *    True if the command has been found ; otherwise, false.
+ *
+ * @codingStandardsIgnoreStart
  *
  * Source: http://stackoverflow.com/questions/12424787/how-to-check-if-a-shell-command-exists-from-php
  */
 function scald_file_command_exists ($command) {
   $whereIsCommand = (PHP_OS == 'WINNT') ? 'where' : 'which';
+  // @codingStandardsIgnoreEnd
 
   $process = proc_open(
     "$whereIsCommand $command",
     array(
-      0 => array("pipe", "r"), //STDIN
-      1 => array("pipe", "w"), //STDOUT
-      2 => array("pipe", "w"), //STDERR
+      // STDIN.
+      0 => array("pipe", "r"),
+      // STDOUT.
+      1 => array("pipe", "w"),
+      // STDERR.
+      2 => array("pipe", "w"),
     ),
     $pipes
   );
-  if ($process !== false) {
+  if ($process !== FALSE) {
     $stdout = stream_get_contents($pipes[1]);
     $stderr = stream_get_contents($pipes[2]);
     fclose($pipes[1]);
@@ -495,28 +511,29 @@ function scald_file_command_exists ($command) {
     return $stdout != '';
   }
 
-  return false;
+  return FALSE;
 }
 
 /**
  * Determines if exec is available.
  *
- * Source: http://stackoverflow.com/questions/3938120/check-if-exec-is-disabled
+ * Source: http://stackoverflow.com/questions/3938120/check-if-exec-is-disabled.
  */
 function scald_file_is_exec_available() {
   static $available;
 
   if (!isset($available)) {
-    $available = true;
+    $available = TRUE;
     if (ini_get('safe_mode')) {
-      $available = false;
-    } else {
+      $available = FALSE;
+    }
+    else {
       $d = ini_get('disable_functions');
       $s = ini_get('suhosin.executor.func.blacklist');
       if ("$d$s") {
         $array = preg_split('/,\s*/', "$d,$s");
         if (in_array('exec', $array)) {
-          $available = false;
+          $available = FALSE;
         }
       }
     }
