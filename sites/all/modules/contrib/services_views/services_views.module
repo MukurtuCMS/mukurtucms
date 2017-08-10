@@ -14,6 +14,26 @@ function services_views_views_api() {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function services_views_menu() {
+  $menu = array();
+  $menu['admin/reports/insecure-view-displays'] = array(
+    'title' => 'Insecure View Displays Report',
+    'page callback' => 'services_views_insecure_view_displays_report',
+    'access arguments' => array('administer views'),
+  );
+  $menu['admin/structure/services/list/%/view_resource'] = array(
+    'title' => 'View Resource Settings',
+    'page callback' => 'services_views_view_resource_settings',
+    'page arguments' => array(4),
+    'access arguments' => array('administer services'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $menu;
+}
+
+/**
  * Implementation of hook_services_resources().
  */
 function services_views_services_resources() {
@@ -139,11 +159,30 @@ function services_views_services_resources() {
 function services_views_access($op = 'view', $args = array()) {
   switch ($op) {
     case 'view':
+      $router_item = menu_get_item();
+      $page_arguments = $router_item['page_arguments'];
+      $endpoint = $page_arguments[0];
+      $prefix = 'services_views_' . $endpoint;
+      $whitelist = variable_get($prefix . '_white_list', 0);
+      $listed_views = variable_get($prefix . "_view_displays", array());
+      $listed_view_key = $args['view_name'] . '|' . $args['display_id'];
       $view = views_get_view($args['view_name']);
       if (empty($view)) {
         return services_error(t('View @view could not be found', array('@view' => $args['view_name'])), 404);
       }
       if (!isset($view->display[$args['display_id']])) {
+        return services_error(t('Display @display on view @view could not be found', array(
+          '@display' => $args['display_id'],
+          '@view' => $args['view_name'],
+        )), 404);
+      }
+      if ($whitelist && empty($listed_views[$listed_view_key])) {
+        return services_error(t('Display @display on view @view could not be found', array(
+          '@display' => $args['display_id'],
+          '@view' => $args['view_name'],
+        )), 404);
+      }
+      elseif (!$whitelist && !empty($listed_views[$listed_view_key])) {
         return services_error(t('Display @display on view @view could not be found', array(
           '@display' => $args['display_id'],
           '@view' => $args['view_name'],
@@ -378,4 +417,93 @@ function services_views_entity_info_alter(&$info) {
       'custom settings' => FALSE,
     );
   }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function services_views_form_services_edit_form_endpoint_resources_alter(&$form, &$form_state, $form_id) {
+  $endpoint = $form['endpoint_object']['#value']->name;
+  foreach (views_get_enabled_views() as $view_name => $view) {
+    foreach ($view->display as $view_display_name => $display) {
+      if (!empty($display->display_options) && !empty($display->display_options['access']) && $display->display_options['access']['type'] == 'none') {
+        $form['resources']['views']['operations']['retrieve']['#description'] .= "<div class='messages warning'>" . t("There are some views with displays that will be exposed that have no access control. This resource may unintentionally leak otherwise inaccessible displays such as panel panes and blocks. See a list <a href='@url'>here</a>. Consider changing which view displays are available to this endpoint in the <a href='@url2'>view resource settings</a>.", array('@url2' => url('admin/structure/services/list/' . $endpoint . '/view_resource'), '@url' => url('admin/reports/insecure-view-displays'))) . "</div>";
+      }
+    }
+  }
+}
+
+/**
+ * Page callback for the Insecure View Displays Report.
+ */
+function services_views_insecure_view_displays_report() {
+  $rows = array();
+  foreach (views_get_enabled_views() as $view_name => $view) {
+    $displays = array();
+    foreach ($view->display as $view_display_name => $display) {
+      if (!empty($display->display_options) && !empty($display->display_options['access']) && $display->display_options['access']['type'] == 'none') {
+        $displays[] = check_plain($display->display_title);
+      }
+    }
+    if (!empty($displays)) {
+      $rows[$view_name] = array(
+        'view' => l(check_plain($view->human_name), "admin/structure/views/view/$view_name"),
+        'displays' => implode(', ', $displays)
+      );
+    }
+  }
+  ksort($rows);
+  return array(
+    'header' => array(
+      '#markup' => "<div class='messages warning'>" . t('This report contains all the views displays that currently have their access property set to "none". This, coupled with the Services Views "views: retrieve" resource can potentially unintentionally leak information because certain view display types (such as block and panel pane displays) do not have a direct route to the display be default. Additionally, other forms of access control on these view types are typically used via a "wrapping" module. Consider adding an access restriction to each of these displays if possible.') . "</div>",
+    ),
+    'table' => array(
+      '#theme' => 'table',
+      '#header' => array(t('View'), t('Displays')),
+      '#rows' => $rows,
+      '#empty' => t('There are no insecure view displays.'),
+      '#sticky' => TRUE,
+    )
+  );
+}
+
+/**
+ * Page callback for configuration page for a service endpoint's view resource.
+ */
+function services_views_view_resource_settings($endpoint_name) {
+  $endpoint = services_endpoint_load($endpoint_name);
+  if (!$endpoint) {
+    return MENU_NOT_FOUND;
+  }
+  return drupal_get_form('services_views_view_resource_settings_form', $endpoint_name);
+}
+
+/**
+ * Services views resource (endpoint specific) views display whitelist form.
+ */
+function services_views_view_resource_settings_form($form, &$form_state, $endpoint_name) {
+  $views = array();
+  foreach (views_get_enabled_views() as $view_name => $view) {
+    foreach ($view->display as $view_display_name => $display) {
+      $views[$view_name . '|' . $view_display_name] = check_plain($view->human_name) . ': ' . check_plain($display->display_title);
+    }
+  }
+  $form = array();
+  $prefix = "services_views_" . $endpoint_name;
+  $form[$prefix . "_white_list"] = array(
+    '#type' => 'radios',
+    '#title' => t('Filter method'),
+    '#options' => array(
+      "0" => t('All views displays except those checked'),
+      "1" => t('Only the views displays checked'),
+    ),
+    '#default_value' => variable_get($prefix . '_white_list', 0),
+  );
+  $form[$prefix . "_view_displays"] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Views to filter'),
+    '#options' => $views,
+    '#default_value' => variable_get($prefix . "_view_displays", array()),
+  );
+  return system_settings_form($form);
 }
