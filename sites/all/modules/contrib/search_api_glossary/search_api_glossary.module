@@ -64,7 +64,7 @@ function search_api_glossary_form_facetapi_facet_display_form_alter(&$form, &$fo
     $index_fields = $index->getFields();
     $index_field_names = $index->server()->getFieldNames($index);
 
-    //$options = array('' => $index_fields[$facet['field']]['name']);
+    $options = array('' => $index_fields[$facet['field']]['name']);
     foreach ($index_fields as $key => $text_field) {
       if (in_array($text_field['type'], array('text', 'string')) && ($key != $facet['field'])) {
         $options[$index_field_names[$key]] = $text_field['name'];
