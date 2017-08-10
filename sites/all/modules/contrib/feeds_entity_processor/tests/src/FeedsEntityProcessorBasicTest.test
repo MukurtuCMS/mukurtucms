@@ -6,10 +6,13 @@
  */
 
 /**
- * Test aggregating a feed as node items.
+ * Tests importing entities using the generic processor.
  */
 class FeedsEntityProcessorBasicTest extends FeedsWebTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Basic import capabilities',

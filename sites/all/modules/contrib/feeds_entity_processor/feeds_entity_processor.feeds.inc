@@ -38,7 +38,7 @@ function feeds_entity_processor_feeds_plugins() {
       ),
       // Add in the entity type used.
       // @see FeedsEntityProcessor::entityType()
-     'type' => $type,
+      'type' => $type,
     );
   }
 
@@ -53,7 +53,8 @@ function feeds_entity_processor_feeds_entity_processor_properties() {
 
   $info = array();
 
-  // Default handler. Used when there is no specific handler for the given property.
+  // Default handler. Used when there is no specific handler for the given
+  // property.
   $info['default'] = array(
     'handler' => array(
       'class' => 'FeedsEntityProcessorPropertyDefault',

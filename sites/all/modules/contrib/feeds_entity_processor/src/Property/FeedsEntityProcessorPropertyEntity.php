@@ -9,11 +9,12 @@
  * Handler for entity property.
  */
 class FeedsEntityProcessorPropertyEntity extends FeedsEntityProcessorPropertyDefault {
+
   /**
    * {@inheritdoc}
    */
-  public function getFormField(&$form, &$form_state, $default) {
-    $property_info = $this->getPropertInfo();
+  public function getFormField(array &$form, array &$form_state, $default) {
+    $property_info = $this->getPropertyInfo();
 
     $field = array(
       '#type' => 'fieldset',
@@ -69,7 +70,7 @@ class FeedsEntityProcessorPropertyEntity extends FeedsEntityProcessorPropertyDef
       if (!$entity) {
         $entity_types = $this->getEntityTypeOptions();
         return array(
-          t('@entity_type with id @entity_id does not exist.', array(
+          t('@entity_type with ID "@entity_id" does not exist.', array(
             '@entity_type' => $entity_types[$value['entity_type']],
             '@entity_id' => $value['entity_id'],
           )),
@@ -175,4 +176,5 @@ class FeedsEntityProcessorPropertyEntity extends FeedsEntityProcessorPropertyDef
       parent::setValue($wrapper, $mapping);
     }
   }
+
 }

@@ -2,7 +2,8 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the feeds_entity_processor_test module.
+ * Install, update and uninstall functions for the feeds_entity_processor_test
+ * module.
  */
 
 /**
@@ -80,7 +81,7 @@ function feeds_entity_processor_test_schema() {
     'foreign keys' => array(
       'uid' => array(
         'table' => 'users',
-        'columns' => array('uid' => 'uid')
+        'columns' => array('uid' => 'uid'),
       ),
     ),
     'primary key' => array('id'),
