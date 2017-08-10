@@ -1,6 +1,6 @@
 /**
  * @file
- * scald_youtube_search.js
+ * File name: scald_youtube_search.js.
  *
  * YouTube Search related functionalities.
  */
