@@ -10358,9 +10358,6 @@ a:hover {
 .owl-carousel {
   padding-bottom: 20px;
 }
-.owl-stage-outer {
-  padding-bottom: 20px;
-}
 .owl-item .selected .page-number {
   background: #e59637;
 }
@@ -10390,6 +10387,14 @@ a:hover {
   margin-right: 25%;
   margin-bottom: -20px;
   z-index: 10;
+}
+.node-digital-heritage.view-mode-full .owl-carousel .owl-nav .owl-prev,
+.node-digital-heritage.view-mode-full .owl-carousel .owl-nav .owl-next {
+  color: #337ab7;
+}
+.node-digital-heritage.view-mode-full .owl-carousel .owl-next {
+  float: right;
+  text-align: center;
 }
 .field-name-field-digital-heritage-items .group-list-view-fields {
   padding: 0;
