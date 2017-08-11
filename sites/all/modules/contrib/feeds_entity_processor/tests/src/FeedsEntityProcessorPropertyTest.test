@@ -9,6 +9,7 @@
  * Tests importing entities with properties of various data types.
  */
 class FeedsEntityProcessorPropertyTest extends FeedsWebTestCase {
+
   /**
    * The created feeds_entity_processor_test_type bundle.
    *
@@ -47,8 +48,6 @@ class FeedsEntityProcessorPropertyTest extends FeedsWebTestCase {
 
     // Create bundle entity.
     $this->bundle = drupal_strtolower($this->randomName());
-
-    // Create bundle entity.
     entity_create('feeds_entity_processor_test_type', array(
       'id' => drupal_strtolower($this->randomName()),
       'name' => $this->bundle,
@@ -196,4 +195,5 @@ class FeedsEntityProcessorPropertyTest extends FeedsWebTestCase {
     $this->assertEqual(1, $entity->etid);
     $this->assertEqual('node', $entity->entity_type);
   }
+
 }

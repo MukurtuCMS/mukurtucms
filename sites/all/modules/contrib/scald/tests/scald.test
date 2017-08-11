@@ -99,6 +99,7 @@ class ScaldWebTestCase extends DrupalWebTestCase {
   public function enablePrivateFileSystem() {
     module_enable(array('scald_image'));
     $web_user = $this->drupalcreateuser(array(
+      'administer fields',
       'administer site configuration',
       'administer scald',
     ));

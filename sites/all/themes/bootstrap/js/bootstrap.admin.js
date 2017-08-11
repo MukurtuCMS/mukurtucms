@@ -10,6 +10,37 @@
     attach: function (context) {
       var $context = $(context);
 
+      // General.
+      $context.find('#edit-general').drupalSetSummary(function () {
+        var summary = [];
+        // Buttons.
+        var size = $context.find('select[name="bootstrap_button_size"] :selected');
+        if (size.val()) {
+          summary.push(Drupal.t('@size Buttons', {
+            '@size': size.text()
+          }));
+        }
+
+        // Images.
+        var shape = $context.find('select[name="bootstrap_image_shape"] :selected');
+        if (shape.val()) {
+          summary.push(Drupal.t('@shape Images', {
+            '@shape': shape.text()
+          }));
+        }
+        if ($context.find(':input[name="bootstrap_image_responsive"]').is(':checked')) {
+          summary.push(Drupal.t('Responsive Images'));
+        }
+
+        // Tables.
+        if ($context.find(':input[name="bootstrap_table_responsive"]').is(':checked')) {
+          summary.push(Drupal.t('Responsive Tables'));
+        }
+
+        return summary.join(', ');
+
+      });
+
       // Components.
       $context.find('#edit-components').drupalSetSummary(function () {
         var summary = [];
@@ -45,19 +76,22 @@
       // Advanced.
       $context.find('#edit-advanced').drupalSetSummary(function () {
         var summary = [];
-        // BootstrapCDN.
-        var bootstrapCDN = $context.find('select[name="bootstrap_cdn"]').val();
-        if (bootstrapCDN.length) {
-          bootstrapCDN = 'BootstrapCDN v' + bootstrapCDN;
-          // Bootswatch.
-          if ($context.find('select[name="bootstrap_bootswatch"]').val().length) {
-            bootstrapCDN += ' (' + $context.find('select[name="bootstrap_bootswatch"] :selected').text() + ')';
+        var $cdnProvider = $context.find('select[name="bootstrap_cdn_provider"] :selected');
+        var cdnProvider = $cdnProvider.val();
+        if ($cdnProvider.length && cdnProvider.length) {
+          summary.push(Drupal.t('CDN provider: %provider', { '%provider': $cdnProvider.text() }));
+
+          // jsDelivr CDN.
+          if (cdnProvider === 'jsdelivr') {
+            var $jsDelivrVersion = $context.find('select[name="bootstrap_cdn_jsdelivr_version"] :selected');
+            if ($jsDelivrVersion.length && $jsDelivrVersion.val().length) {
+              summary.push($jsDelivrVersion.text());
+            }
+            var $jsDelivrTheme = $context.find('select[name="bootstrap_cdn_jsdelivr_theme"] :selected');
+            if ($jsDelivrTheme.length && $jsDelivrTheme.val() !== 'bootstrap') {
+              summary.push($jsDelivrTheme.text());
+            }
           }
-          summary.push(bootstrapCDN);
-        }
-        // Rebuild registry.
-        if ($context.find('input[name="bootstrap_rebuild_registry"]').is(':checked')) {
-          summary.push(Drupal.t('Rebuild Registry'));
         }
         return summary.join(', ');
       });
@@ -65,36 +99,40 @@
   };
 
   /**
-   * Provide Bootstrap Bootswatch preview.
+   * Provide BootstrapCDN (via jsDelivr) theme preview.
    */
-  Drupal.behaviors.bootstrapBootswatchPreview = {
+  Drupal.behaviors.bootstrapThemePreview = {
     attach: function (context) {
       var $context = $(context);
-      var $preview = $context.find('#bootswatch-preview');
-      $preview.once('bootswatch', function () {
-        $.get("http://api.bootswatch.com/3/", function (data) {
-          var themes = data.themes;
-          for (var i = 0, len = themes.length; i < len; i++) {
-            $('<a/>').attr({
-              id: themes[i].name.toLowerCase(),
-              class: 'bootswatch-preview element-invisible',
-              href: themes[i].preview,
-              target: '_blank'
-            }).html(
-              $('<img/>').attr({
-                src: themes[i].thumbnail,
-                alt: themes[i].name
-              })
-            )
-            .appendTo($preview);
-          }
-          $preview.parent().find('select[name="bootstrap_bootswatch"]').bind('change', function () {
-            $preview.find('.bootswatch-preview').addClass('element-invisible');
-            if ($(this).val().length) {
-              $preview.find('#' + $(this).val()).removeClass('element-invisible');
+      var $preview = $context.find('#bootstrap-theme-preview');
+      $preview.once('bootstrap-theme-preview', function () {
+        // Construct the "Bootstrap Theme" preview here since it's not actually
+        // a Bootswatch theme, but rather one provided by Bootstrap itself.
+        // Unfortunately getbootstrap.com does not have HTTPS enabled, so the
+        // preview image cannot be protocol relative.
+        // @todo Make protocol relative if/when Bootstrap enables HTTPS.
+        $preview.append('<a id="bootstrap-theme-preview-bootstrap_theme" class="bootswatch-preview element-invisible" href="http://getbootstrap.com/examples/theme/" target="_blank"><img class="img-responsive" src="http://getbootstrap.com/examples/screenshots/theme.jpg" alt="' + Drupal.t('Preview of the Bootstrap theme') + '" /></a>');
+
+        // Retrieve the Bootswatch theme preview images.
+        // @todo This should be moved into PHP.
+        $.ajax({
+          url: 'https://bootswatch.com/api/3.json',
+          dataType: 'json',
+          success: function (json) {
+            var themes = json.themes;
+            for (var i = 0, len = themes.length; i < len; i++) {
+              $preview.append('<a id="bootstrap-theme-preview-' + themes[i].name.toLowerCase() + '" class="bootswatch-preview element-invisible" href="' + themes[i].preview + '" target="_blank"><img class="img-responsive" src="' + themes[i].thumbnail.replace(/^http:/, 'https:') + '" alt="' + Drupal.t('Preview of the @title Bootswatch theme', { '@title': themes[i].name }) + '" /></a>');
             }
-          }).change();
-        }, "json");
+          },
+          complete: function () {
+            $preview.parent().find('select[name="bootstrap_cdn_jsdelivr_theme"]').bind('change', function () {
+              $preview.find('.bootswatch-preview').addClass('element-invisible');
+              if ($(this).val().length) {
+                $preview.find('#bootstrap-theme-preview-' + $(this).val()).removeClass('element-invisible');
+              }
+            }).change();
+          }
+        });
       });
     }
   };

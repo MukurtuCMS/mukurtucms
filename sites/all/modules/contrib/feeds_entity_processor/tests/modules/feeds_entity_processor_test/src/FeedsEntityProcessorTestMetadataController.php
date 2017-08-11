@@ -9,6 +9,7 @@
  * Extend the default Test entity metadata properties.
  */
 class FeedsEntityProcessorTestMetadataController extends EntityDefaultMetadataController {
+
   /**
    * Overrides EntityDefaultMetadataController::entityPropertyInfo().
    */
@@ -64,4 +65,5 @@ class FeedsEntityProcessorTestMetadataController extends EntityDefaultMetadataCo
 
     return $info;
   }
+
 }

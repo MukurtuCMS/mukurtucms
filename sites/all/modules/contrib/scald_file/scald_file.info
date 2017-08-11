@@ -7,10 +7,9 @@ dependencies[] = scald
 stylesheets[all][] = scald_file.css
 files[] = includes/scald_file_views_handler_field_filesize.inc
 
-
-; Information added by Drupal.org packaging script on 2016-03-01
-version = "7.x-1.3"
+; Information added by Drupal.org packaging script on 2017-08-01
+version = "7.x-1.4"
 core = "7.x"
 project = "scald_file"
-datestamp = "1456846564"
+datestamp = "1501617845"
 

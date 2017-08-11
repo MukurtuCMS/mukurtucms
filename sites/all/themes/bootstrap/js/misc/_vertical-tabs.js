@@ -17,7 +17,7 @@ Drupal.behaviors.verticalTabs = {
     $('.vertical-tabs-panes', context).once('vertical-tabs', function () {
       $(this).addClass('tab-content');
       var focusID = $(':hidden.vertical-tabs-active-tab', this).val();
-      if (!focusID.length) {
+      if (typeof focusID === 'undefined' || !focusID.length) {
         focusID = false;
       }
       var tab_focus;

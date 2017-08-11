@@ -2,11 +2,13 @@ name = Feeds entity processor
 description = Provides a generic entity processor for Feeds.
 package = Feeds
 core = 7.x
-dependencies[] = feeds (7.x-2.x-dev)
+dependencies[] = feeds (>=7.x-2.0-beta1)
 dependencies[] = entity
 
-files[] = tests/src/FeedsEntityProcessorBasicTest.test
-files[] = tests/src/FeedsEntityProcessorPropertyTest.test
+test_dependencies[] = date:date_api
+
+; Feeds plugin classes.
+files[] = src/FeedsEntityProcessor.inc
 
 ; Entity property classes.
 files[] = src/Property/FeedsEntityProcessorPropertyBoolean.php
@@ -15,9 +17,14 @@ files[] = src/Property/FeedsEntityProcessorPropertyDefault.php
 files[] = src/Property/FeedsEntityProcessorPropertyEntity.php
 files[] = src/Property/FeedsEntityProcessorPropertyInterface.php
 
-; Information added by Drupal.org packaging script on 2016-02-21
+; Tests.
+files[] = tests/src/FeedsEntityProcessorBasicTest.test
+files[] = tests/src/FeedsEntityProcessorDateTest.test
+files[] = tests/src/FeedsEntityProcessorPropertyTest.test
+
+; Information added by Drupal.org packaging script on 2017-07-09
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "feeds_entity_processor"
-datestamp = "1456071845"
+datestamp = "1499593144"
 

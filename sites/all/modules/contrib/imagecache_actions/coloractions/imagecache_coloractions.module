@@ -676,16 +676,17 @@ function image_gd_invert(stdClass $image/*, array $data*/) {
 /**
  * Imagemagick toolkit specific implementation of the image invert effect.
  *
- * param stdClass $image
+ * @param stdClass $image
  * param array $data
  *   The parameters for this effect.
  *
  * @return bool
  *   true on success, false otherwise.
  */
-function image_imagemagick_invert(/*stdClass $image, array $data*/) {
-  // @todo
-  return FALSE;
+function image_imagemagick_invert(stdClass $image/*, array $data*/) {
+  // http://www.imagemagick.org/script/command-line-options.php?#negate
+  $image->ops[] = "-negate";
+  return TRUE;
 }
 
 

@@ -19,7 +19,7 @@ function media_views_plugins() {
   if (module_exists('search_api')) {
     // If the Search API module exists, also allow indices of the file-entity
     // that has the fid field indexed.
-    $indices = search_api_index_load_multiple(NULL);
+    $indices = search_api_index_load_multiple(FALSE);
     foreach ($indices as $machine_name => $index) {
       if ($index->item_type == 'file' && isset($index->options['fields']['fid'])) {
         $base[] = 'search_api_index_' . $machine_name;
@@ -33,6 +33,7 @@ function media_views_plugins() {
     'help' => t('Display as a tab in the media browser.'),
     'handler' => 'media_views_plugin_display_media_browser',
     'theme' => 'views_view',
+    'theme path' => drupal_get_path('module', 'views') . '/theme',
     'base' => $base,
     'use ajax' => TRUE,
     'use pager' => TRUE,

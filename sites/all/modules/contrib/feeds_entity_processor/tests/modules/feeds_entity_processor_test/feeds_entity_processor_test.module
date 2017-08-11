@@ -11,7 +11,7 @@
 function feeds_entity_processor_test_entity_info() {
   $items['feeds_entity_processor_test'] = array(
     'label' => t('Test entity'),
-    'plural label' => t('Test Entities'),
+    'plural label' => t('Test entities'),
     'description' => t('An entity type used by the Feeds entity processor tests.'),
     'entity class' => 'Entity',
     'controller class' => 'EntityAPIController',
@@ -71,7 +71,8 @@ function feeds_entity_processor_test_access($op, $entity, $account, $entity_type
 }
 
 /**
- * Getter callback to load a referenced entity from a feeds_entity_processor_test.
+ * Getter callback to load a referenced entity from a
+ * feeds_entity_processor_test.
  *
  * We have to return the entity wrapped.
  */
@@ -79,6 +80,7 @@ function feeds_entity_processor_test_entity_getter($object, array $options, $pro
   switch ($property_name) {
     case 'entity':
       return entity_metadata_wrapper($object->entity_type, $object->etid);
+
     case 'user':
       return entity_metadata_wrapper('user', $object->uid);
   }
@@ -97,6 +99,7 @@ function feeds_entity_processor_test_entity_setter($object, $property_name, $val
       $object->entity_type = $value->type();
       $object->etid = $value->getIdentifier();
       break;
+
     case 'user':
       if ($value instanceof EntityMetadataWrapper) {
         $object->uid = $value->getIdentifier();

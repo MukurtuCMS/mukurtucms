@@ -4,9 +4,9 @@ core = 7.x
 dependencies[] = facetapi
 dependencies[] = search_api
 
-; Information added by Drupal.org packaging script on 2016-04-12
-version = "7.x-2.1"
+; Information added by Drupal.org packaging script on 2017-04-04
+version = "7.x-2.2"
 core = "7.x"
 project = "search_api_glossary"
-datestamp = "1460455441"
+datestamp = "1491304194"
 

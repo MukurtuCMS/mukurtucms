@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Scald Installation
+ * Scald Installation.
  *
  * The database schema is heavily commented; review for details.
  *
@@ -469,7 +469,7 @@ function _scald_create_tags_vocabulary() {
 /**
  * Add the {scald_atoms}.data column.
  *
- * "A serialized array of atom and provider specific additionnal data"
+ * A serialized array of atom and provider specific additionnal data.
  */
 function scald_update_7001() {
   $new_field = array(

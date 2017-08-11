@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains form handlers for the DailyMotion search form.
@@ -84,6 +85,10 @@ function scald_dailymotion_search_form($form, &$form_state) {
             '#type'   => 'item',
             '#markup' => $video->id,
           ),
+          'date' => array(
+            '#type'   => 'item',
+            '#markup' => format_date($video->created_time, 'medium'),
+          ),
         );
       }
       $form['results']['import'] = array(
@@ -149,7 +154,7 @@ function scald_dailymotion_search_form_submit($form, &$form_state) {
  */
 function theme_scald_dailymotion_search_results_table($variables) {
   $form = $variables['form'];
-  $header = array(t('Import'), t('Title'), t('Thumbnail'), t('ID'));
+  $header = array(t('Import'), t('Title'), t('Thumbnail'), t('ID'), t('Date'));
   $rows = array();
   foreach (element_children($form['videos']) as $key) {
     $rows[] = array(
@@ -158,6 +163,7 @@ function theme_scald_dailymotion_search_results_table($variables) {
         drupal_render($form['videos'][$key]['title']),
         drupal_render($form['videos'][$key]['thumbnail']),
         drupal_render($form['videos'][$key]['id']),
+        drupal_render($form['videos'][$key]['date']),
       ),
     );
   }

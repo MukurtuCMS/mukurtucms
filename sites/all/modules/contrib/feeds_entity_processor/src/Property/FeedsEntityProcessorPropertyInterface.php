@@ -5,7 +5,17 @@
  * Contains FeedsEntityProcessorPropertyInterface.
  */
 
+/**
+ * An interface for a Feeds entity property plugin.
+ *
+ * Feeds entity property plugins are used to import and convert values through
+ * Feeds for certain entity property types. This way, the Feeds entity processor
+ * can treat different data types differently. For example, values for a date
+ * property may need to be converted from a particular date format to a
+ * timestamp, like "Y-m-d\TH:i:s".
+ */
 interface FeedsEntityProcessorPropertyInterface {
+
   /**
    * Returns the property's name.
    *
@@ -20,7 +30,7 @@ interface FeedsEntityProcessorPropertyInterface {
    * @return array
    *   The property info.
    */
-  public function getPropertInfo();
+  public function getPropertyInfo();
 
   /**
    * Returns entity metata wrapper.
@@ -51,7 +61,7 @@ interface FeedsEntityProcessorPropertyInterface {
    * @return array
    *   A Drupal Form API field.
    */
-  public function getFormField(&$form, &$form_state, $default);
+  public function getFormField(array &$form, array &$form_state, $default);
 
   /**
    * Validates the value for the property.
@@ -81,4 +91,5 @@ interface FeedsEntityProcessorPropertyInterface {
    *   Mapping configuration.
    */
   public function setValue($value, array $mapping);
+
 }

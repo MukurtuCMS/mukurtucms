@@ -1,3 +1,8 @@
+/**
+ * @file
+ * File: scald_file_edit_form.js.
+ */
+
 (function ($) {
   Drupal.behaviors.scaldFileEditForm = {
     attach: function (context, settings) {
