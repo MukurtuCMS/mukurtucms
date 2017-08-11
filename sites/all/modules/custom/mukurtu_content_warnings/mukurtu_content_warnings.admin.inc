@@ -79,47 +79,57 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
     // Display each taxonomy warning config
     $term_options = mukurtu_content_warnings_term_list();
     $taxonomy_defaults = variable_get('mukurtu_content_warning_taxonomy');
-    if(empty($form_state['input']['mukurtu_content_warning_taxonomy']) && !$form_state['submitted']) {
+    if(!empty($taxonomy_defaults) && empty($form_state['input']['mukurtu_content_warning_taxonomy']) && !$form_state['submitted']) {
         foreach($taxonomy_defaults as $index => $taxonomy_warning) {
             $form_state['input']['mukurtu_content_warning_taxonomy'][$index] = array('term' => $taxonomy_warning['term'],
                                                                                      'warning' => $taxonomy_warning['warning']);
         }
     }
 
-    foreach($form_state['input']['mukurtu_content_warning_taxonomy'] as $i => $values) {
-        $form['mukurtu_content_warning_taxonomy'][$i] = array(
-            '#type' => 'fieldset',
-            '#collapsible' => FALSE,
-        );
+    if(!empty($form_state['input']['mukurtu_content_warning_taxonomy'])) {
+        foreach($form_state['input']['mukurtu_content_warning_taxonomy'] as $i => $values) {
+            $form['mukurtu_content_warning_taxonomy'][$i] = array(
+                '#type' => 'fieldset',
+                '#collapsible' => FALSE,
+            );
 
-        // Taxonomy Term
-        $form['mukurtu_content_warning_taxonomy'][$i]['term'] = array(
-            '#type' => 'select',
-            '#title' => t('Term'),
-            '#options' => $term_options,
-            '#default_value' => isset($taxonomy_defaults[$i]['term']) ? $taxonomy_defaults[$i]['term'] : -1,
-            '#description' => t('Select the term attached to the scald atom that will trigger the warning.'),
-        );
+            // Taxonomy Term
+            $form['mukurtu_content_warning_taxonomy'][$i]['term'] = array(
+                '#type' => 'select',
+                '#title' => t('Term'),
+                '#options' => $term_options,
+                '#default_value' => isset($taxonomy_defaults[$i]['term']) ? $taxonomy_defaults[$i]['term'] : -1,
+                '#description' => t('Select the term attached to the scald atom that will trigger the warning.'),
+            );
 
-        // Warning for that taxonomy term
-        $form['mukurtu_content_warning_taxonomy'][$i]['warning'] = array(
-            '#title' => t('Warning Text'),
-            '#type' => 'textfield',
-            '#description' => t('The text that will be displayed on the media overlay.'),
-            '#default_value' => isset($taxonomy_defaults[$i]['warning']) ? $taxonomy_defaults[$i]['warning'] : $form_state['input']['mukurtu_content_warning_taxonomy']['warning'],
-        );
+            // Warning for that taxonomy term
+            $default_warning = $values['warning'];
 
-        // Remove warning button
-        $form['mukurtu_content_warning_taxonomy'][$i]['remove'] = array(
-            '#type' => 'submit',
-            '#value' => t('Remove'),
-            '#submit' => array('mukurtu_content_warnings_form_remove_taxonomy_warning'),
-            '#name' => 'taxonomy_warning_remove_' . $i,
-            '#ajax' => array(
-                'callback' => 'mukurtu_content_warnings_form_taxonomy_callback',
-                'wrapper' => 'taxonomy-warnings-fieldset-wrapper',
-            ),
-        );
+            if(!empty($form_state['input']['mukurtu_content_warning_taxonomy']['warning'])) {
+                $default_warning = $form_state['input']['mukurtu_content_warning_taxonomy']['warning'];
+            }
+            if(!empty($taxonomy_defaults[$i]['warning'])) {
+                $default_warning = $taxonomy_defaults[$i]['warning'];
+            }
+            $form['mukurtu_content_warning_taxonomy'][$i]['warning'] = array(
+                '#title' => t('Warning Text'),
+                '#type' => 'textfield',
+                '#description' => t('The text that will be displayed on the media overlay.'),
+                '#default_value' => $default_warning,
+            );
+
+            // Remove warning button
+            $form['mukurtu_content_warning_taxonomy'][$i]['remove'] = array(
+                '#type' => 'submit',
+                '#value' => t('Remove'),
+                '#submit' => array('mukurtu_content_warnings_form_remove_taxonomy_warning'),
+                '#name' => 'taxonomy_warning_remove_' . $i,
+                '#ajax' => array(
+                    'callback' => 'mukurtu_content_warnings_form_taxonomy_callback',
+                    'wrapper' => 'taxonomy-warnings-fieldset-wrapper',
+                ),
+            );
+        }
     }
 
     // Add taxonomy warning button
@@ -138,14 +148,19 @@ function mukurtu_content_warnings_form($form, &$form_state, $no_js = FALSE) {
 
 function mukurtu_content_warnings_form_validate($form, &$form_state) {
     // Check that terms were selected, not left on default
-    foreach($form_state['input']['mukurtu_content_warning_taxonomy'] as $i => $values) {
-        if($values['term'] == -1) {
-            form_set_error("mukurtu_content_warning_taxonomy][{$i}][term", t('You must select a term'));
+    if(!empty($form_state['input']['mukurtu_content_warning_taxonomy'])) {
+        foreach($form_state['input']['mukurtu_content_warning_taxonomy'] as $i => $values) {
+            if($values['term'] == -1) {
+                form_set_error("mukurtu_content_warning_taxonomy][{$i}][term", t('You must select a term'));
+            }
         }
     }
 }
 
 function mukurtu_content_warnings_form_add_taxonomy_warning($form, &$form_state) {
+    if(!isset($form_state['taxonomy_warning_count'])) {
+        $form_state['taxonomy_warning_count'] = 0;
+    }
     $form_state['taxonomy_warning_count'] += 1;
     $form_state['input']['mukurtu_content_warning_taxonomy'][] = array('term' => 0,
                                                'warning' => t('Warning: This media may contain sensitive content.'));
