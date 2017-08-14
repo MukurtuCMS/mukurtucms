@@ -10605,3 +10605,7 @@ a:hover {
   border-top-style: solid;
   border-top-width: 1px;
 }
+.table-responsive {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
