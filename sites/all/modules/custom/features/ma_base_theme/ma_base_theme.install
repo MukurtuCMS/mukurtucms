@@ -2,6 +2,15 @@
 /**
  * Enable Boostrap Theme, and Mukurtu Starter, and disable all others
  */
+
+/**
+ * Change the default postion of tooltips after a bootstrap update
+ */
+function ma_base_theme_update_7001() {
+    $mukurtu_starter_settings = variable_get('theme_mukurtu_starter_settings');
+    $mukurtu_starter_settings['bootstrap_tooltip_placement'] = 'auto bottom';
+    variable_set('theme_mukurtu_starter_settings', $mukurtu_starter_settings);
+}
 //function ma_base_theme_install () {
 //  $themes_to_enable = array (
 //    'bootstrap',
