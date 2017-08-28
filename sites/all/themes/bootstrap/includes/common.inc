@@ -74,7 +74,7 @@ function bootstrap_element_smart_description(&$element, &$target = NULL, $input_
   if (($input_only && !isset($target['#input']))
     // Ignore text_format elements.
     // @see https://www.drupal.org/node/2478339
-    || $type === 'text_format'
+    //    || $type === 'text_format'
 
     // Ignore if the actual element has no #description set.
     || empty($element['#description'])

@@ -57,7 +57,8 @@ scripts[] = 'bootstrap/js/transition.js'
 
 ; Disable BootstrapCDN if using Bootstrap source files in your sub-theme.
 settings[bootstrap_cdn] = ''
-
+settings[bootstrap_tooltip_placement] = 'auto bottom'
+settings[bootstrap_forms_smart_descriptions_limit] = 1000
 
 ; ;-------------------------
 ; ; METHOD 2: Bootstrap CDN
