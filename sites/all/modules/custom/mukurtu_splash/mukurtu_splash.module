@@ -471,6 +471,15 @@ function mukurtu_splash_block_site_config() {
           );
       }
 
+      if(user_access('administer modules')) {
+          $items[] = array (
+              'title' => 'Enable/Disable Mukurtu Modules',
+              'href' => 'admin/modules',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content')),
+              'fragment' => 'mukurtu'),
+              'description' => t('Go to the management page for Mukurtu specific modules.'),
+          );
+      }
       $content = array ('content' => $items);
       $markup = theme('admin_block_content', $content);
 
