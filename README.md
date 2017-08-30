@@ -1,18 +1,18 @@
-# Mukurtu CMS 2.0.7
-### [Release Notes] (VERSION.md)
+# Mukurtu CMS 2.0.8
+### [Release Notes](VERSION.md)
 
 ## Contents
-* [What is Mukurtu?] (#whatis)
+* [What is Mukurtu?](#whatis)
 * [License](#license)
 * [Availability](#availability)
-  * [Vendor Hosted] (#vendor-hosted)
-  * [Self-Hosted] (#self-hosted)
-    * [System Requirements] (#system-requirements)
-    * [Installation] (#installation)
-    * [Upgrading] (#upgrading)
-* [Developers] (#developers)
-  * [Contributing Code to Mukurtu] (#code-contributing)
-* [Bug Reports] (#bug-reports)
+  * [Vendor Hosted](#vendor-hosted)
+  * [Self-Hosted](#self-hosted)
+    * [System Requirements](#system-requirements)
+    * [Installation](#installation)
+    * [Upgrading](#upgrading)
+* [Developers](#developers)
+  * [Contributing Code to Mukurtu](#code-contributing)
+* [Bug Reports](#bug-reports)
 
 ### <a name="whatis"></a>What is Mukurtu?
 ##### Mukurtu CMS Provides:
@@ -89,7 +89,7 @@ Mukurtu upgrades are done via its Github repository. Knowing that important secu
 1. Run the database updates: `drush updb -y`
 1. Revert all features, then clear the cache, and revert again: `drush fra -y && drush cc all && drush fra -y`
 1. Check for feature overrides (there should not be any): `drush fd`
-1. Determine your site's current version by looking at the VERSION.md file in the site root, or within the Support block of the Dashboard when logged into your site as a Mukurtu Administrator. In the [release notes] (VERSION.md), check for a subsection named "Manual Upgrade Steps" for each version newer than what your site is running. If there are any, run these steps now. All command line steps should be run from the site root.
+1. Determine your site's current version by looking at the VERSION.md file in the site root, or within the Support block of the Dashboard when logged into your site as a Mukurtu Administrator. In the [release notes](VERSION.md), check for a subsection named "Manual Upgrade Steps" for each version newer than what your site is running. If there are any, run these steps now. All command line steps should be run from the site root.
   * Steps within each release should be run in the order listed, but steps for older releases should be done prior to steps for newer releases. If the step appears more than once (e.g., in different release versions), it only needs to be completed once, at its newest release point (i.e., ignore it in the older release(s)).
 
 ### <a name="developers"></a>Developers

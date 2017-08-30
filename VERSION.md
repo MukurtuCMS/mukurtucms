@@ -1,3 +1,33 @@
+## Mukurtu 2.0.8
+- Added an initial beta implementation of Mukurtu Taxonomy Records, a system that provides the ability to enhance taxonomy terms with additional content
+- Added the “Person” content type, which can be used as a taxonomy record, to provide additional metadata about a specific person
+- Added a media content warning system, used to display warnings before displaying potentially sensitive or graphic media
+- Changed default Search API configuration to better handle some UTF-8 characters
+- Added the “People” field to all Scald media types
+- Consolidated the display of Scald atom metadata to streamline atom creation
+- Added pagination for dictionary word lists
+- Stopped displaying the “Author” field (Mukurtu username) to users without edit permission, when viewing digital heritage items
+- Added an option in community/protocol items to hide or limit the membership list display
+- Improved the dependency handling and messaging of the Zip batch importer
+- Improved the default display of taxonomy term pages
+- Fixed Google Maps configuration issue
+- Fixed a bug that could cause some digital heritage items to not appear in collections
+- Fixed a bug that caused the community/protocol “Do not show on registration page” option to not work in some cases
+- Fixed a bug which caused the Scald library to not load in some cases
+- Fixed a bug which would allow DH items to reference deleted collections
+- Fixed a bug where users who had permission to create a book page were not being presented with the option to do so
+- Fixed a bug where the old style media player was being displayed by default in the dictionary
+- Fixed a bug which prevented adding multiple media items to a single book page
+- Removed the “Digital Heritage Count” facet from the collection browse page
+- Updated Drupal and contrib modules
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- rebuild registry: `drush rr`
+- revert features: `drush fra`. Please first review if there are any custom changes you have done that may be overwritten.
+- clear all caches: `drush cc all`
+- search re-indexing: `drush sapi-c && drush sapi-i`.
+
 ## Mukurtu 2.0.7
 - Now defaulting to HTML5 player for Scald atoms, rather than dewplayer
 - Scald has been updated, with many usability improvements
