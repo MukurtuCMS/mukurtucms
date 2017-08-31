@@ -340,32 +340,37 @@ function scald_atom_add_form_options_submit(&$form, &$form_state) {
     return;
   }
 
+  $atom_keys = array();
+  foreach(array_keys($atoms) as $delta) {
+    $atom_keys[] = 'atom' . $delta;
+  }
+  $values_excluding_atoms = array_diff_key($form_state['values'], array_flip($atom_keys));
+
   foreach ($atoms as $delta => $atom) {
-    if (is_array($form_state['values']['atom' . $delta]['scald_actions'])) {
+    $index = 'atom' . $delta;
+    $values = &$form_state['values'][$index];
+
+    if (is_array($values['scald_actions'])) {
       $bitstream = 0;
       $actions = scald_actions();
       foreach ($actions as $name => $action) {
-        if (!empty($form_state['values']['atom' . $delta]['scald_actions'][$name])) {
+        if (!empty($values['scald_actions'][$name])) {
           $bitstream |= $action['bitmask'];
         }
       }
-      $form_state['values']['atom' . $delta]['actions'] = $bitstream;
+      $values['actions'] = $bitstream;
     }
 
     $op = empty($atom->sid) ? t('created') : t('updated');
 
-    // Let entity add its properties to the atom.
-    entity_form_submit_build_entity('scald_atom', $atom, $form['atom' . $delta], $form_state);
-    $atom->actions = $form_state['values']['atom' . $delta]['actions'];
+    // Prepare a form state that is suitable for modules that provide extra fields.
+    $atom_form_state = array('values' => $values + $values_excluding_atoms) + $form_state;
+    // Add back the structure required for fields and maintain a reference to
+    // the original form state values.
+    $atom_form_state['values'][$index] = &$values;
 
-    // Our form structure is different from standard Entity form because we
-    // support multiple entities in a single form, so we have to process special
-    // stuffs here.
-    // Except when comes the Title module, which is a field and it takes care of
-    // the sync in title_field_attach_submit() so we don't have to do anything.
-    if (!(module_exists('title') && title_field_replacement_enabled('scald_atom', $atom->type, 'title'))) {
-      $atom->title = $form_state['values']['atom' . $delta]['title'];
-    }
+    // Let entity add its properties to the atom.
+    entity_form_submit_build_entity('scald_atom', $atom, $form[$index], $atom_form_state);
 
     // Then save it...
     scald_atom_save($atom);

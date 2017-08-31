@@ -8,9 +8,9 @@ files[] = tests/quicktabs.test
 configure = admin/structure/quicktabs
 dependencies[] = "ctools"
 
-; Information added by Drupal.org packaging script on 2016-03-28
-version = "7.x-3.6+10-dev"
+; Information added by Drupal.org packaging script on 2017-06-16
+version = "7.x-3.8"
 core = "7.x"
 project = "quicktabs"
-datestamp = "1459182848"
+datestamp = "1497619449"
 

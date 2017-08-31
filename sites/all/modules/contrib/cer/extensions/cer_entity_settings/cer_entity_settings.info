@@ -6,9 +6,9 @@ dependencies[] = cer
 dependencies[] = entityreference
 dependencies[] = views
 
-; Information added by Drupal.org packaging script on 2016-02-12
-version = "7.x-3.0-alpha7+25-dev"
+; Information added by Drupal.org packaging script on 2017-04-25
+version = "7.x-3.0-beta1"
 core = "7.x"
 project = "cer"
-datestamp = "1455299962"
+datestamp = "1493121245"
 

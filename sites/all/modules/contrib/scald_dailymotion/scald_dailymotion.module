@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @file
- *   Defines a Dailymotion provider for Scald.
+ * Defines a Dailymotion provider for Scald.
  */
+
 define('SCALD_DAILYMOTION_API', 'https://api.dailymotion.com/');
 define('SCALD_DAILYMOTION_MAX_ITEMS', 30);
 
@@ -10,24 +12,34 @@ define('SCALD_DAILYMOTION_MAX_ITEMS', 30);
  * List of required fields for correct video import.
  *
  * @return array
+ *   Return array with fields values.
  */
 function _scald_dailymotion_api_fields() {
-  return array(
-    'aspect_ratio',
-    'available_formats',
-    'created_time',
-    'id',
-    'owner.username',
-    'tags',
-    'thumbnail_url',
-    'title',
-  );
+  $fields = &drupal_static(__FUNCTION__, NULL);
+  if (!isset($fields)) {
+    $fields = array(
+      'aspect_ratio',
+      'available_formats',
+      'created_time',
+      'id',
+      'owner.username',
+      'tags',
+      'thumbnail_url',
+      'title',
+      'private',
+    );
+
+    // Allow other modules to fetch additional fields from the API.
+    drupal_alter('scald_dailymotion_api_fields', $fields);
+  }
+
+  return $fields;
 }
 
 /**
  * Calculates video dimensions.
  *
- * @param $video
+ * @param object $video
  *   The video object with at least aspect_ratio and available_formats values.
  */
 function _scald_daimotion_video_calculate_dimensions($video) {
@@ -57,11 +69,14 @@ function _scald_daimotion_video_calculate_dimensions($video) {
  * Make an API call.
  *
  * @param string $method
+ *   Method for URL.
  * @param array $params
+ *   Params for URL.
+ *
  * @return mixed
  *   NULL if the request fails.
  */
-function _scald_dailymotion_api_call($method, $params = array()) {
+function _scald_dailymotion_api_call($method, array $params = array()) {
   $url = SCALD_DAILYMOTION_API . $method;
   if ($params) {
     foreach ($params as $key => $value) {
@@ -79,14 +94,16 @@ function _scald_dailymotion_api_call($method, $params = array()) {
 
 /**
  * Implements hook_scald_atom_providers().
+ *
  * Tell Scald that we'll be providing some video atoms.
  */
 function scald_dailymotion_scald_atom_providers() {
   return array(
-    'video' => 'Video hosted on Dailymotion'
+    'video' => 'Video hosted on Dailymotion',
   );
   // This code will never be hit, but is necessary to mark the string
-  // for translation on localize.d.o
+  // for translation on localize.d.o.
+  // @codingStandardsIgnoreLine
   t('Video hosted on Dailymotion');
 }
 
@@ -124,11 +141,15 @@ function scald_dailymotion_scald_add_form(&$form, &$form_state) {
 /**
  * Create a Scald atom from a video object.
  *
- * @param $video
- * @param $atom
- * @param boolean $permanent
+ * @param object $video
+ *   Object with video values.
+ * @param mixed $atom
+ *   Object with atom values.
+ * @param bool $permanent
  *   Whether $atom is temporary object (in a multi-step form) or permanent atom.
+ *
  * @return ScaldAtom
+ *   Return the ScaldAtom object.
  */
 function scald_dailymotion_create_atom($video, $atom = NULL, $permanent = TRUE) {
   if (!$atom) {
@@ -151,7 +172,7 @@ function scald_dailymotion_create_atom($video, $atom = NULL, $permanent = TRUE) 
   else {
     $atom->scald_authors[$langcode][0] = array(
       'tid' => 0,
-      'taxonomy_term' => (object)(array('name' => $video->author))
+      'taxonomy_term' => (object) (array('name' => $video->author)),
     );
   }
 
@@ -169,8 +190,9 @@ function scald_dailymotion_create_atom($video, $atom = NULL, $permanent = TRUE) 
   else {
     foreach ($video->tags as $index => $tag) {
       $atom->scald_tags[$langcode][$index] = array(
-        'tid' => $index,  // Beware, this is not a real tid, it's just an index.
-        'taxonomy_term' => (object)(array('name' => $tag))
+      // Beware, this is not a real tid, it's just an index.
+        'tid' => $index,
+        'taxonomy_term' => (object) (array('name' => $tag)),
       );
     }
   }
@@ -196,8 +218,11 @@ function scald_dailymotion_create_atom($video, $atom = NULL, $permanent = TRUE) 
       ->fields(array('status' => 0))
       ->execute();
     $langcode = field_language('scald_atom', $atom, 'scald_thumbnail');
-    $atom->scald_thumbnail[$langcode][0] = (array)$file;
+    $atom->scald_thumbnail[$langcode][0] = (array) $file;
   }
+
+  // Allow module to alter the atom being created.
+  drupal_alter('scald_dailymotion_create_atom', $atom, $video);
 
   return $atom;
 }
@@ -205,10 +230,12 @@ function scald_dailymotion_create_atom($video, $atom = NULL, $permanent = TRUE) 
 /**
  * Implements hook_scald_add_form_fill().
  */
-function scald_dailymotion_scald_add_form_fill(&$atom, $form, $form_state) {
+function scald_dailymotion_scald_add_form_fill(&$atoms, $form, $form_state) {
   // Get the DM identifier.
   $identifier = scald_dailymotion_parse_id($form_state['values']['identifier']);
   $video = scald_dailymotion_video($identifier);
+  // Compatibility with Scald 1.1+.
+  $atom = is_array($atoms) ? reset($atoms) : $atoms;
   scald_dailymotion_create_atom($video, $atom, FALSE);
 }
 
@@ -239,7 +266,8 @@ function scald_dailymotion_scald_prerender($atom, $context, $options, $mode) {
       $video_height = $context_config->data['height'];
     }
     $atom->rendered->player = theme('scald_dailymotion_player',
-      array('vars' =>
+      array(
+        'vars' =>
         array(
           'video_id'      => $atom->base_id,
           'video_width'   => $video_width,
@@ -260,16 +288,16 @@ function scald_dailymotion_theme() {
   return array(
     'scald_dailymotion_player' => array(
       'variables' => array('vars' => NULL, 'atom' => NULL),
-      'template' => 'scald_dailymotion_player'
+      'template' => 'scald_dailymotion_player',
     ),
     'scald_dailymotion_imports_table' => array(
       'render element' => 'form',
-      'file' => 'scald_dailymotion.admin.inc'
+      'file' => 'scald_dailymotion.admin.inc',
     ),
     'scald_dailymotion_search_results_table' => array(
       'render element' => 'form',
-      'file' => 'scald_dailymotion.pages.inc'
-    )
+      'file' => 'scald_dailymotion.pages.inc',
+    ),
   );
 }
 
@@ -302,7 +330,7 @@ function scald_dailymotion_cron() {
 
     $params = array(
       'fields' => _scald_dailymotion_api_fields(),
-      'limit' => SCALD_DAILYMOTION_MAX_ITEMS,
+      'limit' => variable_get('scald_dailymotion_imports_max_items', SCALD_DAILYMOTION_MAX_ITEMS),
       'created_after' => $last_import,
       'sort' => $all ? 'old' : 'recent',
     );
@@ -311,6 +339,7 @@ function scald_dailymotion_cron() {
       case 'user':
         $method = 'user/' . $import['value'] . '/videos';
         break;
+
       case 'tag':
         $method = 'videos';
         $params['tags'] = $import['value'];
@@ -343,7 +372,7 @@ function scald_dailymotion_menu() {
     'page arguments' => array('scald_dailymotion_imports_form'),
     'access arguments' => array('administer dailymotion imports'),
     'description' => 'Configure the videos that should be automatically imported from Dailymotion',
-    'file' => 'scald_dailymotion.admin.inc'
+    'file' => 'scald_dailymotion.admin.inc',
   );
 
   $items['atoms/dailymotion/search'] = array(
@@ -353,7 +382,7 @@ function scald_dailymotion_menu() {
     'access arguments' => array('import dailymotion videos'),
     'description' => 'Search for new videos to import into this site',
     'file' => 'scald_dailymotion.pages.inc',
-    'type' => MENU_CALLBACK
+    'type' => MENU_CALLBACK,
   );
 
   $items['atoms/dailymotion/import'] = array(
@@ -362,23 +391,26 @@ function scald_dailymotion_menu() {
     'page arguments' => array(),
     'access arguments' => array('import dailymotion videos'),
     'description' => 'Import a video',
-    'type' => MENU_CALLBACK
+    'type' => MENU_CALLBACK,
   );
-
 
   return $items;
 }
 
 /**
+ * Function to direct import.
+ *
  * Automatically creates an atom based on a Dailymotion id or
  * an object containing the video informations.
  *
- * This function is used by the CRON importer and does not require user intervention
+ * This function is used by the CRON importer and does not require user
+ * intervention.
  *
- * @param $video
+ * @param mixed $video
  *   Unique identifier of the video on dailymotion, or object
  *   returned by scald_dailymotion_video.
- * @return integer
+ *
+ * @return int
  *   Unique identifier of the new atom
  */
 function scald_dailymotion_direct_import($video) {
@@ -388,6 +420,9 @@ function scald_dailymotion_direct_import($video) {
   }
   else {
     $video = scald_dailymotion_video($video);
+    if (!is_object($video)) {
+      return FALSE;
+    }
   }
 
   // Check if the video has already been imported to prevent duplicate.
@@ -399,15 +434,16 @@ function scald_dailymotion_direct_import($video) {
   return scald_atom_save($atom);
 }
 
-
 /**
  * Get a taxonomy term by name from a given vocabulary.
+ *
  * Create the term if no matches found.
  *
- * @param $name
+ * @param string $name
  *   The name or the taxonomy term.
- * @param $machine_name
+ * @param string $machine_name
  *   Vocabulary Machine Name to search and create from/to.
+ *
  * @return object
  *   The taxonomy term or NULL if it didn't existed before and creation failed.
  */
@@ -446,8 +482,9 @@ function scald_dailymotion_taxonomy_get_create($name, $machine_name) {
  * Note the the return structure for thumbnail has been changed. There is no
  * longer width/height attributes.
  *
- * @param $id
- *   The video id
+ * @param int $id
+ *   The video id.
+ *
  * @return object
  *   An object containing the video informations.
  */
@@ -459,10 +496,17 @@ function scald_dailymotion_video($id) {
     return $cache[$id];
   }
 
-  $video = _scald_dailymotion_api_call('video/'. $id, array('fields' => _scald_dailymotion_api_fields()));
+  $video = _scald_dailymotion_api_call('video/' . $id, array('fields' => _scald_dailymotion_api_fields()));
 
   if ($video) {
     _scald_dailymotion_api_legacy($video);
+
+    // If we've just used a key instead of a real identifier to get the
+    // video data, then reuse that as the video id, to make sure things
+    // don't break down the line.
+    if ($video->private) {
+      $video->id = $id;
+    }
   }
 
   return $cache[$id] = $video;
@@ -479,10 +523,11 @@ function _scald_dailymotion_api_legacy($video) {
 }
 
 /**
- * Checks if a video has already been imported, based on its video
- * id.
- * @param $id
- *   The video identifier
+ * Checks if a video has already been imported, based on its video id.
+ *
+ * @param int $id
+ *   The video identifier.
+ *
  * @return mixed
  *   FALSE if the video was never imported, the scald identifier of
  *   the video otherwise.
@@ -493,8 +538,7 @@ function scald_dailymotion_already_imported($id) {
 }
 
 /**
- * Form element validation handler for Dailymotion identifier
- *
+ * Form element validation handler for Dailymotion identifier.
  */
 function scald_dailymotion_validate_id($element, &$form_state) {
   $id = scald_dailymotion_parse_id($form_state['values']['identifier']);
@@ -512,11 +556,11 @@ function scald_dailymotion_validate_id($element, &$form_state) {
 function scald_dailymotion_parse_id($string) {
   $string = trim($string);
   if (!preg_match('/^[a-zA-Z0-9]+$/', $string)) {
-    // Full URL
+    // Full URL.
     if (preg_match('#https?://(www\.dailymotion\.com/video|dai\.ly)/(?<id>[a-zA-Z0-9]+)_#', $string, $match)) {
       $id = $match['id'];
     }
-    // or embed URL.
+    // Or embed URL.
     elseif (preg_match('#https?://www\.dailymotion\.com/[a-z]+/video/(?<id>[a-zA-Z0-9]+)#', $string, $match)) {
       $id = $match['id'];
     }
@@ -534,8 +578,7 @@ function scald_dailymotion_parse_id($string) {
 }
 
 /**
- * Import proxy page, fill the identifier
- *
+ * Import proxy page, fill the identifier.
  */
 function scald_dailymotion_import() {
   // The edit page is nothing else other than the add page, at the Add step. We

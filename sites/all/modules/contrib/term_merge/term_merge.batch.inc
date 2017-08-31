@@ -35,8 +35,8 @@
  *       module. Use constant TERM_MERGE_NO_REDIRECT to denote not creating any
  *       HTTP redirect. Note: this parameter requires Redirect module enabled,
  *       otherwise it will be disregarded
- *     - synonyms: (array) Array of field names of trunk term into which branch
- *       terms should be added as synonyms (until each field's cardinality limit
+ *     - synonyms: (string) Optional field name of trunk term into which branch
+ *       terms should be added as synonyms (until field's cardinality limit
  *       is reached). Note: this parameter requires Synonyms module enabled,
  *       otherwise it will be disregarded
  *     - step: (int) How many term branches to merge per script run in batch. If
@@ -56,7 +56,7 @@ function _term_merge_batch_process($term_branch, $term_trunk, $merge_settings, &
     'merge_fields' => array(),
     'keep_only_unique' => TRUE,
     'redirect' => TERM_MERGE_NO_REDIRECT,
-    'synonyms' => array(),
+    'synonyms' => NULL,
     'step' => 40,
   );
 

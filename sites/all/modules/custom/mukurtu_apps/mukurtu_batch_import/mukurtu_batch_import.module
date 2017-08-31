@@ -155,7 +155,7 @@ function mukurtu_batch_import_parse_zip($file) {
   mukurtu_batch_import_import_metadata($temp_extract_path);
 
   // Record/store feedback
-  mukurtu_batch_import_feedback($messages);
+  //  mukurtu_batch_import_feedback($messages);
   $messages = drupal_get_messages('status');
   // Delete extracted files from temporary directory
   //  file_unmanaged_delete_recursive($temp_extract_path);
@@ -236,20 +236,46 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 
 function mukurtu_batch_import_import_metadata($path) {
   module_load_include('inc', 'feeds', 'feeds.pages');
-  
-  // File name -> Feed Importer lookup table
-  $feed_file_names = array(			   
-			   //    'categories.csv' => 'import_categories',
-			   //    'users.csv' => 'import_users',
-			       'media_audio.csv' => 'import_media_audio',
-			       'media_files.csv' => 'import_media_files',
-			       'media_images.csv' => 'import_media_images',
-			       'media_video.csv' => 'import_media_video',
-			       'communities.csv' => 'import_communities',
-			       'protocols.csv' => 'import_cultural_protocols',
-                   'collections.csv' => 'import_collection',
-			       'digitalheritage.csv' => 'digital_heritage_metadata',
-  ); 
+
+  $import_steps = array();
+  // Preload Communities and Protocols, don't show warnings, they might reference non-existant media yet to be imported
+  $import_steps[] = array('filename' => 'communities.csv',
+                          'importer' => 'import_communities',
+                          'hide_warnings' => TRUE);
+  $import_steps[] = array('filename' => 'protocols.csv',
+                          'importer' => 'import_cultural_protocols',
+                          'hide_warnings' => TRUE);
+
+  // Import Media
+  $import_steps[] = array('filename' => 'media_audio.csv',
+                          'importer' => 'import_media_audio',
+                          'hide_warnings' => FALSE);
+  $import_steps[] = array('filename' => 'media_files.csv',
+                          'importer' => 'import_media_files',
+                          'hide_warnings' => FALSE);
+  $import_steps[] = array('filename' => 'media_images.csv',
+                          'importer' => 'import_media_images',
+                          'hide_warnings' => FALSE);
+  $import_steps[] = array('filename' => 'media_video.csv',
+                          'importer' => 'import_media_video',
+                          'hide_warnings' => FALSE);
+
+  // Re-import Communities and Protocols, parent objects and media should exist now
+  $import_steps[] = array('filename' => 'communities.csv',
+                          'importer' => 'import_communities',
+                          'hide_warnings' => FALSE);
+  $import_steps[] = array('filename' => 'protocols.csv',
+                          'importer' => 'import_cultural_protocols',
+                          'hide_warnings' => FALSE);
+
+  // Import collections and digital heritage items
+  $import_steps[] = array('filename' => 'collections.csv',
+                          'importer' => 'import_collection',
+                          'hide_warnings' => FALSE);
+  $import_steps[] = array('filename' => 'digitalheritage.csv',
+                          'importer' => 'digital_heritage_metadata',
+                          'hide_warnings' => FALSE);
+
 
   // Some zip archive programs place files inside a single folder. Rather than failing, if there is one directory in the root,
   // check if the files are there first.
@@ -269,44 +295,96 @@ function mukurtu_batch_import_import_metadata($path) {
       }
   }
 
+  if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
+      unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
+  }
   $success = FALSE;
-  foreach($feed_file_names as $filename => $importer_id) {
-    $csv_path = $path . DIRECTORY_SEPARATOR . $filename;
-    
-    if(file_exists($csv_path)) {
-      // Success in this case is finding at least one of the files we were looking for
-      $success = TRUE;
+  foreach($import_steps as $import_step) {
+      $filename = $import_step['filename'];
+      $importer_id = $import_step['importer'];
+      $hide_warnings = $import_step['hide_warnings'];
 
-      // Save as a managed file.
-      $csv = file_get_contents($csv_path);
+      $csv_path = $path . DIRECTORY_SEPARATOR . $filename;
+      if(file_exists($csv_path)) {
+          // Success in this case is finding at least one of the files we were looking for
+          $success = TRUE;
 
-      // Crude method to support relative file paths
-      $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
+          // Save as a managed file.
+          $csv = file_get_contents($csv_path);
 
-      //      $destination = 'private://feeds/'; 
-      $destination = $path;
-      file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
+          // Crude method to support relative file paths
+          $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
+
+          //      $destination = 'private://feeds/';
+          $destination = $path;
+          file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
+
+          // Prefix will create a different file for imports that get run twice
+          // Without this, feeds could try and run twice using the same file, which usually results in conflict
+          $prefix = $hide_warnings ? 'hidden_' : '';
+          $file = file_save_data($csv, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
+
+          if($hide_warnings) {
+              $_SESSION['mukurtu_zip_import']['hide_warnings'][] = $importer_id;
+          }
+
+          // Load the Feeds Source object.
+          $source = feeds_source($importer_id);
+          $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+          $fetcher_config['source'] = $file->uri;
+          $fetcher_config['file'] = $file;
+
+          // Set the source fetcher config.
+          $source->setConfigFor($source->importer->fetcher, $fetcher_config);
       
-      $file = file_save_data($csv, $destination . DIRECTORY_SEPARATOR . $filename, FILE_EXISTS_REPLACE);
+          // Save the source.
+          $source->save();
 
-      // Load the Feeds Source object.
-      $source = feeds_source($importer_id);
-      $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-      $fetcher_config['source'] = $file->uri;
-      $fetcher_config['file'] = $file;
-
-      // Set the source fetcher config.
-      $source->setConfigFor($source->importer->fetcher, $fetcher_config);
-    
-      // Save the source.
-      $source->save();
-      $source->startImport();
-    }
+          // Do the import
+          $source->startImport();
+      }
   }
 
   if(!$success) {
       dpm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
   }
+}
+
+/**
+ * Implements hook_feeds_before_import()
+ */
+function mukurtu_batch_import_feeds_before_import($source) {
+    $config = $source->config;
+    $importer = $source->importer();
+    $import_config = $importer->config;
+
+    if(stripos($config['FeedsFileFetcher']['source'], 'mukurtu_batch_import/zip_import_')) {
+        if(isset($import_config['name'])) {
+            // Display the name of the importer in bold
+            drupal_set_message("<strong>" . $import_config['name'] . "</strong>");
+        }
+    }
+}
+
+/**
+ * Implements hook_feeds_after_import()
+ */
+function mukurtu_batch_import_feeds_after_import($source) {
+    $config = $source->config;
+    if(stripos($config['FeedsFileFetcher']['source'], 'mukurtu_batch_import/zip_import_')) {
+        $id = $source->importer()->id;
+
+        if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
+            foreach($_SESSION['mukurtu_zip_import']['hide_warnings'] as $key => $hide_id) {
+                if($hide_id == $id) {
+                    // Hide warnings is should probably be named hide errors
+                    // We clear errors for the initial imports that might not have imported their dependencies yet
+                    unset($_SESSION['mukurtu_zip_import']['hide_warnings'][$key]);
+                    drupal_get_messages('error', TRUE);
+                }
+            }
+        }
+    }
 }
 
 function mukurtu_batch_import_form_ajax($form, $form_state) {

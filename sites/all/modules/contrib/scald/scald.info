@@ -21,11 +21,13 @@ files[] = includes/scald_views_handler_filter_atom_type.inc
 files[] = includes/ScaldAtom.inc
 files[] = includes/ScaldAtomController.inc
 files[] = tests/scald.test
+# @codingStandardsIgnoreStart
 files[] = scald.features.inc
+# @codingStandardsIgnoreEnd
 
-; Information added by Drupal.org packaging script on 2016-04-15
-version = "7.x-1.8"
+; Information added by Drupal.org packaging script on 2017-02-26
+version = "7.x-1.9"
 core = "7.x"
 project = "scald"
-datestamp = "1460730556"
+datestamp = "1488106991"
 

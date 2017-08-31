@@ -15,7 +15,7 @@ class CerPresetFinder extends EntityFieldQuery {
 
   protected $entity;
 
-  public function __construct(EntityDrupalWrapper $entity) {
+  public function __construct(EntityDrupalWrapper $entity = NULL) {
     $this->entity = $entity;
 
     $this
@@ -47,6 +47,25 @@ class CerPresetFinder extends EntityFieldQuery {
     usort($result, array($this, '_sort'));
 
     return $result;
+  }
+
+  /**
+   * @return EntityFieldQuery
+   */
+  public function find($left = NULL, $right = NULL, $bidirectional = NULL, $operator = 'STARTS_WITH') {
+    $query = new EntityFieldQuery();
+
+    if ($left) {
+      $query->fieldCondition('cer_left', 'path', $left, $operator);
+    }
+    if ($right) {
+      $query->fieldCondition('cer_right', 'path', $right, $operator);
+    }
+    if (isset($bidirectional)) {
+      $query->fieldCondition('cer_bidirectional', 'value', (boolean) $bidirectional);
+    }
+
+    return $query->entityCondition('entity_type', 'cer')->fieldCondition('cer_enabled', 'value', TRUE);
   }
 
   private function _load(array $result) {

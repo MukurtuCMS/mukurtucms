@@ -175,6 +175,106 @@ function ma_digitalheritage_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_location_div|node|digital_heritage|taxonomy_record_teaser';
+  $field_group->group_name = 'group_location_div';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'digital_heritage';
+  $field_group->mode = 'taxonomy_record_teaser';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Location',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_coverage',
+      1 => 'field_coverage_description',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Location',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-location-div field-group-div col-md-3',
+        'description' => '',
+        'show_label' => '0',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'none',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_location_div|node|digital_heritage|taxonomy_record_teaser'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_media_div|node|digital_heritage|taxonomy_record_teaser';
+  $field_group->group_name = 'group_media_div';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'digital_heritage';
+  $field_group->mode = 'taxonomy_record_teaser';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Media',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_media_asset',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Media',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-media-div field-group-div col-md-3',
+        'description' => '',
+        'show_label' => '0',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'none',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_media_div|node|digital_heritage|taxonomy_record_teaser'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_metadata_div|node|digital_heritage|taxonomy_record_teaser';
+  $field_group->group_name = 'group_metadata_div';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'digital_heritage';
+  $field_group->mode = 'taxonomy_record_teaser';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Metadata',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_community_ref',
+      1 => 'field_category',
+      2 => 'field_date',
+      3 => 'field_description',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Metadata',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-metadata-div field-group-div col-md-6',
+        'description' => '',
+        'show_label' => '0',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'none',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_metadata_div|node|digital_heritage|taxonomy_record_teaser'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_mukurtu_core|node|digital_heritage|form';
   $field_group->group_name = 'group_mukurtu_core';
   $field_group->entity_type = 'node';
@@ -345,6 +445,9 @@ function ma_digitalheritage_field_group_info() {
   // Included for use with string extractors like potx.
   t('Additional Metadata');
   t('List View Fields');
+  t('Location');
+  t('Media');
+  t('Metadata');
   t('Mukurtu Core');
   t('Mukurtu Essentials');
   t('Relations');

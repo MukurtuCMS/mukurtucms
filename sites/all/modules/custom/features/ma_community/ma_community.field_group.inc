@@ -24,9 +24,10 @@ function ma_community_field_group_info() {
     'weight' => '1',
     'children' => array(
       0 => 'group_access',
-      1 => 'group_register',
-      2 => 'og_roles_permissions',
-      3 => 'group_custom_tk_label_text',
+      1 => 'og_roles_permissions',
+      2 => 'group_register',
+      3 => 'field_membership_list_options',
+      4 => 'group_custom_tk_label_text',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -85,7 +86,7 @@ function ma_community_field_group_info() {
   $field_group->parent_name = 'group_advanced';
   $field_group->data = array(
     'label' => 'Custom TK Label Text',
-    'weight' => '7',
+    'weight' => '6',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(

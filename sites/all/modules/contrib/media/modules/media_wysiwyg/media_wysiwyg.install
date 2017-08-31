@@ -5,7 +5,7 @@
  * Install, update and uninstall functions for the Media WYSIWYG module.
  */
 
- /**
+/**
  * Implements hook_schema().
  */
 function media_wysiwyg_schema() {
@@ -76,6 +76,8 @@ function media_wysiwyg_uninstall() {
   variable_del('media_wysiwyg_wysiwyg_override_field_types');
   variable_del('media_wysiwyg_use_link_text_for_filename');
   variable_del('media_wysiwyg_alignment');
+  variable_del('media_wysiwyg_external_link');
+  variable_del('media_wysiwyg_remove_media_class');
 }
 
 /**
@@ -125,6 +127,7 @@ function media_wysiwyg_update_7203() {
 
   return $output;
 }
+
 /**
  * Whitelists certain fields for WYSIWYG overriding.
  */
@@ -170,30 +173,36 @@ function media_wysiwyg_update_7205() {
 
   // Create the new configuration tables.
   if (!db_table_exists('media_restrict_wysiwyg')) {
-    db_create_table('media_restrict_wysiwyg',  $schema['media_restrict_wysiwyg']);
+    db_create_table('media_restrict_wysiwyg', $schema['media_restrict_wysiwyg']);
     db_create_table('media_view_mode_wysiwyg', $schema['media_view_mode_wysiwyg']);
   }
 
   // Migrate the configuration from the old variables into the new DB tables.
   $types = file_type_load_all(TRUE);
   foreach ($types as $type) {
-    $wysiwyg_restricted_view_modes = variable_get("media_wysiwyg_view_mode_{$type->type}_wysiwyg_restricted_view_modes", array());
-    foreach ($wysiwyg_restricted_view_modes as $wysiwyg_restricted_view_mode) {
-      db_insert('media_restrict_wysiwyg')
+    $enabled = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_restricted_view_modes_status", FALSE);
+    if ($enabled) {
+      $wysiwyg_restricted_view_modes = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_restricted_view_modes", array());
+      foreach ($wysiwyg_restricted_view_modes as $wysiwyg_restricted_view_mode) {
+        db_insert('media_restrict_wysiwyg')
+          ->fields(array(
+            'type' => $type->type,
+            'display' => $wysiwyg_restricted_view_mode,
+          ))
+          ->execute();
+      }
+    }
+
+    $enabled = variable_get("media_wysiwyg_view_mode_" . $type->type . "_wysiwyg_view_mode_status", FALSE);
+    if ($enabled) {
+      $file_wysiwyg_view_mode = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_view_mode", 'wysiwyg');
+      db_insert('media_view_mode_wysiwyg')
         ->fields(array(
           'type' => $type->type,
-          'display' => $wysiwyg_restricted_view_mode,
+          'view_mode' => $file_wysiwyg_view_mode,
         ))
         ->execute();
     }
-
-    $file_wysiwyg_view_mode = variable_get("media_wysiwyg_view_mode_{$type->type}_file_wysiwyg_view_mode", 'wysiwyg');
-    db_insert('media_view_mode_wysiwyg')
-      ->fields(array(
-        'type' => $type->type,
-        'view_mode' => $file_wysiwyg_view_mode,
-      ))
-      ->execute();
   }
 
   // Remove old configuration variables.
@@ -233,7 +242,13 @@ function media_wysiwyg_update_7205() {
  */
 function media_wysiwyg_update_7206() {
   $message = t('If you would like to be able to align your embedded media (left, right, or center), go to /admin/config/media/browser and check "Provide alignment option when embedding media", and save the settings.');
-  drupal_set_message($message,'warning',TRUE);
+  drupal_set_message($message, 'warning', TRUE);
 }
 
-
+/**
+ * Notify upgraders that there's optional media linking functionality that needs to be enabled.
+ */
+function media_wysiwyg_update_7207() {
+  $message = t('If you would like to be able to link images to a page, go to /admin/config/media/browser, check "Provide the ability to link media to pages", and save the settings.');
+  drupal_set_message($message, 'warning', TRUE);
+}

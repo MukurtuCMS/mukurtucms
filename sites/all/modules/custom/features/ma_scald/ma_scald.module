@@ -370,6 +370,49 @@ return FALSE;';
 }
 
 /**
+ * Implements hook_views_query_alter
+ */
+function ma_scald_views_query_alter(&$view, &$query) {
+    if($view->name == 'scald_library') {
+        // Filter out Scald atoms that are blocked by protocol in the DND scald view
+        // Note that this isn't actually enforcing protocols, we are just trying to avoid the scald
+        // access denied message in the dnd toolbar.
+
+        // Get the groups the user has view rights to
+        $groups = og_get_groups_by_user(NULL, 'node');
+
+        // Join, to bring in the scald protocol field
+        $join = new views_join;
+        $join->construct('field_data_field_scald_protocol', 'scald_atoms', 'sid', 'entity_id');
+        $query->add_relationship('field_data_field_scald_protocol', $join, 'scald_atoms');
+
+        // Initial condition for all scald atoms without a protocol (effectively open to all)
+        $query->where[] =
+                array('conditions' =>
+                      array(array(
+                          'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
+                          'value' => NULL,
+                          'operator' => 'IS NULL'
+                      )),
+                      'args' => array(),
+                      'type' => 'OR'
+                );
+
+        $query_results = array_keys($query->where);
+        $conditions_key = end($query_results);
+
+        // Add an 'or' condition for each protocol the user can view
+        foreach($groups as $group) {
+            $query->where[$conditions_key]['conditions'][] = array(
+                          'field' => 'field_data_field_scald_protocol.field_scald_protocol_target_id',
+                          'value' => $group,
+                          'operator' => '='
+            );
+        }
+    }
+}
+
+/**
  * Implements hook_scald_player().
  */
 function ma_scald_scald_player() {
@@ -435,4 +478,21 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
             $atom->rendered->player = array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
         }
     }
+}
+
+function ma_scald_get_first_image_atom_content($atom_content_field) {
+    if(!isset($atom_content_field['#items']) || empty($atom_content_field['#items'])) {
+        return $atom_content_field;
+    }
+
+    $first = TRUE;
+    foreach($atom_content_field['#items'] as $index => $atom_ref) {
+        if(!$first) {
+            unset($atom_content_field['#items'][$index]);
+            unset($atom_content_field[$index]);
+        } else {
+            $first = FALSE;
+        }
+    }
+    return $atom_content_field;
 }

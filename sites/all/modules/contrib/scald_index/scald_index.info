@@ -10,9 +10,9 @@ features[features_api][] = api:2
 features[views_view][] = scald_atoms_index
 features_exclude[dependencies][ctools] = ctools
 
-; Information added by Drupal.org packaging script on 2016-12-02
-version = "7.x-1.4"
+; Information added by Drupal.org packaging script on 2017-04-13
+version = "7.x-1.5"
 core = "7.x"
 project = "scald_index"
-datestamp = "1480685589"
+datestamp = "1492057491"
 

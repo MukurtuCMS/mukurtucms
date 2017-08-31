@@ -41,6 +41,7 @@ function ma_collection_node_view($node, $view_mode) {
         $replacement_image = "";
         foreach ($collection_emw->field_digital_heritage_items->value() as $dh_item) {
           $dh_item_emw = entity_metadata_wrapper('node', $dh_item);
+          if(isset($dh_item_emw->field_media_asset)) {
           foreach ($dh_item_emw->field_media_asset->value() as $dh_item_media_index => $dh_item_media) {
             if ($dh_item_media->provider == 'scald_image') {
               $replacement_image = scald_render ($dh_item_emw->field_media_asset->get($dh_item_media_index)->value(), 'ma_scald_search_results');
@@ -59,6 +60,7 @@ function ma_collection_node_view($node, $view_mode) {
                 $replacement_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $dh_item_media->type . '_thumbnail.jpg">';
               }
             }
+          }
           }
         }
 
@@ -179,6 +181,9 @@ function ma_collection_node_update($node, $deleted = NULL) {
       $refs_deleted = array_diff ($old_refs, $new_refs);
       $collections_to_recount = array_merge ($refs_added, $refs_deleted);
       foreach ($collections_to_recount as $collection) {
+        if($collection == NULL) {
+           continue;
+        }
         $query = new EntityFieldQuery();
         $result = $query
           ->entityCondition('entity_type', 'node')
@@ -191,8 +196,10 @@ function ma_collection_node_update($node, $deleted = NULL) {
         $collection_presave_skip[$collection] = $collection;
         variable_set('collection_presave_skip', $collection_presave_skip);
         $collection_emw = entity_metadata_wrapper('node', $collection);
-        $collection_emw->field_digital_heritage_count->set($new_count);
-        $collection_emw->save();
+        if($collection_emw) {
+            $collection_emw->field_digital_heritage_count->set($new_count);
+            $collection_emw->save();
+        }
       }
     }
   }

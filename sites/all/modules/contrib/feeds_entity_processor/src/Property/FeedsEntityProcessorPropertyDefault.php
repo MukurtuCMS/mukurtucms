@@ -9,6 +9,7 @@
  * Default handler for entity properties.
  */
 class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropertyInterface {
+
   /**
    * The property name.
    *
@@ -55,9 +56,9 @@ class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropert
   }
 
   /**
-   * Implements FeedsEntityProcessorPropertyInterface::getPropertInfo().
+   * Implements FeedsEntityProcessorPropertyInterface::getPropertyInfo().
    */
-  public function getPropertInfo() {
+  public function getPropertyInfo() {
     return $this->propertyInfo;
   }
 
@@ -78,8 +79,8 @@ class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropert
   /**
    * Implements FeedsEntityProcessorPropertyInterface::getFormField().
    */
-  public function getFormField(&$form, &$form_state, $default) {
-    $property_info = $this->getPropertInfo();
+  public function getFormField(array &$form, array &$form_state, $default) {
+    $property_info = $this->getPropertyInfo();
 
     $field = array(
       '#type' => 'textfield',
@@ -88,6 +89,22 @@ class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropert
       '#default_value' => $default,
       '#required' => !empty($property_info['required']),
     );
+
+    // Add machine name of property.
+    if (!empty($field['#description'])) {
+      $field['#description'] .= '<br />';
+    }
+    $field['#description'] .= t('Machine name: @name', array(
+      '@name' => $this->name,
+    ));
+
+    // Add data type info, if available.
+    $data_type = $this->getDataType();
+    if ($data_type) {
+      $field['#description'] .= '<br />' . t('Data type: @type', array(
+        '@type' => $data_type,
+      ));
+    }
 
     if (!empty($property_info['options list'])) {
       $field['#type'] = 'select';
@@ -112,7 +129,7 @@ class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropert
    */
   public function validate(&$value) {
     $errors = array();
-    $property_info = $this->getPropertInfo();
+    $property_info = $this->getPropertyInfo();
 
     if (entity_property_list_extract_type($property_info['type']) && !is_array($value)) {
       $value = array($value);
@@ -133,11 +150,24 @@ class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropert
    * Implements FeedsEntityProcessorPropertyInterface::getMappingTarget().
    */
   public function getMappingTarget() {
-    $property_info = $this->getPropertInfo();
+    $property_info = $this->getPropertyInfo();
+
+    $description = isset($property_info['description']) ? check_plain($property_info['description']) : '';
+
+    // Add data type info, if available.
+    $data_type = $this->getDataType();
+    if ($data_type) {
+      if (!empty($description)) {
+        $description .= "\n";
+      }
+      $description .= t('Data type: @type', array(
+        '@type' => $data_type,
+      ));
+    }
 
     return array(
       'name' => check_plain($property_info['label']),
-      'description' => isset($property_info['description']) ? check_plain($property_info['description']) : '',
+      'description' => $description,
     );
   }
 
@@ -147,4 +177,18 @@ class FeedsEntityProcessorPropertyDefault implements FeedsEntityProcessorPropert
   public function setValue($value, array $mapping) {
     $this->entityWrapper()->get($this->getName())->set($value);
   }
+
+  /**
+   * Returns the data type of the current property (if known).
+   *
+   * @return string|null
+   *   The property's data type or NULL if data type is unknown.
+   */
+  protected function getDataType() {
+    $property_info = $this->getPropertyInfo();
+    if (isset($property_info['type'])) {
+      return $property_info['type'];
+    }
+  }
+
 }

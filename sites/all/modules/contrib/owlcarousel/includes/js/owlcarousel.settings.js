@@ -19,8 +19,8 @@
      * @param settings object
      */
       attachInit: function(carousel, settings) {
-	  var element = $('.owl-carousel');
-//      var element = $('#' + carousel);
+      //	  var element = $(carousel + '.owl-carousel');
+      var element = $('#' + carousel + '.owl-carousel');
 	this.attachOwlCarousel(element, settings[carousel].settings);
     },
 

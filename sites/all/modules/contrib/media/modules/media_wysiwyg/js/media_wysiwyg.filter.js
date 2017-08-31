@@ -175,14 +175,15 @@
       Drupal.media.filter.ensure_tagmap();
 
       // Locate and process all the media placeholders in the WYSIWYG content.
-      var contentElements = $('<div/>').html(content);  // TODO: once baseline jQuery is 1.8+, switch to using $.parseHTML(content)
+      var contentElements = $('<div/>');  // TODO: once baseline jQuery is 1.8+, switch to using $.parseHTML(content)
+      contentElements.get(0).innerHTML = content;
       var mediaElements = contentElements.find('.media-element');
       if (mediaElements) {
         $(mediaElements).each(function (i) {
           // Attempt to derive a JSON macro representation of the media placeholder.
           // Note: Drupal 7 ships with JQuery 1.4.4, which allows $(this).attr('outerHTML') to retrieve the eement's HTML,
-          // but many sites use JQuery update to increate this to 1.6+, which insists on $(this).prop('outerHTML). 
-          // Until the minimum jQuery is >= 1.6, we need to do this the old-school way. 
+          // but many sites use JQuery update to increate this to 1.6+, which insists on $(this).prop('outerHTML).
+          // Until the minimum jQuery is >= 1.6, we need to do this the old-school way.
           // See http://stackoverflow.com/questions/2419749/get-selected-elements-outer-html
           var markup = $(this).get(0).outerHTML;
           if (markup === undefined) {
@@ -238,6 +239,11 @@
           if (info.attributes[a]) {
             element.attr(a, info.attributes[a]);
           }
+          else if (element.attr(a)) {
+            // If the element has the attribute, but the value is empty, be
+            // sure to clear it.
+            element.removeAttr(a);
+          }
         });
         delete(info.attributes);
 
@@ -291,8 +297,10 @@
       }
       element.addClass(classes.join(' '));
 
+      // Attempt to override the link_title if the user has chosen to do this.
+      info.link_text = this.overrideLinkTitle(info);
       // Apply link_text if present.
-      if (info.link_text) {
+      if ((info.link_text) && (!info.fields || !info.fields.external_url || info.fields.external_url.length === 0)) {
         $('a', element).html(info.link_text);
       }
 
@@ -309,6 +317,7 @@
       var file_info = Drupal.media.filter.extract_file_info(element);
       if (file_info) {
         if (typeof file_info.link_text == 'string') {
+          file_info.link_text = this.overrideLinkTitle(file_info);
           // Make sure the link_text-html-tags are properly escaped.
           file_info.link_text = file_info.link_text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
@@ -343,8 +352,7 @@
           });
 
           // Extract the link text, if there is any.
-          file_info.link_text = (Drupal.settings.mediaDoLinkText) ? element.find('a').html() : false;
-
+          file_info.link_text = (Drupal.settings.mediaDoLinkText) ? element.find('a:not(:has(img))').html() : false;
           // When a file is embedded, its fields can be overridden. To allow for
           // the edge case where the same file is embedded multiple times with
           // different field overrides, we look for a data-delta attribute on
@@ -431,28 +439,59 @@
     },
 
     /**
+     * Return the overridden link title based on the file_entity title field
+     * set.
+     * @param file the file object.
+     * @returns the overridden link_title or the existing link text if no
+     * overridden.
+     */
+    overrideLinkTitle: function(file) {
+      var file_title_field = Drupal.settings.media.img_title_field.replace('field_', '');
+      var file_title_field_machine_name = '';
+      if (typeof(file.fields) != 'undefined') {
+        jQuery.each(file.fields, function(field, fieldValue) {
+          if (field.indexOf(file_title_field) != -1) {
+            file_title_field_machine_name = field;
+          }
+        });
+
+        if (typeof(file.fields[file_title_field_machine_name]) != 'undefined' && file.fields[file_title_field_machine_name] != '') {
+          return file.fields[file_title_field_machine_name];
+        }
+        else {
+          return file.link_text;
+        }
+      }
+      else {
+        return file.link_text;
+      }
+    },
+
+    /**
      * Generates a unique "delta" for each embedding of a particular file.
      */
     fileEmbedDelta: function(fid, element) {
       // Ensure we have an object to track our deltas.
       Drupal.settings.mediaDeltas = Drupal.settings.mediaDeltas || {};
+      Drupal.settings.maxMediaDelta = Drupal.settings.maxMediaDelta || 0;
 
       // Check to see if the element already has one.
       if (element && element.data('delta')) {
         var existingDelta = element.data('delta');
-        // If so, make sure that it is being tracked in mediaDeltas.
-        if (!Drupal.settings.mediaDeltas[fid]) {
-          Drupal.settings.mediaDeltas[fid] = existingDelta;
+        // If so, make sure that it is being tracked in mediaDeltas. If we're
+        // going to create new deltas later on, make sure they do not overwrite
+        // other mediaDeltas.
+        if (!Drupal.settings.mediaDeltas[existingDelta]) {
+          Drupal.settings.mediaDeltas[existingDelta] = fid;
+          Drupal.settings.maxMediaDelta = Math.max(Drupal.settings.maxMediaDelta, existingDelta);
         }
         return existingDelta;
       }
-      // Otherwise, generate a new one. Arbitrarily start with 1.
-      var delta = 1;
-      if (Drupal.settings.mediaDeltas[fid]) {
-        delta = Drupal.settings.mediaDeltas[fid] + 1;
-      }
-      Drupal.settings.mediaDeltas[fid] = delta;
-      return delta;
+      // Otherwise, generate a new one.
+      var newDelta = Drupal.settings.maxMediaDelta + 1;
+      Drupal.settings.mediaDeltas[newDelta] = fid;
+      Drupal.settings.maxMediaDelta = newDelta;
+      return newDelta;
     }
   }
 

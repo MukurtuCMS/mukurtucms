@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Implements hook_install().
+ */
+function ma_core_install() {
+    mukurtu_create_default_contexts();
+    module_enable(array('ma_dictionary', 'mukurtu_content_warnings', 'mukurtu_taxonomy_records', 'ma_person'));
+    module_disable(array('ma_dictionary'));
+}
+
+/**
  * Implements hook_update().
  */
 
@@ -31,4 +40,18 @@ function ma_core_update_7101() {
 function ma_core_update_7102() {
   module_enable(array('ma_dictionary'));
   module_disable(array('ma_dictionary'));
+}
+
+/**
+ * Enable Mukurtu Content Warnings
+ */
+function ma_core_update_7103() {
+    module_enable(array('mukurtu_content_warnings'));
+}
+
+/**
+ * Enable Mukurtu Taxonomy Records
+ */
+function ma_core_update_7104() {
+    module_enable(array('mukurtu_taxonomy_records'));
 }

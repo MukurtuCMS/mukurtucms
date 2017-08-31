@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Hooks related to Scald atoms and providers.
@@ -78,7 +79,7 @@ function hook_scald_contexts() {
 /**
  * Define information about atom providers provided by a module.
  *
- * @return
+ * @return array
  *   An array of atom providers. This array is keyed by the unified atom type.
  *   A module can define at most one provider for each atom type. Each provider
  *   is defined by an untranslated name.
@@ -89,16 +90,20 @@ function hook_scald_atom_providers() {
   );
 
   // This code will never be hit, but is necessary to mark the string
-  // for translation on localize.d.o
+  // for translation on localize.d.o.
+  // @codingStandardsIgnoreStart
   t('Image hosted on Flickr');
+  // @codingStandardsIgnoreEnd
 }
 
 /**
  * Define additional information about atom providers provided by a module.
  *
- * @return
- *   An array of options per provider. This array is keyed by the unified atom type.
- *   Each provider can define any number of additional options to be used elsewhere.
+ * @return array
+ *   An array of options per provider. This array is keyed
+ *   by the unified atom type.
+ *   Each provider can define any number of additional
+ *   options to be used elsewhere.
  */
 function hook_scald_atom_providers_opt() {
   // The starting_step can be used to skip the add step
@@ -119,6 +124,7 @@ function hook_scald_atom_providers_alter(&$types) {
 
 /**
  * Alters the additional options of the providers.
+ *
  * Do not alter the label in this hook. It is only there for simplicity.
  */
 function hook_scald_atom_providers_opt_alter(&$types) {
@@ -129,13 +135,14 @@ function hook_scald_atom_providers_opt_alter(&$types) {
 /**
  * Define information about atom transcoders provided by a module.
  *
- * @return array $transcoder
- *   An array of atom transcoders. This array is keyed by the machine-readable
- *   transcoder name. Each transcoder is defined as an associative array
- *   containing the following item:
+ * @return array
+ *   An $transcoders array of atom transcoders. This array is keyed by the
+ *   machine-readable transcoder name. Each transcoder is defined as an
+ *   associative array containing the following item:
  *   - "title": the human-readable name of the transcoder.
  *   - "description": the longer description of the transcoder.
- *   - "formats": array of supported formats for each atom type. Currently unused.
+ *   - "formats": array of supported formats for each atom type.
+ *   Currently unused.
  */
 function hook_scald_transcoders() {
   $transcoders = array();
@@ -155,7 +162,7 @@ function hook_scald_transcoders() {
 /**
  * Define information about atom players provided by a module.
  *
- * @return
+ * @return array
  *   An array of atom players. This array is keyed by the machine-readable
  *   player name. Each player is defined as an associative array containing the
  *   following items:
@@ -185,13 +192,16 @@ function hook_scald_player() {
  * This hook is only invoked for the module providing the player that is being
  * edited.
  *
- * @param $form
+ * @param array $form
+ *    Form.
+ * @param array $form_state
+ *   The form state array.
+ *   $form_state['scald'] contains atom type, context and player value.
  *
- * @param $form_state
- *
- * $form_state['scald'] contains atom type, context and player value.
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_player_settings_form($form, &$form_state) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -203,9 +213,9 @@ function hook_scald_player_settings_form($form, &$form_state) {
  * @return array
  *   The array is keyed by action machine name, each array element is another
  *   array, keyed by
- *   - 'title'
- *   - 'adjective': with -able suffix to generate permission name
- *   - 'description'
+ *   - 'title'.
+ *   - 'adjective': with -able suffix to generate permission name.
+ *   - 'description'.
  */
 function hook_scald_actions() {
   return array(
@@ -223,15 +233,17 @@ function hook_scald_actions() {
  * This hook is only invoked for the module providing the atom type or atom
  * after atom creation.
  *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom being created.
- *
- * @param $mode
+ * @param string $mode
  *   Role of the callee function. Can have the following values:
- *   - "type" (not really, as we don't have type provider now)
- *   - "atom"
+ *   - "type" (not really, as we don't have type provider now).
+ *   - "atom".
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_register_atom($atom, $mode) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -240,50 +252,56 @@ function hook_scald_register_atom($atom, $mode) {
  * Similar to hook_scald_register_atom(), but this hook is invoked for existing
  * atoms.
  *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom being created.
- *
- * @param $mode
+ * @param string $mode
  *   Role of the callee function. Can have the following values:
- *   - "type" (not really, as we don't have type provider now)
- *   - "atom"
+ *   - "type" (not really, as we don't have type provider now).
+ *   - "atom".
  *
- * @see hook_scald_register_atom().
+ * @see hook_scald_register_atom()
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_update_atom($atom, $mode) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
  * Respond to atom deletion.
  *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom being created.
- *
- * @param $mode
+ * @param string $mode
  *   Role of the callee function. Can have the following values:
- *   - "type" (not really, as we don't have type provider now)
- *   - "atom"
- *   - "transcoder"
+ *   - "type" (not really, as we don't have type provider now).
+ *   - "atom".
+ *   - "transcoder".
  *
- * @see hook_scald_register_atom().
+ * @see hook_scald_register_atom()
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_unregister_atom($atom, $mode) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
  * Respond to atom fetch (load).
  *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom being created.
- *
- * @param $mode
+ * @param string $mode
  *   Role of the callee function. Can have the following values:
- *   - "type" (not really, as we don't have type provider now)
- *   - "atom"
+ *   - "type" (not really, as we don't have type provider now).
+ *   - "atom".
  *
- * @see hook_scald_register_atom().
+ * @see hook_scald_register_atom()
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_fetch($atom, $mode) {
+  // @codingStandardsIgnoreEnd
   if ($mode == 'atom') {
     $atom->description = 'description';
     $atom->source_file = 'source path';
@@ -306,19 +324,22 @@ function hook_scald_action($atom, $action, $mode) {
  * Respond to atom prerender.
  *
  * @param ScaldAtom $atom
- *   the scald atom object to prepare for rendering.
+ *   The scald atom object to prepare for rendering.
  * @param string $context
- *   the scald context slug.  must be optional since scald core implements
+ *   The scald context slug.  must be optional since scald core implements
  *   multiple providers which require hook_scald_prerender().
  * @param string $options
- *   a string which represents any context options.  must be optional since
+ *   A string which represents any context options.  must be optional since
  *   scald core implements multiple providers which require
  *   hook_scald_prerender().
  * @param string $mode
- *   a string indicating which mode the prerender function is being called in
+ *   A string indicating which mode the prerender function is being called in
  *   ('type', 'atom', 'context', 'player' or 'transcoder').
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_prerender($atom, $context, $options, $mode) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -327,16 +348,17 @@ function hook_scald_prerender($atom, $context, $options, $mode) {
  * It is used by Scald and other modules to provide markup for contexts created
  * in code.
  *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom being rendered.
- *
- * @param $context
+ * @param string $context
  *   The context used to render.
- *
- * @param $options
+ * @param array $options
  *   The options which is a string in JSON format.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_render($atom, $context, $options) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -350,20 +372,24 @@ function hook_scald_render($atom, $context, $options) {
  * @param array $options
  *   The $options array to be updated. The original options string is stored at
  *   $options['option'].
- *
  * @param ScaldAtom $atom
  *   The atom used in render.
- *
  * @param string $context
  *   The context used in render.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_render_options_alter(&$options, &$atom, &$context) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
  * Convert from a rendered format to SAS.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_rendered_to_sas_LANGUAGE($text) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -382,11 +408,13 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
  *
  * @param array $links
  *   List of built action links.
- *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom that user action links are being built.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_atom_user_build_actions_links_alter(&$links, $atom) {
+  // @codingStandardsIgnoreEnd
   unset($links['delete']);
 }
 
@@ -397,18 +425,19 @@ function hook_scald_atom_user_build_actions_links_alter(&$links, $atom) {
  * Scald action. It has the following possible return values:
  *   SCALD_ATOM_ACCESS_ALLOW
  *   SCALD_ATOM_ACCESS_DENY
- *   SCALD_ATOM_ACCESS_IGNORE
+ *   SCALD_ATOM_ACCESS_IGNORE.
  *
- * @param $atom
+ * @param ScaldAtom $atom
  *   The atom being accessed.
- *
- * @param $action
+ * @param strig $action
  *   The action being requested.
- *
- * @param $account
+ * @param mixed $account
  *   The user object of the current user. This is an optional parameter.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_atom_access($atom, $action, $account = NULL) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -418,9 +447,13 @@ function hook_scald_atom_access($atom, $action, $account = NULL) {
  * saved to the database. Like any other hook_ENTITY_TYPE_presave() hook, it is
  * invoked before hook_entity_presave().
  *
- * @param $atom
+ * @param ScaldAtom $atom
+ *   A Scald Atom.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_atom_presave($atom) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -430,9 +463,13 @@ function hook_scald_atom_presave($atom) {
  * saved to the database, after field_attach_insert() and before
  * hook_entity_insert() is called.
  *
- * @param $atom
+ * @param ScaldAtom $atom
+ *   A Scald Atom.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_atom_insert($atom) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -442,9 +479,13 @@ function hook_scald_atom_insert($atom) {
  * is saved to the database, after field_attach_update() and before
  * hook_entity_update() is called.
  *
- * @param $atom
+ * @param ScaldAtom $atom
+ *   A Scald Atom.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_atom_update($atom) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -454,9 +495,13 @@ function hook_scald_atom_update($atom) {
  * unregistered, before hook_entity_delete() is called and before the atom is
  * removed from scald_atoms table in the database.
  *
- * @param $atom
+ * @param ScaldAtom $atom
+ *   A Scald Atom.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_atom_delete($atom) {
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -471,10 +516,14 @@ function hook_scald_atom_delete($atom) {
  * Provides a form using to add an atom.
  *
  * @param array $form
- *
+ *   The form array.
  * @param array $form_state
+ *   The form state array.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_add_form(&$form, &$form_state) {
+  // @codingStandardsIgnoreEnd
   $defaults = scald_atom_defaults('image');
   $form['file'] = array(
     '#type' => $defaults->upload_type,
@@ -492,10 +541,14 @@ function hook_scald_add_form(&$form, &$form_state) {
  * not support multiple atom creation, return 1.
  *
  * @param array $form
- *
+ *   The form array.
  * @param array $form_state
+ *   The form state array.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_add_atom_count(&$form, &$form_state) {
+  // @codingStandardsIgnoreEnd
   if (is_array($form_state['values']['file'])) {
     return max(count($form_state['values']['file']), 1);
   }
@@ -512,12 +565,15 @@ function hook_scald_add_atom_count(&$form, &$form_state) {
  * @param mixed $atoms
  *   An array of atoms if the provider implements hook_scald_add_atom_count(),
  *   otherwise a single atom.
- *
  * @param array $form
- *
+ *   The form array.
  * @param array $form_state
+ *   The form state array.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_add_form_fill(&$atoms, $form, $form_state) {
+  // @codingStandardsIgnoreEnd
   foreach ($atoms as $delta => $atom) {
     if (is_array($form_state['values']['file']) && module_exists('plupload')) {
       module_load_include('inc', 'scald', 'includes/scald.plupload');
@@ -546,8 +602,11 @@ function hook_scald_add_form_fill(&$atoms, $form, $form_state) {
  *   one atom.
  * @param array $context
  *   A keyed array with 'form', and 'form_state'.
+ *
+ * @codingStandardsIgnoreStart
  */
 function hook_scald_add_form_fill_alter(&$atoms, $context) {
+  // @codingStandardsIgnoreEnd
   if ($context['form_state']['scald']['source'] == 'scald_soundcloud') {
     foreach ($atoms as $atom) {
       $atom->field_atom_license[LANGUAGE_NONE][0]['value'] = $atom->_info->license;

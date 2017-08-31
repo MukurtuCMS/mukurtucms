@@ -462,6 +462,24 @@ function mukurtu_splash_block_site_config() {
           'description' => t('If doing a lot of site content editing, you may need to rebuild permissions to make sure that access permissions remain set correctly.'),
       );
 
+      if(module_exists('mukurtu_content_warnings') && drupal_valid_path('admin/config/mukurtu/content-warnings')) {
+          $items[] = array (
+              'title' => 'Configure Media Warnings',
+              'href' => 'admin/config/mukurtu/content-warnings',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+              'description' => t('Configure click-through overlays for potentially sensitive media.'),
+          );
+      }
+
+      if(user_access('administer modules')) {
+          $items[] = array (
+              'title' => 'Enable/Disable Mukurtu Modules',
+              'href' => 'admin/modules',
+              'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content')),
+              'fragment' => 'mukurtu'),
+              'description' => t('Go to the management page for Mukurtu specific modules.'),
+          );
+      }
       $content = array ('content' => $items);
       $markup = theme('admin_block_content', $content);
 

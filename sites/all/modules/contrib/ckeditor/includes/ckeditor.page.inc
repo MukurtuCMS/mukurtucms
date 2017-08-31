@@ -286,6 +286,9 @@ function ckeditor_filter_xss() {
       }
       continue;
     }
+    if (function_exists($filters[$name]['prepare callback'])) {
+      $text = $filters[$name]['prepare callback']($text, $format_filters[$name], $format, '', TRUE, $cache_id);
+    }
     $text = $filters[$name]['process callback']($text, $format_filters[$name], $format, '', TRUE, $cache_id);
   }
 

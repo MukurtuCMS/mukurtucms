@@ -208,6 +208,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
@@ -281,6 +282,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
         ),
         'type' => 'mukurtu_scald_thumbnail_image',
         'weight' => 1,
@@ -308,6 +310,62 @@ function ma_community_field_default_field_instances() {
       ),
       'type' => 'atom_reference_textfield',
       'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-community-field_membership_list_options'.
+  $field_instances['node-community-field_membership_list_options'] = array(
+    'bundle' => 'community',
+    'default_value' => array(
+      0 => array(
+        'value' => 'all',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'These options set the membership list visibility for visitors and community members. The full membership list will always be visible to community managers.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 23,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_membership_list_options',
+    'label' => 'Membership List Options',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
     ),
   );
 
@@ -443,7 +501,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'apply_chosen' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 4,
+      'weight' => 2,
     ),
   );
 
@@ -602,10 +660,12 @@ Strict - Your community page is invisible to all site users who are not members 
   t('Community Parent');
   t('Description');
   t('Group type');
+  t('Membership List Options');
   t('Open - Your community page is visible to all visitors of your site. Any items under open protocols are also accessible.<br>
 Strict - Your community page is invisible to all site users who are not members or your community. All protocols created within this community are inaccessible to users outside of this community.');
   t('Parent Community');
   t('Sharing protocol');
+  t('These options set the membership list visibility for visitors and community members. The full membership list will always be visible to community managers.');
   t('This image is used in the Community listings page. Use a 1:1 width to height ratio.
 ');
   t('Thumbnail Image');

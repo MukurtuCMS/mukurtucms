@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- *   Default theme implementation for Scald File Render.
+ * Default theme implementation for Scald File Render.
  */
 ?>
 <img src="<?php print file_create_url($vars['thumbnail_source']); ?>" class="scald-file-icon" alt="file type icon" />

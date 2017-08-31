@@ -1057,13 +1057,12 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'mukurtu_display_formatters_paged_node',
         'settings' => array(
-          'links' => 1,
-          'use_content_language' => TRUE,
-          'view_mode' => 'teaser',
+          'item_view_mode' => 'teaser',
+          'items_per_page' => 10,
         ),
-        'type' => 'entityreference_entity_view',
+        'type' => 'mukurtu_paged_node_formatter',
         'weight' => 4,
       ),
       'teaser' => array(

@@ -65,7 +65,7 @@ CKEDITOR.plugins.add('dndck4', {
        */
       downcast: function(el) {
         var caption = '';
-        if (this.data.usesCaption) {
+        if (this.data.usesCaption && this.editables.caption) {
           caption = this.editables.caption.getHtml();
         }
         var html = Drupal.dndck4.downcastedHtml(this.data, caption);

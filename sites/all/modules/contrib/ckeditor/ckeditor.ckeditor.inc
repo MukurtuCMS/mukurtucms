@@ -141,11 +141,19 @@ function ckeditor_ckeditor_plugin() {
         $buttons = array();
         if (preg_match_all($pattern, $source, $matches)) {
           foreach ($matches[1] as $i => $button_name) {
+            // Check for icon in button definition (legacy method)
             if (preg_match('#(icon)[\s]*\:[\s]*([^\,\n]*)#', $matches[2][$i], $matches2)) {
               $buttons[$button_name] = array();
               $buttons[$button_name]['label'] = $button_name;
               $matches2[2] = str_replace(array('this.path', '+', '\'', '"'), array('', '', '', ''), $matches2[2]);
               $buttons[$button_name]['icon'] = trim($matches2[2]);
+            }
+            else {
+              // Otherwise we assume the icon is being stored in the icons
+              // folder using the lowercased button name as the filename.
+              $buttons[$button_name] = array();
+              $buttons[$button_name]['label'] = $button_name;
+              $buttons[$button_name]['icon'] = 'icons/' . strtolower($button_name) . '.png';
             }
           }
         }
@@ -183,11 +191,19 @@ function ckeditor_ckeditor_plugin() {
         $buttons = array();
         if (preg_match_all($pattern, $source, $matches)) {
           foreach ($matches[1] as $i => $button_name) {
+            // Check for icon in button definition (legacy method)
             if (preg_match('#(icon)[\s]*\:[\s]*([^\,\n]*)#', $matches[2][$i], $matches2)) {
               $buttons[$button_name] = array();
               $buttons[$button_name]['label'] = $button_name;
               $matches2[2] = str_replace(array('this.path', '+', '\'', '"'), array('', '', '', ''), $matches2[2]);
               $buttons[$button_name]['icon'] = trim($matches2[2]);
+            }
+            else {
+              // Otherwise we assume the icon is being stored in the icons
+              // folder using the lowercased button name as the filename.
+              $buttons[$button_name] = array();
+              $buttons[$button_name]['label'] = $button_name;
+              $buttons[$button_name]['icon'] = 'icons/' . strtolower($button_name) . '.png';
             }
           }
         }

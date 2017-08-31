@@ -15,7 +15,10 @@ function hook_feeds_entity_processor_properties() {
     'handler' => array(
       'class' => 'FeedsEntityProcessorPropertyMyPropertyType',
       'file' => 'FeedsEntityProcessorPropertyMyPropertyType.php',
-      'path' => drupal_get_path('module', 'my_module'), // Feeds entity processor will look for FeedsEntityProcessorPropertyMyPropertyType.php in the my_module directory.
+      // Feeds entity processor will look for
+      // FeedsEntityProcessorPropertyMyPropertyType.php in the my_module
+      // directory.
+      'path' => drupal_get_path('module', 'my_module'),
     ),
   );
 

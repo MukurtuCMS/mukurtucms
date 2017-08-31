@@ -82,7 +82,7 @@ function ma_search_api_node_update($node) {
       $trigger_new_val = $wrapper_new->{$trigger}->value();
       if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
         $trigger_new_val = array_values ($trigger_new_val);
-        $trigger_old_val = array_values ($trigger_old_val);
+        $trigger_old_val = empty($trigger_old_val) ? NULL : array_values ($trigger_old_val);
       }
       if ($trigger_old_val <> $trigger_new_val) {
         # dpm ($trigger_old_val, 'trigger old val');
@@ -332,4 +332,20 @@ function ma_search_api_list_of_indexed_fields() {
   }
   return $output;
 
+}
+
+// Return the config for the Search API whitespace tokenizer regex
+function ma_search_api_get_whitespace_tokenizer_regex() {
+    // Default value
+    $spaces = "[\p{P}|\p{C}|\p{Z}|\p{S}]";
+
+    $server = search_api_server_load('search_api_db_server');
+    if($server) {
+        $index = search_api_index_load('default_node_index');
+        if($index) {
+            $spaces = $index->options['processors']['search_api_tokenizer']['settings']['spaces'];
+        }
+    }
+
+    return $spaces;
 }

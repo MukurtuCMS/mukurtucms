@@ -415,7 +415,7 @@ function scald_index_included($string) {
   }
 
   // Detect DIV atoms.
-  if (preg_match_all('/<div.*data-scald-sid=\"(\\d+)\".*><!-- scald embed --><\\/div>/', $string, $div_atoms)) {
+  if (preg_match_all('/<div.*data-scald-sid=\"(\\d+)\".*>/', $string, $div_atoms)) {
     $atoms = array_merge($atoms, $div_atoms[1]);
   }
 

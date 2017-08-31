@@ -27,11 +27,9 @@ class TermMergeWebTestCase extends DrupalWebTestCase {
 
   /**
    * SetUp method.
-   *
-   * @param array $modules
-   *   Array of modules that need to be enabled for test case
    */
-  public function setUp(array $modules = array()) {
+  public function setUp() {
+    $modules = $this->normalizeSetUpArguments(func_get_args());
     $modules[] = 'term_merge';
     parent::setUp($modules);
 
@@ -79,6 +77,24 @@ class TermMergeWebTestCase extends DrupalWebTestCase {
     $term = entity_load_unchanged('taxonomy_term', $term->tid);
     return $term;
   }
+
+  /**
+   * Normalize the input arguments of ::setUp() method.
+   *
+   * The arguments of ::setUp() method can either be a single argument (array of
+   * modules) or a set of input arguments where each single argument is a module
+   * name.
+   *
+   * @param array $args
+   *   Array of input arguments given to a ::setUp() method
+   *
+   * @return array
+   *   Array of modules that are given to a ::setUp() method.
+   */
+  protected function normalizeSetUpArguments($args) {
+    return (isset($args[0]) && is_array($args[0])) ? $args[0] : $args;
+  }
+
 }
 
 /**
@@ -534,6 +550,7 @@ class TermMergeTermMergeWebTestCase extends TermMergeWebTestCase {
       'taxonomy_term_tab',
       'via_term_trunk_widget_select',
       'via_term_trunk_widget_autocomplete',
+      'via_term_trunk_widget_autocomplete_without_tid',
       'merge_fields',
       'do_not_merge_fields',
     );
@@ -627,7 +644,34 @@ class TermMergeTermMergeWebTestCase extends TermMergeWebTestCase {
           // with valid suggestions.
           $response = $this->drupalGet('term-merge/autocomplete/term-trunk/' . $this->vocabulary->machine_name . '/' . drupal_strtoupper($terms['term_trunk']->name));
           $response = drupal_json_decode($response);
-          $this->assertTrue(isset($response[$terms['term_trunk']->name]), 'Autocomplete menu path replies with valid suggestions for term trunk autocomplete widget.');
+          $autocomplete_key = $terms['term_trunk']->name . ' (' . $terms['term_trunk']->tid . ')';
+          $this->assertTrue(isset($response[$autocomplete_key]), 'Autocomplete menu path replies with valid suggestions for term trunk autocomplete widget.');
+
+          // Making sure for the term trunk autocomplete widget doesn't allow to
+          // submit any of the selected term branches nor their children.
+          $prohibited_terms = array(
+            'parent' => 'Merging into the same term is not allowed in autocomplete widget for term trunk.',
+            'child' => 'Merging into any of child of selected branch terms is not allowed in autocomplete widget for term trunk.',
+          );
+          foreach ($prohibited_terms as $term => $assert_message) {
+            $term = $terms[$term];
+            $this->drupalGet($init_url);
+            $this->drupalPostAJAX(NULL, array(
+              'term_branch[]' => array($terms['parent']->tid),
+              'term_trunk[widget]' => $term_trunk_widget,
+            ), 'term_trunk[widget]');
+            $this->drupalPost(NULL, array(
+              'term_branch[]' => array($terms['parent']->tid),
+              'term_trunk[widget]' => $term_trunk_widget,
+              'term_trunk[tid]' => $term->name . ' (' . $term->tid . ')',
+            ), 'Submit');
+            $this->assertText('Trunk term cannot be one of the selected branch terms or their children', $assert_message);
+          }
+          break;
+
+        case 'via_term_trunk_widget_autocomplete_without_tid':
+          $init_url = 'admin/structure/taxonomy/' . $this->vocabulary->machine_name . '/merge';
+          $term_trunk_widget = 'autocomplete';
 
           // Making sure for the term trunk autocomplete widget doesn't allow to
           // submit any of the selected term branches nor their children.
@@ -704,7 +748,7 @@ class TermMergeTermMergeWebTestCase extends TermMergeWebTestCase {
           break;
 
         case 'autocomplete':
-          $term_trunk_edit += array('term_trunk[tid]' => $terms['term_trunk']->name);
+          $term_trunk_edit += array('term_trunk[tid]' => $terms['term_trunk']->name . ' (' . $terms['term_trunk']->tid . ')');
           break;
       }
 
@@ -1044,7 +1088,8 @@ class RedirectTermMergeWebTestCase extends TermMergeWebTestCase {
   /**
    * SetUp method.
    */
-  public function setUp(array $modules = array()) {
+  public function setUp() {
+    $modules = $this->normalizeSetUpArguments(func_get_args());
     $modules[] = 'redirect';
     $modules[] = 'path';
     parent::setUp($modules);
@@ -1262,11 +1307,21 @@ class SynonymsTermMergeWebTestCase extends TermMergeWebTestCase {
   );
 
   /**
+   * Synonyms behavior implementation that undergoes testing.
+   *
+   * @var array
+   */
+  protected $behavior_implementation;
+
+  /**
    * SetUp method.
    */
-  public function setUp(array $modules = array()) {
+  public function setUp() {
+    $modules = $this->normalizeSetUpArguments(func_get_args());
     $modules[] = 'synonyms';
+    $modules[] = 'synonyms_provider_field';
     parent::setUp($modules);
+
     // Additionally we enable default synonyms field in the vocabulary.
     $this->field = field_create_field($this->field);
     $instance = array(
@@ -1278,11 +1333,21 @@ class SynonymsTermMergeWebTestCase extends TermMergeWebTestCase {
     );
     $instance = field_create_instance($instance);
     $instance = field_info_instance($instance['entity_type'], $instance['field_name'], $instance['bundle']);
-    synonyms_behavior_settings_save(array(
-      'instance_id' => $instance['id'],
-      'behavior' => 'synonyms',
+
+    $this->behavior_implementation = array(
+      'entity_type' => $instance['entity_type'],
+      'bundle' => $instance['bundle'],
+      'provider' => synonyms_provider_field_provider_name($this->field),
+      'behavior' => 'term_merge',
       'settings' => array(),
-    ));
+    );
+    synonyms_behavior_implementation_save($this->behavior_implementation);
+    foreach (synonyms_behavior_get($this->behavior_implementation['behavior'], $this->behavior_implementation['entity_type'], $this->behavior_implementation['bundle'], TRUE) as $behavior_implementation) {
+      if ($behavior_implementation['provider'] == $this->behavior_implementation['provider']) {
+        $this->behavior_implementation = $behavior_implementation;
+        break;
+      }
+    }
   }
 
   /**
@@ -1325,14 +1390,14 @@ class SynonymsTermMergeWebTestCase extends TermMergeWebTestCase {
     actions_do('term_merge_action', $terms['branch'], array(
       'term_trunk' => $terms['trunk']->tid,
       'term_branch_keep' => TRUE,
-      'synonyms' => array(),
+      'synonyms' => NULL,
     ));
     $this->assertSynonymsIntegration($terms, 'No synonyms are added, if action is not instructed to make ones.');
 
     // Testing adding as a synonym.
     actions_do('term_merge_action', $terms['branch'], array(
       'term_trunk' => $terms['trunk']->tid,
-      'synonyms' => array($this->field['field_name']),
+      'synonyms' => $this->behavior_implementation['provider'],
     ));
 
     $terms['trunk']->synonyms = array($terms['branch']->name);
@@ -1350,7 +1415,7 @@ class SynonymsTermMergeWebTestCase extends TermMergeWebTestCase {
       'term_trunk[widget]' => 'select',
       'term_trunk[tid]' => $terms['trunk']->tid,
       'term_branch_keep' => TRUE,
-      'synonyms[' . $this->field['field_name'] . ']' => FALSE,
+      'synonyms' => '',
     ), 'Submit');
     $this->drupalPost(NULL, array(), 'Confirm');
     $this->assertSynonymsIntegration($terms, 'No synonyms are added after running merge batch when not instructed to add synonyms.');
@@ -1361,7 +1426,7 @@ class SynonymsTermMergeWebTestCase extends TermMergeWebTestCase {
       'term_trunk[widget]' => 'select',
       'term_trunk[tid]' => $terms['trunk']->tid,
       'term_branch_keep' => TRUE,
-      'synonyms[' . $this->field['field_name'] . ']' => TRUE,
+      'synonyms' => $this->behavior_implementation['provider'],
     ), 'Submit');
     $terms['trunk']->synonyms = array($terms['branch']->name);
     $this->drupalPost(NULL, array(), 'Confirm');
@@ -1382,10 +1447,10 @@ class SynonymsTermMergeWebTestCase extends TermMergeWebTestCase {
    *   Assert message to be shown on test results page
    */
   protected function assertSynonymsIntegration($terms, $message) {
-    drupal_static_reset();
     foreach ($terms as $term) {
       // Getting an array of synonyms according to Synonyms module.
-      $synonyms = synonyms_get_raw(taxonomy_term_load($term->tid));
+      $context = array();
+      $synonyms = synonyms_get_raw(entity_load_unchanged('taxonomy_term', $term->tid), array(), 'synonyms', 'taxonomy_term', $context);
 
       $expected_synonyms = isset($term->synonyms) ? $term->synonyms : array();
       // Comparing $synonyms to $expected_synonyms.
@@ -1439,7 +1504,8 @@ class ViewsTermMergeWebTestCase extends TermMergeWebTestCase {
   /**
    * SetUp method.
    */
-  public function setUp(array $modules = array()) {
+  public function setUp() {
+    $modules = $this->normalizeSetUpArguments(func_get_args());
     $modules[] = 'views';
     parent::setUp($modules);
     // Additionally we create a view.
@@ -1599,7 +1665,8 @@ class EntityReferenceTermMergeWebTestCase extends TermMergeWebTestCase {
     );
   }
 
-  public function setUp(array $modules = array()) {
+  public function setUp() {
+    $modules = $this->normalizeSetUpArguments(func_get_args());
     $modules[] = 'entityreference';
     parent::setUp($modules);
 

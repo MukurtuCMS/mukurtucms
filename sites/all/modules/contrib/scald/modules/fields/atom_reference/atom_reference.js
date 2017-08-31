@@ -5,15 +5,16 @@
 (function($) {
 
   var $edit_link_model = $('<a target="_blank">')
-    .html(Drupal.t('Edit'))
     .addClass('ctools-use-modal ctools-modal-custom-style atom-reference-edit');
   var $view_link_model = $('<a target="_blank">')
-    .html(Drupal.t('View'))
     .addClass('atom-reference-view');
 
 Drupal.behaviors.atom_reference = {
   attach: function(context, settings) {
     var this_behavior_attach = this;
+
+    $edit_link_model.html(Drupal.t('Edit'));
+    $view_link_model.html(Drupal.t('View'));
 
     // Record if the edit target link modal frame is updated
     $('.ctools-modal-content form', context).bind('formUpdated', function() {

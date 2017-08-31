@@ -10,12 +10,12 @@
 function ma_community_default_cer() {
   $items = array();
   $items['node:community:field_parent_community*node:community:field_child_communities'] = entity_import('cer', '{
-    "identifier" : "node:community:field_parent_community*node:community:field_child_communities",
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
     "cer_left" : { "und" : [ { "path" : "node:community:field_parent_community" } ] },
     "cer_right" : { "und" : [ { "path" : "node:community:field_child_communities" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:community:field_parent_community*node:community:field_child_communities",
     "rdf_mapping" : []
   }');
   return $items;

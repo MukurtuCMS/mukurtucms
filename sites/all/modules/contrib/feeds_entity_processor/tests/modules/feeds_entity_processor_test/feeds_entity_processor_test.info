@@ -5,9 +5,10 @@ core = 7.x
 hidden = TRUE
 
 files[] = src/FeedsEntityProcessorTestMetadataController.php
-; Information added by Drupal.org packaging script on 2016-02-21
+
+; Information added by Drupal.org packaging script on 2017-07-09
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "feeds_entity_processor"
-datestamp = "1456071845"
+datestamp = "1499593144"
 

@@ -5,7 +5,7 @@
  */
 
 define('SCALD_YOUTUBE_WEB', 'https://www.youtube.com/watch');
-define('SCALD_YOUTUBE_EMBED', '//www.youtube.com/embed/');
+define('SCALD_YOUTUBE_EMBED', 'https://www.youtube.com/embed/');
 define('SCALD_YOUTUBE_ID_REGEXP', '/^[a-zA-Z0-9\-_]+$/');
 define('SCALD_YOUTUBE_WEB_REGEXP',
 '/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+(?:&|&#38;);v=))((?:\w|-|_){11})(?:(?:\?|&|&#38;)index=((?:\d){1,3}))?(?:(?:\?|&|&#38;)list=((?:\w|-|_){12,}))?(?:\S+)?/');
@@ -20,9 +20,13 @@ function scald_youtube_scald_atom_providers() {
   return array(
     'video' => 'Video hosted on YouTube',
   );
-  // This code will never be hit, but is necessary to mark the string
-  // for translation on localize.d.o
+  /*
+   * This code will never be hit, but is necessary to mark the string
+   * for translation on localize.d.o
+   * @codingStandardsIgnoreStart
+   */
   t('Video hosted on YouTube');
+  // @codingStandardsIgnoreEnd
 }
 
 /**
@@ -82,8 +86,8 @@ function scald_youtube_scald_add_form(&$form, &$form_state) {
       '#theme' => 'scald_youtube_search',
       '#videos' => array(),
       '#attached' => array(
-        'js' => array(drupal_get_path('module', 'scald_youtube') . '/scald_youtube_search.js'),
-        'css' => array(drupal_get_path('module', 'scald_youtube') . '/scald_youtube_search.css'),
+        'js' => array(drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_search.js'),
+        'css' => array(drupal_get_path('module', 'scald_youtube') . '/css/scald_youtube_search.css'),
       ),
     );
     $form['buttons']['next']['#attributes']['class'][] = 'continue-button';
@@ -156,7 +160,7 @@ function scald_youtube_scald_add_form_fill(&$atom, $form, $form_state) {
       );
     }
   }
-  
+
   // Save video width and height.
   $atom->data['video_width'] = $infos->width;
   $atom->data['video_height'] = $infos->height;
@@ -210,12 +214,25 @@ function scald_youtube_form_scald_atom_add_form_options_alter(&$form, &$form_sta
         '#tree' => TRUE,
         '#parents' => array($key, 'scald_youtube_show_related'),
       );
+
+      $scald_youtube_autoplay = variable_get('scald_youtube_autoplay', FALSE);
+      if (isset($scald['atoms'][$index]->data['youtube_autoplay'])) {
+        $scald_youtube_autoplay = $scald['atoms'][$index]->data['youtube_autoplay'];
+      }
+      $form[$key]['scald_youtube_autoplay'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $scald_youtube_autoplay,
+        '#title' => t('Autoplay the video'),
+        '#description' => t('If checked, the video will be automatically started.'),
+        '#weight' => $form[$key]['scald_thumbnail']['#weight'] + .7,
+        '#tree' => TRUE,
+        '#parents' => array($key, 'scald_youtube_autoplay'),
+      );
     }
   }
 
   array_unshift($form['#submit'], 'scald_youtube_extra_options_save_handler');
 }
-
 
 /**
  * Handler to store any extra options in the atom Entity.
@@ -225,6 +242,7 @@ function scald_youtube_extra_options_save_handler(&$form, &$form_state) {
     if (strpos($key, 'atom') === 0) {
       $index = intval(substr($key, 4));
       $form_state['scald']['atoms'][$index]->data['show_related'] = $form_state['values'][$key]['scald_youtube_show_related'];
+      $form_state['scald']['atoms'][$index]->data['youtube_autoplay'] = $form_state['values'][$key]['scald_youtube_autoplay'];
     }
   }
 }
@@ -262,20 +280,40 @@ function scald_youtube_scald_prerender($atom, $context, $options, $mode) {
     if (isset($atom->data['show_related']) && empty($atom->data['show_related'])) {
       $query['rel'] = '0';
     }
+    // Don't apply the autoplay on admin page.
+    if (isset($atom->data['youtube_autoplay']) && !empty($atom->data['youtube_autoplay']) && !path_is_admin(current_path())) {
+      $query['autoplay'] = '1';
+    }
     $video_url = url(SCALD_YOUTUBE_EMBED . $atom->base_id, array(
       'query' => $query,
     ));
-    $atom->rendered->player = theme('scald_youtube_player', array(
-      'vars' => array(
+
+    $attached_files = array(
+      'css' => array(drupal_get_path('module', 'scald_youtube') . '/css/scald_youtube_iframe.css'),
+    );
+
+    $defer_enable = variable_get('scald_youtube_defer_videos', FALSE);
+    if ($defer_enable) {
+      $attached_files['js'] = array(
+        drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer_library.js',
+        drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer.js',
+      );
+    }
+
+    $atom->rendered->player = array(
+      '#theme' => 'scald_youtube_player',
+      '#vars' => array(
         'video_id'      => $atom->base_id,
         'video_width'   => $video_width,
         'video_height'  => $video_height,
         'video_url'     => $video_url,
         'thumbnail'     => $atom->rendered->thumbnail_source_url,
         'title'         => check_plain($atom->title),
+        'enable_defer' => $defer_enable,
       ),
-      'atom' => $atom,
-    ));
+      '#atom' => $atom,
+      '#attached' => $attached_files,
+    );
   }
 }
 
@@ -289,22 +327,24 @@ function scald_youtube_theme() {
         'vars' => NULL,
         'atom' => NULL,
       ),
-      'template' => 'scald_youtube_player',
+      'template' => 'templates/scald_youtube_player',
     ),
     'scald_youtube_search' => array(
       'variables' => array(
         'videos' => NULL,
       ),
-      'template' => 'scald_youtube_search',
+      'template' => 'templates/scald_youtube_search',
     ),
   );
 }
 
-
 /**
- * Creates an atom based on a video ID or an object containing the video informations.
+ * Scald_youtube_register.
  *
- * @param $video
+ * Creates an atom based on a video ID or an object containing
+ * the video informations.
+ *
+ * @param mixed $video
  *   Unique identifier of the video on YouTube, or object
  *   returned by scald_youtube_video.
  *
@@ -364,13 +404,10 @@ function scald_youtube_register($video) {
   return $atom_sid;
 }
 
-
 /**
  * Analyze a YouTube RSS feed to extract videos information.
  *
- * @param $type
- *   RSS Type of the feed. Example, 'user', 'video', 'tag'.
- * @param $id
+ * @param string $id
  *   Identifier or string associated with the type. For example, user name,
  *   video id or tag.
  *
@@ -536,6 +573,18 @@ function scald_youtube_form_scald_admin_type_form_alter(&$form, &$form_state, $f
       '#title' => t('Show related videos by default'),
       '#description' => t('If checked the related videos will be visible at the end of the video by default for new Atoms.'),
     );
+    $form['defaults']['scald_youtube']['scald_youtube_autoplay'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_autoplay', FALSE),
+      '#title' => t('Autoplay the video'),
+      '#description' => t('If checked, the video will be set to automatically start by default for new Atoms.'),
+    );
+    $form['defaults']['scald_youtube']['scald_youtube_defer_videos'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('scald_youtube_defer_videos', FALSE),
+      '#title' => t('Defer the Youtube videos'),
+      '#description' => t("If this checkbox is checked, the loading of the Scald Youtube videos will be deferred to the end. The cache has to be cleared for the changes to take effect. If you use the WYSIWYG module, you must enable the 'Defer Youtube videos' plugin in your WYSIWYG profile."),
+    );
     $form['#submit'][] = 'scald_youtube_configuration_submit';
   }
 }
@@ -543,7 +592,7 @@ function scald_youtube_form_scald_admin_type_form_alter(&$form, &$form_state, $f
 /**
  * Checks if a video has already been imported, based on its video ID.
  *
- * @param $id
+ * @param string $id
  *   The video identifier.
  *
  * @return mixed
@@ -570,6 +619,8 @@ function scald_youtube_validate_api_key($element, &$form_state) {
 function scald_youtube_configuration_submit($form_id, &$form_state) {
   variable_set('scald_youtube_api_key', $form_state['values']['scald_youtube_api_key']);
   variable_set('scald_youtube_show_related', $form_state['values']['scald_youtube_show_related']);
+  variable_set('scald_youtube_autoplay', $form_state['values']['scald_youtube_autoplay']);
+  variable_set('scald_youtube_defer_videos', $form_state['values']['scald_youtube_defer_videos']);
 }
 
 /**
@@ -621,4 +672,54 @@ function scald_youtube_parse_id($string, $check) {
     }
   }
   return $identifier;
+}
+
+/**
+ * Implements hook_wysiwyg_plugin().
+ */
+function scald_youtube_wysiwyg_plugin($editor, $version) {
+  switch ($editor) {
+    case 'ckeditor':
+      return array(
+        'scald_youtube_defer_plugin' => array(
+          'path' => drupal_get_path('module', 'scald_youtube') . '/scald_youtube_defer_plugin/',
+          'buttons' => array(
+            'scald_youtube_defer_button' => t('Defer Youtube videos'),
+          ),
+          'load' => TRUE,
+        ),
+      );
+  }
+}
+
+/**
+ * Implements hook_element_info_alter().
+ */
+function scald_youtube_element_info_alter(&$types) {
+  $defer_enable = variable_get('scald_youtube_defer_videos', FALSE);
+  if ($defer_enable) {
+    // Add the path of the script.
+    $types['text_format']['#pre_render'][] = 'scald_youtube_add_defer_video_plugin_js';
+  }
+}
+
+/**
+ * A function in order to pass the JS file to the ckeditor plugin.
+ *
+ * @param array $element
+ *   The element array.
+ *
+ * @return array
+ *   Return the text format element with a settings in order to add the JS file.
+ */
+function scald_youtube_add_defer_video_plugin_js($element) {
+  global $base_url, $base_path;
+  $element['#attached']['js'][] = array(
+    'type' => 'setting',
+    'data' => array(
+      'defer_youtube_video_js' => $base_url . $base_path . drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer_library.js',
+    ),
+  );
+
+  return $element;
 }

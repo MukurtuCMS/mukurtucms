@@ -1758,11 +1758,18 @@ function ckeditor_toolbar_buttons_all() {
   );
 
   $plugins = ckeditor_load_plugins(TRUE);
+
   foreach ($plugins as $plugin_name => $plugin) {
-    if (!isset($plugin['buttons']) || $plugin['buttons'] == FALSE)
+    if (empty($plugin['buttons'])) {
       continue;
+    }
     foreach ((array) $plugin['buttons'] as $button_name => $button) {
-      $buttons[$button_name] = array('name' => $button_name, 'icon' => $plugin['path'] . $button['icon'], 'title' => t($button['label']), 'row' => 4);
+      $buttons[$button_name] = array(
+        'name' => $button_name,
+        'icon' => !empty($button['icon_path']) ? $button['icon_path'] . $button['icon'] : $plugin['path'] . $button['icon'],
+        'title' => t($button['label']),
+        'row' => 4,
+      );
     }
   }
 

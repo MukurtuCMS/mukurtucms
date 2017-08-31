@@ -103,7 +103,7 @@ function ma_search_api_default_search_api_index() {
               "field_description:value" : true,
               "field_tk_body:value" : true
             },
-            "spaces" : "[^\\\\p{L}\\\\p{N}]",
+            "spaces" : "[\\\\p{P}|\\\\p{C}|\\\\p{Z}|\\\\p{S}]",
             "ignorable" : "[-]"
           }
         },

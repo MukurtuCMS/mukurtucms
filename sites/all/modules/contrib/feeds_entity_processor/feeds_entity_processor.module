@@ -129,7 +129,7 @@ function taxonomy_form_feedsentityprocessor_feeds_form_alter(&$form, &$form_stat
   if ($form['#configurable']->entityType() == 'taxonomy_term') {
     unset($form['values']['name']);
     if (empty($form['values']['weight']['#default_value'])) {
-      $form['values']['weight']['#default_value']= '';
+      $form['values']['weight']['#default_value'] = '';
     }
     array_unshift($form['#validate'], 'taxonomy_form_feedsentityprocessor_feeds_form_validate');
     unset($form['values']['parent']);

@@ -95,7 +95,7 @@ class FeedsEntityProcessor extends FeedsProcessor {
    *   (optional) The entity object to wrap.
    *
    * @return EntityMetadataWrapper
-   *  An entity metadata wrapper.
+   *   An entity metadata wrapper.
    */
   protected function entityWrapper($entity = NULL) {
     if ($this->bundleKey()) {

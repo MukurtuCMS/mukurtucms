@@ -1,33 +1,35 @@
 <?php
 /**
  * @file
- * template.php
+ * The primary PHP file for the Drupal Bootstrap base theme.
  *
- * This file should only contain light helper functions and stubs pointing to
+ * This file should only contain light helper functions and point to stubs in
  * other files containing more complex functions.
  *
- * The stubs should point to files within the `theme` folder named after the
- * function itself minus the theme prefix. If the stub contains a group of
+ * The stubs should point to files within the `./includes` folder named after
+ * the function itself minus the theme prefix. If the stub contains a group of
  * functions, then please organize them so they are related in some way and name
  * the file appropriately to at least hint at what it contains.
  *
- * All [pre]process functions, theme functions and template implementations also
- * live in the 'theme' folder. This is a highly automated and complex system
+ * All [pre]process functions, theme functions and template files lives inside
+ * the `./templates` folder. This is a highly automated and complex system
  * designed to only load the necessary files when a given theme hook is invoked.
- * @see _bootstrap_theme()
- * @see theme/registry.inc
  *
- * Due to a bug in Drush, these includes must live inside the 'theme' folder
- * instead of something like 'includes'. If a module or theme has an 'includes'
- * folder, Drush will think it is trying to bootstrap core when it is invoked
- * from inside the particular extension's directory.
- * @see https://drupal.org/node/2102287
+ * Visit this project's official documentation site, http://drupal-bootstrap.org
+ * or the markdown files inside the `./docs` folder.
+ *
+ * @see _bootstrap_theme()
  */
 
 /**
  * Include common functions used through out theme.
  */
-include_once dirname(__FILE__) . '/theme/common.inc';
+include_once dirname(__FILE__) . '/includes/common.inc';
+
+/**
+ * Include any deprecated functions.
+ */
+bootstrap_include('bootstrap', 'includes/deprecated.inc');
 
 /**
  * Implements hook_theme().
@@ -43,9 +45,19 @@ include_once dirname(__FILE__) . '/theme/common.inc';
  * @see _bootstrap_theme()
  */
 function bootstrap_theme(&$existing, $type, $theme, $path) {
-  bootstrap_include($theme, 'theme/registry.inc');
+  bootstrap_include($theme, 'includes/registry.inc');
   return _bootstrap_theme($existing, $type, $theme, $path);
 }
+
+/**
+ * Clear any previously set element_info() static cache.
+ *
+ * If element_info() was invoked before the theme was fully initialized, this
+ * can cause the theme's alter hook to not be invoked.
+ *
+ * @see https://www.drupal.org/node/2351731
+ */
+drupal_static_reset('element_info');
 
 /**
  * Declare various hook_*_alter() hooks.
@@ -53,4 +65,4 @@ function bootstrap_theme(&$existing, $type, $theme, $path) {
  * hook_*_alter() implementations must live (via include) inside this file so
  * they are properly detected when drupal_alter() is invoked.
  */
-bootstrap_include('bootstrap', 'theme/alter.inc');
+bootstrap_include('bootstrap', 'includes/alter.inc');
