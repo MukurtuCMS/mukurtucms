@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Implements hook_install().
+ */
+function ma_core_install() {
+    mukurtu_create_default_contexts();
+    module_enable(array('ma_dictionary', 'mukurtu_content_warnings', 'mukurtu_taxonomy_records', 'ma_person'));
+    module_disable(array('ma_dictionary'));
+}
+
+/**
  * Implements hook_update().
  */
 
