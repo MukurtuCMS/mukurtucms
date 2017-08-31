@@ -53,5 +53,5 @@ function ma_core_update_7103() {
  * Enable Mukurtu Taxonomy Records
  */
 function ma_core_update_7104() {
-    module_enable(array('mukurtu_taxonomy_records'));
+    module_enable(array('mukurtu_taxonomy_records', 'ma_person'));
 }
