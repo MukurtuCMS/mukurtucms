@@ -10,6 +10,16 @@
 function ma_person_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: 'administer interpersonal_relationship vocabulary terms'.
+  $permissions['administer interpersonal_relationship vocabulary terms'] = array(
+    'name' => 'administer interpersonal_relationship vocabulary terms',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'vppr',
+  );
+
   // Exported permission: 'clear import_people feeds'.
   $permissions['clear import_people feeds'] = array(
     'name' => 'clear import_people feeds',
@@ -99,7 +109,10 @@ function ma_person_user_default_permissions() {
   // Exported permission: 'delete terms in interpersonal_relationship'.
   $permissions['delete terms in interpersonal_relationship'] = array(
     'name' => 'delete terms in interpersonal_relationship',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'taxonomy',
   );
 
@@ -126,7 +139,10 @@ function ma_person_user_default_permissions() {
   // Exported permission: 'edit terms in interpersonal_relationship'.
   $permissions['edit terms in interpersonal_relationship'] = array(
     'name' => 'edit terms in interpersonal_relationship',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'taxonomy',
   );
 
@@ -153,7 +169,10 @@ function ma_person_user_default_permissions() {
   // Exported permission: 'merge interpersonal_relationship terms'.
   $permissions['merge interpersonal_relationship terms'] = array(
     'name' => 'merge interpersonal_relationship terms',
-    'roles' => array(),
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
     'module' => 'term_merge',
   );
 
