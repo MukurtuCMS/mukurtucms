@@ -945,6 +945,10 @@ function ma_digitalheritage_page_alter(&$data) {
           #'weight' => 0,
         );
 
+        $cr_tab_count = 1;
+        $cr_tab_index = 0;
+        $cr_redirect_source = !empty($_SESSION['mukurtu']['redirect_source']) ? $_SESSION['mukurtu']['redirect_source'] : -1;
+        $cr_redirect_parent = !empty($_SESSION['mukurtu']['redirect_dest']) ? $_SESSION['mukurtu']['redirect_dest'] : -1;
         foreach ($community_records as $community_record) {
 
           global $user;
@@ -967,12 +971,28 @@ function ma_digitalheritage_page_alter(&$data) {
               'hide_title' => 0,
               #'weight' => 0,
             );
+
+            // If we are coming from a community record redirect, check if this is the correct CR.
+            if($community_record->nid == $cr_redirect_source) {
+                // Store the tab index for the community record doing the redirect
+                $cr_tab_index = $cr_tab_count;
+            }
+            $cr_tab_count++;
           }
 
           // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
           else {
             $dh_tabs[] = array();
           }
+        }
+
+        // Set default tab in the case that we are coming from a community record redirect
+        if($cr_redirect_parent == $parent_dh->getIdentifier() && $cr_tab_index > 0) {
+            $tab_settings['default_tab'] = $cr_tab_index;
+
+            // Clear the redirect info, if the page is refreshed, we want to default back to the parent being default
+            unset($_SESSION['mukurtu']['redirect_source']);
+            unset($_SESSION['mukurtu']['redirect_dest']);
         }
 
         // Add the rendered quicktabs to the built page content
@@ -1229,4 +1249,14 @@ function ma_digitalheritage_form_node_delete_confirm_alter(&$form, &$form_state)
     $form['description']['#markup'] = "<p><b>This will delete all of its Community Records.</b></p>" . $form['description']['#markup'];
     drupal_set_title ("Are you sure you want to delete <i>" . $form['#node']->title . "</i> and all of its Community Records?",  PASS_THROUGH);
   }
+}
+
+/**
+ * Implements hook_redirect_alter().
+ */
+function ma_digitalheritage_redirect_alter($redirect) {
+    // Store most recent redirect per session.
+    // We want to use that information to set the default tab for community records.
+    $_SESSION['mukurtu']['redirect_source'] = str_replace('node/', '', $redirect->source);
+    $_SESSION['mukurtu']['redirect_dest'] = str_replace('node/', '', $redirect->redirect);
 }
