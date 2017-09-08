@@ -176,8 +176,7 @@ function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
  * @param type $query
  */
 function ma_search_api_search_api_query_alter($sapi_query) {
-
-  if (!user_access('bypass content access control')) {
+    //  if (!user_access('bypass content access control')) {
 
     $current_page = arg(0);
 
@@ -187,6 +186,38 @@ function ma_search_api_search_api_query_alter($sapi_query) {
         'digital-heritage' => 'digital_heritage',
         'dictionary' => 'dictionary_word',
       );
+
+      // When no search terms have been entered, only show:
+      // * First page of multi-page documents
+      // * Parent item, no community records
+      $child_pages = array();
+      $dh_dw_nids = array();
+      if($current_page === 'digital-heritage') {
+          $index = $sapi_query->getIndex();
+          if($index->machine_name === 'default_node_index') {
+              $keys = $sapi_query->getOriginalKeys();
+              if(empty($keys)) {
+                  // Multi-page
+                  $query = new EntityFieldQuery();
+                  $query->entityCondition('bundle', 'digital_heritage')
+                      ->fieldCondition('field_book_parent');
+                  $result = $query->execute();
+                  if(!empty($result['node'])) {
+                      $child_pages = array_keys($result['node']);
+                  }
+
+                  // Community Records
+                  $query = new EntityFieldQuery();
+                  $query->entityCondition('bundle', 'digital_heritage')
+                      ->fieldCondition('field_community_record_parent');
+                  $result = $query->execute();
+                  if(!empty($result['node'])) {
+                      $community_records = array_keys($result['node']);
+                      $child_pages = array_merge($child_pages, $community_records);
+                  }
+              }
+          }
+      }
 
       // Get all STRICT CPs that the user is not a member of
       $cp_query = new EntityFieldQuery();
@@ -216,14 +247,21 @@ function ma_search_api_search_api_query_alter($sapi_query) {
         if (isset($result['node'])) {
           $dh_dw_nids = array_keys($result['node']);
           # dpm($dh_dw_nids, 'dh/dw nids excluded');
-          $filter = $sapi_query->createFilter('AND');
-          $filter->condition('nid', $dh_dw_nids, 'NOT IN');
-          $sapi_query->filter($filter);
+          //          $filter = $sapi_query->createFilter('AND');
+          //          $filter->condition('nid', $dh_dw_nids, 'NOT IN');
+          //          $sapi_query->filter($filter);
         }
       }
 
+      // Process final filter list
+      $filter_nids = array_unique(array_merge($child_pages, $dh_dw_nids));
+      if(!empty($filter_nids)) {
+          $filter = $sapi_query->createFilter('AND');
+          $filter->condition('nid', $filter_nids, 'NOT IN');
+          $sapi_query->filter($filter);
+      }
     }
-  }
+    //  }
 }
 
 /**

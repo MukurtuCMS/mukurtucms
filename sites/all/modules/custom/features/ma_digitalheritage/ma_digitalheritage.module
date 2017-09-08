@@ -865,6 +865,7 @@ function ma_digitalheritage_node_delete($node) {
  * Implements hook_search_api_index_items_alter().
  */
 function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchApiIndex $index) {
+    /*
   foreach($items as $id => $item){
 
     // Exclude Community Record DH nodes from being indexed
@@ -878,6 +879,7 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
     }
 
   }
+    */
 }
 
 
