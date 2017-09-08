@@ -10268,6 +10268,9 @@ a:hover {
 .node-type-digital-heritage .view-mode-search_result .field {
   margin-bottom: 0;
 }
+.node-digital-heritage.view-mode-search_result .label-default {
+  margin-right: 5px;
+}
 .node-digital-heritage.view-mode-full .scald-atom,
 .node-digital-heritage.view-mode-community_record .scald-atom {
   margin-bottom: 2.5em;
