@@ -170,7 +170,20 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
-    'filters' => array(),
+    'filters' => array(
+      'active_items' => array(
+        'status' => 0,
+        'weight' => '-50',
+      ),
+      'current_depth' => array(
+        'status' => 0,
+        'weight' => '-49',
+      ),
+      'glossary_rewrite_items' => array(
+        'status' => 0,
+        'weight' => '-48',
+      ),
+    ),
     'active_sorts' => array(
       'active' => 'active',
       'count' => 'count',
@@ -342,7 +355,20 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
-    'filters' => array(),
+    'filters' => array(
+      'active_items' => array(
+        'status' => 0,
+        'weight' => '-50',
+      ),
+      'current_depth' => array(
+        'status' => 0,
+        'weight' => '-49',
+      ),
+      'glossary_rewrite_items' => array(
+        'status' => 0,
+        'weight' => '-48',
+      ),
+    ),
     'active_sorts' => array(
       'active' => 'active',
       'count' => 'count',

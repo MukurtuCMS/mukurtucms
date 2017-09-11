@@ -36,20 +36,30 @@ function ma_search_api_default_search_api_index() {
         "search_api_alter_node_access" : { "status" : 1, "weight" : "0", "settings" : [] },
         "search_api_alter_node_status" : { "status" : 0, "weight" : "0", "settings" : [] },
         "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
-        "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
-        "search_api_alter_add_url" : { "status" : 0, "weight" : "0", "settings" : [] },
         "search_api_alter_add_aggregation" : {
           "status" : 1,
           "weight" : "0",
-          "settings" : { "fields" : { "search_api_aggregation_1" : {
+          "settings" : { "fields" : {
+              "search_api_aggregation_1" : {
                 "name" : "Translation Sort",
                 "type" : "first",
+                "separator" : "\\n\\n",
                 "fields" : [ "field_word_entry:field_translation" ],
                 "description" : "A First aggregation of the following fields: Word Entry \\u00bb Translation."
+              },
+              "search_api_aggregation_2" : {
+                "name" : "Child Node Sort",
+                "type" : "count",
+                "separator" : "\\n\\n",
+                "fields" : [ "field_book_parent", "field_community_record_parent" ],
+                "description" : "A Count aggregation of the following fields: Book Parent, Community Record Parent."
               }
             }
           }
-        }
+        },
+        "search_api_alter_add_url" : { "status" : 0, "weight" : "0", "settings" : [] },
+        "search_api_alter_protocol_access" : { "status" : 0, "weight" : "0", "settings" : [] },
+        "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } }
       },
       "processors" : {
         "search_api_case_ignore" : {
@@ -67,8 +77,7 @@ function ma_search_api_default_search_api_index() {
               "field_word_entry:field_source" : true,
               "field_word_entry:field_definition" : true,
               "field_word_entry:field_sample_sentence" : true,
-              "field_word_entry:field_translation" : true,
-              "field_word_entry:field_transliteration" : true
+              "field_word_entry:field_translation" : true
             }
           }
         },
@@ -133,7 +142,44 @@ function ma_search_api_default_search_api_index() {
             "excerpt" : 1,
             "excerpt_length" : "256",
             "exclude_fields" : [],
-            "highlight" : "always"
+            "highlight" : "always",
+            "highlight_partial" : 0
+          }
+        },
+        "search_api_porter_stemmer" : {
+          "status" : 0,
+          "weight" : "35",
+          "settings" : {
+            "fields" : {
+              "title" : true,
+              "field_summary" : true,
+              "field_transcription" : true,
+              "field_date" : true,
+              "field_identifier" : true,
+              "field_source" : true,
+              "field_collection_credit" : true,
+              "field_collection_summary" : true,
+              "body:value" : true,
+              "field_dh_type:name" : true,
+              "field_people:name" : true,
+              "field_category:name" : true,
+              "field_contributor:name" : true,
+              "field_coverage_description:value" : true,
+              "field_creator:name" : true,
+              "field_description:value" : true,
+              "field_format:name" : true,
+              "field_language:name" : true,
+              "field_subject:name" : true,
+              "field_tags:name" : true,
+              "field_tk_body:value" : true,
+              "field_word_entry:field_source" : true,
+              "field_word_entry:field_alternate_spelling" : true,
+              "field_word_entry:field_definition" : true,
+              "field_word_entry:field_sample_sentence" : true,
+              "field_word_entry:field_translation" : true,
+              "field_book_children:body:value" : true
+            },
+            "exceptions" : "texan=texa"
           }
         }
       },
@@ -143,68 +189,42 @@ function ma_search_api_default_search_api_index() {
         "changed" : { "type" : "date" },
         "comment_count" : { "type" : "integer" },
         "created" : { "type" : "date" },
-        "field_book_children:author" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "user" },
-        "field_book_children:body:value" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_category" : {
-          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-          "entity_type" : "taxonomy_term"
-        },
-        "field_book_children:field_category:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_collection_credit" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_collection_summary" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_community_ref" : {
-          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-          "entity_type" : "node"
-        },
-        "field_book_children:field_contributor:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_coverage_description:value" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_creator:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_date" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_description:value" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_dh_type:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_format:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_identifier" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_language:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_people" : {
-          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-          "entity_type" : "taxonomy_term"
-        },
-        "field_book_children:field_source" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_subject:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_summary" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_tags" : {
-          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-          "entity_type" : "taxonomy_term"
-        },
-        "field_book_children:field_tags:name" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E" },
-        "field_book_children:field_tk_body:value" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:field_transcription" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_book_children:title" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_book_parent" : { "type" : "integer", "entity_type" : "node" },
         "field_category" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_category:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_collection" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_collection_credit" : { "type" : "text" },
         "field_collection_summary" : { "type" : "text" },
+        "field_community_record_parent" : { "type" : "integer", "entity_type" : "node" },
         "field_community_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_contributor" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_contributor:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_coverage:geo_type" : { "type" : "string" },
         "field_coverage_description:value" : { "type" : "text" },
+        "field_creator" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_creator:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_date" : { "type" : "text" },
         "field_description:value" : { "type" : "text" },
+        "field_dh_type" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_dh_type:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
         "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_format" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_identifier" : { "type" : "text" },
+        "field_language" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_licence_std_cc" : { "type" : "string" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_publisher" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_rights" : { "type" : "text" },
         "field_source" : { "type" : "text" },
+        "field_subject" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_summary" : { "type" : "text" },
         "field_tags" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
@@ -217,7 +237,6 @@ function ma_search_api_default_search_api_index() {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
           "entity_type" : "taxonomy_term"
         },
-        "field_word_entry:field_pronunciation:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_sample_sentence" : { "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E", "boost" : "0.8" },
         "field_word_entry:field_source" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_translation" : { "type" : "list\\u003Ctext\\u003E" },
@@ -228,6 +247,7 @@ function ma_search_api_default_search_api_index() {
         "promote" : { "type" : "boolean" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
         "search_api_aggregation_1" : { "type" : "string" },
+        "search_api_aggregation_2" : { "type" : "integer" },
         "search_api_language" : { "type" : "string" },
         "status" : { "type" : "boolean" },
         "sticky" : { "type" : "boolean" },
@@ -257,7 +277,8 @@ function ma_search_api_default_search_api_server() {
       "database" : "default:default",
       "min_chars" : "3",
       "partial_matches" : 0,
-      "indexes" : { "default_node_index" : {
+      "indexes" : {
+        "default_node_index" : {
           "type" : {
             "table" : "search_api_db_default_node_index",
             "column" : "type",
@@ -474,130 +495,6 @@ function ma_search_api_default_search_api_server() {
             "type" : "text",
             "boost" : "1.0"
           },
-          "field_book_children:title" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:author" : {
-            "table" : "search_api_db_default_node_index_field_book_children_author",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_community_ref" : {
-            "table" : "search_api_db_default_node_index_field_book_children_field_com",
-            "column" : "value",
-            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_summary" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_category" : {
-            "table" : "search_api_db_default_node_index_field_book_children_field_cat",
-            "column" : "value",
-            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_date" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_identifier" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_source" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_tags" : {
-            "table" : "search_api_db_default_node_index_field_book_children_field_tag",
-            "column" : "value",
-            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_transcription" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_collection_credit" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_collection_summary" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:body:value" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_dh_type:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_category:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_contributor:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_coverage_description:value" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_creator:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_description:value" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_format:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_language:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_subject:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_tags:name" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Clist\\u003Ctext\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_tk_body:value" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
           "field_coverage:geo_type" : {
             "table" : "search_api_db_default_node_index",
             "column" : "field_coverage_geo_type",
@@ -613,12 +510,6 @@ function ma_search_api_default_search_api_server() {
           "field_people:name" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_book_children:field_people" : {
-            "table" : "search_api_db_default_node_index_field_book_children_field_peo",
-            "column" : "value",
-            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
             "boost" : "1.0"
           },
           "field_dictionary_word_language" : {
@@ -684,11 +575,6 @@ function ma_search_api_default_search_api_server() {
             "type" : "string",
             "boost" : "1.0"
           },
-          "field_word_entry:field_pronunciation:value" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
           "field_related_dictionary_words" : {
             "table" : "search_api_db_default_node_index_field_related_dictionary_word",
             "column" : "value",
@@ -699,11 +585,295 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
+          },
+          "field_book_parent" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_book_parent",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_community_record_parent" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_community_record_parent",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "search_api_aggregation_2" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "search_api_aggregation_2",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_dh_type" : {
+            "table" : "search_api_db_default_node_index_field_dh_type",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_contributor" : {
+            "table" : "search_api_db_default_node_index_field_contributor",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_creator" : {
+            "table" : "search_api_db_default_node_index_field_creator",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_format" : {
+            "table" : "search_api_db_default_node_index_field_format",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_language" : {
+            "table" : "search_api_db_default_node_index_field_language",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_licence_std_cc" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_licence_std_cc",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_publisher" : {
+            "table" : "search_api_db_default_node_index_field_publisher",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_rights" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_subject" : {
+            "table" : "search_api_db_default_node_index_field_subject",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          }
+        },
+        "mukurtu_search_index" : {
+          "status" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "status",
+            "type" : "boolean",
+            "boost" : "1.0"
+          },
+          "author" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "author",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "search_api_access_node" : {
+            "table" : "search_api_db_mukurtu_search_index_search_api_access_node",
+            "column" : "value",
+            "type" : "list\\u003Cstring\\u003E",
+            "boost" : "1.0"
+          },
+          "nid" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "nid",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "type" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "type",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "title" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "5.0"
+          },
+          "language" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "language",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "created" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "created",
+            "type" : "date",
+            "boost" : "1.0"
+          },
+          "changed" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "changed",
+            "type" : "date",
+            "boost" : "1.0"
+          },
+          "title_az_glossary" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "title_az_glossary",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_community_record_children" : {
+            "table" : "search_api_db_mukurtu_search_index_field_community_record_chil",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_community_ref" : {
+            "table" : "search_api_db_mukurtu_search_index_field_community_ref",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_dh_type" : {
+            "table" : "search_api_db_mukurtu_search_index_field_dh_type",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_people" : {
+            "table" : "search_api_db_mukurtu_search_index_field_people",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_related_dictionary_words" : {
+            "table" : "search_api_db_mukurtu_search_index_field_related_dictionary_wo",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_summary" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_transcription" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_category" : {
+            "table" : "search_api_db_mukurtu_search_index_field_category",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_contributor" : {
+            "table" : "search_api_db_mukurtu_search_index_field_contributor",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_creator" : {
+            "table" : "search_api_db_mukurtu_search_index_field_creator",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_date" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_format" : {
+            "table" : "search_api_db_mukurtu_search_index_field_format",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_identifier" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_language" : {
+            "table" : "search_api_db_mukurtu_search_index_field_language",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_licence_std_cc" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "field_licence_std_cc",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_licence_trad" : {
+            "table" : "search_api_db_mukurtu_search_index_field_licence_trad",
+            "column" : "value",
+            "type" : "list\\u003Cstring\\u003E",
+            "boost" : "1.0"
+          },
+          "field_publisher" : {
+            "table" : "search_api_db_mukurtu_search_index_field_publisher",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_rights" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_source" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_subject" : {
+            "table" : "search_api_db_mukurtu_search_index_field_subject",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_tags" : {
+            "table" : "search_api_db_mukurtu_search_index_field_tags",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "search_api_language" : {
+            "table" : "search_api_db_mukurtu_search_index",
+            "column" : "search_api_language",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "body:value" : {
+            "table" : "search_api_db_mukurtu_search_index_text",
+            "type" : "text",
+            "boost" : "1.0"
           }
         }
       }
     },
     "enabled" : "1",
+    "rdf_mapping" : []
+  }');
+  return $items;
+}
+
+/**
+ * Implements hook_default_search_api_sort().
+ */
+function ma_search_api_default_search_api_sort() {
+  $items = array();
+  $items['default_node_index__search_api_aggregation_2'] = entity_import('search_api_sort', '{
+    "index_id" : "default_node_index",
+    "field" : "search_api_aggregation_2",
+    "name" : "Child Node Sort",
+    "enabled" : "1",
+    "weight" : "0",
+    "identifier" : "default_node_index__search_api_aggregation_2",
+    "default_sort" : "1",
+    "default_sort_no_terms" : "1",
+    "default_order" : "asc",
+    "options" : { "field_name" : "Child Node Sort" },
     "rdf_mapping" : []
   }');
   return $items;

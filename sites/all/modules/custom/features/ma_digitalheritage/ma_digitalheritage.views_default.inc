@@ -255,11 +255,11 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['sorts']['search_api_relevance']['table'] = 'search_api_index_default_node_index';
   $handler->display->display_options['sorts']['search_api_relevance']['field'] = 'search_api_relevance';
   $handler->display->display_options['sorts']['search_api_relevance']['order'] = 'DESC';
-  /* Sort criterion: Indexed Node: Date changed */
-  $handler->display->display_options['sorts']['changed']['id'] = 'changed';
-  $handler->display->display_options['sorts']['changed']['table'] = 'search_api_index_default_node_index';
-  $handler->display->display_options['sorts']['changed']['field'] = 'changed';
-  $handler->display->display_options['sorts']['changed']['order'] = 'DESC';
+  /* Sort criterion: Indexed Node: Child Node Sort */
+  $handler->display->display_options['sorts']['search_api_aggregation_2']['id'] = 'search_api_aggregation_2';
+  $handler->display->display_options['sorts']['search_api_aggregation_2']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['sorts']['search_api_aggregation_2']['field'] = 'search_api_aggregation_2';
+  $handler->display->display_options['sorts']['search_api_aggregation_2']['expose']['label'] = 'Child Node Sort';
   /* Filter criterion: Search: Fulltext search */
   $handler->display->display_options['filters']['search_api_views_fulltext']['id'] = 'search_api_views_fulltext';
   $handler->display->display_options['filters']['search_api_views_fulltext']['table'] = 'search_api_index_default_node_index';
@@ -426,6 +426,7 @@ function ma_digitalheritage_views_default_views() {
     t('Node ID'),
     t('.'),
     t(','),
+    t('Child Node Sort'),
     t('All'),
     t('View panes'),
     t('Community-filtered'),
