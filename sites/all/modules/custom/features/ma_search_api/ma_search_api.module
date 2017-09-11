@@ -192,7 +192,7 @@ function ma_search_api_search_api_query_alter($sapi_query) {
       // * Parent item, no community records
       $child_pages = array();
       $dh_dw_nids = array();
-      if($current_page === 'digital-heritage') {
+      /*      if($current_page === 'digital-heritage') {
           $index = $sapi_query->getIndex();
           if($index->machine_name === 'default_node_index') {
               $keys = $sapi_query->getOriginalKeys();
@@ -217,7 +217,7 @@ function ma_search_api_search_api_query_alter($sapi_query) {
                   }
               }
           }
-      }
+          } */
 
       // Get all STRICT CPs that the user is not a member of
       $cp_query = new EntityFieldQuery();
