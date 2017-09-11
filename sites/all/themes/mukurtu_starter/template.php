@@ -47,12 +47,36 @@ function mukurtu_starter_preprocess_field(&$variables, $hook) {
                 }
             }
 
+            // "Community Record" label
+            if(!empty($variables['element']['#object']->field_community_record_parent[LANGUAGE_NONE])) {
+                $cr_label = '<span class="label label-default community-record-label">'. t("Community Record") . '</span>';
+                $variables['items'][0]['#markup'] = $variables['items'][0]['#markup'] . $cr_label;
+            }
+
             // Book Page Count Label
             if(!empty($variables['element']['#object']->field_book_children[LANGUAGE_NONE])) {
                 $count = count($variables['element']['#object']->field_book_children[LANGUAGE_NONE]);
                 if($count) {
                     $cr_label = '<span class="label label-default page-label">'. t("@count Pages", array('@count' => $count + 1)).'</span>';
                     $variables['items'][0]['#markup'] = $variables['items'][0]['#markup'] . $cr_label;
+                }
+            }
+
+            // Child book page label
+            if(!empty($variables['element']['#object']->field_book_parent[LANGUAGE_NONE])) {
+                $parent = node_load($variables['element']['#object']->field_book_parent[LANGUAGE_NONE][0]['target_id']);
+                if($parent) {
+                    $page = 1;
+                    $total_pages = count($parent->field_book_children[LANGUAGE_NONE]) + 1;
+                    foreach($parent->field_book_children[LANGUAGE_NONE] as $child_page) {
+                        $page++;
+                        if($child_page['target_id'] == $variables['element']['#object']->nid) {
+                            break;
+                        }
+                    }
+                    $pages = array('@page' => $page, '@pages' => $total_pages);
+                    $page_label = '<span class="label label-default page-label">'. t("Page @page of @pages", $pages).'</span>';
+                    $variables['items'][0]['#markup'] = $variables['items'][0]['#markup'] . $page_label;
                 }
             }
         }
