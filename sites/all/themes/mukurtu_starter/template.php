@@ -30,10 +30,20 @@ function mukurtu_starter_preprocess_field(&$variables, $hook) {
     if(!empty($element['#object']->type) && $element['#object']->type == 'digital_heritage' && $element['#view_mode'] == 'search_result') {
         if($element['#field_name'] == 'title') {
             // Community Record Count Label
+            $parent_record = NULL;
             if(!empty($variables['element']['#object']->field_community_record_children[LANGUAGE_NONE])) {
+                $parent_record = $variables['element']['#object'];
+            }
+
+            // If this is a community record, load the parent and run through all records
+            if(!empty($variables['element']['#object']->field_community_record_parent[LANGUAGE_NONE])) {
+                $parent_record = node_load($variables['element']['#object']->field_community_record_parent[LANGUAGE_NONE][0]['target_id']);
+            }
+
+            if($parent_record) {
                 // Only count those we have access to
                 $cr_count = 1;
-                foreach($variables['element']['#object']->field_community_record_children[LANGUAGE_NONE] as $cr) {
+                foreach($parent_record->field_community_record_children[LANGUAGE_NONE] as $cr) {
                     $node = node_load($cr['target_id']);
                     if($node && node_access('view', $node)) {
                         $cr_count++;
@@ -45,12 +55,6 @@ function mukurtu_starter_preprocess_field(&$variables, $hook) {
                     $cr_label = '<span class="label label-default community-record-label">'. t("@count Records", array('@count' => $cr_count)).'</span>';
                     $variables['items'][0]['#markup'] = $variables['items'][0]['#markup'] . $cr_label;
                 }
-            }
-
-            // "Community Record" label
-            if(!empty($variables['element']['#object']->field_community_record_parent[LANGUAGE_NONE])) {
-                $cr_label = '<span class="label label-default community-record-label">'. t("Community Record") . '</span>';
-                $variables['items'][0]['#markup'] = $variables['items'][0]['#markup'] . $cr_label;
             }
 
             // Book Page Count Label
