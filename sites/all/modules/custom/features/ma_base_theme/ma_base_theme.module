@@ -39,6 +39,7 @@ function ma_base_theme_install() {
     ma_base_theme_modify_default_image_style('thumbnail');
     ma_base_theme_modify_default_image_style('medium');
     ma_base_theme_modify_default_image_style('large');
+    ma_base_theme_update_7002();
 }
 
 /**

@@ -4,6 +4,16 @@
  */
 
 /**
+ * Set default settings for Mukurtu Starter theme
+ */
+function ma_base_theme_update_7002() {
+    $theme_settings = variable_get('theme_mukurtu_starter_settings');
+    $theme_settings['display_record_label'] = TRUE;
+    $theme_settings['display_book_page_label'] = TRUE;
+    variable_set('theme_mukurtu_starter_settings', $theme_settings);
+}
+
+/**
  * Change the default postion of tooltips after a bootstrap update
  */
 function ma_base_theme_update_7001() {
