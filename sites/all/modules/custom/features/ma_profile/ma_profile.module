@@ -61,8 +61,10 @@ function ma_profile_query_og_alter(QueryAlterableInterface $query) {
     // Loop through conditions, add if necessary
     $conditions = &$query->conditions();
     foreach ($conditions as $key => $condition) {
-        if($condition['field'] == 'node.nid' && $condition['value'] == -1 && $condition['operator'] == '=') {
-            return;
+        if(isset($condition['field']) && isset($condition['value'])) {
+            if($condition['field'] == 'node.nid' && $condition['value'] == -1 && $condition['operator'] == '=') {
+                return;
+            }
         }
     }
 
