@@ -77,6 +77,36 @@ function ma_dictionary_views_api($module = NULL, $api = NULL) {
 }
 
 /**
+ * Implements hook_eck_bundle_info().
+ */
+function ma_dictionary_eck_bundle_info() {
+  $items = array(
+    'alphabetical_order_definition_alphabetical_order_definition' => array(
+      'machine_name' => 'alphabetical_order_definition_alphabetical_order_definition',
+      'entity_type' => 'alphabetical_order_definition',
+      'name' => 'alphabetical_order_definition',
+      'label' => 'Alphabetical Order Definition',
+      'config' => array(),
+    ),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_eck_entity_type_info().
+ */
+function ma_dictionary_eck_entity_type_info() {
+  $items = array(
+    'alphabetical_order_definition' => array(
+      'name' => 'alphabetical_order_definition',
+      'label' => 'Alphabetical Order Definition',
+      'properties' => array(),
+    ),
+  );
+  return $items;
+}
+
+/**
  * Implements hook_node_info().
  */
 function ma_dictionary_node_info() {

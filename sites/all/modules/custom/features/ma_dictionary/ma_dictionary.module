@@ -1037,3 +1037,158 @@ function ma_dictionary_language_community_referenced($node) {
 
     return FALSE;
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function ma_dictionary_form_alter(&$form, &$form_state, $form_id) {
+
+  // Modifications to the sort order definition form.
+  if ($form_id == 'eck__entity__form_edit_alphabetical_order_definition_alphabetical_order_definition' OR $form_id == 'eck__entity__form_add_alphabetical_order_definition_alphabetical_order_definition') {
+
+    // Custom description prefix, including the status of the PHP Intl ext.
+    $description = '<p>If this site has dictionary words that start with custom or accented characters, then these characters display in the letter grid Title filter on the Dictionary page. There are two ways to ensure that these characters are alphabetically sorted within the filter. The first is to install the PHP Internationalization (Intl) extension on this site\'s server. This will sort them according to alphabetization rules of the language you choose. This will usually produce satisfactory results. If however these rules and/or the available languages are insufficient for your needs, or if your web host or server administrator is unable to enable the PHP Intl extension, then you can select "User-defined sort" to define a custom alphabetical order.</p><p>If this site does not use any custom or accented characters, no action is required.</p>';
+    $description .= "<p><b>Status of PHP Intl extension: ";
+    $intl_status = 'disabled';
+    if (extension_loaded('intl')) {
+      $intl_status = 'enabled';
+    }
+    else {
+      $form['field_aod_language']['#access']= FALSE; // To prevent function not found error.
+    }
+    $description .= $intl_status . '</b></p>';
+    $form['#prefix'] = $description;
+
+    // Set the default language to English World. Setting in the field config can miss this depending on how the user got here.
+    if (!$form['field_aod_language'][LANGUAGE_NONE]['#default_value']) {
+      $form['field_aod_language'][LANGUAGE_NONE]['#default_value'] = 'en_001';
+    }
+
+    // Hide the URL redirect field.
+    $form['redirect']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function ma_dictionary_entity_presave($entity, $type) {
+
+  // Set the AOD properties to variables to reduce processing later.
+  if ($type == 'alphabetical_order_definition') {
+    if ($entity->field_aod_active['und'][0]['value']) {
+      // For the custom order, add both cases.
+      $custom_order_both_cases = array();
+      foreach ($entity->field_aod_character['und'] as $character) {
+        $custom_order_both_cases[] = mb_strtoupper($character['value']);
+        $custom_order_both_cases[] = mb_strtolower($character['value']);
+      }
+      $custom_order_both_cases = array_unique ($custom_order_both_cases);
+      variable_set('mukurtu_aod_sort_order', $custom_order_both_cases);
+      variable_del('mukurtu_aod_language');
+    }
+    else {
+      if (isset($entity->field_aod_language[0]['value'])) {
+        $language = $entity->field_aod_language[LANGUAGE_NONE][0]['value'];
+      }
+      variable_set('mukurtu_aod_language', $language);
+      variable_del('mukurtu_aod_sort_order');
+    }
+
+  }
+}
+
+/**
+ * Custom/accented character sorting, called by patched search_api_glossary.module.
+ */
+function ma_dictionary_glossary_sort ($a_value, $b_value) {
+
+  // If there is a custom order, use that.
+  if ($custom_order = variable_get('mukurtu_aod_sort_order')) {
+
+    $a_value_order = array_search(mb_strtolower($a_value), $custom_order);
+    $b_value_order = array_search(mb_strtolower($b_value), $custom_order);
+    if ($a_value && $a_value_order === FALSE) {
+      $_SESSION['glossary_missing_chars'][] = $a_value;
+    }
+    if ($b_value && $b_value_order === FALSE) {
+      $_SESSION['glossary_missing_chars'][] = $b_value;
+    }
+    return ($a_value_order < $b_value_order) ? -1 : 1;
+  }
+
+  // There is no custom order. Check if PHP Intl extension is enabled, and use that.
+  elseif (extension_loaded('intl')) {
+    $locale = variable_get('mukurtu_aod_language', 'en_001'); // Use English World if this was never set.
+    $coll = collator_create($locale);
+    return collator_compare($coll, $a_value, $b_value );
+  }
+
+  // There is no custom order or PHP Intl extension, but there are special characters, so warn admins.
+  else {
+    $_SESSION['glossary_special_chars_no_sort_def'][] = 1;
+  }
+
+}
+
+/**
+ * Implements hook_page_build.
+ */
+function ma_dictionary_page_build(&$page) {
+
+  // Inform admin users of any problems with custom characters in the Title filter, when viewing the dictionary.
+  if (current_path() == 'dictionary') {
+    $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
+    $drupal_admin = user_role_load_by_name('administrator');
+    if (user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid)) {
+
+      // Missing characters from a custom sort.
+      if (isset($_SESSION['glossary_missing_chars'])) {
+        $missing_chars = array_unique($_SESSION['glossary_missing_chars']);
+        sort($missing_chars);
+        drupal_set_message("The following characters need to be defined in the " . l('custom sort order', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . " in order to sort correctly in the Title filter: " . implode(', ', $missing_chars));
+        unset($_SESSION['glossary_missing_chars']);
+      }
+
+      // Need a custom sort or PHP Intl enabled.
+      elseif (isset($_SESSION['glossary_special_chars_no_sort_def'])) {
+        drupal_set_message('The Title filter has custom characters in it which may appear in an incorrect order. To resolve, configure ' . l ('this Dashboard option', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . '.');
+        unset($_SESSION['glossary_special_chars_no_sort_def']);
+      }
+    }
+  }
+}
+
+/**
+ * Get AOD add/edit path.
+ */
+function ma_dictionary_get_aod_add_edit_path() {
+  $aodes = entity_load('alphabetical_order_definition');
+  if (count($aodes)) {
+    $aode = end($aodes); // There should normally be only one AOD entity, but in case there are more, use the most recent one.
+    $aod_path_end = $aode->id . '/edit';
+  }
+  else {
+    $aod_path_end =  'add';
+  }
+  return 'admin/structure/entity-type/alphabetical_order_definition/alphabetical_order_definition/' . $aod_path_end;
+}
+
+/**
+ * Provides list options for field_aod_language().
+ */
+function ma_dictionary_collation_locale_options() {
+  if (extension_loaded('intl')) {
+    $locales = ResourceBundle::getLocales('');
+    $options = [];
+    foreach ($locales as $locale) {
+      $language = locale_get_display_language($locale);
+      $region = locale_get_display_region($locale);
+      $options [$locale] = $language;
+      if ($region) {
+        $options[$locale] .= ' (' . $region . ')';
+      }
+    }
+    return $options;
+  }
+}

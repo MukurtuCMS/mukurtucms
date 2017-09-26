@@ -614,6 +614,18 @@ function mukurtu_splash_block_manage_dictionary() {
 
     if(module_exists('ma_dictionary') && (user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid))) {
         $items[] = array(
+            'title' => 'Customize Dictionary Title Filter Alphabetical Order',
+            'href' => ma_dictionary_get_aod_add_edit_path(),
+            'localized_options' => array(
+              'attributes' => array('class' => array('opic-dashboard-content')),
+              'query' => drupal_get_destination(),
+            ),
+            'description' => t('Customize the sort order of characters in the Title filter on the dictionary page.'),
+        );
+    }
+
+    if(module_exists('ma_dictionary') && (user_has_role($mukurtu_admin->rid) || user_has_role($drupal_admin->rid))) {
+        $items[] = array(
             'title' => 'Manage Language Communities',
             'href' => 'dashboard/manage-dictionaries',
             'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),

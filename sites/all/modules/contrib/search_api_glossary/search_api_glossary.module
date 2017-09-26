@@ -177,7 +177,7 @@ function search_api_glossary_entity_property_info() {
  */
 function search_api_glossary_title_getter_callback($node, $name) {
   // @TODO: remove hardcoded node title field and expose this as a setting.
-  $first_letter = strtoupper($node->title[0]);
+  $first_letter = mb_strtoupper(mb_substr($node->title, 0, 1));
   $key = search_api_glossary_getter_helper($first_letter);
   return $key;
 }
@@ -196,9 +196,9 @@ function search_api_glossary_getter_helper($first_letter) {
   elseif (ctype_digit($first_letter)) {
     $key = "0-9";
   }
-  // Catch all.
+  // Kanopi patch - all non-alpha letters get included.
   else {
-    $key = "#";
+    $key = $first_letter;
   }
 
   return $key;
@@ -249,6 +249,10 @@ function search_api_glossary_sort_glossary(array $a, array $b) {
   elseif ($b_value == "0-9" && $a_value == "#") {
     return -1;
   }
+  // Mukurtu patch for custom character sorting.
+  else {
+    return ma_dictionary_glossary_sort($a_value, $b_value);
+  }
 }
 
 
@@ -293,7 +297,9 @@ class SearchApiGlossaryRewriteItems extends FacetapiFilter {
    */
   public function padListItems(&$build) {
     $glossary_array = range('A', 'Z');
-    $glossary_array[] = "#";
+    // Mukurtu patch, comment this out:
+    // $glossary_array[] = "#";
+
     $glossary_array[] = "0-9";
 
     foreach ($glossary_array as $key) {
