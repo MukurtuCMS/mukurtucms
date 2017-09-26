@@ -164,7 +164,7 @@ function ma_dictionary_default_search_api_sort() {
     "field" : "search_api_aggregation_1",
     "name" : "Translation",
     "enabled" : "1",
-    "weight" : "0",
+    "weight" : "-98",
     "identifier" : "default_node_index__search_api_aggregation_1",
     "default_sort" : "0",
     "default_sort_no_terms" : "0",
@@ -172,17 +172,17 @@ function ma_dictionary_default_search_api_sort() {
     "options" : { "field_name" : "Translation Sort" },
     "rdf_mapping" : []
   }');
-  $items['default_node_index__title_az_glossary'] = entity_import('search_api_sort', '{
+  $items['default_node_index__search_api_aggregation_2'] = entity_import('search_api_sort', '{
     "index_id" : "default_node_index",
-    "field" : "title_az_glossary",
+    "field" : "search_api_aggregation_2",
     "name" : "Term",
     "enabled" : "1",
     "weight" : "-100",
-    "identifier" : "default_node_index__title_az_glossary",
+    "identifier" : "default_node_index__search_api_aggregation_2",
     "default_sort" : "1",
     "default_sort_no_terms" : "1",
     "default_order" : "asc",
-    "options" : { "field_name" : "Title A-Z Glossary" },
+    "options" : { "field_name" : "Node Title" },
     "rdf_mapping" : []
   }');
   return $items;
