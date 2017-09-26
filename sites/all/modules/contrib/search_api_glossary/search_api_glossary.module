@@ -177,6 +177,7 @@ function search_api_glossary_entity_property_info() {
  */
 function search_api_glossary_title_getter_callback($node, $name) {
   // @TODO: remove hardcoded node title field and expose this as a setting.
+  // Mukurtu patch for unicode first letter.
   $first_letter = mb_strtoupper(mb_substr($node->title, 0, 1));
   $key = search_api_glossary_getter_helper($first_letter);
   return $key;
@@ -196,7 +197,7 @@ function search_api_glossary_getter_helper($first_letter) {
   elseif (ctype_digit($first_letter)) {
     $key = "0-9";
   }
-  // Kanopi patch - all non-alpha letters get included.
+  // Mukurtu patch - all non-alpha letters get included.
   else {
     $key = $first_letter;
   }
@@ -297,9 +298,8 @@ class SearchApiGlossaryRewriteItems extends FacetapiFilter {
    */
   public function padListItems(&$build) {
     $glossary_array = range('A', 'Z');
-    // Mukurtu patch, comment this out:
+    // Mukurtu patch - special characters are now printed, so do not pad with the number sign.
     // $glossary_array[] = "#";
-
     $glossary_array[] = "0-9";
 
     foreach ($glossary_array as $key) {
@@ -418,7 +418,7 @@ class SearchApiGlossaryWidget extends FacetapiWidgetLinks {
 
     foreach ($build as $value => $item) {
       $row = array('class' => array());
-      
+
       if(!isset($item['#active'])){
         $item['#active'] = FALSE;
       }
