@@ -1147,7 +1147,7 @@ function ma_dictionary_glossary_sort ($a_value, $b_value) {
  */
 function ma_dictionary_page_build(&$page) {
 
-  // Inform admin users of any problems with custom characters in the Title filter, when viewing the dictionary.
+  // Inform admin users of any problems with custom characters.
   if (current_path() == 'dictionary') {
     $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
     $drupal_admin = user_role_load_by_name('administrator');
@@ -1157,13 +1157,13 @@ function ma_dictionary_page_build(&$page) {
       if (isset($_SESSION['glossary_missing_chars'])) {
         $missing_chars = array_unique($_SESSION['glossary_missing_chars']);
         sort($missing_chars);
-        drupal_set_message("The following characters need to be defined in the " . l('custom sort order', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . " in order to sort correctly in the Title filter: " . implode(', ', $missing_chars));
+        drupal_set_message("The following characters need to be defined in the " . l('custom sort order', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . " in order to sort correctly: " . implode(', ', $missing_chars));
         unset($_SESSION['glossary_missing_chars']);
       }
 
       // Need a custom sort or PHP Intl enabled.
       elseif (isset($_SESSION['glossary_special_chars_no_sort_def'])) {
-        drupal_set_message('The Title filter has custom characters in it which may appear in an incorrect order. To resolve, configure ' . l ('this Dashboard option', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . '.');
+        drupal_set_message('The dictionary language has custom or accented characters in it which may cause poor alphabetical sorting of the words in the list and letters in the Title filter. To resolve, configure ' . l ('this Dashboard option', ma_dictionary_get_aod_add_edit_path(), array('query' => drupal_get_destination())) . '.');
         unset($_SESSION['glossary_special_chars_no_sort_def']);
       }
     }
