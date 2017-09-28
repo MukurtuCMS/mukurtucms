@@ -177,8 +177,9 @@ function search_api_glossary_entity_property_info() {
  */
 function search_api_glossary_title_getter_callback($node, $name) {
   // @TODO: remove hardcoded node title field and expose this as a setting.
-  // Mukurtu patch for unicode first letter.
-  $first_letter = mb_strtoupper(mb_substr($node->title, 0, 1));
+  // Mukurtu patch.
+  // Return the unicode of the first character, whatever it is.
+  return mb_strtoupper(mb_substr($node->title, 0, 1));
   $key = search_api_glossary_getter_helper($first_letter);
   return $key;
 }
@@ -197,9 +198,9 @@ function search_api_glossary_getter_helper($first_letter) {
   elseif (ctype_digit($first_letter)) {
     $key = "0-9";
   }
-  // Mukurtu patch - all non-alpha letters get included.
+  // Catch all.
   else {
-    $key = $first_letter;
+    $key = "#";
   }
 
   return $key;
@@ -298,9 +299,15 @@ class SearchApiGlossaryRewriteItems extends FacetapiFilter {
    */
   public function padListItems(&$build) {
     $glossary_array = range('A', 'Z');
-    // Mukurtu patch - special characters are now printed, so do not pad with the number sign.
+    // Mukurtu patch
+    // Special characters and numbers are now printed, so do not pad them with their alternate links.
     // $glossary_array[] = "#";
-    $glossary_array[] = "0-9";
+    // $glossary_array[] = "0-9";
+    // If skip padding var is set, then do not pad.
+    if (variable_get('field_aod_letter_padding')) {
+      return $build;
+    }
+    // end Mukurtu patch
 
     foreach ($glossary_array as $key) {
       if (!array_key_exists($key, $build)) {
