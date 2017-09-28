@@ -1059,9 +1059,9 @@ function ma_dictionary_form_alter(&$form, &$form_state, $form_id) {
     $description .= $intl_status . '</b></p>';
     $form['#prefix'] = $description;
 
-    // Set the default language to English World. Setting in the field config can miss this depending on how the user got here.
+    // Set the default language to English. Setting in the field config can miss this depending on how the user got here.
     if (!$form['field_aod_language'][LANGUAGE_NONE]['#default_value']) {
-      $form['field_aod_language'][LANGUAGE_NONE]['#default_value'] = 'en_001';
+      $form['field_aod_language'][LANGUAGE_NONE]['#default_value'] = 'en';
     }
 
     // Hide the URL redirect field.
@@ -1130,7 +1130,7 @@ function ma_dictionary_glossary_sort ($a_value, $b_value) {
 
   // There is no custom order. Check if PHP Intl extension is enabled, and use that.
   elseif (extension_loaded('intl')) {
-    $locale = variable_get('mukurtu_aod_language', 'en_001'); // Use English World if this was never set.
+    $locale = variable_get('mukurtu_aod_language', 'en'); // Use English if this was never set.
     $coll = collator_create($locale);
     return collator_compare($coll, $a_value, $b_value );
   }
@@ -1218,7 +1218,7 @@ function ma_dictionary_resort_search_results (&$results, $query) {
   if ($custom_order = variable_get('mukurtu_aod_sort_order')) {
   }
   elseif (extension_loaded('intl')) {
-    $locale = variable_get('mukurtu_aod_language', 'en_001'); // Use English World if this was never set.
+    $locale = variable_get('mukurtu_aod_language', 'en'); // Use English if this was never set.
     $coll = collator_create($locale);
   }
   if (isset($custom_order) OR isset($locale)) {
