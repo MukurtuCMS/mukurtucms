@@ -10,6 +10,181 @@
 function ma_dictionary_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance:
+  // 'alphabetical_order_definition-alphabetical_order_definition-field_aod_active'.
+  $field_instances['alphabetical_order_definition-alphabetical_order_definition-field_aod_active'] = array(
+    'bundle' => 'alphabetical_order_definition',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'alphabetical_order_definition',
+    'field_name' => 'field_aod_active',
+    'label' => 'Sort Method',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_buttons',
+      'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'alphabetical_order_definition-alphabetical_order_definition-field_aod_character'.
+  $field_instances['alphabetical_order_definition-alphabetical_order_definition-field_aod_character'] = array(
+    'bundle' => 'alphabetical_order_definition',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Enter <b>all</b> the characters of the language(s) on the site, then drag and drop them into their correct alphabetical order.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'alphabetical_order_definition',
+    'field_name' => 'field_aod_character',
+    'label' => 'Characters',
+    'required' => 0,
+    'settings' => array(
+      'context' => 'title',
+      'context_default' => 'sdl_editor_representation',
+      'dnd_enabled' => 0,
+      'mee_enabled' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'alphabetical_order_definition-alphabetical_order_definition-field_aod_language'.
+  $field_instances['alphabetical_order_definition-alphabetical_order_definition-field_aod_language'] = array(
+    'bundle' => 'alphabetical_order_definition',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'alphabetical_order_definition',
+    'field_name' => 'field_aod_language',
+    'label' => 'Sort Language',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'alphabetical_order_definition-alphabetical_order_definition-field_aod_letter_padding'.
+  $field_instances['alphabetical_order_definition-alphabetical_order_definition-field_aod_letter_padding'] = array(
+    'bundle' => 'alphabetical_order_definition',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Normally, the glossary title letter filter will "pad" itself with all letters from A-Z for which there are no words in the site\'s glossary that start with that letter. Unlike the other letters, they are unlinked. Their purpose is to provide a complete-looking alphabet in the filter. However, if the language(s) of the glossary does not include all the letters from A-Z, it would be preferable to leave out the letters which do not exist in the language. Click this checkbox to disable padding of the glossary with all the letters from A-Z. Only the first letter of words in the glossary will remain in the filter.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'alphabetical_order_definition',
+    'field_name' => 'field_aod_letter_padding',
+    'label' => 'Do not pad the glossary letter filter',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 3,
+    ),
+  );
+
   // Exported field_instance: 'node-dictionary_word-field_additional_media'.
   $field_instances['node-dictionary_word-field_additional_media'] = array(
     'bundle' => 'dictionary_word',
@@ -1610,6 +1785,7 @@ function ma_dictionary_field_default_field_instances() {
   t('A word list is an collection of dictionary words.');
   t('Additional Media');
   t('Alternate Spelling');
+  t('Characters');
   t('Choose one or more parts of speech that best matches your word entry. This field can be used for content browsing. Separate multiple entries with a semi-colon.');
   t('Community');
   t('Community Language');
@@ -1617,6 +1793,8 @@ function ma_dictionary_field_default_field_instances() {
   t('Definition');
   t('Description');
   t('Determine if this is an OG group.');
+  t('Do not pad the glossary letter filter');
+  t('Enter <b>all</b> the characters of the language(s) on the site, then drag and drop them into their correct alphabetical order.');
   t('Group');
   t('Groups audience');
   t('If the spelling of an entry differs from the term, enter it here. Leave blank otherwise.');
@@ -1627,6 +1805,7 @@ function ma_dictionary_field_default_field_instances() {
   t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. Separate multiple keywords with semicolons.');
   t('Language');
   t('Language Community');
+  t('Normally, the glossary title letter filter will "pad" itself with all letters from A-Z for which there are no words in the site\'s glossary that start with that letter. Unlike the other letters, they are unlinked. Their purpose is to provide a complete-looking alphabet in the filter. However, if the language(s) of the glossary does not include all the letters from A-Z, it would be preferable to leave out the letters which do not exist in the language. Click this checkbox to disable padding of the glossary with all the letters from A-Z. Only the first letter of words in the glossary will remain in the filter.');
   t('One or more example sentences that demonstrate use of the word entry.');
   t('Part of Speech');
   t('Pronunciation');
@@ -1636,6 +1815,8 @@ function ma_dictionary_field_default_field_instances() {
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Sample Sentences');
+  t('Sort Language');
+  t('Sort Method');
   t('Source');
   t('Summary');
   t('The word entry term translated (if appropriate) to the primary language of the site.');
