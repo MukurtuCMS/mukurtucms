@@ -32,6 +32,7 @@ dependencies[] = scald_dailymotion
 dependencies[] = scald_dnd_library
 dependencies[] = scald_file
 dependencies[] = scald_image
+dependencies[] = scald_sketchfab
 dependencies[] = scald_soundcloud
 dependencies[] = scald_video
 dependencies[] = scald_vimeo
