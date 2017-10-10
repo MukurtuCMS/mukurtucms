@@ -156,8 +156,8 @@ function scald_sketchfab_scald_prerender($atom, $context, $options, $mode) {
       '#theme' => 'scald_sketchfab_player',
       '#vars' => array(
         'video_url'     => $atom->base_id,
-        'video_width'   => $video_width,
-        'video_height'  => $video_height,
+//        'video_width'   => $video_width,
+//        'video_height'  => $video_height,
         'thumbnail'     => $atom->rendered->thumbnail_source_url,
         'title'         => check_plain($atom->title),
       ),
