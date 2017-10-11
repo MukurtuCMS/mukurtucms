@@ -10,6 +10,21 @@
  */
 function scald_sketchfab_install() {
   ScaldAtomController::addType('sketchfab', 'Sketchfab', 'Sketchfab model');
+
+  // This is for the scald drawer thumbnails, not the thumbnails within the nodes, which we are handling separately
+  $thumbnails = array(
+    'sketchfab.png',
+  );
+  foreach ($thumbnails as $thumbnail) {
+    $thumbnail_target = 'public://atoms/' . $thumbnail;
+
+    if (!file_exists($thumbnail_target)) {
+      $directory = dirname($thumbnail_target);
+      file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+      file_unmanaged_copy(drupal_get_path('module', 'scald_sketchfab') . '/icons/scald_drawer_atom_thumbnail/' . $thumbnail, $thumbnail_target);
+    }
+  }
+
 }
 
 /**

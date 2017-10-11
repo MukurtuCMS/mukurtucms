@@ -465,6 +465,12 @@ function ma_scald_strongarm() {
       'upload_type' => 'plupload',
       'actions' => 15,
     ),
+    'sketchfab' => (object) array(
+      'thumbnail_source' => 'public://atoms/sketchfab.png',
+      'description' => '',
+      'upload_type' => 'plupload',
+      'actions' => 15,
+    ),
   );
   $export['scald_atom_defaults'] = $strongarm;
 
