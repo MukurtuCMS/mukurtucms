@@ -3,7 +3,4 @@ description = Provides Sketchfab atoms from Sketchfab URLs.
 package = Scald Providers
 core = 7.x
 dependencies[] = scald
-#files[] = scald_sketchfab.test
-
-
-
+stylesheets[all][] = css/scald_sketchfab.css

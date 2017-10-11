@@ -130,9 +130,6 @@ function scald_sketchfab_scald_fetch($atom, $type) {
 function scald_sketchfab_scald_prerender($atom, $context, $options, $mode) {
   if ($atom->type == 'sketchfab') { // This is not actually necessary, though I am unclear why, so leaving in for good measure.
     if ($mode == 'atom') { // Not sure this line is necessary either
-      $attached_files = [
-        'css' => [drupal_get_path('module', 'scald_sketchfab') . '/css/scald_sketchfab.css'],
-      ];
 
       switch ($context) {
         case 'ma_colorbox':
@@ -147,7 +144,6 @@ function scald_sketchfab_scald_prerender($atom, $context, $options, $mode) {
               'title' => check_plain($atom->title),
             ],
             '#atom' => $atom,
-            '#attached' => $attached_files,
           ];
           break;
 
