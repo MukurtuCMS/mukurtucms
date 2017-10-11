@@ -27,6 +27,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -42,6 +45,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -69,6 +76,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -84,6 +94,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -111,6 +125,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -128,6 +145,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'default',
       'settings' => array(),
+    ),
+    'sketchfab' => array(
+      '*' => 'mukurtu_default',
     ),
   );
   $context_config->data = array(
@@ -153,6 +173,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -169,6 +192,10 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
+      '*' => 'default',
       'settings' => array(),
     ),
   );
@@ -195,6 +222,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -210,6 +240,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -237,6 +271,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -252,6 +289,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -279,6 +320,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -294,6 +338,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'video' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -321,6 +369,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -334,6 +385,10 @@ function ma_scald_default_scald_context_config() {
     ),
     'video' => array(
       '*' => 'default',
+    ),
+    'sketchfab' => array(
+      '*' => 'default',
+      'settings' => array(),
     ),
   );
   $context_config->data = array(
@@ -359,6 +414,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -375,6 +433,10 @@ function ma_scald_default_scald_context_config() {
     ),
     'video' => array(
       '*' => 'mukurtu_default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
+      '*' => 'default',
       'settings' => array(),
     ),
   );
@@ -401,6 +463,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -416,6 +481,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -443,6 +512,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -458,6 +530,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -485,6 +561,9 @@ function ma_scald_default_scald_context_config() {
     'video' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -499,6 +578,10 @@ function ma_scald_default_scald_context_config() {
     ),
     'video' => array(
       '*' => 'default',
+    ),
+    'sketchfab' => array(
+      '*' => 'default',
+      'settings' => array(),
     ),
   );
   $context_config->data = array(
@@ -524,6 +607,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -539,6 +625,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),
@@ -566,6 +656,9 @@ function ma_scald_default_scald_context_config() {
     'file' => array(
       '*' => 'passthrough',
     ),
+    'sketchfab' => array(
+      '*' => 'passthrough',
+    ),
   );
   $context_config->player = array(
     'audio' => array(
@@ -581,6 +674,10 @@ function ma_scald_default_scald_context_config() {
       'settings' => array(),
     ),
     'file' => array(
+      '*' => 'default',
+      'settings' => array(),
+    ),
+    'sketchfab' => array(
       '*' => 'default',
       'settings' => array(),
     ),

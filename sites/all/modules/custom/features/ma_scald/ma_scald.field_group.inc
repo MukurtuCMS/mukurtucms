@@ -361,6 +361,40 @@ function ma_scald_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_scald_atom_metadata|scald_atom|sketchfab|ma_colorbox';
+  $field_group->group_name = 'group_scald_atom_metadata';
+  $field_group->entity_type = 'scald_atom';
+  $field_group->bundle = 'sketchfab';
+  $field_group->mode = 'ma_colorbox';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Metadata',
+    'weight' => '1',
+    'children' => array(
+      0 => 'scald_authors',
+      1 => 'scald_tags',
+      2 => 'field_scald_protocol',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => 'Metadata',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => '',
+        'description' => '',
+        'show_label' => '0',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'fast',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_scald_atom_metadata|scald_atom|sketchfab|ma_colorbox'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_scald_atom_metadata|scald_atom|video|ma_colorbox';
   $field_group->group_name = 'group_scald_atom_metadata';
   $field_group->entity_type = 'scald_atom';

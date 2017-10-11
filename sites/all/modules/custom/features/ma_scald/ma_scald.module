@@ -449,6 +449,9 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
         scald_soundcloud_scald_prerender($atom, $context, $options, $mode);
     }
 
+    // For Sketchfab atoms, this hook is not fired as scald_sketchfab_scald_prerender catches it first, which we want.
+    // If for some reason this hook starts firing on Sketchfab atoms, do something similar to what we do for Soundcloud atoms above.
+
     if($mode == 'player') {
         if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {
             // Use the atom thumbnail if there is one
