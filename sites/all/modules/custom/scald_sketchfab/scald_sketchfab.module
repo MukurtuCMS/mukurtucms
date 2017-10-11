@@ -134,44 +134,48 @@ function scald_sketchfab_scald_prerender($atom, $context, $options, $mode) {
         'css' => [drupal_get_path('module', 'scald_sketchfab') . '/css/scald_sketchfab.css'],
       ];
 
-      if ($context <> 'ma_colorbox') {
-        // Thumbnail
-        if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
-          $image_styles = [
-            'ma_scald_search_results' => 'medium',
-            'mukurtu_scald_related_items' => 'related_items_teaser'
+      switch ($context) {
+        case 'ma_colorbox':
+        case 'mukurtu_scald_media_assets_edit_':
+          $atom->rendered->player = [
+            '#theme' => 'scald_sketchfab_player',
+            '#vars' => [
+              'video_url' => $atom->base_id,
+              //        'video_width'   => $video_width,
+              //        'video_height'  => $video_height,
+              'thumbnail' => $atom->rendered->thumbnail_source_url,
+              'title' => check_plain($atom->title),
+            ],
+            '#atom' => $atom,
+            '#attached' => $attached_files,
           ];
-          $thumbnail_image = theme_image_style([
-            'style_name' => $image_styles[$context],
-            'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
-          ]);
-        }
-        // If no atom thumbnail, use our default thumbnail.
-        else {
-          $image_widths = [
-            'ma_scald_search_results' => '220',
-            'mukurtu_scald_related_items' => '280'
-          ];
-          $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'scald_sketchfab') . '/default_thumbnails/default_sketchfab_thumbnail_' . $image_widths[$context] . '.jpg">';
-        }
+          break;
 
-        $atom->rendered->player = ['#markup' => l($thumbnail_image, $options['link'], ['html' => TRUE])];
+        default:
 
-      }
+          // Thumbnail
+          if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
+            $image_styles = [
+              'ma_scald_search_results' => 'medium',
+              'mukurtu_scald_related_items' => 'related_items_teaser'
+            ];
+            $thumbnail_image = theme_image_style([
+              'style_name' => $image_styles[$context],
+              'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
+            ]);
+          }
+          // If no atom thumbnail, use our default thumbnail.
+          else {
+            $image_widths = [
+              'ma_scald_search_results' => '220',
+              'mukurtu_scald_related_items' => '280'
+            ];
+            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'scald_sketchfab') . '/default_thumbnails/default_sketchfab_thumbnail_' . $image_widths[$context] . '.jpg">';
+          }
 
-      else {
-        $atom->rendered->player = [
-          '#theme' => 'scald_sketchfab_player',
-          '#vars' => [
-            'video_url' => $atom->base_id,
-            //        'video_width'   => $video_width,
-            //        'video_height'  => $video_height,
-            'thumbnail' => $atom->rendered->thumbnail_source_url,
-            'title' => check_plain($atom->title),
-          ],
-          '#atom' => $atom,
-          '#attached' => $attached_files,
-        ];
+          $atom->rendered->player = ['#markup' => l($thumbnail_image, $options['link'], ['html' => TRUE])];
+
+          break;
       }
     }
   }

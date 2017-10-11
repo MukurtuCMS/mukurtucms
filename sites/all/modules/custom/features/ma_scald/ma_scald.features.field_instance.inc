@@ -2717,13 +2717,9 @@ function ma_scald_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 3,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
       ),
       'ma_colorbox' => array(
         'label' => 'above',
@@ -2793,10 +2789,9 @@ function ma_scald_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 1,
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'ma_colorbox' => array(
         'label' => 'above',
@@ -2857,9 +2852,8 @@ function ma_scald_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'hidden',
         'weight' => 2,
       ),
       'ma_colorbox' => array(
@@ -2923,7 +2917,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 4,
       ),
       'ma_colorbox' => array(
         'label' => 'above',
