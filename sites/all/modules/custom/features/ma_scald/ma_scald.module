@@ -260,6 +260,14 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
 
       // Set metadata
       $entity = $form['atom' . $atom_index]['#entity'];
+
+      // $entity is empty on our custom scald_sketchfab provider (for reasons unknown), so do not
+      // alter any fields as we need $entity hereforth. This is fine as sketchfab and any other custom
+      // scald providers can have any custom metadata handling done within the provider code.
+      if (!$entity) {
+        return;
+      }
+
       if(isset($entity->base_id)) {
 	$file = file_load($entity->base_id);
       }

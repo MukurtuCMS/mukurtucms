@@ -112,6 +112,36 @@ function ma_scald_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_scald_accordion|scald_atom|sketchfab|form';
+  $field_group->group_name = 'group_scald_accordion';
+  $field_group->entity_type = 'scald_atom';
+  $field_group->bundle = 'sketchfab';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_scald_addtional_fields';
+  $field_group->data = array(
+    'label' => 'Additional Fields',
+    'weight' => '10',
+    'children' => array(
+      0 => 'scald_thumbnail',
+      1 => 'scald_authors',
+      2 => 'field_scald_description',
+      3 => 'redirect',
+    ),
+    'format_type' => 'accordion-item',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-scald-accordion field-group-accordion-item',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $field_groups['group_scald_accordion|scald_atom|sketchfab|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_scald_accordion|scald_atom|video|form';
   $field_group->group_name = 'group_scald_accordion';
   $field_group->entity_type = 'scald_atom';
@@ -218,6 +248,33 @@ function ma_scald_field_group_info() {
     ),
   );
   $field_groups['group_scald_addtional_fields|scald_atom|image|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_scald_addtional_fields|scald_atom|sketchfab|form';
+  $field_group->group_name = 'group_scald_addtional_fields';
+  $field_group->entity_type = 'scald_atom';
+  $field_group->bundle = 'sketchfab';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Additional Fields',
+    'weight' => '3',
+    'children' => array(
+      0 => 'group_scald_accordion',
+    ),
+    'format_type' => 'accordion',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'effect' => 'none',
+        'classes' => 'group-scald-addtional-fields field-group-accordion',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_scald_addtional_fields|scald_atom|sketchfab|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -374,6 +431,7 @@ function ma_scald_field_group_info() {
       0 => 'scald_authors',
       1 => 'scald_tags',
       2 => 'field_scald_protocol',
+      3 => 'field_scald_description',
     ),
     'format_type' => 'div',
     'format_settings' => array(

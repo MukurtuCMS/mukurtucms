@@ -671,23 +671,29 @@ function ma_scald_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'title',
         1 => 'field_scald_protocol',
-        2 => 'scald_authors',
-        3 => 'scald_tags',
-        4 => 'scald_thumbnail',
+        2 => 'scald_tags',
+        3 => 'group_scald_addtional_fields',
+        5 => 'group_scald_accordion',
+        6 => 'scald_thumbnail',
+        7 => 'scald_authors',
+        8 => 'field_scald_description',
+        9 => 'redirect',
       ),
       'hidden' => array(
-        5 => 'redirect',
-        6 => '_add_existing_field',
+        4 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'title' => 'ds_content',
       'field_scald_protocol' => 'ds_content',
-      'scald_authors' => 'ds_content',
       'scald_tags' => 'ds_content',
-      'scald_thumbnail' => 'ds_content',
-      'redirect' => 'hidden',
+      'group_scald_addtional_fields' => 'ds_content',
       '_add_existing_field' => 'hidden',
+      'group_scald_accordion' => 'ds_content',
+      'scald_thumbnail' => 'ds_content',
+      'scald_authors' => 'ds_content',
+      'field_scald_description' => 'ds_content',
+      'redirect' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -721,6 +727,7 @@ function ma_scald_ds_layout_settings_info() {
         2 => 'field_scald_protocol',
         3 => 'scald_authors',
         4 => 'scald_tags',
+        5 => 'field_scald_description',
       ),
     ),
     'fields' => array(
@@ -729,6 +736,7 @@ function ma_scald_ds_layout_settings_info() {
       'field_scald_protocol' => 'ds_content',
       'scald_authors' => 'ds_content',
       'scald_tags' => 'ds_content',
+      'field_scald_description' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
