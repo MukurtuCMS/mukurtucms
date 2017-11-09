@@ -2,6 +2,8 @@
   background: url('../icons/sketchfab-large-inverted.png') 50% 50% no-repeat;
 }
 
-/*.dnd-library-wrapper .editor-item .meta.type-sketchfab {*/
-  /*background-image: url('..icons/scald_drawer_atom_thumbnail/sketchfab.png');*/
-/*}*/
+.dnd-library-wrapper .editor-item .meta.type-sketchfab {
+  background-image: url('../icons/sketchfab.png');
+}
+
+
