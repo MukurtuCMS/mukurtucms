@@ -275,7 +275,7 @@ col-md-4 col-md-push-8';
           'weight' => '2',
         ),
         'path' => array(
-          'weight' => '3',
+          'weight' => '2',
         ),
         'redirect' => array(
           'weight' => '5',
