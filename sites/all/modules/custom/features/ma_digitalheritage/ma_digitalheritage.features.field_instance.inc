@@ -1556,7 +1556,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'size' => 12,
+        'size' => 100,
       ),
       'type' => 'text_textfield',
       'weight' => 7,
