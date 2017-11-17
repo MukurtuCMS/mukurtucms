@@ -169,7 +169,7 @@ function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
 }
 
 
-//  See "HOW DIGITAL HERITAGE (AND DICTIONARY WORDS) CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+
 /**
  * Implements hook_search_api_query_alter().
  * Exclude user defined nodes from search index
@@ -177,9 +177,10 @@ function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
  */
 function ma_search_api_search_api_query_alter($sapi_query) {
 
-  if (!user_access('bypass content access control')) {
+  $current_page = arg(0);
 
-    $current_page = arg(0);
+  // Permissions alterations. See "HOW DIGITAL HERITAGE (AND DICTIONARY WORDS) CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+  if (!user_access('bypass content access control')) {
 
     if ($current_page == 'digital-heritage' OR $current_page = 'dictionary') {
 
@@ -224,6 +225,54 @@ function ma_search_api_search_api_query_alter($sapi_query) {
 
     }
   }
+
+
+  // Custom sorts
+
+  if ($current_page == 'digital-heritage') { // Add Dictionary and Collections here later.
+
+    // Sort according to the session var, otherwise fallback to default
+    if (isset($_SESSION['custom_sort_order'])) {
+
+      // Unset existing sorts
+      $sort =& $sapi_query->getSort();
+      $sort = array();
+
+      // Sort map
+      $sort_map = array(
+        'alphabetical' => array(
+          'sort' => 'search_api_aggregation_2',
+        ),
+        'changed' => array(
+          'sort' => 'changed',
+          'reverse' => TRUE,
+        ),
+        'added' => array(
+          'sort' => 'created',
+          'reverse' => TRUE,
+        ),
+        'oldest' => array(
+          'sort' => 'field_original_date:timestamp',
+        ),
+        'newest' => array(
+          'sort' => 'field_original_date:timestamp',
+          'reverse' => TRUE,
+        ),
+      );
+      $sort_direction = 'ASC';
+      if (isset($sort_map[$_SESSION['custom_sort_order']]['reverse']) AND $sort_map[$_SESSION['custom_sort_order']]['reverse']) {
+        $sort_direction = 'DESC';
+      }
+      $sapi_query->sort($sort_map[$_SESSION['custom_sort_order']]['sort'], $sort_direction);
+
+
+      // When sorting by oldest or newest, filter out DH nodes that do not have an original date set.
+      if ($_SESSION['custom_sort_order'] == 'oldest' OR $_SESSION['custom_sort_order'] == 'newest') {
+        $sapi_query->condition('field_original_date:timestamp', NULL, '<>');
+      }
+
+    }
+  }
 }
 
 /**
@@ -243,7 +292,7 @@ function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
     return SCALD_ATOM_ACCESS_IGNORE;
   }
   if ($groups = $group_wrapper->field_scald_protocol->value()) {
-    foreach ($groups as $group) { 
+    foreach ($groups as $group) {
       if (node_access('view', $group)) {
         return SCALD_ATOM_ACCESS_IGNORE;
       }
@@ -336,16 +385,96 @@ function ma_search_api_list_of_indexed_fields() {
 
 // Return the config for the Search API whitespace tokenizer regex
 function ma_search_api_get_whitespace_tokenizer_regex() {
-    // Default value
-    $spaces = "[\p{P}|\p{C}|\p{Z}|\p{S}]";
+  // Default value
+  $spaces = "[\p{P}|\p{C}|\p{Z}|\p{S}]";
 
-    $server = search_api_server_load('search_api_db_server');
-    if($server) {
-        $index = search_api_index_load('default_node_index');
-        if($index) {
-            $spaces = $index->options['processors']['search_api_tokenizer']['settings']['spaces'];
-        }
+  $server = search_api_server_load('search_api_db_server');
+  if($server) {
+    $index = search_api_index_load('default_node_index');
+    if($index) {
+      $spaces = $index->options['processors']['search_api_tokenizer']['settings']['spaces'];
     }
+  }
 
-    return $spaces;
+  return $spaces;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ *
+ * Custom index fields.
+ */
+function ma_search_api_entity_property_info_alter(&$info) {
+  $info['node']['properties']['dh_original_year'] = array(
+    'type'            => 'integer',
+    'label'           => t('DH Original Year'),
+    'sanitized'       => TRUE,
+    'getter callback' => 'ma_search_api_getter_callback_dh_original_year',
+  );
+}
+// The sort is done on the timestamp component of the original date field. This is being indexed when/if we add a year filter.
+function ma_search_api_getter_callback_dh_original_year($item) {
+  if (isset($item->field_original_date[LANGUAGE_NONE][0]['from']['year'])) {
+    return $item->field_original_date[LANGUAGE_NONE][0]['from']['year'];
+  }
+}
+
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_search_api_block_info() {
+  $blocks['ma_custom_sorts'] = array(
+    'info' => t('Custom sorts for the browse pages'),
+  );
+  return $blocks;
+}
+
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_search_api_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+
+    case 'ma_custom_sorts':
+      $block['subject'] = 'Sort';
+      $search_form = drupal_get_form('ma_search_api_sort_form');
+      $block['content'] = drupal_render($search_form);
+      break;
+  }
+
+  return $block;
+
+}
+
+/**
+ * Returns the render array for the form.
+ */
+function ma_search_api_sort_form($form, &$form_state) {
+  $sort_options = array(
+    'changed' => t('Date Changed'),
+    'added' => t('Date Added'),
+    'newest' => t('Newest'),
+    'oldest' => t('Oldest'), // NOTE: If the Original Date field is unset, date = 0, so those DH nodes will appear at top of Oldest list. This is a limitation of using the DB for the Search API backend. It should be resolveable when / if switching to SOLR.
+    'alphabetical' => t('Alphabetical'),
+  );
+
+  $form['sort'] = array(
+    '#type' => 'select',
+    '#default_value' => isset($_SESSION['custom_sort_order']) ? $_SESSION['custom_sort_order'] : 'changed',
+    '#options' => $sort_options,
+    '#attributes' => array('onchange' => 'this.form.submit();'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes' => array('class' => array('element-invisible')),
+  );
+  return $form;
+}
+function ma_search_api_sort_form_submit($form, $form_state){
+  if (isset ($form_state['values']['sort'])) {
+    $_SESSION['custom_sort_order'] = $form_state['values']['sort'];
+  }
 }

@@ -637,7 +637,7 @@ return FALSE;';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -845,7 +845,7 @@ return FALSE;';
     t('Category'),
     t('Creator'),
     t('Contributor'),
-    t('Original Date'),
+    t('Original Date Description'),
     t('Collection'),
     t('Category (field_category)'),
     t('Community Record Parent (field_community_record_parent)'),
