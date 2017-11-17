@@ -1810,7 +1810,7 @@ class SearchApiDbService extends SearchApiAbstractService {
     // TODO: extend this function properly. This is explained in search_api's readme.
     $sorts =  $query->getSort();
     if (arg(0) == 'dictionary' AND isset($sorts['search_api_aggregation_2'])) {
-      ma_dictionary_resort_search_results($results, $query);
+      ma_dictionary_resort_search_results($results, $sorts['search_api_aggregation_2']);
     }
   }
 

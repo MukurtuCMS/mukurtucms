@@ -1207,7 +1207,7 @@ function ma_dictionary_collation_locale_options() {
 /**
  * Custom re-sorting of search results, called by hacked search_api_db service postQuery.
  */
-function ma_dictionary_resort_search_results (&$results, $query) {
+function ma_dictionary_resort_search_results (&$results, $sort_direction) {
 
   // Modify the dictionary search results according to the custom sort.
 
@@ -1256,8 +1256,12 @@ function ma_dictionary_resort_search_results (&$results, $query) {
       foreach ($sort_list as $sort_list_item_nid => $sort_list_item) {
         $sorted_results[$sort_list_item_nid] = $results['results'][$sort_list_item_nid];
       }
-      $results['results'] = $sorted_results;
-
+      if ($sort_direction == 'ASC') {
+        $results['results'] = $sorted_results;
+      }
+      else {
+        $results['results'] = array_reverse($sorted_results, TRUE);
+      }
     }
   }
 }
