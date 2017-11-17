@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_update_N().
+ *
+ * For DH items, populate new Original Date field from old Date (now Date Description) field where possible.
+ */
+function ma_digitalheritage_update_7100() {
+  // First revert DH so that the Original Date field is added.
+  features_revert_module ('ma_digitalheritage');
+  // Then run the population script.
+  include_once('one_time_updates/populate_original_date.php');
+}
