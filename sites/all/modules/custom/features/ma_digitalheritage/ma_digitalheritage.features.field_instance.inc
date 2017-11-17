@@ -2501,7 +2501,14 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => '<i>Original Date</i> is flexible:
+<ul>
+<li>If the decade or century is known but not the specific year, you can select from <i>year estimate</i> instead of <i>year</i>.</li>
+<li>If the season is known but not the specific month, you can select from <i>month estimate</i> instead of <i>month</i>.</li>
+<li>Individual components can be skipped. For example, you can select a <i>year</i> without selecting a <i>month</i> or a <i>day</i>.</li>
+<li>You can set the <i>to</i> date to specify a date range.</li>
+</ul>
+Note: If <i>Original Date</i> is left entirely empty, this item will not appear in <i>Browse Digital Heritage</i> when sorting by <i>oldest</i> or </i>newest</i>.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2649,7 +2656,7 @@ function ma_digitalheritage_field_default_field_instances() {
         0 => FALSE,
         'estimates' => array(
           'from' => array(
-            'day' => 'day',
+            'day' => 0,
             'hour' => 0,
             'minute' => 0,
             'month' => 'month',
@@ -3993,6 +4000,14 @@ function ma_digitalheritage_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('<i>Original Date</i> is flexible:
+<ul>
+<li>If the decade or century is known but not the specific year, you can select from <i>year estimate</i> instead of <i>year</i>.</li>
+<li>If the season is known but not the specific month, you can select from <i>month estimate</i> instead of <i>month</i>.</li>
+<li>Individual components can be skipped. For example, you can select a <i>year</i> without selecting a <i>month</i> or a <i>day</i>.</li>
+<li>You can set the <i>to</i> date to specify a date range.</li>
+</ul>
+Note: If <i>Original Date</i> is left entirely empty, this item will not appear in <i>Browse Digital Heritage</i> when sorting by <i>oldest</i> or </i>newest</i>.');
   t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. More than one Contributor may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
   t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
   t('A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.

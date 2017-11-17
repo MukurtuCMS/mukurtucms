@@ -9777,6 +9777,13 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-digital-heritage #edit-og-group-ref {
   display: none;
 }
+.node-type-digital-heritage #edit-field-original-date .help-block,
+.page-node-add-digital-heritage #edit-field-original-date .help-block {
+  clear: both;
+  margin: 0;
+  margin-top: 50px;
+  padding: 0;
+}
 .node-type-community #edit-group-access,
 .page-node-add-community #edit-group-access {
   display: none;
@@ -10138,7 +10145,6 @@ a:hover {
   background: #E3E2E1;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  padding: 5px 10px;
   padding: 10px 20px;
   font-size: 140%;
   font-weight: 400;
@@ -10146,6 +10152,7 @@ a:hover {
 .panel-panel .right-pane .pane-content,
 .pane-block .pane-content {
   padding-left: 20px;
+  padding-right: 20px;
   padding-bottom: 10px;
 }
 .panel-panel .right-pane .pane-content .view-content,
