@@ -241,7 +241,7 @@ function ma_search_api_search_api_query_alter($sapi_query) {
       // Sort map
       $sort_map = array(
         'alphabetical' => array(
-          'sort' => 'sort_title',
+          'sort' => 'search_api_aggregation_2',
         ),
         'changed' => array(
           'sort' => 'changed',
@@ -403,16 +403,8 @@ function ma_search_api_get_whitespace_tokenizer_regex() {
  * Implements hook_entity_property_info_alter().
  *
  * Custom index fields.
- * Some of these are already indexed as different type (eg. text), whereas here we another instance
- * of the field to the index to be indexed as a different type (eg. string) for different purposes.
  */
 function ma_search_api_entity_property_info_alter(&$info) {
-  $info['node']['properties']['sort_title'] = array(
-    'type'            => 'text',
-    'label'           => t('Title (sort)'),
-    'sanitized'       => TRUE,
-    'getter callback' => 'ma_search_api_getter_callback_title',
-  );
   $info['node']['properties']['dh_original_year'] = array(
     'type'            => 'integer',
     'label'           => t('DH Original Year'),
@@ -420,11 +412,7 @@ function ma_search_api_entity_property_info_alter(&$info) {
     'getter callback' => 'ma_search_api_getter_callback_dh_original_year',
   );
 }
-
-function ma_search_api_getter_callback_title($item) {
-  return $item->title;
-}
-
+// The sort is done on the timestamp component of the original date field. This is being indexed when/if we add a year filter.
 function ma_search_api_getter_callback_dh_original_year($item) {
   if (isset($item->field_original_date[LANGUAGE_NONE][0]['from']['year'])) {
     return $item->field_original_date[LANGUAGE_NONE][0]['from']['year'];
