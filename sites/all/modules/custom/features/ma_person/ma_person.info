@@ -93,6 +93,7 @@ features[field_instance][] = node-person-field_media_aggregate
 features[field_instance][] = node-person-field_media_asset
 features[field_instance][] = node-person-field_mukurtu_terms
 features[field_instance][] = node-person-field_node_aggregate
+features[field_instance][] = node-person-field_pre_actions
 features[field_instance][] = node-person-field_related_people
 features[field_instance][] = node-person-field_sections
 features[field_instance][] = node-person-og_group_ref

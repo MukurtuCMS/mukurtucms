@@ -115,7 +115,7 @@ function ma_collection_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_basic',
       1 => 'group_digital_heritage_items',

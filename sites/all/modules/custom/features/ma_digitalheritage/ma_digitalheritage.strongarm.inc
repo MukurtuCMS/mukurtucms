@@ -104,6 +104,27 @@ function ma_digitalheritage_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_digital_heritage';
+  $strongarm->value = 1;
+  $export['diff_enable_revisions_page_node_digital_heritage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_digital_heritage';
+  $strongarm->value = 1;
+  $export['diff_show_preview_changes_node_digital_heritage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_digital_heritage';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_digital_heritage'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'ds_classes_fields';
   $strongarm->value = 'col-md-8 col-md-pull-4
 col-md-4 col-md-push-8
@@ -275,7 +296,7 @@ col-md-4 col-md-push-8';
           'weight' => '2',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '3',
         ),
         'redirect' => array(
           'weight' => '5',

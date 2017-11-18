@@ -23,11 +23,11 @@ function ma_culturalprotocol_field_group_info() {
     'label' => 'Advanced',
     'weight' => '2',
     'children' => array(
-      0 => 'field_protocol_auto_join',
-      1 => 'group_group',
-      2 => 'group_register',
-      3 => 'og_roles_permissions',
-      4 => 'field_membership_list_options',
+      0 => 'field_membership_list_options',
+      1 => 'field_protocol_auto_join',
+      2 => 'group_group',
+      3 => 'group_register',
+      4 => 'og_roles_permissions',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -86,7 +86,7 @@ function ma_culturalprotocol_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_advanced',
       1 => 'group_basic',

@@ -222,3 +222,21 @@ function ma_core_get_create_tax_term ($term_name, $vocab_name) {
     return $term;
   }
 }
+
+/**
+ * Implementation of HOOK_form_alter()
+ */
+function ma_core_form_alter(&$form, $form_state, $form_id) {
+
+  // Duplicate a the node form action buttons at the top of the form.
+  // Normally we could just duplicate the field here and set its weight,
+  // but because our forms are managed in DS, the field needs to be created there
+  // first, or else we can't move the field high enough on the form. So we create
+  // a dummy Pre-Actions field (a boolean) in Manage Fields, and then rewrite it here,
+  // simply duplicating the contents of form actions as they appear at bottom.
+  if (isset($form['#node_edit_form']) AND $form['#node_edit_form']) {
+    $form['field_pre_actions'] = $form['actions'];
+    $form['field_pre_actions']['#weight'] = -5; // for those content types where the field layout is not in DS.
+  }
+
+}

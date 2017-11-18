@@ -98,6 +98,12 @@ function ma_collection_strongarm() {
       'map_popup' => array(
         'custom_settings' => FALSE,
       ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -105,10 +111,10 @@ function ma_collection_strongarm() {
           'weight' => '1',
         ),
         'path' => array(
-          'weight' => '3',
+          'weight' => '2',
         ),
         'redirect' => array(
-          'weight' => '4',
+          'weight' => '3',
         ),
       ),
       'display' => array(),

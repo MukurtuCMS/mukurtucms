@@ -104,10 +104,10 @@ function ma_culturalprotocol_strongarm() {
           'weight' => '0',
         ),
         'path' => array(
-          'weight' => '4',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '3',
+          'weight' => '2',
         ),
       ),
       'display' => array(),

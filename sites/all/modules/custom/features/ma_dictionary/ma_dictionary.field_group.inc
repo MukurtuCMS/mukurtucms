@@ -23,10 +23,10 @@ function ma_dictionary_field_group_info() {
     'label' => 'Basic',
     'weight' => '6',
     'children' => array(
-      0 => 'field_collection_summary',
-      1 => 'field_description',
-      2 => 'field_collection_image',
-      3 => 'field_collection_credit',
+      0 => 'field_collection_credit',
+      1 => 'field_collection_image',
+      2 => 'field_collection_summary',
+      3 => 'field_description',
       4 => 'title',
     ),
     'format_type' => 'htab',
@@ -87,9 +87,9 @@ function ma_dictionary_field_group_info() {
     'children' => array(
       0 => 'field_dictionary_word_related_dh',
       1 => 'field_item_privacy_setting',
-      2 => 'og_group_ref',
+      2 => 'field_related_dictionary_words',
       3 => 'field_word_list',
-      4 => 'field_related_dictionary_words',
+      4 => 'og_group_ref',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -144,7 +144,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_dictionary_word_basic',
       1 => 'group_dictionary_word_relations',
@@ -171,7 +171,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_basic',
       1 => 'group_words',

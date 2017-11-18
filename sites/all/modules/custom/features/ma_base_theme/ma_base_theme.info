@@ -65,6 +65,7 @@ features[field_base][] = field_language
 features[field_base][] = field_licence_std_cc
 features[field_base][] = field_licence_trad
 features[field_base][] = field_media_asset
+features[field_base][] = field_pre_actions
 features[field_base][] = field_publisher
 features[field_base][] = field_rights
 features[field_base][] = field_source

@@ -240,7 +240,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 30,
+      'weight' => 57,
     ),
   );
 
@@ -333,7 +333,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 32,
+      'weight' => 58,
     ),
   );
 
@@ -475,7 +475,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -570,7 +570,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 26,
+      'weight' => 53,
     ),
   );
 
@@ -664,7 +664,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 29,
+      'weight' => 56,
     ),
   );
 
@@ -759,7 +759,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -903,7 +903,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -1024,7 +1024,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -1451,7 +1451,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -1559,7 +1559,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 100,
       ),
       'type' => 'text_textfield',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -2065,7 +2065,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -2361,7 +2361,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 49,
+      'weight' => 50,
     ),
   );
 
@@ -2810,6 +2810,86 @@ Note: If <i>Original Date</i> is left entirely empty, this item will not appear 
     ),
   );
 
+  // Exported field_instance: 'node-digital_heritage-field_pre_actions'.
+  $field_instances['node-digital_heritage-field_pre_actions'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 46,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
+    ),
+  );
+
   // Exported field_instance: 'node-digital_heritage-field_publisher'.
   $field_instances['node-digital_heritage-field_publisher'] = array(
     'bundle' => 'digital_heritage',
@@ -3007,7 +3087,7 @@ Note: If <i>Original Date</i> is left entirely empty, this item will not appear 
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 27,
+      'weight' => 54,
     ),
   );
 
@@ -3099,7 +3179,7 @@ Note: If <i>Original Date</i> is left entirely empty, this item will not appear 
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 28,
+      'weight' => 55,
     ),
   );
 
@@ -3404,7 +3484,7 @@ Note: If <i>Original Date</i> is left entirely empty, this item will not appear 
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 30,
+      'weight' => 31,
     ),
   );
 
@@ -4044,6 +4124,7 @@ Note: If <i>Original Date</i> is left entirely empty, this item will not appear 
   t('Original Date Description');
   t('People');
   t('Please provide a brief summary of this item in less than 140 characters. Other fields will allow for more elaboration about the content.');
+  t('Pre-Actions');
   t('Protocol');
   t('Publisher');
   t('Rather than a quick gloss (like the description field) the Cultural Narrative field allows one to provide lengthy commentary, stories, observations, or any relevant context for the DH item. For example, if the item is a basket, this field may contain a narrative from the basket-maker about his/her technique or it may tell a story about how the baskets were used by previous generations and how they are used today. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');

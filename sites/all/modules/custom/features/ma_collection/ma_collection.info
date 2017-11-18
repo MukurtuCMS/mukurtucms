@@ -67,6 +67,7 @@ features[field_instance][] = node-collection-field_collection_summary
 features[field_instance][] = node-collection-field_description
 features[field_instance][] = node-collection-field_digital_heritage_count
 features[field_instance][] = node-collection-field_digital_heritage_items
+features[field_instance][] = node-collection-field_pre_actions
 features[menu_links][] = main-menu_-collection:node/add/collection
 features[node][] = collection
 features[page_manager_pages][] = collections_browse
