@@ -68,7 +68,7 @@ function ma_community_manage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 4,
+      'weight' => 5,
     ),
     'widget_type' => 'options_select',
   );
@@ -140,7 +140,7 @@ function ma_community_manage_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 

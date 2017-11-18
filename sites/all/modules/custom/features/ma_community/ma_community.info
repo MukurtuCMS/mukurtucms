@@ -66,6 +66,7 @@ features[field_instance][] = node-community-field_community_image
 features[field_instance][] = node-community-field_community_image_thumbnail
 features[field_instance][] = node-community-field_membership_list_options
 features[field_instance][] = node-community-field_parent_community
+features[field_instance][] = node-community-field_pre_actions
 features[field_instance][] = node-community-group_access
 features[field_instance][] = node-community-group_group
 features[field_instance][] = node-community-og_group_ref

@@ -22,11 +22,6 @@ function ma_collection_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_digital_heritage_items' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
   );
   $export['node|collection|default'] = $ds_fieldsetting;
 
@@ -138,37 +133,37 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'group_tabs',
-        2 => 'title',
-        3 => 'group_basic',
+        0 => 'field_pre_actions',
+        1 => 'group_basic',
+        2 => 'group_tabs',
+        3 => 'title',
         4 => 'field_collection_summary',
         5 => 'group_digital_heritage_items',
         6 => 'path',
-        7 => 'field_description',
-        8 => 'field_collection_image',
-        9 => 'redirect',
-        11 => 'field_digital_heritage_items',
-        12 => 'field_collection_credit',
+        7 => 'redirect',
+        8 => 'field_description',
+        10 => 'field_digital_heritage_items',
+        11 => 'field_collection_image',
+        13 => 'field_collection_credit',
       ),
       'hidden' => array(
-        1 => 'group_digital_heritage',
-        10 => 'field_digital_heritage_count',
-        13 => '_add_existing_field',
+        9 => 'field_digital_heritage_count',
+        14 => '_add_existing_field',
       ),
     ),
     'fields' => array(
-      'group_tabs' => 'ds_content',
-      'group_digital_heritage' => 'hidden',
-      'title' => 'ds_content',
+      'field_pre_actions' => 'ds_content',
       'group_basic' => 'ds_content',
+      'group_tabs' => 'ds_content',
+      'title' => 'ds_content',
       'field_collection_summary' => 'ds_content',
       'group_digital_heritage_items' => 'ds_content',
       'path' => 'ds_content',
-      'field_description' => 'ds_content',
-      'field_collection_image' => 'ds_content',
       'redirect' => 'ds_content',
+      'field_description' => 'ds_content',
       'field_digital_heritage_count' => 'hidden',
       'field_digital_heritage_items' => 'ds_content',
+      'field_collection_image' => 'ds_content',
       'field_collection_credit' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
@@ -185,6 +180,7 @@ function ma_collection_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|collection|form'] = $ds_layout;
 

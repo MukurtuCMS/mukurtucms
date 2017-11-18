@@ -152,7 +152,7 @@ function ma_person_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Record Management',
-    'weight' => '15',
+    'weight' => '16',
     'children' => array(
       0 => 'field_mukurtu_terms',
     ),
@@ -179,7 +179,7 @@ function ma_person_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Relations',
-    'weight' => '14',
+    'weight' => '15',
     'children' => array(
       0 => 'field_related_people',
     ),
@@ -264,7 +264,7 @@ function ma_person_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_biographic',
       1 => 'group_record_connections',

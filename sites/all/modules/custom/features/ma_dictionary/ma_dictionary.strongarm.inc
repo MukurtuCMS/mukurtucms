@@ -210,10 +210,10 @@ function ma_dictionary_strongarm() {
           'weight' => '24',
         ),
         'path' => array(
-          'weight' => '10',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '9',
+          'weight' => '2',
         ),
       ),
       'display' => array(

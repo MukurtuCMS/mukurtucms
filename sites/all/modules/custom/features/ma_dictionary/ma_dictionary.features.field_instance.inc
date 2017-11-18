@@ -294,7 +294,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 20,
+      'weight' => 6,
     ),
   );
 
@@ -499,7 +499,57 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 16,
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-dictionary_word-field_pre_actions'.
+  $field_instances['node-dictionary_word-field_pre_actions'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 25,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -1211,6 +1261,56 @@ function ma_dictionary_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-word_list-field_pre_actions'.
+  $field_instances['node-word_list-field_pre_actions'] = array(
+    'bundle' => 'word_list',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 5,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
+    ),
+  );
+
   // Exported field_instance: 'node-word_list-field_words'.
   $field_instances['node-word_list-field_words'] = array(
     'bundle' => 'word_list',
@@ -1808,6 +1908,7 @@ function ma_dictionary_field_default_field_instances() {
   t('Normally, the glossary title letter filter will "pad" itself with all letters from A-Z for which there are no words in the site\'s glossary that start with that letter. Unlike the other letters, they are unlinked. Their purpose is to provide a complete-looking alphabet in the filter. However, if the language(s) of the glossary does not include all the letters from A-Z, it would be preferable to leave out the letters which do not exist in the language. Click this checkbox to disable padding of the glossary with all the letters from A-Z. Only the first letter of words in the glossary will remain in the filter.');
   t('One or more example sentences that demonstrate use of the word entry.');
   t('Part of Speech');
+  t('Pre-Actions');
   t('Pronunciation');
   t('Protocol');
   t('Recording');
