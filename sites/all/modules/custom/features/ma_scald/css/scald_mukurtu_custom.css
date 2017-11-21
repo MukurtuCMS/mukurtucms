@@ -1,0 +1,28 @@
+.scald-menu {
+    left: -55px;
+}
+.scald-menu .summary .toggle {
+    width: 55px;
+}
+.scald-menu .filters {
+    left: 55px;
+}
+.scald-menu .add-buttons {
+    padding-top: 60px;
+    width: 55px;
+}
+.scald-menu .add-buttons ul li {
+    height: 68px;
+    width: 43px;
+    text-indent: 0;
+    overflow: visible;
+    margin-top: -18px;
+}
+.scald-menu .add-buttons a {
+     margin-top: 43px;
+     font-size: 10px;
+     text-align: center;
+     width: 43px;
+     height: 68px;
+     color: white;
+}

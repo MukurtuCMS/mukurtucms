@@ -240,3 +240,4 @@ features[variable][] = scald_context_fallbacks
 features[variable][] = scald_custom_contexts
 features[variable][] = scald_tags_vocabulary
 features[variable][] = scald_video_upload_location
+stylesheets[all][] = css/scald_mukurtu_custom.css
