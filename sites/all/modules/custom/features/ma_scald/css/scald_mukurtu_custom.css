@@ -1,3 +1,6 @@
+/**
+ * Add atom type labels under the icons in the scald drawer.
+ */
 .scald-menu {
     left: -55px;
 }
@@ -30,3 +33,15 @@
      height: 68px;
      color: white;
 }
+
+/**
+ * Aesthetic tweaks due to the fact we are making the whole scald drawer item row draggable, instead of just the image.
+ */
+.dnd-library-wrapper .editor-item {
+    cursor: move;
+}
+.dnd-library-wrapper .editor-item:hover img,
+.dnd-library-wrapper .editor-item.bt-active img {
+    outline: 0px;
+}
+
