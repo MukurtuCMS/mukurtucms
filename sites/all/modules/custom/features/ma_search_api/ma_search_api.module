@@ -229,10 +229,12 @@ function ma_search_api_search_api_query_alter($sapi_query) {
 
   // Custom sorts
 
-  if ($current_page == 'digital-heritage') { // Add Dictionary and Collections here later.
+  if ($current_page == 'digital-heritage' or $current_page == 'collections') { // Add Dictionary here later.
 
     // Sort according to the session var, otherwise fallback to default
-    if (isset($_SESSION['custom_sort_order'])) {
+    if (isset($_SESSION[$current_page . '_custom_sort_order'])) {
+
+      $custom_sort = $_SESSION[$current_page . '_custom_sort_order'];
 
       // Unset existing sorts
       $sort =& $sapi_query->getSort();
@@ -260,14 +262,14 @@ function ma_search_api_search_api_query_alter($sapi_query) {
         ),
       );
       $sort_direction = 'ASC';
-      if (isset($sort_map[$_SESSION['custom_sort_order']]['reverse']) AND $sort_map[$_SESSION['custom_sort_order']]['reverse']) {
+      if (isset($sort_map[$custom_sort]['reverse']) AND $sort_map[$custom_sort]['reverse']) {
         $sort_direction = 'DESC';
       }
-      $sapi_query->sort($sort_map[$_SESSION['custom_sort_order']]['sort'], $sort_direction);
+      $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_direction);
 
 
       // When sorting by oldest or newest, filter out DH nodes that do not have an original date set.
-      if ($_SESSION['custom_sort_order'] == 'oldest' OR $_SESSION['custom_sort_order'] == 'newest') {
+      if ($custom_sort == 'oldest' OR $custom_sort == 'newest') {
         $sapi_query->condition('field_original_date:timestamp', NULL, '<>');
       }
 
@@ -453,6 +455,7 @@ function ma_search_api_block_view($delta = '') {
  * Returns the render array for the form.
  */
 function ma_search_api_sort_form($form, &$form_state) {
+  $current_page = arg(0);
   $sort_options = array(
     'changed' => t('Date Changed'),
     'added' => t('Date Added'),
@@ -460,10 +463,14 @@ function ma_search_api_sort_form($form, &$form_state) {
     'oldest' => t('Oldest'), // NOTE: If the Original Date field is unset, date = 0, so those DH nodes will appear at top of Oldest list. This is a limitation of using the DB for the Search API backend. It should be resolveable when / if switching to SOLR.
     'alphabetical' => t('Alphabetical'),
   );
+  if ($current_page <> 'digital-heritage') {
+    unset($sort_options['newest']);
+    unset($sort_options['oldest']);
+  }
 
   $form['sort'] = array(
     '#type' => 'select',
-    '#default_value' => isset($_SESSION['custom_sort_order']) ? $_SESSION['custom_sort_order'] : 'changed',
+    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'changed',
     '#options' => $sort_options,
     '#attributes' => array('onchange' => 'this.form.submit();'),
   );
@@ -475,6 +482,6 @@ function ma_search_api_sort_form($form, &$form_state) {
 }
 function ma_search_api_sort_form_submit($form, $form_state){
   if (isset ($form_state['values']['sort'])) {
-    $_SESSION['custom_sort_order'] = $form_state['values']['sort'];
+    $_SESSION[arg(0) . '_custom_sort_order'] = $form_state['values']['sort'];
   }
 }
