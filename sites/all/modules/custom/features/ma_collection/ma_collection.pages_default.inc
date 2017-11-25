@@ -172,6 +172,29 @@ function ma_collection_default_page_manager_pages() {
   $pane->uuid = 'd7e6f156-c2b7-4707-883e-1218ae5cadbf';
   $display->content['new-d7e6f156-c2b7-4707-883e-1218ae5cadbf'] = $pane;
   $display->panels['right'][0] = 'new-d7e6f156-c2b7-4707-883e-1218ae5cadbf';
+  $pane = new stdClass();
+  $pane->pid = 'new-c1926a00-2d88-4f8f-9fca-5d4005aaa686';
+  $pane->panel = 'right';
+  $pane->type = 'block';
+  $pane->subtype = 'ma_search_api-ma_custom_sorts';
+  $pane->shown = TRUE;
+  $pane->access = array();
+  $pane->configuration = array(
+    'override_title' => 0,
+    'override_title_text' => '',
+    'override_title_heading' => 'h2',
+  );
+  $pane->cache = array();
+  $pane->style = array(
+    'settings' => NULL,
+  );
+  $pane->css = array();
+  $pane->extras = array();
+  $pane->position = 1;
+  $pane->locks = array();
+  $pane->uuid = 'c1926a00-2d88-4f8f-9fca-5d4005aaa686';
+  $display->content['new-c1926a00-2d88-4f8f-9fca-5d4005aaa686'] = $pane;
+  $display->panels['right'][1] = 'new-c1926a00-2d88-4f8f-9fca-5d4005aaa686';
   $display->hide_title = PANELS_TITLE_FIXED;
   $display->title_pane = '0';
   $handler->conf['display'] = $display;
