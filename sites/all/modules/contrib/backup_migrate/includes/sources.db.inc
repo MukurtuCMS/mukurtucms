@@ -11,8 +11,8 @@
  *
  * @ingroup backup_migrate_destinations
  */
-class backup_migrate_destination_db extends backup_migrate_destination_remote {
-  var $supported_ops = array('scheduled backup', 'manual backup', 'configure', 'source');
+class backup_migrate_source_db extends backup_migrate_source_remote {
+  var $supported_ops = array('configure', 'source');
   var $db_target = 'default';
   var $connection = null;
 
@@ -42,9 +42,8 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
    */
   function edit_form() {
     $form = parent::edit_form();
-    $form['scheme']['#title'] = t('Database type');
-//    $form['scheme']['#options'] = array($GLOBALS['db_type'] => $GLOBALS['db_type']);
-    $form['scheme']['#description'] = t('The type of the database. Drupal only supports one database type at a time, so this must be the same as the current database type.');
+    $form['scheme']['#default_value'] = $this->default_scheme();
+    $form['scheme']['#access'] = FALSE;
     $form['path']['#title'] = t('Database name');
     $form['path']['#description'] = t('The name of the database. The database must exist, it will not be created for you.');
     $form['user']['#description'] = t('Enter the name of a user who has write access to the database.');
@@ -109,7 +108,7 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
     }
 
     return array(
-      'nodata_tables' => array_merge($basic, $cache, module_invoke_all('devel_caches')),
+      'nodata_tables' => drupal_map_assoc(array_merge($basic, $cache, module_invoke_all('devel_caches'))),
       'exclude_tables' => $simpletest,
       'utils_lock_tables' => FALSE,
     );
@@ -129,12 +128,11 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
       "#default_value" => $settings['exclude_tables'],
       "#description" => t("The selected tables will not be added to the backup file."),
     );
-    $tables  = $this->get_table_names();
     $form['nodata_tables'] = array(
       "#type" => "select",
       "#multiple" => TRUE,
       "#title" => t("Exclude the data from the following tables"),
-      "#options" => $tables,
+      "#options" => $objects,
       "#default_value" => $settings['nodata_tables'],
       "#description" => t("The selected tables will have their structure backed up but not their contents. This is useful for excluding cache data to reduce file size."),
     );
@@ -153,14 +151,12 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
   function backup_to_file($file, $settings) {
     $file->push_type($this->get_file_type_id());
 
-    backup_migrate_filters_invoke_all('pre_backup', $this, $file, $settings);
     //$this->lock_tables($settings);
 
     // Switch to a different db if specified.
     $success = $this->_backup_db_to_file($file, $settings);
 
     //$this->unlock_tables($settings);
-    backup_migrate_filters_invoke_all('post_backup', $this, $file, $settings, $success);
 
     return $success ? $file : FALSE;
   }
@@ -315,4 +311,15 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
   function get_file_type_id() {
     return 'sql';
   }
+
+  /**
+   * Get the version info for the given DB.
+   */
+  function _db_info() {
+    return array(
+      'type' => FALSE,
+      'version' => t('Unknown'),
+    );
+  }
+
 }
