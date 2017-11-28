@@ -31,7 +31,7 @@ function ma_collection_preprocess_views_view(&$vars) {
 function ma_collection_node_view($node, $view_mode) {
   if ($node->type == 'collection') {
 
-      if ($view_mode == 'search_result') {
+    if ($view_mode == 'search_result') {
 
       // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use the first available image atom from the Digital Heritage items in that Collection. If none of the DH items have an image atom, use the thumbnail from the first available non-image atom from the DH items in that Collection. If that atom does not have an uploaded thumbnail, use the default thumbnail for that atom type.
 
@@ -42,25 +42,25 @@ function ma_collection_node_view($node, $view_mode) {
         foreach ($collection_emw->field_digital_heritage_items->value() as $dh_item) {
           $dh_item_emw = entity_metadata_wrapper('node', $dh_item);
           if(isset($dh_item_emw->field_media_asset)) {
-          foreach ($dh_item_emw->field_media_asset->value() as $dh_item_media_index => $dh_item_media) {
-            if ($dh_item_media->provider == 'scald_image') {
-              $replacement_image = scald_render ($dh_item_emw->field_media_asset->get($dh_item_media_index)->value(), 'ma_scald_search_results');
-              break 2;
-            }
-            elseif (!$replacement_image) {
-              // Use the atom thumbnail if there is one
-              if (count($dh_item_media->scald_thumbnail)) {
-                $replacement_image = theme_image_style (array (
-                  'style_name' => 'medium',
-                  'path' => $dh_item_media->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
-                ));
+            foreach ($dh_item_emw->field_media_asset->value() as $dh_item_media_index => $dh_item_media) {
+              if ($dh_item_media->provider == 'scald_image') {
+                $replacement_image = scald_render ($dh_item_emw->field_media_asset->get($dh_item_media_index)->value(), 'ma_scald_search_results');
+                break 2;
               }
-              // If no atom thumbnail, use our default thumbnails
-              else {
-                $replacement_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $dh_item_media->type . '_thumbnail.jpg">';
+              elseif (!$replacement_image) {
+                // Use the atom thumbnail if there is one
+                if (count($dh_item_media->scald_thumbnail)) {
+                  $replacement_image = theme_image_style (array (
+                    'style_name' => 'medium',
+                    'path' => $dh_item_media->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
+                  ));
+                }
+                // If no atom thumbnail, use our default thumbnails
+                else {
+                  $replacement_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $dh_item_media->type . '_thumbnail.jpg">';
+                }
               }
             }
-          }
           }
         }
 
@@ -157,9 +157,9 @@ function ma_collection_node_insert($node) {
  */
 // We need to use this hook instead of hook_node_delete because hook_node_delete runs too early
 function ma_collection_field_attach_delete ($entity_type, $entity) {
-    if (isset($entity->type) && $entity->type == 'digital_heritage') {
-        ma_collection_node_update($entity, 1);
-    }
+  if (isset($entity->type) && $entity->type == 'digital_heritage') {
+    ma_collection_node_update($entity, 1);
+  }
 }
 
 /**
@@ -182,7 +182,7 @@ function ma_collection_node_update($node, $deleted = NULL) {
       $collections_to_recount = array_merge ($refs_added, $refs_deleted);
       foreach ($collections_to_recount as $collection) {
         if($collection == NULL) {
-           continue;
+          continue;
         }
         $query = new EntityFieldQuery();
         $result = $query
@@ -197,8 +197,8 @@ function ma_collection_node_update($node, $deleted = NULL) {
         variable_set('collection_presave_skip', $collection_presave_skip);
         $collection_emw = entity_metadata_wrapper('node', $collection);
         if($collection_emw) {
-            $collection_emw->field_digital_heritage_count->set($new_count);
-            $collection_emw->save();
+          $collection_emw->field_digital_heritage_count->set($new_count);
+          $collection_emw->save();
         }
       }
     }
@@ -237,4 +237,193 @@ function ma_collection_collections_title_with_count ($entity) {
     }
   }
   return '<h2>' . l ($entity->title . ' (' . $dh_count . ')', 'node/' . $entity->nid) . '</h2>';
+}
+
+/**
+ * Popup to add current node to a Collection.
+ *
+ * Called by custom DS field.
+ *
+ * This uses AJAX and ctools to put a form into a modal, with the contents of the modal being updated after form submit.
+ * Described at as described https://www.deeson.co.uk/labs/insert-form-pop-modal-ctools-and-drupal-7
+ */
+function ma_collection_add_to_collection($entity) {
+
+  if (user_access('edit own collection content')) {
+    ctools_include('modal'); // This is included statically by Ctools so no risk of including from here.
+    drupal_add_js([
+      'add-to-collection' => [
+        'modalClass' => 'add-to-collection',
+        'modalSize' => [
+          'type' => 'fixed',
+          'width' => 250,
+          'height' => 250,
+          'contentRight' => 0,
+          'contentBottom' => 0,
+        ],
+      ],
+    ], 'setting');
+    ctools_modal_add_js(); // This is added statically by Ctools so no risk of adding from here.
+    $output = ma_collection_add_to_collection_text(NULL, $entity->nid);
+    return $output;
+  }
+}
+
+/**
+ * Build the Add to Collection text.
+ */
+function ma_collection_add_to_collection_text($results_text = '', $nid_to_add = NULL) {
+  $output = '<div id="add-to-collection">'; // These contents updated by AJAX when a node is added to a collection.
+  if ($results_text){
+    $output .= $results_text;
+  }
+  $output .= l('Add to Collection', 'ma_collection/nojs/' . $nid_to_add, array('attributes' => array('class' => 'ctools-use-modal ctools-modal-add-to-collection'), 'html' => TRUE, ));
+  $output .= '</div>';
+  return $output;
+}
+
+/**
+ * Add to Collection form.
+ */
+function ma_collection_add_to_collection_form($form, $form_state) {
+
+  $nid_to_add = $form_state['nid_to_add'];
+
+  // Build an array of collections.
+
+  // First get collections that already have this node in it, so we can exclude them later.
+  // Will need to repeat this for all content types when we allow more than DHs in collections, merging $colls_to_exclude results.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'collection')
+    ->fieldCondition('field_digital_heritage_items', 'target_id', $nid_to_add)
+  ;
+  $result = $query->execute();
+  $colls_to_exclude = array();
+  if (isset($result['node'])) {
+    $colls_to_exclude = array_keys($result['node']);
+  }
+
+  // Get the collections.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'collection')
+    ->propertyCondition('status', NODE_PUBLISHED)
+  ;
+  $result = $query->execute();
+  if (isset($result['node'])) {
+    $coll_nids = array_keys($result['node']);
+    $colls = [];
+    foreach ($coll_nids as $coll_nid) {
+      if (in_array($coll_nid, $colls_to_exclude)) {
+        continue;
+      }
+      $coll_node = node_load($coll_nid);
+      if (node_access('update', $coll_node)) { // exclude nodes user does not have permission to edit.
+        $colls[$coll_nid] = $coll_node->title;
+      }
+    }
+    if (count($colls)) {
+
+      // Build the form.
+      $form = [
+        'collection' => [
+          '#title' => t('Add Item to Collection'),
+          '#type' => 'select',
+          '#options' => $colls,
+          '#chosen' => TRUE,
+          // '#attributes' => array('onchange' => 'this.form.submit();'), // does not work in this context, so we need the submit button.
+        ],
+        'actions' => [
+          '#type' => 'actions',
+          'submit' => [
+            '#type' => 'submit',
+            '#value' => t('Add'),
+          ],
+          'cancel' => [
+            '#type' => 'submit',
+            '#value' => t('Cancel'),
+          ],
+        ]
+      ];
+      return $form;
+    }
+  }
+  $form = [];
+  $form['#prefix'] = 'There are no Collections that you can add this item to.';
+  return $form;
+}
+
+/**
+ * Add to Collection form submit handler.
+ */
+function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
+
+  // Tell the browser to close the modal.
+  $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+
+  // Skip if user pressed Cancel.
+  if ($form_state['values']['op'] == "Cancel") {
+    return;
+  }
+
+  $coll_nid = $form_state['values']['collection'];
+  if ($coll_nid) {
+    $coll_node = node_load($coll_nid);
+    if (node_access('update', $coll_node)) {
+
+      // Add the item to the Collection node.
+      $cw = entity_metadata_wrapper('node', $coll_node);
+      $cw->field_digital_heritage_items[] = $form_state['nid_to_add']; // This will have to change once there is more than just DH.
+      $cw->save();
+
+      // Replace the text on the link to show that item was added to the collection.
+      $results_text = 'Added to collection <i>' . $form['collection']['#options'][$form_state['values']['collection']] . '</i><br />';
+      $link = ma_collection_add_to_collection_text($results_text);
+      $form_state['ajax_commands'][] = ajax_command_replace('#add-to-collection', $link);
+
+    }
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_collection_menu() {
+  $items = array();
+  $items['ma_collection/%ctools_js'] = array(
+    'page callback' => 'ma_collection_add_to_collection_callback',
+    'page arguments' => array(1, 2),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Add to Collection ajax callback.
+ */
+function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+    $form_state = array(
+      'ajax' => TRUE,
+      'nid_to_add' => $nid_to_add,
+    );
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper('ma_collection_add_to_collection_form', $form_state);
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output = $form_state['ajax_commands'];
+    }
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  }
+  else {
+    // We're assuming JS is enabled, so do nothing if not.
+  }
 }

@@ -37,6 +37,7 @@ features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
 features[ds_field_settings][] = node|collection|default
 features[ds_field_settings][] = node|collection|search_result
+features[ds_fields][] = add_to_collection
 features[ds_fields][] = collections_title_with_count
 features[ds_layout_settings][] = node|collection|default
 features[ds_layout_settings][] = node|collection|form

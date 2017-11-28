@@ -10615,3 +10615,6 @@ a:hover {
   overflow-x: visible !important;
   overflow-y: visible !important;
 }
+.modal-add-to-collection .modal-header {
+  display: none;
+}

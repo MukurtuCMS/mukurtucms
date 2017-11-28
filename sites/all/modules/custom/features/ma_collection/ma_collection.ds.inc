@@ -56,6 +56,24 @@ function ma_collection_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'add_to_collection';
+  $ds_field->label = 'Add to Collection';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php return ma_collection_add_to_collection($entity); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['add_to_collection'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'collections_title_with_count';
   $ds_field->label = 'Collections title with count';
   $ds_field->field_type = 5;
