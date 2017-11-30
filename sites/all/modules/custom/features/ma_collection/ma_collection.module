@@ -29,6 +29,14 @@ function ma_collection_preprocess_views_view(&$vars) {
 }
 
 function ma_collection_node_view($node, $view_mode) {
+
+  // On full node view of node types that can be added to a Collection, load the "Add to Collection" ctools modal JS.
+  if ($view_mode == 'full') {
+    if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
+      ma_collection_include_add_to_collection_modal_js();
+    }
+  }
+
   if ($node->type == 'collection') {
 
     if ($view_mode == 'search_result') {
@@ -239,51 +247,103 @@ function ma_collection_collections_title_with_count ($entity) {
   return '<h2>' . l ($entity->title . ' (' . $dh_count . ')', 'node/' . $entity->nid) . '</h2>';
 }
 
-/**
- * Popup to add current node to a Collection.
- *
- * Called by custom DS field.
- *
- * This uses AJAX and ctools to put a form into a modal, with the contents of the modal being updated after form submit.
- * Described at as described https://www.deeson.co.uk/labs/insert-form-pop-modal-ctools-and-drupal-7
- */
-function ma_collection_add_to_collection($entity) {
 
-  if (user_access('edit own collection content')) {
-    ctools_include('modal'); // This is included statically by Ctools so no risk of including from here.
-    drupal_add_js([
-      'add-to-collection' => [
-        'modalClass' => 'add-to-collection',
-        'modalSize' => [
-          'type' => 'fixed',
-          'width' => 250,
-          'height' => 250,
-          'contentRight' => 0,
-          'contentBottom' => 0,
-        ],
-      ],
-    ], 'setting');
-    ctools_modal_add_js(); // This is added statically by Ctools so no risk of adding from here.
-    $output = ma_collection_add_to_collection_text(NULL, $entity->nid);
-    return $output;
+/**
+ * Implements hook_menu().
+ */
+function ma_collection_menu() {
+  $items = array();
+
+  // "Add to Collection" ajax.
+  $items['ma_collection/%ctools_js'] = array(
+    'page callback' => 'ma_collection_add_to_collection_callback',
+    'page arguments' => array(1, 2),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  // Add "Add to Collection" node view nav tab.
+  $items['node/%node/add_to_collection'] = array(
+    'title' => 'Add to Collection',
+    'access callback' => 'ma_collection_add_node_to_collection_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  return $items;
+}
+
+/**
+ * Add to Collection ajax callback.
+ */
+function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+    $form_state = array(
+      'ajax' => TRUE,
+      'nid_to_add' => $nid_to_add,
+    );
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper('ma_collection_add_to_collection_form', $form_state);
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output = $form_state['ajax_commands'];
+    }
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  }
+  else {
+    // We're assuming JS is enabled, so do nothing if not.
   }
 }
 
 /**
- * Build the Add to Collection text.
+ * Rewrite the link path for the "Add to Collection" node view nav tab to the Ctools modal.
+ *
+ * The original path needs to be written as "node/{nid}/{path}" in order for the tab to show up in the node view.
  */
-function ma_collection_add_to_collection_text($results_text = '', $nid_to_add = NULL) {
-  $output = '<div id="add-to-collection">'; // These contents updated by AJAX when a node is added to a collection.
-  if ($results_text){
-    $output .= $results_text;
+function ma_collection_url_outbound_alter(&$path, &$options, $original_path) {
+  if (substr($path,-18) == '/add_to_collection') {
+    $path_parts = explode('/', $path);
+    if (is_numeric($path_parts[1])) {
+      $path = 'ma_collection/nojs/' . $path_parts[1];
+      $options['attributes'] = array('class' => 'ctools-use-modal ctools-modal-add-to-collection');
+    }
   }
-  $output .= l('Add to Collection', 'ma_collection/nojs/' . $nid_to_add, array('attributes' => array('class' => 'ctools-use-modal ctools-modal-add-to-collection'), 'html' => TRUE, ));
-  $output .= '</div>';
-  return $output;
 }
 
 /**
- * Add to Collection form.
+ * Implements hook_contextual_links_view_alter().
+ *
+ * Add an "Add to Collection" contextual link to the search results nodes.
+ */
+function ma_collection_contextual_links_view_alter(&$element, $items) {
+
+  if (!empty($element['#element']['#entity_type']) && !empty($element['#element']['#bundle']) && user_access('edit own collection content')) {
+    if (in_array($element['#element']['#bundle'], ma_collection_get_valid_node_types_for_collection())) {
+      $view_mode = isset($element['#element']['#view_mode']) ? $element['#element']['#view_mode'] : 'default';
+      if ($view_mode == 'search_result') {
+
+        // Conditions met. Add the link.
+        ma_collection_include_add_to_collection_modal_js();
+        $nid = $element['#element']['#node']->nid;
+        $element['#links']['add_to_collection'] = array(
+          'title' => t('Add to Collection'),
+          'href' => 'ma_collection/nojs/' . $nid,
+          'attributes' => array('class' => 'ctools-use-modal ctools-modal-add-to-collection'),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * "Add to Collection" form.
  */
 function ma_collection_add_to_collection_form($form, $form_state) {
 
@@ -292,24 +352,24 @@ function ma_collection_add_to_collection_form($form, $form_state) {
   // Build an array of collections.
 
   // First get collections that already have this node in it, so we can exclude them later.
-  // Will need to repeat this for all content types when we allow more than DHs in collections, merging $colls_to_exclude results.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'collection')
-    ->fieldCondition('field_digital_heritage_items', 'target_id', $nid_to_add)
-  ;
-  $result = $query->execute();
   $colls_to_exclude = array();
-  if (isset($result['node'])) {
-    $colls_to_exclude = array_keys($result['node']);
+  $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
+  foreach ($valid_collection_types as $entity_reference_field => $node_type) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'collection')
+      ->fieldCondition($entity_reference_field, 'target_id', $nid_to_add);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+      $colls_to_exclude = array_keys($result['node']);
+    }
   }
 
   // Get the collections.
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'collection')
-    ->propertyCondition('status', NODE_PUBLISHED)
-  ;
+    ->propertyCondition('status', NODE_PUBLISHED);
   $result = $query->execute();
   if (isset($result['node'])) {
     $coll_nids = array_keys($result['node']);
@@ -374,56 +434,58 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
 
       // Add the item to the Collection node.
       $cw = entity_metadata_wrapper('node', $coll_node);
-      $cw->field_digital_heritage_items[] = $form_state['nid_to_add']; // This will have to change once there is more than just DH.
-      $cw->save();
-
-      // Replace the text on the link to show that item was added to the collection.
-      $results_text = 'Added to collection <i>' . $form['collection']['#options'][$form_state['values']['collection']] . '</i><br />';
-      $link = ma_collection_add_to_collection_text($results_text);
-      $form_state['ajax_commands'][] = ajax_command_replace('#add-to-collection', $link);
-
+      $nid_to_add = $form_state['nid_to_add'];
+      $node_to_add = node_load ($nid_to_add);
+      $entity_ref_field = array_search($node_to_add->type, ma_collection_get_valid_node_types_for_collection());
+      $cw->{$entity_ref_field}[] = $nid_to_add;
+      $cw->save(); // comment this line while debugging.
     }
   }
 }
 
 /**
- * Implements hook_menu().
+ * Helper function to add the JS for an "Add To Collection" ctools modal.
+ *
+ * This uses AJAX and ctools to put a form into a modal.
  */
-function ma_collection_menu() {
-  $items = array();
-  $items['ma_collection/%ctools_js'] = array(
-    'page callback' => 'ma_collection_add_to_collection_callback',
-    'page arguments' => array(1, 2),
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK,
-  );
-  return $items;
+function ma_collection_include_add_to_collection_modal_js() {
+
+  if (user_access('edit own collection content')) {
+    ctools_include('modal'); // This is included statically by Ctools so no performance risk of multiple loading.
+    drupal_add_js([
+      'add-to-collection' => [
+        'modalClass' => 'add-to-collection',
+        'modalSize' => [
+          'type' => 'fixed',
+          'width' => 250,
+          'height' => 250,
+          'contentRight' => 0,
+          'contentBottom' => 0,
+        ],
+      ],
+    ], 'setting');
+    ctools_modal_add_js(); // This is added statically by Ctools so no performance risk of multiple loading.
+  }
 }
 
 /**
- * Add to Collection ajax callback.
+ * Access callback for the "Add to Collection" node view tab.
  */
-function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
-  if ($ajax) {
-    ctools_include('ajax');
-    ctools_include('modal');
-    $form_state = array(
-      'ajax' => TRUE,
-      'nid_to_add' => $nid_to_add,
-    );
-    // Use ctools to generate ajax instructions for the browser to create
-    // a form in a modal popup.
-    $output = ctools_modal_form_wrapper('ma_collection_add_to_collection_form', $form_state);
-    // If the form has been submitted, there may be additional instructions
-    // such as dismissing the modal popup.
-    if (!empty($form_state['ajax_commands'])) {
-      $output = $form_state['ajax_commands'];
+function ma_collection_add_node_to_collection_access($node) {
+  if (user_access('edit own collection content')) {
+    if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
+      return TRUE;
     }
-    // Return the ajax instructions to the browser via ajax_render().
-    print ajax_render($output);
-    drupal_exit();
   }
-  else {
-    // We're assuming JS is enabled, so do nothing if not.
-  }
+}
+
+/**
+ * Helper function to return types of content that can be added to a collection, and the collection entity reference field for that type.
+ *
+ * Currently just DH, but more will be added here later.
+ */
+function ma_collection_get_valid_node_types_for_collection() {
+  return [
+    'field_digital_heritage_items' => 'digital_heritage',
+  ];
 }
