@@ -363,7 +363,7 @@ function ma_digitalheritage_field_default_field_bases() {
         'from_granularity_month' => 0,
         'from_granularity_second' => 0,
         'from_granularity_timezone' => 0,
-        'from_granularity_year' => 0,
+        'from_granularity_year' => 1,
         'to_estimates_day' => 0,
         'to_estimates_hour' => 0,
         'to_estimates_minute' => 0,
