@@ -13,6 +13,7 @@ dependencies[] = features
 dependencies[] = feeds
 dependencies[] = feeds_tamper
 dependencies[] = field_group
+dependencies[] = list
 dependencies[] = ma_base_theme
 dependencies[] = ma_core
 dependencies[] = menu

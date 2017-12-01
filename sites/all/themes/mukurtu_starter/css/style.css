@@ -10615,3 +10615,9 @@ a:hover {
   overflow-x: visible !important;
   overflow-y: visible !important;
 }
+.modal-add-to-collection .modal-header {
+  display: none;
+}
+.modal-add-to-collection .loading-spinner {
+  top: 25px !important;
+}

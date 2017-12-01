@@ -51,17 +51,17 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
     'dh_related_items_teasers' => array(
-      'weight' => '12',
+      'weight' => '13',
       'label' => 'above',
       'format' => 'default',
     ),
     'comments' => array(
-      'weight' => '11',
+      'weight' => '12',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'author' => array(
-      'weight' => '32',
+      'weight' => '33',
       'label' => 'above',
       'format' => 'author_linked',
     ),
@@ -105,11 +105,6 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(
           'classes' => 'clearfix',
         ),
-      ),
-    ),
-    'field_original_date' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
   );
@@ -485,8 +480,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
         7 => 'field_coverage',
         8 => 'field_coverage_description',
         9 => 'field_related_dh_items',
-        10 => 'field_related_dictionary_words',
-        11 => 'field_transcription',
+        10 => 'field_transcription',
+        11 => 'field_related_dictionary_words',
         12 => 'comments',
       ),
       'right' => array(
@@ -524,8 +519,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_coverage' => 'left',
       'field_coverage_description' => 'left',
       'field_related_dh_items' => 'left',
-      'field_related_dictionary_words' => 'left',
       'field_transcription' => 'left',
+      'field_related_dictionary_words' => 'left',
       'comments' => 'left',
       'dh_related_items_teasers' => 'right',
       'field_community_ref' => 'right',
@@ -646,6 +641,7 @@ function ma_digitalheritage_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|digital_heritage|search_result'] = $ds_layout;
 
