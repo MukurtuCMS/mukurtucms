@@ -31,7 +31,7 @@ class backup_migrate_destination_browser_upload extends backup_migrate_destinati
   function __construct() {
     $params = array();
     $params['name'] = "Upload";
-    $params['machine_name'] = 'upload';
+    $params['destination_id'] = 'upload';
     parent::__construct($params);
   }
 
@@ -39,6 +39,7 @@ class backup_migrate_destination_browser_upload extends backup_migrate_destinati
    * File load destination callback.
    */
   function load_file($file_id) {
+    backup_migrate_include('files');
     if ($file = file_save_upload('backup_migrate_restore_upload')) {
       $out = new backup_file(array('filepath' => $file->uri));
       backup_migrate_temp_files_add($file->uri);
@@ -55,13 +56,10 @@ class backup_migrate_destination_browser_upload extends backup_migrate_destinati
  */
 class backup_migrate_destination_browser_download extends backup_migrate_destination_browser {
   var $supported_ops = array('manual backup');
-  // Browser downloads must always be the last destination as they must end the current process when they are done.
-  var $weight = 1000;
-
   function __construct() {
     $params = array();
     $params['name'] = "Download";
-    $params['machine_name'] = 'download';
+    $params['destination_id'] = 'download';
     parent::__construct($params);
   }
 
