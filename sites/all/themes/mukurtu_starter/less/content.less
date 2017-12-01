@@ -1169,10 +1169,17 @@ a.tooltips span {
 
 // Add to Collection modal
 .modal-add-to-collection {
+
+  // The default position is too close to the top of the screen.
+  // top: 200px !important; // This only works in the full node view.
+  // TODO: get the modal to center vertically, or perhaps position where the mouse was clicked.
+
+  // Hide the header. Instead we add a cancel button. Keep the modal smaller.
   .modal-header {
     display: none;
   }
+  // With the hidden header, we need to slightly reposition the spinner.
   .loading-spinner {
     top: 25px !important;
   }
-}
+  }
