@@ -194,6 +194,11 @@ function ma_collection_views_default_views() {
   $handler->display->display_options['filters']['status']['value'] = array(
     1 => '1',
   );
+  /* Filter criterion: Indexed Node: Top-level collection */
+  $handler->display->display_options['filters']['field_collections_parent_coll']['id'] = 'field_collections_parent_coll';
+  $handler->display->display_options['filters']['field_collections_parent_coll']['table'] = 'search_api_index_default_node_index';
+  $handler->display->display_options['filters']['field_collections_parent_coll']['field'] = 'field_collections_parent_coll';
+  $handler->display->display_options['filters']['field_collections_parent_coll']['operator'] = 'empty';
 
   /* Display: All */
   $handler = $view->new_display('panel_pane', 'All', 'all');
