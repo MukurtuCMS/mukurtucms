@@ -9,6 +9,15 @@
  */
 function ma_collection_default_cer() {
   $items = array();
+  $items['node:collection:field_collections_parent_coll*node:collection:field_collections_child_coll'] = entity_import('cer', '{
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:collection:field_collections_parent_coll" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:collection:field_collections_child_coll" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:collection:field_collections_parent_coll*node:collection:field_collections_child_coll",
+    "rdf_mapping" : []
+  }');
   $items['node:collection:field_digital_heritage_items*node:digital_heritage:field_collection'] = entity_import('cer', '{
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },

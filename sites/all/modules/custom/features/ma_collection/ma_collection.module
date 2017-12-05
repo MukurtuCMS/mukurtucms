@@ -214,16 +214,36 @@ function ma_collection_node_update($node, $deleted = NULL) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implementation of hook_form_FORM_ID_alter().
+ *
+ * Collection node form alter.
  */
-function ma_collection_form_alter(&$form, $form_state, $form_id) {
+function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
+  $node = $form['#node'];
 
-  // When deleting a Collection, let the user know on the confirmation message that the DH items will remain
-  if ($form_id == 'node_delete_confirm') {
-    $node = $form['#node'];
-    if ($node->type == 'collection') {
-      $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
-    }
+  // Collections Tree in the collection node form
+
+  //  Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
+  $form['field_collections_parent_coll']['#access'] = FALSE;
+  // If this is a sub-collection, then...
+  if (isset($node->field_collections_parent_coll[LANGUAGE_NONE][0])) {
+    // ...show the top-level collection field, but do not allow editing.
+    $form['field_collections_parent_coll']['#access'] = TRUE;
+    $form['field_collections_parent_coll']['#disabled'] = TRUE;
+    // ...hide the sub-collections field.
+    $form['field_collections_child_coll']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implementation of hook_form_FORM_ID_alter().
+ *
+ * When deleting a Collection, let the user know on the confirmation message that the DH items will remain.
+ */
+function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
+  $node = $form['#node'];
+  if ($node->type == 'collection') {
+    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
   }
 }
 
@@ -496,4 +516,21 @@ function ma_collection_get_valid_node_types_for_collection() {
   return [
     'field_digital_heritage_items' => 'digital_heritage',
   ];
+}
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
+
+  // When editing a collection, allow the current collection as the parent collection on the subcollections filters.
+  // Using an argument in a view filter, we would normally use a contextual filter, but we need to put this in a filter
+  // group to also allow collections with no parents, thus we need to use a regular filter, so we sub the argument here.
+  if ($view->name == 'child_collections_entity_reference') {
+    $filters = $view->display_handler->get_option('filters');
+    if (is_numeric(arg(1))) {
+      $filters['field_collections_parent_coll_target_id']['value']['value']=arg(1);
+      $view->display_handler->override_option('filters', $filters);
+    }
+  }
 }
