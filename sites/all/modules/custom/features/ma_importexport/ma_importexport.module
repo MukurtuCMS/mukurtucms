@@ -234,8 +234,25 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
 /**
  * Implements hook_feeds_presave().
  */
-function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item) {
-    $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();    
+function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
+    $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
+
+    // Enforce access control on feeds
+    // TODO: get accurate entity type
+    $entity_type = 'node';
+
+    // All Mukurtu supplied importers should have titles/guids
+    $item_id = isset($item['guid']) ? "(GUID: " . $item['guid'] . ")" : "";
+    $item_title = isset($item['title']) ? $item['title'] : "";
+
+    // If there's an existing ID, check if the user can update that entity.
+    // If the ID is NULL, we are creating a new entity, check creation permission.
+    $action = $entity_id ? 'update' : 'create';
+    if(!entity_access($action, $entity_type, $entity)) {
+        // User does not have sufficient permissions, show warning and skip that item
+        drupal_set_message(t('Access denied: importing item %title %guid', array('%title' => $item_title, '%guid' => $item_id)), 'error');
+        $entity->feeds_item->skip = TRUE;
+    }
 
   // Custom handling of Youtube and Vimeo URLs
   // This code is adapted from _ma_services_create_atom, which itself is adapted from scald provider code as commented there
