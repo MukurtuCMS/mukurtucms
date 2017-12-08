@@ -233,6 +233,22 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
     // ...hide the sub-collections field.
     $form['field_collections_child_coll']['#access'] = FALSE;
   }
+
+  // Creating a new Collection
+  if (!isset($node->nid)) {
+
+    // Prepopulate any "Add To Collection" nodes in the entity refs.
+    $query = drupal_get_query_parameters();
+    if (isset($query['add'])) {
+      $add = explode('-', $query['add']);
+      $entity_ref_field = array_search($add[0], ma_collection_get_valid_node_types_for_collection());
+      if (isset($entity_ref_field) && is_numeric($add[1])) {
+        $node_to_add = node_load($add[1]);
+        $form[$entity_ref_field][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
+      }
+    }
+
+  }
 }
 
 /**
@@ -392,6 +408,11 @@ function ma_collection_add_to_collection_form($form, $form_state) {
 
   $nid_to_add = $form_state['nid_to_add'];
 
+  // First option is to create a new collection.
+  $colls = [
+    'create_new_collection' => 'Create a new Collection'
+  ];
+
   // Build an array of collections.
 
   // First get collections that already have this node in it, so we can exclude them later.
@@ -416,7 +437,6 @@ function ma_collection_add_to_collection_form($form, $form_state) {
   $result = $query->execute();
   if (isset($result['node'])) {
     $coll_nids = array_keys($result['node']);
-    $colls = [];
     foreach ($coll_nids as $coll_nid) {
       if (in_array($coll_nid, $colls_to_exclude)) {
         continue;
@@ -429,26 +449,22 @@ function ma_collection_add_to_collection_form($form, $form_state) {
 
     // Build the form.
 
-    if (count($colls)) {
-      $form['collection'] = [
-        '#title' => t('Add Item to Collection'),
-        '#type' => 'select',
-        '#options' => $colls,
-        '#chosen' => TRUE,
-        // '#attributes' => array('onchange' => 'this.form.submit();'), // does not work in this context, so we need the submit button.
-      ];
-      $form['actions']['submit'] = [
+    $form['collection'] = [
+      '#title' => t('Add Item to Collection'),
+      '#type' => 'select',
+      '#options' => $colls,
+      '#chosen' => TRUE,
+      // '#attributes' => array('onchange' => 'this.form.submit();'), // does not work in this context, so we need the submit button.
+    ];
+    $form['actions'] = [
+      'submit' => [
         '#type' => 'submit',
         '#value' => t('Add'),
-      ];
-    }
-    else {
-      $form['#prefix'] = '<p>There are no Collections that you can add this item to.</p>';
-    }
-    $form['actions']['#type']['actions'] = 'submit';
-    $form['actions']['cancel'] = [
-      '#type' => 'submit',
-      '#value' => t('Cancel'),
+      ],
+      'cancel' => [
+        '#type' => 'submit',
+        '#value' => t('Cancel'),
+      ],
     ];
   }
   return $form;
@@ -469,27 +485,45 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
 
   $coll_nid = $form_state['values']['collection'];
   if ($coll_nid) {
-    $coll_node = node_load($coll_nid);
-    if (node_access('update', $coll_node)) {
 
-      $nid_to_add = $form_state['nid_to_add'];
-      $node_to_add = node_load ($nid_to_add);
+    $nid_to_add = $form_state['nid_to_add'];
+    $node_to_add = node_load ($nid_to_add);
 
-      // Display confirmation once submitted.
-      if ( $form_state['submitted']) {
-        $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.</p>';
+    if ($entity_ref_field = array_search($node_to_add->type, ma_collection_get_valid_node_types_for_collection())) {
 
-        $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
-        $ctools_output[] = ctools_modal_command_display('Success', $output );
-        print ajax_render($ctools_output);
+      // Create a new Collection
+      if ($coll_nid == 'create_new_collection') {
+        ctools_include('ajax');
+        ctools_add_js('ajax-responder');
+        $query = [];
+        $query['add'] = $node_to_add->type . '-' . $nid_to_add;
+        $referer = parse_url($_SERVER['HTTP_REFERER']); // Using referring page because current path is ajax callback.
+        if (isset($referer['path'])) {
+          $query['destination'] = substr($referer['path'], 1);
+        }
+        $commands[] = ctools_ajax_command_redirect('node/add/collection', 0, ['query' => $query]);
+        print ajax_render($commands);
         exit;
       }
 
-      // Add the item to the Collection node.
-      $cw = entity_metadata_wrapper('node', $coll_node);
-      $entity_ref_field = array_search($node_to_add->type, ma_collection_get_valid_node_types_for_collection());
-      $cw->{$entity_ref_field}[] = $nid_to_add;
-      $cw->save(); // comment this line while debugging.
+      // Add to existing Collection
+      $coll_node = node_load($coll_nid);
+      if (node_access('update', $coll_node)) {
+
+        // Add the item to the Collection node.
+        $cw = entity_metadata_wrapper('node', $coll_node);
+        $cw->{$entity_ref_field}[] = $nid_to_add;
+        $cw->save(); // comment this line while debugging.
+
+        // Display confirmation message.
+        // EntityDrupalWrapper::save throws an exception if it fails, so if we get here, we know it worked.
+        $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.</p>';
+        $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
+        $ctools_output[] = ctools_modal_command_display('Success', $output);
+        print ajax_render($ctools_output);
+        exit;
+
+      }
     }
   }
 }
