@@ -1182,4 +1182,40 @@ a.tooltips span {
   .loading-spinner {
     top: 25px !important;
   }
+}
+
+// Collections tree. Based on http://odyniec.net/articles/turning-lists-into-trees/.
+
+.collections-tree {
+
+  ul {
+    background: url(../collection_tree/vline.png) repeat-y;
+    margin-left: 10px;
+    padding: 0;
   }
+  li {
+    padding: 0 12px;
+    line-height: 20px;
+    background: url(../collection_tree/node.png) no-repeat;
+    list-style-type: none;
+  }
+  li.last {
+    background: #fff url(../collection_tree/lastnode.png) no-repeat;
+  }
+  .parent {
+    background: none !important;
+  }
+  .current {
+    font-weight: bold;
+  }
+}
+.class-collections-tree-popup {
+  ul.collections-tree {
+    padding: 0;
+    margin: 0;
+  }
+  a {
+    color: #337ab7 !important;
+    text-decoration: none !important;
+  }
+}

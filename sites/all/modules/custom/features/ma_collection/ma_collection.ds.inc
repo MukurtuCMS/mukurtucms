@@ -17,6 +17,11 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'collection';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'collections_tree' => array(
+      'weight' => '6',
+      'label' => 'above',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -36,11 +41,6 @@ function ma_collection_ds_field_settings_info() {
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
-    ),
-    'field_collection_image' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
     ),
   );
   $export['node|collection|search_result'] = $ds_fieldsetting;
@@ -65,12 +65,30 @@ function ma_collection_ds_custom_fields_info() {
   $ds_field->ui_limit = 'collection|search_result';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<?php print ma_collection_collections_title_with_count ($entity); ?>',
+      'value' => '<?php print ma_collection_collections_title_with_count_and_tree_popup ($entity); ?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,
   );
   $export['collections_title_with_count'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'collections_tree';
+  $ds_field->label = 'Collections Tree';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php return ma_collection_collections_tree($entity); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['collections_tree'] = $ds_field;
 
   return $export;
 }
@@ -97,6 +115,7 @@ function ma_collection_ds_layout_settings_info() {
         3 => 'field_description',
         4 => 'field_collection_credit',
         5 => 'field_digital_heritage_items',
+        6 => 'collections_tree',
       ),
     ),
     'fields' => array(
@@ -106,6 +125,7 @@ function ma_collection_ds_layout_settings_info() {
       'field_description' => 'ds_content',
       'field_collection_credit' => 'ds_content',
       'field_digital_heritage_items' => 'ds_content',
+      'collections_tree' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -201,16 +221,16 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'field_collection_image',
-        1 => 'collections_title_with_count',
+        0 => 'collections_title_with_count',
+        1 => 'field_collection_image',
         2 => 'group_list_view_fields',
         3 => 'field_collection_summary',
         4 => 'field_collection_credit',
       ),
     ),
     'fields' => array(
-      'field_collection_image' => 'ds_content',
       'collections_title_with_count' => 'ds_content',
+      'field_collection_image' => 'ds_content',
       'group_list_view_fields' => 'ds_content',
       'field_collection_summary' => 'ds_content',
       'field_collection_credit' => 'ds_content',
@@ -228,6 +248,7 @@ function ma_collection_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|collection|search_result'] = $ds_layout;
 
