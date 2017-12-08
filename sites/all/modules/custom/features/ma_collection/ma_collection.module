@@ -475,21 +475,20 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
       $nid_to_add = $form_state['nid_to_add'];
       $node_to_add = node_load ($nid_to_add);
 
-      // Display confirmation once submitted.
-      if ( $form_state['submitted']) {
-        $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.</p>';
-
-        $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
-        $ctools_output[] = ctools_modal_command_display('Success', $output );
-        print ajax_render($ctools_output);
-        exit;
-      }
-
       // Add the item to the Collection node.
       $cw = entity_metadata_wrapper('node', $coll_node);
       $entity_ref_field = array_search($node_to_add->type, ma_collection_get_valid_node_types_for_collection());
       $cw->{$entity_ref_field}[] = $nid_to_add;
       $cw->save(); // comment this line while debugging.
+
+      // Display confirmation message.
+      // EntityDrupalWrapper::save throws an exception if it fails, so if we get here, we know it worked.
+      $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.</p>';
+      $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
+      $ctools_output[] = ctools_modal_command_display('Success', $output );
+      print ajax_render($ctools_output);
+      exit;
+
     }
   }
 }
