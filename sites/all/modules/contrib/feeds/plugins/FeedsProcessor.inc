@@ -723,6 +723,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
         $target_name = $mapping['target'];
       }
 
+      if(!isset($result->input_fields) || in_array(strtolower($mapping['source']), $result->input_fields)) {
       // If the target is a field empty the value for the targeted language
       // only.
       // In all other cases, just empty the target completely.
@@ -734,6 +735,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
         // Empty the whole target.
         $target_item->{$target_name} = NULL;
       }
+    }
     }
 
     // This is where the actual mapping happens: For every mapping we invoke
