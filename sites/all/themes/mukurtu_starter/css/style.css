@@ -10621,3 +10621,31 @@ a:hover {
 .modal-add-to-collection .loading-spinner {
   top: 25px !important;
 }
+.collections-tree ul {
+  background: url(../collection_tree/vline.png) repeat-y;
+  margin-left: 10px;
+  padding: 0;
+}
+.collections-tree li {
+  padding: 0 12px;
+  line-height: 20px;
+  background: url(../collection_tree/node.png) no-repeat;
+  list-style-type: none;
+}
+.collections-tree li.last {
+  background: #fff url(../collection_tree/lastnode.png) no-repeat;
+}
+.collections-tree .parent {
+  background: none !important;
+}
+.collections-tree .current {
+  font-weight: bold;
+}
+.class-collections-tree-popup ul.collections-tree {
+  padding: 0;
+  margin: 0;
+}
+.class-collections-tree-popup a {
+  color: #337ab7 !important;
+  text-decoration: none !important;
+}

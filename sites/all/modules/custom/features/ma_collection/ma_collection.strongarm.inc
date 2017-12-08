@@ -108,13 +108,13 @@ function ma_collection_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '1',
+          'weight' => '3',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '3',
+          'weight' => '4',
         ),
       ),
       'display' => array(),

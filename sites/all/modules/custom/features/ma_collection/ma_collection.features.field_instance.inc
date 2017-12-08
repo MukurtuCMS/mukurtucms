@@ -93,7 +93,7 @@ function ma_collection_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -152,7 +152,7 @@ function ma_collection_field_default_field_instances() {
         'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -203,7 +203,120 @@ function ma_collection_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-collection-field_collections_child_coll'.
+  $field_instances['node-collection-field_collections_child_coll'] = array(
+    'bundle' => 'collection',
+    'default_value' => array(),
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '<p>Collections added here become <i>sub-collections</i>. Collections with sub-collections in them are called <i>top-level collections</i>. You may add here any collection that is not already a sub-collection of a different top-level collection, or is itself a top-level collection.</p>
+
+<p>Sub-collections can be nested by using the arrows button to drag it to the right. They can be nested multiple levels, creating a <i>collections tree</i>. The arrows button can be used to move the sub-collection to anywhere in the tree.</p>
+
+
+',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_collections_child_coll',
+    'label' => 'Sub-collections',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'apply_chosen' => '',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+        'treeable' => 1,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 9,
+    ),
+  );
+
+  // Exported field_instance: 'node-collection-field_collections_parent_coll'.
+  $field_instances['node-collection-field_collections_parent_coll'] = array(
+    'bundle' => 'collection',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'This collection is a sub-collection of the top-level collection shown here. To remove this sub-collection from the top-level collection, or to move its position within the collections tree, edit the top-level collection.
+',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_collections_parent_coll',
+    'label' => 'Top-level collection',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 8,
     ),
   );
 
@@ -225,7 +338,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 14,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -256,7 +369,7 @@ function ma_collection_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -271,13 +384,13 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 22,
       ),
       'search_result' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -302,7 +415,7 @@ function ma_collection_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -327,7 +440,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -376,16 +489,15 @@ function ma_collection_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 7,
+        'type' => 'hidden',
+        'weight' => 23,
       ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -415,6 +527,12 @@ function ma_collection_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('<p>Collections added here become <i>sub-collections</i>. Collections with sub-collections in them are called <i>top-level collections</i>. You may add here any collection that is not already a sub-collection of a different top-level collection, or is itself a top-level collection.</p>
+
+<p>Sub-collections can be nested by using the arrows button to drag it to the right. They can be nested multiple levels, creating a <i>collections tree</i>. The arrows button can be used to move the sub-collection to anywhere in the tree.</p>
+
+
+');
   t('Comment');
   t('Credit');
   t('Description');
@@ -422,7 +540,11 @@ function ma_collection_field_default_field_instances() {
   t('Digital Heritage Items');
   t('Image');
   t('Pre-Actions');
+  t('Sub-collections');
   t('Summary');
+  t('This collection is a sub-collection of the top-level collection shown here. To remove this sub-collection from the top-level collection, or to move its position within the collections tree, edit the top-level collection.
+');
+  t('Top-level collection');
   t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 
   return $field_instances;

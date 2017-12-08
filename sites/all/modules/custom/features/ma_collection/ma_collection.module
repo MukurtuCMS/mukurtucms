@@ -214,21 +214,43 @@ function ma_collection_node_update($node, $deleted = NULL) {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implementation of hook_form_FORM_ID_alter().
+ *
+ * Collection node form alter.
  */
-function ma_collection_form_alter(&$form, $form_state, $form_id) {
+function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
+  $node = $form['#node'];
 
-  // When deleting a Collection, let the user know on the confirmation message that the DH items will remain
-  if ($form_id == 'node_delete_confirm') {
-    $node = $form['#node'];
-    if ($node->type == 'collection') {
-      $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
-    }
+  // Collections Tree in the collection node form
+
+  //  Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
+  $form['field_collections_parent_coll']['#access'] = FALSE;
+  // If this is a sub-collection, then...
+  if (isset($node->field_collections_parent_coll[LANGUAGE_NONE][0])) {
+    // ...show the top-level collection field, but do not allow editing.
+    $form['field_collections_parent_coll']['#access'] = TRUE;
+    $form['field_collections_parent_coll']['#disabled'] = TRUE;
+    // ...hide the sub-collections field.
+    $form['field_collections_child_coll']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implementation of hook_form_FORM_ID_alter().
+ *
+ * When deleting a Collection, let the user know on the confirmation message that the DH items will remain.
+ */
+function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
+  $node = $form['#node'];
+  if ($node->type == 'collection') {
+    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
   }
 }
 
 // Rewrite the Collection node title in the Collection search view to show a count of DH items
-function ma_collection_collections_title_with_count ($entity) {
+function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
+
+  // Get the DH count
   $dh_count = 0;
   $coll_wrapper = entity_metadata_wrapper('node', $entity);
   $dhs = $coll_wrapper->field_digital_heritage_items->value();
@@ -244,7 +266,28 @@ function ma_collection_collections_title_with_count ($entity) {
       }
     }
   }
-  return '<h2>' . l ($entity->title . ' (' . $dh_count . ')', 'node/' . $entity->nid) . '</h2>';
+
+  $title = '<h2>' . $entity->title . ' (' . $dh_count . ')</h2>';
+  $path = 'node/' . $entity->nid;
+
+  // Get the collection tree.
+  if ($tree = ma_collection_collections_tree($entity)) {
+    module_load_include('inc', 'popup', 'includes/popup.api');
+    $attributes = [
+      'link' => $path,
+      'origin' => 'top-right',
+      'expand' => 'top-right',
+      // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
+      'width' => '100%',
+      'class' => 'collections-tree-popup',
+    ];
+    $output =  popup_element($title, $tree, $attributes);
+  }
+  // Standalone collections have no tree.
+  else {
+    $output = l($title, $path, ['html' => TRUE]);
+  }
+  return $output;
 }
 
 
@@ -496,4 +539,87 @@ function ma_collection_get_valid_node_types_for_collection() {
   return [
     'field_digital_heritage_items' => 'digital_heritage',
   ];
+}
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
+
+  // When editing a collection, allow the current collection as the parent collection on the subcollections filters.
+  // Using an argument in a view filter, we would normally use a contextual filter, but we need to put this in a filter
+  // group to also allow collections with no parents, thus we need to use a regular filter, so we sub the argument here.
+  if ($view->name == 'child_collections_entity_reference') {
+    $filters = $view->display_handler->get_option('filters');
+    if (is_numeric(arg(1))) {
+      $filters['field_collections_parent_coll_target_id']['value']['value']=arg(1);
+      $view->display_handler->override_option('filters', $filters);
+    }
+  }
+}
+
+/**
+ * Render a collection tree, and the current node's place within that tree.
+ */
+function ma_collection_collections_tree($current, $popup = 0) {
+
+  if (isset($current->field_collections_child_coll[LANGUAGE_NONE])) {
+    $parent = $current;
+  }
+  elseif (isset($current->field_collections_parent_coll[LANGUAGE_NONE])) {
+    $parent = node_load($current->field_collections_parent_coll[LANGUAGE_NONE][0]['target_id']);
+  }
+
+  if (isset($parent)) {
+    $children = $parent->field_collections_child_coll[LANGUAGE_NONE];
+
+    foreach ($children as $child_i => &$child) {
+      $child['id'] = $child_i + 1;
+      $child['parent_delta'] + 1;
+      $child_node = node_load($child['target_id']);
+      if ($current->nid == $child_node->nid) {
+        $child['data'] = '<span class="current";>' . $current->title . '</span>';
+      }
+      else {
+        $child['data'] = l($child_node->title, 'node/' . $child_node->nid);
+      }
+    }
+    // Buid a recursive array out of the flat array.
+    $children_tree = buildTree($children);
+
+    // Put the parent at the top, with the children below.
+    if ($current->nid == $parent->nid) {
+      $parent_data = '<span class="current";>' . $parent->title . '</span>';
+    }
+    else {
+      $parent_data = l($parent->title, 'node/' . $parent->nid);
+    }
+    $items = [[
+      'data' =>  $parent_data,
+      'children' => $children_tree,
+      'class' => ['parent']
+    ]];
+
+    // theme_item_list correctly nests recursive arrays.
+    // The CSS to make the nested list look like a tree is based on http://odyniec.net/articles/turning-lists-into-trees/
+    $output = theme('item_list', array('items' => $items, 'attributes' => array('class' => array('collections-tree'))));
+    return $output;
+
+  }
+}
+
+// Recursive helper function to build a recursive array out of an flat array with parent refs.
+// From https://stackoverflow.com/a/8587437/5128322.
+function buildTree(array $elements, $parentId = 0) {
+  $branch = array();
+  foreach ($elements as $element) {
+    if ($element['parent_delta'] == $parentId) {
+      $children = buildTree($elements, $element['id']);
+      if ($children) {
+        $element['children'] = $children;
+      }
+      $branch[] = $element;
+    }
+  }
+  return $branch;
 }

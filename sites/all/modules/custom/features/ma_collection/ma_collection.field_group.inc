@@ -45,6 +45,35 @@ function ma_collection_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_collections_related|node|collection|form';
+  $field_group->group_name = 'group_collections_related';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'collection';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Collections Tree',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_collections_child_coll',
+      1 => 'field_collections_parent_coll',
+    ),
+    'format_type' => 'htab',
+    'format_settings' => array(
+      'label' => 'Collections Tree',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-collections-related field-group-htab',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_collections_related|node|collection|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_digital_heritage_items|node|collection|form';
   $field_group->group_name = 'group_digital_heritage_items';
   $field_group->entity_type = 'node';
@@ -119,6 +148,7 @@ function ma_collection_field_group_info() {
     'children' => array(
       0 => 'group_basic',
       1 => 'group_digital_heritage_items',
+      2 => 'group_collections_related',
     ),
     'format_type' => 'htabs',
     'format_settings' => array(
@@ -133,6 +163,7 @@ function ma_collection_field_group_info() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Basic');
+  t('Collections Tree');
   t('Digital Heritage Items');
   t('List View Fields');
   t('Tabs');

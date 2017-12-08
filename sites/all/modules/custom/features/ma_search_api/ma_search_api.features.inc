@@ -251,6 +251,8 @@ function ma_search_api_default_search_api_index() {
         "field_collection" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_collection_credit" : { "type" : "text" },
         "field_collection_summary" : { "type" : "text" },
+        "field_collections_child_coll" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_collections_parent_coll" : { "type" : "integer", "entity_type" : "node" },
         "field_community_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_contributor:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_coverage:geo_type" : { "type" : "string" },
@@ -783,6 +785,18 @@ function ma_search_api_default_search_api_server() {
           "dh_original_year" : {
             "table" : "search_api_db_default_node_index",
             "column" : "dh_original_year",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_collections_child_coll" : {
+            "table" : "search_api_db_default_node_index_field_collections_child_coll",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_collections_parent_coll" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_collections_parent_coll",
             "type" : "integer",
             "boost" : "1.0"
           }
