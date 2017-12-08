@@ -445,7 +445,6 @@ function ma_collection_add_to_collection_form($form, $form_state) {
     else {
       $form['#prefix'] = '<p>There are no Collections that you can add this item to.</p>';
     }
-    $form['actions']['#type']['actions'] = 'submit';
     $form['actions']['cancel'] = [
       '#type' => 'submit',
       '#value' => t('Cancel'),
