@@ -15,14 +15,22 @@ class FeedsParserResult extends FeedsResult {
   public $items;
   public $current_item;
 
+  // Mukurtu specific change. We want to keep track of which
+  // fields were actually provided in the input. We'll use
+  // this information in the processor later to allow
+  // partial update of content (leaving unspecified fields
+  // intact for existing entities).
+  public $input_fields;
+
   /**
    * Constructor.
    */
-  public function __construct($items = array()) {
+  public function __construct($items = array(), $nid = NULL, $input_fields = array()) {
     $this->title = '';
     $this->description = '';
     $this->link = '';
     $this->items = $items;
+    $this->input_fields = $input_fields;
   }
 
   /**
