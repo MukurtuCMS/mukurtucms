@@ -2694,7 +2694,7 @@ function ma_digitalheritage_field_default_field_instances() {
             'txt_short' => 'Short description of date',
           ),
         ),
-        'hide_remove' => 0,
+        'hide_remove' => 1,
         'increments' => array(
           'minute' => 1,
           'second' => 1,

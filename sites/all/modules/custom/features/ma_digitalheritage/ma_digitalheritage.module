@@ -619,7 +619,10 @@ function ma_digitalheritage_add_book_page ($node) {
  */
 function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form_state) {
 
-  // Always hide these fields
+  // Add an after build callback to tweak elements that aren't available here yet
+  $form['#after_build'][] = 'ma_digitalheritage_dh_form_after_build';
+
+  // Prevent editing book parent
   $form['field_book_parent']['#access'] = FALSE;
 
   // Grab Community Record parent on node edit and set page title
@@ -722,6 +725,19 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 
   }
 
+}
+
+/**
+ * After-build changes to the DH node form.
+ */
+function ma_digitalheritage_dh_form_after_build($form, &$form_state) {
+
+  // Do some cleanup of the Original Date field
+  unset($form['field_original_date'][LANGUAGE_NONE][0]['_separator']);
+  $form['field_original_date']['und'][0]['from']['month']['#options'][''] = ''; // hide the "N/A"
+  $form['field_original_date']['und'][0]['from']['day']['#options'][''] = ''; // hide the "N/A"
+
+  return $form;
 }
 
 /**
