@@ -9784,6 +9784,10 @@ table .checkbox input[type="checkbox"] {
   margin-top: 50px;
   padding: 0;
 }
+.node-type-digital-heritage #field-original-date-add-more-wrapper .form-group,
+.page-node-add-digital-heritage #field-original-date-add-more-wrapper .form-group {
+  margin-bottom: 0;
+}
 .node-type-community #edit-group-access,
 .page-node-add-community #edit-group-access {
   display: none;
