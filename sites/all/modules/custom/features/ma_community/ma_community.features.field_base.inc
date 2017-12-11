@@ -43,6 +43,47 @@ function ma_community_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
+      'treeable' => FALSE,
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
+  );
+
+  // Exported field_base: 'field_community_featured_colls'.
+  $field_bases['field_community_featured_colls'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_community_featured_colls',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'duplicates' => 1,
+      'handler' => 'base',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'target_bundles' => array(
+          'collection' => 'collection',
+        ),
+      ),
+      'target_type' => 'node',
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -62,7 +103,9 @@ function ma_community_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );
@@ -81,7 +124,9 @@ function ma_community_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );
@@ -107,6 +152,7 @@ function ma_community_field_default_field_bases() {
         'managers' => 'Display only community managers/protocol stewards',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -145,6 +191,7 @@ function ma_community_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
