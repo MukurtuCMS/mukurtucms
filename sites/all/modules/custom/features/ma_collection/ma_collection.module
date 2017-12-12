@@ -223,7 +223,7 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
 
   // Collections Tree in the collection node form
 
-  //  Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
+  // Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
   $form['field_collections_parent_coll']['#access'] = FALSE;
   // If this is a sub-collection, then...
   if (isset($node->field_collections_parent_coll[LANGUAGE_NONE][0])) {
@@ -259,7 +259,7 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
 function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
   $node = $form['#node'];
   if ($node->type == 'collection') {
-    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
+    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the items within the Collection.</p>";
   }
 }
 
