@@ -633,7 +633,9 @@ function ma_collection_collections_tree($current) {
 
     foreach ($children as $child_i => &$child) {
       $child['id'] = $child_i + 1;
-      $child['parent_delta'] + 1;
+      if (isset($child['parent_delta'])) {
+        $child['parent_delta']++;
+      }
       $child_node = node_load($child['target_id']);
       if ($current->nid == $child_node->nid) {
         $child['data'] = '<span class="current";>' . $current->title . '</span>';
