@@ -214,6 +214,25 @@ function ma_collection_node_update($node, $deleted = NULL) {
 }
 
 /**
+ * Implements hook_node_access().
+ */
+function ma_collection_node_access($node, $op, $account) {
+
+  $type = is_string($node) ? $node : $node->type;
+
+  // Prevent deleting collections with sub-collections.
+  // Note, this permission check is bypassed for admin user 1, so we also hide the delete button manually in the node form (if has subcollections).
+  if ($type == 'collection') {
+    if ($op == 'delete') {
+      if (ma_collection_check_for_subcollections($node)) {
+        return NODE_ACCESS_DENY;
+      }
+    }
+  }
+
+}
+
+/**
  * Implementation of hook_form_FORM_ID_alter().
  *
  * Collection node form alter.
@@ -223,7 +242,7 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
 
   // Collections Tree in the collection node form
 
-  //  Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
+  // Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
   $form['field_collections_parent_coll']['#access'] = FALSE;
   // If this is a sub-collection, then...
   if (isset($node->field_collections_parent_coll[LANGUAGE_NONE][0])) {
@@ -233,6 +252,11 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
     // ...hide the sub-collections field.
     $form['field_collections_child_coll']['#access'] = FALSE;
   }
+
+  // Hide the delete button if the collection has sub-collections.
+  // This is for the benefit of admin user 1, as the check is also done in ma_collection_node_access,
+  // which will, in addition to actually preventing deletion, will hide the button, but admin 1 bypasses this check.
+  $form['actions']['delete']['#access'] = !ma_collection_check_for_subcollections($node);
 
   // Creating a new Collection
   if (!isset($node->nid)) {
@@ -259,7 +283,7 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
 function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
   $node = $form['#node'];
   if ($node->type == 'collection') {
-    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the Digital Heritage items within the Collection.</p>";
+    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the items within the Collection.</p>";
   }
 }
 
@@ -595,7 +619,7 @@ function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
 /**
  * Render a collection tree, and the current node's place within that tree.
  */
-function ma_collection_collections_tree($current, $popup = 0) {
+function ma_collection_collections_tree($current) {
 
   if (isset($current->field_collections_child_coll[LANGUAGE_NONE])) {
     $parent = $current;
@@ -618,7 +642,7 @@ function ma_collection_collections_tree($current, $popup = 0) {
         $child['data'] = l($child_node->title, 'node/' . $child_node->nid);
       }
     }
-    // Buid a recursive array out of the flat array.
+    // Build a recursive array out of the flat array.
     $children_tree = buildTree($children);
 
     // Put the parent at the top, with the children below.
@@ -656,4 +680,45 @@ function buildTree(array $elements, $parentId = 0) {
     }
   }
   return $branch;
+}
+
+/**
+ * Recursive helper function to get ancestors (not descendants) of a sub-collection.
+ * Does not get the top-level parent. That needs to be appended to the array separately at the end.
+ */
+function ma_collection_get_subcollection_ancestors ($children, $title_components, $coll) {
+  $node = node_load($coll['target_id']);
+  $title_components[] = $node->title;
+  if (isset($children[$coll['parent_delta']])) {
+    $title_components = ma_collection_get_subcollection_ancestors($children, $title_components, $children[$coll['parent_delta']]);
+  }
+  return $title_components;
+}
+
+/**
+ * Check if a collection has sub-collections.
+ */
+function ma_collection_check_for_subcollections($current) {
+  if (isset($current->field_collections_child_coll[LANGUAGE_NONE])) {
+    return TRUE; // collection is top-level collection.
+  }
+  if (isset($current->field_collections_parent_coll[LANGUAGE_NONE])) {
+    $parent = node_load($current->field_collections_parent_coll[LANGUAGE_NONE][0]['target_id']);
+    $children = $parent->field_collections_child_coll[LANGUAGE_NONE];
+    foreach ($children as $coll_delta => $coll) {
+      if ($coll['target_id'] == $current->nid) {
+        $current_delta = $coll_delta;
+        break;
+      }
+    }
+    if (isset($current_delta)) {
+      foreach ($children as $coll) {
+        if ($coll['parent_delta'] == $coll_delta) {
+          if ($current_delta == $coll_delta) {
+            return TRUE; // collection is a sub-collection with sub-collections below it.
+          }
+        }
+      }
+    }
+  }
 }
