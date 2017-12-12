@@ -595,7 +595,7 @@ function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
 /**
  * Render a collection tree, and the current node's place within that tree.
  */
-function ma_collection_collections_tree($current, $popup = 0) {
+function ma_collection_collections_tree($current) {
 
   if (isset($current->field_collections_child_coll[LANGUAGE_NONE])) {
     $parent = $current;
@@ -618,7 +618,7 @@ function ma_collection_collections_tree($current, $popup = 0) {
         $child['data'] = l($child_node->title, 'node/' . $child_node->nid);
       }
     }
-    // Buid a recursive array out of the flat array.
+    // Build a recursive array out of the flat array.
     $children_tree = buildTree($children);
 
     // Put the parent at the top, with the children below.
