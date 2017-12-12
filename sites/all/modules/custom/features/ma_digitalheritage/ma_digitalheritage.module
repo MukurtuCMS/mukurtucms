@@ -629,21 +629,15 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
       if (isset($current->field_collections_parent_coll[LANGUAGE_NONE])) {
         $parent = node_load($current->field_collections_parent_coll[LANGUAGE_NONE][0]['target_id']);
         $title_components = [];
-        $title_components[] = $parent->title;
         $children = $parent->field_collections_child_coll[LANGUAGE_NONE];
-        foreach ($children as $child_i => &$child) {
-          $child['id'] = $child_i + 1;
-          $child['parent_delta'] + 1;
-        }
-        $children_tree = buildTree($children);
-        foreach ($children_tree as $child) {
-          $child_node = node_load($child['target_id']);
-          $title_components[] = $child_node->title;
-          if ($child['target_id'] == $coll_nid) { // only show ancestors, not descendants
+        foreach ($children as $coll) {
+          if ($coll['target_id'] == $coll_nid) {
+            $title_components = ma_collection_get_subcollection_ancestors($children, $title_components, $coll);
+            $title_components[] = $parent->title;
+            $coll_title = implode(' ➞ ', $title_components);
             break;
           }
         }
-        $coll_title = implode(' ➞ ', array_reverse($title_components));
       }
     }
   }

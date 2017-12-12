@@ -657,3 +657,16 @@ function buildTree(array $elements, $parentId = 0) {
   }
   return $branch;
 }
+
+/**
+ * Recursive helper function to get ancestors (not descendants) of a sub-collection.
+ * Does not get the top-level parent. That needs to be appended to the array separately at the end.
+ */
+function ma_collection_get_subcollection_ancestors ($children, $title_components, $coll) {
+  $node = node_load($coll['target_id']);
+  $title_components[] = $node->title;
+  if (isset($children[$coll['parent_delta']])) {
+    $title_components = ma_collection_get_subcollection_ancestors($children, $title_components, $children[$coll['parent_delta']]);
+  }
+  return $title_components;
+}
