@@ -214,6 +214,25 @@ function ma_collection_node_update($node, $deleted = NULL) {
 }
 
 /**
+ * Implements hook_node_access().
+ */
+function ma_collection_node_access($node, $op, $account) {
+
+  $type = is_string($node) ? $node : $node->type;
+
+  // Prevent deleting collections with sub-collections.
+  // Note, this permission check is bypassed for admin user 1, so we also hide the delete button manually in the node form (if has subcollections).
+  if ($type == 'collection') {
+    if ($op == 'delete') {
+      if (ma_collection_check_for_subcollections($node)) {
+        return NODE_ACCESS_DENY;
+      }
+    }
+  }
+
+}
+
+/**
  * Implementation of hook_form_FORM_ID_alter().
  *
  * Collection node form alter.
@@ -233,6 +252,11 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
     // ...hide the sub-collections field.
     $form['field_collections_child_coll']['#access'] = FALSE;
   }
+
+  // Hide the delete button if the collection has sub-collections.
+  // This is for the benefit of admin user 1, as the check is also done in ma_collection_node_access,
+  // which will, in addition to actually preventing deletion, will hide the button, but admin 1 bypasses this check.
+  $form['actions']['delete']['#access'] = !ma_collection_check_for_subcollections($node);
 
   // Creating a new Collection
   if (!isset($node->nid)) {
@@ -669,4 +693,32 @@ function ma_collection_get_subcollection_ancestors ($children, $title_components
     $title_components = ma_collection_get_subcollection_ancestors($children, $title_components, $children[$coll['parent_delta']]);
   }
   return $title_components;
+}
+
+/**
+ * Check if a collection has sub-collections.
+ */
+function ma_collection_check_for_subcollections($current) {
+  if (isset($current->field_collections_child_coll[LANGUAGE_NONE])) {
+    return TRUE; // collection is top-level collection.
+  }
+  if (isset($current->field_collections_parent_coll[LANGUAGE_NONE])) {
+    $parent = node_load($current->field_collections_parent_coll[LANGUAGE_NONE][0]['target_id']);
+    $children = $parent->field_collections_child_coll[LANGUAGE_NONE];
+    foreach ($children as $coll_delta => $coll) {
+      if ($coll['target_id'] == $current->nid) {
+        $current_delta = $coll_delta;
+        break;
+      }
+    }
+    if (isset($current_delta)) {
+      foreach ($children as $coll) {
+        if ($coll['parent_delta'] == $coll_delta) {
+          if ($current_delta == $coll_delta) {
+            return TRUE; // collection is a sub-collection with sub-collections below it.
+          }
+        }
+      }
+    }
+  }
 }
