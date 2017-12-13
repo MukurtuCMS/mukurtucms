@@ -102,7 +102,9 @@ function ma_collection_field_default_field_bases() {
           ),
         ),
         'view' => array(
-          'args' => array(),
+          'args' => array(
+            0 => '[node:nid]',
+          ),
           'display_name' => 'entityreference_1',
           'view_name' => 'child_collections_entity_reference',
         ),
