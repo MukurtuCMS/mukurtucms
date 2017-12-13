@@ -604,9 +604,10 @@ function ma_collection_get_valid_node_types_for_collection() {
  */
 function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
 
-  // When editing a collection, allow the current collection as the parent collection on the subcollections filters.
-  // Using an argument in a view filter, we would normally use a contextual filter, but we need to put this in a filter
-  // group to also allow collections with no parents, thus we need to use a regular filter, so we sub the argument here.
+  // In the subcollections field of a collection, when editing the collection,
+  // allow subcollections where the parent is the current collection.
+  // The filter is already set in the view as part of a filter group (which is why it can't be a contextual filter).
+  // Here we are simply replacing the filter value with the $arg[0] which is the current collection NID, when editing.
   if ($view->name == 'child_collections_entity_reference') {
     $filters = $view->display_handler->get_option('filters');
     if (is_numeric(arg(1))) {
