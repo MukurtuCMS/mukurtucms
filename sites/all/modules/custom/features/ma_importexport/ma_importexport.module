@@ -235,6 +235,7 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
+    global $user;
     $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
 
     // Enforce access control on feeds
@@ -248,6 +249,14 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
     // If there's an existing ID, check if the user can update that entity.
     // If the ID is NULL, we are creating a new entity, check creation permission.
     $action = $entity_id ? 'update' : 'create';
+
+    // If this is existing node content, put the nid back in.
+    // Not doing this will cause the upcoming entity_access call to fail.
+    if(isset($entity_id) && $entity_type == 'node') {
+        $entity->nid = $entity_id;
+    }
+
+    // Check user's access to perform the action
     if(!entity_access($action, $entity_type, $entity)) {
         // User does not have sufficient permissions, show warning and skip that item
         drupal_set_message(t('Access denied: importing item %title %guid', array('%title' => $item_title, '%guid' => $item_id)), 'error');
