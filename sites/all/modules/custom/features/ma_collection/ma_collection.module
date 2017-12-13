@@ -315,10 +315,10 @@ function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
     module_load_include('inc', 'popup', 'includes/popup.api');
     $attributes = [
       'link' => $path,
+      'style' => 'Bent white',
       'origin' => 'top-right',
       'expand' => 'top-right',
       // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
-      'width' => '100%',
       'class' => 'collections-tree-popup',
     ];
     $output =  popup_element($title, $tree, $attributes);

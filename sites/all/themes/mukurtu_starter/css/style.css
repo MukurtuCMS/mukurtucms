@@ -10652,3 +10652,9 @@ a:hover {
   color: #337ab7 !important;
   text-decoration: none !important;
 }
+.class-collections-tree-popup td.center {
+  white-space: nowrap;
+}
+.class-collections-tree-popup td.center .inner {
+  width: auto !important;
+}
