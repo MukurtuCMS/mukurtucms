@@ -137,5 +137,6 @@ features[variable][] = pathauto_node_collection_pattern
 features[views_view][] = child_collections_entity_reference
 features[views_view][] = collections_grid_list
 features[views_view][] = dh_nodes_available_to_collection
+features[views_view][] = personal_collections
 features_exclude[field_base][comment_body] = comment_body
 features_exclude[field_instance][node-collection-field_media] = node-collection-field_media

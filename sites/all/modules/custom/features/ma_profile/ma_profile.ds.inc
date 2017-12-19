@@ -17,18 +17,42 @@ function ma_profile_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'user';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'personal_collections' => array(
+      'weight' => '2',
+      'label' => 'above',
+      'format' => 'default',
+    ),
     'ds_user_picture' => array(
-      'weight' => '1',
+      'weight' => '0',
       'label' => 'hidden',
       'format' => 'ds_picture_large',
     ),
-    'og_user_node' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
   );
   $export['user|user|default'] = $ds_fieldsetting;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_profile_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'personal_collections';
+  $ds_field->label = 'Personal Collections';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'user' => 'user',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'block' => 'views|personal_collections-block',
+    'block_render' => '3',
+  );
+  $export['personal_collections'] = $ds_field;
 
   return $export;
 }
@@ -49,15 +73,17 @@ function ma_profile_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'summary',
-        1 => 'ds_user_picture',
-        2 => 'og_user_node',
+        0 => 'ds_user_picture',
+        1 => 'og_user_node',
+        2 => 'personal_collections',
+        3 => 'summary',
       ),
     ),
     'fields' => array(
-      'summary' => 'ds_content',
       'ds_user_picture' => 'ds_content',
       'og_user_node' => 'ds_content',
+      'personal_collections' => 'ds_content',
+      'summary' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -72,6 +98,7 @@ function ma_profile_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['user|user|default'] = $ds_layout;
 
