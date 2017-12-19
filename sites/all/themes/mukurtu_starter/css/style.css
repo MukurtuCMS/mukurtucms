@@ -9762,9 +9762,6 @@ table .checkbox input[type="checkbox"] {
 .mukurtu-collapsed-fieldset-div.collapsed .field-group-format-toggler a {
   background-image: url(../grey-right-arrow.png);
 }
-#edit-field-digital-heritage-items .field-label {
-  display: none;
-}
 #edit-search-api-views-fulltext-wrapper label {
   display: none;
 }

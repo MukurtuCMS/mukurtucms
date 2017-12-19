@@ -32,6 +32,7 @@ function ma_collection_node_view($node, $view_mode) {
 
   // On full node view of node types that can be added to a Collection, load the "Add to Collection" ctools modal JS.
   if ($view_mode == 'full') {
+    // Personal maybe
     if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
       ma_collection_include_add_to_collection_modal_js();
     }
@@ -42,6 +43,7 @@ function ma_collection_node_view($node, $view_mode) {
     if ($view_mode == 'search_result') {
 
       // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use the first available image atom from the Digital Heritage items in that Collection. If none of the DH items have an image atom, use the thumbnail from the first available non-image atom from the DH items in that Collection. If that atom does not have an uploaded thumbnail, use the default thumbnail for that atom type.
+      // This will need some easy refactoring once other items than DH can go into a collection.
 
       if (!count($node->field_collection_image)) {
         $collection_emw = entity_metadata_wrapper('node', $node);
@@ -111,6 +113,18 @@ function ma_collection_node_view($node, $view_mode) {
     }
 
   }
+
+  // Personal Collection
+  if ($node->type == 'personal_collection') {
+
+    // Hide the Privacy field unless you are the author of the Personal Collection (or have edit access to it)
+    // We do not want to show "Public" when a user is viewing another user's Personal Collection, because that is assumed, thus redundant.
+    if (!node_access('update', $node)) {
+      $node->content['field_personal_coll_privacy']['#access'] = FALSE;
+    }
+
+  }
+
 }
 
 /**
@@ -133,6 +147,8 @@ function ma_collection_form_views_exposed_form_alter(&$form, &$form_state) {
 function ma_collection_node_presave($node) {
 
   // Populate the Digital Heritage Count
+  // This will need some easy refactoring once other items than DH can go into a collection.
+  // Personal yes
   if ($node->type == 'collection') {
     $collection_presave_skip = variable_get('collection_presave_skip', array());
     if (array_key_exists($node->nid, $collection_presave_skip)) {
@@ -155,6 +171,7 @@ function ma_collection_node_presave($node) {
  * Implements hook_node_insert().
  */
 function ma_collection_node_insert($node) {
+  // This will need some easy refactoring once other items than DH can go into a collection.
   if ($node->type == 'digital_heritage') {
     ma_collection_node_update($node);
   }
@@ -177,6 +194,8 @@ function ma_collection_node_update($node, $deleted = NULL) {
 
   // Update the Digital Heritage Count on Collection nodes when a DH node adds or removes a Collection reference, or a DH node with a Collection reference is deleted, or a DH node with a Collection reference is cloned
   if ($node->type == 'digital_heritage') {
+    // This will need some easy refactoring once other items than DH can go into a collection.
+    // Personal yes
     $wrapper_new = entity_metadata_wrapper('node', $node);
     $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->field_collection->value());
     $old_refs = array();
@@ -262,6 +281,7 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
   if (!isset($node->nid)) {
 
     // Prepopulate any "Add To Collection" nodes in the entity refs.
+    // Personal maybe
     $query = drupal_get_query_parameters();
     if (isset($query['add'])) {
       $add = explode('-', $query['add']);
@@ -283,6 +303,7 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
 function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
   $node = $form['#node'];
   if ($node->type == 'collection') {
+    // Personal yes
     $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the items within the Collection.</p>";
   }
 }

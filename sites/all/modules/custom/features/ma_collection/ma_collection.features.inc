@@ -77,6 +77,14 @@ function ma_collection_node_info() {
       'title_label' => t('Collection Name'),
       'help' => '',
     ),
+    'personal_collection' => array(
+      'name' => t('Personal Collection'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Personal Collection Name'),
+      'help' => '',
+    ),
   );
   drupal_alter('node_info', $items);
   return $items;
