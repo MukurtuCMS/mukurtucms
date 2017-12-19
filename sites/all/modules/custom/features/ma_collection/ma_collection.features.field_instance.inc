@@ -802,7 +802,7 @@ function ma_collection_field_default_field_instances() {
     'bundle' => 'personal_collection',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Personal Collections are listed on your user profile page. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.',
+    'description' => 'Personal Collections are listed on your <a href=\'/user\'>user profile page</a>. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -900,7 +900,7 @@ function ma_collection_field_default_field_instances() {
   t('Digital Heritage Count');
   t('Digital Heritage Items');
   t('Image');
-  t('Personal Collections are listed on your user profile page. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.');
+  t('Personal Collections are listed on your <a href=\'/user\'>user profile page</a>. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.');
   t('Pre-Actions');
   t('Privacy');
   t('Sub-collections');
