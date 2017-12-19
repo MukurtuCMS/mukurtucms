@@ -746,3 +746,43 @@ function ma_collection_check_for_subcollections($current) {
     }
   }
 }
+
+/**
+ * Implements hook_node_grants().
+ */
+function ma_collection_node_grants($account, $op) {
+  // Implement the Privacy field on Personal Collections.
+  // Uses hook_node_access_records + hook_node_grants as hook_node_access is not respected by Views,
+  // ie. the Personal Collections view on the user profile page.
+  $grants['personal_collection_public'][] = 0; // everyone can see a public Personal Collection
+  $grants['personal_collection_author'][] = array($account->uid); // only the author can see a private Personal Collection
+  return $grants;
+}
+
+/**
+ * Implements hook_node_access_records().
+ */
+function ma_collection_node_access_records($node) {
+  if ($node->type == 'personal_collection') {
+    $grants = array();
+    $grants[] = array(
+      'realm' => 'personal_collection_author',
+      'gid' => $node->uid,
+      'grant_view' => 1,
+      'grant_update' => 0,
+      'grant_delete' => 0,
+      'priority' => 1, // By setting the priority > 0 we override OG's default handling for this DH node
+    );
+    if ($node->field_personal_coll_privacy[LANGUAGE_NONE][0]['value'] == 'public') {
+      $grants[] = [
+        'realm' => 'personal_collection_public',
+        'gid' => 0,
+        'grant_view' => 1,
+        'grant_update' => 0,
+        'grant_delete' => 0,
+        'priority' => 1, // By setting the priority > 0 we override OG's default handling for this DH node
+      ];
+    }
+    return $grants;
+  }
+}
