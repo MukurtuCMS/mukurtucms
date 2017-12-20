@@ -284,7 +284,6 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
   if (!isset($node->nid)) {
 
     // Prepopulate any "Add To Collection" nodes in the entity refs.
-    // Personal maybe
     $query = drupal_get_query_parameters();
     if (isset($query['add'])) {
       $add = explode('-', $query['add']);
@@ -313,27 +312,27 @@ function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
   }
 }
 
-// Rewrite the Collection node title in the Collection search view to show a count of DH items
+// Helper function to rewrite the Collection and Precollection node title to show the item count in parenthesis, plus the Collection Tree if applicable.
 function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
 
-  // Get the DH count
-  $dh_count = 0;
+  // Get the item count
+  $item_count = 0;
   $coll_wrapper = entity_metadata_wrapper('node', $entity);
-  $dhs = $coll_wrapper->field_digital_heritage_items->value();
-  if (count($dhs)) {
+  $items = $coll_wrapper->field_digital_heritage_items->value();
+  if (count($items)) {
     if (user_access('bypass content access control')) {
-      $dh_count = count($dhs);
+      $item_count = count($items);
     }
     else {
-      foreach ($dhs as $dh) {
-        if (node_access('view', $dh)) {
-          $dh_count++;
+      foreach ($items as $item) {
+        if (node_access('view', $item)) {
+          $item_count++;
         }
       }
     }
   }
 
-  $title = '<h2>' . $entity->title . ' (' . $dh_count . ')</h2>';
+  $title = $entity->title . ' (' . $item_count . ')';
   $path = 'node/' . $entity->nid;
 
   // Get the collection tree.

@@ -77,7 +77,7 @@ function ma_collection_ds_custom_fields_info() {
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'collection|search_result';
+  $ds_field->ui_limit = '';
   $ds_field->properties = array(
     'code' => array(
       'value' => '<?php print ma_collection_collections_title_with_count_and_tree_popup ($entity); ?>',
