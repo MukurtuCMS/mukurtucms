@@ -494,6 +494,8 @@ function ma_collection_add_to_collection_form($form, $form_state) {
       if (node_access('update', $coll_node)) { // exclude nodes user does not have permission to edit.
         $colls[$coll_nid] = $coll_node->title;
       }
+      // Edit the options values to show collection ancestors.
+      $colls = ma_collection_add_ancestors_to_collections_titles($colls);
     }
 
     // Build the form.
@@ -590,9 +592,9 @@ function ma_collection_include_add_to_collection_modal_js() {
       'add-to-collection' => [
         'modalClass' => 'add-to-collection',
         'modalSize' => [
-          'type' => 'fixed',
-          'width' => 250,
-          'height' => 250,
+          'type' => 'scale',
+          'width' => .8,
+          'height' => .8,
           'contentRight' => 0,
           'contentBottom' => 0,
         ],
@@ -805,4 +807,29 @@ function ma_collection_node_access_records($node) {
     }
     return $grants;
   }
+}
+
+/**
+ * Given an array of collections, update the collection titles to show ancestors.
+ */
+function ma_collection_add_ancestors_to_collections_titles($collections) {
+  foreach ($collections as $coll_nid => &$coll_title) {
+    if (is_numeric($coll_nid)) {
+      $current = node_load($coll_nid);
+      if (isset($current->field_collections_parent_coll[LANGUAGE_NONE])) {
+        $parent = node_load($current->field_collections_parent_coll[LANGUAGE_NONE][0]['target_id']);
+        $title_components = [];
+        $children = $parent->field_collections_child_coll[LANGUAGE_NONE];
+        foreach ($children as $coll) {
+          if ($coll['target_id'] == $coll_nid) {
+            $title_components = ma_collection_get_subcollection_ancestors($children, $title_components, $coll);
+            $title_components[] = $parent->title;
+            $coll_title = implode(' ➞ ', $title_components);
+            break;
+          }
+        }
+      }
+    }
+  }
+  return $collections;
 }
