@@ -148,8 +148,7 @@ function ma_collection_node_presave($node) {
 
   // Populate the Digital Heritage Count
   // This will need some easy refactoring once other items than DH can go into a collection.
-  // Personal yes
-  if ($node->type == 'collection') {
+  if ($node->type == 'collection' or $node->type == 'personal_collection') {
     $collection_presave_skip = variable_get('collection_presave_skip', array());
     if (array_key_exists($node->nid, $collection_presave_skip)) {
       unset ($collection_presave_skip[$node->nid]);
@@ -192,41 +191,46 @@ function ma_collection_field_attach_delete ($entity_type, $entity) {
  */
 function ma_collection_node_update($node, $deleted = NULL) {
 
-  // Update the Digital Heritage Count on Collection nodes when a DH node adds or removes a Collection reference, or a DH node with a Collection reference is deleted, or a DH node with a Collection reference is cloned
-  if ($node->type == 'digital_heritage') {
-    // This will need some easy refactoring once other items than DH can go into a collection.
-    // Personal yes
-    $wrapper_new = entity_metadata_wrapper('node', $node);
-    $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->field_collection->value());
-    $old_refs = array();
-    if (!$deleted AND isset($node->original)) {
-      $wrapper_old = entity_metadata_wrapper('node', $node->original);
-      $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->field_collection->value());
-    }
-    if ($old_refs <> $new_refs) {
-      $refs_added = array_diff ($new_refs, $old_refs);
-      $refs_deleted = array_diff ($old_refs, $new_refs);
-      $collections_to_recount = array_merge ($refs_added, $refs_deleted);
-      foreach ($collections_to_recount as $collection) {
-        if($collection == NULL) {
-          continue;
-        }
-        $query = new EntityFieldQuery();
-        $result = $query
-          ->entityCondition('entity_type', 'node')
-          ->entityCondition('bundle', 'digital_heritage')
-          ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
-          ->fieldCondition('field_collection', 'target_id', $collection)
-          ->execute();
-        $new_count = count($result['node']);
-        $collection_presave_skip = variable_get('collection_presave_skip', array());
-        $collection_presave_skip[$collection] = $collection;
-        variable_set('collection_presave_skip', $collection_presave_skip);
-        $collection_emw = entity_metadata_wrapper('node', $collection);
-        if($collection_emw) {
-          $collection_emw->field_digital_heritage_count->set($new_count);
-          $collection_emw->save();
-        }
+  // Update the Item Count on Collection and Personal Collection nodes when a node that can be in a Collection / Personal Collection
+  // adds or removes a Collection reference, is deleted, or is cloned.
+  if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
+    ma_collection_update_item_count ($node, 'field_collection', $deleted);
+    ma_collection_update_item_count ($node, 'field_personal_collections', $deleted);
+  }
+}
+
+
+function ma_collection_update_item_count ($node, $source_field_name, $deleted) {
+  $wrapper_new = entity_metadata_wrapper('node', $node);
+  $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$source_field_name}->value());
+  $old_refs = array();
+  if (!$deleted AND isset($node->original)) {
+    $wrapper_old = entity_metadata_wrapper('node', $node->original);
+    $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$source_field_name}->value());
+  }
+  if ($old_refs <> $new_refs) {
+    $refs_added = array_diff ($new_refs, $old_refs);
+    $refs_deleted = array_diff ($old_refs, $new_refs);
+    $collections_to_recount = array_merge ($refs_added, $refs_deleted);
+    foreach ($collections_to_recount as $collection) {
+      if($collection == NULL) {
+        continue;
+      }
+      $query = new EntityFieldQuery();
+      $result = $query
+        ->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', $node->type)
+        ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
+        ->fieldCondition($source_field_name, 'target_id', $collection)
+        ->execute();
+      $new_count = count($result['node']);
+      $collection_presave_skip = variable_get('collection_presave_skip', array());
+      $collection_presave_skip[$collection] = $collection;
+      variable_set('collection_presave_skip', $collection_presave_skip);
+      $collection_emw = entity_metadata_wrapper('node', $collection);
+      if($collection_emw) {
+        $collection_emw->field_digital_heritage_count->set($new_count);
+        $collection_emw->save();
       }
     }
   }
@@ -303,8 +307,10 @@ function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
 function ma_collection_form_node_delete_confirm_alter(&$form, $form_state) {
   $node = $form['#node'];
   if ($node->type == 'collection') {
-    // Personal yes
     $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Collection but not the items within the Collection.</p>";
+  }
+  elseif ($node->type == 'personal_collection') {
+    $form['description']['#markup'] = "<p>This action cannot be undone.</p>This will delete the Personal Collection but not the items within the Collection.</p>";
   }
 }
 

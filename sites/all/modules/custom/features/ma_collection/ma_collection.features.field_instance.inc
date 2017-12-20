@@ -581,7 +581,7 @@ function ma_collection_field_default_field_instances() {
         'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -633,7 +633,7 @@ function ma_collection_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -686,7 +686,7 @@ function ma_collection_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -702,7 +702,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 5,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -733,7 +733,7 @@ function ma_collection_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 5,
+      'weight' => 4,
     ),
   );
 
@@ -833,7 +833,7 @@ function ma_collection_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
