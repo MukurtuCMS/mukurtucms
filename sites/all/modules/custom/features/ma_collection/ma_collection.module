@@ -640,6 +640,22 @@ function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
       $view->display_handler->override_option('filters', $filters);
     }
   }
+
+  if ($view->name == 'personal_collections') {
+
+    // Hide the "Add a Personal Collection" footer unless user is on own profile page.
+    global $user;
+    if (arg(1) <> $user->uid) {
+      $item = array(
+        'id' => 'area',
+        'table' => 'views',
+        'field' => 'area',
+        'content' => '',
+      );
+      $view->set_item($display_id, 'footer', 'area', $item);
+    }
+  }
+  
 }
 
 /**
