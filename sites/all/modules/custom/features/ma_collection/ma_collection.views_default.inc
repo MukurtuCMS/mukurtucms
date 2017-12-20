@@ -360,6 +360,19 @@ function ma_collection_views_default_views() {
   $handler->display->display_options['row_options']['delta_fieldset']['delta_fields'] = array();
   $handler->display->display_options['row_options']['grouping_fieldset']['group_field'] = 'node|created';
   $handler->display->display_options['row_options']['default_fieldset']['view_mode'] = 'teaser';
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['label'] = 'Add a Personal Collection';
+  $handler->display->display_options['footer']['area']['empty'] = TRUE;
+  $handler->display->display_options['footer']['area']['content'] = '<a href="/node/add/personal-collection">+ Add a Personal Collection</a>';
+  $handler->display->display_options['footer']['area']['format'] = 'filtered_html';
+  /* No results behavior: Global: Messages */
+  $handler->display->display_options['empty']['messages']['id'] = 'messages';
+  $handler->display->display_options['empty']['messages']['table'] = 'views';
+  $handler->display->display_options['empty']['messages']['field'] = 'messages';
+  $handler->display->display_options['empty']['messages']['label'] = 'Need this to ensure the footer renders';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -415,6 +428,9 @@ function ma_collection_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('Add a Personal Collection'),
+    t('<a href="/node/add/personal-collection">+ Add a Personal Collection</a>'),
+    t('Need this to ensure the footer renders'),
     t('All'),
     t('Block'),
   );
