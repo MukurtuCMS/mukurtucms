@@ -170,8 +170,7 @@ function ma_collection_node_presave($node) {
  * Implements hook_node_insert().
  */
 function ma_collection_node_insert($node) {
-  // This will need some easy refactoring once other items than DH can go into a collection.
-  if ($node->type == 'digital_heritage') {
+  if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
     ma_collection_node_update($node);
   }
 }
