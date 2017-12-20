@@ -9762,11 +9762,12 @@ table .checkbox input[type="checkbox"] {
 .mukurtu-collapsed-fieldset-div.collapsed .field-group-format-toggler a {
   background-image: url(../grey-right-arrow.png);
 }
-#edit-field-digital-heritage-items .field-label {
-  display: none;
-}
-#edit-search-api-views-fulltext-wrapper label {
-  display: none;
+.view-collections-grid-list .field-name-collections-title-with-count {
+  font-size: 30px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  line-height: 1.1;
+  font-weight: 200;
 }
 .node-type-digital-heritage,
 .page-node-add-digital-heritage {
@@ -10004,6 +10005,9 @@ table .checkbox input[type="checkbox"] {
 }
 a:hover {
   text-decoration: none;
+}
+#edit-search-api-views-fulltext-wrapper label {
+  display: none;
 }
 .view-dictionary-words .field-name-download-atom {
   display: none;

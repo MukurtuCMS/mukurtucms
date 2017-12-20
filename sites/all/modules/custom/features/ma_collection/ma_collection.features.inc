@@ -27,6 +27,15 @@ function ma_collection_default_cer() {
     "identifier" : "node:collection:field_digital_heritage_items*node:digital_heritage:field_collection",
     "rdf_mapping" : []
   }');
+  $items['node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections'] = entity_import('cer', '{
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:personal_collection:field_digital_heritage_items" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_personal_collections" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections",
+    "rdf_mapping" : []
+  }');
   return $items;
 }
 
@@ -75,6 +84,14 @@ function ma_collection_node_info() {
       'description' => t('A collection of digital heritage items.'),
       'has_title' => '1',
       'title_label' => t('Collection Name'),
+      'help' => '',
+    ),
+    'personal_collection' => array(
+      'name' => t('Personal Collection'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Personal Collection Name'),
       'help' => '',
     ),
   );

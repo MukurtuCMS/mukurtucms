@@ -240,7 +240,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 57,
+      'weight' => 58,
     ),
   );
 
@@ -333,7 +333,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 58,
+      'weight' => 59,
     ),
   );
 
@@ -482,10 +482,10 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_collection'.
   $field_instances['node-digital_heritage-field_collection'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => array(),
+    'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A collection is an aggregation of digital heritage items.',
+    'description' => 'A collection is an aggregation of items.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -553,7 +553,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_collection',
-    'label' => 'Collection',
+    'label' => 'Collections',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -568,6 +568,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'treeable' => 0,
       ),
       'type' => 'options_select',
       'weight' => 53,
@@ -664,7 +665,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 56,
+      'weight' => 57,
     ),
   );
 
@@ -2803,6 +2804,93 @@ function ma_digitalheritage_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance:
+  // 'node-digital_heritage-field_personal_collections'.
+  $field_instances['node-digital_heritage-field_personal_collections'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 47,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_personal_collections',
+    'label' => 'Personal Collections',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 54,
+    ),
+  );
+
   // Exported field_instance: 'node-digital_heritage-field_pre_actions'.
   $field_instances['node-digital_heritage-field_pre_actions'] = array(
     'bundle' => 'digital_heritage',
@@ -3080,7 +3168,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 54,
+      'weight' => 55,
     ),
   );
 
@@ -3172,7 +3260,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 55,
+      'weight' => 56,
     ),
   );
 
@@ -4077,7 +4165,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
   t('A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
 ');
-  t('A collection is an aggregation of digital heritage items.');
+  t('A collection is an aggregation of items.');
   t('A reference to one or many related dictionary words.');
   t('A reference to one or many related digital heritage items.');
   t('An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.');
@@ -4085,7 +4173,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Book Parent');
   t('Category');
   t('Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.');
-  t('Collection');
+  t('Collections');
   t('Comment');
   t('Community');
   t('Community Record Parent');
@@ -4108,6 +4196,7 @@ function ma_digitalheritage_field_default_field_instances() {
   t('Original Date');
   t('Original Date Description');
   t('People');
+  t('Personal Collections');
   t('Please provide a brief summary of this item in less than 140 characters. Other fields will allow for more elaboration about the content.');
   t('Pre-Actions');
   t('Protocol');

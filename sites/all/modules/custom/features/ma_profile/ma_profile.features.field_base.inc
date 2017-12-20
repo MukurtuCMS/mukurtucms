@@ -26,7 +26,9 @@ function ma_profile_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -67,6 +69,7 @@ function ma_profile_field_default_field_bases() {
       ),
       'handler_submit' => 'Change handler',
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',

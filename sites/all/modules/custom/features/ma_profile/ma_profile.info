@@ -21,6 +21,7 @@ dependencies[] = textformatter
 features[ctools][] = ds:ds:1
 features[ctools][] = strongarm:strongarm:1
 features[ds_field_settings][] = user|user|default
+features[ds_fields][] = personal_collections
 features[ds_layout_settings][] = user|user|default
 features[ds_layout_settings][] = user|user|form
 features[features_api][] = api:2
