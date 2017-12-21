@@ -356,5 +356,12 @@ function ma_collection_strongarm() {
   $strongarm->value = 'collection/[node:title]';
   $export['pathauto_node_collection_pattern'] = $strongarm;
 
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_personal_collection_pattern';
+  $strongarm->value = 'personal-collection/[node:title]';
+  $export['pathauto_node_personal_collection_pattern'] = $strongarm;
+
   return $export;
 }
