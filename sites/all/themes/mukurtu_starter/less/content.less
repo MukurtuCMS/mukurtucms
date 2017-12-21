@@ -1188,9 +1188,11 @@ a.tooltips span {
   .modal-header {
     display: none;
   }
-  // With the hidden header, we need to slightly reposition the spinner.
+
   .loading-spinner {
-    top: 25px !important;
+    display: none; // width below not positioned properly, so simply hiding the spinner. It's a quick load and shouldn't matter. If there turns out to be sites with many, many Collection / Personal Collections and the modal loads slowly, then look at this again.
+    // width: 100% !important; // Need to fill to max as the default fixed width no good for dynamic width modal.
+   //  top: 25px !important;  // With the hidden header, we need to slightly reposition the spinner.
   }
 }
 

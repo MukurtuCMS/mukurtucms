@@ -10626,7 +10626,7 @@ a:hover {
   display: none;
 }
 .modal-add-to-collection .loading-spinner {
-  top: 25px !important;
+  display: none;
 }
 .collections-tree ul {
   background: url(../collection_tree/vline.png) repeat-y;
