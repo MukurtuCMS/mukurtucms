@@ -140,6 +140,7 @@ features[variable][] = node_preview_personal_collection
 features[variable][] = node_submitted_collection
 features[variable][] = node_submitted_personal_collection
 features[variable][] = pathauto_node_collection_pattern
+features[variable][] = pathauto_node_personal_collection_pattern
 features[views_view][] = child_collections_entity_reference
 features[views_view][] = collections_grid_list
 features[views_view][] = dh_nodes_available_to_collection
