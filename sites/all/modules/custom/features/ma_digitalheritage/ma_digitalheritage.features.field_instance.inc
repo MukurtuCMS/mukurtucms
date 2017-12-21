@@ -475,7 +475,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'apply_chosen' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 10,
+      'weight' => 7,
     ),
   );
 
@@ -1025,7 +1025,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 12,
+      'weight' => 9,
     ),
   );
 
@@ -1452,7 +1452,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 11,
+      'weight' => 8,
     ),
   );
 
@@ -1560,7 +1560,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 100,
       ),
       'type' => 'text_textfield',
-      'weight' => 8,
+      'weight' => 11,
     ),
   );
 
@@ -2066,7 +2066,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 9,
+      'weight' => 6,
     ),
   );
 
@@ -2709,7 +2709,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'tz_handling' => 'none',
       ),
       'type' => 'partial_date',
-      'weight' => 6,
+      'weight' => 10,
     ),
   );
 
