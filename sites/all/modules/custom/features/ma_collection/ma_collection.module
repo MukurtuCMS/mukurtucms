@@ -32,7 +32,6 @@ function ma_collection_node_view($node, $view_mode) {
 
   // On full node view of node types that can be added to a Collection, load the "Add to Collection" ctools modal JS.
   if ($view_mode == 'full') {
-    // Personal maybe
     if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
       ma_collection_include_add_to_collection_modal_js();
     }
@@ -255,45 +254,50 @@ function ma_collection_node_access($node, $op, $account) {
 }
 
 /**
- * Implementation of hook_form_FORM_ID_alter().
+ * Implementation of hook_form_alter().
  *
- * Collection node form alter.
+ * Collection and Personal Collection node form alter.
  */
-function ma_collection_form_collection_node_form_alter(&$form, $form_state) {
-  $node = $form['#node'];
+function ma_collection_form_alter(&$form, $form_state, $form_id) {
 
-  // Collections Tree in the collection node form
+  if ($form_id == 'collection_node_form' OR $form_id == 'personal_collection_node_form') {
+    $node = $form['#node'];
 
-  // Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
-  $form['field_collections_parent_coll']['#access'] = FALSE;
-  // If this is a sub-collection, then...
-  if (isset($node->field_collections_parent_coll[LANGUAGE_NONE][0])) {
-    // ...show the top-level collection field, but do not allow editing.
-    $form['field_collections_parent_coll']['#access'] = TRUE;
-    $form['field_collections_parent_coll']['#disabled'] = TRUE;
-    // ...hide the sub-collections field.
-    $form['field_collections_child_coll']['#access'] = FALSE;
-  }
+    if ($form_id == 'collection_node_form') {
+      // Collections Tree in the collection node form
 
-  // Hide the delete button if the collection has sub-collections.
-  // This is for the benefit of admin user 1, as the check is also done in ma_collection_node_access,
-  // which will, in addition to actually preventing deletion, will hide the button, but admin 1 bypasses this check.
-  $form['actions']['delete']['#access'] = !ma_collection_check_for_subcollections($node);
-
-  // Creating a new Collection
-  if (!isset($node->nid)) {
-
-    // Prepopulate any "Add To Collection" nodes in the entity refs.
-    $query = drupal_get_query_parameters();
-    if (isset($query['add'])) {
-      $add = explode('-', $query['add']);
-      $entity_ref_field = array_search($add[0], ma_collection_get_valid_node_types_for_collection());
-      if (isset($entity_ref_field) && is_numeric($add[1])) {
-        $node_to_add = node_load($add[1]);
-        $form[$entity_ref_field][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
+      // Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.
+      $form['field_collections_parent_coll']['#access'] = FALSE;
+      // If this is a sub-collection, then...
+      if (isset($node->field_collections_parent_coll[LANGUAGE_NONE][0])) {
+        // ...show the top-level collection field, but do not allow editing.
+        $form['field_collections_parent_coll']['#access'] = TRUE;
+        $form['field_collections_parent_coll']['#disabled'] = TRUE;
+        // ...hide the sub-collections field.
+        $form['field_collections_child_coll']['#access'] = FALSE;
       }
+
+      // Hide the delete button if the collection has sub-collections.
+      // This is for the benefit of admin user 1, as the check is also done in ma_collection_node_access,
+      // which will, in addition to actually preventing deletion, will hide the button, but admin 1 bypasses this check.
+      $form['actions']['delete']['#access'] = !ma_collection_check_for_subcollections($node);
     }
 
+    // Creating a new Collection or Personal Collection
+    if (!isset($node->nid)) {
+
+      // Prepopulate any "Add To Collection" / "Add to Personal Collectin" nodes in the entity refs.
+      $query = drupal_get_query_parameters();
+      if (isset($query['add'])) {
+        $add = explode('-', $query['add']);
+        $entity_ref_field = array_search($add[0], ma_collection_get_valid_node_types_for_collection());
+        if (isset($entity_ref_field) && is_numeric($add[1])) {
+          $node_to_add = node_load($add[1]);
+          $form[$entity_ref_field][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
+        }
+      }
+
+    }
   }
 }
 
@@ -362,18 +366,27 @@ function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
 function ma_collection_menu() {
   $items = array();
 
-  // "Add to Collection" ajax.
+  // "Add to Collection" & "Add to Personal Collection" ajax.
   $items['ma_collection/%ctools_js'] = array(
     'page callback' => 'ma_collection_add_to_collection_callback',
-    'page arguments' => array(1, 2),
+    'page arguments' => array(1, 2, 3),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 
   // Add "Add to Collection" node view nav tab.
-  $items['node/%node/add_to_collection'] = array(
+  $items['node/%node/add-to-collection'] = array(
     'title' => 'Add to Collection',
     'access callback' => 'ma_collection_add_node_to_collection_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  // Add "Add to Personal Collection" node view nav tab.
+  $items['node/%node/add-to-personal-collection'] = array(
+    'title' => 'Add to Personal Collection',
+    'access callback' => 'ma_collection_add_node_to_personal_collection_access',
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
     'weight' => 100,
@@ -385,7 +398,8 @@ function ma_collection_menu() {
 /**
  * Add to Collection ajax callback.
  */
-function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
+function ma_collection_add_to_collection_callback($ajax, $nid_to_add, $collection_type) {
+
   if ($ajax) {
     ctools_include('ajax');
     ctools_include('modal');
@@ -395,7 +409,7 @@ function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
     );
     // Use ctools to generate ajax instructions for the browser to create
     // a form in a modal popup.
-    $output = ctools_modal_form_wrapper('ma_collection_add_to_collection_form', $form_state);
+    $output = ctools_modal_form_wrapper('ma_collection_add_to_' . $collection_type . '_form', $form_state);
     // If the form has been submitted, there may be additional instructions
     // such as dismissing the modal popup.
     if (!empty($form_state['ajax_commands'])) {
@@ -406,7 +420,7 @@ function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
     drupal_exit();
   }
   else {
-    // We're assuming JS is enabled, so do nothing if not.
+    return "Please enable Javascript in your browser.";
   }
 }
 
@@ -416,10 +430,17 @@ function ma_collection_add_to_collection_callback($ajax, $nid_to_add) {
  * The original path needs to be written as "node/{nid}/{path}" in order for the tab to show up in the node view.
  */
 function ma_collection_url_outbound_alter(&$path, &$options, $original_path) {
-  if (substr($path,-18) == '/add_to_collection') {
+  if (substr($path,-18) == '/add-to-collection') {
     $path_parts = explode('/', $path);
     if (is_numeric($path_parts[1])) {
-      $path = 'ma_collection/nojs/' . $path_parts[1];
+      $path = 'ma_collection/nojs/' . $path_parts[1] . '/collection';
+      $options['attributes'] = array('class' => 'ctools-use-modal ctools-modal-add-to-collection');
+    }
+  }
+  elseif (substr($path,-27) == '/add-to-personal-collection') {
+    $path_parts = explode('/', $path);
+    if (is_numeric($path_parts[1])) {
+      $path = 'ma_collection/nojs/' . $path_parts[1] . '/personal_collection';
       $options['attributes'] = array('class' => 'ctools-use-modal ctools-modal-add-to-collection');
     }
   }
@@ -428,23 +449,34 @@ function ma_collection_url_outbound_alter(&$path, &$options, $original_path) {
 /**
  * Implements hook_contextual_links_view_alter().
  *
- * Add an "Add to Collection" contextual link to the search results nodes.
+ * Add "Add to Collection" and "Add to Personal Collection" contextual links to the search results nodes.
  */
 function ma_collection_contextual_links_view_alter(&$element, $items) {
 
-  if (!empty($element['#element']['#entity_type']) && !empty($element['#element']['#bundle']) && user_access('edit own collection content')) {
+  if (!empty($element['#element']['#entity_type']) && !empty($element['#element']['#bundle'])) {
     if (in_array($element['#element']['#bundle'], ma_collection_get_valid_node_types_for_collection())) {
       $view_mode = isset($element['#element']['#view_mode']) ? $element['#element']['#view_mode'] : 'default';
       if ($view_mode == 'search_result') {
-
-        // Conditions met. Add the link.
-        ma_collection_include_add_to_collection_modal_js();
-        $nid = $element['#element']['#node']->nid;
-        $element['#links']['add_to_collection'] = array(
-          'title' => t('Add to Collection'),
-          'href' => 'ma_collection/nojs/' . $nid,
-          'attributes' => array('class' => 'ctools-use-modal ctools-modal-add-to-collection'),
-        );
+        if (user_access('edit own collection content')) {
+          // Conditions met. Add the link.
+          ma_collection_include_add_to_collection_modal_js();
+          $nid = $element['#element']['#node']->nid;
+          $element['#links']['add_to_collection'] = array(
+            'title' => t('Add to Collection'),
+            'href' => 'ma_collection/nojs/' . $nid . '/collection',
+            'attributes' => array('class' => 'ctools-use-modal ctools-modal-add-to-collection'),
+          );
+        }
+        if (user_access('edit own personal_collection content')) {
+          // Conditions met. Add the link.
+          ma_collection_include_add_to_collection_modal_js();
+          $nid = $element['#element']['#node']->nid;
+          $element['#links']['add_to_personal_collection'] = array(
+            'title' => t('Add to Personal Collection'),
+            'href' => 'ma_collection/nojs/' . $nid . '/personal_collection',
+            'attributes' => array('class' => 'ctools-use-modal ctools-modal-add-to-collection'),
+          );
+        }
       }
     }
   }
@@ -457,12 +489,12 @@ function ma_collection_add_to_collection_form($form, $form_state) {
 
   $nid_to_add = $form_state['nid_to_add'];
 
+  // Build an array of collections.
+
   // First option is to create a new collection.
   $colls = [
     'create_new_collection' => 'Create a new Collection'
   ];
-
-  // Build an array of collections.
 
   // First get collections that already have this node in it, so we can exclude them later.
   $colls_to_exclude = array();
@@ -497,34 +529,105 @@ function ma_collection_add_to_collection_form($form, $form_state) {
       // Edit the options values to show collection ancestors.
       $colls = ma_collection_add_ancestors_to_collections_titles($colls);
     }
-
-    // Build the form.
-
-    $form['collection'] = [
-      '#title' => t('Add Item to Collection'),
-      '#type' => 'select',
-      '#options' => $colls,
-      '#chosen' => TRUE,
-      // '#attributes' => array('onchange' => 'this.form.submit();'), // does not work in this context, so we need the submit button.
-    ];
-    $form['actions'] = [
-      'submit' => [
-        '#type' => 'submit',
-        '#value' => t('Add'),
-      ],
-      'cancel' => [
-        '#type' => 'submit',
-        '#value' => t('Cancel'),
-      ],
-    ];
   }
+
+
+  // Build the form.
+  $form['collection'] = [
+    '#title' => t('Add Item to Collection'),
+    '#type' => 'select',
+    '#options' => $colls,
+    '#chosen' => TRUE,
+  ];
+  $form['actions'] = [
+    'submit' => [
+      '#type' => 'submit',
+      '#value' => t('Add'),
+    ],
+    'cancel' => [
+      '#type' => 'submit',
+      '#value' => t('Cancel'),
+    ],
+  ];
+
+  return $form;
+}
+
+
+/**
+ * "Add to Personal Collection" form.
+ */
+function ma_collection_add_to_personal_collection_form($form, $form_state) {
+
+  $nid_to_add = $form_state['nid_to_add'];
+
+  // Build an array of personal collections.
+
+  // First option is to create a new collection.
+  $personal_colls = [
+    'create_new_collection' => 'Create a new Personal Collection'
+  ];
+
+  // First get collections that already have this node in it, so we can exclude them later.
+  $colls_to_exclude = array();
+  $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
+  foreach ($valid_collection_types as $entity_reference_field => $node_type) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'personal_collection')
+      ->fieldCondition($entity_reference_field, 'target_id', $nid_to_add);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+      $colls_to_exclude = array_keys($result['node']);
+    }
+  }
+
+  // Get the collections.
+  global $user;
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'personal_collection')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->propertyCondition('uid', $user->uid);
+
+  $result = $query->execute();
+  if (isset($result['node'])) {
+    $coll_nids = array_keys($result['node']);
+    foreach ($coll_nids as $coll_nid) {
+      if (in_array($coll_nid, $colls_to_exclude)) {
+        continue;
+      }
+      $coll_node = node_load($coll_nid);
+      $personal_colls[$coll_nid] = $coll_node->title;
+    }
+  }
+
+  // Build the form.
+
+  $form['collection'] = [
+    '#title' => t('Add Item to Personal Collection'),
+    '#type' => 'select',
+    '#options' => $personal_colls,
+    '#chosen' => TRUE,
+  ];
+  $form['actions'] = [
+    'submit' => [
+      '#type' => 'submit',
+      '#value' => t('Add'),
+    ],
+    'cancel' => [
+      '#type' => 'submit',
+      '#value' => t('Cancel'),
+    ],
+  ];
+
   return $form;
 }
 
 /**
  * Add to Collection form submit handler.
  */
-function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
+function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $personal = 0) {
 
   // Tell the browser to close the modal.
   $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
@@ -552,7 +655,11 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
         if (isset($referer['path'])) {
           $query['destination'] = substr($referer['path'], 1);
         }
-        $commands[] = ctools_ajax_command_redirect('node/add/collection', 0, ['query' => $query]);
+        $node_type_to_create = 'collection';
+        if ($personal) {
+          $node_type_to_create = 'personal-collection';
+        }
+        $commands[] = ctools_ajax_command_redirect('node/add/' . $node_type_to_create, 0, ['query' => $query]);
         print ajax_render($commands);
         exit;
       }
@@ -568,7 +675,11 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
 
         // Display confirmation message.
         // EntityDrupalWrapper::save throws an exception if it fails, so if we get here, we know it worked.
-        $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.</p>';
+        $collection_type = "Collection";
+        if ($personal) {
+          $collection_type = "Personal Collection";
+        }
+        $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to ' . $collection_type . ' <i>' . $coll_node->title . '</i>.</p>';
         $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
         $ctools_output[] = ctools_modal_command_display('Success', $output);
         print ajax_render($ctools_output);
@@ -580,13 +691,20 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state) {
 }
 
 /**
+ * Add to Personal Collection form submit handler.
+ */
+function ma_collection_add_to_personal_collection_form_submit(&$form, &$form_state) {
+  ma_collection_add_to_collection_form_submit($form, $form_state, $personal = 1);
+}
+
+/**
  * Helper function to add the JS for an "Add To Collection" ctools modal.
  *
  * This uses AJAX and ctools to put a form into a modal.
  */
 function ma_collection_include_add_to_collection_modal_js() {
 
-  if (user_access('edit own collection content')) {
+  if (user_is_logged_in()) {
     ctools_include('modal'); // This is included statically by Ctools so no performance risk of multiple loading.
     drupal_add_js([
       'add-to-collection' => [
@@ -609,6 +727,17 @@ function ma_collection_include_add_to_collection_modal_js() {
  */
 function ma_collection_add_node_to_collection_access($node) {
   if (user_access('edit own collection content')) {
+    if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
+      return TRUE;
+    }
+  }
+}
+
+/**
+ * Access callback for the "Add to Collection" node view tab.
+ */
+function ma_collection_add_node_to_personal_collection_access($node) {
+  if (user_is_logged_in()) {
     if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
       return TRUE;
     }
