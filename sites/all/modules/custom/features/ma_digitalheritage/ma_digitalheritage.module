@@ -623,7 +623,7 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
   $form['#after_build'][] = 'ma_digitalheritage_dh_form_after_build';
 
   // In the Collections field, edit the title of the options to show collection ancestors.
-  $form['field_collection']['und']['#options'] = ma_collection_add_ancestors_to_collections_titles($form['field_collection']['und']['#options']);
+  $form['field_collection'][LANGUAGE_NONE]['#options'] = ma_collection_add_ancestors_to_collections_titles($form['field_collection'][LANGUAGE_NONE]['#options']);
 
   // Prevent editing book parent
   $form['field_book_parent']['#access'] = FALSE;
