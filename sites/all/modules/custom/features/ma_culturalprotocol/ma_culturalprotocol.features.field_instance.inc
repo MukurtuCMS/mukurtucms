@@ -431,8 +431,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
-Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ',
+    'description' => 'Open - This cultural protocol and the items within it are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
+Strict - This cultural protocol and the items within it are shared with, visible, and accessible to its cultural protocol members only ',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -790,8 +790,8 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Group roles and permissions');
   t('Group type');
   t('Membership List Options');
-  t('Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
-Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ');
+  t('Open - This cultural protocol and the items within it are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
+Strict - This cultural protocol and the items within it are shared with, visible, and accessible to its cultural protocol members only ');
   t('Parent Community');
   t('Please select the Community to which this Cultural Protocol belongs. You may select multiple Communities. You may only select or deselect Parent Communities for which you are a Community Manager.
 ');

@@ -224,7 +224,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 25,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -280,7 +280,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 28,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -317,6 +317,69 @@ function ma_collection_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-collection-field_community_ref'.
+  $field_instances['node-collection-field_community_ref'] = array(
+    'bundle' => 'collection',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'node_reference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 7,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_ref',
+    'label' => 'Community',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'node_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'node_reference/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'node_reference_autocomplete',
+      'weight' => 4,
     ),
   );
 
@@ -384,7 +447,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 26,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -415,7 +478,7 @@ function ma_collection_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -477,6 +540,55 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-collection-field_item_privacy_setting'.
+  $field_instances['node-collection-field_item_privacy_setting'] = array(
+    'bundle' => 'collection',
+    'default_value' => array(
+      0 => array(
+        'value' => 'all',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_item_privacy_setting',
+    'label' => 'Item Sharing Settings',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 6,
+    ),
+  );
+
   // Exported field_instance: 'node-collection-field_pre_actions'.
   $field_instances['node-collection-field_pre_actions'] = array(
     'bundle' => 'collection',
@@ -492,7 +604,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 27,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -523,6 +635,85 @@ function ma_collection_field_default_field_instances() {
       ),
       'type' => 'options_onoff',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'node-collection-og_group_ref'.
+  $field_instances['node-collection-og_group_ref'] = array(
+    'bundle' => 'collection',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'og_group_ref',
+    'label' => 'Protocol',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'view modes' => array(
+      'full' => array(
+        'custom settings' => FALSE,
+        'label' => 'Full',
+        'type' => 'og_list_default',
+      ),
+      'teaser' => array(
+        'custom settings' => FALSE,
+        'label' => 'Teaser',
+        'type' => 'og_list_default',
+      ),
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
     ),
   );
 
@@ -895,14 +1086,17 @@ function ma_collection_field_default_field_instances() {
 
 ');
   t('Comment');
+  t('Community');
   t('Credit');
   t('Description');
   t('Digital Heritage Count');
   t('Digital Heritage Items');
   t('Image');
+  t('Item Sharing Settings');
   t('Personal Collections are listed on your <a href=\'/user\'>user profile page</a>. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.');
   t('Pre-Actions');
   t('Privacy');
+  t('Protocol');
   t('Sub-collections');
   t('Summary');
   t('This collection is a sub-collection of the top-level collection shown here. To remove this sub-collection from the top-level collection, or to move its position within the collections tree, edit the top-level collection.

@@ -4,3 +4,6 @@ Rather than resolving this, the to-do item is to update OG to the latest version
 
 
 The two Mukurtu patches are now in '132925713-Apply-Mukurtu-og-patches.patch'. 1256956-strict-private.patch and strict-private.patch are nearly the same and neither appear to have been applied for the duration of the GitHub project. A deep dive on OG/Protocols is probably warranted at this point.
+
+Dec 22/2017 - todo -- clean up these patches! - shiraz
+
