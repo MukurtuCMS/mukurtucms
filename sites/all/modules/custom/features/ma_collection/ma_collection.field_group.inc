@@ -140,19 +140,22 @@ function ma_collection_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Items',
+    'label' => 'Relations',
     'weight' => '2',
     'children' => array(
       0 => 'field_digital_heritage_items',
+      1 => 'og_group_ref',
+      2 => 'field_item_privacy_setting',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Relations',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-items field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-items field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'closed',
     ),
   );
   $field_groups['group_items|node|collection|form'] = $field_group;
@@ -279,6 +282,7 @@ function ma_collection_field_group_info() {
   t('Digital Heritage Items');
   t('Items');
   t('List View Fields');
+  t('Relations');
   t('Tabs');
 
   return $field_groups;

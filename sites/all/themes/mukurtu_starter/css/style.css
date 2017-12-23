@@ -9799,6 +9799,9 @@ table .checkbox input[type="checkbox"] {
 #dictionary-word-node-form #edit-og-group-ref {
   display: none;
 }
+#collection-node-form #edit-og-group-ref {
+  display: none;
+}
 .node-dictionary-word.view-mode-full .scald-atom,
 .node-word-list.view-mode-full .scald-atom,
 .node-dictionary-word.view-mode-full .scald_video,

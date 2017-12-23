@@ -263,7 +263,27 @@ function ma_collection_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'collection_node_form' OR $form_id == 'personal_collection_node_form') {
     $node = $form['#node'];
 
+    // Collection node form
     if ($form_id == 'collection_node_form') {
+
+      // "Item Sharing Settings" field customizations versus how it works by default (as used in the DH node form) //
+
+      // Not required for Dictionary Words
+      $form['field_item_privacy_setting'][LANGUAGE_NONE]['#required'] = FALSE;
+
+      // The field has a default value. This is just to catch cases on demo sites where words were set already before this field was added
+      if (!$form['field_item_privacy_setting'][LANGUAGE_NONE]['#default_value']) {
+        $form['field_item_privacy_setting'][LANGUAGE_NONE]['#default_value'] = 'all';
+      }
+
+      // Hide the field unless a Community is selected in the first value
+      $form['field_item_privacy_setting']['#states'] = array(
+        'invisible' => array(
+          ':input[id="edit-oggroup-fieldset-0-dropdown-first"]' => array('value' => 0),
+        ),
+      );
+
+
       // Collections Tree in the collection node form
 
       // Top-level Collection field should generally be hidden, as we only want to set sub-collections in top-level collection, and restrict the other way around.

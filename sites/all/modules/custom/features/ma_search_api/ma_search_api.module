@@ -134,35 +134,25 @@ function ma_search_api_node_update($node) {
  */
 function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
 
-  // Rebuild permissions and reindex any DH nodes that were queued up for this op, just before the view is rendered.
-  if ($view->name == 'digital_heritage_grid_list') {
-    $dh_nodes_to_rebuild_and_reindex = variable_get ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
-    if (count($dh_nodes_to_rebuild_and_reindex)) {
-      $dh_nodes_to_rebuild_and_reindex = array_unique ($dh_nodes_to_rebuild_and_reindex);
-      # dpm ($dh_nodes_to_rebuild_and_reindex, '$dh_nodes_to_rebuild_and_reindex');
-      // Rebuild perms
-      foreach ($dh_nodes_to_rebuild_and_reindex as $dh_nid) {
-        node_access_acquire_grants(node_load($dh_nid));
+  // Rebuild permissions and reindex any nodes-in-CP that were queued up for this op, just before the view is rendered.
+  $types_to_process = [
+    'digital_heritage_grid_list' => 'mukurtu_dh_nodes_to_rebuild_perms_and_reindex',
+    'dictionary_words' => 'mukurtu_dw_nodes_to_rebuild_perms_and_reindex',
+    'collections_grid_list' => 'mukurtu_coll_nodes_to_rebuild_perms_and_reindex',
+  ];
+  foreach ($types_to_process as $view_name => $process_nids_var) {
+    if ($view->name == $view_name) {
+      $dh_nodes_to_rebuild_and_reindex = variable_get ($process_nids_var, array());
+      if (count($dh_nodes_to_rebuild_and_reindex)) {
+        $dh_nodes_to_rebuild_and_reindex = array_unique ($dh_nodes_to_rebuild_and_reindex);
+        // Rebuild perms
+        foreach ($dh_nodes_to_rebuild_and_reindex as $dh_nid) {
+          node_access_acquire_grants(node_load($dh_nid));
+        }
+        // Reindex
+        search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuild_and_reindex);
+        variable_set ($process_nids_var, array());
       }
-      // Reindex
-      search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuild_and_reindex);
-      variable_set ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
-    }
-  }
-
-  // Rebuild permissions and reindex any DW nodes that were queued up for this op, just before the view is rendered.
-  if ($view->name == 'dictionary_words') {
-    $dw_nodes_to_rebuild_and_reindex = variable_get ('mukurtu_dw_nodes_to_rebuild_perms_and_reindex', array());
-    if (count($dw_nodes_to_rebuild_and_reindex)) {
-      $dw_nodes_to_rebuild_and_reindex = array_unique ($dw_nodes_to_rebuild_and_reindex);
-      # dpm ($dw_nodes_to_rebuild_and_reindex, '$dw_nodes_to_rebuild_and_reindex');
-      // Rebuild perms
-      foreach ($dw_nodes_to_rebuild_and_reindex as $dw_nid) {
-        node_access_acquire_grants(node_load($dw_nid));
-      }
-      // Reindex
-      search_api_index_specific_items (search_api_index_load('default_node_index'), $dw_nodes_to_rebuild_and_reindex);
-      variable_set ('mukurtu_dw_nodes_to_rebuild_perms_and_reindex', array());
     }
   }
 
@@ -179,49 +169,52 @@ function ma_search_api_search_api_query_alter($sapi_query) {
 
   $current_page = arg(0);
 
-  // Permissions alterations. See "HOW DIGITAL HERITAGE (AND DICTIONARY WORDS) CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+  // Permissions alterations. See "HOW NODES-IN-CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
   if (!user_access('bypass content access control')) {
 
-    if ($current_page == 'digital-heritage' OR $current_page = 'dictionary') {
+    switch ($current_page) {
+      case 'digital-heritage':
+      case 'dictionary':
+      case 'collections':
 
-      $type_map = array (
-        'digital-heritage' => 'digital_heritage',
-        'dictionary' => 'dictionary_word',
-      );
+        $type_map = array (
+          'digital-heritage' => 'digital_heritage',
+          'dictionary' => 'dictionary_word',
+          'collections' => 'collection',
+        );
 
-      // Get all STRICT CPs that the user is not a member of
-      $cp_query = new EntityFieldQuery();
-      $cp_query->entityCondition('entity_type', 'node')
-        ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
-        ->entityCondition('bundle', 'cultural_protocol_group')
-        ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
-      // Only groups the user is not a member of
-      if ($user_groups = og_get_groups_by_user()) {
-        $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
-      }
-      $result = $cp_query->execute();
-
-      // Of all the CPs that the user cannot access, get all DH/DWs within them that have Item Sharing set to "ALL"
-      if (isset($result['node'])) {
-        $cp_nids = array_keys($result['node']);
-        # dpm($cp_nids, 'cp nids');
-        $dh_query = new EntityFieldQuery();
-        $dh_query->entityCondition('entity_type', 'node')
+        // Get all STRICT CPs that the user is not a member of
+        $cp_query = new EntityFieldQuery();
+        $cp_query->entityCondition('entity_type', 'node')
           ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
-          ->entityCondition('bundle', $type_map[$current_page])
-          ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
-          ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
-        $result = $dh_query->execute();
-
-        // Filter our the DH/DW items the user should not see
-        if (isset($result['node'])) {
-          $dh_dw_nids = array_keys($result['node']);
-          # dpm($dh_dw_nids, 'dh/dw nids excluded');
-          $filter = $sapi_query->createFilter('AND');
-          $filter->condition('nid', $dh_dw_nids, 'NOT IN');
-          $sapi_query->filter($filter);
+          ->entityCondition('bundle', 'cultural_protocol_group')
+          ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
+        // Only groups the user is not a member of
+        if ($user_groups = og_get_groups_by_user()) {
+          $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
         }
-      }
+        $result = $cp_query->execute();
+
+        // Of all the CPs that the user cannot access, get all nodes-in-CP within them that have Item Sharing set to "ALL"
+        if (isset($result['node'])) {
+          $cp_nids = array_keys($result['node']);
+          # dpm($cp_nids, 'cp nids');
+          $dh_query = new EntityFieldQuery();
+          $dh_query->entityCondition('entity_type', 'node')
+            ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+            ->entityCondition('bundle', $type_map[$current_page])
+            ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
+            ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
+          $result = $dh_query->execute();
+
+          // Filter out the nodes-in-CP the user should not see
+          if (isset($result['node'])) {
+            $nids_in_cp = array_keys($result['node']);
+            $filter = $sapi_query->createFilter('AND');
+            $filter->condition('nid', $nids_in_cp, 'NOT IN');
+            $sapi_query->filter($filter);
+          }
+        }
 
     }
   }
