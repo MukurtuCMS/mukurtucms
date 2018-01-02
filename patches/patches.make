@@ -26,6 +26,11 @@ projects[drupal][patch][] = core/117661693-Stop-double-quoting-quotes-in-term-au
 ; IE11 & Chrome(PointerEvents enabled) scrolls to the top of the page after dragging the bottom item with jquery 1.5 <-> 1.11
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2843240-22.patch
 
+; Color is a core module but for some reason we need to specify color as the project
+projects[color][patch][] = core/789554-show-added-palette-fields.patch
+
+; Color is a core module but for some reason we need to specify color as the project
+projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
 
 
 ;;;;;;;;;;;;;
@@ -37,12 +42,6 @@ projects[bootstrap][patch][] = contrib/150281138-add-first-last-classes-to-lists
 
 ;
 projects[bootstrap][patch][] = contrib/150281089-Dont-skip-over-text_format-fields.patch
-
-;
-projects[color][patch][] = contrib/789554-show-added-palette-fields.patch
-
-;
-projects[color][patch][] = contrib/include-newly-added-colorable-elements-1236098.patch
 
 ; PHP Notice: Undefined variables: user and terms_to_add
 projects[community_tags][patch][] = https://www.drupal.org/files/issues/community_tags-undefined-variables-7.x-1.x-2420969-1_0.patch
