@@ -8,10 +8,10 @@ Otherwise it applies the same settings to all carousels.
  .../modules/contrib/owlcarousel/includes/js/owlcarousel.settings.js   | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/sites/all/modules/contrib/owlcarousel/includes/js/owlcarousel.settings.js b/sites/all/modules/contrib/owlcarousel/includes/js/owlcarousel.settings.js
+diff --git a/includes/js/owlcarousel.settings.js b/includes/js/owlcarousel.settings.js
 index 16d9a5c..956a746 100755
---- a/sites/all/modules/contrib/owlcarousel/includes/js/owlcarousel.settings.js
-+++ b/sites/all/modules/contrib/owlcarousel/includes/js/owlcarousel.settings.js
+--- a/includes/js/owlcarousel.settings.js
++++ b/includes/js/owlcarousel.settings.js
 @@ -19,8 +19,8 @@
       * @param settings object
       */

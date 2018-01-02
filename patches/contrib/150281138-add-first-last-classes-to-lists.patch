@@ -4,13 +4,13 @@ Date: Tue, 29 Aug 2017 10:52:07 -0700
 Subject: [PATCH] Add old Bootstrap code to add first/last classes to lists
 
 ---
- sites/all/themes/bootstrap/templates/system/item-list.func.php | 10 +++++++++-
+ templates/system/item-list.func.php | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/sites/all/themes/bootstrap/templates/system/item-list.func.php b/sites/all/themes/bootstrap/templates/system/item-list.func.php
+diff --git a/templates/system/item-list.func.php b/templates/system/item-list.func.php
 index 7a10d70..b527bb6 100644
---- a/sites/all/themes/bootstrap/templates/system/item-list.func.php
-+++ b/sites/all/themes/bootstrap/templates/system/item-list.func.php
+--- a/templates/system/item-list.func.php
++++ b/templates/system/item-list.func.php
 @@ -66,8 +66,11 @@ function bootstrap_item_list($variables) {
    $output = '';
    if ($items) {

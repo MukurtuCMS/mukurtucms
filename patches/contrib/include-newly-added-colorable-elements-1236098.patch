@@ -1,7 +1,7 @@
-diff --git a/modules/color/color.module b/modules/color/color.module
+diff --git a/color.module b/color.module
 index 7665631..0a3ca47 100644
---- a/modules/color/color.module
-+++ b/modules/color/color.module
+--- a/color.module
++++ b/color.module
 @@ -139,7 +139,7 @@ function color_get_palette($theme, $default = FALSE) {
    $palette = $info['schemes']['default']['colors'];
  

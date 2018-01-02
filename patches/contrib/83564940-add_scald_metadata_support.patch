@@ -1,7 +1,7 @@
-diff --git a/sites/all/modules/contrib/scald_feeds/scald_feeds.module b/sites/all/modules/contrib/scald_feeds/scald_feeds.module
+diff --git a/scald_feeds.module b/scald_feeds.module
 index 13f1780..dc02747 100644
---- a/sites/all/modules/contrib/scald_feeds/scald_feeds.module
-+++ b/sites/all/modules/contrib/scald_feeds/scald_feeds.module
+--- a/scald_feeds.module
++++ b/scald_feeds.module
 @@ -21,7 +21,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
        );
      }

@@ -8,10 +8,10 @@ Subject: [PATCH] Sync keys between geofield/geofield_gmap
  sites/all/modules/contrib/geofield_gmap/geofield_gmap.module   |  6 +++++-
  2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/sites/all/modules/contrib/geofield/modules/geofield_map/geofield_map.admin.inc b/sites/all/modules/contrib/geofield/modules/geofield_map/geofield_map.admin.inc
+diff --git a/geofield_map.admin.inc b/geofield_map.admin.inc
 index d57e630a..887e91d7 100644
---- a/sites/all/modules/contrib/geofield/modules/geofield_map/geofield_map.admin.inc
-+++ b/sites/all/modules/contrib/geofield/modules/geofield_map/geofield_map.admin.inc
+--- a/geofield_map.admin.inc
++++ b/geofield_map.admin.inc
 @@ -65,5 +65,15 @@ function geofield_map_admin_settings($form, &$form_state) {
      ),
    );

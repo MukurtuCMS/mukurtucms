@@ -1,7 +1,7 @@
-diff --git a/sites/all/modules/contrib/scald/modules/library/dnd/js/dnd-library.js b/sites/all/modules/contrib/scald/modules/library/dnd/js/dnd-library.js
+diff --git a/dnd-library.js b/dnd-library.js
 index 8c7ceb5c..4c236122 100644
---- a/sites/all/modules/contrib/scald/modules/library/dnd/js/dnd-library.js
-+++ b/sites/all/modules/contrib/scald/modules/library/dnd/js/dnd-library.js
+--- a/dnd-library.js
++++ b/dnd-library.js
 @@ -364,7 +364,8 @@ renderLibrary: function(data, editor) {
        })
        .bind('dragstart', function(e) {

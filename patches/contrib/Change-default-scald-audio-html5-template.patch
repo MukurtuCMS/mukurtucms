@@ -8,10 +8,10 @@ Testing fix for compatibility for m4a on various browsers.
  .../scald/modules/providers/scald_audio/scald_audio_html5.tpl.php | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/sites/all/modules/contrib/scald/modules/providers/scald_audio/scald_audio_html5.tpl.php b/sites/all/modules/contrib/scald/modules/providers/scald_audio/scald_audio_html5.tpl.php
+diff --git a/modules/providers/scald_audio/scald_audio_html5.tpl.php b/modules/providers/scald_audio/scald_audio_html5.tpl.php
 index 274b854..b5abb67 100644
---- a/sites/all/modules/contrib/scald/modules/providers/scald_audio/scald_audio_html5.tpl.php
-+++ b/sites/all/modules/contrib/scald/modules/providers/scald_audio/scald_audio_html5.tpl.php
+--- a/modules/providers/scald_audio/scald_audio_html5.tpl.php
++++ b/modules/providers/scald_audio/scald_audio_html5.tpl.php
 @@ -5,7 +5,13 @@
   * Changed to use HTML5 Audio element by Mark Conroy - https://www.drupal.org/user/336910
   */

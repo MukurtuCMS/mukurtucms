@@ -4,13 +4,13 @@ Date: Tue, 13 Dec 2016 13:50:39 -0800
 Subject: [PATCH] Respect quoted strings in Soundcloud tags
 
 ---
- sites/all/modules/contrib/scald_soundcloud/scald_soundcloud.module | 2 +-
+ scald_soundcloud.module | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/sites/all/modules/contrib/scald_soundcloud/scald_soundcloud.module b/sites/all/modules/contrib/scald_soundcloud/scald_soundcloud.module
+diff --git a/scald_soundcloud.module b/scald_soundcloud.module
 index 3553b17..18ba851 100644
---- a/sites/all/modules/contrib/scald_soundcloud/scald_soundcloud.module
-+++ b/sites/all/modules/contrib/scald_soundcloud/scald_soundcloud.module
+--- a/scald_soundcloud.module
++++ b/scald_soundcloud.module
 @@ -183,7 +183,7 @@ function scald_soundcloud_audio($id) {
    }
  

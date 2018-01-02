@@ -6,13 +6,13 @@ Subject: [PATCH] Change Search API DB to pull regex from Search API
 Search API DB had the problematic regex hardcoded. Here we set it to
 pull from the existing Search API configuration.
 ---
- sites/all/modules/contrib/search_api_db/service.inc | 9 ++++++---
+ service.inc | 9 ++++++---
  1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/sites/all/modules/contrib/search_api_db/service.inc b/sites/all/modules/contrib/search_api_db/service.inc
+diff --git a/service.inc b/service.inc
 index 609e5d4..314915f 100644
---- a/sites/all/modules/contrib/search_api_db/service.inc
-+++ b/sites/all/modules/contrib/search_api_db/service.inc
+--- a/service.inc
++++ b/service.inc
 @@ -1055,7 +1055,8 @@ class SearchApiDbService extends SearchApiAbstractService {
              $score = $v['score'];
              $v = $v['value'];

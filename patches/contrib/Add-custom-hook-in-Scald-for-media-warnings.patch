@@ -4,13 +4,13 @@ Date: Wed, 14 Jun 2017 16:32:07 -0700
 Subject: [PATCH] Add custom hook in Scald for media warnings
 
 ---
- sites/all/modules/contrib/scald/scald.module | 3 +++
+ scald.module | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/sites/all/modules/contrib/scald/scald.module b/sites/all/modules/contrib/scald/scald.module
+diff --git a/scald.module b/scald.module
 index 5682f7d..2c7065c 100644
---- a/sites/all/modules/contrib/scald/scald.module
-+++ b/sites/all/modules/contrib/scald/scald.module
+--- a/scald.module
++++ b/scald.module
 @@ -1412,7 +1412,9 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
      $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
    }

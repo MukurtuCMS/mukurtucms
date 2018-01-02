@@ -4,13 +4,13 @@ Date: Tue, 10 May 2016 13:58:48 -0700
 Subject: [PATCH] Alter required field tamper to allow 0 as value
 
 ---
- sites/all/modules/contrib/feeds_tamper/plugins/required.inc | 4 ++--
+ plugins/required.inc | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/sites/all/modules/contrib/feeds_tamper/plugins/required.inc b/sites/all/modules/contrib/feeds_tamper/plugins/required.inc
+diff --git a/plugins/required.inc b/plugins/required.inc
 index a18d540..aa37d21 100644
---- a/sites/all/modules/contrib/feeds_tamper/plugins/required.inc
-+++ b/sites/all/modules/contrib/feeds_tamper/plugins/required.inc
+--- a/plugins/required.inc
++++ b/plugins/required.inc
 @@ -39,14 +39,14 @@ function feeds_tamper_required_form($importer, $element_key, $settings) {
  
  function feeds_tamper_required_callback($result, $item_key, $element_key, &$field, $settings, $source) {
