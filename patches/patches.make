@@ -8,17 +8,17 @@ core = 7.x
 ; IE11 & Chrome(PointerEvents enabled) scrolls to the top of the page after dragging the bottom item with jquery 1.5 <-> 1.11
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2843240-22.patch
 
-; Color is a core module but for some reason we need to specify color as the project
+; Color is a core module but must specify color as the project
 projects[color][patch][] = core/789554-show-added-palette-fields.patch
 
-; Color is a core module but for some reason we need to specify color as the project
+; Color is a core module but must specify color as the project
 projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
 
 ;
 projects[drupal][patch][] = core/1150608_use_comma_for_tax_delimiter_and_allow_quotes.patch
 
-;
-projects[drupal][patch][] = core/use_mukurtu_logo_during_install.patch
+; Seven is a core theme but must specify seven as the project
+projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
 
 ; Custom logo and favicon stored in private filesystem if it is the default
 projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057.patch

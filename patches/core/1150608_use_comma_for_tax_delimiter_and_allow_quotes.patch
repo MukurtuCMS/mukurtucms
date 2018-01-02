@@ -1,5 +1,5 @@
 diff --git a/modules/taxonomy/taxonomy.module b/modules/taxonomy/taxonomy.module
-index e147c1c..2784af3 100644
+index 981649d2..f61ab30d 100644
 --- a/modules/taxonomy/taxonomy.module
 +++ b/modules/taxonomy/taxonomy.module
 @@ -1418,17 +1418,13 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
@@ -34,7 +34,7 @@ index e147c1c..2784af3 100644
        // See if the term exists in the chosen vocabulary and return the tid;
        // otherwise, create a new 'autocreate' term for insert/update.
 diff --git a/modules/taxonomy/taxonomy.pages.inc b/modules/taxonomy/taxonomy.pages.inc
-index 975ff12..bf473fc 100644
+index 38b24b3b..01919878 100644
 --- a/modules/taxonomy/taxonomy.pages.inc
 +++ b/modules/taxonomy/taxonomy.pages.inc
 @@ -135,7 +135,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
