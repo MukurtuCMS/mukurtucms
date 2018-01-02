@@ -584,25 +584,16 @@ Drupal.tableDrag.prototype.mouseCoords = function (event) {
   // version 1.11.1; between versions 1.7 and 1.11.0 pointer events have the
   // clientX and clientY properties undefined. In those cases, the properties
   // must be retrieved from the event.originalEvent object instead.
-  var clientX;
-  var clientY;
-  if (event.type === 'pointermove') {
-    clientX = event.originalEvent.clientX;
-    clientY = event.originalEvent.clientY;
-  }
-  else {
-    clientX = event.clientX || event.originalEvent.clientX;
-    clientY = event.clientY || event.originalEvent.clientY;
-  }
+  var clientX = event.clientX || event.originalEvent.clientX;
+  var clientY = event.clientY || event.originalEvent.clientY;
 
   if (event.pageX || event.pageY) {
     return { x: event.pageX, y: event.pageY };
   }
 
-  var scrollNode = document.scrollingElement  || document.body;
   return {
-    x: clientX + scrollNode.scrollLeft - scrollNode.clientLeft,
-    y: clientY + scrollNode.scrollTop  - scrollNode.clientTop
+    x: clientX + document.body.scrollLeft - document.body.clientLeft,
+    y: clientY + document.body.scrollTop  - document.body.clientTop
   };
 };
 
@@ -611,14 +602,6 @@ Drupal.tableDrag.prototype.mouseCoords = function (event) {
  * element. To do this we need the element's position and the mouse position.
  */
 Drupal.tableDrag.prototype.getMouseOffset = function (target, event) {
-  // Complete support for pointer events was only introduced to jQuery in
-  // version 1.11.1; between versions 1.7 and 1.11.0 pointer events have the
-  // clientX and clientY properties undefined. In those cases, the properties
-  // must be retrieved from the event.originalEvent object instead.
-  if (event.type === 'pointerdown') {
-    event = event.originalEvent;
-  }
-
   var docPos   = $(target).offset();
   var mousePos = this.mouseCoords(event);
   return { x: mousePos.x - docPos.left, y: mousePos.y - docPos.top };
