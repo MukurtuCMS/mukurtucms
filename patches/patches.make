@@ -18,10 +18,10 @@ projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-pub
 projects[drupal][patch][] = core/ignore_files_dir_contents_but_include_files_dir_itself.patch
 
 ;
-projects[drupal][patch][] = core/117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
+projects[drupal][patch][] = core/109315810-Change-delimiter-from-comma-to-semi-colon.patch
 
 ;
-projects[drupal][patch][] = core/109315810-Change-delimiter-from-comma-to-semi-colon.patch
+projects[drupal][patch][] = core/117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
 
 ; IE11 & Chrome(PointerEvents enabled) scrolls to the top of the page after dragging the bottom item with jquery 1.5 <-> 1.11
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2843240-22.patch
