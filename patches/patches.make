@@ -12,7 +12,7 @@ projects[drupal][patch][] = core/1150608_use_comma_for_tax_delimiter_and_allow_q
 projects[drupal][patch][] = core/use_mukurtu_logo_during_install.patch
 
 ; Custom logo and favicon stored in private filesystem if it is the default
-projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057-b.patch
+projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057.patch
 
 ;
 projects[drupal][patch][] = core/ignore_files_dir_contents_but_include_files_dir_itself.patch
@@ -132,6 +132,7 @@ projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-reg
 ;
 projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_characters_and_option_to_skip_padding.patch
 
+; Services issue with multivals
 ; see https://www.drupal.org/project/services/issues/2224803
 projects[services][patch][] = contrib/fix_services_multivals-2224803-comment-8844431
 

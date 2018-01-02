@@ -22,3 +22,13 @@ function scald_video_uninstall() {
   ScaldAtomController::removeType('video');
   variable_del('scald_video_upload_location');
 }
+
+/**
+ * Ensure default video atom thumbnail is available
+ */
+function scald_video_update_7101() {
+  $video_defaults = scald_atom_defaults('video');
+  $target_path = $video_defaults->thumbnail_source;
+  $source_path = drupal_get_path('module', 'scald_video') . '/icons/video.png';
+  file_unmanaged_copy ($source_path, $target_path, FILE_EXISTS_ERROR);
+}
