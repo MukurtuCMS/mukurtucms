@@ -1,19 +1,8 @@
-From 38e1cff12160d2b8533ea9eaa46a32f4a26670b7 Mon Sep 17 00:00:00 2001
-From: Steve Taylor <steve_taylor@wsu.edu>
-Date: Thu, 31 Mar 2016 16:28:03 -0700
-Subject: [PATCH 2/2] Change delimiter from comma to semi-colon
-
----
- includes/common.inc                 | 2 +-
- misc/autocomplete.js                | 2 +-
- modules/taxonomy/taxonomy.pages.inc | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
-
 diff --git a/includes/common.inc b/includes/common.inc
-index c6303ef..375a698 100644
+index a32930a5..0c7fb889 100644
 --- a/includes/common.inc
 +++ b/includes/common.inc
-@@ -7589,7 +7589,7 @@ function drupal_implode_tags($tags) {
+@@ -7638,7 +7638,7 @@ function drupal_implode_tags($tags) {
  
      $encoded_tags[] = $tag;
    }
@@ -23,7 +12,7 @@ index c6303ef..375a698 100644
  
  /**
 diff --git a/misc/autocomplete.js b/misc/autocomplete.js
-index d71441b..ed32d58 100644
+index af090713..b2cc5253 100644
 --- a/misc/autocomplete.js
 +++ b/misc/autocomplete.js
 @@ -277,7 +277,7 @@ Drupal.ACDB.prototype.search = function (searchString) {
@@ -36,7 +25,7 @@ index d71441b..ed32d58 100644
    }
  
 diff --git a/modules/taxonomy/taxonomy.pages.inc b/modules/taxonomy/taxonomy.pages.inc
-index bf473fc..b4dd3fd 100644
+index 01919878..f4b99717 100644
 --- a/modules/taxonomy/taxonomy.pages.inc
 +++ b/modules/taxonomy/taxonomy.pages.inc
 @@ -165,12 +165,12 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
@@ -54,6 +43,3 @@ index bf473fc..b4dd3fd 100644
          $n = '"' . str_replace('"', '""', $name) . '"';
        }
        $term_matches[$prefix . $n] = check_plain($name);
--- 
-1.9.1
-
