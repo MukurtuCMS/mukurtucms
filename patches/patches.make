@@ -86,11 +86,9 @@ projects[og][patch][] = contrib/1256956-strict-private.patch
 ; Feeds Import Not Saving Geofield
 projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
 
-; Google maps requires API keys for sites going live after 22/6/2016
+; Google maps API fix
 projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-google-api-key-2757953-71.patch
-
-; see https://www.drupal.org/project/geofield/issues/2757953
-projects[geofield_gmap][patch][] = contrib/0001-Sync-keys-between-geofield-geofield_gmap.patch
+projects[geofield_gmap][patch][] = https://www.drupal.org/files/issues/fix-api-key-not-being-used-2746209-16.patch
 
 ; Add property info callback
 projects[partial_date][patch][] = https://www.drupal.org/files/issues/add_property_info-2781135-2.patch
