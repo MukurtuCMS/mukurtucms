@@ -1,17 +1,8 @@
-From 8826cc31f87b40b01990a48586d8218f7fe60fee Mon Sep 17 00:00:00 2001
-From: Steve Taylor <steve_taylor@wsu.edu>
-Date: Wed, 14 Jun 2017 16:32:07 -0700
-Subject: [PATCH] Add custom hook in Scald for media warnings
-
----
- scald.module | 3 +++
- 1 file changed, 3 insertions(+)
-
 diff --git a/scald.module b/scald.module
-index 5682f7d..2c7065c 100644
+index 5311bd0..f86cb61 100644
 --- a/scald.module
 +++ b/scald.module
-@@ -1412,7 +1412,9 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
+@@ -1445,6 +1445,9 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
      $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
    }
  
@@ -21,6 +12,3 @@ index 5682f7d..2c7065c 100644
    // Only cache the Atom if Contexts, etc. have not indicated that the rendering
    // is not cacheable (e.g. it contains the current user's username).
    if (!$atom->rendered->nocache) {
--- 
-2.7.4
-
