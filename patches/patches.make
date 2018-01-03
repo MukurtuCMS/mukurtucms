@@ -100,9 +100,9 @@ projects[scald][patch][] = contrib/make_whole_scald_drawer_atom_row_draggable.pa
 projects[scald][patch][] = contrib/Change-default-scald-audio-html5-template.patch
 ; Add custom hook in scald for media warnings
 projects[scald][patch][] = contrib/Add-custom-hook-in-Scald-for-media-warnings.patch
-; Uploaded video dimensin fix
+; Uploaded video dimension fix. Copies the code from scald_youtube.
 projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
-; Upload video do no fill dimensions on upload
+; Upload video do no fill dimensions on upload.
 projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
 
 ;;; Scald Feeds
