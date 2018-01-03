@@ -35,7 +35,7 @@ projects[color][patch][] = core/789554-show-added-palette-fields.patch
 projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
 
 ; Use Mukurtu logo during install.
-projects[drupal][patch][] = core/use_mukurtu_logo_during_install.patch
+projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
 
 
 
