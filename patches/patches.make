@@ -1,34 +1,42 @@
 api = 2
 core = 7.x
 
+
 ;;;;;;;;;;
 ;; Core ;;
 ;;;;;;;;;;
 
-; IE11 & Chrome(PointerEvents enabled) scrolls to the top of the page after dragging the bottom item with jquery 1.5 <-> 1.11
+; Fix IE11 & Chrome scrolls to the top of the page after dragging the bottom item with jquery 1.5 <-> 1.11.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/2843240-22.patch
 
-; Color is a core module but must specify color as the project
-projects[color][patch][] = core/789554-show-added-palette-fields.patch
-
-; Color is a core module but must specify color as the project
-projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
-
-
-; Seven is a core theme but must specify seven as the project
-projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
-
-; Custom logo and favicon stored in private filesystem if it is the default
+; Custom logo and favicon stored in private filesystem if it is the default.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057.patch
 
-;
+; Ignore files dir contents but include files dir itself.
 projects[drupal][patch][] = core/ignore_files_dir_contents_but_include_files_dir_itself.patch
 
-; Multipatch combination of 3 separate custom patches from before
+; Multipatch combination of 3 separate custom patches from before this was cleaned up in drush patchfile:
 ; 1150608_use_comma_for_tax_delimiter_and_allow_quotes.patch
 ; 109315810-Change-delimiter-from-comma-to-semi-colon.patch
 ; 117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
 projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
+
+
+
+;;;;;;;;;;;;;;;;;;;
+;; Core Projects ;;
+;;;;;;;;;;;;;;;;;;;
+; These projects are contained in core, but must be specified here by their specific project name, not "Drupal"
+
+; Show added palette fields.
+projects[color][patch][] = core/789554-show-added-palette-fields.patch
+
+; Include newly added colorable elements.
+projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
+
+; Use Mukurtu logo during install.
+projects[drupal][patch][] = core/use_mukurtu_logo_during_install.patch
+
 
 
 ;;;;;;;;;;;;;
