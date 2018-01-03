@@ -30,7 +30,8 @@ projects[drupal][patch][] = core/ignore_files_dir_contents_but_include_files_dir
 projects[drupal][patch][] = core/109315810-Change-delimiter-from-comma-to-semi-colon.patch
 
 ;
-projects[drupal][patch][] = core/117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
+projects[taxonomy][patch][] = core/117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
+
 
 ;;;;;;;;;;;;;
 ;; Contrib ;;
