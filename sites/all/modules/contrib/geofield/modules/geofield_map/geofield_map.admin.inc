@@ -65,15 +65,5 @@ function geofield_map_admin_settings($form, &$form_state) {
     ),
   );
 
-  $form['#submit'][] = 'geofield_map_admin_settings_submit';
   return system_settings_form($form);
-}
-
-function geofield_map_admin_settings_submit($form, $form_state) {
-    //geofield_gmap_google_api_key
-    if(isset($form['geofield_map_google_auth_method']['#value']) && $form['geofield_map_google_auth_method']['#value'] == 1) {
-        if(isset($form['geofield_map_google_apikey']['#value'])) {
-            variable_set('geofield_gmap_google_api_key', $form['geofield_map_google_apikey']['#value']);
-        }
-    }
 }
