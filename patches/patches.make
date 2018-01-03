@@ -121,6 +121,8 @@ projects[scald_soundcloud][patch][] = contrib/Respect-quoted-strings-in-Soundclo
 projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-fix_access_info_indexing.patch
 ; Modify dictionary search results based on custom sort
 projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_based_on_custom_sort.patch
+
+;;; Search API DB
 ; Change Seach API DB to pull regex from Search API
 projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-regex-from-Search-API.patch
 
