@@ -72,16 +72,7 @@ projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-m
 projects[og][patch][] = https://www.drupal.org/files/issues/entityreference_fields_do_not_validate-2249261-10-test.patch
 
 ;
-projects[og][patch][] = contrib/og_patches.patch
-
-;
-projects[og][patch][] = contrib/strict-private.patch
-
-;
 projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
-
-;
-projects[og][patch][] = contrib/1256956-strict-private.patch
 
 ; Feeds Import Not Saving Geofield
 projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch

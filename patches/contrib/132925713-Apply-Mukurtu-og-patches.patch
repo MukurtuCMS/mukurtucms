@@ -1,32 +1,25 @@
-From 2b3cdb28b572400ec4002fd751698c81cc370c91 Mon Sep 17 00:00:00 2001
-From: Steve Taylor <steve_taylor@wsu.edu>
-Date: Fri, 21 Oct 2016 11:42:03 -0700
-Subject: [PATCH] Apply Mukurtu og patches
-
----
- sites/all/modules/contrib/og/og.module | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/sites/all/modules/contrib/og/og.module b/sites/all/modules/contrib/og/og.module
-index 6f28205..d17b3fb 100755
---- a/sites/all/modules/contrib/og/og.module
-+++ b/sites/all/modules/contrib/og/og.module
-@@ -545,6 +545,14 @@ function og_node_access($node, $op, $account) {
+diff --git a/og.module b/og.module
+index 6f28205..32d0275 100755
+--- a/og.module
++++ b/og.module
+@@ -545,6 +545,16 @@ function og_node_access($node, $op, $account) {
          ($account->uid == $node->uid && og_user_access_entity("$op own $type content", 'node', $node, $account));
      }
- 
+
 +    // mukurtu patch
-+    // Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
++    // Edit perms on nodes-in-CP nodes should be determined by our custom logic, same as view perms
 +    // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
-+    if ($op == 'update' && $node->type=='digital_heritage') {
-+        return mukurtu_protocol_field_update_dh_dw_access($node);
++    if ($op == 'update') {
++      if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
++        return mukurtu_protocol_field_update_node_in_cp_access($node);
++      }
 +    }
 +    // end patch
 +
      if (!$access && $op == 'update' && og_is_group('node', $node)) {
        // The node is a group, so check "update group" permission.
        $access = og_user_access_entity('update group', 'node', $node, $account);
-@@ -2248,6 +2256,12 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
+@@ -2248,6 +2258,12 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
        return TRUE;
      }
      else {
@@ -39,6 +32,3 @@ index 6f28205..d17b3fb 100755
        // An entity can be a group and group content in the same time. The group
        // didn't return TRUE, but the user still might have access to the
        // permission in group content context.
--- 
-2.1.4
-
