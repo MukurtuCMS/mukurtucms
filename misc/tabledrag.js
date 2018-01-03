@@ -599,7 +599,7 @@ Drupal.tableDrag.prototype.mouseCoords = function (event) {
     return { x: event.pageX, y: event.pageY };
   }
 
-  var scrollNode = document.scrollingElement  || document.body;
+  var scrollNode = document.scrollingElement  || document.documentElement;
   return {
     x: clientX + scrollNode.scrollLeft - scrollNode.clientLeft,
     y: clientY + scrollNode.scrollTop  - scrollNode.clientTop

@@ -135,7 +135,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
   }
 
   // The user enters a comma-separated list of tags. We only autocomplete the last tag.
-  $tags_typed = ma_core_taxonomy_explode_tags($tags_typed);
+  $tags_typed = ma_core_taxonomy_explode_tags($tags_typed); // mukurtu patch
   $tag_last = drupal_strtolower(array_pop($tags_typed));
 
   $term_matches = array();
@@ -170,11 +170,10 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
     foreach ($tags_return as $tid => $name) {
       $n = $name;
       // Term names containing commas or quotes must be wrapped in quotes.
-      /*
-      if (strpos($name, ';') !== FALSE || strpos($name, '"') !== FALSE) {
-        $n = '"' . str_replace('"', '""', $name) . '"';
-      }
-      */
+      // Mukurtu patch, comment this out
+      // if (strpos($name, ';') !== FALSE || strpos($name, '"') !== FALSE) {
+      //   $n = '"' . str_replace('"', '""', $name) . '"';
+      // }
       $term_matches[$prefix . $n] = check_plain($name);
     }
   }
