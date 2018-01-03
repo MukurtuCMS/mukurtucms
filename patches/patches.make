@@ -117,9 +117,6 @@ projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
 projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
 
 ;
-projects[scald][patch][] = contrib/2406895.empty_video_thumbnail.patch_deprecated
-
-;
 projects[scald_feeds][patch][] = contrib/83564940-add_scald_metadata_support.patch
 
 ;
