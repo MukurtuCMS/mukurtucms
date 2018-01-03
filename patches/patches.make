@@ -67,10 +67,6 @@ projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-al
 ; Groups Audience field not available for Feeds Mapping
 projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-mapper.patch
 
-; FieldValidationException: error when saving entity og reference fields
-; check if already committed
-projects[og][patch][] = https://www.drupal.org/files/issues/entityreference_fields_do_not_validate-2249261-10-test.patch
-
 ;
 projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
 
