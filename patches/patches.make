@@ -14,8 +14,6 @@ projects[color][patch][] = core/789554-show-added-palette-fields.patch
 ; Color is a core module but must specify color as the project
 projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
 
-;
-projects[drupal][patch][] = core/1150608_use_comma_for_tax_delimiter_and_allow_quotes.patch
 
 ; Seven is a core theme but must specify seven as the project
 projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
@@ -26,11 +24,11 @@ projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-pub
 ;
 projects[drupal][patch][] = core/ignore_files_dir_contents_but_include_files_dir_itself.patch
 
-;
-projects[drupal][patch][] = core/109315810-Change-delimiter-from-comma-to-semi-colon.patch
-
-;
-projects[taxonomy][patch][] = core/117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
+; Multipatch combination of 3 separate custom patches from before
+; 1150608_use_comma_for_tax_delimiter_and_allow_quotes.patch
+; 109315810-Change-delimiter-from-comma-to-semi-colon.patch
+; 117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
+projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
 
 
 ;;;;;;;;;;;;;
