@@ -29,7 +29,7 @@ projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
 ;;; These projects are contained in core, but must be specified here by their specific project name, not "Drupal"
 
 ;;; Color
-; Show added palette fields.
+; Show added palette fields. NOTE: this was not previously applied.
 projects[color][patch][] = core/789554-show-added-palette-fields.patch
 ; Include newly added colorable elements.
 projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
@@ -100,9 +100,9 @@ projects[scald][patch][] = contrib/make_whole_scald_drawer_atom_row_draggable.pa
 projects[scald][patch][] = contrib/Change-default-scald-audio-html5-template.patch
 ; Add custom hook in scald for media warnings
 projects[scald][patch][] = contrib/Add-custom-hook-in-Scald-for-media-warnings.patch
-; Uploaded video dimension fix. Copies the code from scald_youtube.
+; Uploaded video dimension fix. Copies the code from scald_youtube. NOTE: this was not previously applied.
 projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
-; Upload video do no fill dimensions on upload.
+; Upload video do no fill dimensions on upload. NOTE: this was not previously applied.
 projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
 
 ;;; Scald Feeds
