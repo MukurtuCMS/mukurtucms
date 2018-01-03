@@ -1,5 +1,5 @@
 diff --git a/scald_feeds.module b/scald_feeds.module
-index 13f1780..dc02747 100644
+index 13f1780..67609bb 100644
 --- a/scald_feeds.module
 +++ b/scald_feeds.module
 @@ -21,7 +21,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
@@ -39,7 +39,7 @@ index 13f1780..dc02747 100644
    if (empty($value)) {
      return;
    }
-@@ -65,90 +70,250 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
+@@ -65,90 +70,259 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
      $data[$entity_type] = $entity;
    }
  
@@ -52,17 +52,25 @@ index 13f1780..dc02747 100644
    foreach ($value as $v) {
 -    try {
 -      $file = $v->getFile($destination);
--    }
++    // First check if we are given a scald ID
++    $existing_sid = FALSE;
++    if(is_numeric($v->getValue())) {
++        $atom = scald_atom_load($v->getValue());
++        if($atom) {
++            $existing_sid = $atom->sid;
++        }
++    }
++      
++    // Check if using a GUID for an existing scald atom previously imported by feeds
++    if($existing_sid == FALSE) {
++        $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
+     }
 -    catch (Exception $e) {
 -      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
 +
-+    // Check if using a GUID for an existing scald atom previously imported by feeds
-+    $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
-+
++    // Search for a previously imported matching scald atom and use that if found.
 +    if($existing_sid == FALSE) {
 +      $type = _scald_feeds_get_provider_by_mime_type($v->getMimeType());
-+    
-+      // Search for a previously imported matching scald atom and use that if found.
 +      $existing_sid = scald_feeds_fetch_matching_atom($v->getValue(), $type);
      }
 -    if ($file) {
@@ -164,15 +172,15 @@ index 13f1780..dc02747 100644
 +  // Skip atom type the user isn't allowed to create.
 +  if (!scald_action_permitted($atoms[0], 'create')) {
 +    return FALSE;
-+  }
+   }
+-  elseif (!is_object($file) && !is_array($file)) {
 +
 +  if(valid_url($file, TRUE)) {
 +    $data = drupal_http_request($file);
 +    $temp_file = file_unmanaged_save_data($data->data);
 +  } else {
 +    $temp_file = file_unmanaged_copy($file);
-   }
--  elseif (!is_object($file) && !is_array($file)) {
++  }
 +
 +  if($temp_file === FALSE) {
      return FALSE;
