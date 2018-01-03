@@ -1,7 +1,7 @@
-diff --git a/scald_video.module b/scald_video.module
+diff --git a/modules/providers/scald_video/scald_video.module b/modules/providers/scald_video/scald_video.module
 index 7e17c34..ec094a6 100644
---- a/scald_video.module
-+++ b/scald_video.module
+--- a/modules/providers/scald_video/scald_video.module
++++ b/modules/providers/scald_video/scald_video.module
 @@ -194,52 +194,7 @@ function scald_video_form_scald_atom_add_form_options_alter(&$form, &$form_state
        break;
      }

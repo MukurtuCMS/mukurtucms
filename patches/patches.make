@@ -111,19 +111,19 @@ projects[scald][patch][] = contrib/Change-default-scald-audio-html5-template.pat
 projects[scald][patch][] = contrib/Add-custom-hook-in-Scald-for-media-warnings.patch
 
 ;
+projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
+
+;
+projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
+
+;
+projects[scald][patch][] = contrib/2406895.empty_video_thumbnail.patch_deprecated
+
+;
 projects[scald_feeds][patch][] = contrib/83564940-add_scald_metadata_support.patch
 
 ;
 projects[scald_soundcloud][patch][] = contrib/Respect-quoted-strings-in-Soundcloud-tags.patch
-
-;
-projects[scald_video][patch][] = contrib/uploaded_video_dimension_fix.patch
-
-;
-projects[scald_video][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
-
-;
-projects[scald_video][patch][] = contrib/2406895.empty_video_thumbnail.patch_deprecated
 
 ; The 'For missing images' option will always fail
 projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-fix_access_info_indexing.patch
