@@ -1,0 +1,32 @@
+diff --git a/sites/default/default.settings.php b/sites/default/default.settings.php
+index b044be3b..c0846642 100644
+--- a/sites/default/default.settings.php
++++ b/sites/default/default.settings.php
+@@ -628,3 +628,27 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
+  * @see drupal_clean_css_identifier()
+  */
+ # $conf['allow_css_double_underscores'] = TRUE;
++
++
++### mukurtu values to fill
++
++$databases = array (
++  'default' =>
++  array (
++    'default' =>
++    array (
++      'database' => '',
++      'username' => '',
++      'password' => '',
++      'host' => 'localhost',
++      'port' => '',
++      'driver' => 'mysql',
++      'prefix' => '',
++    ),
++  ),
++);
++
++
++### mukurtu customizations (generally leave as is)
++
++$conf['error_level'] = 0;
