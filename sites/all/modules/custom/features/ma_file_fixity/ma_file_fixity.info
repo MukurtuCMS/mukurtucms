@@ -1,0 +1,11 @@
+name = Mukurtu File Fixity
+core = 7.x
+package = Features
+dependencies[] = ctools
+dependencies[] = filehash
+dependencies[] = strongarm
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[variable][] = filehash_algos
+features[variable][] = filehash_dedupe
+project path = sites/all/modules/custom/features
