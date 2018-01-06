@@ -56,7 +56,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -90,10 +90,10 @@ function ma_file_fixity_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_fixity_days_frequency',
     'label' => 'Frequency in Days',
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'max' => '',
-      'min' => '',
+      'min' => 1,
       'prefix' => '',
       'suffix' => '',
       'user_register_form' => FALSE,
@@ -105,7 +105,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'number',
-      'weight' => 4,
+      'weight' => 3,
     ),
   );
 

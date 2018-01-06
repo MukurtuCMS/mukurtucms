@@ -21,23 +21,23 @@ function ma_file_fixity_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_pre_actions',
-        1 => 'title',
         2 => 'field_fixity_schedule',
-        3 => 'field_fixity_cps',
-        4 => 'field_fixity_days_frequency',
+        3 => 'field_fixity_days_frequency',
+        4 => 'field_fixity_cps',
         5 => 'redirect',
         6 => 'path',
       ),
       'hidden' => array(
+        1 => 'title',
         7 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'field_pre_actions' => 'ds_content',
-      'title' => 'ds_content',
+      'title' => 'hidden',
       'field_fixity_schedule' => 'ds_content',
-      'field_fixity_cps' => 'ds_content',
       'field_fixity_days_frequency' => 'ds_content',
+      'field_fixity_cps' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
       '_add_existing_field' => 'hidden',

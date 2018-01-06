@@ -20,9 +20,44 @@ function ma_file_fixity_bulk_generate_file_hashes() {
     drupal_set_message($message = t('Added file hashes for ' . count($files['file']) . ' files.'), $type = 'status');
 }
 
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_file_fixity_form_fixity_check_node_form_alter(&$form, &$form_state) {
+
+  // The Fixity Check node title gets set automatically.
+  $form['title']['#access'] = FALSE;
+  $form['title']['#required'] = FALSE;
+
+}
+
 /**
  * Implements hook_entity_presave().
  */
 function ma_file_fixity_entity_presave($entity, $type) {
-  $entity->title = 'hello';
+  if ($entity->type == 'fixity_check') {
+
+    // Set the Fixity Check node title
+    $schedule = ucfirst($entity->field_fixity_schedule['und'][0]['value']);
+    if (empty($schedule)) {
+      $schedule = 'Unscheduled';
+    }
+    $schedule = str_replace('x', $entity->field_fixity_days_frequency['und'][0]['value'], $schedule);
+    $cps = $entity->field_fixity_cps['und'];
+    if (count($cps)) {
+      $cp_names = [];
+      foreach ($cps as $cp) {
+        $cp_node = node_load ($cp['target_id']);
+        $cp_names[] = $cp_node->title;
+      }
+      $cps_title = implode(', ', $cp_names);
+    }
+    else {
+      $cps_title = 'all media assets';
+    }
+    $entity->title = $schedule . ' - ' . $cps_title;
+
+  }
 }
+

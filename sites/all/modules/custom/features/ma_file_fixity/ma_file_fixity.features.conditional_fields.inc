@@ -106,10 +106,10 @@ function ma_file_fixity_conditional_fields_default_fields() {
       ),
       'selector' => '',
       'values_set' => 1,
-      'value_form' => 'x_days',
+      'value_form' => 'Every x days',
       'value' => array(
         0 => array(
-          'value' => 'x_days',
+          'value' => 'Every x days',
         ),
       ),
       'values' => array(),

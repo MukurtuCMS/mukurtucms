@@ -85,9 +85,9 @@ function ma_file_fixity_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        'weekly' => 'Weekly',
-        'monthly' => 'Monthly',
-        'x_days' => 'Every x Days',
+        'Weekly' => 'Weekly',
+        'Monthly' => 'Monthly',
+        'Every x days' => 'Every x days',
       ),
       'allowed_values_function' => '',
       'treeable' => 0,
