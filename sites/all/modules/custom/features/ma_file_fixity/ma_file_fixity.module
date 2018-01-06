@@ -20,3 +20,9 @@ function ma_file_fixity_bulk_generate_file_hashes() {
     drupal_set_message($message = t('Added file hashes for ' . count($files['file']) . ' files.'), $type = 'status');
 }
 
+/**
+ * Implements hook_entity_presave().
+ */
+function ma_file_fixity_entity_presave($entity, $type) {
+  $entity->title = 'hello';
+}
