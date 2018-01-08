@@ -1,0 +1,8 @@
+name = Mukurtu export
+description = "Allows users to export Mukurtu content."
+core = 7.x
+package = "Mukurtu"
+;configure = admin/config/content/mukurtu_export
+;files[]=views/views_handler_field_node_link_export.inc
+;files[]=node_export.test
+core = "7.x"
