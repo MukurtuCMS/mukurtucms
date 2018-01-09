@@ -10,42 +10,43 @@
 function ma_file_fixity_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_fixity_check_fails'.
-  $field_bases['field_fixity_check_fails'] = array(
+  // Exported field_base: 'field_fixity_check_fails_count'.
+  $field_bases['field_fixity_check_fails_count'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_fixity_check_fails_count',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'number_integer',
+  );
+
+  // Exported field_base: 'field_fixity_check_fails_details'.
+  $field_bases['field_fixity_check_fails_details'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_fixity_check_fails',
+    'field_name' => 'field_fixity_check_fails_details',
     'indexes' => array(
-      'target_id' => array(
-        0 => 'target_id',
+      'format' => array(
+        0 => 'format',
       ),
     ),
     'locked' => 0,
-    'module' => 'entityreference',
+    'module' => 'text',
     'settings' => array(
-      'duplicates' => 0,
-      'handler' => 'base',
-      'handler_settings' => array(
-        'behaviors' => array(
-          'treeable_behavior' => array(
-            'status' => 0,
-          ),
-          'views-select-list' => array(
-            'status' => 0,
-          ),
-        ),
-        'sort' => array(
-          'type' => 'none',
-        ),
-        'target_bundles' => array(),
-      ),
-      'target_type' => 'file',
+      'max_length' => 512,
       'treeable' => 0,
     ),
     'translatable' => 0,
-    'type' => 'entityreference',
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_fixity_cps'.

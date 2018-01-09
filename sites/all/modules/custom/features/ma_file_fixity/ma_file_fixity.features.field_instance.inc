@@ -11,47 +11,104 @@ function ma_file_fixity_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
-  // 'field_collection_item-field_fixity_report-field_fixity_check_fails'.
-  $field_instances['field_collection_item-field_fixity_report-field_fixity_check_fails'] = array(
+  // 'field_collection_item-field_fixity_report-field_fixity_check_fails_count'.
+  $field_instances['field_collection_item-field_fixity_report-field_fixity_check_fails_count'] = array(
     'bundle' => 'field_fixity_report',
     'default_value' => NULL,
-    'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
+        'label' => 'inline',
+        'module' => 'number',
         'settings' => array(
-          'bypass_access' => 0,
-          'link' => 1,
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
         ),
-        'type' => 'entityreference_label',
+        'type' => 'number_integer',
         'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
-    'field_name' => 'field_fixity_check_fails',
-    'label' => 'Check Fails',
+    'field_name' => 'field_fixity_check_fails_count',
+    'label' => 'Files failed',
     'required' => 0,
     'settings' => array(
-      'behaviors' => array(
-        'prepopulate' => array(
-          'status' => 0,
-        ),
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(
+        'treeable' => 0,
       ),
+      'type' => 'number',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'field_collection_item-field_fixity_report-field_fixity_check_fails_details'.
+  $field_instances['field_collection_item-field_fixity_report-field_fixity_check_fails_details'] = array(
+    'bundle' => 'field_fixity_report',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 6,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_fixity_check_fails_details',
+    'label' => 'Check fails details',
+    'required' => 0,
+    'settings' => array(
+      'context' => 'title',
+      'context_default' => 'sdl_editor_representation',
+      'dnd_enabled' => 0,
+      'mee_enabled' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -79,7 +136,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_fixity_files_checked',
-    'label' => 'Files Checked',
+    'label' => 'Files checked',
     'required' => 0,
     'settings' => array(
       'max' => '',
@@ -123,7 +180,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_fixity_processing_time',
-    'label' => 'Processing time to run check',
+    'label' => 'Processing time',
     'required' => 0,
     'settings' => array(
       'max' => '',
@@ -152,7 +209,7 @@ function ma_file_fixity_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'hidden',
         'module' => 'date',
         'settings' => array(
           'format_type' => 'long',
@@ -202,7 +259,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -232,7 +289,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 3,
     ),
   );
 
@@ -247,7 +304,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -259,7 +316,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_fixity_days_frequency',
-    'label' => 'Frequency in Days',
+    'label' => 'Frequency in days',
     'required' => 1,
     'settings' => array(
       'max' => '',
@@ -275,7 +332,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'number',
-      'weight' => 3,
+      'weight' => 2,
     ),
   );
 
@@ -283,7 +340,11 @@ function ma_file_fixity_field_default_field_instances() {
   // 'node-fixity_check-field_fixity_latest_check_status'.
   $field_instances['node-fixity_check-field_fixity_latest_check_status'] = array(
     'bundle' => 'fixity_check',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 'not_run',
+      ),
+    ),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -292,7 +353,7 @@ function ma_file_fixity_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 4,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -304,8 +365,8 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_fixity_latest_check_status',
-    'label' => 'Latest Check Result',
-    'required' => 0,
+    'label' => 'Latest check result',
+    'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
@@ -317,7 +378,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 6,
     ),
   );
 
@@ -325,7 +386,7 @@ function ma_file_fixity_field_default_field_instances() {
   // 'node-fixity_check-field_fixity_latest_check_time'.
   $field_instances['node-fixity_check-field_fixity_latest_check_time'] = array(
     'bundle' => 'fixity_check',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -341,7 +402,7 @@ function ma_file_fixity_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 5,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -353,7 +414,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_fixity_latest_check_time',
-    'label' => 'Latest Check Time',
+    'label' => 'Latest check time',
     'required' => 0,
     'settings' => array(
       'default_value' => 'now',
@@ -367,10 +428,18 @@ function ma_file_fixity_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 0,
+        'display_all_day' => 0,
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'no_fieldset' => 0,
+        'text_parts' => array(),
         'treeable' => 0,
+        'year_range' => '-3:+3',
       ),
       'type' => 'options_select',
-      'weight' => 9,
+      'weight' => 7,
     ),
   );
 
@@ -383,16 +452,9 @@ function ma_file_fixity_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'field_collection',
-        'settings' => array(
-          'add' => 'Add',
-          'delete' => 'Delete',
-          'description' => TRUE,
-          'edit' => 'Edit',
-          'view_mode' => 'full',
-        ),
-        'type' => 'field_collection_view',
-        'weight' => 6,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -416,7 +478,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_hidden',
-      'weight' => 7,
+      'weight' => 9,
     ),
   );
 
@@ -431,7 +493,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 1,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -456,7 +518,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 1,
     ),
   );
 
@@ -475,7 +537,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -506,15 +568,16 @@ function ma_file_fixity_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Check Fails');
+  t('Check fails details');
   t('Checks');
-  t('Files Checked');
-  t('Frequency in Days');
+  t('Files checked');
+  t('Files failed');
+  t('Frequency in days');
   t('If no schedule is selected, this File Fixity Check can still be run manually.');
-  t('Latest Check Result');
-  t('Latest Check Time');
+  t('Latest check result');
+  t('Latest check time');
   t('Pre-Actions');
-  t('Processing time to run check');
+  t('Processing time');
   t('Protocols');
   t('Schedule');
   t('Select Cultural Protocol(s) to limit which media assets are checked. The media asset must belong to at least one of these Cultural Protocols to be checked (the Cultural Protocol of the Digital Heritage item in which the media file is not considered). If this field is left blank, all media assets are checked. ');

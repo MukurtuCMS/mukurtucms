@@ -10665,3 +10665,21 @@ a:hover {
 .class-collections-tree-popup td.center .inner {
   width: auto !important;
 }
+.view-mode-full .field-name-field-fixity-check-fails-details ul {
+  padding-left: 30px;
+  list-style-type: disc;
+}
+.view-mode-full .field-name-field-fixity-check-fails-details ul .fail {
+  color: red;
+}
+.view-mode-full .field-name-field-fixity-check-fails-details ul .pass {
+  color: green;
+}
+.view-mode-full .field-name-field-fixity-check-fails-details ul p {
+  margin-bottom: 0;
+}
+.view-fixity-reports .views-row {
+  margin-top: 1em;
+  border-top: solid;
+  border-width: 1px;
+}

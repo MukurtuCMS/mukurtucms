@@ -10,14 +10,14 @@ include_once 'ma_file_fixity.features.inc';
  * Bulk generate the file hashes for all existing files. Called once by an ma_core update hook
  */
 function ma_file_fixity_bulk_generate_file_hashes() {
-     $query = new EntityFieldQuery();
-    $files = $query->entityCondition('entity_type', 'file')
-      ->addMetaData('account', user_load(1))
-      ->execute();
-    foreach ($files['file'] as $file) {
-      file_load($file->fid); // The hashes are generated on file load if they do yet not exist for the file.
-    }
-    drupal_set_message($message = t('Added file hashes for ' . count($files['file']) . ' files.'), $type = 'status');
+  $query = new EntityFieldQuery();
+  $files = $query->entityCondition('entity_type', 'file')
+    ->addMetaData('account', user_load(1))
+    ->execute();
+  foreach ($files['file'] as $file) {
+    file_load($file->fid); // The hashes are generated on file load if they do yet not exist for the file.
+  }
+  drupal_set_message($message = t('Added file hashes for ' . count($files['file']) . ' files.'), $type = 'status');
 }
 
 
@@ -36,6 +36,9 @@ function ma_file_fixity_form_fixity_check_node_form_alter(&$form, &$form_state) 
  * Implements hook_entity_presave().
  */
 function ma_file_fixity_entity_presave($entity, $type) {
+  if (!isset($entity->type)) {
+    return;
+  }
   if ($entity->type == 'fixity_check') {
 
     // Set the Fixity Check node title
@@ -44,20 +47,115 @@ function ma_file_fixity_entity_presave($entity, $type) {
       $schedule = 'Unscheduled';
     }
     $schedule = str_replace('x', $entity->field_fixity_days_frequency['und'][0]['value'], $schedule);
-    $cps = $entity->field_fixity_cps['und'];
-    if (count($cps)) {
-      $cp_names = [];
-      foreach ($cps as $cp) {
-        $cp_node = node_load ($cp['target_id']);
-        $cp_names[] = $cp_node->title;
+    if (isset($entity->field_fixity_cps[LANGUAGE_NONE])) {
+      $cps = $entity->field_fixity_cps[LANGUAGE_NONE];
+      if (count($cps)) {
+        $cp_names = [];
+        foreach ($cps as $cp) {
+          $cp_node = node_load($cp['target_id']);
+          $cp_names[] = $cp_node->title;
+        }
+        $cps_title = implode(', ', $cp_names);
       }
-      $cps_title = implode(', ', $cp_names);
+      else {
+        $cps_title = 'all media assets';
+      }
+      $entity->title = $schedule . ' - ' . $cps_title;
     }
-    else {
-      $cps_title = 'all media assets';
-    }
-    $entity->title = $schedule . ' - ' . $cps_title;
-
   }
 }
 
+
+/**
+ * Implements hook_menu().
+ */
+function ma_file_fixity_menu() {
+  $items = array();
+
+  // Run fixity check manually
+  $items['run-fixity-check/%node'] = array(
+    'page callback' => 'ma_file_fixity_run_check_manually',
+    'page arguments' => array(1),
+    'access callback' => 'user_access',
+    'access arguments' => array('create fixity_check content'),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Run file fixity check manually page callback.
+ */
+function ma_file_fixity_run_check_manually($node) {
+  if ($node->type <> 'fixity_check') {
+    return "Not a Fixity Check node.";
+  }
+  $fw = entity_metadata_wrapper('node', $node);
+  $start_time = time();
+  $cps = $fw->field_fixity_cps->raw(); // TODO: only show for selected CPs
+  $files_checked = 0;
+  $file_fails = [];
+
+  $query = new EntityFieldQuery();
+  $files = $query->entityCondition('entity_type', 'file')
+    ->addMetaData('account', user_load(1))
+    ->execute();
+  foreach ($files['file'] as $file) {
+    $file = file_load($file->fid);
+    $algo_comp_text = '';
+    $algo_fail = 0;
+    foreach (filehash_algos() as $algo) {
+      $saved_hash =  $file->filehash[$algo];
+      $checked_hash = hash_file($algo, $file->uri);
+      if ($saved_hash <> $checked_hash) {
+        $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. Checked as ' . $checked_hash . '.</li>';
+        $algo_fail = 1;
+      }
+      else {
+        $algo_comp_text .= '<li class="pass"><i>' . $algo . '</i> matches.</li>';
+      }
+    }
+    if ($algo_fail) {
+      $file_fails[] = [
+        'value' => l($file->filename, 'file/' . $file->fid) . '<ul>' . $algo_comp_text . '</ul>',
+        'format' => 'full_html'
+      ];
+    }
+    $files_checked++;
+  }
+
+  $ffc_item = entity_create('field_collection_item', array('field_name' => 'field_fixity_report'));
+  $ffc_item->setHostEntity('node', $node);
+  $ffcw = entity_metadata_wrapper('field_collection_item', $ffc_item);
+  $ffcw->field_fixity_time_of_check->set($start_time);
+  $ffcw->field_fixity_processing_time->set(time()-$start_time);
+  $ffcw->field_fixity_files_checked	->set($files_checked);
+  $overall_status = 'pass';
+  if (count($file_fails)) {
+    $ffcw->field_fixity_check_fails_details->set($file_fails);
+    $ffcw->field_fixity_check_fails_count->set(count($file_fails));
+    $overall_status = 'fail';
+  }
+
+  $node->field_fixity_latest_check_time['und'][0]['value'] = $start_time;
+  $node->field_fixity_latest_check_status['und'][0]['value'] = $overall_status;
+  node_save($node);
+
+  drupal_goto ('node/' . $node->nid);
+}
+
+/**
+ * Implements hook_field_collection_item_view().
+ */
+function ma_file_fixity_field_collection_item_view($field_collection_item, $view_mode, $langcode) {
+  // Show the time of check field in either green or red depending on whether it found check fails, and make it a header.
+  if ($field_collection_item->field_name == 'field_fixity_report') {
+    $color = 'green';
+    if ($field_collection_item->field_fixity_check_fails_count[LANGUAGE_NONE]) {
+      $color = 'red';
+    }
+    $time_of_check =& $field_collection_item->content['field_fixity_time_of_check'][0]['#markup'];
+    $time_of_check = '<h4 style="color: ' . $color . ';">' . $time_of_check . '</h4>';
+  }
+}

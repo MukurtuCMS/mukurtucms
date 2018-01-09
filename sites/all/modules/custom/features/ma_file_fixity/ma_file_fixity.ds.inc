@@ -17,6 +17,16 @@ function ma_file_fixity_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'fixity_check';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'fixity_reports' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'fixity_run_check' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -24,6 +34,48 @@ function ma_file_fixity_ds_field_settings_info() {
     ),
   );
   $export['node|fixity_check|default'] = $ds_fieldsetting;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_file_fixity_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'fixity_reports';
+  $ds_field->label = 'Checks';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'fixity_check|*';
+  $ds_field->properties = array(
+    'block' => 'views|fixity_reports-block_1',
+    'block_render' => '3',
+  );
+  $export['fixity_reports'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'fixity_run_check';
+  $ds_field->label = 'Run fixity check';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'fixity_check|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php print l(\'Run this check now\', \'run-fixity-check/\' . $entity->nid); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['fixity_run_check'] = $ds_field;
 
   return $export;
 }
@@ -47,21 +99,29 @@ function ma_file_fixity_ds_layout_settings_info() {
         0 => 'field_fixity_time_of_check',
         1 => 'field_fixity_processing_time',
         2 => 'field_fixity_files_checked',
-        3 => 'field_fixity_check_fails',
+        3 => 'field_fixity_check_fails_count',
+        4 => 'field_fixity_check_fails_details',
       ),
     ),
     'fields' => array(
       'field_fixity_time_of_check' => 'ds_content',
       'field_fixity_processing_time' => 'ds_content',
       'field_fixity_files_checked' => 'ds_content',
-      'field_fixity_check_fails' => 'ds_content',
+      'field_fixity_check_fails_count' => 'ds_content',
+      'field_fixity_check_fails_details' => 'ds_content',
     ),
-    'classes' => array(),
-    'wrappers' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
-    'layout_attributes_merge' => TRUE,
-    'layout_link_attribute' => FALSE,
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
     'layout_link_custom' => '',
     'layout_disable_css' => FALSE,
   );
@@ -80,17 +140,19 @@ function ma_file_fixity_ds_layout_settings_info() {
         0 => 'field_fixity_time_of_check',
         1 => 'field_fixity_processing_time',
         2 => 'field_fixity_files_checked',
-        3 => 'field_fixity_check_fails',
+        3 => 'field_fixity_check_fails_count',
       ),
       'hidden' => array(
-        4 => '_add_existing_field',
+        4 => 'field_fixity_check_fails_details',
+        5 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'field_fixity_time_of_check' => 'ds_content',
       'field_fixity_processing_time' => 'ds_content',
       'field_fixity_files_checked' => 'ds_content',
-      'field_fixity_check_fails' => 'ds_content',
+      'field_fixity_check_fails_count' => 'ds_content',
+      'field_fixity_check_fails_details' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -123,14 +185,16 @@ function ma_file_fixity_ds_layout_settings_info() {
         0 => 'title',
         1 => 'field_fixity_latest_check_status',
         2 => 'field_fixity_latest_check_time',
-        3 => 'field_fixity_report',
+        3 => 'fixity_run_check',
+        4 => 'fixity_reports',
       ),
     ),
     'fields' => array(
       'title' => 'ds_content',
       'field_fixity_latest_check_status' => 'ds_content',
       'field_fixity_latest_check_time' => 'ds_content',
-      'field_fixity_report' => 'ds_content',
+      'fixity_run_check' => 'ds_content',
+      'fixity_reports' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -160,29 +224,31 @@ function ma_file_fixity_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_pre_actions',
-        2 => 'field_fixity_schedule',
-        3 => 'field_fixity_days_frequency',
-        4 => 'field_fixity_cps',
-        5 => 'redirect',
-        6 => 'path',
+        1 => 'field_fixity_schedule',
+        2 => 'field_fixity_days_frequency',
+        3 => 'field_fixity_cps',
+        4 => 'redirect',
+        5 => 'path',
       ),
       'hidden' => array(
-        1 => 'title',
-        7 => 'field_fixity_report',
-        8 => 'field_fixity_latest_check_status',
-        9 => '_add_existing_field',
+        6 => 'field_fixity_latest_check_status',
+        7 => 'field_fixity_latest_check_time',
+        8 => 'title',
+        9 => 'field_fixity_report',
+        10 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'field_pre_actions' => 'ds_content',
-      'title' => 'hidden',
       'field_fixity_schedule' => 'ds_content',
       'field_fixity_days_frequency' => 'ds_content',
       'field_fixity_cps' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
-      'field_fixity_report' => 'hidden',
       'field_fixity_latest_check_status' => 'hidden',
+      'field_fixity_latest_check_time' => 'hidden',
+      'title' => 'hidden',
+      'field_fixity_report' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
