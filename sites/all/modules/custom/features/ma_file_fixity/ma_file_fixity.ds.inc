@@ -68,7 +68,7 @@ function ma_file_fixity_ds_custom_fields_info() {
   $ds_field->ui_limit = 'fixity_check|*';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<?php print l(\'Run this check now\', \'run-fixity-check/\' . $entity->nid); ?>',
+      'value' => '<?php print l(\'Run this check now.\', \'run-fixity-check/\' . $entity->nid); ?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,
