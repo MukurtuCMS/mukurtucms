@@ -143,7 +143,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_fixity_check_fails_details',
-    'label' => 'Check fails details',
+    'label' => 'Check run fails details',
     'required' => 0,
     'settings' => array(
       'context' => 'title',
@@ -279,7 +279,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_fixity_time_of_check',
-    'label' => 'Time of check',
+    'label' => 'Time of check run',
     'required' => 0,
     'settings' => array(
       'default_value' => 'now',
@@ -423,7 +423,7 @@ function ma_file_fixity_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -469,7 +469,7 @@ function ma_file_fixity_field_default_field_instances() {
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -481,7 +481,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_fixity_latest_check_status',
-    'label' => 'Latest check result',
+    'label' => 'Latest check run result',
     'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -502,7 +502,7 @@ function ma_file_fixity_field_default_field_instances() {
   // 'node-fixity_check-field_fixity_latest_check_time'.
   $field_instances['node-fixity_check-field_fixity_latest_check_time'] = array(
     'bundle' => 'fixity_check',
-    'default_value' => array(),
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -518,7 +518,7 @@ function ma_file_fixity_field_default_field_instances() {
           'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
-        'weight' => 2,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -530,7 +530,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_fixity_latest_check_time',
-    'label' => 'Latest check time',
+    'label' => 'Latest check run time',
     'required' => 0,
     'settings' => array(
       'default_value' => 'now',
@@ -544,15 +544,7 @@ function ma_file_fixity_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 0,
-        'display_all_day' => 0,
-        'increment' => 15,
-        'input_format' => 'm/d/Y - H:i:s',
-        'input_format_custom' => '',
-        'label_position' => 'above',
-        'no_fieldset' => 0,
-        'text_parts' => array(),
         'treeable' => 0,
-        'year_range' => '-3:+3',
       ),
       'type' => 'options_select',
       'weight' => 8,
@@ -582,7 +574,7 @@ function ma_file_fixity_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_fixity_report',
-    'label' => 'Checks',
+    'label' => 'Check runs',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -686,22 +678,22 @@ function ma_file_fixity_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('Check at least one hash to check against.
 ');
-  t('Check fails details');
-  t('Checks');
+  t('Check run fails details');
+  t('Check runs');
   t('Files checked');
   t('Files failed');
   t('Frequency in days');
   t('Hashes checked against	');
   t('Hashes to check against');
-  t('Latest check result');
-  t('Latest check time');
+  t('Latest check run result');
+  t('Latest check run time');
   t('Pre-Actions');
   t('Processing time');
   t('Protocols');
   t('Schedule');
   t('Select Cultural Protocol(s) to limit which media assets are checked. The media asset must belong to at least one of these Cultural Protocols to be checked (the Cultural Protocol of the Digital Heritage item in which the media file is not considered). If this field is left blank, all media assets are checked. ');
   t('Set to "Unscheduled" to run this fixity check manually only.');
-  t('Time of check');
+  t('Time of check run');
 
   return $field_instances;
 }

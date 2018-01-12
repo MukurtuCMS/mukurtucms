@@ -184,7 +184,7 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
-  /* Field: Content: Latest check time */
+  /* Field: Content: Latest check run time */
   $handler->display->display_options['fields']['field_fixity_latest_check_time']['id'] = 'field_fixity_latest_check_time';
   $handler->display->display_options['fields']['field_fixity_latest_check_time']['table'] = 'field_data_field_fixity_latest_check_time';
   $handler->display->display_options['fields']['field_fixity_latest_check_time']['field'] = 'field_fixity_latest_check_time';
@@ -197,7 +197,7 @@ function ma_file_fixity_views_default_views() {
     'multiple_to' => '',
     'show_remaining_days' => 0,
   );
-  /* Field: Content: Latest check result */
+  /* Field: Content: Latest check run result */
   $handler->display->display_options['fields']['field_fixity_latest_check_status']['id'] = 'field_fixity_latest_check_status';
   $handler->display->display_options['fields']['field_fixity_latest_check_status']['table'] = 'field_data_field_fixity_latest_check_status';
   $handler->display->display_options['fields']['field_fixity_latest_check_status']['field'] = 'field_fixity_latest_check_status';
@@ -240,20 +240,20 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   $handler->display->display_options['sorts']['created']['exposed'] = TRUE;
-  $handler->display->display_options['sorts']['created']['expose']['label'] = 'Fixity check created';
-  /* Sort criterion: Content: Latest check result (field_fixity_latest_check_status) */
-  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['id'] = 'field_fixity_latest_check_status_value';
-  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['table'] = 'field_data_field_fixity_latest_check_status';
-  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['field'] = 'field_fixity_latest_check_status_value';
-  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['exposed'] = TRUE;
-  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check result';
-  /* Sort criterion: Content: Latest check time (field_fixity_latest_check_time) */
+  $handler->display->display_options['sorts']['created']['expose']['label'] = 'Fixity Check created';
+  /* Sort criterion: Content: Latest check run time (field_fixity_latest_check_time) */
   $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['id'] = 'field_fixity_latest_check_time_value';
   $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['table'] = 'field_data_field_fixity_latest_check_time';
   $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['field'] = 'field_fixity_latest_check_time_value';
   $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['order'] = 'DESC';
   $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['exposed'] = TRUE;
-  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['expose']['label'] = 'Latest check time';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['expose']['label'] = 'Latest check run time';
+  /* Sort criterion: Content: Latest check run result (field_fixity_latest_check_status) */
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['id'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['table'] = 'field_data_field_fixity_latest_check_status';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['field'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check run result';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -287,14 +287,14 @@ function ma_file_fixity_views_default_views() {
     5 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Latest check result (field_fixity_latest_check_status) */
+  /* Filter criterion: Content: Latest check run result (field_fixity_latest_check_status) */
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['id'] = 'field_fixity_latest_check_status_value';
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['table'] = 'field_data_field_fixity_latest_check_status';
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['field'] = 'field_fixity_latest_check_status_value';
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['group'] = 1;
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['operator_id'] = 'field_fixity_latest_check_status_value_op';
-  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check result';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check run result';
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['operator'] = 'field_fixity_latest_check_status_value_op';
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['identifier'] = 'field_fixity_latest_check_status_value';
   $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['remember_roles'] = array(
@@ -322,13 +322,13 @@ function ma_file_fixity_views_default_views() {
     t('Advanced options'),
     t('Sort options'),
     t('<a href=\'/node/add/fixity-check\'>Add a Fixity Check</a>'),
-    t('Latest check time'),
-    t('Latest check result'),
+    t('Latest check run time'),
+    t('Latest check run result'),
     t('Details'),
     t('Run this check now.'),
     t('Edit'),
     t('Delete'),
-    t('Fixity check created'),
+    t('Fixity Check created'),
     t('Schedule'),
     t('Page'),
   );
@@ -354,7 +354,7 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'entity';
-  /* Relationship: Field collection item: Entity with the Checks (field_fixity_report) */
+  /* Relationship: Field collection item: Entity with the Check runs (field_fixity_report) */
   $handler->display->display_options['relationships']['field_fixity_report_node']['id'] = 'field_fixity_report_node';
   $handler->display->display_options['relationships']['field_fixity_report_node']['table'] = 'field_collection_item';
   $handler->display->display_options['relationships']['field_fixity_report_node']['field'] = 'field_fixity_report_node';
@@ -363,7 +363,7 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['fields']['item_id']['id'] = 'item_id';
   $handler->display->display_options['fields']['item_id']['table'] = 'field_collection_item';
   $handler->display->display_options['fields']['item_id']['field'] = 'item_id';
-  /* Sort criterion: Field collection item: Time of check (field_fixity_time_of_check) */
+  /* Sort criterion: Field collection item: Time of check run (field_fixity_time_of_check) */
   $handler->display->display_options['sorts']['field_fixity_time_of_check_value']['id'] = 'field_fixity_time_of_check_value';
   $handler->display->display_options['sorts']['field_fixity_time_of_check_value']['table'] = 'field_data_field_fixity_time_of_check';
   $handler->display->display_options['sorts']['field_fixity_time_of_check_value']['field'] = 'field_fixity_time_of_check_value';

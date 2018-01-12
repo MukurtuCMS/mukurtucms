@@ -18,7 +18,7 @@ function ma_file_fixity_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'fixity_reports' => array(
-      'weight' => '5',
+      'weight' => '4',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -26,7 +26,7 @@ function ma_file_fixity_ds_field_settings_info() {
       ),
     ),
     'fixity_run_check' => array(
-      'weight' => '4',
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -45,7 +45,7 @@ function ma_file_fixity_ds_custom_fields_info() {
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
   $ds_field->field = 'fixity_reports';
-  $ds_field->label = 'Checks';
+  $ds_field->label = 'Check Runs';
   $ds_field->field_type = 6;
   $ds_field->entities = array(
     'node' => 'node',
