@@ -28,9 +28,139 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['access']['perm'] = 'create fixity_check content';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['type'] = 'better_exposed_filters';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
+  $handler->display->display_options['exposed_form']['options']['expose_sort_order'] = FALSE;
+  $handler->display->display_options['exposed_form']['options']['autosubmit'] = TRUE;
+  $handler->display->display_options['exposed_form']['options']['bef'] = array(
+    'general' => array(
+      'input_required' => 0,
+      'text_input_required' => array(
+        'text_input_required' => array(
+          'value' => 'Select any filter and click on Apply to see results',
+          'format' => 'filtered_html',
+        ),
+      ),
+      'allow_secondary' => 0,
+      'secondary_label' => 'Advanced options',
+      'secondary_collapse_override' => '0',
+    ),
+    'sort' => array(
+      'bef_format' => 'default',
+      'advanced' => array(
+        'collapsible' => 0,
+        'collapsible_label' => 'Sort options',
+        'combine' => 0,
+        'combine_param' => 'sort_bef_combine',
+        'combine_rewrite' => '',
+        'reset' => 0,
+        'reset_label' => '',
+        'is_secondary' => 0,
+        'autosubmit' => 0,
+      ),
+    ),
+    'field_fixity_schedule_value' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'bef_select_all_none' => 1,
+        'bef_collapsible' => 0,
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+    'field_fixity_latest_check_status_value' => array(
+      'bef_format' => 'default',
+      'more_options' => array(
+        'bef_select_all_none' => FALSE,
+        'bef_collapsible' => 0,
+        'autosubmit' => 0,
+        'is_secondary' => 0,
+        'any_label' => '',
+        'bef_filter_description' => '',
+        'tokens' => array(
+          'available' => array(
+            0 => 'global_types',
+          ),
+        ),
+        'rewrite' => array(
+          'filter_rewrite_values' => '',
+        ),
+      ),
+    ),
+  );
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'nid' => 'nid',
+    'title' => 'title',
+    'field_fixity_latest_check_time' => 'field_fixity_latest_check_time',
+    'field_fixity_latest_check_status' => 'field_fixity_latest_check_status',
+    'view_node' => 'view_node',
+    'nothing' => 'nothing',
+    'edit_node' => 'edit_node',
+    'delete_node' => 'delete_node',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'nid' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'title' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_fixity_latest_check_time' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'desc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_fixity_latest_check_status' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'view_node' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'nothing' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'edit_node' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'delete_node' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
   /* Footer: Global: Text area */
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
@@ -109,6 +239,21 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  $handler->display->display_options['sorts']['created']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['created']['expose']['label'] = 'Fixity check created';
+  /* Sort criterion: Content: Latest check result (field_fixity_latest_check_status) */
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['id'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['table'] = 'field_data_field_fixity_latest_check_status';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['field'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check result';
+  /* Sort criterion: Content: Latest check time (field_fixity_latest_check_time) */
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['id'] = 'field_fixity_latest_check_time_value';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['table'] = 'field_data_field_fixity_latest_check_time';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['field'] = 'field_fixity_latest_check_time_value';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['order'] = 'DESC';
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_fixity_latest_check_time_value']['expose']['label'] = 'Latest check time';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -123,6 +268,43 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'fixity_check' => 'fixity_check',
   );
+  $handler->display->display_options['filters']['type']['group'] = 1;
+  /* Filter criterion: Content: Schedule (field_fixity_schedule) */
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['id'] = 'field_fixity_schedule_value';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['table'] = 'field_data_field_fixity_schedule';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['field'] = 'field_fixity_schedule_value';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['group'] = 1;
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['expose']['operator_id'] = 'field_fixity_schedule_value_op';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['expose']['label'] = 'Schedule';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['expose']['operator'] = 'field_fixity_schedule_value_op';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['expose']['identifier'] = 'field_fixity_schedule_value';
+  $handler->display->display_options['filters']['field_fixity_schedule_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: Content: Latest check result (field_fixity_latest_check_status) */
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['id'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['table'] = 'field_data_field_fixity_latest_check_status';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['field'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['group'] = 1;
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['operator_id'] = 'field_fixity_latest_check_status_value_op';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check result';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['operator'] = 'field_fixity_latest_check_status_value_op';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['identifier'] = 'field_fixity_latest_check_status_value';
+  $handler->display->display_options['filters']['field_fixity_latest_check_status_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
@@ -136,6 +318,9 @@ function ma_file_fixity_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('Select any filter and click on Apply to see results'),
+    t('Advanced options'),
+    t('Sort options'),
     t('<a href=\'/node/add/fixity-check\'>Add a Fixity Check</a>'),
     t('Latest check time'),
     t('Latest check result'),
@@ -143,6 +328,8 @@ function ma_file_fixity_views_default_views() {
     t('Run this check now.'),
     t('Edit'),
     t('Delete'),
+    t('Fixity check created'),
+    t('Schedule'),
     t('Page'),
   );
   $export['fixity_checks'] = $view;

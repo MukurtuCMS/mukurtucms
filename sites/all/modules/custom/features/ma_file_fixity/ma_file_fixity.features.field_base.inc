@@ -288,6 +288,7 @@ function ma_file_fixity_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
+        'Unscheduled' => 'Unscheduled',
         'Weekly' => 'Weekly',
         'Monthly' => 'Monthly',
         'Every x days' => 'Every x days',

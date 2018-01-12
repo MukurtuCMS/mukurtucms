@@ -42,12 +42,7 @@ function ma_file_fixity_entity_presave($entity, $type) {
   if ($entity->type == 'fixity_check') {
 
     // Set the Fixity Check node title
-    if (isset($entity->field_fixity_schedule['und'][0]['value'])) {
-      $schedule = ucfirst($entity->field_fixity_schedule['und'][0]['value']);
-    }
-    else {
-      $schedule = 'Unscheduled';
-    }
+    $schedule = $entity->field_fixity_schedule['und'][0]['value'];
     if (isset($entity->field_fixity_days_frequency['und'][0]['value'])) {
       $schedule = str_replace('x', $entity->field_fixity_days_frequency['und'][0]['value'], $schedule);
     }

@@ -1,6 +1,7 @@
 name = Mukurtu File Fixity
 core = 7.x
 package = Features
+dependencies[] = better_exposed_filters
 dependencies[] = conditional_fields
 dependencies[] = ctools
 dependencies[] = date

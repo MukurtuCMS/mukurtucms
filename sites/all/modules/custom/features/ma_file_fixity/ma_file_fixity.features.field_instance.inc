@@ -603,7 +603,7 @@ function ma_file_fixity_field_default_field_instances() {
     'bundle' => 'fixity_check',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'If no schedule is selected, this File Fixity Check can still be run manually.',
+    'description' => 'Set to "Unscheduled" to run this fixity check manually only.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -622,7 +622,7 @@ function ma_file_fixity_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_fixity_schedule',
     'label' => 'Schedule',
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
@@ -693,7 +693,6 @@ function ma_file_fixity_field_default_field_instances() {
   t('Frequency in days');
   t('Hashes checked against	');
   t('Hashes to check against');
-  t('If no schedule is selected, this File Fixity Check can still be run manually.');
   t('Latest check result');
   t('Latest check time');
   t('Pre-Actions');
@@ -701,6 +700,7 @@ function ma_file_fixity_field_default_field_instances() {
   t('Protocols');
   t('Schedule');
   t('Select Cultural Protocol(s) to limit which media assets are checked. The media asset must belong to at least one of these Cultural Protocols to be checked (the Cultural Protocol of the Digital Heritage item in which the media file is not considered). If this field is left blank, all media assets are checked. ');
+  t('Set to "Unscheduled" to run this fixity check manually only.');
   t('Time of check');
 
   return $field_instances;
