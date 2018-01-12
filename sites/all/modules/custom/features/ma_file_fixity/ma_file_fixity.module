@@ -61,9 +61,19 @@ function ma_file_fixity_entity_presave($entity, $type) {
       }
       $entity->title = $schedule . ' - ' . $cps_title;
     }
+
+    // Set the fixity check scheduled job if it has a schedule.
+    //$fw_emw = entity_metadata_wrapper('node', $entity);
+    $job = [
+      'type' => 'fixity_check',
+      'id' => $entity->nid,
+      'period' => 3600, // TODO set this properly. Also delete the job on node delete.
+      'periodic' => TRUE,
+    ];
+    JobScheduler::get('run_fixity_check')->set($job);
+
   }
 }
-
 
 /**
  * Implements hook_menu().
@@ -90,6 +100,32 @@ function ma_file_fixity_run_check_manually($node) {
   if ($node->type <> 'fixity_check') {
     return "Not a Fixity Check node.";
   }
+  $job = [
+    'id' => $node->nid
+  ];
+  ma_file_fixity_run_fixity_check($job);
+  drupal_goto ('node/' . $node->nid);
+}
+
+/**
+ * Implements hook_cron_job_scheduler_info().
+ */
+function ma_file_fixity_cron_job_scheduler_info() {
+
+  // Use the jobs_scheduler module (already in the build as a feeds dependency) for scheduled check runs.
+  $schedulers = array();
+  $schedulers['run_fixity_check'] = array(
+    'worker callback' => 'ma_file_fixity_run_fixity_check',
+  );
+  return $schedulers;
+}
+
+/**
+ * Run a fixity check. Can be called from the job_scheduler (on cron runs), or manually from the page callback.
+ */
+function ma_file_fixity_run_fixity_check($job) {
+
+  $node = node_load($job['id']);
   $fw = entity_metadata_wrapper('node', $node);
   $start_time = time();
   $hashes_to_check_against = $fw->field_fixity_hashes_to_use->raw();
@@ -173,7 +209,6 @@ function ma_file_fixity_run_check_manually($node) {
   $node->field_fixity_latest_check_status[LANGUAGE_NONE][0]['value'] = $overall_status;
   node_save($node);
 
-  drupal_goto ('node/' . $node->nid);
 }
 
 /**
