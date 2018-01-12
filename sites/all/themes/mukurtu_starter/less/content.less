@@ -1253,28 +1253,32 @@ a.tooltips span {
 
 // File Fixity
 .view-mode-full {
-  .field-name-field-fixity-check-fails-details {
-    ul {
-      padding-left: 30px;
-      list-style-type: disc;
-      .fail {
-        color: red;
-      }
-      .pass {
-        color: green;
-      }
-      p {
-        margin-bottom: 0;
+  .field-name-fixity-reports {
+    .label-above {
+      font-size: 1.5em;
+      text-transform: capitalize;
+      margin-top: 1em;
+    }
+    .views-row {
+      padding-bottom: 1em;
+      border-bottom: solid;
+      border-width: 1px;
+    }
+    .field-name-field-fixity-check-fails-details {
+      ul {
+        padding-left: 30px;
+        list-style-type: disc;
+        .fail {
+          color: red;
+        }
+        .pass {
+          color: green;
+        }
+        p {
+          margin-bottom: 0;
+        }
       }
     }
-
-  }
-}
-.view-fixity-reports {
-  .views-row {
-    margin-top: 1em;
-    border-top: solid;
-    border-width: 1px;
   }
 }
 .fixity-check-fail-status {

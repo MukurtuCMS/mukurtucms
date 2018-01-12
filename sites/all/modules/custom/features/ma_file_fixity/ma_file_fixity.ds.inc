@@ -19,8 +19,11 @@ function ma_file_fixity_ds_field_settings_info() {
   $ds_fieldsetting->settings = array(
     'fixity_reports' => array(
       'weight' => '5',
-      'label' => 'hidden',
+      'label' => 'above',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
     ),
     'fixity_run_check' => array(
       'weight' => '4',
@@ -31,11 +34,6 @@ function ma_file_fixity_ds_field_settings_info() {
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
-    ),
-    'field_fixity_hashes_to_use' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
     ),
   );
   $export['node|fixity_check|default'] = $ds_fieldsetting;

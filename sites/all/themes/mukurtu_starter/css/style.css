@@ -10665,23 +10665,28 @@ a:hover {
 .class-collections-tree-popup td.center .inner {
   width: auto !important;
 }
-.view-mode-full .field-name-field-fixity-check-fails-details ul {
+.view-mode-full .field-name-fixity-reports .label-above {
+  font-size: 1.5em;
+  text-transform: capitalize;
+  margin-top: 1em;
+}
+.view-mode-full .field-name-fixity-reports .views-row {
+  padding-bottom: 1em;
+  border-bottom: solid;
+  border-width: 1px;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul {
   padding-left: 30px;
   list-style-type: disc;
 }
-.view-mode-full .field-name-field-fixity-check-fails-details ul .fail {
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul .fail {
   color: red;
 }
-.view-mode-full .field-name-field-fixity-check-fails-details ul .pass {
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul .pass {
   color: green;
 }
-.view-mode-full .field-name-field-fixity-check-fails-details ul p {
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul p {
   margin-bottom: 0;
-}
-.view-fixity-reports .views-row {
-  margin-top: 1em;
-  border-top: solid;
-  border-width: 1px;
 }
 .fixity-check-fail-status {
   font-weight: bold;
