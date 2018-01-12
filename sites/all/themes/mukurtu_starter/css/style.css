@@ -10683,3 +10683,13 @@ a:hover {
   border-top: solid;
   border-width: 1px;
 }
+.fixity-check-fail-status {
+  font-weight: bold;
+  color: red;
+  text-transform: uppercase;
+}
+.fixity-check-pass-status {
+  font-weight: bold;
+  color: green;
+  text-transform: uppercase;
+}

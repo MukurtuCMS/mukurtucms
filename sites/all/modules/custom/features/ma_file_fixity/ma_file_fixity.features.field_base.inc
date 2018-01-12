@@ -165,8 +165,8 @@ function ma_file_fixity_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         'not_run' => 'Not yet run',
-        'pass' => 'Pass',
-        'fail' => '<b>FAIL</b>',
+        'pass' => '<span class="fixity-check-pass-status">Pass</span>',
+        'fail' => '<span class="fixity-check-fail-status">Fail</span>',
       ),
       'allowed_values_function' => '',
       'treeable' => 0,

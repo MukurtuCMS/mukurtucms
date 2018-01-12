@@ -168,3 +168,34 @@ function ma_file_fixity_field_collection_item_view($field_collection_item, $view
     $time_of_check = '<h4 style="color: ' . $color . ';">' . $time_of_check . '</h4>';
   }
 }
+
+/**
+ * Implements hook_node_view().
+ */
+function ma_file_fixity_node_view($node, $view_mode, $langcode) {
+  if ($node->type == 'fixity_check') {
+
+    // Create a breadcrumb on the fixity check node, so that the user can link back to the fixity-checks view.
+    drupal_set_breadcrumb ([
+      l(t('test'), 'fixity-checks'), // Not sure why this dummy entry is required.
+      l(t('Home'), '<front>'),
+      l(t('Fixity Checks'), 'fixity-checks'),
+    ]);
+  }
+}
+
+/**
+ * Implements hook_views_post_render.
+ */
+function ma_file_fixity_views_post_render(&$view, &$output, &$cache) {
+  if ($view->name == 'fixity_checks') {
+
+    // Create a breadcrumb on the fixity checks view, for visual consistency with the fixity check node.
+    drupal_set_breadcrumb([
+      l(t('test'), 'fixity-checks'), // Not sure why this dummy entry is required.
+      l(t('Home'), '<front>'),
+    ]);
+
+  }
+}
+

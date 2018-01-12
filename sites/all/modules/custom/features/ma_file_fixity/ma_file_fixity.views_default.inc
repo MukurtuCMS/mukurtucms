@@ -31,6 +31,13 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['style_plugin'] = 'table';
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['empty'] = TRUE;
+  $handler->display->display_options['footer']['area']['content'] = '<a href=\'/node/add/fixity-check\'>Add a Fixity Check</a>';
+  $handler->display->display_options['footer']['area']['format'] = 'filtered_html';
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -79,7 +86,7 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['fields']['nothing']['table'] = 'views';
   $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
   $handler->display->display_options['fields']['nothing']['label'] = '';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'Run this check now';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'Run this check now.';
   $handler->display->display_options['fields']['nothing']['alter']['make_link'] = TRUE;
   $handler->display->display_options['fields']['nothing']['alter']['path'] = 'run-fixity-check/[nid]';
   $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
@@ -129,10 +136,11 @@ function ma_file_fixity_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('<a href=\'/node/add/fixity-check\'>Add a Fixity Check</a>'),
     t('Latest check time'),
     t('Latest check result'),
     t('Details'),
-    t('Run this check now'),
+    t('Run this check now.'),
     t('Edit'),
     t('Delete'),
     t('Page'),
