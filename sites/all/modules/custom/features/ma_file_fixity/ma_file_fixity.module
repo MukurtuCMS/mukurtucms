@@ -94,6 +94,7 @@ function ma_file_fixity_run_check_manually($node) {
   $fw = entity_metadata_wrapper('node', $node);
   $start_time = time();
   $cps = $fw->field_fixity_cps->raw(); // TODO: only show for selected CPs
+  $hashes_to_check_against = $fw->field_fixity_hashes_to_use->raw();
   $files_checked = 0;
   $file_fails = [];
 
@@ -105,7 +106,7 @@ function ma_file_fixity_run_check_manually($node) {
     $file = file_load($file->fid);
     $algo_comp_text = '';
     $algo_fail = 0;
-    foreach (filehash_algos() as $algo) {
+    foreach ($hashes_to_check_against as $algo) {
       $saved_hash =  $file->filehash[$algo];
       $checked_hash = hash_file($algo, $file->uri);
       if ($saved_hash <> $checked_hash) {
@@ -138,7 +139,7 @@ function ma_file_fixity_run_check_manually($node) {
   $ffcw->field_fixity_time_of_check->set($start_time);
   $ffcw->field_fixity_processing_time->set(time()-$start_time);
   $ffcw->field_fixity_files_checked->set($files_checked);
-  $ffcw->field_fixity_algos_checked->set(array_keys(filehash_algos()));
+  $ffcw->field_fixity_algos_checked->set($hashes_to_check_against);
 
   $overall_status = 'pass';
   if (count($file_fails)) {

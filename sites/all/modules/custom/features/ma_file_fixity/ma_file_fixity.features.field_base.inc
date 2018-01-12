@@ -148,6 +148,29 @@ function ma_file_fixity_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
+  // Exported field_base: 'field_fixity_hashes_to_use'.
+  $field_bases['field_fixity_hashes_to_use'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_fixity_hashes_to_use',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(),
+      'allowed_values_function' => 'filehash_algos',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_fixity_latest_check_status'.
   $field_bases['field_fixity_latest_check_status'] = array(
     'active' => 1,

@@ -18,12 +18,12 @@ function ma_file_fixity_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'fixity_reports' => array(
-      'weight' => '4',
+      'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'fixity_run_check' => array(
-      'weight' => '3',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -31,6 +31,11 @@ function ma_file_fixity_ds_field_settings_info() {
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
+    ),
+    'field_fixity_hashes_to_use' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
     ),
   );
   $export['node|fixity_check|default'] = $ds_fieldsetting;
@@ -189,14 +194,16 @@ function ma_file_fixity_ds_layout_settings_info() {
         0 => 'title',
         1 => 'field_fixity_latest_check_status',
         2 => 'field_fixity_latest_check_time',
-        3 => 'fixity_run_check',
-        4 => 'fixity_reports',
+        3 => 'field_fixity_hashes_to_use',
+        4 => 'fixity_run_check',
+        5 => 'fixity_reports',
       ),
     ),
     'fields' => array(
       'title' => 'ds_content',
       'field_fixity_latest_check_status' => 'ds_content',
       'field_fixity_latest_check_time' => 'ds_content',
+      'field_fixity_hashes_to_use' => 'ds_content',
       'fixity_run_check' => 'ds_content',
       'fixity_reports' => 'ds_content',
     ),
@@ -231,15 +238,16 @@ function ma_file_fixity_ds_layout_settings_info() {
         1 => 'field_fixity_schedule',
         2 => 'field_fixity_days_frequency',
         3 => 'field_fixity_cps',
-        4 => 'redirect',
-        5 => 'path',
+        4 => 'field_fixity_hashes_to_use',
+        5 => 'redirect',
+        6 => 'path',
       ),
       'hidden' => array(
-        6 => 'field_fixity_latest_check_status',
-        7 => 'field_fixity_latest_check_time',
-        8 => 'title',
-        9 => 'field_fixity_report',
-        10 => '_add_existing_field',
+        7 => 'field_fixity_latest_check_status',
+        8 => 'field_fixity_latest_check_time',
+        9 => 'title',
+        10 => 'field_fixity_report',
+        11 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -247,6 +255,7 @@ function ma_file_fixity_ds_layout_settings_info() {
       'field_fixity_schedule' => 'ds_content',
       'field_fixity_days_frequency' => 'ds_content',
       'field_fixity_cps' => 'ds_content',
+      'field_fixity_hashes_to_use' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
       'field_fixity_latest_check_status' => 'hidden',

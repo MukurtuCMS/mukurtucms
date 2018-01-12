@@ -312,7 +312,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -357,7 +357,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -386,6 +386,69 @@ function ma_file_fixity_field_default_field_instances() {
       ),
       'type' => 'number',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-fixity_check-field_fixity_hashes_to_use'.
+  $field_instances['node-fixity_check-field_fixity_hashes_to_use'] = array(
+    'bundle' => 'fixity_check',
+    'default_value' => array(
+      0 => array(
+        'value' => 'sha256',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Check at least one hash to check against.
+',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_fixity_hashes_to_use',
+    'label' => 'Hashes to check against',
+    'required' => 1,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 0,
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 4,
     ),
   );
 
@@ -431,7 +494,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -492,7 +555,7 @@ function ma_file_fixity_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -507,7 +570,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -531,7 +594,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_hidden',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -546,7 +609,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -590,7 +653,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -621,12 +684,15 @@ function ma_file_fixity_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Check at least one hash to check against.
+');
   t('Check fails details');
   t('Checks');
   t('Files checked');
   t('Files failed');
   t('Frequency in days');
   t('Hashes checked against	');
+  t('Hashes to check against');
   t('If no schedule is selected, this File Fixity Check can still be run manually.');
   t('Latest check result');
   t('Latest check time');
