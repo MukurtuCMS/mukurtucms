@@ -162,7 +162,7 @@ function ma_file_fixity_field_collection_item_view($field_collection_item, $view
   // Show the time of check field in either green or red depending on whether it found check fails, and make it a header.
   if ($field_collection_item->field_name == 'field_fixity_report') {
     $color = 'green';
-    if ($field_collection_item->field_fixity_check_fails_count[LANGUAGE_NONE]) {
+    if (isset($field_collection_item->field_fixity_check_fails_count[LANGUAGE_NONE]) && $field_collection_item->field_fixity_check_fails_count[LANGUAGE_NONE] > 0) {
       $color = 'red';
     }
     $time_of_check =& $field_collection_item->content['field_fixity_time_of_check'][0]['#markup'];

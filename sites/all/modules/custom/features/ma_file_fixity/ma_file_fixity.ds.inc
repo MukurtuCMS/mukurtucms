@@ -30,11 +30,6 @@ function ma_file_fixity_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
   );
   $export['node|fixity_check|default'] = $ds_fieldsetting;
 
@@ -189,16 +184,14 @@ function ma_file_fixity_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'title',
-        1 => 'field_fixity_latest_check_status',
-        2 => 'field_fixity_latest_check_time',
-        3 => 'field_fixity_hashes_to_use',
-        4 => 'fixity_run_check',
-        5 => 'fixity_reports',
+        0 => 'field_fixity_latest_check_status',
+        1 => 'field_fixity_latest_check_time',
+        2 => 'field_fixity_hashes_to_use',
+        3 => 'fixity_run_check',
+        4 => 'fixity_reports',
       ),
     ),
     'fields' => array(
-      'title' => 'ds_content',
       'field_fixity_latest_check_status' => 'ds_content',
       'field_fixity_latest_check_time' => 'ds_content',
       'field_fixity_hashes_to_use' => 'ds_content',
