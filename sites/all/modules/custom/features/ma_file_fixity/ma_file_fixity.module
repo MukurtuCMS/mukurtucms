@@ -109,7 +109,7 @@ function ma_file_fixity_run_check_manually($node) {
       $saved_hash =  $file->filehash[$algo];
       $checked_hash = hash_file($algo, $file->uri);
       if ($saved_hash <> $checked_hash) {
-        $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. Checked as ' . $checked_hash . '.</li>';
+        $algo_comp_text .= '<li><span class="fail"><i>' . $algo . '</i> does not match.</span> Saved as ' . $saved_hash . '. Checked returned ' . $checked_hash . '.</li>';
         $algo_fail = 1;
       }
       else {
@@ -117,10 +117,17 @@ function ma_file_fixity_run_check_manually($node) {
       }
     }
     if ($algo_fail) {
+      $file_link = l($file->filename, 'file/' . $file->fid);
+      $usages_link = '';
+      $usage = file_usage_list($file);
+      if ($usage) {
+        $usages_link = ' - ' . l('file usages', 'file/' . $file->fid . '/usage');
+      }
       $file_fails[] = [
-        'value' => l($file->filename, 'file/' . $file->fid) . '<ul>' . $algo_comp_text . '</ul>',
+        'value' => $file_link . $usages_link . '<ul>' . $algo_comp_text . '</ul>',
         'format' => 'full_html'
       ];
+
     }
     $files_checked++;
   }
