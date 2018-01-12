@@ -47,7 +47,7 @@ function mukurtu_protocol_field_node_insert($node) {
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
   switch ($form_id) {
-    case 'digital_heritage_node_form-heritage':
+    case 'digital_heritage_node_form':
     case 'dictionary_word_node_form':
     case 'collection_node_form':
 
