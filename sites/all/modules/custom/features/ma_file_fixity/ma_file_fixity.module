@@ -130,7 +130,9 @@ function ma_file_fixity_run_check_manually($node) {
   $ffcw = entity_metadata_wrapper('field_collection_item', $ffc_item);
   $ffcw->field_fixity_time_of_check->set($start_time);
   $ffcw->field_fixity_processing_time->set(time()-$start_time);
-  $ffcw->field_fixity_files_checked	->set($files_checked);
+  $ffcw->field_fixity_files_checked->set($files_checked);
+  $ffcw->field_fixity_algos_checked->set(array_keys(filehash_algos()));
+
   $overall_status = 'pass';
   if (count($file_fails)) {
     $ffcw->field_fixity_check_fails_details->set($file_fails);
@@ -138,8 +140,8 @@ function ma_file_fixity_run_check_manually($node) {
     $overall_status = 'fail';
   }
 
-  $node->field_fixity_latest_check_time['und'][0]['value'] = $start_time;
-  $node->field_fixity_latest_check_status['und'][0]['value'] = $overall_status;
+  $node->field_fixity_latest_check_time[LANGUAGE_NONE][0]['value'] = $start_time;
+  $node->field_fixity_latest_check_status[LANGUAGE_NONE][0]['value'] = $overall_status;
   node_save($node);
 
   drupal_goto ('node/' . $node->nid);

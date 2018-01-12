@@ -11,6 +11,59 @@ function ma_file_fixity_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
+  // 'field_collection_item-field_fixity_report-field_fixity_algos_checked'.
+  $field_instances['field_collection_item-field_fixity_report-field_fixity_algos_checked'] = array(
+    'bundle' => 'field_fixity_report',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_fixity_algos_checked',
+    'label' => 'Hashes checked against	',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 0,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'field_collection_item-field_fixity_report-field_fixity_check_fails_count'.
   $field_instances['field_collection_item-field_fixity_report-field_fixity_check_fails_count'] = array(
     'bundle' => 'field_fixity_report',
@@ -28,7 +81,7 @@ function ma_file_fixity_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 3,
+        'weight' => 4,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -50,7 +103,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'number',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -84,7 +137,7 @@ function ma_file_fixity_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 6,
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -108,7 +161,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -130,7 +183,7 @@ function ma_file_fixity_field_default_field_instances() {
           'thousand_separator' => '',
         ),
         'type' => 'number_integer',
-        'weight' => 2,
+        'weight' => 3,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -152,7 +205,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'number',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -573,6 +626,7 @@ function ma_file_fixity_field_default_field_instances() {
   t('Files checked');
   t('Files failed');
   t('Frequency in days');
+  t('Hashes checked against	');
   t('If no schedule is selected, this File Fixity Check can still be run manually.');
   t('Latest check result');
   t('Latest check time');
