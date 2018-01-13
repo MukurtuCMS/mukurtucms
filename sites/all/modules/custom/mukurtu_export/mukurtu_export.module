@@ -22,8 +22,8 @@
       $items['atom/%scald_atom/mukurtu-export'] = array(
         'access callback' => 'mukurtu_export_access_export',
         'access arguments' => array(1),
-        'page callback' => 'mukurtu_export_gui',
-        'page arguments' => array(1),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_export_form'),
         'title' => 'Mukurtu export',
         'type' => MENU_LOCAL_TASK,
         'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
@@ -87,6 +87,23 @@ function mukurtu_export_field_handlers() {
   return $field_handlers;
 }
 
+/**
+ * Get a list of format handlers
+ *
+ * @return
+ *   An array of format handlers from hook implementations.
+ * @see hook_mukurtu_export_format_handlers()
+ */
+function mukurtu_export_format_handlers() {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.format_handlers');
+  $format_handlers = &drupal_static(__FUNCTION__);
+  if (empty($format_handlers)) {
+    $format_handlers = module_invoke_all('mukurtu_export_format_handlers');
+  }
+  drupal_alter('mukurtu_export_format_handlers', $format_handlers);
+  return $format_handlers;
+}
+
 function mukurtu_export_extract_value($entity_type, $field_name, $value) {
   // Make hook to allow custom changes?
 
@@ -114,6 +131,10 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value) {
   }
   return array($value, $referenced_entities);
 }
+
+/* VBO Functions */
+
+
 
 function _mukurtu_export_entity_type($entity) {
   if(is_object($entity)) {

@@ -12,7 +12,6 @@
  *  @return
  *    The node export form or nothing if calling function to serve file.
  */
-
  function mukurtu_export_gui($entities = NULL, $format = NULL, $delivery = NULL, $field_list = NULL) {
   // Determine which content we are exporting
   if(is_object($entities)) {
@@ -29,12 +28,21 @@
     drupal_set_title(t('Exporting @title', array('@title' => $entities->title)));
   }
 
-  // Get the current format, either previous or default
-  if(is_null($format)) {
-    if(isset($_SESSION['mukurtu_export']['format'])) {
+  $format_handlers = mukurtu_export_format_handlers();
+  // Format not specified or specified format isn't available
+  if(is_null($format) || !in_array($format, array_keys($format_handlers))) {
+    // Check if the user selected a format previously
+    if(isset($_SESSION['mukurtu_export']['format'])
+              && in_array($_SESSION['mukurtu_export']['format'], array_keys($format_handlers))) {
       $format = $_SESSION['mukurtu_export']['format'];
     } else {
-      $format = 'csv';
+      // Only one available format, default to that
+      if(count($format_handlers) == 1) {
+        $format = array_keys($format_handlers)[0];
+      } else {
+        // Multiple formats, show selection form
+        return drupal_get_form('mukurtu_export_format_selection_form', $format_handlers);
+      }
     }
   }
 
@@ -45,47 +53,154 @@
   }
 
   $code_string = NULL;
-  return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, $format, $field_list);
+  return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, $format_handlers[$format], $field_list);
 }
 
-function mukurtu_export_form($form, &$form_state, $export_ids, $code_string, $format, $field_list = NULL) {
-  include_once "formats/csv.inc";
 
-  if(is_null($field_list)) {
-    $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids);
-    $form['download_file'] = array(
-      '#type' => 'submit',
-      '#value' => t('Download file'),
-    );
-    $form_state['rebuild'] = TRUE;
-  } else {
-    //$code_string = mukurtu_export_csv_export(array(55 => node_load(55)));
-    $code_string = mukurtu_export_csv_export($export_ids, $format, $field_list);
-kpr($code_string);
-    $form['export'] = array(
-      '#type' => 'textarea',
-      '#title' => t('Mukurtu export code'),
-      '#default_value' => print_r($code_string, TRUE),
-      '#rows' => 30,
-      '#description' => t('Copy this code and then on the site you want to import to, go to the <em>Node export: import</em> link under <em>Add content</em>, and paste it in there.'),
-      '#attributes' => array(
-        'wrap' => 'off',
-      ),
-      '#wysiwyg' => FALSE,
-    );
+function mukurtu_export_form($form, &$form_state) {
+  $export_ids = isset($form_state['mukurtu_export']['export_ids']) ? $form_state['mukurtu_export']['export_ids'] : NULL;
+  $formatter = isset($form_state['mukurtu_export']['formatter']) ? $form_state['mukurtu_export']['formatter'] : NULL;
+  $formatter_settings = isset($form_state['mukurtu_export']['formatter_settings']) ? $form_state['mukurtu_export']['formatter_settings'] : NULL;
+  $field_list = isset($form_state['mukurtu_export']['export_fields']) ? $form_state['mukurtu_export']['export_fields'] : NULL;
+
+  if(is_null($export_ids) && isset($form_state['build_info']['args'][0])) {
+    $export_ids = $form_state['build_info']['args'][0];
   }
 
-  unset($_SESSION['mukurtu_export']['field_list']);
+  // No format selected
+  $format_handlers = mukurtu_export_format_handlers();
+  // Format not specified or specified format isn't available
+  if(is_null($formatter) || !in_array($formatter, array_keys($format_handlers))) {
+    /*// Check if the user selected a format previously
+    if(isset($_SESSION['mukurtu_export']['format'])
+              && in_array($_SESSION['mukurtu_export']['format'], array_keys($format_handlers))) {
+      $formatter = $_SESSION['mukurtu_export']['format'];
+    } else { */
+      // Only one available format, default to that
+      if(count($format_handlers) == 1) {
+        $formatter = array_keys($format_handlers)[0];
+      } else {
+        // Multiple formats, show selection form
+        return mukurtu_export_format_selection_form($form, $form_state, $format_handlers);
+      }
+//    }
+  }
+
+  //include_once "formats/csv.inc";
+  include_once $format_handlers[$formatter]['#file'];
+
+
+  // Format selected, need formatter settings
+  if(is_null($formatter_settings)) {
+    // Get settings form for formatter
+    if(isset($format_handlers[$formatter]['#settings_callback']) && function_exists($format_handlers[$formatter]['#settings_callback'])) {
+      $form['export']['settings'] = call_user_func($format_handlers[$formatter]['#settings_callback'], $form, $form_state);
+    }
+    $form['export_next_step'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+    );
+    return $form;
+  }
+
+  if(is_null($field_list)) {
+
+    $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids);
+
+    $form['download_file'] = array(
+      '#type' => 'submit',
+      '#value' => t('Download'),
+    );
+    return $form;
+  }
+
+    //$code_string = mukurtu_export_csv_export($export_ids, $formatter, $field_list);
+  $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list);
+//kpr($download_file);
+
+  $form['export'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Mukurtu export code'),
+    '#default_value' => print_r($download_file->uri, TRUE),
+    '#rows' => 30,
+    '#description' => t('Copy this code and then on the site you want to import to, go to the <em>Node export: import</em> link under <em>Add content</em>, and paste it in there.'),
+    '#attributes' => array(
+      'wrap' => 'off',
+    ),
+      '#wysiwyg' => FALSE,
+    );
+
+  mukurtu_export_get_file($download_file);
+}
+
+function mukurtu_export_get_file($file) {
+  header('Content-type: ' . $file->filemime);
+  header('Content-Disposition: attachment; filename="' . $file->filename . '"');
+  print(file_get_contents(drupal_realpath($file->uri)));
+  file_delete($file);
+  module_invoke_all('exit');
+  exit;
+}
+
+
+
+function mukurtu_export_form_submit($form, &$form_state) {
+  //$export_ids = NULL;
+  //$code_string = NULL;
+  //$field_list = isset($form_state['values']['export_fields']) ? $form_state['values']['export_fields'] : 1;
+  //$_SESSION['mukurtu_export']['field_list'] = $field_list;
+
+  // Content to export
+  $form_state["rebuild"] = TRUE;
+  if(isset($form_state['values']['export_ids'])) {
+    $form_state['mukurtu_export']['export_ids'] = $form_state['values']['export_ids'];
+  }
+
+  // Formatter
+  if(isset($form_state['values']['export_format'])) {
+    $form_state['mukurtu_export']['formatter'] = $form_state['values']['export_format'];
+  }
+
+  // Formatter Settings
+  if(isset($form_state['mukurtu_export']['formatter'])) {
+    $format = $form_state['mukurtu_export']['formatter'];
+    if(isset($form_state['values'][$format])) {
+      $form_state['mukurtu_export']['formatter_settings'] = $form_state['values'][$format];
+    }
+  }
+
+  // Field List
+  if(isset($form_state['values']['export_fields'])) {
+    $form_state['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
+  }
+  //return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, 'csv', $field_list);
+}
+
+function mukurtu_export_format_selection_form($form, &$form_state, $format_handlers, $default_format = 'csv') {
+  $formatter_options = array();
+  foreach($format_handlers as $format => $format_info) {
+    $formatter_options[$format] = $format_info['#title'];
+  }
+
+  $form['export_format'] = array(
+    '#type' => 'radios',
+    '#title' => t('Export Format'),
+    '#options' => $formatter_options,
+    '#default_value' => $default_format,
+    '#description' => t('Select the format for export.'),
+    '#tree' => TRUE,
+  );
+
+  $form['export_next_step'] = array(
+    '#type' => 'submit',
+    '#value' => t('Next'),
+  );
+
   return $form;
 }
 
-function mukurtu_export_form_submit($form, &$form_state) {
-  $export_ids = NULL;
-  $code_string = NULL;
-  $field_list = isset($form_state['values']['export_fields']) ? $form_state['values']['export_fields'] : 1;
-  $_SESSION['mukurtu_export']['field_list'] = $field_list;
-
-  //return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, 'csv', $field_list);
+function mukurtu_export_format_selection_form_submit($form, &$form_state) {
+  $_SESSION['mukurtu_export']['format'] = $form_state['values']['export_format'];
 }
 
 function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL) {
@@ -94,7 +209,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       '#type' => 'fieldset',
       '#title' => t('Select Fields for Export'),
       '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
+      '#collapsed' => FALSE,
       '#tree' => TRUE,
     );
 

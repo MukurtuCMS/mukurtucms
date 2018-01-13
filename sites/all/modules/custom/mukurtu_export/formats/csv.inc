@@ -13,18 +13,15 @@
 function mukurtu_export_csv_settings($form, $form_state) {
   $settings['csv'] = array(
     '#type' => 'fieldset',
-    '#title' => t('csv format settings'),
+    '#title' => t('Mukurtu CSV Export Settings'),
     '#description' => t(
-     'Select how your csv output will be formatted - this must be configured the
-     same on both sites.  By default this is configured to RFC4180 CSV format
-     where the delimiter is a comma (,), the enclosure is a double-quote ("),
-     and the separator is CRLF (\r\n).  Not all configurations may be possible,
-     use wisely.  Enclosure will only be used to escape values that contain any
-     of the configured strings.  Additionally single-quotes will be used to
-     escape values that are equivalent to reserved words (NULL, TRUE, FALSE).'
+     'Select how your csv output will be formatted.
+     By default this is configured to output files compatible with the Mukurtu importers.
+     '
     ),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
   );
 
   $settings['csv']['mukurtu_export_csv_delimiter'] = array(
@@ -32,7 +29,10 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#title' => t('Value delimiter'),
     '#size' => 5,
     '#maxlength' => 255,
-    '#default_value' => variable_get('mukurtu_export_csv_delimiter', ','),
+    '#default_value' => variable_get('mukurtu_export_csv_delimiter', ';'),
+    '#description' => t(
+    'This delimiter will be used to separate mulitple values for a single field.
+    Mukurtu uses a single semicolon by default.'),
     '#required' => TRUE,
   );
 
@@ -61,6 +61,18 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#description' => t('This is to overcome problems where Windows injects CRLF line breaks.'),
   );
 
+  $settings['csv']['mukurtu_export_csv_id_format'] = array(
+    '#type' => 'radios',
+    '#title' => t('Content Identifier Format'),
+    '#options' => array(
+      'internal' => 'Export internal content identifiers for re-import',
+      'guid' => 'Export GUIDs for import into a different site'
+    ),
+    '#default_value' => 'internal',
+    '#description' => t('Select the identifier format for export.'),
+    '#required' => TRUE,
+  );
+
   return $settings;
 }
 
@@ -79,7 +91,7 @@ function mukurtu_export_csv_string($string) {
 /**
  * Export callback.
  */
-function mukurtu_export_csv_export($entities, $format, $field_list = NULL) {
+function mukurtu_export_csv_export($entities, $field_list = NULL) {
   $delimiter = mukurtu_export_csv_string(variable_get('mukurtu_export_csv_delimiter', ','));
   $enclosure = mukurtu_export_csv_string(variable_get('mukurtu_export_csv_enclosure', '"'));
   $separator = mukurtu_export_csv_string(variable_get('mukurtu_export_csv_separator', '\r\n'));
@@ -90,10 +102,45 @@ function mukurtu_export_csv_export($entities, $format, $field_list = NULL) {
   foreach ($entities as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
       //$encoded_export[$entity_type][$bundle_name] = mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list[$entity_type][$bundle_name]);
-        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list[$entity_type][$bundle_name]));
+        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list));
     }
   }
-  return $encoded_export;
+  return mukurtu_export_csv_export_to_zip($encoded_export);
+
+  //return $encoded_export;
+}
+
+function mukurtu_export_csv_export_to_zip($encoded_export) {
+  $csv_files = array();
+
+  $zip = new ZipArchive();
+  $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
+  $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
+
+  foreach ($encoded_export as $entity_type => $bundle) {
+    foreach ($bundle as $bundle_name => $bundle_entities) {
+      $temp = file_save_data($encoded_export[$entity_type][$bundle_name]);
+      $csv_files[] = $temp;
+      $zip->addFile(drupal_realpath($temp->uri), "{$entity_type}_{$bundle_name}.csv");
+    }
+  }
+  $zip->close();
+
+  $destination = 'private://batch_export/';
+  file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
+  $filename = 'export.zip';
+
+  $zip_handle = fopen($tempfile, 'r');
+  $download_file = file_save_data($zip_handle, $destination . $filename, FILE_EXISTS_RENAME);
+
+  // Delete temp files
+  foreach($csv_files as $csv_file) {
+    file_delete($csv_file);
+  }
+
+  unlink(drupal_realpath($tempfile));
+//kpr($download_file);
+  return $download_file;
 }
 
 /**
@@ -133,7 +180,7 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
 /**
  * Process a node and update $header and $encoded_nodes accordingly.
  */
-function mukurtu_export_csv_encode_node(&$encoded_nodes, $node_key, $var, $entity_type = NULL, $bundle_name = NULL, $header_list = NULL, $parent = NULL, $parent_index = 0) {
+function mukurtu_export_csv_encode_node(&$encoded_nodes, $node_key, $var, $entity_type = NULL, $bundle_name = NULL, $field_list = NULL, $parent = NULL, $parent_index = 0) {
   foreach ($var as $k => &$v) {
     // Get the new header value.
     list($header_value, $header_index) = mukurtu_export_csv_encode_header_value($parent, $parent_index, $var, $k);
@@ -141,16 +188,17 @@ function mukurtu_export_csv_encode_node(&$encoded_nodes, $node_key, $var, $entit
     // Skip export for fields that have been selected for exclusion.
     // Skip export for fields that aren't present in the list, if given a non-null list.
     // For a null list, assume we want to export everything.
-    if((!is_null($header_list) && isset($header_list[$header_value]) && $header_list[$header_value] == 0)
+    $header_list = isset($field_list[$entity_type][$bundle_name]) ? $field_list[$entity_type][$bundle_name] : NULL;
+    if((!empty($header_list) && isset($header_list[$header_value]) && $header_list[$header_value] == 0)
         ||
-        (!is_null($header_list) && !isset($header_list[$header_value]))) {
+        (!empty($header_list) && !isset($header_list[$header_value]))) {
       continue;
     }
 
     //if (is_object($v) || is_array($v)) {
     if (is_array($v) && !is_numeric($k)) {
       // Recurse through the structure.
-      mukurtu_export_csv_encode_node($encoded_nodes, $node_key, $v, $entity_type, $bundle_name, $header_list, $header_value, $header_index);
+      mukurtu_export_csv_encode_node($encoded_nodes, $node_key, $v, $entity_type, $bundle_name, $field_list, $header_value, $header_index);
     }
     else {
       // Create a safe text version of this value and store it against the header using a safe key.
@@ -170,7 +218,7 @@ function mukurtu_export_csv_encode_node(&$encoded_nodes, $node_key, $var, $entit
           if(isset($encoded_nodes['__exported_key_list'][$new_node_key])) {
             return;
           }
-          mukurtu_export_csv_encode_node($encoded_nodes, $new_node_key, $referenced_entity_object[$r_id], $referenced_entity_type, $referenced_entity_object[$r_id]->type);
+          mukurtu_export_csv_encode_node($encoded_nodes, $new_node_key, $referenced_entity_object[$r_id], $referenced_entity_type, $referenced_entity_object[$r_id]->type, $field_list);
         }
       }
       $encoded_nodes[$entity_type][$bundle_name][$header_value][$node_key][$header_index] = mukurtu_export_csv_encode_sanitize_value($value);
