@@ -30,6 +30,10 @@ function ma_file_fixity_form_fixity_check_node_form_alter(&$form, &$form_state) 
   $form['title']['#access'] = FALSE;
   $form['title']['#required'] = FALSE;
 
+  // The the check run latest and next fields. They are already hidden in the DS field config but this prevents form errors and value resets.
+  $form['field_fixity_latest_check_time']['#access'] = FALSE;
+  $form['field_fixity_next_check_run_time']['#access'] = FALSE;
+
 }
 
 /**
@@ -42,9 +46,10 @@ function ma_file_fixity_entity_presave($entity, $type) {
   if ($entity->type == 'fixity_check') {
 
     // Set the Fixity Check node title
-    $schedule = $entity->field_fixity_schedule['und'][0]['value'];
-    if (isset($entity->field_fixity_days_frequency['und'][0]['value'])) {
-      $schedule = str_replace('x', $entity->field_fixity_days_frequency['und'][0]['value'], $schedule);
+    $schedule_title = $schedule = $entity->field_fixity_schedule['und'][0]['value'];
+    if ($schedule == 'Every x days') {
+      $frequency =  $entity->field_fixity_days_frequency['und'][0]['value'];
+      $schedule_title = str_replace('x', $frequency, $schedule_title);
     }
     if (isset($entity->field_fixity_cps[LANGUAGE_NONE])) {
       $cps = $entity->field_fixity_cps[LANGUAGE_NONE];
@@ -59,19 +64,35 @@ function ma_file_fixity_entity_presave($entity, $type) {
       else {
         $cps_title = 'all media assets';
       }
-      $entity->title = $schedule . ' - ' . $cps_title;
+      $entity->title = $schedule_title . ' - ' . $cps_title;
     }
 
     // Set the fixity check scheduled job if it has a schedule.
-    //$fw_emw = entity_metadata_wrapper('node', $entity);
-    $job = [
-      'type' => 'fixity_check',
-      'id' => $entity->nid,
-      'period' => 3600, // TODO set this properly. Also delete the job on node delete.
-      'periodic' => TRUE,
-    ];
-    JobScheduler::get('run_fixity_check')->set($job);
+    switch ($schedule) {
+      case 'Weekly':
+        $seconds = 604800;
+        break;
+      case 'Monthly':
+        $seconds = 2592000;
+        break;
+      case 'Every x days':
+        $seconds = $frequency * 86400;
+        break;
+    }
+    if (isset($seconds)) {
+      $job = [
+        'type' => 'fixity_check',
+        'id' => $entity->nid,
+        'period' => $seconds,
+        // TODO delete the job on node delete.
+        'periodic' => TRUE,
+      ];
+      JobScheduler::get('run_fixity_check')->set($job);
 
+      // Set next check run value.
+      $entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value'] = $_SERVER['REQUEST_TIME'] + $seconds;
+
+    }
   }
 }
 

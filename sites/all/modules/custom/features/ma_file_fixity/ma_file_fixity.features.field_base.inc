@@ -228,6 +228,36 @@ function ma_file_fixity_field_default_field_bases() {
     'type' => 'datestamp',
   );
 
+  // Exported field_base: 'field_fixity_next_check_run_time'.
+  $field_bases['field_fixity_next_check_run_time'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_fixity_next_check_run_time',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'date',
+    'settings' => array(
+      'cache_count' => 4,
+      'cache_enabled' => 0,
+      'granularity' => array(
+        'day' => 'day',
+        'hour' => 'hour',
+        'minute' => 'minute',
+        'month' => 'month',
+        'second' => 'second',
+        'year' => 'year',
+      ),
+      'timezone_db' => 'UTC',
+      'todate' => '',
+      'treeable' => 0,
+      'tz_handling' => 'site',
+    ),
+    'translatable' => 0,
+    'type' => 'datestamp',
+  );
+
   // Exported field_base: 'field_fixity_processing_time'.
   $field_bases['field_fixity_processing_time'] = array(
     'active' => 1,

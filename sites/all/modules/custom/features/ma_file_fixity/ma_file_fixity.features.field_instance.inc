@@ -312,7 +312,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -357,7 +357,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -423,7 +423,7 @@ function ma_file_fixity_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -502,7 +502,7 @@ function ma_file_fixity_field_default_field_instances() {
   // 'node-fixity_check-field_fixity_latest_check_time'.
   $field_instances['node-fixity_check-field_fixity_latest_check_time'] = array(
     'bundle' => 'fixity_check',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -533,7 +533,7 @@ function ma_file_fixity_field_default_field_instances() {
     'label' => 'Latest check run time',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -541,13 +541,80 @@ function ma_file_fixity_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'date',
       'settings' => array(
         'apply_chosen' => 0,
+        'display_all_day' => 0,
+        'increment' => 1,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
         'treeable' => 0,
+        'year_range' => '-3:+3',
       ),
-      'type' => 'options_select',
+      'type' => 'date_text',
       'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-fixity_check-field_fixity_next_check_run_time'.
+  $field_instances['node-fixity_check-field_fixity_next_check_run_time'] = array(
+    'bundle' => 'fixity_check',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => FALSE,
+        ),
+        'type' => 'date_default',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_fixity_next_check_run_time',
+    'label' => 'Next check run time',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'blank',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'apply_chosen' => 0,
+        'display_all_day' => 0,
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
+        'treeable' => 0,
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_select',
+      'weight' => 11,
     ),
   );
 
@@ -562,7 +629,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -601,7 +668,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -645,7 +712,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -687,6 +754,7 @@ function ma_file_fixity_field_default_field_instances() {
   t('Hashes to check against');
   t('Latest check run result');
   t('Latest check run time');
+  t('Next check run time');
   t('Pre-Actions');
   t('Processing time');
   t('Protocols');

@@ -189,7 +189,7 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['fields']['field_fixity_latest_check_time']['table'] = 'field_data_field_fixity_latest_check_time';
   $handler->display->display_options['fields']['field_fixity_latest_check_time']['field'] = 'field_fixity_latest_check_time';
   $handler->display->display_options['fields']['field_fixity_latest_check_time']['settings'] = array(
-    'format_type' => 'long',
+    'format_type' => 'short',
     'custom_date_format' => '',
     'fromto' => 'both',
     'multiple_number' => '',
@@ -220,6 +220,19 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['fields']['nothing']['alter']['make_link'] = TRUE;
   $handler->display->display_options['fields']['nothing']['alter']['path'] = 'run-fixity-check/[nid]';
   $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
+  /* Field: Content: Next check run time */
+  $handler->display->display_options['fields']['field_fixity_next_check_run_time']['id'] = 'field_fixity_next_check_run_time';
+  $handler->display->display_options['fields']['field_fixity_next_check_run_time']['table'] = 'field_data_field_fixity_next_check_run_time';
+  $handler->display->display_options['fields']['field_fixity_next_check_run_time']['field'] = 'field_fixity_next_check_run_time';
+  $handler->display->display_options['fields']['field_fixity_next_check_run_time']['settings'] = array(
+    'format_type' => 'short',
+    'custom_date_format' => '',
+    'fromto' => 'both',
+    'multiple_number' => '',
+    'multiple_from' => '',
+    'multiple_to' => '',
+    'show_remaining_days' => 0,
+  );
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
@@ -254,6 +267,13 @@ function ma_file_fixity_views_default_views() {
   $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['field'] = 'field_fixity_latest_check_status_value';
   $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['exposed'] = TRUE;
   $handler->display->display_options['sorts']['field_fixity_latest_check_status_value']['expose']['label'] = 'Latest check run result';
+  /* Sort criterion: Content: Next check run time (field_fixity_next_check_run_time) */
+  $handler->display->display_options['sorts']['field_fixity_next_check_run_time_value']['id'] = 'field_fixity_next_check_run_time_value';
+  $handler->display->display_options['sorts']['field_fixity_next_check_run_time_value']['table'] = 'field_data_field_fixity_next_check_run_time';
+  $handler->display->display_options['sorts']['field_fixity_next_check_run_time_value']['field'] = 'field_fixity_next_check_run_time_value';
+  $handler->display->display_options['sorts']['field_fixity_next_check_run_time_value']['order'] = 'DESC';
+  $handler->display->display_options['sorts']['field_fixity_next_check_run_time_value']['exposed'] = TRUE;
+  $handler->display->display_options['sorts']['field_fixity_next_check_run_time_value']['expose']['label'] = 'Next check run time';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -326,6 +346,7 @@ function ma_file_fixity_views_default_views() {
     t('Latest check run result'),
     t('Details'),
     t('Run this check now.'),
+    t('Next check run time'),
     t('Edit'),
     t('Delete'),
     t('Fixity Check created'),

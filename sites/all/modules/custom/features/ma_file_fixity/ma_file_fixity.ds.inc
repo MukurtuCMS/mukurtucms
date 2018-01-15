@@ -17,18 +17,18 @@ function ma_file_fixity_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'fixity_check';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'fixity_reports' => array(
+    'fixity_run_check' => array(
       'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'fixity_reports' => array(
+      'weight' => '5',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(),
       ),
-    ),
-    'fixity_run_check' => array(
-      'weight' => '3',
-      'label' => 'hidden',
-      'format' => 'default',
     ),
   );
   $export['node|fixity_check|default'] = $ds_fieldsetting;
@@ -186,14 +186,16 @@ function ma_file_fixity_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'field_fixity_latest_check_status',
         1 => 'field_fixity_latest_check_time',
-        2 => 'field_fixity_hashes_to_use',
-        3 => 'fixity_run_check',
-        4 => 'fixity_reports',
+        2 => 'field_fixity_next_check_run_time',
+        3 => 'field_fixity_hashes_to_use',
+        4 => 'fixity_run_check',
+        5 => 'fixity_reports',
       ),
     ),
     'fields' => array(
       'field_fixity_latest_check_status' => 'ds_content',
       'field_fixity_latest_check_time' => 'ds_content',
+      'field_fixity_next_check_run_time' => 'ds_content',
       'field_fixity_hashes_to_use' => 'ds_content',
       'fixity_run_check' => 'ds_content',
       'fixity_reports' => 'ds_content',
@@ -238,7 +240,8 @@ function ma_file_fixity_ds_layout_settings_info() {
         8 => 'field_fixity_latest_check_time',
         9 => 'title',
         10 => 'field_fixity_report',
-        11 => '_add_existing_field',
+        11 => 'field_fixity_next_check_run_time',
+        12 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -253,6 +256,7 @@ function ma_file_fixity_ds_layout_settings_info() {
       'field_fixity_latest_check_time' => 'hidden',
       'title' => 'hidden',
       'field_fixity_report' => 'hidden',
+      'field_fixity_next_check_run_time' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
