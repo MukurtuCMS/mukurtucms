@@ -67,7 +67,7 @@ function ma_file_fixity_entity_presave($entity, $type) {
       $entity->title = $schedule_title . ' - ' . $cps_title;
     }
 
-    // Set the fixity check scheduled job if it has a schedule.
+    // Set the fixity check scheduled job if it has a schedule, and delete the job in case it was a formerly scheduled, now Unscheduled fixity check.
     switch ($schedule) {
       case 'Weekly':
         $seconds = 604800;
@@ -78,6 +78,13 @@ function ma_file_fixity_entity_presave($entity, $type) {
       case 'Every x days':
         $seconds = $frequency * 86400;
         break;
+      case 'Unscheduled':
+        $job = array(
+          'type' => 'fixity_check',
+          'id' => $entity->nid,
+        );
+        JobScheduler::get('run_fixity_check')->remove($job);
+        unset ($entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value']);
     }
     if (isset($seconds)) {
       $job = [
