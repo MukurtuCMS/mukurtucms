@@ -91,7 +91,6 @@ function ma_file_fixity_entity_presave($entity, $type) {
         'type' => 'fixity_check',
         'id' => $entity->nid,
         'period' => $seconds,
-        // TODO delete the job on node delete.
         'periodic' => TRUE,
       ];
       JobScheduler::get('run_fixity_check')->set($job);
@@ -100,6 +99,26 @@ function ma_file_fixity_entity_presave($entity, $type) {
       $entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value'] = $_SERVER['REQUEST_TIME'] + $seconds;
 
     }
+  }
+}
+
+
+/**
+ * Implements hook_entity_delete().
+ */
+function ma_file_fixity_entity_delete($entity, $type) {
+  if (!isset($entity->type)) {
+    return;
+  }
+  if ($entity->type == 'fixity_check') {
+
+    // Delete fixity check scheduled job when deleting a fixity check node.
+    $job = array(
+      'type' => 'fixity_check',
+      'id' => $entity->nid,
+    );
+    JobScheduler::get('run_fixity_check')->remove($job);
+
   }
 }
 
