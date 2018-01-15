@@ -65,11 +65,10 @@ function ma_file_fixity_field_default_field_bases() {
     'locked' => 0,
     'module' => 'text',
     'settings' => array(
-      'max_length' => 512,
       'treeable' => 0,
     ),
     'translatable' => 0,
-    'type' => 'text',
+    'type' => 'text_long',
   );
 
   // Exported field_base: 'field_fixity_cps'.

@@ -142,9 +142,9 @@ function ma_file_fixity_ds_layout_settings_info() {
         2 => 'field_fixity_algos_checked',
         3 => 'field_fixity_files_checked',
         4 => 'field_fixity_check_fails_count',
+        5 => 'field_fixity_check_fails_details',
       ),
       'hidden' => array(
-        5 => 'field_fixity_check_fails_details',
         6 => '_add_existing_field',
       ),
     ),
@@ -154,7 +154,7 @@ function ma_file_fixity_ds_layout_settings_info() {
       'field_fixity_algos_checked' => 'ds_content',
       'field_fixity_files_checked' => 'ds_content',
       'field_fixity_check_fails_count' => 'ds_content',
-      'field_fixity_check_fails_details' => 'hidden',
+      'field_fixity_check_fails_details' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(

@@ -155,12 +155,12 @@ function ma_file_fixity_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'text',
       'settings' => array(
-        'apply_chosen' => 0,
+        'rows' => 5,
         'treeable' => 0,
       ),
-      'type' => 'options_select',
+      'type' => 'text_textarea',
       'weight' => 5,
     ),
   );

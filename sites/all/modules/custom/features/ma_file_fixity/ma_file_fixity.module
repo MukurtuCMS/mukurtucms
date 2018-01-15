@@ -84,7 +84,9 @@ function ma_file_fixity_entity_presave($entity, $type) {
           'id' => $entity->nid,
         );
         JobScheduler::get('run_fixity_check')->remove($job);
-        unset ($entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value']);
+        if (isset($entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value'])) {
+          unset ($entity->field_fixity_next_check_run_time[LANGUAGE_NONE][0]['value']);
+        }
     }
     if (isset($seconds)) {
       $job = [
@@ -223,14 +225,35 @@ function ma_file_fixity_run_fixity_check($job) {
       }
     }
     if ($algo_fail) {
-      $file_link = l($file->filename, 'file/' . $file->fid);
-      $usages_link = '';
-      $usage = file_usage_list($file);
-      if ($usage) {
-        $usages_link = ' - ' . l('file usages', 'file/' . $file->fid . '/usage');
+      $algo_comp_text = '<li>Checks:<ul>' . $algo_comp_text . '</ul></li>';
+      $file_link = 'File: ' . l($file->filename, 'file/' . $file->fid);
+      $usages_text = '';
+      $file_usages = file_usage_list($file);
+      if ($file_usages) {
+        $usages_text = '<li>' . l('File usages', 'file/' . $file->fid . '/usage') . '</li>';
+        foreach ($file_usages as $file_usage) {
+          if (isset($file_usage['scald_atom'])) {
+            $usages_text .= '<li>Atom usages of file:<ul>';
+            foreach ($file_usage['scald_atom'] as $atom_id => $file_usage_count) {
+              $atom = scald_atom_load($atom_id);
+              $usages_text .= '<li>' . l($atom->title, '/atom/' . $atom_id) . '</li>';
+              $atom_usages = scald_index_get_nodes($atom_id);
+              if (count($atom_usages)) {
+                $usages_text .= '<li>Media item usages of atom:<ul>';
+                foreach ($atom_usages as $atom_usage) {
+                  $atom_usage_node = node_load($atom_usage);
+                  $usages_text .= '<li>' . l($atom_usage_node->title, '/node/' . $atom_usage_node->nid) . '</li>';
+                }
+                $usages_text .= '</ul></li>';
+              }
+            }
+            $usages_text .= '</ul></li>';
+          }
+        }
+
       }
       $file_fails[] = [
-        'value' => $file_link . $usages_link . '<ul>' . $algo_comp_text . '</ul>',
+        'value' => $file_link . '<ul>' . $algo_comp_text . $usages_text. '</ul>',
         'format' => 'full_html'
       ];
     }
