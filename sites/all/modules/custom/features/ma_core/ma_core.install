@@ -55,3 +55,12 @@ function ma_core_update_7103() {
 function ma_core_update_7104() {
     module_enable(array('mukurtu_taxonomy_records', 'ma_person'));
 }
+
+/**
+ * Bulk add file hashes
+ */
+function ma_core_update_7105() {
+  module_enable(array('ma_file_fixity'));
+  features_revert_module('ma_file_fixity');
+  ma_file_fixity_bulk_generate_file_hashes();
+}

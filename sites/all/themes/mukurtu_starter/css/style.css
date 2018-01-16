@@ -10665,3 +10665,36 @@ a:hover {
 .class-collections-tree-popup td.center .inner {
   width: auto !important;
 }
+.view-mode-full .field-name-fixity-reports .label-above {
+  font-size: 1.5em;
+  text-transform: capitalize;
+  margin-top: 1em;
+}
+.view-mode-full .field-name-fixity-reports .views-row {
+  padding-bottom: 1em;
+  border-bottom: solid;
+  border-width: 1px;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul {
+  padding-left: 30px;
+  list-style-type: disc;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul .fail {
+  color: red;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul .pass {
+  color: green;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul p {
+  margin-bottom: 0;
+}
+.fixity-check-fail-status {
+  font-weight: bold;
+  color: red;
+  text-transform: uppercase;
+}
+.fixity-check-pass-status {
+  font-weight: bold;
+  color: green;
+  text-transform: uppercase;
+}

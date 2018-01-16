@@ -557,6 +557,15 @@ function mukurtu_splash_block_manage_content() {
     );
   }
 
+  if(user_access('create fixity_check content')) {
+    $items[] = array(
+      'title' => 'File Fixity Checks',
+      'href' => 'fixity-checks',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('View, manage, create, and run file fixity checks, to assure of Media Asset integrity.'),
+    );
+  }
+
   $content = array ('content' => $items);
   $markup = theme('admin_block_content', $content);
 
