@@ -1,70 +1,16 @@
 <?php
 
-/**
- *  Export GUI function.
- *
- *  @param $entities
- *    A node, an array of nodes, or an array of nids.
- *  @param $format
- *    The node export format.
- *  @param $delivery
- *    The code delivery format, if NULL will use settings.
- *  @return
- *    The node export form or nothing if calling function to serve file.
- */
- function mukurtu_export_gui($entities = NULL, $format = NULL, $delivery = NULL, $field_list = NULL) {
-  // Determine which content we are exporting
-  if(is_object($entities)) {
-    // Single item, from node/entity page
-    $entity_type = _mukurtu_export_entity_type($entities);
-    $entity_id = _mukurtu_export_entity_id($entity_type);
-    $export_ids = array($entity_type =>
-      array($entities->type =>
-        array(
-          $entities->{$entity_id} => $entities
-        )
-      )
-    );
-    drupal_set_title(t('Exporting @title', array('@title' => $entities->title)));
-  }
-
-  $format_handlers = mukurtu_export_format_handlers();
-  // Format not specified or specified format isn't available
-  if(is_null($format) || !in_array($format, array_keys($format_handlers))) {
-    // Check if the user selected a format previously
-    if(isset($_SESSION['mukurtu_export']['format'])
-              && in_array($_SESSION['mukurtu_export']['format'], array_keys($format_handlers))) {
-      $format = $_SESSION['mukurtu_export']['format'];
-    } else {
-      // Only one available format, default to that
-      if(count($format_handlers) == 1) {
-        $format = array_keys($format_handlers)[0];
-      } else {
-        // Multiple formats, show selection form
-        return drupal_get_form('mukurtu_export_format_selection_form', $format_handlers);
-      }
-    }
-  }
-
-  if(is_null($field_list)) {
-    if(isset($_SESSION['mukurtu_export']['field_list'])) {
-      $field_list = $_SESSION['mukurtu_export']['field_list'];
-    }
-  }
-
-  $code_string = NULL;
-  return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, $format_handlers[$format], $field_list);
-}
-
-
 function mukurtu_export_form($form, &$form_state) {
   $export_ids = isset($form_state['mukurtu_export']['export_ids']) ? $form_state['mukurtu_export']['export_ids'] : NULL;
   $formatter = isset($form_state['mukurtu_export']['formatter']) ? $form_state['mukurtu_export']['formatter'] : NULL;
   $formatter_settings = isset($form_state['mukurtu_export']['formatter_settings']) ? $form_state['mukurtu_export']['formatter_settings'] : NULL;
   $field_list = isset($form_state['mukurtu_export']['export_fields']) ? $form_state['mukurtu_export']['export_fields'] : NULL;
 
-  if(is_null($export_ids) && isset($form_state['build_info']['args'][0])) {
-    $export_ids = $form_state['build_info']['args'][0];
+  if(is_null($export_ids)){// && isset($form_state['build_info']['args'][0])) {
+    //kpr("menu");
+    //kpr(menu_get_object());
+    $current_node = menu_get_object();
+    $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
   }
 
   // No format selected
@@ -79,6 +25,7 @@ function mukurtu_export_form($form, &$form_state) {
       // Only one available format, default to that
       if(count($format_handlers) == 1) {
         $formatter = array_keys($format_handlers)[0];
+        $form_state['mukurtu_export']['formatter'] = $formatter;
       } else {
         // Multiple formats, show selection form
         return mukurtu_export_format_selection_form($form, $form_state, $format_handlers);

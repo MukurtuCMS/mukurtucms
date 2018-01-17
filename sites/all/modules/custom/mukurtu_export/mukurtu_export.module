@@ -11,8 +11,8 @@
     $items['node/%node/mukurtu-export'] = array(
         'access callback' => 'mukurtu_export_access_export',
         'access arguments' => array(1),
-        'page callback' => 'mukurtu_export_gui',
-        'page arguments' => array(1),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('mukurtu_export_form'),
         'title' => 'Mukurtu export',
         'type' => MENU_LOCAL_TASK,
         'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
