@@ -62,7 +62,7 @@ function mukurtu_export_form($form, &$form_state) {
   }
 
     //$code_string = mukurtu_export_csv_export($export_ids, $formatter, $field_list);
-  $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list);
+  $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list, $formatter_settings);
 //kpr($download_file);
 
   $form['export'] = array(

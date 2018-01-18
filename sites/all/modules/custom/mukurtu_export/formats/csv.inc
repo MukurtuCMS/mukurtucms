@@ -26,13 +26,12 @@ function mukurtu_export_csv_settings($form, $form_state) {
 
   $settings['csv']['mukurtu_export_csv_delimiter'] = array(
     '#type' => 'textfield',
-    '#title' => t('Value delimiter'),
+    '#title' => t('Field delimiter'),
     '#size' => 5,
     '#maxlength' => 255,
-    '#default_value' => variable_get('mukurtu_export_csv_delimiter', ';'),
+    '#default_value' => variable_get('mukurtu_export_csv_delimiter', ','),
     '#description' => t(
-    'This delimiter will be used to separate mulitple values for a single field.
-    Mukurtu uses a single semicolon by default.'),
+    'This delimiter will be used to separate fields. Mukurtu uses comma separated values by default.'),
     '#required' => TRUE,
   );
 
@@ -51,6 +50,18 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#size' => 5,
     '#maxlength' => 255,
     '#default_value' => variable_get('mukurtu_export_csv_separator', '\r\n'),
+    '#required' => TRUE,
+  );
+
+  $settings['csv']['mukurtu_export_csv_multivalue_delimiter'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Multiple value delimiter'),
+    '#size' => 5,
+    '#maxlength' => 255,
+    '#default_value' => variable_get('mukurtu_export_csv_multivalue_delimiter', ';'),
+    '#description' => t(
+    'This delimiter will be used to separate mulitple values for a single field.
+    Mukurtu uses a single semicolon by default.'),
     '#required' => TRUE,
   );
 
@@ -91,23 +102,21 @@ function mukurtu_export_csv_string($string) {
 /**
  * Export callback.
  */
-function mukurtu_export_csv_export($entities, $field_list = NULL) {
-  $delimiter = mukurtu_export_csv_string(variable_get('mukurtu_export_csv_delimiter', ','));
-  $enclosure = mukurtu_export_csv_string(variable_get('mukurtu_export_csv_enclosure', '"'));
-  $separator = mukurtu_export_csv_string(variable_get('mukurtu_export_csv_separator', '\r\n'));
-  $escape_eol = variable_get('mukurtu_export_csv_escape_eol', 1);
-  $multivalue_delimiter = variable_get('mukurtu_export_csv_multivalue_delimiter', ';');
+function mukurtu_export_csv_export($entities, $field_list, $settings) {
+  $delimiter = mukurtu_export_csv_string($settings['mukurtu_export_csv_delimiter']);
+  $enclosure = mukurtu_export_csv_string($settings['mukurtu_export_csv_enclosure']);
+  $separator = mukurtu_export_csv_string($settings['mukurtu_export_csv_separator']);
+  $escape_eol = $settings['mukurtu_export_csv_escape_eol'];
+  $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
+  $id_format = $settings['mukurtu_export_csv_id_format'];
 
   $encoded_export = array();
   foreach ($entities as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
-      //$encoded_export[$entity_type][$bundle_name] = mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list[$entity_type][$bundle_name]);
         $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list));
     }
   }
   return mukurtu_export_csv_export_to_zip($encoded_export);
-
-  //return $encoded_export;
 }
 
 function mukurtu_export_csv_export_to_zip($encoded_export) {
