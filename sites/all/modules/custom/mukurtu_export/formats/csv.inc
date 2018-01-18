@@ -160,14 +160,18 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
   }
 
   // Remove bookkeeping info
+  $encoded_list = $encoded_nodes['__exported_key_list'];
   unset($encoded_nodes['__exported_key_list']);
 
   foreach(array_keys($encoded_nodes) as $encoded_entity_type) {
     foreach(array_keys($encoded_nodes[$encoded_entity_type]) as $encoded_bundle_name) {
       $csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'] = array_keys($encoded_nodes[$encoded_entity_type][$encoded_bundle_name]);
+
       foreach (array_keys($encoded_nodes[$encoded_entity_type][$encoded_bundle_name]) as $header_value) {
-        foreach (array_keys($encoded_nodes[$encoded_entity_type][$encoded_bundle_name][$header_value]) as $encoded_node_key) {
-          $csv_lines[$encoded_entity_type][$encoded_bundle_name][$encoded_node_key][$header_value] = $encoded_nodes[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_node_key];
+        foreach (array_keys($encoded_list[$encoded_entity_type][$encoded_bundle_name]) as $encoded_node_key) {
+        //foreach (array_keys($encoded_nodes[$encoded_entity_type][$encoded_bundle_name][$header_value]) as $encoded_node_key) {
+          $field_value = isset($encoded_nodes[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_node_key]) ? $encoded_nodes[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_node_key] : NULL;
+          $csv_lines[$encoded_entity_type][$encoded_bundle_name][$encoded_node_key][$header_value] = $field_value;
         }
       }
       $csv_output[$encoded_entity_type][$encoded_bundle_name] = mukurtu_export_csv_array_to_csv($csv_lines[$encoded_entity_type][$encoded_bundle_name], $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter);
@@ -215,14 +219,14 @@ function mukurtu_export_csv_encode_node(&$encoded_nodes, $node_key, $var, $entit
           $new_node_key = "{$referenced_entity_type}__{$referenced_entity_object[$r_id]->type}_{$r_id}";
 
           // Check if already exported, prevent infinite recursion
-          if(isset($encoded_nodes['__exported_key_list'][$new_node_key])) {
+          if(isset($encoded_nodes['__exported_key_list'][$referenced_entity_type][$referenced_entity_object[$r_id]->type][$new_node_key])) {
             return;
           }
           mukurtu_export_csv_encode_node($encoded_nodes, $new_node_key, $referenced_entity_object[$r_id], $referenced_entity_type, $referenced_entity_object[$r_id]->type, $field_list);
         }
       }
       $encoded_nodes[$entity_type][$bundle_name][$header_value][$node_key][$header_index] = mukurtu_export_csv_encode_sanitize_value($value);
-      $encoded_nodes['__exported_key_list'][$node_key] = TRUE;
+      $encoded_nodes['__exported_key_list'][$entity_type][$bundle_name][$node_key] = TRUE;
     }
   }
 }
@@ -337,6 +341,9 @@ function mukurtu_export_csv_decode($code_string, $delimiter, $enclosure, $separa
  *  Encode csv.
  */
 function mukurtu_export_csv_array_to_csv($array, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter) {
+  $csv_output = fopen('php://output', 'w');
+  ob_start();
+
   $lines = array();
   foreach ($array as $line) {
     $out_item = array();
@@ -344,8 +351,6 @@ function mukurtu_export_csv_array_to_csv($array, $delimiter, $enclosure, $separa
       if(!is_array($item)) {
         $item = array($item);
       }
-
-      //$item = mukurtu_export_extract_value('node', $line_key, $item);
 
       foreach($item as $item_key => $item_value) {
 
@@ -363,9 +368,12 @@ function mukurtu_export_csv_array_to_csv($array, $delimiter, $enclosure, $separa
       }
       $out_item[] = implode($multivalue_delimiter, $item);
     }
-    $lines[] = implode($delimiter, $out_item);
+    fputcsv($csv_output, $out_item, $delimiter, $enclosure);
   }
-  return implode($separator, $lines);
+
+  fclose($csv_output);
+  $csv = ob_get_clean();
+  return $csv;
 }
 
 /**
