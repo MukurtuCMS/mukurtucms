@@ -65,18 +65,6 @@ function mukurtu_export_form($form, &$form_state) {
   $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list, $formatter_settings);
 //kpr($download_file);
 
-  $form['export'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Mukurtu export code'),
-    '#default_value' => print_r($download_file->uri, TRUE),
-    '#rows' => 30,
-    '#description' => t('Copy this code and then on the site you want to import to, go to the <em>Node export: import</em> link under <em>Add content</em>, and paste it in there.'),
-    '#attributes' => array(
-      'wrap' => 'off',
-    ),
-      '#wysiwyg' => FALSE,
-    );
-
   mukurtu_export_get_file($download_file);
 }
 
