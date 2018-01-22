@@ -110,10 +110,22 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
   $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
   $id_format = $settings['mukurtu_export_csv_id_format'];
 
+  // If GUIDs are selected for export, don't export the native ID field of the entity
+  if($id_format == 'guid') {
+    foreach($field_list as $entity_type => $bundle) {
+      $id_field = _mukurtu_export_entity_id($entity_type);
+      foreach($bundle as $bundle_name => $bundle_fields){
+        if(isset($field_list[$entity_type][$bundle_name][$id_field])) {
+          $field_list[$entity_type][$bundle_name][$id_field] = 0;
+        }
+      }
+    }
+  }
+
   $encoded_export = array();
   foreach ($entities as $entity_type => $bundle) {
-    foreach ($bundle as $bundle_name => $bundle_entities) {      
-        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list));
+    foreach ($bundle as $bundle_name => $bundle_entities) {
+        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format));
     }
   }
   return mukurtu_export_csv_export_to_zip($encoded_export);
@@ -155,7 +167,7 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
 /**
  * Build csv string.
  */
-function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list) {
+function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format = 'internal') {
   $encoded_content = array();
   $csv_lines = array();
   $csv_output = array();
@@ -165,7 +177,7 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
   foreach (array_keys($entities) as $entity_key) {
     $new_entity_key = "{$entity_type}__{$bundle_name}_{$entity_key}";
     $entity_keys[] = $new_entity_key;
-    mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $entities[$entity_key], $entity_type, $bundle_name, $field_list);
+    mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $entities[$entity_key], $entity_type, $bundle_name, $field_list, $id_format);
   }
 
   // Remove bookkeeping info
@@ -193,7 +205,12 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
 /**
  * Process an entity and update $header and $encoded_content accordingly.
  */
-function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, $entity_type = NULL, $bundle_name = NULL, $field_list = NULL, $parent = NULL, $parent_index = 0) {
+function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, $entity_type = NULL, $bundle_name = NULL, $field_list = NULL, $id_format = 'internal', $parent = NULL, $parent_index = 0) {
+  // GUID is a special case
+  if(is_null($parent) && $id_format == 'guid') {
+    $encoded_content[$entity_type][$bundle_name]['guid'][$entity_key][0] = _mukurtu_export_entity_get_guid($entity_type, $var->{_mukurtu_export_entity_id($entity_type, $var)});
+  }
+
   foreach ($var as $k => &$v) {
     // Get the new header value.
     list($header_value, $header_index) = mukurtu_export_csv_encode_header_value($parent, $parent_index, $var, $k);
@@ -211,11 +228,13 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
     //if (is_object($v) || is_array($v)) {
     if (is_array($v) && !is_numeric($k)) {
       // Recurse through the structure.
-      mukurtu_export_csv_encode_entity($encoded_content, $entity_key, $v, $entity_type, $bundle_name, $field_list, $header_value, $header_index);
+      mukurtu_export_csv_encode_entity($encoded_content, $entity_key, $v, $entity_type, $bundle_name, $field_list, $id_format, $header_value, $header_index);
     }
     else {
       // Create a safe text version of this value and store it against the header using a safe key.
-      list($value, $referenced_entities_to_encode) = mukurtu_export_extract_value($entity_type, $parent, $v);
+      $options = array('id_format' => $id_format);
+
+      list($value, $referenced_entities_to_encode) = mukurtu_export_extract_value($entity_type, $parent, $v, $options);
       foreach($referenced_entities_to_encode as $referenced_entity_type => $referenced_entity) {
         foreach($referenced_entity as $r_id => $r_entity) {
           // Check permission?
@@ -231,7 +250,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
           if(isset($encoded_content['__exported_key_list'][$referenced_entity_type][$referenced_entity_object[$r_id]->type][$new_entity_key])) {
             return;
           }
-          mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $referenced_entity_object[$r_id]->type, $field_list);
+          mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $referenced_entity_object[$r_id]->type, $field_list, $id_format);
         }
       }
       $encoded_content[$entity_type][$bundle_name][$header_value][$entity_key][$header_index] = mukurtu_export_csv_encode_sanitize_value($value);

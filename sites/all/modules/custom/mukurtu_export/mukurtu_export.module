@@ -104,7 +104,7 @@ function mukurtu_export_format_handlers() {
   return $format_handlers;
 }
 
-function mukurtu_export_extract_value($entity_type, $field_name, $value) {
+function mukurtu_export_extract_value($entity_type, $field_name, $value, $options = array()) {
   // Make hook to allow custom changes?
 
   $referenced_entities = array();
@@ -122,7 +122,7 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value) {
       && isset($field_handlers[$field_info['type']]['#callback'])
       && function_exists($field_handlers[$field_info['type']]['#callback'])
       ) {
-      return call_user_func($field_handlers[$field_info['type']]['#callback'], $value, $field_info, $referenced_entities);
+      return call_user_func($field_handlers[$field_info['type']]['#callback'], $value, $field_info, $options);
     }
   }
 
@@ -161,4 +161,18 @@ function _mukurtu_export_entity_id($entity_type = NULL, $entity = NULL) {
     default:
       return 'nid';
   }
+}
+
+function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
+  $entity = entity_load($entity_type, array($entity_id));
+  
+  $feeds_info = feeds_item_info_load($entity_type, $entity_id);
+  // Check for an existing feeds guid
+  if($feeds_info && isset($feeds_info->guid)) {
+    return $feeds_info->guid;
+  }
+
+  // Otherwise generate a new one
+  $guid = $entity[$entity_id]->type . '_' . $entity_id . '_' . $entity[$entity_id]->created;
+  return $guid;
 }
