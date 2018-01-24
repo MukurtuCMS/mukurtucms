@@ -52,9 +52,14 @@ function mukurtu_export_form($form, &$form_state) {
 
   if(is_null($field_list)) {
 
+    $form['download_file_top'] = array(
+      '#type' => 'submit',
+      '#value' => t('Download'),
+    );
+
     $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids);
 
-    $form['download_file'] = array(
+    $form['download_file_bottom'] = array(
       '#type' => 'submit',
       '#value' => t('Download'),
     );
@@ -107,6 +112,7 @@ function mukurtu_export_form_submit($form, &$form_state) {
   // Field List
   if(isset($form_state['values']['export_fields'])) {
     $form_state['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
+    $_SESSION['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
   }
   //return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, 'csv', $field_list);
 }
@@ -138,7 +144,7 @@ function mukurtu_export_format_selection_form_submit($form, &$form_state) {
   $_SESSION['mukurtu_export']['format'] = $form_state['values']['export_format'];
 }
 
-function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL) {
+function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
   if(!is_null($export_ids)) {
     $form['export_fields'] = array(
       '#type' => 'fieldset',
@@ -148,15 +154,29 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       '#tree' => TRUE,
     );
 
-    foreach($export_ids as $entity_type => $bundles) {
+    // Load defaults
+    $defaults = NULL;
+    if(!$reset && isset($_SESSION['mukurtu_export']['export_fields'])) {
+      $defaults = $_SESSION['mukurtu_export']['export_fields'];
+    }
+
+    foreach(array_keys(entity_get_info()) as $entity_type) {
+
+      // Currently only show node/scald_atom fields
+      if($entity_type != 'node' && $entity_type != 'scald_atom'){
+        continue;
+      }
+
       $entity_info = entity_get_info($entity_type);
       $id = _mukurtu_export_entity_id($entity_type);
-      foreach($bundles as $bundle_name => $ids) {
+
+      foreach($entity_info['bundles'] as $bundle_name => $ids) {
         $form['export_fields'][$entity_type][$bundle_name] = array(
           '#type' => 'fieldset',
-          '#title' => $entity_info['bundles'][$bundle_name]['label'],
+          '#title' => $entity_info['label'] . ' - ' . $entity_info['bundles'][$bundle_name]['label'],
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
+          '#weight' => 0,
         );
 
         $fields_info = field_info_instances($entity_type, $bundle_name);
@@ -168,7 +188,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
         $form['export_fields'][$entity_type][$bundle_name][$id] = array(
           '#type' => 'checkbox',
           '#title' => $id_label,
-          '#default_value' => TRUE,
+          '#default_value' => isset($defaults[$entity_type][$bundle_name][$id]) ? $defaults[$entity_type][$bundle_name][$id] : TRUE,
           '#weight' => -2
         );
 
@@ -176,7 +196,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
         $form['export_fields'][$entity_type][$bundle_name]['title'] = array(
           '#type' => 'checkbox',
           '#title' => t('Title'),
-          '#default_value' => TRUE,
+          '#default_value' => isset($defaults[$entity_type][$bundle_name]['title']) ? $defaults[$entity_type][$bundle_name]['title'] : TRUE,
           '#weight' => -1
         );
 
@@ -184,12 +204,24 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
           $form['export_fields'][$entity_type][$bundle_name][$field_name] = array(
             '#type' => 'checkbox',
             '#title' => $field['label'],
-            '#default_value' => TRUE,
+            '#default_value' => isset($defaults[$entity_type][$bundle_name][$field_name]) ? $defaults[$entity_type][$bundle_name][$field_name] : TRUE,
             '#weight' => $field['widget']['weight']
           );
         }
       }
     }
+
+    // Re-order form based on content types we are exporting
+    $entity_weight = -1000;
+    $bundle_weight = -1000;
+    foreach($export_ids as $entity_type => $bundles) {
+      $form['export_fields'][$entity_type]['#weight'] = $entity_weight++;
+      foreach($bundles as $bundle_name => $ids) {
+        $form['export_fields'][$entity_type][$bundle_name]['#weight'] = $bundle_weight++;
+        $form['export_fields'][$entity_type][$bundle_name]['#collapsed'] = FALSE;
+      }
+    }
+
   }
   return $form;
 }
