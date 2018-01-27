@@ -270,9 +270,25 @@ function ma_file_fixity_run_fixity_check($job) {
 
   $overall_status = 'pass';
   if (count($file_fails)) {
+    $overall_status = 'fail';
+
+    // Update the fixity check node.
     $ffcw->field_fixity_check_fails_details->set($file_fails);
     $ffcw->field_fixity_check_fails_count->set(count($file_fails));
-    $overall_status = 'fail';
+
+    // Send an check fail email.
+    $message = 'There has been a file fixity check fail on ' . variable_get('site_name') . ".";
+    $message .= "\n\nFixity check name: " . $node->title;
+    $message .= "\nTime of check: " . format_date ($start_time, 'long');
+    $message .= "\nFiles failed: " . count($file_fails);
+    $message .= "\n\nFor more information see: " . $GLOBALS['base_url'] . url('node/'. $node->nid);
+    $params = array(
+      'subject' => t('File fixity check fail on ' . variable_get('site_name')),
+      'body' => check_markup($message,'plain_text'),
+    );
+    $check_author = user_load($node->uid); // TODO: send to other mukurtu admins too? If not update the text above to say "on *your* fixity check" somewhere.
+    drupal_mail('ma_file_fixity', 'fixity_check_error', $check_author->mail, language_default(), $params);
+
   }
 
   $node->field_fixity_latest_check_time[LANGUAGE_NONE][0]['value'] = $start_time;
@@ -326,3 +342,14 @@ function ma_file_fixity_views_post_render(&$view, &$output, &$cache) {
   }
 }
 
+/**
+ * Implements hook_mail for module_name.
+ */
+function ma_file_fixity_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'fixity_check_error':
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['body'];
+      break;
+  }
+}
