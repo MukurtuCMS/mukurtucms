@@ -129,13 +129,13 @@ function ma_file_fixity_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '9',
+          'weight' => '10',
         ),
         'path' => array(
-          'weight' => '6',
+          'weight' => '7',
         ),
         'redirect' => array(
-          'weight' => '5',
+          'weight' => '6',
         ),
       ),
       'display' => array(),

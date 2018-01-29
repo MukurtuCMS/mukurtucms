@@ -286,8 +286,18 @@ function ma_file_fixity_run_fixity_check($job) {
       'subject' => t('File fixity check fail on ' . variable_get('site_name')),
       'body' => check_markup($message,'plain_text'),
     );
-    $check_author = user_load($node->uid); // TODO: send to other mukurtu admins too? If not update the text above to say "on *your* fixity check" somewhere.
-    drupal_mail('ma_file_fixity', 'fixity_check_error', $check_author->mail, language_default(), $params);
+
+    $check_author = user_load($node->uid);
+    $recipients = [$check_author->mail];
+    if ($fw->field_fixity_email_all_admins->value()) {
+      $mukurtu_admins = ma_core_get_users_per_role('Mukurtu Administrator');
+      foreach ($mukurtu_admins as $mukurtu_admin) {
+        $recipients[] = $mukurtu_admin->mail;
+      }
+    }
+    $recipients = implode (', ', array_unique($recipients));
+
+    drupal_mail('ma_file_fixity', 'fixity_check_error', $recipients, language_default(), $params);
 
   }
 
