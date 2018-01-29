@@ -64,15 +64,17 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
     }
 
     // Gather group field info
-    $og_group_parent = $form['#group_children']['og_group_ref'];
-    $form['#group_children']['oggroup_fieldset'] = $og_group_parent;
+    $form['#group_children']['oggroup_fieldset'] = isset($form['#group_children']['og_group_ref']) ? $form['#group_children']['og_group_ref'] : null;
+
+    // Hide the original Protocol field.
+    $form['og_group_ref']['#access'] = FALSE;
 
     // Build the $structure and $community_defaults_with_titles arrays
     $structure = array();
     $community_defaults_with_titles = array();
     $cps = array();
-    if (isset($form_state['node']->og_group_ref['und'])) {
-      $cps = $form_state['node']->og_group_ref['und'];
+    if (isset($form_state['node']->og_group_ref[LANGUAGE_NONE])) {
+      $cps = $form_state['node']->og_group_ref[LANGUAGE_NONE];
       foreach ($cps as $cp) {
         $cp_nid = $cp['target_id'];
         $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
@@ -115,8 +117,8 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
     );
-    if ($form_id == 'digital_heritage_node_form') {
-      $form['oggroup_fieldset']['#title'] .= " *"; // Mark the fieldset as required, on DH nodes only
+    if (ma_cultural_protocol_node_type_must_have_cp($node_type)) {
+      $form['oggroup_fieldset']['#title'] .= " *"; // Mark the fieldset as required.
     }
 
     // Retrieve defaults from the url (only applies to node creation)
@@ -205,8 +207,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
         '#multiple' => TRUE,
         '#attributes' => array ('class' => array('chosen-enable')),
       );
-      // DH node (only) needs at least one protocol
-      if ($i == 0 AND $form_id == 'digital_heritage_node_form') {
+      if ($i == 0 && ma_cultural_protocol_node_type_must_have_cp($node_type)) {
         $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
       }
     }
@@ -260,7 +261,7 @@ function mukurtu_protocol_field_form_validate($form, &$form_state) {
     }
   }
 
-  $form_state['values']['og_group_ref']['und'] = $newstate;
+  $form_state['values']['og_group_ref'][LANGUAGE_NONE] = $newstate;
 
 }
 
@@ -322,18 +323,18 @@ function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_
  */
 function mukurtu_protocol_field_node_presave($node) {
   if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
-    $dh_emw = entity_metadata_wrapper('node', $node);
+    $nmw = entity_metadata_wrapper('node', $node);
 
-    // Update the Community field according to the protocols for the node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet). It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
+    // Update the Community field according to the protocols for the node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet), on certain node types. It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
     $communities = array();
-    foreach ($dh_emw->og_group_ref->value() as $protocol) {
+    foreach ($nmw->og_group_ref->value() as $protocol) {
       $p_emw = entity_metadata_wrapper('node', $protocol);
       foreach ($p_emw->og_group_ref->value() as $community) {
         $communities[] = $community->nid;
       }
     }
     if (count($communities)) {
-      $dh_emw->field_community_ref->set(array_unique($communities));
+      $nmw->field_community_ref->set(array_unique($communities));
     }
   }
 }
@@ -373,15 +374,10 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
 
       // What to do if no protocol is set.
       if (!$groups_on_node = og_get_entity_groups('node', $node)) {
-        switch ($node->type) {
-          // No protocol is required.
-          case 'dictionary_word':
-          case 'collection':
-            return NODE_ACCESS_ALLOW;
-          // Protocol is required.
-          default:
-            return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
+        if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
+          return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
         }
+        return NODE_ACCESS_ALLOW;
       }
 
       $groups_on_node = array_values($groups_on_node['node']);
@@ -472,15 +468,10 @@ function mukurtu_protocol_field_update_node_in_cp_access ($node) {
     global $user;
 
   if (!$groups_on_node = og_get_entity_groups('node', $node)) {
-    switch ($node->type) {
-      // No protocol is required.
-      case 'dictionary_word':
-      case 'collection':
-        return NODE_ACCESS_ALLOW;
-      // Protocol is required.
-      case  'digital_heritage':
-        return NODE_ACCESS_DENY;  // Safeguard. This should never happen. All DH items should be in a group.
+    if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
+      return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
     }
+    return NODE_ACCESS_ALLOW;
   }
 
   $groups_on_node = array_values($groups_on_node['node']);

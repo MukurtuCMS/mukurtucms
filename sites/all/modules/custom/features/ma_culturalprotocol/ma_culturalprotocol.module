@@ -411,19 +411,40 @@ function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
 }
 
 /**
- * Helper function returns whether a node type can be in a CP
+ * Helper function returns whether a node type *can* be in a CP
  */
 function ma_cultural_protocol_node_type_can_have_cp($node_type) {
-  $node_types_that_can_have_cp = [
-    'digital_heritage',
-    'dictionary_word',
-    'collection',
-    'oa_section',
-    'oa_discussion_post',
-    'oa_wiki_page',
-    'oa_event'
-  ];
-  if (in_array($node_type, $node_types_that_can_have_cp)) {
+  $node_types = _ma_cultural_protocol_get_node_types();
+  if (in_array($node_type, array_merge($node_types['optional'], $node_types['required']))) {
     return TRUE;
   }
+}
+
+/**
+ * Helper function returns whether a node type *must* be in a CP
+ */
+function ma_cultural_protocol_node_type_must_have_cp($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types();
+  if (in_array($node_type, $node_types['required'])) {
+    return TRUE;
+  }
+}
+
+/**
+ * Internal function used by the helper functions.
+ */
+function _ma_cultural_protocol_get_node_types() {
+  return [
+    'optional' => [
+      'collection',
+    ],
+    'required' => [
+      'digital_heritage',
+      'dictionary_word',
+      'oa_section',
+      'oa_discussion_post',
+      'oa_wiki_page',
+      'oa_event'
+    ]
+  ];
 }

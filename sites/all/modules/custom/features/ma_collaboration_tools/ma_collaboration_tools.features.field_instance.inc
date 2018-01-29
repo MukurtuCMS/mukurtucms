@@ -64,6 +64,49 @@ function ma_collaboration_tools_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-oa_discussion_post-field_community_ref'.
+  $field_instances['node-oa_discussion_post-field_community_ref'] = array(
+    'bundle' => 'oa_discussion_post',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'node_reference',
+        'settings' => array(),
+        'type' => 'node_reference_default',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_ref',
+    'label' => 'Community',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'node_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'node_reference/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'node_reference_autocomplete',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance:
   // 'node-oa_discussion_post-field_item_privacy_setting'.
   $field_instances['node-oa_discussion_post-field_item_privacy_setting'] = array(
@@ -365,6 +408,49 @@ function ma_collaboration_tools_field_default_field_instances() {
       ),
       'type' => 'text_textarea_with_summary',
       'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_event-field_community_ref'.
+  $field_instances['node-oa_event-field_community_ref'] = array(
+    'bundle' => 'oa_event',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'node_reference',
+        'settings' => array(),
+        'type' => 'node_reference_default',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_ref',
+    'label' => 'Community',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'node_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'node_reference/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'node_reference_autocomplete',
+      'weight' => 15,
     ),
   );
 
@@ -1207,6 +1293,49 @@ http://www.whitehouse.gov/',
     ),
   );
 
+  // Exported field_instance: 'node-oa_section-field_community_ref'.
+  $field_instances['node-oa_section-field_community_ref'] = array(
+    'bundle' => 'oa_section',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'node_reference',
+        'settings' => array(),
+        'type' => 'node_reference_default',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_ref',
+    'label' => 'Community',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'node_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'node_reference/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'node_reference_autocomplete',
+      'weight' => 7,
+    ),
+  );
+
   // Exported field_instance: 'node-oa_section-field_item_privacy_setting'.
   $field_instances['node-oa_section-field_item_privacy_setting'] = array(
     'bundle' => 'oa_section',
@@ -1368,6 +1497,49 @@ http://www.whitehouse.gov/',
       ),
       'type' => 'text_textarea_with_summary',
       'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_wiki_page-field_community_ref'.
+  $field_instances['node-oa_wiki_page-field_community_ref'] = array(
+    'bundle' => 'oa_wiki_page',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'node_reference',
+        'settings' => array(),
+        'type' => 'node_reference_default',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_ref',
+    'label' => 'Community',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'node_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'node_reference/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'node_reference_autocomplete',
+      'weight' => 10,
     ),
   );
 
@@ -1666,6 +1838,7 @@ http://www.whitehouse.gov/',
   // Included for use with string extractors like potx.
   t('Attachments');
   t('Body');
+  t('Community');
   t('Describe the Event');
   t('Description');
   t('Enter the Discussion Post Content Here');
