@@ -1,5 +1,7 @@
 <?php
 
+define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]"); 
+
 /**
  * @file
  * The Mukurtu export module.
@@ -126,6 +128,18 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
     }
   }
 
+  if(is_null($field_info)) {
+    if(isset($field_handlers['simple'][$field_name])
+    && isset($field_handlers['simple'][$field_name]['#callback'])
+    && function_exists($field_handlers['simple'][$field_name]['#callback'])) {
+      return call_user_func($field_handlers['simple'][$field_name]['#callback'], $value, $field_info, $options);
+    }
+  }
+
+  if($value == 'private://atoms/image/rudolph.jpg') {
+    //dpm("hi"); //$field_name = NULL, $entity_type = 'file'
+  }
+
   if(isset($value['value'])) {
     return array($value['value'], $referenced_entities);
   }
@@ -133,7 +147,25 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
 }
 
 /* VBO Functions */
+function mukurtu_export_action_info() {
+  return array(
+    'mukurtu_export_action' => array(
+      'type' => 'node',
+      'label' => t('Mukurtu Export'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => TRUE,
+      'triggers' => array('any'),
+    ),
+  );
+}
 
+function mukurtu_export_action_form($settings, &$form_state) {
+  kpr($settings);
+  kpr($form_state);
+  //$form_state['build_info']['args'][0]->result
+  return drupal_get_form('mukurtu_export_form');
+}
 
 
 function _mukurtu_export_entity_type($entity) {
@@ -165,6 +197,7 @@ function _mukurtu_export_entity_id($entity_type = NULL, $entity = NULL) {
 
 function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
   $entity = entity_load($entity_type, array($entity_id));
+  $entity_wrapper = entity_metadata_wrapper($entity_type, $entity[$entity_id]);
   
   $feeds_info = feeds_item_info_load($entity_type, $entity_id);
   // Check for an existing feeds guid
@@ -173,6 +206,6 @@ function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
   }
 
   // Otherwise generate a new one
-  $guid = $entity[$entity_id]->type . '_' . $entity_id . '_' . $entity[$entity_id]->created;
+  $guid = implode('_', array($entity_wrapper->getBundle(), $entity_id, $entity[$entity_id]->created));
   return $guid;
 }

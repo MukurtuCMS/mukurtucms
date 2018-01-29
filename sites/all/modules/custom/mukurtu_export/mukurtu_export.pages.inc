@@ -183,7 +183,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
 
         // Default fields
         // ID
-        $id_label = t('ID');
+        $id_label = t(strtoupper($id));
 
         $form['export_fields'][$entity_type][$bundle_name][$id] = array(
           '#type' => 'checkbox',

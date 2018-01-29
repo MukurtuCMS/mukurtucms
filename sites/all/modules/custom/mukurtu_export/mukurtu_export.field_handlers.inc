@@ -32,7 +32,12 @@ function mukurtu_export_mukurtu_export_field_handlers() {
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
             '#callback' => 'mukurtu_export_field_handler_partial_date_range'
-        )
+        ),
+        'scald_thumbnail' => array(
+            '#module' => 'mukurtu_export',
+            '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
+            '#callback' => 'mukurtu_export_field_handler_scald_thumbnail'
+        ),
     );
 }
 
@@ -42,6 +47,13 @@ function mukurtu_export_field_handler_taxonomy_term_reference($value, $field_inf
     if(isset($value['tid'])) {
         $term = taxonomy_term_load($value['tid']);
         if(isset($term->name)) {
+            // Specific check for Mukurtu Taxonomy Records
+            // Later we may want to fully run through all taxonomy fields, but this is good enough for now
+            if(isset($term->field_mukurtu_records[LANGUAGE_NONE])) {
+                foreach($term->field_mukurtu_records[LANGUAGE_NONE] as $record) {
+                    $referenced_entities['node'][$record['target_id']] = $record['target_id'];
+                }
+            }
             return array($term->name, $referenced_entities);
         }
     }
@@ -50,7 +62,34 @@ function mukurtu_export_field_handler_taxonomy_term_reference($value, $field_inf
 
 // Handle Images files (not Scald Atoms)
 function mukurtu_export_field_handler_image($value, $field_info, $options = array()) {
-    return isset($value['fid']) ? $value['fid'] : NULL;
+    $referenced_entities = array();
+    $binary_files = array();
+
+    // Copy files
+    /*
+    $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
+    $tempmedia = file_unmanaged_copy($value['uri'], $tempmedia, FILE_EXISTS_REPLACE);
+    $localname = implode(DIRECTORY_SEPARATOR, array('files', $field_info['settings']['uri_scheme'], $value['type'], $value['fid'], $value['filename']));
+    $binary_files[$value['fid']]['filename'] = $tempmedia;
+    $binary_files[$value['fid']]['localname'] = $localname;
+*/
+    //dpm("Dump {$value['uri']}");
+    //dpm($value);
+    //dpm($field_info);
+    //dpm($binary_files);
+    $saved_file = _mukurtu_export_save_file($value);
+    //dpm($saved_file);
+    //$return_value = isset($value['fid']) ? $value['fid'] : NULL;
+    $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
+    //$return_value = $localname;
+    //$referenced_entities['file'][$return_value] = isset($value['fid']) ? $value['fid'] : NULL;
+    return array($return_value, $referenced_entities, $saved_file);
+}
+
+function _mukurtu_export_save_file($file) {
+    $uri_scheme = file_uri_scheme($file['uri']);
+    $localname = implode(DIRECTORY_SEPARATOR, array('files', $uri_scheme, $file['type'], $file['fid'], $file['filename']));
+    return array($file['fid'] => array('uri' => $file['uri'], 'filename' => $localname));
 }
 
 // Handle entityreference fields
@@ -103,6 +142,12 @@ function mukurtu_export_field_handler_partial_date_range($value, $field_info, $o
     if(isset($value['timestamp'])) {
         return array($value['timestamp'], $referenced_entities);
     }
+    return array(NULL, $referenced_entities);
+}
+
+function mukurtu_export_field_handler_scald_thumbnail($value, $field_info, $options = array()) {
+    $referenced_entities = array();
+
     return array(NULL, $referenced_entities);
 }
 

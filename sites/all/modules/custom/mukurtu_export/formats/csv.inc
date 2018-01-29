@@ -138,6 +138,17 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
   $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
 
+  // These are raw files that we want to include in the Zip
+  if(isset($encoded_export['__files'])) {
+    foreach($encoded_export['__files'] as $binary_file) {
+      $zip->addFile(drupal_realpath($binary_file['uri']), $binary_file['filename']);
+    }
+
+    // Unset this, so we don't try to further process them
+    unset($encoded_export['__files']);
+  }
+
+  // Write all the CSV files and add them to the Zip archive
   foreach ($encoded_export as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
       $temp = file_save_data($encoded_export[$entity_type][$bundle_name]);
@@ -183,6 +194,12 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
   // Remove bookkeeping info
   $encoded_list = $encoded_content['__exported_key_list'];
   unset($encoded_content['__exported_key_list']);
+
+  // Binary files to be handled
+  if(isset($encoded_content['__files'])) {
+    $csv_output['__files'] = $encoded_content['__files'];
+    unset($encoded_content['__files']);
+  }
 
   foreach(array_keys($encoded_content) as $encoded_entity_type) {
     foreach(array_keys($encoded_content[$encoded_entity_type]) as $encoded_bundle_name) {
@@ -234,7 +251,16 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
       // Create a safe text version of this value and store it against the header using a safe key.
       $options = array('id_format' => $id_format);
 
-      list($value, $referenced_entities_to_encode) = mukurtu_export_extract_value($entity_type, $parent, $v, $options);
+      list($value, $referenced_entities_to_encode, $files) = mukurtu_export_extract_value($entity_type, $parent, $v, $options);
+
+      // Add any raw files we want to include
+      if(!empty($files)) {
+        foreach($files as $fid => $fileinfo) {
+          $encoded_content['__files'][$fid] = $fileinfo;
+        }
+      }
+
+      // Run through all the content referenced by this field and decide if we should export it
       foreach($referenced_entities_to_encode as $referenced_entity_type => $referenced_entity) {
         foreach($referenced_entity as $r_id => $r_entity) {
           // Check permission?
@@ -244,13 +270,19 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
           if(empty($referenced_entity_object)) {
             continue;
           }
-          $new_entity_key = "{$referenced_entity_type}__{$referenced_entity_object[$r_id]->type}_{$r_id}";
+
+          // Get referenced content bundle type
+          $referenced_entity_object_wrapper = entity_metadata_wrapper($referenced_entity_type, $referenced_entity_object[$r_id]);
+          $ref_bundle_type = $referenced_entity_object_wrapper->getBundle();
+          $new_entity_key = "{$referenced_entity_type}__{$ref_bundle_type}_{$r_id}";
 
           // Check if already exported, prevent infinite recursion
-          if(isset($encoded_content['__exported_key_list'][$referenced_entity_type][$referenced_entity_object[$r_id]->type][$new_entity_key])) {
+          if(isset($encoded_content['__exported_key_list'][$referenced_entity_type][$ref_bundle_type][$new_entity_key])) {
             return;
           }
-          mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $referenced_entity_object[$r_id]->type, $field_list, $id_format);
+
+          // Encode referenced content
+          mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format);
         }
       }
       $encoded_content[$entity_type][$bundle_name][$header_value][$entity_key][$header_index] = mukurtu_export_csv_encode_sanitize_value($value);
