@@ -130,6 +130,32 @@ function ma_file_fixity_field_default_field_bases() {
     'type' => 'number_integer',
   );
 
+  // Exported field_base: 'field_fixity_email_all_admins'.
+  $field_bases['field_fixity_email_all_admins'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_fixity_email_all_admins',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => 'No',
+        1 => 'Yes',
+      ),
+      'allowed_values_function' => '',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
   // Exported field_base: 'field_fixity_files_checked'.
   $field_bases['field_fixity_files_checked'] = array(
     'active' => 1,

@@ -312,7 +312,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -357,7 +357,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -386,6 +386,51 @@ function ma_file_fixity_field_default_field_instances() {
       ),
       'type' => 'number',
       'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-fixity_check-field_fixity_email_all_admins'.
+  $field_instances['node-fixity_check-field_fixity_email_all_admins'] = array(
+    'bundle' => 'fixity_check',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'In the event that a Fixity Check Run fails (finds a hash mismatch), an email alert is sent to the Mukurtu Administrator that is author of this Fixity Check (seen in <i>Authoring information</i>)  below. Check this box to have a fail alert email <i>all</i> Mukurtu Administrators instead.',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_fixity_email_all_admins',
+    'label' => 'Email all Mukurtu Administrators',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 5,
     ),
   );
 
@@ -494,7 +539,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -554,7 +599,7 @@ function ma_file_fixity_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -614,7 +659,7 @@ function ma_file_fixity_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_select',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -629,7 +674,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -653,7 +698,7 @@ function ma_file_fixity_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_hidden',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -668,7 +713,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -712,7 +757,7 @@ function ma_file_fixity_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -747,11 +792,13 @@ function ma_file_fixity_field_default_field_instances() {
 ');
   t('Check run fails details');
   t('Check runs');
+  t('Email all Mukurtu Administrators');
   t('Files checked');
   t('Files failed');
   t('Frequency in days');
   t('Hashes checked against	');
   t('Hashes to check against');
+  t('In the event that a Fixity Check Run fails (finds a hash mismatch), an email alert is sent to the Mukurtu Administrator that is author of this Fixity Check (seen in <i>Authoring information</i>)  below. Check this box to have a fail alert email <i>all</i> Mukurtu Administrators instead.');
   t('Latest check run result');
   t('Latest check run time');
   t('Next check run time');

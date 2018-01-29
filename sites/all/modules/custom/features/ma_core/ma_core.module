@@ -127,6 +127,18 @@ function ma_core_og_get_users_in_group($gid) {
 }
 
 /**
+ * Helper function to load users by core role.
+ */
+function ma_core_get_users_per_role ($role_name) {
+  if ($role = user_role_load_by_name($role_name)) {
+    $query = 'SELECT DISTINCT(ur.uid)  FROM {users_roles} AS ur WHERE ur.rid = (:rid)';
+    $result = db_query($query, [':rid' => $role->rid]);
+    $uids = $result->fetchCol();
+    return user_load_multiple($uids);
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function ma_core_menu() {
@@ -240,3 +252,4 @@ function ma_core_form_alter(&$form, $form_state, $form_id) {
   }
 
 }
+
