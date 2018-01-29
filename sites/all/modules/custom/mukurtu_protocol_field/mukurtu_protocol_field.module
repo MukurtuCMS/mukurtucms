@@ -42,191 +42,189 @@ function mukurtu_protocol_field_node_insert($node) {
 /**
  *  Implements hook_form_alter().
  *
- *  Alters the digitial heritage node edit form to replace the og_group_ref with our enhanced protocol selector field
+ *  Alters node forms to replace the og_group_ref with our enhanced protocol selector field
  */
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
-  switch ($form_id) {
-    case 'digital_heritage_node_form':
-    case 'dictionary_word_node_form':
-    case 'collection_node_form':
+  $node_type = str_replace('_node_form', '', $form_id, $count);
+  if ($count && ma_cultural_protocol_node_type_can_have_cp($node_type)) {
 
-      // Do not create this custom field for Book Pages
-      if(isset($form_state['mukurtu_book_parent'])) {
-          return;
+    // Do not create this custom field for Book Pages
+    if(isset($form_state['mukurtu_book_parent'])) {
+        return;
+    }
+
+    // Do not create this custom field for Book Pages
+    // Also hide the Item Sharing Settings field
+    if (isset ($form['field_book_parent'])) {
+      if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
+        $form['field_item_privacy_setting']['#access'] = FALSE;
+        return;
+      }
+    }
+
+    // Gather group field info
+    $og_group_parent = $form['#group_children']['og_group_ref'];
+    $form['#group_children']['oggroup_fieldset'] = $og_group_parent;
+
+    // Build the $structure and $community_defaults_with_titles arrays
+    $structure = array();
+    $community_defaults_with_titles = array();
+    $cps = array();
+    if (isset($form_state['node']->og_group_ref['und'])) {
+      $cps = $form_state['node']->og_group_ref['und'];
+      foreach ($cps as $cp) {
+        $cp_nid = $cp['target_id'];
+        $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
+        $community_nodes = $cp_wrapper->og_group_ref->value();
+        $community_node = $community_nodes[0];
+        $community_nid = $community_node->nid;
+        $structure[$community_nid][] = $cp_nid;
+        $community_defaults_with_titles[$community_nid] = $community_node->title;
+      }
+    }
+
+    // Set the $first_build value
+    $first_build = 0;
+    if (!$form_state['rebuild'] && !empty($form_state['node']->og_group_ref)) {
+      $first_build = 1;
+    }
+
+    // Get the list of options to populate the first dropdown.
+    $options_first = _ajax_get_community_dropdown_options($community_defaults_with_titles);
+
+    // Set the number of combo field instances
+    if ($first_build) {
+      $form_state['num_protocols'] = sizeof($structure);
+    }
+    elseif (empty($form_state['num_protocols'])) {
+      // DH node is being added via Services. Set num_protocols according to the number of communities set in the service request.
+      if (isset($form_state['values']['oggroup_fieldset'])) {
+        $form_state['num_protocols'] = count($form_state['values']['oggroup_fieldset']);
+      }
+      // DH node is being added from the UI
+      else {
+        $form_state['num_protocols'] = 1;
+      }
+    }
+
+    // Wrap the combo fields in an overall fieldset
+    $form['oggroup_fieldset'] = array(
+      '#title' => t('Communities and Protocols'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+    );
+    if ($form_id == 'digital_heritage_node_form') {
+      $form['oggroup_fieldset']['#title'] .= " *"; // Mark the fieldset as required, on DH nodes only
+    }
+
+    // Retrieve defaults from the url (only applies to node creation)
+    $community_first_default = arg(3);
+    $protocol_first_default = arg(4);;
+
+    // Loop through each combo field
+    for ($i = 0; $i < $form_state['num_protocols']; $i++) {
+
+      if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_first'])) {
+        $selected = $form_state['values']['oggroup_fieldset'][$i]['dropdown_first'];
+      } else if (isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_first'])) {
+        $selected = $form_state['input']['oggroup_fieldset'][$i]['dropdown_first'];
+      } else {
+        $selected = false;
       }
 
-      // Do not create this custom field for Book Pages
-      // Also hide the Item Sharing Settings field
-      if (isset ($form['field_book_parent'])) {
-        if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
-          $form['field_item_privacy_setting']['#access'] = FALSE;
-          return;
-        }
+      // Set the default Community of the first combo field if it's not set and if there's a numeric value in the url
+      if ($i == 0 && !$selected && is_numeric($community_first_default) ) {
+        $selected = $community_first_default;
       }
 
-      // Gather group field info
-      $og_group_parent = $form['#group_children']['og_group_ref'];
-      $form['#group_children']['oggroup_fieldset'] = $og_group_parent;
+      $protocol_options = array();
 
-      // Build the $structure and $community_defaults_with_titles arrays
-      $structure = array();
-      $community_defaults_with_titles = array();
-      $cps = array();
-      if (isset($form_state['node']->og_group_ref['und'])) {
-        $cps = $form_state['node']->og_group_ref['und'];
-        foreach ($cps as $cp) {
-          $cp_nid = $cp['target_id'];
-          $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
-          $community_nodes = $cp_wrapper->og_group_ref->value();
-          $community_node = $community_nodes[0];
-          $community_nid = $community_node->nid;
-          $structure[$community_nid][] = $cp_nid;
-          $community_defaults_with_titles[$community_nid] = $community_node->title;
-        }
-      }
-
-      // Set the $first_build value
-      $first_build = 0;
-      if (!$form_state['rebuild'] && !empty($form_state['node']->og_group_ref)) {
-        $first_build = 1;
-      }
-
-      // Get the list of options to populate the first dropdown.
-      $options_first = _ajax_get_community_dropdown_options($community_defaults_with_titles);
-
-      // Set the number of combo field instances
       if ($first_build) {
-        $form_state['num_protocols'] = sizeof($structure);
-      }
-      elseif (empty($form_state['num_protocols'])) {
-        // DH node is being added via Services. Set num_protocols according to the number of communities set in the service request.
-        if (isset($form_state['values']['oggroup_fieldset'])) {
-          $form_state['num_protocols'] = count($form_state['values']['oggroup_fieldset']);
-        }
-        // DH node is being added from the UI
-        else {
-          $form_state['num_protocols'] = 1;
-        }
+        $keys = array_keys($structure);
+        $selected = $keys[$i];
+        list($protocol_options) = array_slice($structure, $i, 1);
       }
 
-      // Wrap the combo fields in an overall fieldset
-      $form['oggroup_fieldset'] = array(
-        '#title' => t('Communities and Protocols'),
+      // Wrap the combo field in a fieldset
+      $form['oggroup_fieldset'][$i] = array(
         '#type' => 'fieldset',
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-      );
-      if ($form_id == 'digital_heritage_node_form') {
-        $form['oggroup_fieldset']['#title'] .= " *"; // Mark the fieldset as required, on DH nodes only
-      }
-
-      // Retrieve defaults from the url (only applies to node creation)
-      $community_first_default = arg(3);
-      $protocol_first_default = arg(4);;
-
-      // Loop through each combo field
-      for ($i = 0; $i < $form_state['num_protocols']; $i++) {
-
-        if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_first'])) {
-          $selected = $form_state['values']['oggroup_fieldset'][$i]['dropdown_first'];
-        } else if (isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_first'])) {
-          $selected = $form_state['input']['oggroup_fieldset'][$i]['dropdown_first'];
-        } else {
-          $selected = false;
-        }
-
-        // Set the default Community of the first combo field if it's not set and if there's a numeric value in the url
-        if ($i == 0 && !$selected && is_numeric($community_first_default) ) {
-          $selected = $community_first_default;
-        }
-
-        $protocol_options = array();
-
-        if ($first_build) {
-          $keys = array_keys($structure);
-          $selected = $keys[$i];
-          list($protocol_options) = array_slice($structure, $i, 1);
-        }
-
-        // Wrap the combo field in a fieldset
-        $form['oggroup_fieldset'][$i] = array(
-          '#type' => 'fieldset',
-          '#title' => t("Communities and Protocols @num", array('@num' => $i+1)),
-          // Set up the wrapper so that AJAX will be able to replace the fieldset.
-          '#prefix' => '<div id="og_gorup-fieldset-wrapper-'.$i.'">',
-          '#suffix' => '</div>',
-        );
-
-        // Community dropdown
-        $form['oggroup_fieldset'][$i]['dropdown_first'] = array(
-          '#type' => 'select',
-          '#title' => 'Community',
-          '#options' => $options_first,
-          '#default_value' => $selected,
-          // Bind an ajax callback to the change event (which is the default for the
-          // select form type) of the first dropdown. It will replace the second
-          // dropdown when rebuilt.
-          '#ajax' => array(
-            'callback' => 'ajax_mukurtu_protocol_dependent_dropdown_callback',
-            'event' => 'change',
-            'wrapper' => 'dropdown-second-replace-'.$i,
-          ),
-          '#attributes' => array ('class' => array('chosen-enable')),
-        );
-
-
-        if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_second'])) {
-          $protocol_defaults = $form_state['values']['oggroup_fieldset'][$i]['dropdown_second'];
-        } else if(isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_second'])) {
-          $protocol_defaults = $form_state['input']['oggroup_fieldset'][$i]['dropdown_second'];
-        } else {
-          $protocol_defaults = false;
-        }
-
-        // Set the default protocol of the first combo field if it's not set and if there's a numeric value in the url
-        if ($i == 0 && !$protocol_defaults && is_numeric($protocol_first_default) ) {
-          $protocol_defaults = $protocol_first_default;
-        }
-        if (!empty($protocol_options)) {
-          $protocol_defaults = $protocol_options;
-        }
-
-        // Protocol dropdown
-        $form['oggroup_fieldset'][$i]['dropdown_second'] = array(
-          '#type' => 'select',
-          '#title' => t('Protocol'),
-          // The entire enclosing div created here gets replaced when dropdown_first
-          // is changed.
-          '#prefix' => '<div id="dropdown-second-replace-'.$i.'">',
-          '#suffix' => '</div>',
-          // When the form is rebuilt during ajax processing, the $selected variable
-          // will now have the new value and so the options will change.
-          '#options' => _ajax_get_protocol_by_community_dropdown_options($selected, $protocol_defaults),
-          '#default_value' => $protocol_defaults,
-          '#multiple' => TRUE,
-          '#attributes' => array ('class' => array('chosen-enable')),
-        );
-        // DH node (only) needs at least one protocol
-        if ($i == 0 AND $form_id == 'digital_heritage_node_form') {
-          $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
-        }
-      }
-      // finished combo field building loop
-
-
-      // Adds "Add another name" button.
-      $form['oggroup_fieldset']['add_community'] = array(
-        '#type' => 'submit',
-        '#value' => t('Add another community'),
-        '#submit' => array('form_field_add_communities'),
+        '#title' => t("Communities and Protocols @num", array('@num' => $i+1)),
+        // Set up the wrapper so that AJAX will be able to replace the fieldset.
+        '#prefix' => '<div id="og_gorup-fieldset-wrapper-'.$i.'">',
+        '#suffix' => '</div>',
       );
 
-      $form['oggroup_fieldset']['#tree'] = TRUE;
-      array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
-      //$form['og_group_ref']['#type'] = 'hidden';
-      $weight = $form['og_group_ref']['#weight'];
-      $form['oggroup_fieldset']['#weight'] = $weight;
+      // Community dropdown
+      $form['oggroup_fieldset'][$i]['dropdown_first'] = array(
+        '#type' => 'select',
+        '#title' => 'Community',
+        '#options' => $options_first,
+        '#default_value' => $selected,
+        // Bind an ajax callback to the change event (which is the default for the
+        // select form type) of the first dropdown. It will replace the second
+        // dropdown when rebuilt.
+        '#ajax' => array(
+          'callback' => 'ajax_mukurtu_protocol_dependent_dropdown_callback',
+          'event' => 'change',
+          'wrapper' => 'dropdown-second-replace-'.$i,
+        ),
+        '#attributes' => array ('class' => array('chosen-enable')),
+      );
+
+
+      if (isset($form_state['values']['oggroup_fieldset'][$i]['dropdown_second'])) {
+        $protocol_defaults = $form_state['values']['oggroup_fieldset'][$i]['dropdown_second'];
+      } else if(isset($form_state['input']['oggroup_fieldset'][$i]['dropdown_second'])) {
+        $protocol_defaults = $form_state['input']['oggroup_fieldset'][$i]['dropdown_second'];
+      } else {
+        $protocol_defaults = false;
+      }
+
+      // Set the default protocol of the first combo field if it's not set and if there's a numeric value in the url
+      if ($i == 0 && !$protocol_defaults && is_numeric($protocol_first_default) ) {
+        $protocol_defaults = $protocol_first_default;
+      }
+      if (!empty($protocol_options)) {
+        $protocol_defaults = $protocol_options;
+      }
+
+      // Protocol dropdown
+      $form['oggroup_fieldset'][$i]['dropdown_second'] = array(
+        '#type' => 'select',
+        '#title' => t('Protocol'),
+        // The entire enclosing div created here gets replaced when dropdown_first
+        // is changed.
+        '#prefix' => '<div id="dropdown-second-replace-'.$i.'">',
+        '#suffix' => '</div>',
+        // When the form is rebuilt during ajax processing, the $selected variable
+        // will now have the new value and so the options will change.
+        '#options' => _ajax_get_protocol_by_community_dropdown_options($selected, $protocol_defaults),
+        '#default_value' => $protocol_defaults,
+        '#multiple' => TRUE,
+        '#attributes' => array ('class' => array('chosen-enable')),
+      );
+      // DH node (only) needs at least one protocol
+      if ($i == 0 AND $form_id == 'digital_heritage_node_form') {
+        $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
+      }
+    }
+    // finished combo field building loop
+
+
+    // Adds "Add another name" button.
+    $form['oggroup_fieldset']['add_community'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add another community'),
+      '#submit' => array('form_field_add_communities'),
+    );
+
+    $form['oggroup_fieldset']['#tree'] = TRUE;
+    array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
+    //$form['og_group_ref']['#type'] = 'hidden';
+    $weight = $form['og_group_ref']['#weight'];
+    $form['oggroup_fieldset']['#weight'] = $weight;
 
   }
 }
@@ -381,8 +379,8 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
           case 'collection':
             return NODE_ACCESS_ALLOW;
           // Protocol is required.
-          case  'digital_heritage':
-            return NODE_ACCESS_DENY;  // Safeguard. This should never happen. All DH items should be in a group.
+          default:
+            return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
         }
       }
 

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Collaboration Tools feature.
+ */
+
+include_once 'ma_collaboration_tools.features.inc';

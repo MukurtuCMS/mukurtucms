@@ -417,7 +417,11 @@ function ma_cultural_protocol_node_type_can_have_cp($node_type) {
   $node_types_that_can_have_cp = [
     'digital_heritage',
     'dictionary_word',
-    'collection'
+    'collection',
+    'oa_section',
+    'oa_discussion_post',
+    'oa_wiki_page',
+    'oa_event'
   ];
   if (in_array($node_type, $node_types_that_can_have_cp)) {
     return TRUE;
