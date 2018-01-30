@@ -1,0 +1,17 @@
+name = Fasttoggle Comment
+description = Enables fast toggling of binary settings for comments.
+version = "7.x-1.x-dev"
+package = Administration
+files[] = views/fasttoggle_comment.views.inc
+files[] = views/fasttoggle_comment_views_handler_field_comment_link.inc
+core = 7.x
+configure = admin/config/system/fasttoggle
+dependencies[] = fasttoggle_node
+dependencies[] = comment
+
+; Information added by Drupal.org packaging script on 2017-09-21
+version = "7.x-1.7"
+core = "7.x"
+project = "fasttoggle"
+datestamp = "1506034749"
+

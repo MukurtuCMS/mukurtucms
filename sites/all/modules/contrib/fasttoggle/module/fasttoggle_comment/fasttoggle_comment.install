@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * @file
+ * The installation file for fasttoggle_comment.module
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function fasttoggle_comment_uninstall() {
+  variable_del('fasttoggle_comment_status_settings');
+  variable_del('fasttoggle_comments_rw_only');
+}

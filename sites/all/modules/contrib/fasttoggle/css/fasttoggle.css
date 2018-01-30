@@ -1,0 +1,55 @@
+/* Unpublished node */
+.block-fasttoggle .fasttoggle-status-node-status-status-0 {
+  font-weight: bold;
+}
+
+/* Published node */
+.block-fasttoggle .fasttoggle-status-node-status-status-1 {
+  font-weight: normal;
+}
+
+/* Commenting disabled */
+.block-fasttoggle .fasttoggle-status-node-status-comment-0 {
+  font-weight: bold;
+}
+
+/* Comments read-only */
+.block-fasttoggle .fasttoggle-status-node-status-comment-1 {
+  font-weight: bold;
+}
+
+/* Comments read-write */
+.block-fasttoggle .fasttoggle-status-node-status-comment-2 {
+  font-weight: normal;
+}
+
+/* Awaiting moderation */
+.block-fasttoggle .fasttoggle-status-node-status-moderate-0 {
+  font-weight: normal;
+}
+
+/* Moderated */
+.block-fasttoggle .fasttoggle-status-node-status-moderate-1 {
+  font-weight: bold;
+}
+
+/* Not Sticky */
+.block-fasttoggle .fasttoggle-status-node-status-sticky-0 {
+  font-weight: normal;
+}
+
+/* Sticky */
+.block-fasttoggle .fasttoggle-status-node-status-sticky-1 {
+  font-weight: bold;
+}
+
+/* Not Promoted */
+.block-fasttoggle .fasttoggle-status-node-status-promote-0 {
+  font-weight: normal;
+}
+
+/* Promoted */
+.block-fasttoggle .fasttoggle-status-node-status-promote-1 {
+  font-weight: bold;
+}
+

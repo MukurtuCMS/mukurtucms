@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * The installation file for fasttoggle_field.module
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function fasttoggle_field_uninstall() {
+  foreach (field_info_instances() as $entity_type => $instance_array) {
+    foreach($instance_array as $group => $instances) {
+      foreach($instances as $fieldname => $field_settings) {
+        variable_del("fasttoggle_{$entity_type}_{$group}_settings");
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Provides hook implementations and functionality to oa_date.
+ */
+
+/**
+ * Implements hook_date_format_types().
+ */
+function oa_date_date_format_types() {
+  return array(
+    'oa_date' => t('Relative Date'),
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function oa_date_views_api() {
+  return array('api' => 3);
+}
+
+/**
+ * Implements hook_date_formats().
+ */
+function oa_date_date_formats() {
+  $formats = array();
+
+  $formats[] = array(
+    'type' => 'oa_date',
+    'format' => 'l, F j',
+    'locales' => array(),
+  );
+
+  return $formats;
+}
+
+/**
+ * Helper function to render the relative date.
+ */
+function oa_date_format_date($timestamp) {
+  static $dates;
+  if (!isset($dates)) {
+    $dates = array(
+      'today' => strtotime("today"),
+      'yesterday' => strtotime("yesterday"),
+      'year' => strtotime("first day of January")
+    );
+  }
+  if ($timestamp >= $dates['today']) {
+    return t("Today") . format_date($timestamp, 'custom', ', F j');
+  }
+  elseif ($timestamp >= $dates['yesterday']) {
+    return t("Yesterday") . format_date($timestamp, 'custom', ', F j');
+  }
+  elseif ($timestamp < $dates['year']) {
+    // only add year to dates from previous years
+    return format_date($timestamp, 'custom', 'l, F j Y');
+  }
+  else {
+    return format_date($timestamp, 'custom', 'l, F j');
+  }
+}

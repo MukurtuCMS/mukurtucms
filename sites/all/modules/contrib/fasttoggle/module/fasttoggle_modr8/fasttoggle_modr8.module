@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function fasttoggle_modr8_permission() {
+  return array(
+      'moderate posts' => array(
+        'title' => t('Moderate posts'),
+        ),
+      );
+}
+
+function fasttoggle_modr8_moder8_access() {
+  return fasttoggle_allow_access_if(user_access("moderate posts"));
+}
+
+/**
+ * Implementation of hook_fasttoggle_labels().
+ */
+function fasttoggle_modr8_fasttoggle_available_links($type = NULL, $obj = NULL) {
+  if (!is_null($type) && $type != "node")
+    return array();
+
+  $result = array(
+      'node' => array(
+        'fields' => array(
+          'status' => array(
+            'instances' => array(
+              'moderate' => array(
+                'description' => t('Moderated <small>(in the moderation queue)</small>'),
+                'access' => array('fasttoggle_modr8_moder8_access'),
+                'labels' => array(
+                  FASTTOGGLE_LABEL_ACTION => array(0 => t('unmoderate'), 1 => t('moderate')),
+                  FASTTOGGLE_LABEL_STATUS => array(0 => t('not moderated'), 1 => t('moderated'))
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  return $result;
+}
+
+function fasttoggle_modr8_views_api() {
+  return array(
+      'api' => 3,
+      'path' => drupal_get_path('module', 'fasttoggle_modr8') . '/views',
+      );
+}
+

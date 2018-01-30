@@ -1,0 +1,262 @@
+<?php
+
+module_load_include('inc', 'fasttoggle_user');
+module_load_include('inc', 'fasttoggle');
+
+/**
+ * @file
+ * Enables fast toggling of binary or not so binary settings.
+ */
+
+function fasttoggle_role_name($role) {
+  return "Toggle role " . $role;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function fasttoggle_user_permission() {
+  $available_roles = fasttoggle_sitewide_toggleable_roles();
+  $roles = array();
+  if (!empty($available_roles)) {
+    foreach ($available_roles as $rid => $name) {
+      $roles[fasttoggle_role_name($name)] = array(
+          'title' => t('Toggle role \'' . $name . '\''),
+          );
+    }
+  }
+
+  $fixed_roles = array(
+      'moderate users' => array(
+        'title' => t('Moderate users'),
+        ),
+      );
+  $result = array_merge($roles, $fixed_roles);
+  asort($result);
+  return $result;
+}
+
+function fasttoggle_user_role_access($obj, $type, $group, $instance)
+{
+  static $available_roles = array();
+
+  if (empty($available_roles)) {
+    $available_roles = fasttoggle_sitewide_toggleable_roles();
+  }
+
+  if (!isset($available_roles[$instance])) {
+    return FALSE;
+  }
+
+  return fasttoggle_allow_access_if(user_access("Toggle role {$available_roles[$instance]}"));
+}
+
+function fasttoggle_user_status_access($obj, $type, $group, $instance)
+{
+  $allow_u1 = variable_get('fasttoggle_allow_block_user1', 0);
+
+  if (!is_null($obj) && $obj->uid == 0) {
+      return FALSE;
+  }
+
+  return fasttoggle_allow_access_if((user_access("administer users") || user_access("moderate users")) && (is_null($obj) || $obj->uid != 1 || $allow_u1));
+}
+
+/**
+ * Implementation of hook_user().
+ *
+ * Add togglable links to user pages.
+ */
+function fasttoggle_user_view($account, $view_mode, $langcode) {
+  $link_data = fasttoggle_user_link('user', $account, TRUE);
+  $links = array();
+  foreach ($link_data as $name => $link) {
+    if ($name == 'status_status') {
+      $links['status'] = array(
+        'title' => t('Status') . ': ' . l($link['title'], $link['href'], $link),
+        'html' => TRUE,
+      );
+    }
+    else if (strpos($name, 'role_') === 0) {
+      $links[$name] = array(
+        'title'=> t('Role') .': '. l($link['title'], $link['href'], $link),
+        'html' => TRUE,
+      );
+    }
+    else {
+      $links[$name] = array(
+        'title'=> l($link['title'], $link['href'], $link),
+        'html' => TRUE,
+      );
+    }
+  }
+
+  // If any links were made, add them to the entity's links array.
+  if (isset($links)) {
+    $account->content['links']['fasttoggle'] = array(
+      '#theme' => 'links',
+      '#links' => $links,
+      '#attributes' => array('class' => array('links', 'inline')),
+    );
+  }
+}
+
+function fasttoggle_get_user_role_option_value($options, $group, $option, $object) {
+  return intval(isset($object->roles[$option]));
+}
+
+function fasttoggle_get_user_role_array($account, $role) {
+  $result = $account->roles;
+  if (isset($account->roles[$role])) {
+    unset($result[$role]);
+  } else {
+    $result[$role] = TRUE;
+  }
+  return $result;
+}
+
+function fasttoggle_user_save($options, $group, $instance, $new_value, $object) {
+  $edit = array();
+  if ($group == 'role') {
+    $edit['roles'] = $new_value;
+  } else {
+    $edit[$instance] = $new_value;
+  }
+  user_save($object, $edit);
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function fasttoggle_user_form_alter(&$form, $form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_admin_account':
+      // Add blocked/unblocked toggle links to the user overview page.
+      $config = fasttoggle_get_allowed_links('user');
+      $settings = variable_get('fasttoggle_user_status_settings', array('status_status' => TRUE));
+      if (variable_get('fasttoggle_enhance_user_overview_page', 1) && $settings['status_status'] !== 0 && isset($form['accounts']['#options']) && (user_access('administer users') || user_access('moderate users'))) {
+        $allow_u1 = variable_get('fasttoggle_allow_block_user1', 0);
+        $option_info = fasttoggle_get_available_links('user');
+        $label_style = variable_get('fasttoggle_label_style', FASTTOGGLE_LABEL_STATUS);
+
+        foreach ($form['accounts']['#options'] as $key => $data) {
+          if ($key != 1 || $allow_u1) {
+            $status = intval($data['status'] == t('active'));
+            $account_obj = new stdClass();
+            $account_obj->uid = $key;
+            $account_obj->status = $status;
+            $form['accounts']['#options'][$key]['status'] = array();
+            $current_label = $option_info['fields']['status']['instances']['status']['labels'][$label_style][$status];
+            $form['accounts']['#options'][$key]['status']['data'][$current_label] = fasttoggle($option_info, 'status', 'status', $account_obj, FASTTOGGLE_FORMAT_FORM);
+          }
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_link().
+ */
+function fasttoggle_user_link($type, $obj = NULL, $teaser = FALSE) {
+  $links = array();
+  $options = fasttoggle_get_allowed_links($type, $obj);
+
+  if (!empty($options)) {
+    $label_style = variable_get('fasttoggle_label_style', FASTTOGGLE_LABEL_STATUS);
+
+    switch ($type) {
+      // User is not one of the standard types for hook_link(). This
+      // use enables adding of user links to a user profile. It may be called
+      // from a view field handler without a proper user object loaded.
+      case 'user':
+        if (!empty($options['fields'])) {
+          foreach ($options['fields'] as $group => $flags) {
+            if (!empty($flags['instances'])) {
+              foreach($flags['instances'] as $key => $data) {
+                $links[$group . "_" . $key] = fasttoggle($options, $group, $key, $obj, FASTTOGGLE_FORMAT_LINK_ARRAY);
+              }
+            }
+          }
+        }
+        break;
+    }
+  }
+
+  return $links;
+}
+
+/**
+ * Implementation of hook_fasttoggle_available_links().
+ */
+function fasttoggle_user_fasttoggle_available_links($type = NULL, $obj = NULL) {
+  if (!is_null($type) && $type != 'user')
+    return array();
+
+  $available_roles = fasttoggle_potential_toggleable_roles();
+
+  $result = array(
+      'user' => array(
+        'id_field' => 'uid',
+        'title_field' => 'name',
+        'save_fn' => 'fasttoggle_user_save',
+        'object_type' => 'user',
+        'extra_settings' => array(
+          'fasttoggle_allow_block_user1' => array(
+            '#type' => 'checkbox',
+            '#title' => t("Allow user 1's account to be blocked using Fasttoggle."),
+            '#default_value' => variable_get('fasttoggle_allow_block_user1', 0),
+            ),
+          'fasttoggle_enhance_user_overview_page' => array(
+            '#type' => 'checkbox',
+            '#title' => t('Add blocked/unblocked toggle links to the user overview page.'),
+            '#default_value' => variable_get('fasttoggle_enhance_user_overview_page', TRUE),
+            )
+          ),
+        'fields' => array(
+          'status' => array(
+            'instances' => array(
+              'status' => array(
+                'description' => t('Status <small>(unblocked/blocked)</small>'),
+                'default' => TRUE,
+                'access' => array('fasttoggle_user_status_access'),
+                'labels' => array(
+                  FASTTOGGLE_LABEL_ACTION => array(0 => t('unblock'), 1 => t('block')),
+                  FASTTOGGLE_LABEL_STATUS => array(0 => t('blocked'), 1 => t('active'))
+                  ),
+                ),
+              ),
+            ),
+          'role' => array(
+            '#title' => t('Roles that may be toggled'),
+            'new_value_fn' => 'fasttoggle_get_user_role_array',
+            'value_fn' => 'fasttoggle_get_user_role_option_value',
+            )
+          )
+          )
+          );
+
+  foreach ($available_roles as $rid => $role_name) {
+    $safe_role = check_plain($role_name);
+    $result['user']['fields']['role']['instances'][$rid] = array(
+        'description' => ucfirst($safe_role),
+        'default' => TRUE,
+        'value_key' => $rid,
+        'access' => array('fasttoggle_user_role_access'),
+        'role' => $safe_role,
+        'labels' => array(
+          FASTTOGGLE_LABEL_ACTION => array(0 => t("Add role '$safe_role'"), 1 => t("Revoke '$safe_role' role")),
+          FASTTOGGLE_LABEL_STATUS => array(0 => t("Lacks role '$safe_role'"), 1 => t("Has '$safe_role' role")),
+          )
+        );
+  }
+
+  return $result;
+}
+
+function fasttoggle_user_views_api() {
+  return array(
+      'api' => 3,
+      'path' => drupal_get_path('module', 'fasttoggle_user') . '/views',
+      );
+}

@@ -1,0 +1,169 @@
+#comments {
+  clear: both;
+}
+
+.oa-comment i {
+  font-size: 1.2em;
+}
+
+.oa-comment .oa-user-picture img {
+  height: 30px;
+  width: 30px;
+}
+
+form.comment-form .comment-reply-post-button {
+  position: relative;
+  bottom: 65px;
+  height: 0;
+}
+
+form.comment-form .comment-reply-post-button input.form-submit {
+  float: right;
+  margin-right: 0;
+}
+
+form.comment-form .reply-comment-parent {
+  padding: 0 150px 1em 5em;
+}
+
+form.comment-form .text-format-wrapper .clearfix:after {
+  clear: none;
+}
+
+#modal-content form.comment-form {
+  margin-top: 1em;
+}
+
+#modal-content form.comment-form .comment-reply-post-button {
+  position: relative;
+  bottom: 65px;
+}
+
+#modal-content form.comment-form .comment-reply-post-button input.form-submit {
+  float: right;
+  margin-right: 0;
+}
+
+#modal-content input.p-icon-button {
+  font-size: 2em;
+}
+
+.oa-list.oa-comment .oa-description {
+  font-size: 14px;
+}
+
+.oa-list.oa-comment .oa-pullout-left {
+  padding-top: 16px;
+  padding-bottom: 0;
+  height: 24px;
+  font-size: 12px;
+  width: auto;
+  min-width: 20px;
+}
+
+.pane-node-comments .oa-list .oa-comment-reply-body,
+.pane-content #comments .oa-list .oa-comment-reply-body {
+  font-size: 14px;
+  padding: 8px 5px 0 5px;
+}
+
+.pane-node-comments .oa-list .pull-right,
+.pane-content #comments .oa-list .pull-right {
+  padding-left: 5px;
+}
+
+.pane-node-comments .oa-list .pull-right + p,
+.pane-content #comments .oa-list .pull-right + p {
+  margin-top: 5px;
+}
+
+.pane-node-comments .oa-list .oa-comment-hide,
+.pane-content #comments .oa-list .oa-comment-hide {
+  height: 30px;
+}
+
+.pane-node-comment-wrapper .oa-list .oa-comment-hide {
+  height: 2em;
+}
+
+.pane-node-comments .oa-list .oa-comment-hide:hover,
+.pane-node-comment-wrapper .oa-list .oa-comment-hide:hover,
+.pane-content #comments .oa-list .oa-comment-hide:hover {
+  background-color: #e0eeff;
+}
+
+.pane-node-comment-form {
+  clear: both;
+}
+
+.pane-node-comment-form .field-name-comment-body label {
+  font-size: 24px;
+}
+
+.comment-created-date .user-info .marker {
+  margin-right: 5px;
+}
+
+/*Hide the date on comments when on xs screen.*/
+@media (max-width: 767px) {
+  .comment-created-date {
+    display: none;
+  }
+}
+
+.comment-user-info {
+  font-size: 12px;
+  color: #555;
+}
+
+#toggle-comment-visibility {
+  float: right;
+}
+
+.view-oa-comment-media hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-color: #e3e3e3;
+}
+
+table.comment-alter-diff {
+  float: right;
+  clear: right;
+  margin-left: 10px;
+}
+
+.oa-comment .links {
+  clear: right;
+}
+
+.oa-comment .oa-comment-extra {
+  margin-top: 5px;
+}
+
+.oa-comment .oa-pull-right.comment-created-date {
+  margin-left: 5px;
+}
+
+/* Worktracker comments */
+.node-type-oa-worktracker-task .field-name-comment-body {
+  margin-top: 42px;
+}
+
+/* Embedded Comments */
+.paragraphs-item-paragraph-content .view-mode-featured #comments.comment-wrapper {
+  margin-left: 24px;
+}
+
+.accordion-toggle .oa-list-header .oa-comment-reply-body p {
+  cursor: pointer;
+}
+
+.indented .indented .indented .indented .indented {
+  margin-left: 0;
+}
+
+@media (max-width: 767px) {
+  .indented {
+    margin-left: 0 !important;
+  }
+}

@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * The installation file for fasttoggle_node.module
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function fasttoggle_node_uninstall() {
+  variable_del('fasttoggle_node_comments_rw_only');
+  variable_del('fasttoggle_node_status_settings');
+  variable_del('fasttoggle_enhance_node_overview_page');
+
+  foreach(node_type_get_names() as $type => $name) {
+    variable_del('fasttoggle_togglable_options_node_' . $type);
+    variable_del('fasttoggle_add_to_node_links_node_' . $type);
+  }
+}

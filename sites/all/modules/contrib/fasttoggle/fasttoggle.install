@@ -1,0 +1,80 @@
+<?php
+
+/**
+ * @file
+ * The installation file for fasttoggle.module
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function fasttoggle_install() {
+  db_query("UPDATE {system} SET weight = 5 WHERE name = 'fasttoggle' AND type = 'module'");
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fasttoggle_uninstall() {
+  variable_del('fasttoggle_label_style');
+  variable_del('fasttoggle_labels');
+}
+
+function fasttoggle_rename_variable($old_name, $new_name, $value_renames = array(), $flip = FALSE) {
+  $temp = variable_get($old_name, FALSE);
+  if ($temp !== FALSE) {
+    variable_del($old_name);
+    if ($flip) {
+      $temp = array_flip($temp);
+    }
+    foreach ($value_renames as $old => $new) {
+      if (isset($temp[$old])) {
+        $temp[$new] = 1;  /* Not $temp[$old] in case $temp[$old] == 0 */
+        unset($temp[$old]);
+      }
+    }
+    variable_set($new_name, $temp);
+  }
+}
+
+/**
+ * Update fasttoggle settings for 7.x-1.4
+ */
+function fasttoggle_update_7000() {
+  drupal_set_message("Updated fasttoggle settings for 7.x-1.4.");
+
+  fasttoggle_rename_variable('fasttoggle_comment_settings', 'fasttoggle_comment_status_settings',
+      array('status' => 'status_status'));
+  fasttoggle_rename_variable('fasttoggle_user_settings', 'fasttoggle_user_status_settings',
+      array('status' => 'status_status'));
+  fasttoggle_rename_variable('fasttoggle_node_settings', 'fasttoggle_node_status_settings',
+      array(
+      'status' => 'status_status',
+      'sticky' => 'status_sticky',
+      'promote' => 'status_promote',
+      'comment' => 'status_comment',
+      'moderate' => 'status_moderate')
+      );
+
+  $subs = array();
+  foreach (user_roles(TRUE) as $rid => $role) {
+    if ($rid === DRUPAL_AUTHENTICATED_RID) {
+      continue;
+    }
+
+    $subs[$rid] = "role_{$rid}";
+  }
+
+  fasttoggle_rename_variable('fasttoggle_role_settings', 'fasttoggle_user_role_settings', $subs);
+
+  $types = node_type_get_types();
+
+  foreach($types as $type_name => $data) {
+    fasttoggle_rename_variable("fasttoggle_togglable_options_{$type_name}", "fasttoggle_togglable_options_node_{$type_name}",
+        array('status' => 'status_status', 'sticky' => 'status_sticky', 'promote' => 'status_promote', 'comment' => 'status_comment', 'moderate' => 'status_moderate'), TRUE);
+    fasttoggle_rename_variable("fasttoggle_add_to_node_links_{$type_name}", "fasttoggle_add_to_node_links_node_{$type_name}",
+        array('status' => 'status_status', 'sticky' => 'status_sticky', 'promote' => 'status_promote', 'comment' => 'status_comment', 'moderate' => 'status_moderate'), TRUE);
+  }
+
+  module_enable(array('fasttoggle_comment', 'fasttoggle_field', 'fasttoggle_node', 'fasttoggle_user', 'fasttoggle_modr8'), TRUE);
+}

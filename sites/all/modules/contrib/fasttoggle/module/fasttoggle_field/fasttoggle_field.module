@@ -1,0 +1,248 @@
+<?php
+
+module_load_include('inc', 'fasttoggle');
+
+function fasttoggle_fasttoggle_field_access($object, $type, $group, $fieldname = NULL)
+{
+  $result = false;
+
+  switch ($type) {
+    case 'node':
+      $result = node_access('update', $object);
+    case 'profile2':
+      $result = field_access('edit', field_info_field($fieldname), 'profile2', $object);
+  }
+
+  return $result ? FASTTOGGLE_ACCESS_ALLOWED : FASTTOGGLE_ACCESS_DENIED;
+}
+
+function fasttoggle_field_merge_field_labels($entity_type, $instance_type, $fieldname, $field, &$returning)
+{
+  $result = array();
+  $field_info = field_info_field($field['field_name']);
+  if ($field_info['module'] == 'list') {
+    $new_data = array(
+        'description' => "The field " . (empty($field['label']) ? t($field_info['field_name']) :
+          t($field['label'])) . " in a {$entity_type} of type {$instance_type}",
+        'access' => array('fasttoggle_fasttoggle_field_access'),
+        'default' => isset($field['default_value']) ? $field['default_value'][0]['value'] : FALSE,
+        'optional' => ($field['required'] == 0),
+        'type' => $field_info['type'],
+        'content_type' => $instance_type,
+        'field_name' => $field_info['field_name'],
+        'labels' => array(
+          FASTTOGGLE_LABEL_ACTION => array(),
+          FASTTOGGLE_LABEL_STATUS => array()
+          )
+        );
+    $labels_to_use = array();
+    $keys = array_keys($field_info['settings']['allowed_values']);
+    foreach(array_keys($keys) as $key) {
+      $value = $field_info['settings']['allowed_values'][$keys[$key]];
+      $next_index = ($key == (sizeof($keys) - 1)) ? 0 : $key + 1;
+      $next_value = $field_info['settings']['allowed_values'][$keys[$next_index]];
+      if ($next_index == 0 && !$field['required']) {
+        $next_value = 'being unset';
+      }
+      $new_data['labels'][FASTTOGGLE_LABEL_ACTION][$keys[$key]] = t('Switch to @label', array('@label' => $next_value));
+      $new_data['labels'][FASTTOGGLE_LABEL_STATUS][$keys[$key]] = t($value);
+    }
+    if (!$field['required']) {
+      $new_data['labels'][FASTTOGGLE_LABEL_ACTION]['[unset]'] = t('Switch to @label', array('@label' => array_shift($field_info['settings']['allowed_values'])));
+      $new_data['labels'][FASTTOGGLE_LABEL_STATUS]['[unset]'] = t('unset');
+    }
+    $result[$entity_type]['fields'][$instance_type]['instances'][$field_info['field_name']] = $new_data;
+  }
+
+  if (isset($result) && is_array($result)) {
+    $returning = array_merge_recursive($returning, $result);
+  }
+  elseif (isset($result)) {
+    $returning[] = $result;
+  }
+}
+
+/**
+ * Implementation of hook_fasttoggle_available_links().
+ */
+function fasttoggle_field_fasttoggle_available_links($type = NULL, $obj = NULL) {
+
+  $result = array();
+
+  foreach (field_info_instances() as $entity_type => $instance_array) {
+    // Skip entity types that we aren't interested in.
+    if (!is_null($type) && $type != $entity_type)
+      continue;
+    foreach($instance_array as $group => $instances) {
+      // If a node is given, filter out groups that don't match the node type.
+      if (isset($obj) && $type == "node" && $obj->type != $group)
+        continue;
+      foreach($instances as $fieldname => $field_settings) {
+        fasttoggle_field_merge_field_labels($entity_type, $group, $fieldname, $field_settings, $result);
+      }
+      if (!empty($result[$entity_type]['fields'][$group]['instances'])) {
+        $result[$entity_type]['fields'][$group]['value_fn'] = 'fasttoggle_field_get_field_value';
+        $result[$entity_type]['fields'][$group]['save_fn'] = 'fasttoggle_field_save';
+      }
+    }
+  }
+
+  if (module_exists("profile2") && isset($result["profile2"])) {
+    $result = array_merge_recursive($result,
+        array("profile2" => array(
+            'id_field' => 'pid',
+            'title_field' => 'title',
+            'save_fn' => 'fasttoggle_field_save',
+            'object_type' => "profile2"
+            )
+          )
+        );
+  }
+
+  return $result;
+}
+
+function fasttoggle_field_field_formatter_info() {
+  $info = array(
+      'fasttoggle' => array(
+        'label' => t('Fasttoggle link'),
+        'field types' => array('list_boolean', 'list_integer', 'list_float', 'list_text'),
+        'description' => t('Displays the setting as a Fasttoggle link.'),
+        ),
+      );
+  return $info;
+}
+
+
+function fasttoggle_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  switch ($display['type']) {
+    case 'fasttoggle':
+      switch ($entity_type) {
+        case 'node':
+          $id = $entity->nid;
+          break;
+        case 'user':
+          $id = $entity->uid;
+          break;
+        default:
+          return $element;
+      }
+      $options = fasttoggle_get_allowed_links($entity_type, $entity, $id, 'fasttoggle_add_to_node_links');
+      if (!empty($options) && isset($options['fields'][$entity->type]['instances'][$field['field_name']])) {
+        $label_style = variable_get('fasttoggle_label_style', FASTTOGGLE_LABEL_STATUS);
+        //$links = array_flip(variable_get('fasttoggle_add_to_node_links_' . $entity->type, array()));
+        $element[] = fasttoggle($options, $entity->type, $field['field_name'], $entity, FASTTOGGLE_FORMAT_FORM);
+      } else {
+        // Invoke the default formatter instead
+        // Based on prepareInstanceDisplay in field.info.class.inc
+        $field_type_info = field_info_field_types($field['type']);
+        $display['type'] = $field_type_info['default_formatter'];
+        $formatter_type_info = field_info_formatter_types($display['type']);
+        $display['module'] = $formatter_type_info['module'];
+        // Fill in default settings for the formatter.
+        $display['settings'] = field_info_formatter_settings($display['type']);
+
+        $temp = field_default_view($entity_type, $entity, $field, $instance, $langcode, $items, $display);
+        if ($temp) {
+          $temp = array_shift($temp);
+          $temp['#label_display'] = "hidden";
+          $element[] = $temp;
+        }
+      }
+      break;
+  }
+  return $element;
+}
+
+function fasttoggle_field_save($options, $group, $instance, $new_value, $object) {
+  $label_settings = $options['fields'][$group]['instances'][$instance];
+  $values_array = $label_settings['labels'][FASTTOGGLE_LABEL_STATUS];
+  $keys = array_keys($values_array);
+
+  // If the data value is optional, the last value is the 'unset' value.
+  $last_value = array_pop($keys);
+  if (($label_settings['optional']) && (string) $new_value === (string) $last_value) {
+    $object->{$instance} = array();
+  } else {
+    $object->{$instance}[LANGUAGE_NONE][0]['value'] = $new_value;
+  }
+  field_attach_update($options['object_type'], $object);
+}
+
+function fasttoggle_field_get_field_value($options, $group, $instance, $object) {
+  $field_info = $options['fields'][$group]['instances'][$instance];
+  $items = field_get_items($options['object_type'], $object, $field_info['field_name']);
+  if (!$items) {
+    if (!$field_info['optional'])
+      $key = $field_info['default'];
+    else
+      $key = '[unset]';
+  } else {
+    $key = $items[0]['value'];
+  }
+
+  return $key;
+}
+
+/**
+ * Implementation of hook_node_view_alter().
+ */
+function fasttoggle_field_node_view($node, $view_mode) {
+  if ($view_mode == 'rss')
+    return;
+
+  $options = fasttoggle_get_allowed_links('node', $node, $node->nid, "fasttoggle_add_to_node_links");
+  $label_style = variable_get('fasttoggle_label_style', FASTTOGGLE_LABEL_STATUS);
+  $links = array_flip(variable_get('fasttoggle_add_to_node_links_' . $node->type, array()));
+
+  if (!empty($options['fields'])) {
+    foreach ($options['fields'] as $group => $flags) {
+      if ($group != $node->type)
+        continue;
+      if (!empty($flags['instances'])) {
+        foreach ($flags['instances'] as $instance => $data) {
+          $key = "{$group}_{$instance}";
+          if (array_key_exists($key, $links))
+            $node->content['links']['node']['#links']['fasttoggle_' . $key] = fasttoggle($options, $group, $instance, $node, FASTTOGGLE_FORMAT_LINK_ARRAY);
+        }
+      }
+    }
+  }
+}
+
+function fasttoggle_field_menu_contextual_links_alter(&$links, $router_item, $root_path) {
+  if ($root_path == 'node/%') {
+    if (isset($router_item['map'][0]) && $router_item['map'][0] == 'node') {
+      if (isset($router_item['map'][1]) && is_object($router_item['map'][1])) {
+        $node = $router_item['map'][1];
+        $options = fasttoggle_get_allowed_links('node', $node);
+        $link_list = variable_get('fasttoggle_add_to_node_links_' . $node->type, array());
+        $options = array_intersect_key($options, array_flip($link_list));
+
+        if (!empty($options['fields'])) {
+          foreach ($options['fields'] as $group => $flags) {
+            if (!empty($flags['instances'])) {
+              foreach ($flags as $key => $data) {
+                $link = fasttoggle($options, $group, $key, $node, FASTTOGGLE_FORMAT_LINK_ARRAY);
+                // massage to $link so it fits the expected format.
+                $link['localized_options']['query'] = $link['query'];
+                unset($link['query']);
+                $link['localized_options']['attributes'] = $link['attributes'];
+                unset($link['attributes']);
+                $links['fasttoggle_' . $group . '_' . $key] = $link;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function fasttoggle_field_views_api() {
+  return array(
+      'api' => 3,
+      'path' => drupal_get_path('module', 'fasttoggle_field') . '/views',
+      );
+}

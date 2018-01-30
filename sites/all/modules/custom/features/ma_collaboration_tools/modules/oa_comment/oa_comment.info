@@ -1,0 +1,38 @@
+name = Open Atrium Comments
+description = Configure core comments
+core = 7.x
+package = Open Atrium
+dependencies[] = comment
+dependencies[] = ctools
+dependencies[] = fasttoggle_comment
+; dependencies[] = oa_core // Commented out by Mukurtu
+dependencies[] = strongarm
+dependencies[] = views
+dependencies[] = views_content
+dependencies[] = views_load_more
+apps[screenshots][] = app/screenshot.png
+apps[logo] = app/logo.png
+apps[author] = Phase2 Technology
+apps[author_url] = http://www.phase2technology.com/
+apps[server] = openatrium
+apps[package] = Core addons
+features[ctools][] = strongarm:strongarm:1
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[variable][] = fasttoggle_comment_status_settings
+features[variable][] = fasttoggle_comments_rw_only
+features[variable][] = fasttoggle_label_style
+features[views_view][] = oa_comment_media
+features[views_view][] = oa_comment_topics
+files[] = views/views_handler_field_oa_comment_timestamp_new_comments.inc
+files[] = views/views_handler_field_oa_comment_timestamp_updated_comments.inc
+files[] = views/views_handler_field_oa_comment_last_date.inc
+files[] = views/views_handler_argument_oa_comment_paragraph_and_current_ids.inc
+files[] = views/views_handler_sort_oa_comment_last_date.inc
+
+; Information added by Drupal.org packaging script on 2017-12-14
+version = "7.x-2.17"
+core = "7.x"
+project = "oa_comment"
+datestamp = "1513284787"
+

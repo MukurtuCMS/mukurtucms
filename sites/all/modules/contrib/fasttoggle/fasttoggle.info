@@ -1,0 +1,14 @@
+name = Fasttoggle
+description = Enables fast toggling of binary settings.
+version = "7.x-1.x-dev"
+package = Administration
+files[] = fasttoggle.admin.inc
+core = 7.x
+configure = admin/config/system/fasttoggle
+
+; Information added by Drupal.org packaging script on 2017-09-21
+version = "7.x-1.7"
+core = "7.x"
+project = "fasttoggle"
+datestamp = "1506034749"
+

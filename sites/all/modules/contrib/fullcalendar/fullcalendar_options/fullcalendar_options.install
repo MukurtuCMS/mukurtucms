@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the FullCalendar Options module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function fullcalendar_options_install() {
+  variable_set('fullcalendar_options', array_fill_keys(array_keys(_fullcalendar_options_list(TRUE)), TRUE));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fullcalendar_options_uninstall() {
+  variable_del('fullcalendar_options');
+}

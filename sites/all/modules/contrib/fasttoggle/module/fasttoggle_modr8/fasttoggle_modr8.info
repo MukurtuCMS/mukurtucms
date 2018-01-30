@@ -1,0 +1,16 @@
+name = Fasttoggle Modr8
+description = Enables fast toggling of modr8 settings for nodes.
+version = "7.x-1.x-dev"
+package = Administration
+files[] = views/fasttoggle_modr8.views.inc
+core = 7.x
+configure = admin/config/system/fasttoggle
+dependencies[] = fasttoggle_comment
+dependencies[] = modr8
+
+; Information added by Drupal.org packaging script on 2017-09-21
+version = "7.x-1.7"
+core = "7.x"
+project = "fasttoggle"
+datestamp = "1506034749"
+

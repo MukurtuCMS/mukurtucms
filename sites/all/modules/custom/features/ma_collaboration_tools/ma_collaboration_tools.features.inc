@@ -17,6 +17,78 @@ function ma_collaboration_tools_ctools_plugin_api($module = NULL, $api = NULL) {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function ma_collaboration_tools_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
+}
+
+/**
+ * Implements hook_flag_default_flags().
+ */
+function ma_collaboration_tools_flag_default_flags() {
+  $flags = array();
+  // Exported flag: "Section Content Subscribe".
+  $flags['subscribe_section_content'] = array(
+    'entity_type' => 'node',
+    'title' => 'Section Content Subscribe',
+    'global' => 0,
+    'types' => array(),
+    'flag_short' => 'Follow',
+    'flag_long' => 'Follow to receive messages related to this content',
+    'flag_message' => 'Following',
+    'unflag_short' => 'UnFollow',
+    'unflag_long' => 'UnFollow to stop receiving messages about this content',
+    'unflag_message' => 'UnFollowed',
+    'unflag_denied_text' => '',
+    'link_type' => 'toggle',
+    'weight' => 0,
+    'show_in_links' => array(),
+    'show_as_field' => FALSE,
+    'show_on_form' => 0,
+    'access_author' => '',
+    'show_contextual_link' => FALSE,
+    'i18n' => 0,
+    'api_version' => 3,
+    'module' => 'ma_collaboration_tools',
+    'locked' => array(
+      0 => 'name',
+    ),
+  );
+  // Exported flag: "Archive".
+  $flags['trash'] = array(
+    'entity_type' => 'node',
+    'title' => 'Archive',
+    'global' => 1,
+    'types' => array(),
+    'flag_short' => 'Archive This',
+    'flag_long' => 'Move item to the site archive',
+    'flag_message' => 'Item has been archived',
+    'unflag_short' => 'Remove from archive',
+    'unflag_long' => 'Unarchive item and restore previous access settings.',
+    'unflag_message' => 'Item removed from archive',
+    'unflag_denied_text' => 'Archived',
+    'link_type' => 'confirm',
+    'weight' => 0,
+    'show_in_links' => array(),
+    'show_as_field' => FALSE,
+    'show_on_form' => 0,
+    'access_author' => '',
+    'show_contextual_link' => FALSE,
+    'i18n' => 0,
+    'flag_confirmation' => 'Are you sure you want to archive this item? You may be unable to access it after archiving.',
+    'unflag_confirmation' => 'Are you sure you want to remove this item from archive?',
+    'api_version' => 3,
+    'module' => 'ma_collaboration_tools',
+    'locked' => array(
+      0 => 'name',
+    ),
+  );
+  return $flags;
+
+}
+
+/**
  * Implements hook_node_info().
  */
 function ma_collaboration_tools_node_info() {

@@ -1,0 +1,16 @@
+name = Fasttoggle User
+description = Enables fast toggling of binary settings for users.
+version = "7.x-1.x-dev"
+package = Administration
+files[] = views/fasttoggle_user.views.inc
+files[] = views/fasttoggle_user_views_handler_field_user_link.inc
+core = 7.x
+configure = admin/config/system/fasttoggle
+dependencies[] = fasttoggle
+
+; Information added by Drupal.org packaging script on 2017-09-21
+version = "7.x-1.7"
+core = "7.x"
+project = "fasttoggle"
+datestamp = "1506034749"
+

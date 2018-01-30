@@ -1,0 +1,17 @@
+name = Fasttoggle Field
+description = Enables fast toggling of binary settings for fields.
+version = "7.x-1.x-dev"
+package = Administration
+files[] = views/fasttoggle_field.views.inc
+files[] = views/fasttoggle_field_views_handler_field_field_link.inc
+core = 7.x
+configure = admin/config/system/fasttoggle
+dependencies[] = fasttoggle
+dependencies[] = field
+
+; Information added by Drupal.org packaging script on 2017-09-21
+version = "7.x-1.7"
+core = "7.x"
+project = "fasttoggle"
+datestamp = "1506034749"
+

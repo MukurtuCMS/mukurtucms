@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * The installation file for fasttoggle_user.module
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function fasttoggle_user_install() {
+  db_query("UPDATE {system} SET weight = 5 WHERE name = 'fasttoggle_user' AND type = 'module'");
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fasttoggle_user_uninstall() {
+  variable_del('fasttoggle_user_status_settings');
+  variable_del('fasttoggle_user_role_settings');
+  variable_del('fasttoggle_allow_block_user1');
+  variable_del('fasttoggle_enhance_user_overview_page');
+}

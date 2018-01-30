@@ -1,0 +1,183 @@
+<?php
+
+/**
+ * @file
+ * Enables fast toggling of binary or not so binary settings.
+ */
+
+module_load_include('inc', 'fasttoggle');
+
+/**
+ * Implementation of hook_perm().
+ */
+function fasttoggle_comment_permission() {
+  return array(
+      'moderate comments' => array(
+        'title' => t('Moderate comments'),
+        ),
+      );
+}
+
+/**
+ * Fasttoggle comment access check function.
+ */
+function fasttoggle_comment_access_status() {
+  return fasttoggle_allow_access_if(user_access('administer comments') || user_access('moderate comments'));
+}
+
+/**
+ * Enable modules to add properties to comments through hook_comment().
+ *
+ * To support toggling, a property needs to be loaded onto the base object.
+ * hook_nodeapi() and hook_user() support a 'load' op but _comment_load()
+ * loads data only from the comments table. This function allows modules
+ * to load properties onto comments through a 'load' op in hook_comment()
+ * and hence to produce custom comment properties that support toggling.
+ */
+function fasttoggle_comment_load_comment(&$comment) {
+  if ($extra = comment_invoke_comment($comment, 'load')) {
+    foreach ($extra as $key => $value) {
+      $comment->$key = $value;
+    }
+  }
+}
+
+/**
+ * Save a new value for a comment attribute.
+ */
+function fasttoggle_comment_save($options, $group, $instance, $new_value, $object) {
+  $object->$instance = $new_value;
+  comment_save($object);
+}
+
+/**
+ * Implementation of hook_comment_view().
+ */
+function fasttoggle_comment_comment_view($comment, $view_mode) {
+  $options = fasttoggle_get_allowed_links('comment', $comment);
+
+  //fasttoggle_load_comment($node);
+  if (!empty($options['fields'])) {
+    foreach($options['fields'] as $group => $flags) {
+      if (!empty($flags['instances'])) {
+        foreach ($flags['instances'] as $key => $data) {
+          $comment->content['links']['comment']['#links']['fasttoggle_' . $group . '_' . $key] = fasttoggle($options, $group, $key, $comment, FASTTOGGLE_FORMAT_LINK_ARRAY);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_link().
+ */
+function fasttoggle_comment_link($type, $obj = NULL, $teaser = FALSE) {
+  $links = array();
+  $options = fasttoggle_get_allowed_links($type, $obj);
+
+  if (!empty($options) && $type == 'comment') {
+    fasttoggle_load_comment($obj);
+    foreach (array_keys($options) as $key) {
+      $links['fasttoggle_' . $key] = fasttoggle($options, 'status', $key, $comment, FASTTOGGLE_FORMAT_LINK_ARRAY);
+    }
+  }
+
+  return $links;
+}
+
+/**
+ * Implementation of hook_fasttoggle_available_links().
+ */
+function fasttoggle_comment_fasttoggle_available_links($type = NULL, $obj = NULL) {
+
+  $result = array();
+
+  if (is_null($type) || $type == "node") {
+    $result['node'] = array(
+        'fields' => array(
+          'status' => array(
+            'instances' => array(
+              'comment' => array(
+                'description' => t('Topic opened/closed <small>(users are allowed/disallowed to post comments)</small>'),
+                'access' => array('fasttoggle_comment_access_status'),
+                'labels' => array(
+                  FASTTOGGLE_LABEL_ACTION => array(0 => t('lock comments'), 1 => t('unlock comments'), 2 => t('hide comments')),
+                  FASTTOGGLE_LABEL_STATUS => array(0 => t('comments disabled'), 1 => t('comments read only'), 2 => t('comments read/write')))
+                ),
+              )
+            )
+          )
+        );
+    if (variable_get('fasttoggle_comments_rw_only', FALSE)) {
+      $result['node']['fields']['status']['instances']['comment']['allowed_values'] = array(1, 2);
+    }
+  }
+
+  if (is_null($type) || $type == "comment") {
+    $result['comment'] = array(
+        'id_field' => 'cid',
+        'title_field' => 'title',
+        'object_type' => 'comment',
+        'save_fn' => 'fasttoggle_comment_save',
+        'extra_settings' => array(
+          'fasttoggle_comments_rw_only' => array(
+            '#type' => 'checkbox',
+            '#title' => t('Toggle comments between read/write and readonly only? (Not completely disabled as well)'),
+            '#default_value' => variable_get('fasttoggle_comments_rw_only', FALSE),
+            '#weight' => 50,
+            ),
+          'help_text' => array(
+            '#value' => t('Configure access restrictions for these settings on the <a href="@url">access control</a> page.', array('@url' => url('admin/user/permissions', array('fragment' => 'module-fasttoggle')))),
+            '#prefix' => '<div>',
+            '#suffix' => '</div>',
+            ),
+          ),
+        'fields' => array(
+          'status' => array(
+            'instances' => array(
+              'status' => array(
+                'description' => t('Status <small>(published/unpublished)</small>'),
+                'access' => array('fasttoggle_comment_access_status'),
+                'labels' => array(
+                  FASTTOGGLE_LABEL_ACTION => array(0 => t('publish'), 1 => t('unpublish')),
+                  FASTTOGGLE_LABEL_STATUS => array(0 => t('not published'), 1 => t('published'))
+                  )
+                )
+              )
+            )
+          )
+        );
+  }
+
+  return $result;
+}
+
+/**
+ * Add a class so content can be found and replaced by fasttoggle.
+ */
+function fasttoggle_comment_preprocess_comment(&$variables)
+{
+  $variables['classes_array'][] = 'comment-content-' . $variables['comment']->cid;
+}
+
+/**
+ * Replace the content of a comment.
+ */
+function fasttoggle_comment_fasttoggle_ajax_alter(&$ajax_commands, $object_type, $object, $params)
+{
+  if ($object_type != "comment" || $params['view'] != 'full')
+    return;
+
+  $node = node_load($object->nid);
+  $unrendered = comment_view($object, $node);
+  unset($unrendered['#prefix']);
+  $replacement_content = drupal_render($unrendered);
+  $ajax_commands[] = ajax_command_replace('.' . 'comment-content-' . $object->cid, $replacement_content);
+}
+
+function fasttoggle_comment_views_api() {
+  return array(
+      'api' => 3,
+      'path' => drupal_get_path('module', 'fasttoggle_comment') . '/views',
+      );
+}
