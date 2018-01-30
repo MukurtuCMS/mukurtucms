@@ -65,24 +65,9 @@ function mukurtu_export_field_handler_image($value, $field_info, $options = arra
     $referenced_entities = array();
     $binary_files = array();
 
-    // Copy files
-    /*
-    $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
-    $tempmedia = file_unmanaged_copy($value['uri'], $tempmedia, FILE_EXISTS_REPLACE);
-    $localname = implode(DIRECTORY_SEPARATOR, array('files', $field_info['settings']['uri_scheme'], $value['type'], $value['fid'], $value['filename']));
-    $binary_files[$value['fid']]['filename'] = $tempmedia;
-    $binary_files[$value['fid']]['localname'] = $localname;
-*/
-    //dpm("Dump {$value['uri']}");
-    //dpm($value);
-    //dpm($field_info);
-    //dpm($binary_files);
     $saved_file = _mukurtu_export_save_file($value);
-    //dpm($saved_file);
-    //$return_value = isset($value['fid']) ? $value['fid'] : NULL;
     $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
-    //$return_value = $localname;
-    //$referenced_entities['file'][$return_value] = isset($value['fid']) ? $value['fid'] : NULL;
+
     return array($return_value, $referenced_entities, $saved_file);
 }
 

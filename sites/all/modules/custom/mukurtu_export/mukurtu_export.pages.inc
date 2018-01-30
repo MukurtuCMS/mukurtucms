@@ -5,10 +5,10 @@ function mukurtu_export_form($form, &$form_state) {
   $formatter = isset($form_state['mukurtu_export']['formatter']) ? $form_state['mukurtu_export']['formatter'] : NULL;
   $formatter_settings = isset($form_state['mukurtu_export']['formatter_settings']) ? $form_state['mukurtu_export']['formatter_settings'] : NULL;
   $field_list = isset($form_state['mukurtu_export']['export_fields']) ? $form_state['mukurtu_export']['export_fields'] : NULL;
+  $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
+  //$is_batch = (isset($form_state['input']['op']) && $form_state['input']['op'] == 'Execute') ? TRUE : FALSE;
 
-  if(is_null($export_ids)){// && isset($form_state['build_info']['args'][0])) {
-    //kpr("menu");
-    //kpr(menu_get_object());
+  if(!$is_batch && is_null($export_ids)){
     $current_node = menu_get_object();
     $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
   }
@@ -17,11 +17,6 @@ function mukurtu_export_form($form, &$form_state) {
   $format_handlers = mukurtu_export_format_handlers();
   // Format not specified or specified format isn't available
   if(is_null($formatter) || !in_array($formatter, array_keys($format_handlers))) {
-    /*// Check if the user selected a format previously
-    if(isset($_SESSION['mukurtu_export']['format'])
-              && in_array($_SESSION['mukurtu_export']['format'], array_keys($format_handlers))) {
-      $formatter = $_SESSION['mukurtu_export']['format'];
-    } else { */
       // Only one available format, default to that
       if(count($format_handlers) == 1) {
         $formatter = array_keys($format_handlers)[0];
@@ -30,12 +25,10 @@ function mukurtu_export_form($form, &$form_state) {
         // Multiple formats, show selection form
         return mukurtu_export_format_selection_form($form, $form_state, $format_handlers);
       }
-//    }
   }
 
-  //include_once "formats/csv.inc";
+  // Load formatter code
   include_once $format_handlers[$formatter]['#file'];
-
 
   // Format selected, need formatter settings
   if(is_null($formatter_settings)) {
@@ -43,34 +36,43 @@ function mukurtu_export_form($form, &$form_state) {
     if(isset($format_handlers[$formatter]['#settings_callback']) && function_exists($format_handlers[$formatter]['#settings_callback'])) {
       $form['export']['settings'] = call_user_func($format_handlers[$formatter]['#settings_callback'], $form, $form_state);
     }
-    $form['export_next_step'] = array(
-      '#type' => 'submit',
-      '#value' => t('Next'),
-    );
-    return $form;
+    if(!$is_batch) {
+      $form['export_next_step'] = array(
+        '#type' => 'submit',
+        '#value' => t('Next'),
+      );
+      return $form;
+    }
   }
 
   if(is_null($field_list)) {
 
-    $form['download_file_top'] = array(
-      '#type' => 'submit',
-      '#value' => t('Download'),
-    );
+    if(!$is_batch) {
+      $form['download_file_top'] = array(
+        '#type' => 'submit',
+        '#value' => t('Download'),
+      );
+    }
 
     $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids);
 
-    $form['download_file_bottom'] = array(
-      '#type' => 'submit',
-      '#value' => t('Download'),
-    );
+    if(!$is_batch) {
+      $form['download_file_bottom'] = array(
+        '#type' => 'submit',
+        '#value' => t('Download'),
+      );
+    }
     return $form;
   }
 
-    //$code_string = mukurtu_export_csv_export($export_ids, $formatter, $field_list);
-  $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list, $formatter_settings);
-//kpr($download_file);
+  // Batch run, wait to assemble export file
+  if($is_batch) {
+    return $form;
+  }
 
-  mukurtu_export_get_file($download_file);
+  // Non-batch run, export and download exported file
+  $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list, $formatter_settings);
+  return mukurtu_export_get_file($download_file);
 }
 
 function mukurtu_export_get_file($file) {
@@ -145,72 +147,74 @@ function mukurtu_export_format_selection_form_submit($form, &$form_state) {
 }
 
 function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
+  $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
+
+  $form['export_fields'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Select Fields for Export'),
+    '#collapsible' => TRUE,
+    '#collapsed' => $is_batch,
+    '#tree' => TRUE,
+  );
+
+  // Load defaults
+  $defaults = NULL;
+  if(!$reset && isset($_SESSION['mukurtu_export']['export_fields'])) {
+    $defaults = $_SESSION['mukurtu_export']['export_fields'];
+  }
+
+  foreach(array_keys(entity_get_info()) as $entity_type) {
+
+    // Currently only show node/scald_atom fields
+    if($entity_type != 'node' && $entity_type != 'scald_atom'){
+      continue;
+    }
+
+    $entity_info = entity_get_info($entity_type);
+    $id = _mukurtu_export_entity_id($entity_type);
+
+    foreach($entity_info['bundles'] as $bundle_name => $ids) {
+      $form['export_fields'][$entity_type][$bundle_name] = array(
+        '#type' => 'fieldset',
+        '#title' => $entity_info['label'] . ' - ' . $entity_info['bundles'][$bundle_name]['label'],
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#weight' => 0,
+      );
+
+      $fields_info = field_info_instances($entity_type, $bundle_name);
+
+      // Default fields
+      // ID
+      $id_label = t(strtoupper($id));
+
+      $form['export_fields'][$entity_type][$bundle_name][$id] = array(
+        '#type' => 'checkbox',
+        '#title' => $id_label,
+        '#default_value' => isset($defaults[$entity_type][$bundle_name][$id]) ? $defaults[$entity_type][$bundle_name][$id] : TRUE,
+        '#weight' => -2
+      );
+
+      // Title
+      $form['export_fields'][$entity_type][$bundle_name]['title'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Title'),
+        '#default_value' => isset($defaults[$entity_type][$bundle_name]['title']) ? $defaults[$entity_type][$bundle_name]['title'] : TRUE,
+        '#weight' => -1
+      );
+
+      foreach($fields_info as $field_name => $field) {
+        $form['export_fields'][$entity_type][$bundle_name][$field_name] = array(
+          '#type' => 'checkbox',
+          '#title' => $field['label'],
+          '#default_value' => isset($defaults[$entity_type][$bundle_name][$field_name]) ? $defaults[$entity_type][$bundle_name][$field_name] : TRUE,
+          '#weight' => $field['widget']['weight']
+        );
+      }
+    }
+  }
+
   if(!is_null($export_ids)) {
-    $form['export_fields'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Select Fields for Export'),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-      '#tree' => TRUE,
-    );
-
-    // Load defaults
-    $defaults = NULL;
-    if(!$reset && isset($_SESSION['mukurtu_export']['export_fields'])) {
-      $defaults = $_SESSION['mukurtu_export']['export_fields'];
-    }
-
-    foreach(array_keys(entity_get_info()) as $entity_type) {
-
-      // Currently only show node/scald_atom fields
-      if($entity_type != 'node' && $entity_type != 'scald_atom'){
-        continue;
-      }
-
-      $entity_info = entity_get_info($entity_type);
-      $id = _mukurtu_export_entity_id($entity_type);
-
-      foreach($entity_info['bundles'] as $bundle_name => $ids) {
-        $form['export_fields'][$entity_type][$bundle_name] = array(
-          '#type' => 'fieldset',
-          '#title' => $entity_info['label'] . ' - ' . $entity_info['bundles'][$bundle_name]['label'],
-          '#collapsible' => TRUE,
-          '#collapsed' => TRUE,
-          '#weight' => 0,
-        );
-
-        $fields_info = field_info_instances($entity_type, $bundle_name);
-
-        // Default fields
-        // ID
-        $id_label = t(strtoupper($id));
-
-        $form['export_fields'][$entity_type][$bundle_name][$id] = array(
-          '#type' => 'checkbox',
-          '#title' => $id_label,
-          '#default_value' => isset($defaults[$entity_type][$bundle_name][$id]) ? $defaults[$entity_type][$bundle_name][$id] : TRUE,
-          '#weight' => -2
-        );
-
-        // Title
-        $form['export_fields'][$entity_type][$bundle_name]['title'] = array(
-          '#type' => 'checkbox',
-          '#title' => t('Title'),
-          '#default_value' => isset($defaults[$entity_type][$bundle_name]['title']) ? $defaults[$entity_type][$bundle_name]['title'] : TRUE,
-          '#weight' => -1
-        );
-
-        foreach($fields_info as $field_name => $field) {
-          $form['export_fields'][$entity_type][$bundle_name][$field_name] = array(
-            '#type' => 'checkbox',
-            '#title' => $field['label'],
-            '#default_value' => isset($defaults[$entity_type][$bundle_name][$field_name]) ? $defaults[$entity_type][$bundle_name][$field_name] : TRUE,
-            '#weight' => $field['widget']['weight']
-          );
-        }
-      }
-    }
-
     // Re-order form based on content types we are exporting
     $entity_weight = -1000;
     $bundle_weight = -1000;
@@ -221,7 +225,6 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
         $form['export_fields'][$entity_type][$bundle_name]['#collapsed'] = FALSE;
       }
     }
-
   }
   return $form;
 }

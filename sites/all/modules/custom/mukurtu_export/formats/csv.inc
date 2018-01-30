@@ -11,6 +11,8 @@
  * Settings callback.
  */
 function mukurtu_export_csv_settings($form, $form_state) {
+  $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
+
   $settings['csv'] = array(
     '#type' => 'fieldset',
     '#title' => t('Mukurtu CSV Export Settings'),
@@ -84,6 +86,11 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
+  $settings['csv']['mukurtu_export_csv_is_batch'] = array(
+    '#type' => 'hidden',
+    '#value' => $is_batch,
+  );
+
   return $settings;
 }
 
@@ -106,6 +113,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
   $delimiter = mukurtu_export_csv_string($settings['mukurtu_export_csv_delimiter']);
   $enclosure = mukurtu_export_csv_string($settings['mukurtu_export_csv_enclosure']);
   $separator = mukurtu_export_csv_string($settings['mukurtu_export_csv_separator']);
+  $is_batch = mukurtu_export_csv_string($settings['mukurtu_export_csv_is_batch']);
   $escape_eol = $settings['mukurtu_export_csv_escape_eol'];
   $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
   $id_format = $settings['mukurtu_export_csv_id_format'];
@@ -125,8 +133,12 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
   $encoded_export = array();
   foreach ($entities as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
-        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format));
+        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format, $include_headers));
     }
+  }
+
+  if($is_batch) {
+    return $encoded_export;
   }
   return mukurtu_export_csv_export_to_zip($encoded_export);
 }
@@ -375,7 +387,6 @@ function mukurtu_export_csv_array_to_csv($array, $delimiter, $enclosure, $separa
   $csv_output = fopen('php://output', 'w');
   ob_start();
 
-  $lines = array();
   foreach ($array as $line) {
     $out_item = array();
     foreach ($line as $line_key => $item) {

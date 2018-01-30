@@ -136,10 +136,6 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
     }
   }
 
-  if($value == 'private://atoms/image/rudolph.jpg') {
-    //dpm("hi"); //$field_name = NULL, $entity_type = 'file'
-  }
-
   if(isset($value['value'])) {
     return array($value['value'], $referenced_entities);
   }
@@ -151,7 +147,7 @@ function mukurtu_export_action_info() {
   return array(
     'mukurtu_export_action' => array(
       'type' => 'node',
-      'label' => t('Mukurtu Export'),
+      'label' => t('Mukurtu CSV Export'),
       'behavior' => array('changes_property'),
       'configurable' => FALSE,
       'vbo_configurable' => TRUE,
@@ -161,10 +157,41 @@ function mukurtu_export_action_info() {
 }
 
 function mukurtu_export_action_form($settings, &$form_state) {
-  kpr($settings);
-  kpr($form_state);
-  //$form_state['build_info']['args'][0]->result
-  return drupal_get_form('mukurtu_export_form');
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
+
+  $form_state['mukurtu_export']['is_batch'] = TRUE;
+  $form_state['mukurtu_export']['formatter'] = 'csv';
+  return drupal_retrieve_form('mukurtu_export_form', $form_state);
+}
+
+function mukurtu_export_action_submit($form, $form_state) {
+  $settings = array();
+  $settings['export_fields'] = $form_state['input']['export_fields'];
+  $settings['csv']['settings'] = $form_state['input']['csv'];
+  return $settings;
+}
+
+function mukurtu_export_action(&$node, $context) {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
+  module_load_include('inc', 'mukurtu_export', 'formats/csv');
+
+  if($context['progress']['current'] == 1) {
+    // VBO only runs on nodes, so we can hardcode that here
+    $_SESSION['mukurtu_export_csv_vbo'] = array();
+  }
+
+  // Assemble list of nodes to export
+  $_SESSION['mukurtu_export_csv_vbo']['node'][$node->type][$node->nid] = $node;
+
+  // Export items and get link to zip file
+  if($context['progress']['current'] == $context['progress']['total']) {
+    $export_result = mukurtu_export_csv_export($_SESSION['mukurtu_export_csv_vbo'], $context['export_fields'], $context['csv']['settings']);
+    unset($_SESSION['mukurtu_export_csv_vbo']);
+    $zip_file = mukurtu_export_csv_export_to_zip($export_result);
+    $download_link = file_create_url($zip_file->uri);
+    $message = t('Download your exported items: <div class="btn btn-default form-submit"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
+    drupal_set_message($message);
+  }
 }
 
 
