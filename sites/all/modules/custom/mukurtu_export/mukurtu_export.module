@@ -146,9 +146,9 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
 function mukurtu_export_action_info() {
   return array(
     'mukurtu_export_action' => array(
-      'type' => 'node',
+      'type' => 'entity',
       'label' => t('Mukurtu CSV Export'),
-      'behavior' => array('changes_property'),
+      'behavior' => array(),
       'configurable' => FALSE,
       'vbo_configurable' => TRUE,
       'triggers' => array('any'),
@@ -171,17 +171,17 @@ function mukurtu_export_action_submit($form, $form_state) {
   return $settings;
 }
 
-function mukurtu_export_action(&$node, $context) {
+function mukurtu_export_action(&$entity, $context) {
   module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
   module_load_include('inc', 'mukurtu_export', 'formats/csv');
 
   if($context['progress']['current'] == 1) {
-    // VBO only runs on nodes, so we can hardcode that here
     $_SESSION['mukurtu_export_csv_vbo'] = array();
   }
 
   // Assemble list of nodes to export
-  $_SESSION['mukurtu_export_csv_vbo']['node'][$node->type][$node->nid] = $node;
+  $entity_type = _mukurtu_export_entity_type($entity);
+  $_SESSION['mukurtu_export_csv_vbo'][$entity_type][$entity->type][$entity->nid] = $entity;
 
   // Export items and get link to zip file
   if($context['progress']['current'] == $context['progress']['total']) {
