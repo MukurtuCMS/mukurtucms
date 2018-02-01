@@ -110,13 +110,21 @@ function mukurtu_export_csv_string($string) {
  * Export callback.
  */
 function mukurtu_export_csv_export($entities, $field_list, $settings) {
+  // CSV format settings
   $delimiter = mukurtu_export_csv_string($settings['mukurtu_export_csv_delimiter']);
   $enclosure = mukurtu_export_csv_string($settings['mukurtu_export_csv_enclosure']);
   $separator = mukurtu_export_csv_string($settings['mukurtu_export_csv_separator']);
-  $is_batch = mukurtu_export_csv_string($settings['mukurtu_export_csv_is_batch']);
   $escape_eol = $settings['mukurtu_export_csv_escape_eol'];
-  $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
+
+  // Content format settings
   $id_format = $settings['mukurtu_export_csv_id_format'];
+  $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
+
+  // Batch settings
+  $is_batch = mukurtu_export_csv_string($settings['mukurtu_export_csv_is_batch']);
+  $batch_current = isset($settings['batch_current']) ? $settings['batch_current'] : NULL;
+  $batch_total = isset($settings['batch_total']) ? $settings['batch_total'] : NULL;
+  $batch_previous = isset($settings['batch_previous']) ? $settings['batch_previous'] : array();
 
   // If GUIDs are selected for export, don't export the native ID field of the entity
   if($id_format == 'guid') {
@@ -130,18 +138,25 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
     }
   }
 
-  $encoded_export = array();
+  $encoded_export = ($is_batch == TRUE) ? $batch_previous : array();
   foreach ($entities as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
-        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format, $include_headers));
+        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format, $is_batch, $encoded_export));
     }
   }
 
-  if($is_batch) {
-    return $encoded_export;
+  if($is_batch == TRUE) {
+    if($batch_current < $batch_total) {
+      // Batch job not complete, return raw data so the next run can modify
+      return $encoded_export;
+    } else {
+      // Batch job complete, convert raw data to CSV and package files
+      return mukurtu_export_csv_export_to_zip(_mukurtu_export_csv_encoded_content_to_csv_array($encoded_export, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter));
+    }
   }
   return mukurtu_export_csv_export_to_zip($encoded_export);
 }
+
 
 function mukurtu_export_csv_export_to_zip($encoded_export) {
   $csv_files = array();
@@ -183,25 +198,34 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   }
 
   unlink(drupal_realpath($tempfile));
-//kpr($download_file);
+
   return $download_file;
 }
 
 /**
- * Build csv string.
+ * Build the encoded array of fields.
  */
-function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format = 'internal') {
-  $encoded_content = array();
-  $csv_lines = array();
-  $csv_output = array();
-
-  $entity_keys = array();
+function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format = 'internal', $is_batch = FALSE, $previous_encoded_content = array()) {
+  $encoded_content = $previous_encoded_content;
 
   foreach (array_keys($entities) as $entity_key) {
     $new_entity_key = "{$entity_type}__{$bundle_name}_{$entity_key}";
-    $entity_keys[] = $new_entity_key;
+    // Check if this entity has already been encoded
+    if(isset($encoded_content['__exported_key_list'][$entity_type][$bundle_name][$new_entity_key])) {
+      return array();
+    }
     mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $entities[$entity_key], $entity_type, $bundle_name, $field_list, $id_format);
   }
+
+  if($is_batch == TRUE) {
+    return $encoded_content;
+  }
+  return _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter);
+}
+
+function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter) {
+  $csv_lines = array();
+  $csv_output = array();
 
   // Remove bookkeeping info
   $encoded_list = $encoded_content['__exported_key_list'];

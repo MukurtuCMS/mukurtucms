@@ -175,21 +175,28 @@ function mukurtu_export_action(&$entity, $context) {
   module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
   module_load_include('inc', 'mukurtu_export', 'formats/csv');
 
+  // Start of batch run, start with an empty result set
   if($context['progress']['current'] == 1) {
     $_SESSION['mukurtu_export_csv_vbo'] = array();
   }
 
-  // Assemble list of nodes to export
-  $entity_type = _mukurtu_export_entity_type($entity);
-  $_SESSION['mukurtu_export_csv_vbo'][$entity_type][$entity->type][$entity->nid] = $entity;
+  // Batch settings to pass to CSV exporter
+  $context['csv']['settings']['batch_current'] = $context['progress']['current'];
+  $context['csv']['settings']['batch_total'] = $context['progress']['total'];
+  $context['csv']['settings']['batch_previous'] = $_SESSION['mukurtu_export_csv_vbo'];
 
-  // Export items and get link to zip file
+  // Export current entity
+  $entity_type = _mukurtu_export_entity_type($entity);
+  $entity_wrapper = entity_metadata_wrapper($entity_type, $entity);
+  $entities = array($entity_type => array($entity->type => array($entity_wrapper->getIdentifier() => $entity)));
+  $_SESSION['mukurtu_export_csv_vbo'] = mukurtu_export_csv_export($entities, $context['export_fields'], $context['csv']['settings']);
+
+  // Batch run complete, show link to download the file
   if($context['progress']['current'] == $context['progress']['total']) {
-    $export_result = mukurtu_export_csv_export($_SESSION['mukurtu_export_csv_vbo'], $context['export_fields'], $context['csv']['settings']);
-    unset($_SESSION['mukurtu_export_csv_vbo']);
-    $zip_file = mukurtu_export_csv_export_to_zip($export_result);
+    $zip_file = $_SESSION['mukurtu_export_csv_vbo'];
     $download_link = file_create_url($zip_file->uri);
     $message = t('Download your exported items: <div class="btn btn-default form-submit"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
+    unset($_SESSION['mukurtu_export_csv_vbo']);
     drupal_set_message($message);
   }
 }
