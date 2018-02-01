@@ -141,7 +141,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
   $encoded_export = ($is_batch == TRUE) ? $batch_previous : array();
   foreach ($entities as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
-        $encoded_export = array_merge_recursive($encoded_export, mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format, $is_batch, $encoded_export));
+        $encoded_export = mukurtu_export_csv_encode($entity_type, $bundle_name, $bundle_entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format, $is_batch, $encoded_export);
     }
   }
 
@@ -212,7 +212,7 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
     $new_entity_key = "{$entity_type}__{$bundle_name}_{$entity_key}";
     // Check if this entity has already been encoded
     if(isset($encoded_content['__exported_key_list'][$entity_type][$bundle_name][$new_entity_key])) {
-      return array();
+      continue;
     }
     mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $entities[$entity_key], $entity_type, $bundle_name, $field_list, $id_format);
   }
