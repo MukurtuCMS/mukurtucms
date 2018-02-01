@@ -1329,48 +1329,17 @@ function _render_subscribe_link($entity) {
   }
 }
 
+/**
+ * Render the OG links for a group.
+ */
 function mukurtu_splash_block_group_links() {
-  // links to manage the current group
-  $links = "";
-
-  $nid = arg(1);  // load group nid from url
-
-  if (is_numeric($nid)) {
-
-    $node = node_load($nid);
-
-    $result = _render_subscribe_link($node);
-    $result[0]['#attributes']['class'] = 'btn';
-    $subcribe_link_content = render($result);
-
-    $links .= $subcribe_link_content;
-
-    // confirm permission to create DH items
-    if (og_user_access('node',$node->nid,'create digital_heritage content')) {
-      $link_url = 'node/add/digital-heritage';
-
-      if ($node->type == 'community') {
-        $link_url .= '/'.$node->nid;
-      } else if ($node->type == 'cultural_protocol_group') {
-        $link_url .= '/'.$node->og_group_ref['und'][0]['target_id'].'/'.$node->nid;
-      }
-
-      $links .= l('Create Digital Heritage Content >>', $link_url, array('attributes'=>array('class'=>array('btn'))));
+  if (is_numeric(arg(1))) {
+    $node = node_load(arg(1));
+    if (og_is_group('node', $node)) {
+      $result = _render_subscribe_link($node);
     }
-
-    // confirm permission to create protocols
-    if ($node->type == 'community' && og_user_access('node',$node->nid,'create cultural_protocol_group content')) {
-
-      $links .= l('Create Cultural Protocol >>', 'node/add/cultural-protocol-group', array('attributes'=>array('class'=>array('btn')), 'query' => array('og_group_ref' => $node->nid)));
-    }
+    return '<span class="btn">' . render($result) . '</span>';
   }
-
-  $markup = $links;
-
-  $block = array(
-    '#markup' => $markup,
-  );
-  return $block;
 }
 
 /**

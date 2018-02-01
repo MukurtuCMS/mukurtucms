@@ -58,41 +58,69 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 }
 
 /**
- * Implements hook_views_pre_build().
+ * Implements hook_views_pre_view().
  */
-// Add the Add and Manage Members links to the group member list, for users with perm to do so
-// Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
-function ma_core_views_pre_build(&$view) {
+function ma_core_views_pre_view(&$view, &$display_id, &$args) {
   if ($view->name == 'group_members') {
+
+    // Hide the manage/add members links in footer unless user can admin this group.
     if (is_numeric(arg(1))) {
       $gid = arg(1);
-      if (og_user_access('node', $gid, 'manage members')) {
-        // We always want to show the buttons to users who can use them, so we need to have an empty
-        // "no results" message so that the view is actually displayed
-        $options = [
-          'id' => 'empty_text',
-          'table' => 'views',
-          'field' => 'area',
-          'empty' => FALSE,
-          'content' => '',
-          'format' => 'filtered_html',
-          'tokenize' => 0,
-        ];
-        $view->set_item('default', 'empty', 'empty_text', $options);
-
-        // Display the user management buttons
-        $output = '<div class="add-manage-members-links">';
-        $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
-        $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
-        $output .= '</div>';
-        $view->add_item('default', 'footer', 'views', 'area', [
-          'content' => $output,
-          'format' => 'full_html',
-          'empty' => 1
-        ]);
+      if (!og_user_access('node', $gid, 'manage members')) {
+        $view->set_item_option('block_1', 'footer', 'area', 'content', NULL);
       }
     }
   }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_core_views_pre_render(&$view) {
+  if ($view->name == 'group_members') {
+    if (is_numeric(arg(1))) {
+      $gid = arg(1);
+
+      // Add the user role(s) after the user names. This can't quite be done in view config alone.
+      $results = &$view->result;
+      $roles_order = [
+        'Community Manager',
+        'Protocol Steward',
+        'Contributor'
+      ];
+      foreach ($results as &$result) {
+        $roles = og_get_user_roles('node', $gid, $result->uid);
+        $formatted_roles = [];
+        foreach ($roles as $role) {
+          if ($role <> 'member') {
+            $formatted_roles[] = ucwords ($role);
+          }
+        }
+        if (count($formatted_roles)) {
+          usort ($formatted_roles, "ma_core_sort_og_roles");
+          $result->users_name = $result->users_name . ' (' . implode(', ', $formatted_roles) . ')';
+        }
+      }
+
+    }
+  }
+}
+
+/**
+ * Helper function to sort the OG roles so that Protocol Steward is listed ahead of Contributor.
+ */
+function ma_core_sort_og_roles($leftItem, $rightItem){
+  $order =  $roles_order = [
+    'Community Manager',
+    'Protocol Steward',
+    'Contributor'
+  ];
+
+  $flipped = array_flip($order);
+
+  $leftPos = $flipped[$leftItem];
+  $rightPos = $flipped[$rightItem];
+  return $leftPos >= $rightPos;
 }
 
 /**
@@ -259,3 +287,80 @@ function ma_core_form_alter(&$form, $form_state, $form_id) {
 
 }
 
+
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_core_block_info() {
+  $blocks['create_content'] = array(
+    'info' => t('Create Content'),
+  );
+
+
+  return $blocks;
+}
+
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_core_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'create_content':
+      $block['subject'] = t('Create Content');
+      $block['content'] = ma_core_create_content_block();
+      break;
+  }
+  return $block;
+}
+
+function ma_core_create_content_block() {
+
+
+    // links to manage the current group
+    $links = "";
+
+    $nid = arg(1);  // load group nid from url
+
+    if (is_numeric($nid)) {
+
+      $node = node_load($nid);
+
+      $result = _render_subscribe_link($node);
+      $result[0]['#attributes']['class'] = 'btn';
+      $subcribe_link_content = render($result);
+
+      $links .= $subcribe_link_content;
+
+      // confirm permission to create DH items
+      if (og_user_access('node',$node->nid,'create digital_heritage content')) {
+        $link_url = 'node/add/digital-heritage';
+
+        if ($node->type == 'community') {
+          $link_url .= '/'.$node->nid;
+        } else if ($node->type == 'cultural_protocol_group') {
+          $link_url .= '/'.$node->og_group_ref['und'][0]['target_id'].'/'.$node->nid;
+        }
+
+        $links .= l('Create Digital Heritage Content >>', $link_url, array('attributes'=>array('class'=>array('btn'))));
+      }
+
+      // confirm permission to create protocols
+      if ($node->type == 'community' && og_user_access('node',$node->nid,'create cultural_protocol_group content')) {
+
+        $links .= l('Create Cultural Protocol >>', 'node/add/cultural-protocol-group', array('attributes'=>array('class'=>array('btn')), 'query' => array('og_group_ref' => $node->nid)));
+      }
+    }
+
+    $markup = $links;
+
+    $block = array(
+      '#markup' => $markup,
+    );
+    return $block;
+
+
+
+}
