@@ -64,19 +64,20 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 // Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
 function ma_core_views_pre_build(&$view) {
   if ($view->name == 'group_members') {
-    $gid = arg(1);
-    if (og_user_access('node', $gid, 'manage members')) {
+    if (is_numeric(arg(1))) {
+      $gid = arg(1);
+      if (og_user_access('node', $gid, 'manage members')) {
         // We always want to show the buttons to users who can use them, so we need to have an empty
         // "no results" message so that the view is actually displayed
-        $options = array(
-            'id' => 'empty_text',
-            'table' => 'views',
-            'field' => 'area',
-            'empty' => FALSE,
-            'content' => '',
-            'format' => 'filtered_html',
-            'tokenize' => 0,
-        );
+        $options = [
+          'id' => 'empty_text',
+          'table' => 'views',
+          'field' => 'area',
+          'empty' => FALSE,
+          'content' => '',
+          'format' => 'filtered_html',
+          'tokenize' => 0,
+        ];
         $view->set_item('default', 'empty', 'empty_text', $options);
 
         // Display the user management buttons
@@ -84,7 +85,12 @@ function ma_core_views_pre_build(&$view) {
         $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
         $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
         $output .= '</div>';
-        $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html', 'empty' => 1));
+        $view->add_item('default', 'footer', 'views', 'area', [
+          'content' => $output,
+          'format' => 'full_html',
+          'empty' => 1
+        ]);
+      }
     }
   }
 }
