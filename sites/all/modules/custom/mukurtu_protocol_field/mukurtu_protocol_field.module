@@ -186,7 +186,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
       // Set the default protocol of the first combo field if it's not set and if there's a numeric value in the url
       if ($i == 0 && !$protocol_defaults && is_numeric($protocol_first_default) ) {
-        $protocol_defaults = $protocol_first_default;
+        $protocol_defaults = array($protocol_first_default);
       }
       if (!empty($protocol_options)) {
         $protocol_defaults = $protocol_options;
