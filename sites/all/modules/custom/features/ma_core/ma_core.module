@@ -342,8 +342,9 @@ function ma_core_create_content_block() {
     // Output the links
     $links = "";
     foreach ($link_sources as $target_type => $link_query) {
+      $target_type_link = str_replace('_', '-', $target_type);
       if (og_user_access('node', $perm_nid, 'create ' . $target_type)) {
-        $links .= '<div class="view-content"><a href="' . '/node/add/' . $target_type . $link_query . '">Create ' . node_type_get_names()[$target_type] . '</a></div>';
+        $links .= '<div class="view-content"><a href="' . '/node/add/' . $target_type_link . $link_query . '">Create ' . node_type_get_names()[$target_type] . '</a></div>';
       }
     }
 
