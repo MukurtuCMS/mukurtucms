@@ -110,36 +110,40 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
   // Make hook to allow custom changes?
 
   $referenced_entities = array();
+  $files = array();
   $field_handlers = mukurtu_export_field_handlers();
 
   // Headers, no value to extract
   if(is_numeric($field_name)) {
-    return array($value, $referenced_entities);
+    return array($value, $referenced_entities, $files);
   }
 
   $field_info = field_info_field($field_name);
 
-  if(!is_null($field_info) && isset($field_info['type'])) {
+  if(!is_null($field_info) && isset($field_info['type'])) {    
+    // Call the specific field handler, if available
     if(isset($field_handlers[$field_info['type']])
       && isset($field_handlers[$field_info['type']]['#callback'])
       && function_exists($field_handlers[$field_info['type']]['#callback'])
       ) {
       return call_user_func($field_handlers[$field_info['type']]['#callback'], $value, $field_info, $options);
     }
-  }
 
-  if(is_null($field_info)) {
-    if(isset($field_handlers['simple'][$field_name])
-    && isset($field_handlers['simple'][$field_name]['#callback'])
-    && function_exists($field_handlers['simple'][$field_name]['#callback'])) {
-      return call_user_func($field_handlers['simple'][$field_name]['#callback'], $value, $field_info, $options);
+    // No default handler.
+    // If using GUID, convert DnD Scald embed code to use GUID rather than SID
+    if(in_array($field_info['type'], mee_field_types()) 
+    && (isset($options['id_format']) && ($options['id_format'] == 'guid')
+    && isset($value['value']))) {
+      $extracted_value = _mukurtu_export_encode_scald_dnd($value['value']);
+      return array($extracted_value, $referenced_entities, $files);
     }
   }
 
+  // Default behavior for simple fields
   if(isset($value['value'])) {
-    return array($value['value'], $referenced_entities);
+    return array($value['value'], $referenced_entities, $files);
   }
-  return array($value, $referenced_entities);
+  return array($value, $referenced_entities, $files);
 }
 
 /* VBO Functions */
@@ -242,4 +246,24 @@ function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
   // Otherwise generate a new one
   $guid = implode('_', array($entity_wrapper->getBundle(), $entity_id, $entity[$entity_id]->created));
   return $guid;
+}
+
+/**
+ *  Replace SIDs with GUIDs in embedded Scald drag and drop fields for export
+ */
+function _mukurtu_export_encode_scald_dnd($value) {
+  $sid_pattern = "/scald=(\d+):/";
+  preg_match_all($sid_pattern, $value, $matches);
+  
+  foreach($matches[1] as $sid) {
+      $atom_guid = _mukurtu_export_entity_get_guid('scald_atom', $sid);
+      if($atom_guid != "") {
+          $atom_guid_token = '[MUKURTU_ATOM_GUID:' . $atom_guid . ']';
+          $value = str_replace("scald=$sid:", "scald=$atom_guid_token:", $value);
+          $value = str_replace("<!--copyright=$sid", "<!--copyright=$atom_guid_token", $value);
+          $value = str_replace("<!--END copyright=$sid", "<!--END copyright=$atom_guid_token", $value);
+      }
+  }
+
+  return $value;
 }
