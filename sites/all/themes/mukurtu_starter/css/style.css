@@ -9773,10 +9773,6 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-digital-heritage {
   /* hiding the og ref field for digital heritage items */
 }
-.node-type-digital-heritage #edit-og-group-ref,
-.page-node-add-digital-heritage #edit-og-group-ref {
-  display: none;
-}
 .node-type-digital-heritage #edit-field-original-date .help-block,
 .page-node-add-digital-heritage #edit-field-original-date .help-block {
   clear: both;
@@ -9795,12 +9791,6 @@ table .checkbox input[type="checkbox"] {
 #dictionary-word-node-form #dewplayer-2,
 #dictionary-word-node-form #dewplayer-1 {
   height: 20px;
-}
-#dictionary-word-node-form #edit-og-group-ref {
-  display: none;
-}
-#collection-node-form #edit-og-group-ref {
-  display: none;
 }
 .node-dictionary-word.view-mode-full .scald-atom,
 .node-word-list.view-mode-full .scald-atom,
