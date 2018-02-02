@@ -300,6 +300,10 @@ function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_
     return array(0 => 'Select a community first');
   }
 
+  if (!$protocol_defaults) {
+    return;
+  }
+
   $protocol_defaults_with_titles = array();
   foreach ($protocol_defaults as $protocol_default) {
     $cp_wrapper = entity_metadata_wrapper('node', $protocol_default);
