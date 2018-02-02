@@ -287,7 +287,6 @@ function ma_core_form_alter(&$form, $form_state, $form_id) {
 
 }
 
-
 /**
  * Implementation of hook_block_info().
  */
@@ -295,11 +294,8 @@ function ma_core_block_info() {
   $blocks['create_content'] = array(
     'info' => t('Create Content'),
   );
-
-
   return $blocks;
 }
-
 
 /**
  * Implementation of hook_block_view().
@@ -316,51 +312,41 @@ function ma_core_block_view($delta = '') {
   return $block;
 }
 
+/**
+ * The Create Content block which appears on the Community, CP, Calendar Section, Discussion Section, and Document Section node views.
+ */
 function ma_core_create_content_block() {
 
+  $nid = arg(1);
+  if (is_numeric($nid)) {
+    $node = node_load($nid);
 
-    // links to manage the current group
+    switch ($node->type) {
+      case 'community':
+        $link_sources = [
+          'cultural_protocol_group' => '?og_group_ref=' . $nid,
+          'digital_heritage' => '/' . $nid,
+        ];
+        $perm_nid = $nid;
+        break;
+      case 'cultural_protocol_group':
+        $link_sources = [
+          'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
+        ];
+        $perm_nid = $nid;
+        break;
+      default:
+        return; // Safeguard. This should never happen.
+    }
+
+    // Output the links
     $links = "";
-
-    $nid = arg(1);  // load group nid from url
-
-    if (is_numeric($nid)) {
-
-      $node = node_load($nid);
-
-      $result = _render_subscribe_link($node);
-      $result[0]['#attributes']['class'] = 'btn';
-      $subcribe_link_content = render($result);
-
-      $links .= $subcribe_link_content;
-
-      // confirm permission to create DH items
-      if (og_user_access('node',$node->nid,'create digital_heritage content')) {
-        $link_url = 'node/add/digital-heritage';
-
-        if ($node->type == 'community') {
-          $link_url .= '/'.$node->nid;
-        } else if ($node->type == 'cultural_protocol_group') {
-          $link_url .= '/'.$node->og_group_ref['und'][0]['target_id'].'/'.$node->nid;
-        }
-
-        $links .= l('Create Digital Heritage Content >>', $link_url, array('attributes'=>array('class'=>array('btn'))));
-      }
-
-      // confirm permission to create protocols
-      if ($node->type == 'community' && og_user_access('node',$node->nid,'create cultural_protocol_group content')) {
-
-        $links .= l('Create Cultural Protocol >>', 'node/add/cultural-protocol-group', array('attributes'=>array('class'=>array('btn')), 'query' => array('og_group_ref' => $node->nid)));
+    foreach ($link_sources as $target_type => $link_query) {
+      if (og_user_access('node', $perm_nid, 'create ' . $target_type)) {
+        $links .= '<div class="view-content"><a href="' . '/node/add/' . $target_type . $link_query . '">Create ' . node_type_get_names()[$target_type] . '</a></div>';
       }
     }
 
-    $markup = $links;
-
-    $block = array(
-      '#markup' => $markup,
-    );
-    return $block;
-
-
-
+    return $links;
+  }
 }

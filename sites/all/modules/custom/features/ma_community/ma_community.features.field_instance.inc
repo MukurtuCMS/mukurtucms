@@ -71,7 +71,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -152,7 +152,7 @@ function ma_community_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 8,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -213,7 +213,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -335,7 +335,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -401,7 +401,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -472,7 +472,7 @@ function ma_community_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -533,7 +533,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -595,7 +595,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -656,7 +656,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -723,7 +723,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
