@@ -658,5 +658,54 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->value = 1;
   $export['node_submitted_oa_wiki_page'] = $strongarm;
 
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_calendar_pattern';
+  $strongarm->value = 'calendar/[node:title]';
+  $export['pathauto_node_calendar_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_discussion_space_pattern';
+  $strongarm->value = 'discussion-space/[node:title]';
+  $export['pathauto_node_discussion_space_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_document_library_pattern';
+  $strongarm->value = 'document-library/[node:title]';
+  $export['pathauto_node_document_library_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_oa_discussion_post_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_oa_discussion_post_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_oa_event_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_oa_event_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_oa_ical_importer_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_oa_ical_importer_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_oa_wiki_page_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_oa_wiki_page_pattern'] = $strongarm;
+
   return $export;
 }
