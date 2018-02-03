@@ -441,7 +441,9 @@ function _ma_cultural_protocol_get_node_types() {
     'required' => [
       'digital_heritage',
       'dictionary_word',
-      'oa_section',
+      'calendar',
+      'discussion_space',
+      'document_library',
       'oa_discussion_post',
       'oa_wiki_page',
       'oa_event'

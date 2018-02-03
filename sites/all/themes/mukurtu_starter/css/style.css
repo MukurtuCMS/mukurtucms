@@ -10116,6 +10116,9 @@ a:hover {
 .node-cultural-protocol-group .group-right .field ul {
   padding-top: 10px;
 }
+.node-type-oa-section .view-mode-full .group-right .panel-title {
+  font-size: 20px;
+}
 .field-name-protocol-dh-items,
 .field-name-community-dh-items {
   padding-top: 20px;

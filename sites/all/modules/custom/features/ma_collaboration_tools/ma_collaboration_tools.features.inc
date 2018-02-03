@@ -11,6 +11,9 @@ function ma_collaboration_tools_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "ds" && $api == "ds") {
     return array("version" => "1");
   }
+  if ($module == "field_group" && $api == "field_group") {
+    return array("version" => "1");
+  }
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => "1");
   }
@@ -49,11 +52,11 @@ function ma_collaboration_tools_flag_default_flags() {
     'access_author' => '',
     'show_contextual_link' => FALSE,
     'i18n' => 0,
-    'api_version' => 3,
     'module' => 'ma_collaboration_tools',
     'locked' => array(
       0 => 'name',
     ),
+    'api_version' => 3,
   );
   // Exported flag: "Archive".
   $flags['trash'] = array(
@@ -78,11 +81,11 @@ function ma_collaboration_tools_flag_default_flags() {
     'i18n' => 0,
     'flag_confirmation' => 'Are you sure you want to archive this item? You may be unable to access it after archiving.',
     'unflag_confirmation' => 'Are you sure you want to remove this item from archive?',
-    'api_version' => 3,
     'module' => 'ma_collaboration_tools',
     'locked' => array(
       0 => 'name',
     ),
+    'api_version' => 3,
   );
   return $flags;
 
@@ -93,6 +96,30 @@ function ma_collaboration_tools_flag_default_flags() {
  */
 function ma_collaboration_tools_node_info() {
   $items = array(
+    'calendar' => array(
+      'name' => t('Calendar'),
+      'base' => 'node_content',
+      'description' => t('A collaboration section to show within a Cultural Protocol.'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'discussion_space' => array(
+      'name' => t('Discussion Space'),
+      'base' => 'node_content',
+      'description' => t('A collaboration section to show within a Cultural Protocol.'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
+    'document_library' => array(
+      'name' => t('Document Library'),
+      'base' => 'node_content',
+      'description' => t('A collaboration section to show within a Cultural Protocol.'),
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'oa_discussion_post' => array(
       'name' => t('Discussion Post'),
       'base' => 'node_content',
@@ -113,14 +140,6 @@ function ma_collaboration_tools_node_info() {
       'name' => t('iCal Importer'),
       'base' => 'node_content',
       'description' => t('A feeds node to import event from an iCal feed.'),
-      'has_title' => '1',
-      'title_label' => t('Title'),
-      'help' => '',
-    ),
-    'oa_section' => array(
-      'name' => t('Collaboration Section'),
-      'base' => 'node_content',
-      'description' => t('A collaboration section to show within a Cultural Protocol.'),
       'has_title' => '1',
       'title_label' => t('Title'),
       'help' => '',
