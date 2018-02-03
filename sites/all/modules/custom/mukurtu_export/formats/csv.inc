@@ -157,7 +157,9 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
   return mukurtu_export_csv_export_to_zip($encoded_export);
 }
 
-
+/**
+ * Packages a CSV array into a Zip archive containing exported CSV files and media
+ */
 function mukurtu_export_csv_export_to_zip($encoded_export) {
   $csv_files = array();
 
@@ -223,6 +225,9 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
   return _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter);
 }
 
+/**
+ * Converts the encoded entity array into an array that resembles CSV format
+ */
 function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter) {
   $csv_lines = array();
   $csv_output = array();
@@ -243,7 +248,6 @@ function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $del
 
       foreach (array_keys($encoded_content[$encoded_entity_type][$encoded_bundle_name]) as $header_value) {
         foreach (array_keys($encoded_list[$encoded_entity_type][$encoded_bundle_name]) as $encoded_entity_key) {
-        //foreach (array_keys($encoded_content[$encoded_entity_type][$encoded_bundle_name][$header_value]) as $encoded_entity_key) {
           $field_value = isset($encoded_content[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_entity_key]) ? $encoded_content[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_entity_key] : NULL;
           $csv_lines[$encoded_entity_type][$encoded_bundle_name][$encoded_entity_key][$header_value] = $field_value;
         }

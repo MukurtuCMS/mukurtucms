@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Form for export
+ */
 function mukurtu_export_form($form, &$form_state) {
   $export_ids = isset($form_state['mukurtu_export']['export_ids']) ? $form_state['mukurtu_export']['export_ids'] : NULL;
   $formatter = isset($form_state['mukurtu_export']['formatter']) ? $form_state['mukurtu_export']['formatter'] : NULL;
@@ -85,13 +88,10 @@ function mukurtu_export_get_file($file) {
 }
 
 
-
+/**
+ * Form submit for export
+ */
 function mukurtu_export_form_submit($form, &$form_state) {
-  //$export_ids = NULL;
-  //$code_string = NULL;
-  //$field_list = isset($form_state['values']['export_fields']) ? $form_state['values']['export_fields'] : 1;
-  //$_SESSION['mukurtu_export']['field_list'] = $field_list;
-
   // Content to export
   $form_state["rebuild"] = TRUE;
   if(isset($form_state['values']['export_ids'])) {
@@ -116,9 +116,12 @@ function mukurtu_export_form_submit($form, &$form_state) {
     $form_state['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
     $_SESSION['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
   }
-  //return drupal_get_form('mukurtu_export_form', $export_ids, $code_string, 'csv', $field_list);
+  
 }
 
+/**
+ * Form for selecting export format
+ */
 function mukurtu_export_format_selection_form($form, &$form_state, $format_handlers, $default_format = 'csv') {
   $formatter_options = array();
   foreach($format_handlers as $format => $format_info) {
@@ -142,10 +145,16 @@ function mukurtu_export_format_selection_form($form, &$form_state, $format_handl
   return $form;
 }
 
+/**
+ * Form submit for export format
+ */
 function mukurtu_export_format_selection_form_submit($form, &$form_state) {
   $_SESSION['mukurtu_export']['format'] = $form_state['values']['export_format'];
 }
 
+/**
+ * Form for selecting which fields to export
+ */
 function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
   $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
 
@@ -166,7 +175,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
   foreach(array_keys(entity_get_info()) as $entity_type) {
 
     // Currently only show node/scald_atom fields
-    if($entity_type != 'node' && $entity_type != 'scald_atom'){
+    if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom'))) {
       continue;
     }
 

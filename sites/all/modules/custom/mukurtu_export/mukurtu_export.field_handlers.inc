@@ -1,6 +1,8 @@
 <?php
 
-// Stock Mukurtu Export Field Handlers
+/**
+ *  Define stock Mukurtu Export field handlers
+ */
 function mukurtu_export_mukurtu_export_field_handlers() {
     return array(
         'image' => array(
@@ -28,6 +30,11 @@ function mukurtu_export_mukurtu_export_field_handlers() {
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
             '#callback' => 'mukurtu_export_field_handler_entity_reference'
         ),
+        'paragraphs' => array(
+            '#module' => 'mukurtu_export',
+            '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
+            '#callback' => 'mukurtu_export_field_handler_paragraphs'
+        ),
         'partial_date_range' => array(
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
@@ -41,7 +48,9 @@ function mukurtu_export_mukurtu_export_field_handlers() {
     );
 }
 
-// Handle Taxonomy Term References
+/**
+ * Handle Taxonomy Term References
+ */
 function mukurtu_export_field_handler_taxonomy_term_reference($value, $field_info, $options = array()) {
     $referenced_entities = array();
     $files = array();
@@ -62,7 +71,9 @@ function mukurtu_export_field_handler_taxonomy_term_reference($value, $field_inf
     return array(NULL, $referenced_entities, $files);
 }
 
-// Handle Images files (not Scald Atoms)
+/**
+ * Handle Images files (not Scald Atoms)
+ */
 function mukurtu_export_field_handler_image($value, $field_info, $options = array()) {
     $referenced_entities = array();
     $binary_files = array();
@@ -73,7 +84,9 @@ function mukurtu_export_field_handler_image($value, $field_info, $options = arra
     return array($return_value, $referenced_entities, $saved_file);
 }
 
-// Handle entityreference fields
+/**
+ * Handle entityreference fields
+ */
 function mukurtu_export_field_handler_entity_reference($value, $field_info, $options = array()) {
     $referenced_entities = array();
     $files = array();
@@ -92,6 +105,9 @@ function mukurtu_export_field_handler_entity_reference($value, $field_info, $opt
     return array(NULL, $referenced_entities, $files);
 }
 
+/**
+ * Handle node reference fields
+ */
 function mukurtu_export_field_handler_node_reference($value, $field_info, $options = array()) {
     $referenced_entities = array();
     $files = array();
@@ -107,6 +123,9 @@ function mukurtu_export_field_handler_node_reference($value, $field_info, $optio
     return array(NULL, $referenced_entities, $files);
 }
 
+/**
+ * Handle Scald atom reference fields
+ */
 function mukurtu_export_field_handler_atom_reference($value, $field_info, $options = array()) {
     $referenced_entities = array();
     $files = array();
@@ -124,6 +143,24 @@ function mukurtu_export_field_handler_atom_reference($value, $field_info, $optio
     return array(NULL, $referenced_entities, $files);
 }
 
+/**
+ * Handle paragraph fields
+ */
+function mukurtu_export_field_handler_paragraphs($value, $field_info, $options = array()) {
+    $referenced_entities = array();
+    $files = array();
+
+    if(isset($value['value'])) {
+        $referenced_entities['paragraphs_item'][$value['value']] = $value['value'];
+        return array($value['value'], $referenced_entities, $files);
+    }
+    
+    return array(NULL, $referenced_entities, $files);
+}
+
+/**
+ * Handle partial date fields
+ */
 function mukurtu_export_field_handler_partial_date_range($value, $field_info, $options = array()) {
     $referenced_entities = array();
     $files = array();
@@ -141,6 +178,10 @@ function mukurtu_export_field_handler_scald_thumbnail($value, $field_info, $opti
     return array(NULL, $referenced_entities, $files);
 }
 
+
+/**
+ * Helper function to mark files to be saved during export
+ */
 function _mukurtu_export_save_file($file) {
     $uri_scheme = file_uri_scheme($file['uri']);
     $localname = implode(DIRECTORY_SEPARATOR, array('files', $uri_scheme, $file['type'], $file['fid'], $file['filename']));
