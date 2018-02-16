@@ -11,9 +11,7 @@ include_once('ma_digitalheritage.features.inc');
  */
 function ma_digitalheritage_node_presave($node) {
   if ($node->type == 'digital_heritage') {
-
-    $dh_emw = entity_metadata_wrapper('node', $node);
-
+    
     // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
     if (isset ($_SESSION['community_record_parent']) && isset($_SESSION['community_record_parent_requesting_path'])) {
         // Check and see if the previous page we were on matches the requesting page.  We don't want to set the parent on the wrong
