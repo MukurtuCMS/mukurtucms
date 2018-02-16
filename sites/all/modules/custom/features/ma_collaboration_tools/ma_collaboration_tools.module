@@ -5,3 +5,108 @@
  */
 
 include_once 'ma_collaboration_tools.features.inc';
+
+/**
+ * Implements hook_page_alter().
+ *
+ * When viewing a CP, if there are section pages for the CP that the user has view rights to, then show them as tabs, with the CP itself in the first tab.
+ */
+function ma_collaboration_tools_page_alter(&$data) {
+
+  if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
+
+    $array_keys = array_keys($data['content']['system_main']['nodes']);
+    $cp_node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
+    if ($cp_node && $cp_node->type == 'cultural_protocol_group') {
+      $nids = element_children($data['content']['system_main']['nodes']);
+      $nid = $nids[0];
+
+      // Get all section pages referencing that are in this CP.
+      $query = new EntityFieldQuery();
+      $result = $query
+        ->entityCondition('entity_type', 'node')
+        ->entityCondition('bundle', ma_collaboration_tools_cp_section_node_types(), 'IN')
+        ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
+        ->fieldCondition('og_group_ref', 'target_id', $nid)
+        ->execute();
+
+      if (count($result['node'])) {
+        $tabs = [];
+        $section_nodes = node_load_multiple(array_keys($result['node']));
+        foreach ($section_nodes as $section_node) {
+          if (node_access('view', $section_node)) { // Ensure user has view perms to this section page.
+            $tabs[] = [
+              'type' => 'node',
+              'nid' => $section_node->nid,
+              'view_mode' => 'full',
+              'title' => $section_node->title,
+              'hide_title' => 0,
+            ];
+          }
+        }
+        if (count($tabs)) {
+
+          // Main CP tab
+          $contents = '';
+
+          // Add the CP local tasks within the tab content.
+          // This is like what is being done in ma_digitalheritage_preprocess_node & ma_digitalheritage_community_record_local_tasks but with a lot less code.
+          $local_tasks = menu_local_tasks()['tabs']['output'];
+          if (count($local_tasks) > 1) {
+            $local_tasks['#prefix'] = '<ul class="tabs--primary nav nav-tabs">';
+            $local_tasks['#suffix'] = '</ul>';
+            $contents .= drupal_render($local_tasks);
+            // Set a flag to remove the CP local tasks from above the tabs, processed in ma_collaboration_tools_preprocess_page.
+            $data['hide_node_local_tasks'] = 1;
+          }
+
+          // Add the CP node content to the first tab contents, and then build the first tab.
+          $node_view = node_view($cp_node, 'full');
+          $contents .= drupal_render($node_view);
+          $tabs[] = [
+            'contents' => $contents,
+            'title' => 'Protocol',
+            'hide_title' => 1,
+            'weight' => -1,
+          ];
+
+          // Build the tabs object and render it as the output.
+          $tab_settings = [
+            'ajax' => 0,
+            'default_tab' => 0,
+            'title' => 'CP Tabs',
+            'renderer' => 'quicktabs',
+            'style' => 'Excel',
+            'hide_empty_tabs' => 1,
+          ];
+          $built_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $tabs);
+          $data['content']['system_main']['#markup'] = drupal_render($built_tabs);
+
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper function returns CP section node types
+ */
+function ma_collaboration_tools_cp_section_node_types() {
+  return [
+    'calendar',
+    'discussion_space',
+    'document_library',
+  ];
+}
+
+/**
+ * Implements hook_preprocess_page.
+ */
+function ma_collaboration_tools_preprocess_page(&$variables) {
+  if(isset($variables['node']) && $variables['node']->type == 'cultural_protocol_group') {
+    // If the local tasks are being displayed separately within the CP tab, then hide the default local tasks which appear above the tabs.
+    if (isset($variables['page']['hide_node_local_tasks'])) {
+      unset($variables['tabs']);
+    }
+  }
+}
