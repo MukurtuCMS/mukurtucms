@@ -1042,12 +1042,6 @@ function ma_digitalheritage_page_alter(&$data) {
         $dh_page_content .= drupal_render($community_record_tabs);
       }
 
-      // Node does not have community records. Render DH normally.
-      else {
-        $node_array = node_view($node, 'full');
-        $dh_page_content .= drupal_render($node_array);
-      }
-
       // Rewrite the output for DH nodes with our built DH page content
       $data['content']['system_main']['#markup'] = $dh_page_content;
     }
