@@ -72,7 +72,7 @@ function ma_collaboration_tools_page_alter(&$data) {
 
           // Build the tabs object and render it as the output.
           $tab_settings = [
-            'ajax' => 0,
+            'ajax' => 1,
             'default_tab' => 0,
             'title' => 'CP Tabs',
             'renderer' => 'quicktabs',
