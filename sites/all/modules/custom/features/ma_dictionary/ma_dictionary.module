@@ -448,25 +448,27 @@ function ma_dictionary_node_access($node, $op, $account) {
     // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
     // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
     if($type == 'dictionary_word') {
-        $groups = og_get_groups_by_user(NULL, 'node');
-        foreach($groups as $group) {
-            $og_node = node_load($group);
-            if($og_node->type == 'language_community') {
-                if($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
-                    if(!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
-                        return NODE_ACCESS_ALLOW;
-                    }
-                }
-
-                if($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
-                    return NODE_ACCESS_ALLOW;
-                }
-
-                if($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
-                    return NODE_ACCESS_ALLOW;
-                }
+      $groups = og_get_groups_by_user(NULL, 'node');
+      if (count($groups)) {
+        foreach ($groups as $group) {
+          $og_node = node_load($group);
+          if ($og_node->type == 'language_community') {
+            if ($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
+              if (!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
+                return NODE_ACCESS_ALLOW;
+              }
             }
+
+            if ($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
+              return NODE_ACCESS_ALLOW;
+            }
+
+            if ($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
+              return NODE_ACCESS_ALLOW;
+            }
+          }
         }
+      }
     }
 
     return NODE_ACCESS_IGNORE;

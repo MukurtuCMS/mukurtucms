@@ -375,39 +375,43 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
  */
 function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
   $groups_for_user = og_get_groups_by_user(null, 'node');
-  $allowed_groups_for_user[] = array();
-  foreach ($groups_for_user as $group_for_user) {
-    $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
-    if (array_intersect(array('contributor', 'protocol steward'), $roles_for_user_in_group)) {
-      $allowed_groups_for_user[] = $group_for_user;
-    }
-  }
-
-  // EFQ to get sub protocols for a community (or all if no community specified)
-  $query = new EntityFieldQuery();
-
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'cultural_protocol_group')
-    ->propertyCondition('status', NODE_PUBLISHED);
-  if ($community_nid) {
-    $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
-  }
-
-  $result = $query->execute();
-
-  if (isset($result['node'])) {
-    $protocol_items_nids = array_keys($result['node']);
-    $protocol_items = entity_load('node', $protocol_items_nids);
-
-    $cps = array();
-    foreach ($protocol_items as $protocol_item) {
-      if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
-        $cps[$protocol_item->nid] = $protocol_item->title;
+  if (count($groups_for_user)) {
+    $allowed_groups_for_user[] = [];
+    foreach ($groups_for_user as $group_for_user) {
+      $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
+      if (array_intersect([
+        'contributor',
+        'protocol steward'
+      ], $roles_for_user_in_group)) {
+        $allowed_groups_for_user[] = $group_for_user;
       }
     }
-    return $cps;
-  }
 
+    // EFQ to get sub protocols for a community (or all if no community specified)
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'cultural_protocol_group')
+      ->propertyCondition('status', NODE_PUBLISHED);
+    if ($community_nid) {
+      $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
+    }
+
+    $result = $query->execute();
+
+    if (isset($result['node'])) {
+      $protocol_items_nids = array_keys($result['node']);
+      $protocol_items = entity_load('node', $protocol_items_nids);
+
+      $cps = [];
+      foreach ($protocol_items as $protocol_item) {
+        if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
+          $cps[$protocol_item->nid] = $protocol_item->title;
+        }
+      }
+      return $cps;
+    }
+  }
 }
 
 /**
