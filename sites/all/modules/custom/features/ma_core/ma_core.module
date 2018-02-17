@@ -333,6 +333,11 @@ function ma_core_create_content_block() {
         $link_sources = [
           'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
         ];
+        if (module_exists('ma_collaboration_tools')) {
+          $link_sources['calendar'] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid;
+          $link_sources['discussion_space'] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid;
+          $link_sources['document_library'] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid;
+        }
         $perm_nid = $nid;
         break;
       default:
