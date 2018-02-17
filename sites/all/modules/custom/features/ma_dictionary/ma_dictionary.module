@@ -6,6 +6,15 @@
 
 include_once 'ma_dictionary.features.inc';
 
+/**
+ * Implements hook_post_features_rebuild().
+ */
+function ma_dictionary_post_features_rebuild($component) {
+    // Clear warnings on dictionary rebuild. Not the best way of doing this,
+    // but people were getting very confused about the define permission warnings.
+    $install_warnings = drupal_get_messages('warning', TRUE);
+}
+
 function ma_dictionary_menu() {
 
     // Form to set default language
