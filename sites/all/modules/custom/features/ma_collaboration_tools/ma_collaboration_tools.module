@@ -30,7 +30,7 @@ function ma_collaboration_tools_page_alter(&$data) {
         ->fieldCondition('og_group_ref', 'target_id', $nid)
         ->execute();
 
-      if (count($result['node'])) {
+      if (isset($result['node']) && count($result['node'])) {
         $tabs = [];
         $section_nodes = node_load_multiple(array_keys($result['node']));
         foreach ($section_nodes as $section_node) {
@@ -109,4 +109,27 @@ function ma_collaboration_tools_preprocess_page(&$variables) {
       unset($variables['tabs']);
     }
   }
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function ma_collaboration_tools_node_view($node, $view_mode) {
+
+  // Update the item privacy text on the Collab section pages node view, to make more sense in this context and to hide it if there is only one protocol.
+  if ($view_mode == 'full' && in_array($node->type, ma_collaboration_tools_cp_section_node_types())) {
+    if (count($node->content['og_group_ref'][0]['#items']) < 2) {
+      unset($node->content['field_item_privacy_setting'][0]['#markup']);
+    }
+    else{
+      if ($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == 'any') {
+        $text = 'Item is shared with members that belong to ANY of the above Protocols.';
+      }
+      else {
+        $text = 'Item is shared with members that belong to ALL the above Protocols.';
+      }
+      $node->content['field_item_privacy_setting'][0]['#markup'] = $text;
+    }
+  }
+
 }
