@@ -207,7 +207,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -523,7 +523,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -839,7 +839,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',

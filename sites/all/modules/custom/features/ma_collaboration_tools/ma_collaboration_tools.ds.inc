@@ -17,6 +17,16 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'calendar';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'add_content_to_collab_sect_link' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'edit_collab_section_link' => array(
+      'weight' => '5',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -37,6 +47,16 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'discussion_space';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'add_content_to_collab_sect_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'edit_collab_section_link' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -57,6 +77,16 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'document_library';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'add_content_to_collab_sect_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'edit_collab_section_link' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -69,6 +99,55 @@ function ma_collaboration_tools_ds_field_settings_info() {
     ),
   );
   $export['node|document_library|full'] = $ds_fieldsetting;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_collaboration_tools_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'add_content_to_collab_sect_link';
+  $ds_field->label = 'Add Content to Collab Section Link';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+return ma_collaboration_tools_add_content_to_section_link($entity);
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['add_content_to_collab_sect_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'edit_collab_section_link';
+  $ds_field->label = 'Edit Collab Section Link';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+return ma_collaboration_tools_edit_collab_section_link($entity);
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['edit_collab_section_link'] = $ds_field;
 
   return $export;
 }
@@ -189,9 +268,12 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       ),
       'right' => array(
         3 => 'field_community_ref',
-        4 => 'og_group_ref',
-        5 => 'field_item_privacy_setting',
-        6 => 'group_access',
+        4 => 'group_collab_actions',
+        5 => 'og_group_ref',
+        6 => 'add_content_to_collab_sect_link',
+        7 => 'field_item_privacy_setting',
+        8 => 'edit_collab_section_link',
+        9 => 'group_access',
       ),
     ),
     'fields' => array(
@@ -199,8 +281,11 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'body' => 'left',
       'comments' => 'left',
       'field_community_ref' => 'right',
+      'group_collab_actions' => 'right',
       'og_group_ref' => 'right',
+      'add_content_to_collab_sect_link' => 'right',
       'field_item_privacy_setting' => 'right',
+      'edit_collab_section_link' => 'right',
       'group_access' => 'right',
     ),
     'classes' => array(
@@ -326,24 +411,30 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'left' => array(
         0 => 'title',
-        1 => 'body',
-        2 => 'comments',
+        3 => 'body',
+        4 => 'comments',
       ),
       'right' => array(
-        3 => 'field_community_ref',
-        4 => 'og_group_ref',
-        5 => 'field_item_privacy_setting',
-        6 => 'group_access',
+        1 => 'add_content_to_collab_sect_link',
+        2 => 'edit_collab_section_link',
+        5 => 'group_collab_actions',
+        6 => 'field_community_ref',
+        7 => 'group_access',
+        8 => 'og_group_ref',
+        9 => 'field_item_privacy_setting',
       ),
     ),
     'fields' => array(
       'title' => 'left',
+      'add_content_to_collab_sect_link' => 'right',
+      'edit_collab_section_link' => 'right',
       'body' => 'left',
       'comments' => 'left',
+      'group_collab_actions' => 'right',
       'field_community_ref' => 'right',
+      'group_access' => 'right',
       'og_group_ref' => 'right',
       'field_item_privacy_setting' => 'right',
-      'group_access' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -468,24 +559,30 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'left' => array(
         0 => 'title',
-        1 => 'body',
-        2 => 'comments',
+        3 => 'body',
+        4 => 'comments',
       ),
       'right' => array(
-        3 => 'field_community_ref',
-        4 => 'og_group_ref',
-        5 => 'field_item_privacy_setting',
-        6 => 'group_access',
+        1 => 'add_content_to_collab_sect_link',
+        2 => 'edit_collab_section_link',
+        5 => 'group_collab_actions',
+        6 => 'field_community_ref',
+        7 => 'group_access',
+        8 => 'og_group_ref',
+        9 => 'field_item_privacy_setting',
       ),
     ),
     'fields' => array(
       'title' => 'left',
+      'add_content_to_collab_sect_link' => 'right',
+      'edit_collab_section_link' => 'right',
       'body' => 'left',
       'comments' => 'left',
+      'group_collab_actions' => 'right',
       'field_community_ref' => 'right',
+      'group_access' => 'right',
       'og_group_ref' => 'right',
       'field_item_privacy_setting' => 'right',
-      'group_access' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(

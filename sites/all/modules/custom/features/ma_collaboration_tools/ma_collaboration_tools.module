@@ -133,3 +133,38 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
   }
 
 }
+
+/**
+ * DS custom field.
+ *
+ * Add content to collab section link.
+ */
+function ma_collaboration_tools_add_content_to_section_link($entity) {
+  $map = [
+    'calendar' => 'oa_event',
+    'discussion_space' => 'oa_discussion_post',
+    'document_library' => 'oa_wiki_page'
+  ];
+  $target_type = $map[$entity->type];
+  $node_disp_name = node_type_get_names()[$target_type];
+  $pronoun = 'a';
+  if (in_array(strtolower($node_disp_name{0}), ['a','e','i','o','u'])) {
+    $pronoun = 'an';
+  }
+  $target_type_path = str_replace('_', '-', $target_type);
+  if (og_user_access_entity('create ' . $target_type . ' content', 'node', $entity)) {
+    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $target_type_path . '/' . $entity->nid);
+  }
+}
+
+/**
+ * DS custom field.
+ *
+ * Edit collab section link.
+ */
+function ma_collaboration_tools_edit_collab_section_link($entity) {
+  if (node_access('update', $entity)) {
+    $node_disp_name = node_type_get_names()[$entity->type];
+    return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit');
+  }
+}
