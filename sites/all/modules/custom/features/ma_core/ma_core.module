@@ -327,18 +327,16 @@ function ma_core_create_content_block() {
           'cultural_protocol_group' => '?og_group_ref=' . $nid,
           'digital_heritage' => '/' . $nid,
         ];
-        $perm_nid = $nid;
         break;
       case 'cultural_protocol_group':
         $link_sources = [
           'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
         ];
         if (module_exists('ma_collaboration_tools')) {
-          $link_sources['calendar'] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid;
-          $link_sources['discussion_space'] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid;
-          $link_sources['document_library'] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid;
+          foreach (ma_collaboration_tools_cp_section_node_types() as $collab_section_type) {
+            $link_sources[$collab_section_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid;
+          }
         }
-        $perm_nid = $nid;
         break;
       default:
         return; // Safeguard. This should never happen.
@@ -348,7 +346,7 @@ function ma_core_create_content_block() {
     $links = "";
     foreach ($link_sources as $target_type => $link_query) {
       $target_type_link = str_replace('_', '-', $target_type);
-      if (og_user_access('node', $perm_nid, 'create ' . $target_type)) {
+      if (og_user_access('node', $nid, 'create ' . $target_type . ' content')) {
         $links .= '<div class="view-content"><a href="' . '/node/add/' . $target_type_link . $link_query . '">Create ' . node_type_get_names()[$target_type] . '</a></div>';
       }
     }
