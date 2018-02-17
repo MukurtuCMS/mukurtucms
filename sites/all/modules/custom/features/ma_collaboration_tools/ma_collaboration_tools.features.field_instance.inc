@@ -1354,7 +1354,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -1397,7 +1397,57 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 15,
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_event-field_event_calendar_section'.
+  $field_instances['node-oa_event-field_event_calendar_section'] = array(
+    'bundle' => 'oa_event',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_event_calendar_section',
+    'label' => 'Calendar Section',
+    'required' => 1,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 0,
     ),
   );
 
@@ -1430,7 +1480,7 @@ function ma_collaboration_tools_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_item_privacy_setting',
     'label' => 'Item Sharing Settings',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
@@ -1441,7 +1491,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 3,
+      'weight' => 11,
     ),
   );
 
@@ -1503,7 +1553,7 @@ http://www.whitehouse.gov/',
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 4,
+      'weight' => 3,
     ),
   );
 
@@ -1579,7 +1629,7 @@ http://www.whitehouse.gov/',
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 9,
+      'weight' => 6,
     ),
   );
 
@@ -1651,7 +1701,7 @@ http://www.whitehouse.gov/',
         ),
       ),
       'type' => 'geofield_wkt',
-      'weight' => 10,
+      'weight' => 7,
     ),
   );
 
@@ -1743,75 +1793,7 @@ http://www.whitehouse.gov/',
         'progress_indicator' => 'throbber',
       ),
       'type' => 'media_generic',
-      'weight' => 6,
-    ),
-  );
-
-  // Exported field_instance: 'node-oa_event-oa_section_ref'.
-  $field_instances['node-oa_event-oa_section_ref'] = array(
-    'bundle' => 'oa_event',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 6,
-      ),
-      'featured' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'ical' => array(
-        'label' => 'hidden',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 12,
-      ),
-      'notifications' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'oa_section_ref',
-    'label' => 'Section',
-    'options_limit' => 1,
-    'options_limit_empty_behaviour' => 1,
-    'options_limit_fields' => array(
-      'body' => 0,
-      'oa_section_ref' => 0,
-      'og_group_ref' => 'og_group_ref',
-    ),
-    'options_optomize_entityreferences' => 1,
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'apply_chosen' => 0,
-      ),
-      'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 4,
     ),
   );
 
@@ -1865,9 +1847,19 @@ http://www.whitehouse.gov/',
     'options_limit_fields' => array(
       'body' => 0,
     ),
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'behaviors' => array(
+        'og_widget' => array(
+          'access_override' => 0,
+          'admin' => array(
+            'widget_type' => 'entityreference_autocomplete',
+          ),
+          'default' => array(
+            'widget_type' => 'options_select',
+          ),
+          'status' => TRUE,
+        ),
         'prepopulate' => array(
           'status' => 0,
         ),
@@ -1893,7 +1885,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 2,
+      'weight' => 10,
     ),
   );
 
@@ -2539,6 +2531,7 @@ http://www.whitehouse.gov/',
   // Included for use with string extractors like potx.
   t('Attachments');
   t('Body');
+  t('Calendar Section');
   t('Community');
   t('Describe the Event');
   t('Description');

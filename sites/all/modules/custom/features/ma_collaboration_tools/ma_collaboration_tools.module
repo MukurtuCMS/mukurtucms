@@ -72,7 +72,7 @@ function ma_collaboration_tools_page_alter(&$data) {
 
           // Build the tabs object and render it as the output.
           $tab_settings = [
-            'ajax' => 1,
+            'ajax' => 0,
             'default_tab' => 0,
             'title' => 'CP Tabs',
             'renderer' => 'quicktabs',
@@ -135,17 +135,23 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
 }
 
 /**
+ * Get a map of the section page type to its content page type.
+ */
+function ma_collaboration_tools_section_type_to_page_type_map() {
+  return [
+    'calendar' => 'oa_event',
+    'discussion_space' => 'oa_discussion_post',
+    'document_library' => 'oa_wiki_page'
+  ];
+}
+
+/**
  * DS custom field.
  *
  * Add content to collab section link.
  */
 function ma_collaboration_tools_add_content_to_section_link($entity) {
-  $map = [
-    'calendar' => 'oa_event',
-    'discussion_space' => 'oa_discussion_post',
-    'document_library' => 'oa_wiki_page'
-  ];
-  $target_type = $map[$entity->type];
+  $target_type = ma_collaboration_tools_section_type_to_page_type_map()[$entity->type];
   $node_disp_name = node_type_get_names()[$target_type];
   $pronoun = 'a';
   if (in_array(strtolower($node_disp_name{0}), ['a','e','i','o','u'])) {
@@ -166,5 +172,22 @@ function ma_collaboration_tools_edit_collab_section_link($entity) {
   if (node_access('update', $entity)) {
     $node_disp_name = node_type_get_names()[$entity->type];
     return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit');
+  }
+}
+
+/**
+ * Get current section page NID, whether on the page directly or on a tab of the page.
+ */
+function ma_collaboration_tools_get_current_section_page_nid() {
+  $current_nid = arg(1);
+  if (is_numeric($current_nid)) {
+    $map = ma_collaboration_tools_section_type_to_page_type_map();
+    $current_node = node_load ($current_nid);
+    if (array_key_exists($current_node->type, $map)) { // Viewing the content page directly.
+      return ($current_nid);
+    }
+    elseif (in_array($current_node->type, $map)) { // Viewing the content page within a tab on a section page.
+      // TODO fix this -- need current tab context.
+    }
   }
 }

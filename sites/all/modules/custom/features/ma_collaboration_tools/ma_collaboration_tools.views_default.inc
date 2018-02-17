@@ -1142,14 +1142,11 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['style_options']['advanced'] = TRUE;
   $handler->display->display_options['style_options']['timeformatMonth'] = 'h(:mm)t';
   $handler->display->display_options['style_options']['theme'] = FALSE;
-  /* Relationship: Flags: trash */
-  $handler->display->display_options['relationships']['flag_content_rel']['id'] = 'flag_content_rel';
-  $handler->display->display_options['relationships']['flag_content_rel']['table'] = 'node';
-  $handler->display->display_options['relationships']['flag_content_rel']['field'] = 'flag_content_rel';
-  $handler->display->display_options['relationships']['flag_content_rel']['label'] = 'archived';
-  $handler->display->display_options['relationships']['flag_content_rel']['required'] = 0;
-  $handler->display->display_options['relationships']['flag_content_rel']['flag'] = 'trash';
-  $handler->display->display_options['relationships']['flag_content_rel']['user_scope'] = 'any';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_event_calendar_section_target_id']['id'] = 'field_event_calendar_section_target_id';
+  $handler->display->display_options['relationships']['field_event_calendar_section_target_id']['table'] = 'field_data_field_event_calendar_section';
+  $handler->display->display_options['relationships']['field_event_calendar_section_target_id']['field'] = 'field_event_calendar_section_target_id';
+  $handler->display->display_options['relationships']['field_event_calendar_section_target_id']['required'] = TRUE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -1184,8 +1181,10 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['nid']['id'] = 'nid';
   $handler->display->display_options['arguments']['nid']['table'] = 'node';
   $handler->display->display_options['arguments']['nid']['field'] = 'nid';
-  $handler->display->display_options['arguments']['nid']['exception']['value'] = ' ';
-  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'field_event_calendar_section_target_id';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'php';
+  $handler->display->display_options['arguments']['nid']['default_argument_options']['code'] = 'return ma_collaboration_tools_get_current_section_page_nid();';
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
@@ -1203,126 +1202,6 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'oa_event' => 'oa_event',
   );
-  /* Filter criterion: Field: Protocol (og_group_ref) */
-  $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator_id'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['label'] = 'Space';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['identifier'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Content: Section (oa_section_ref) */
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator_id'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['label'] = 'Section';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['identifier'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Flags: Flagged */
-  $handler->display->display_options['filters']['flagged']['id'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['table'] = 'flagging';
-  $handler->display->display_options['filters']['flagged']['field'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['relationship'] = 'flag_content_rel';
-  $handler->display->display_options['filters']['flagged']['value'] = '0';
-  $handler->display->display_options['filters']['flagged']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['flagged']['expose']['operator_id'] = '';
-  $handler->display->display_options['filters']['flagged']['expose']['label'] = 'Include archived content';
-  $handler->display->display_options['filters']['flagged']['expose']['operator'] = 'flagged_op';
-  $handler->display->display_options['filters']['flagged']['expose']['identifier'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-
-  /* Display: Calendar */
-  $handler = $view->new_display('panel_pane', 'Calendar', 'oa_calendar_month');
-  $handler->display->display_options['pane_category']['name'] = 'Open Atrium Events';
-  $handler->display->display_options['pane_category']['weight'] = '0';
-  $handler->display->display_options['allow']['use_pager'] = 0;
-  $handler->display->display_options['allow']['items_per_page'] = 0;
-  $handler->display->display_options['allow']['offset'] = 0;
-  $handler->display->display_options['allow']['link_to_view'] = 0;
-  $handler->display->display_options['allow']['more_link'] = 0;
-  $handler->display->display_options['allow']['path_override'] = 0;
-  $handler->display->display_options['allow']['title_override'] = 0;
-  $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['inherit_panels_path'] = '1';
-
-  /* Display: Daily Calendar */
-  $handler = $view->new_display('panel_pane', 'Daily Calendar', 'oa_calendar_day');
-  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
-  $handler->display->display_options['style_plugin'] = 'fullcalendar';
-  $handler->display->display_options['style_options']['defaultView'] = 'agendaDay';
-  $handler->display->display_options['style_options']['left'] = '';
-  $handler->display->display_options['style_options']['center'] = '';
-  $handler->display->display_options['style_options']['right'] = 'today prev,next';
-  $handler->display->display_options['style_options']['advanced'] = TRUE;
-  $handler->display->display_options['style_options']['timeformatMonth'] = 'h(:mm)t';
-  $handler->display->display_options['style_options']['columnformatDay'] = 'dddd, MMM d, yyyy';
-  $handler->display->display_options['style_options']['theme'] = FALSE;
-  $handler->display->display_options['style_options']['contentHeight'] = 480;
-  $handler->display->display_options['defaults']['style_options'] = FALSE;
-  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
-  $handler->display->display_options['defaults']['row_options'] = FALSE;
-  $handler->display->display_options['pane_category']['name'] = 'Open Atrium Events';
-  $handler->display->display_options['pane_category']['weight'] = '0';
-  $handler->display->display_options['allow']['use_pager'] = 0;
-  $handler->display->display_options['allow']['items_per_page'] = 0;
-  $handler->display->display_options['allow']['offset'] = 0;
-  $handler->display->display_options['allow']['link_to_view'] = 0;
-  $handler->display->display_options['allow']['more_link'] = 0;
-  $handler->display->display_options['allow']['path_override'] = 0;
-  $handler->display->display_options['allow']['title_override'] = 0;
-  $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['inherit_panels_path'] = '1';
-
-  /* Display: Weekly Calendar */
-  $handler = $view->new_display('panel_pane', 'Weekly Calendar', 'oa_calendar_week');
-  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
-  $handler->display->display_options['style_plugin'] = 'fullcalendar';
-  $handler->display->display_options['style_options']['defaultView'] = 'basicWeek';
-  $handler->display->display_options['style_options']['left'] = 'title';
-  $handler->display->display_options['style_options']['center'] = '';
-  $handler->display->display_options['style_options']['right'] = 'today prev,next';
-  $handler->display->display_options['style_options']['advanced'] = TRUE;
-  $handler->display->display_options['style_options']['timeformatMonth'] = 'h(:mm)t';
-  $handler->display->display_options['style_options']['columnformatDay'] = 'dddd, MMM d, yyyy';
-  $handler->display->display_options['style_options']['theme'] = FALSE;
-  $handler->display->display_options['style_options']['contentHeight'] = 200;
-  $handler->display->display_options['defaults']['style_options'] = FALSE;
-  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
-  $handler->display->display_options['defaults']['row_options'] = FALSE;
-  $handler->display->display_options['pane_category']['name'] = 'Open Atrium Events';
-  $handler->display->display_options['pane_category']['weight'] = '0';
-  $handler->display->display_options['allow']['use_pager'] = 0;
-  $handler->display->display_options['allow']['items_per_page'] = 0;
-  $handler->display->display_options['allow']['offset'] = 0;
-  $handler->display->display_options['allow']['link_to_view'] = 0;
-  $handler->display->display_options['allow']['more_link'] = 0;
-  $handler->display->display_options['allow']['path_override'] = 0;
-  $handler->display->display_options['allow']['title_override'] = 0;
-  $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['inherit_panels_path'] = '1';
 
   /* Display: iCal */
   $handler = $view->new_display('feed', 'iCal', 'oa_calendar_ical');
@@ -1343,6 +1222,9 @@ function ma_collaboration_tools_views_default_views() {
     'oa_calendar_day' => 0,
     'oa_calendar_week' => 0,
   );
+
+  /* Display: Calendar */
+  $handler = $view->new_display('block', 'Calendar', 'calendar');
   $translatables['oa_fullcalendar'] = array(
     t('Master'),
     t('more'),
@@ -1351,17 +1233,11 @@ function ma_collaboration_tools_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
-    t('archived'),
+    t('Content entity referenced from field_event_calendar_section'),
     t('<br><em>[title]</em>'),
     t('All'),
-    t('Space'),
-    t('Section'),
-    t('Include archived content'),
-    t('Calendar'),
-    t('Open Atrium Events'),
-    t('Daily Calendar'),
-    t('Weekly Calendar'),
     t('iCal'),
+    t('Calendar'),
   );
   $export['oa_fullcalendar'] = $view;
 
