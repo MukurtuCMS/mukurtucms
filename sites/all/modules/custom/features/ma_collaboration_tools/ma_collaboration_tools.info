@@ -35,6 +35,7 @@ features[ds_field_settings][] = node|calendar|full
 features[ds_field_settings][] = node|discussion_space|full
 features[ds_field_settings][] = node|document_library|full
 features[ds_fields][] = add_content_to_collab_sect_link
+features[ds_fields][] = calendar_pane
 features[ds_fields][] = edit_collab_section_link
 features[ds_layout_settings][] = node|calendar|default
 features[ds_layout_settings][] = node|calendar|form

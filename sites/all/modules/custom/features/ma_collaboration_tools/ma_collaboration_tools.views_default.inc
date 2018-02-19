@@ -1182,9 +1182,8 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['nid']['table'] = 'node';
   $handler->display->display_options['arguments']['nid']['field'] = 'nid';
   $handler->display->display_options['arguments']['nid']['relationship'] = 'field_event_calendar_section_target_id';
-  $handler->display->display_options['arguments']['nid']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'not found';
   $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'php';
-  $handler->display->display_options['arguments']['nid']['default_argument_options']['code'] = 'return ma_collaboration_tools_get_current_section_page_nid();';
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
@@ -1223,8 +1222,18 @@ function ma_collaboration_tools_views_default_views() {
     'oa_calendar_week' => 0,
   );
 
-  /* Display: Calendar */
-  $handler = $view->new_display('block', 'Calendar', 'calendar');
+  /* Display: Calendar pane */
+  $handler = $view->new_display('panel_pane', 'Calendar pane', 'calendar_pane');
+  $handler->display->display_options['argument_input'] = array(
+    'nid' => array(
+      'type' => 'user',
+      'context' => 'entity:alphabetical_order_definition.cer',
+      'context_optional' => 0,
+      'panel' => '0',
+      'fixed' => '',
+      'label' => 'Content: Nid',
+    ),
+  );
   $translatables['oa_fullcalendar'] = array(
     t('Master'),
     t('more'),
@@ -1237,7 +1246,8 @@ function ma_collaboration_tools_views_default_views() {
     t('<br><em>[title]</em>'),
     t('All'),
     t('iCal'),
-    t('Calendar'),
+    t('Calendar pane'),
+    t('View panes'),
   );
   $export['oa_fullcalendar'] = $view;
 

@@ -22,10 +22,17 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'calendar' => array(
-      'weight' => '0',
+    'calendar_pane' => array(
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:1:{s:9:"arguments";a:1:{s:3:"nid";s:9:"%node:nid";}}s:4:"type";s:11:"views_panes";s:7:"subtype";s:29:"oa_fullcalendar-calendar_pane";}',
+        'load_terms' => 0,
+        'ft' => array(),
+      ),
     ),
     'edit_collab_section_link' => array(
       'weight' => '5',
@@ -38,7 +45,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'format' => 'default',
     ),
     'comments' => array(
-      'weight' => '2',
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -133,6 +140,32 @@ return ma_collaboration_tools_add_content_to_section_link($entity);
     'use_token' => 0,
   );
   $export['add_content_to_collab_sect_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'calendar_pane';
+  $ds_field->label = 'Calendar';
+  $ds_field->field_type = 7;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'default' => array(),
+    'settings' => array(
+      'show_title' => array(
+        'type' => 'checkbox',
+      ),
+      'title_wrapper' => array(
+        'type' => 'textfield',
+        'description' => 'Eg: h1, h2, p',
+      ),
+      'ctools' => array(
+        'type' => 'ctools',
+      ),
+    ),
+  );
+  $export['calendar_pane'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -268,32 +301,32 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'left' => array(
         0 => 'title',
-        1 => 'calendar',
-        2 => 'body',
+        1 => 'body',
+        2 => 'calendar_pane',
         3 => 'comments',
       ),
       'right' => array(
         4 => 'field_community_ref',
         5 => 'group_collab_actions',
-        6 => 'og_group_ref',
-        7 => 'add_content_to_collab_sect_link',
-        8 => 'field_item_privacy_setting',
+        6 => 'add_content_to_collab_sect_link',
+        7 => 'og_group_ref',
+        8 => 'group_access',
         9 => 'edit_collab_section_link',
-        10 => 'group_access',
+        10 => 'field_item_privacy_setting',
       ),
     ),
     'fields' => array(
       'title' => 'left',
-      'calendar' => 'left',
       'body' => 'left',
+      'calendar_pane' => 'left',
       'comments' => 'left',
       'field_community_ref' => 'right',
       'group_collab_actions' => 'right',
-      'og_group_ref' => 'right',
       'add_content_to_collab_sect_link' => 'right',
-      'field_item_privacy_setting' => 'right',
-      'edit_collab_section_link' => 'right',
+      'og_group_ref' => 'right',
       'group_access' => 'right',
+      'edit_collab_section_link' => 'right',
+      'field_item_privacy_setting' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(

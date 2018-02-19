@@ -175,19 +175,3 @@ function ma_collaboration_tools_edit_collab_section_link($entity) {
   }
 }
 
-/**
- * Get current section page NID, whether on the page directly or on a tab of the page.
- */
-function ma_collaboration_tools_get_current_section_page_nid() {
-  $current_nid = arg(1);
-  if (is_numeric($current_nid)) {
-    $map = ma_collaboration_tools_section_type_to_page_type_map();
-    $current_node = node_load ($current_nid);
-    if (array_key_exists($current_node->type, $map)) { // Viewing the content page directly.
-      return ($current_nid);
-    }
-    elseif (in_array($current_node->type, $map)) { // Viewing the content page within a tab on a section page.
-      // TODO fix this -- need current tab context.
-    }
-  }
-}
