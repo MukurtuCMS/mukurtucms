@@ -208,7 +208,6 @@ function ma_core_user_default_permissions() {
   $permissions['administer category vocabulary terms'] = array(
     'name' => 'administer category vocabulary terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -585,7 +584,6 @@ function ma_core_user_default_permissions() {
   $permissions['administer tags vocabulary terms'] = array(
     'name' => 'administer tags vocabulary terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -861,7 +859,6 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in category'] = array(
     'name' => 'delete terms in category',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -973,7 +970,6 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in tags'] = array(
     'name' => 'delete terms in tags',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1085,7 +1081,6 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in category'] = array(
     'name' => 'edit terms in category',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1197,7 +1192,6 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in tags'] = array(
     'name' => 'edit terms in tags',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1237,7 +1231,6 @@ function ma_core_user_default_permissions() {
   $permissions['merge tags terms'] = array(
     'name' => 'merge tags terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
