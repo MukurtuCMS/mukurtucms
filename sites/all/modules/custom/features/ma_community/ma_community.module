@@ -61,6 +61,17 @@ function ma_community_node_access($node, $op, $account) {
     return NODE_ACCESS_IGNORE;
 }
 
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_community_form_og_ui_add_users_alter(&$form, &$form_state) {
+    // For the OG add user form, default to "Not an invitation"
+    if(isset($form['membership_fields']['og_membership_invitation'][LANGUAGE_NONE])){
+        $form['membership_fields']['og_membership_invitation'][LANGUAGE_NONE]['#default_value'] = 0;
+    }
+}
+
 /**
  * Implements hook_form_FORM_ID_alter().
  */
