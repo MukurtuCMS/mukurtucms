@@ -79,6 +79,10 @@ projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-m
 ; 1. Use custom mukurtu permission logic when editing nodes-in-CPs; 2. Fix bug where Community admins get edit perms on CP nodes therein, even if they should not have that permission.
 projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
 
+;;; Organic groups invite
+; Comment out view modification for group members admin view
+projects[og_invite][patch][] = contrib/0001-Go-back-to-using-default-view-but-remove-og_invite-v.patch
+
 ;;; Geofield & Geofield Gmap
 ; Feeds Import Not Saving Geofield
 projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
