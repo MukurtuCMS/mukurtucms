@@ -175,3 +175,61 @@ function ma_collaboration_tools_edit_collab_section_link($entity) {
   }
 }
 
+
+/**
+ * Implements hook_node_presave().
+ */
+function ma_collaboration_tools_node_presave($node) {
+  if (ma_cultural_protocol_node_type_is_collab_page($node->type)) {
+
+    // Copy the protocol, community, and item sharing field values for the collab pages from their parent section.
+    $collab_page_w = entity_metadata_wrapper('node', $node);
+    $collab_section_w = entity_metadata_wrapper('node', $collab_page_w->{ma_collaboration_tools_get_collab_page_section_page_field_ref($node->type)}->value());
+    $collab_page_w->field_item_privacy_setting->set($collab_section_w->field_item_privacy_setting->value());
+    $protocols = $collab_section_w->og_group_ref->value();
+    $protocol_nids = [];
+    $community_nids = [];
+    foreach ($protocols as $protocol) {
+      $protocol_nids[] = $protocol->nid;
+      $community_nids[] = $protocol->og_group_ref[LANGUAGE_NONE][0]['target_id'];
+    }
+    if (count($protocol_nids)) {
+      $collab_page_w->og_group_ref->set(array_unique($protocol_nids));
+      $collab_page_w->field_community_ref->set(array_unique($community_nids));
+    }
+
+  }
+}
+
+/**
+ * Helper function to get the collab page entity ref to its parent section field name.
+ */
+function ma_collaboration_tools_get_collab_page_section_page_field_ref($collab_page_node_type) {
+  $field_map = [
+    'oa_event' => 'field_event_calendar_section',
+    'oa_discussion_post' => '',
+    'oa_wiki_page' => '',
+  ];
+  return $field_map[$collab_page_node_type];
+}
+
+/**
+ *  Implements hook_form_alter().
+ */
+function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
+
+  // On Collab Pages (not collab section)
+  $node_type = str_replace('_node_form', '', $form_id, $count);
+  if ($count && ma_cultural_protocol_node_type_is_collab_page($node_type)) {
+
+    // Adding a new collab page.
+    if (is_null($form['nid']['#value'])) {
+
+      // Prepopulate the reference to the section page with the argument from the URL.
+      if (is_numeric(arg(3))) {
+        $ref_field = ma_collaboration_tools_get_collab_page_section_page_field_ref($node_type);
+        $form[$ref_field][LANGUAGE_NONE]['#value'] = arg(3);
+      }
+    }
+  }
+}

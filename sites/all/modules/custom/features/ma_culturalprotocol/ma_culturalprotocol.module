@@ -415,10 +415,20 @@ function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
 }
 
 /**
- * Helper function returns whether a node type *can* be in a CP
+ * Helper function returns whether a node type *can* be in a CP (including collab pages)
  */
 function ma_cultural_protocol_node_type_can_have_cp($node_type) {
-  $node_types = _ma_cultural_protocol_get_node_types();
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['optional'], $node_types['required'], $node_types['collab_pages']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * Helper function returns whether a node type *can* be in a CP (not including collab pages)
+ */
+function ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
   if (in_array($node_type, array_merge($node_types['optional'], $node_types['required']))) {
     return TRUE;
   }
@@ -428,8 +438,18 @@ function ma_cultural_protocol_node_type_can_have_cp($node_type) {
  * Helper function returns whether a node type *must* be in a CP
  */
 function ma_cultural_protocol_node_type_must_have_cp($node_type) {
-  $node_types = _ma_cultural_protocol_get_node_types();
-  if (in_array($node_type, $node_types['required'])) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['required'], $node_types['collab_pages']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * Helper function returns whether a node type is a collaboration page (NOT a collaboration section).
+ */
+function ma_cultural_protocol_node_type_is_collab_page($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, $node_types['collab_pages'])) {
     return TRUE;
   }
 }
@@ -437,7 +457,7 @@ function ma_cultural_protocol_node_type_must_have_cp($node_type) {
 /**
  * Internal function used by the helper functions.
  */
-function _ma_cultural_protocol_get_node_types() {
+function _ma_cultural_protocol_get_node_types_in_cps() {
   return [
     'optional' => [
       'collection',
@@ -448,9 +468,11 @@ function _ma_cultural_protocol_get_node_types() {
       'calendar',
       'discussion_space',
       'document_library',
-//      'oa_discussion_post',
-//      'oa_wiki_page',
-//      'oa_event'
+     ],
+    'collab_pages' => [
+      'oa_discussion_post',
+      'oa_wiki_page',
+      'oa_event'
     ]
   ];
 }

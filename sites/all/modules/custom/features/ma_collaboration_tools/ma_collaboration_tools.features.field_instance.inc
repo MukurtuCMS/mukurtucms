@@ -1350,6 +1350,13 @@ function ma_collaboration_tools_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'ical' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -1393,7 +1400,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 2,
+      'weight' => 1,
     ),
   );
 
@@ -1405,6 +1412,13 @@ function ma_collaboration_tools_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'above',
+        'module' => 'node_reference',
+        'settings' => array(),
+        'type' => 'node_reference_default',
+        'weight' => 10,
+      ),
+      'full' => array(
         'label' => 'above',
         'module' => 'node_reference',
         'settings' => array(),
@@ -1436,7 +1450,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 12,
+      'weight' => 9,
     ),
   );
 
@@ -1449,6 +1463,16 @@ function ma_collaboration_tools_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 11,
+      ),
+      'full' => array(
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
@@ -1486,7 +1510,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 0,
+      'weight' => 3,
     ),
   );
 
@@ -1502,6 +1526,13 @@ function ma_collaboration_tools_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 9,
+      ),
+      'full' => array(
         'label' => 'above',
         'module' => 'list',
         'settings' => array(),
@@ -1557,6 +1588,13 @@ http://www.whitehouse.gov/',
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'ical' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1592,7 +1630,7 @@ http://www.whitehouse.gov/',
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 3,
+      'weight' => 2,
     ),
   );
 
@@ -1622,6 +1660,20 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+          'show_remaining_days' => FALSE,
+        ),
+        'type' => 'date_default',
+        'weight' => 4,
       ),
       'ical' => array(
         'label' => 'above',
@@ -1668,7 +1720,7 @@ http://www.whitehouse.gov/',
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -1693,6 +1745,15 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'geofield',
+        'settings' => array(
+          'data' => 'full',
+        ),
+        'type' => 'geofield_wkt',
+        'weight' => 2,
       ),
       'ical' => array(
         'label' => 'above',
@@ -1740,7 +1801,7 @@ http://www.whitehouse.gov/',
         ),
       ),
       'type' => 'geofield_wkt',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
@@ -1763,6 +1824,13 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'file',
+        'settings' => array(),
+        'type' => 'file_default',
+        'weight' => 3,
       ),
       'ical' => array(
         'label' => 'above',
@@ -1857,6 +1925,13 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'og_ui',
+        'settings' => array(),
+        'type' => 'og_list_default',
+        'weight' => 5,
       ),
       'ical' => array(
         'label' => 'hidden',

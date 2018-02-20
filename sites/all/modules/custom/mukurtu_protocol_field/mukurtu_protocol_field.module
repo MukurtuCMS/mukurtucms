@@ -47,7 +47,7 @@ function mukurtu_protocol_field_node_insert($node) {
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
   $node_type = str_replace('_node_form', '', $form_id, $count);
-  if ($count && ma_cultural_protocol_node_type_can_have_cp($node_type)) {
+  if ($count && ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type)) {
 
     // Do not create this custom field for Book Pages
     if(isset($form_state['mukurtu_book_parent'])) {
@@ -322,7 +322,7 @@ function _ajax_get_protocol_by_community_dropdown_options($community, $protocol_
  * Implements hook_node_presave().
  */
 function mukurtu_protocol_field_node_presave($node) {
-  if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
+  if (ma_cultural_protocol_node_type_can_have_cp_except_hidden($node->type)) {
     $nmw = entity_metadata_wrapper('node', $node);
 
     // Update the Community field according to the protocols for the node. The community field is a noderef field hidden from the node form, but displayed on the node view and search results view (and used as a search facet), on certain node types. It is a hidden noderef field (as opposed to group field) because we can only have one group field per node type and that's already used for the protocol.
