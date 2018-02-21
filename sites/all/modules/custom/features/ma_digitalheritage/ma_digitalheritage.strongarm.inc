@@ -133,7 +133,8 @@ col-md-3
 col-md-6
 col-md-8
 col-md-12
-clearfix';
+clearfix
+right-col-block';
   $export['ds_classes_fields'] = $strongarm;
 
   $strongarm = new stdClass();

@@ -567,16 +567,35 @@ a:hover {
 }
 
 // Collaboration Section Pages
-.node-type-oa-section {
-  .view-mode-full {
+.node-calendar.view-mode-full {
 
-    .group-right .panel-title {
-      font-size: 20px;
+  // Blocks in right column
+  .group-right {
+    .panel, .right-col-block {
+      background: #F8F7F7;
+      border-radius: 5px;
+      border-color: #ddd !important;
+      border: 1px solid;
+      margin-bottom: 20px;
+      .view {
+        padding: 15px;
+      }
+    }
+    .right-col-block .label-above, .panel-title {
+        font-size: 20px;
+        font-weight: 400;
+        text-transform: none;
+    }
+    .right-col-block .label-above, .panel-heading {
+      background: #E3E2E1;
+    }
+    .right-col-block .label-above {
+      padding: 10px 15px;
     }
   }
 }
 
-// this section should probably be within the above section (within the node views)
+// this section should probably be within the node views
 .field-name-protocol-dh-items,
 .field-name-community-dh-items {
   padding-top:20px;
@@ -1284,3 +1303,97 @@ a.tooltips span {
   text-transform: uppercase;
 }
 
+
+// Events
+// Taken from OA with minor mods.
+.oa-event-date-wrapper {
+  height: 5em;
+  width: 5em;
+  margin: 5px;
+  margin-left: 0px;
+  border: 1px solid #AAA;
+  background: #F6F7FC;
+  float: left;
+  font-size: 10px;
+}
+
+.oa-event-date-month-wrapper {
+  height: 1.4em;
+  background: #4791FF;
+  margin: 2px;
+}
+
+.oa-event-date-month {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  display: block;
+  text-align: center;
+  font-size: 1em;
+  font-weight: normal;
+  color: #FFFFFF;
+}
+
+
+.oa-event-label {
+  font-weight: bold;
+  float: left;
+  height: 0;
+}
+
+.oa-event-item {
+  display: inline-block;
+  font-size: 1em;
+  padding-left: 8ex;
+  line-height: 1.4em;
+}
+
+.oa-event-date-day {
+  display: block;
+  font-size: 2.5em;
+  line-height: 120%;
+  text-align: center;
+}
+
+.oa-event-day,
+.oa-event-time {
+  white-space: nowrap;
+}
+
+.oa-event .addthisevent-drop {
+  margin: 10px;
+  float: right;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+
+.oa-event-location .field-content {
+  display: inline-block;
+}
+
+.oa-event-description .flag-subscribe-section-content {
+  display: none;
+}
+
+.oa-event-header .oa-event-icon {
+  float: left;
+  padding-right: 10px;
+}
+
+.oa-event-header .location {
+  padding-top: 20px;
+}
+
+.oa-event-details {
+  overflow: hidden;
+}
+
+.oa-event-description ul,
+.oa-event-list li {
+  list-style: none;
+}
+.view-oa-event-list li {
+  overflow: hidden;
+  clear: both;
+}

@@ -233,3 +233,155 @@ function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
     }
   }
 }
+
+/**
+ * Implements hook_field_formatter_info().
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_field_formatter_info() {
+  return array(
+    'oa_events_date_formatter' => array(
+      'label' => t('Open Atrium Date Formatter'),
+      'field types' => array('datestamp'),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if ($display['type'] == 'oa_events_date_formatter') {
+
+    $event_info = ma_collaboration_tools_find_next_event($items);
+    $event = $event_info['event'];
+
+    // Create Date objects from item values.
+    $timezone_object = date_default_timezone_object();
+
+    $start_date = new DateObject($event['value'], $event['timezone_db'], DATE_FORMAT_UNIX);
+    $start_date->setTimezone($timezone_object);
+
+    $end_date = new DateObject($event['value2'], $event['timezone_db'], DATE_FORMAT_UNIX);
+    $end_date->setTimezone($timezone_object);
+
+    // Create an array of month / day information for ease of use.
+    $dates = array(
+      'start' => array(
+        'day' => date_format_date($start_date, 'custom', 'd'),
+        'month' => date_format_date($start_date, 'custom', 'M'),
+      ),
+      'end' => array(
+        'day' => date_format_date($end_date, 'custom', 'd'),
+        'month' => date_format_date($end_date, 'custom', 'M'),
+      ),
+    );
+
+    // For now always use the start date. We may add multi-day event to the
+    // widget at some point in the future.
+    $day = $dates['start']['day'];
+    $month = $dates['start']['month'];
+    $element[0] = array(
+      '#markup' => theme('oa_event_date', array('month' => $month, 'day' => $day)),
+    );
+  }
+  return $element;
+}
+
+/**
+ * Find the next upcoming event or the last event in a series.
+ *
+ * @param  array $items
+ *   An array of dates attached to a field.
+ * @return array
+ *   An array, keyed by delta and event.
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_find_next_event($items) {
+  // Set some base params we'll need.
+  $now = time();
+  $event = NULL;
+  $event_delta = NULL;
+  $next_event = NULL;
+  $last_event = NULL;
+  $next_event_delta = NULL;
+  $last_event_delta = NULL;
+  $diff = 0;
+
+  // Loop through all events.
+  foreach ($items as $delta => $date) {
+    // If event is a future date.
+    if ($date['value'] >= $now) {
+      // That happens before the last found future event
+      if ($diff == 0 || ($date['value'] - $now) < $diff) {
+        // Set it as the currently found next event, and update the difference.
+        $diff = $date['value'] - $now;
+        $next_event = $date;
+        $next_event_delta = 0;
+      }
+    }
+    // Determine if this is the last event in the series.
+    else if (empty($last_event) || ($date['value'] > $last_event['value'])) {
+      $last_event = $date;
+      $last_event_delta = $delta;
+    }
+  }
+
+  // If there is no future event we'll use the last occurrence.
+  if (empty($next_event)) {
+    $event = $last_event;
+    $event_delta = $last_event_delta;
+  }
+  else {
+    $event = $next_event;
+    $event_delta = $next_event_delta;
+  }
+
+  return array(
+    'delta' => $event_delta,
+    'event' => $event,
+  );
+}
+
+/**
+ * Implements hook_theme()
+ *
+ * Taken from OA.
+ */
+function ma_collaboration_tools_theme() {
+
+  $theme = array(
+    'oa_event_date' => array(
+      'template' => 'oa-event-date',
+      'path' => drupal_get_path('module', 'ma_collaboration_tools') . '/templates',
+      'variables' => array(
+        'month' => NULL,
+        'day' => NULL,
+      ),
+    ),
+  );
+
+  $displays = array('event_details', 'event_details_list');
+  foreach ($displays as $display) {
+    $key = 'views_view_fields__oa_event_detail__' . $display;
+    $filename = str_replace('_', '-', $key);
+    $theme[$key] = array(
+      'template'  => $filename,
+      'base hook' => 'views_view_fields',
+      'preprocess functions' => array(
+        'template_preprocess',
+        'template_preprocess_views_view_fields',
+      ),
+      'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL),
+      'path' => drupal_get_path('module', 'ma_collaboration_tools') . '/templates',
+    );
+  }
+
+  return $theme;
+}

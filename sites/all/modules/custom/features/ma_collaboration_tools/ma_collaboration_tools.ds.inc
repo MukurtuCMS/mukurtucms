@@ -39,6 +39,21 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'upcoming_events' => array(
+      'weight' => '0',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:1:{s:9:"arguments";a:1:{s:3:"nid";s:9:"%node:nid";}}s:4:"type";s:11:"views_panes";s:7:"subtype";s:34:"oa_event_list-upcoming_events_pane";}',
+        'load_terms' => 0,
+        'ft' => array(
+          'classes' => 'right-col-block',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -187,6 +202,32 @@ return ma_collaboration_tools_edit_collab_section_link($entity);
   );
   $export['edit_collab_section_link'] = $ds_field;
 
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'upcoming_events';
+  $ds_field->label = 'Upcoming Events';
+  $ds_field->field_type = 7;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'default' => array(),
+    'settings' => array(
+      'show_title' => array(
+        'type' => 'checkbox',
+      ),
+      'title_wrapper' => array(
+        'type' => 'textfield',
+        'description' => 'Eg: h1, h2, p',
+      ),
+      'ctools' => array(
+        'type' => 'ctools',
+      ),
+    ),
+  );
+  $export['upcoming_events'] = $ds_field;
+
   return $export;
 }
 
@@ -195,47 +236,6 @@ return ma_collaboration_tools_edit_collab_section_link($entity);
  */
 function ma_collaboration_tools_ds_layout_settings_info() {
   $export = array();
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|calendar|default';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'calendar';
-  $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'og_group_ref',
-        1 => 'body',
-        2 => 'field_item_privacy_setting',
-        3 => 'field_community_ref',
-        4 => 'field_pre_actions',
-      ),
-    ),
-    'fields' => array(
-      'og_group_ref' => 'ds_content',
-      'body' => 'ds_content',
-      'field_item_privacy_setting' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'field_pre_actions' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
-  );
-  $export['node|calendar|default'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -301,31 +301,33 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'left' => array(
         0 => 'title',
-        1 => 'body',
-        2 => 'calendar_pane',
-        3 => 'comments',
+        2 => 'body',
+        3 => 'calendar_pane',
+        5 => 'comments',
       ),
       'right' => array(
+        1 => 'upcoming_events',
         4 => 'field_community_ref',
-        5 => 'group_collab_actions',
-        6 => 'add_content_to_collab_sect_link',
-        7 => 'og_group_ref',
-        8 => 'group_access',
+        6 => 'og_group_ref',
+        7 => 'group_collab_actions',
+        8 => 'add_content_to_collab_sect_link',
         9 => 'edit_collab_section_link',
-        10 => 'field_item_privacy_setting',
+        10 => 'group_access',
+        11 => 'field_item_privacy_setting',
       ),
     ),
     'fields' => array(
       'title' => 'left',
+      'upcoming_events' => 'right',
       'body' => 'left',
       'calendar_pane' => 'left',
-      'comments' => 'left',
       'field_community_ref' => 'right',
+      'comments' => 'left',
+      'og_group_ref' => 'right',
       'group_collab_actions' => 'right',
       'add_content_to_collab_sect_link' => 'right',
-      'og_group_ref' => 'right',
-      'group_access' => 'right',
       'edit_collab_section_link' => 'right',
+      'group_access' => 'right',
       'field_item_privacy_setting' => 'right',
     ),
     'classes' => array(
@@ -345,47 +347,6 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_disable_css' => 0,
   );
   $export['node|calendar|full'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|discussion_space|default';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'discussion_space';
-  $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'og_group_ref',
-        1 => 'body',
-        2 => 'field_item_privacy_setting',
-        3 => 'field_community_ref',
-        4 => 'field_pre_actions',
-      ),
-    ),
-    'fields' => array(
-      'og_group_ref' => 'ds_content',
-      'body' => 'ds_content',
-      'field_item_privacy_setting' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'field_pre_actions' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
-  );
-  $export['node|discussion_space|default'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -493,47 +454,6 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_disable_css' => 0,
   );
   $export['node|discussion_space|full'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|document_library|default';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'document_library';
-  $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'og_group_ref',
-        1 => 'body',
-        2 => 'field_item_privacy_setting',
-        3 => 'field_community_ref',
-        4 => 'field_pre_actions',
-      ),
-    ),
-    'fields' => array(
-      'og_group_ref' => 'ds_content',
-      'body' => 'ds_content',
-      'field_item_privacy_setting' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'field_pre_actions' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
-  );
-  $export['node|document_library|default'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
