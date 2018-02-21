@@ -736,14 +736,14 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_oa_discussion_post_pattern';
-  $strongarm->value = '';
+  $strongarm->value = 'discussion-post/[node:title]';
   $export['pathauto_node_oa_discussion_post_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_oa_event_pattern';
-  $strongarm->value = '';
+  $strongarm->value = 'event/[node:title]';
   $export['pathauto_node_oa_event_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -757,7 +757,7 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_oa_wiki_page_pattern';
-  $strongarm->value = '';
+  $strongarm->value = 'document-page/[node:title]';
   $export['pathauto_node_oa_wiki_page_pattern'] = $strongarm;
 
   return $export;
