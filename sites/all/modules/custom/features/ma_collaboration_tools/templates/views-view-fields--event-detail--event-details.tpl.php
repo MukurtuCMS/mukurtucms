@@ -24,9 +24,9 @@
  * @ingroup views_templates
  */
 ?>
-<div class='oa-event'>
-  <div class='oa-event-header'>
-    <div class='oa-event-icon'>
+<div class='event'>
+  <div class='event-header'>
+    <div class='event-icon'>
       <?php
       if (!empty($field_oa_media)) {
         print $field_oa_media;
@@ -36,17 +36,17 @@
       }
       ?>
     </div>
-    <div class='oa-event-details'>
+    <div class='event-details'>
       <?php print $field_oa_date; ?>
-      <div class='oa-event-location'>
-        <span class='oa-event-label'>
+      <div class='event-location'>
+        <span class='event-label'>
           <?php print t('Where'); ?>:
         </span>
-        <span class="oa-event-item"><?php print $field_oa_address; ?></span>
+        <span class="event-item"><?php print $field_oa_address; ?></span>
       </div>
     </div>
   </div>
-  <div class='oa-event-description'>
+  <div class='event-description'>
     <?php  print $field_oa_date_2; ?>
     <?php print $body; ?>
     <?php if (!empty($field_oa_related)) {print $field_oa_related;} ?>

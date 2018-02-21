@@ -39,8 +39,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:create oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:create oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:create event content'
+  $permissions['node:cultural_protocol_group:create event content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -48,8 +48,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:create oa_event content'
-  $permissions['node:cultural_protocol_group:create oa_event content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:create oa_discussion_post content'
+  $permissions['node:cultural_protocol_group:create oa_discussion_post content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -81,13 +81,13 @@ function ma_collaboration_tools_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete any oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:delete any oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete any event content'
+  $permissions['node:cultural_protocol_group:delete any event content'] = array(
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete any oa_event content'
-  $permissions['node:cultural_protocol_group:delete any oa_event content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete any oa_discussion_post content'
+  $permissions['node:cultural_protocol_group:delete any oa_discussion_post content'] = array(
     'roles' => array(),
   );
 
@@ -120,8 +120,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete own oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:delete own oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete own event content'
+  $permissions['node:cultural_protocol_group:delete own event content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -129,8 +129,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete own oa_event content'
-  $permissions['node:cultural_protocol_group:delete own oa_event content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete own oa_discussion_post content'
+  $permissions['node:cultural_protocol_group:delete own oa_discussion_post content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -162,13 +162,13 @@ function ma_collaboration_tools_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update any oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:update any oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update any event content'
+  $permissions['node:cultural_protocol_group:update any event content'] = array(
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update any oa_event content'
-  $permissions['node:cultural_protocol_group:update any oa_event content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update any oa_discussion_post content'
+  $permissions['node:cultural_protocol_group:update any oa_discussion_post content'] = array(
     'roles' => array(),
   );
 
@@ -201,8 +201,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update own oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:update own oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update own event content'
+  $permissions['node:cultural_protocol_group:update own event content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -210,8 +210,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update own oa_event content'
-  $permissions['node:cultural_protocol_group:update own oa_event content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update own oa_discussion_post content'
+  $permissions['node:cultural_protocol_group:update own oa_discussion_post content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',

@@ -11,7 +11,7 @@ function ma_collaboration_tools_views_default_views() {
   $export = array();
 
   $view = new view();
-  $view->name = 'oa_event_detail';
+  $view->name = 'event_detail';
   $view->description = '';
   $view->tag = 'OA';
   $view->base_table = 'node';
@@ -47,7 +47,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date_1']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date_1']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date_1']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date_1']['type'] = 'oa_events_date_formatter';
+  $handler->display->display_options['fields']['field_oa_date_1']['type'] = 'events_date_formatter';
   $handler->display->display_options['fields']['field_oa_date_1']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -63,7 +63,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date']['label'] = 'Date';
   $handler->display->display_options['fields']['field_oa_date']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date']['type'] = 'oa_events_upcoming_date';
+  $handler->display->display_options['fields']['field_oa_date']['type'] = 'events_upcoming_date';
   $handler->display->display_options['fields']['field_oa_date']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -79,7 +79,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_address']['field'] = 'field_oa_address';
   $handler->display->display_options['fields']['field_oa_address']['label'] = '';
   $handler->display->display_options['fields']['field_oa_address']['alter']['text'] = '[field_oa_address]
-[field_oa_event_link]';
+[field_event_link]';
   $handler->display->display_options['fields']['field_oa_address']['element_label_colon'] = FALSE;
   /* Field: Content: Event Date */
   $handler->display->display_options['fields']['field_oa_date_2']['id'] = 'field_oa_date_2';
@@ -87,7 +87,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date_2']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date_2']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date_2']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date_2']['type'] = 'oa_events_addthis';
+  $handler->display->display_options['fields']['field_oa_date_2']['type'] = 'events_addthis';
   $handler->display->display_options['fields']['field_oa_date_2']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -185,7 +185,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date_1']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date_1']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date_1']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date_1']['type'] = 'oa_events_date_formatter';
+  $handler->display->display_options['fields']['field_oa_date_1']['type'] = 'events_date_formatter';
   $handler->display->display_options['fields']['field_oa_date_1']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -201,7 +201,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date']['label'] = 'Date';
   $handler->display->display_options['fields']['field_oa_date']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date']['type'] = 'oa_events_upcoming_date';
+  $handler->display->display_options['fields']['field_oa_date']['type'] = 'events_upcoming_date';
   $handler->display->display_options['fields']['field_oa_date']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -217,7 +217,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_address']['field'] = 'field_oa_address';
   $handler->display->display_options['fields']['field_oa_address']['label'] = 'Where';
   $handler->display->display_options['fields']['field_oa_address']['alter']['text'] = '[field_oa_address]
-[field_oa_event_link]';
+[field_event_link]';
   $handler->display->display_options['fields']['field_oa_address']['element_label_colon'] = FALSE;
   /* Field: Content: Event Date */
   $handler->display->display_options['fields']['field_oa_date_2']['id'] = 'field_oa_date_2';
@@ -225,7 +225,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date_2']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date_2']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date_2']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date_2']['type'] = 'oa_events_addthis';
+  $handler->display->display_options['fields']['field_oa_date_2']['type'] = 'events_addthis';
   $handler->display->display_options['fields']['field_oa_date_2']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -276,7 +276,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date_1']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date_1']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date_1']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date_1']['type'] = 'oa_events_date_formatter';
+  $handler->display->display_options['fields']['field_oa_date_1']['type'] = 'events_date_formatter';
   $handler->display->display_options['fields']['field_oa_date_1']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -293,7 +293,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date']['label'] = 'Date';
   $handler->display->display_options['fields']['field_oa_date']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date']['type'] = 'oa_events_upcoming_date';
+  $handler->display->display_options['fields']['field_oa_date']['type'] = 'events_upcoming_date';
   $handler->display->display_options['fields']['field_oa_date']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -355,7 +355,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date_2']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date_2']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date_2']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date_2']['type'] = 'oa_events_addthis';
+  $handler->display->display_options['fields']['field_oa_date_2']['type'] = 'events_addthis';
   $handler->display->display_options['fields']['field_oa_date_2']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -440,7 +440,7 @@ function ma_collaboration_tools_views_default_views() {
       'label' => 'Content: Open Atrium Section (oa_section_ref)',
     ),
   );
-  $translatables['oa_event_detail'] = array(
+  $translatables['event_detail'] = array(
     t('Master'),
     t('more'),
     t('Apply'),
@@ -458,7 +458,7 @@ function ma_collaboration_tools_views_default_views() {
     t('flag'),
     t('Date'),
     t('[field_oa_address]
-[field_oa_event_link]'),
+[field_event_link]'),
     t('Body'),
     t('Attachments'),
     t('All'),
@@ -470,10 +470,10 @@ function ma_collaboration_tools_views_default_views() {
     t('[title] [timestamp]'),
     t('Include archived content'),
   );
-  $export['oa_event_detail'] = $view;
+  $export['event_detail'] = $view;
 
   $view = new view();
-  $view->name = 'oa_event_list';
+  $view->name = 'event_list';
   $view->description = '';
   $view->tag = 'OA';
   $view->base_table = 'node';
@@ -508,7 +508,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date']['id'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date']['table'] = 'field_data_field_oa_date';
   $handler->display->display_options['fields']['field_oa_date']['field'] = 'field_oa_date';
-  $handler->display->display_options['fields']['field_oa_date']['type'] = 'oa_events_date_formatter';
+  $handler->display->display_options['fields']['field_oa_date']['type'] = 'events_date_formatter';
   $handler->display->display_options['fields']['field_oa_date']['settings'] = array(
     'format_type' => 'long',
     'fromto' => 'both',
@@ -584,7 +584,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'oa_event' => 'oa_event',
+    'event' => 'event',
   );
   /* Filter criterion: Content: Event Date - end date (field_oa_date:value2) */
   $handler->display->display_options['filters']['field_oa_date_value2']['id'] = 'field_oa_date_value2';
@@ -594,7 +594,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['filters']['field_oa_date_value2']['default_date'] = 'today';
 
   /* Display: iCal Feed */
-  $handler = $view->new_display('feed', 'iCal Feed', 'oa_events_ical');
+  $handler = $view->new_display('feed', 'iCal Feed', 'events_ical');
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'date_ical';
@@ -624,7 +624,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['field_oa_date']['field'] = 'field_oa_date';
   $handler->display->display_options['fields']['field_oa_date']['label'] = '';
   $handler->display->display_options['fields']['field_oa_date']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_oa_date']['type'] = 'oa_events_date_formatter';
+  $handler->display->display_options['fields']['field_oa_date']['type'] = 'events_date_formatter';
   $handler->display->display_options['fields']['field_oa_date']['settings'] = array(
     'format_type' => 'long',
     'custom_date_format' => '',
@@ -677,7 +677,7 @@ function ma_collaboration_tools_views_default_views() {
       'label' => 'Content: Nid',
     ),
   );
-  $translatables['oa_event_list'] = array(
+  $translatables['event_list'] = array(
     t('Master'),
     t('Open Atrium iCal Calendar'),
     t('more'),
@@ -705,7 +705,7 @@ function ma_collaboration_tools_views_default_views() {
     t('Upcoming Events pane'),
     t('View panes'),
   );
-  $export['oa_event_list'] = $view;
+  $export['event_list'] = $view;
 
   $view = new view();
   $view->name = 'oa_fullcalendar';
@@ -789,7 +789,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'oa_event' => 'oa_event',
+    'event' => 'event',
   );
 
   /* Display: iCal */

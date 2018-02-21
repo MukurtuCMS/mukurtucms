@@ -472,7 +472,7 @@ function _ma_cultural_protocol_get_node_types_in_cps() {
     'collab_pages' => [
       'oa_discussion_post',
       'oa_wiki_page',
-      'oa_event'
+      'event'
     ]
   ];
 }

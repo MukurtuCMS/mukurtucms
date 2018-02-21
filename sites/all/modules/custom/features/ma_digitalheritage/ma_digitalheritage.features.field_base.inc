@@ -226,7 +226,7 @@ function ma_digitalheritage_field_default_field_bases() {
         'fixity_check' => 0,
         'language_community' => 0,
         'oa_discussion_post' => 0,
-        'oa_event' => 0,
+        'event' => 0,
         'oa_ical_importer' => 0,
         'oa_wiki_page' => 0,
         'page' => 0,

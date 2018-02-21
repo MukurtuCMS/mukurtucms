@@ -120,18 +120,18 @@ function ma_collaboration_tools_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
-    'oa_discussion_post' => array(
-      'name' => t('Discussion Post'),
+    'event' => array(
+      'name' => t('Event'),
       'base' => 'node_content',
-      'description' => t('A collaboration discussion post'),
+      'description' => t('A collaboration Event'),
       'has_title' => '1',
       'title_label' => t('Title'),
       'help' => '',
     ),
-    'oa_event' => array(
-      'name' => t('Event'),
+    'oa_discussion_post' => array(
+      'name' => t('Discussion Post'),
       'base' => 'node_content',
-      'description' => t('A collaboration Event'),
+      'description' => t('A collaboration discussion post'),
       'has_title' => '1',
       'title_label' => t('Title'),
       'help' => '',

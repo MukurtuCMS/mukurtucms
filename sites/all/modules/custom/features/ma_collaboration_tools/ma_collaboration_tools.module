@@ -139,7 +139,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
  */
 function ma_collaboration_tools_section_type_to_page_type_map() {
   return [
-    'calendar' => 'oa_event',
+    'calendar' => 'event',
     'discussion_space' => 'oa_discussion_post',
     'document_library' => 'oa_wiki_page'
   ];
@@ -206,7 +206,7 @@ function ma_collaboration_tools_node_presave($node) {
  */
 function ma_collaboration_tools_get_collab_page_section_page_field_ref($collab_page_node_type) {
   $field_map = [
-    'oa_event' => 'field_event_calendar_section',
+    'event' => 'field_event_calendar_section',
     'oa_discussion_post' => '',
     'oa_wiki_page' => '',
   ];
@@ -241,7 +241,7 @@ function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
  */
 function ma_collaboration_tools_field_formatter_info() {
   return array(
-    'oa_events_date_formatter' => array(
+    'events_date_formatter' => array(
       'label' => t('Open Atrium Date Formatter'),
       'field types' => array('datestamp'),
     ),
@@ -256,7 +256,7 @@ function ma_collaboration_tools_field_formatter_info() {
  */
 function ma_collaboration_tools_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
-  if ($display['type'] == 'oa_events_date_formatter') {
+  if ($display['type'] == 'events_date_formatter') {
 
     $event_info = ma_collaboration_tools_find_next_event($items);
     $event = $event_info['event'];
@@ -287,7 +287,7 @@ function ma_collaboration_tools_field_formatter_view($entity_type, $entity, $fie
     $day = $dates['start']['day'];
     $month = $dates['start']['month'];
     $element[0] = array(
-      '#markup' => theme('oa_event_date', array('month' => $month, 'day' => $day)),
+      '#markup' => theme('event_date', array('month' => $month, 'day' => $day)),
     );
   }
   return $element;
@@ -357,8 +357,8 @@ function ma_collaboration_tools_find_next_event($items) {
 function ma_collaboration_tools_theme() {
 
   $theme = array(
-    'oa_event_date' => array(
-      'template' => 'oa-event-date',
+    'event_date' => array(
+      'template' => 'event-date',
       'path' => drupal_get_path('module', 'ma_collaboration_tools') . '/templates',
       'variables' => array(
         'month' => NULL,
@@ -369,7 +369,7 @@ function ma_collaboration_tools_theme() {
 
   $displays = array('event_details', 'event_details_list');
   foreach ($displays as $display) {
-    $key = 'views_view_fields__oa_event_detail__' . $display;
+    $key = 'views_view_fields__event_detail__' . $display;
     $filename = str_replace('_', '-', $key);
     $theme[$key] = array(
       'template'  => $filename,
