@@ -41,7 +41,7 @@ function ma_core_ckeditor_profile_defaults() {
             'pre_indent' => 0,
           ),
         ),
-        'css_mode' => 'none',
+        'css_mode' => 'theme',
         'css_path' => '',
         'css_style' => 'theme',
         'styles_path' => '',
@@ -54,6 +54,17 @@ function ma_core_ckeditor_profile_defaults() {
         'theme_config_js' => 'f',
         'js_conf' => '',
         'loadPlugins' => array(
+          'dndck4' => array(
+            'name' => 'dndck4',
+            'desc' => 'Scald Drag and Drop integration - CKEditor 4 widgets',
+            'path' => '%base_path%sites/all/modules/contrib/scald/modules/fields/mee/plugins/dndck4/',
+            'buttons' => array(
+              'ScaldAtom' => array(
+                'icon' => 'icons/atom.png',
+                'label' => 'Edit atom properties',
+              ),
+            ),
+          ),
           'drupalbreaks' => array(
             'name' => 'drupalbreaks',
             'desc' => 'Plugin for inserting Drupal teaser and page breaks.',
@@ -111,7 +122,7 @@ function ma_core_ckeditor_profile_defaults() {
             'pre_indent' => 0,
           ),
         ),
-        'css_mode' => 'none',
+        'css_mode' => 'theme',
         'css_path' => '',
         'css_style' => 'theme',
         'styles_path' => '',
@@ -124,6 +135,17 @@ function ma_core_ckeditor_profile_defaults() {
         'theme_config_js' => 'f',
         'js_conf' => '',
         'loadPlugins' => array(
+          'dndck4' => array(
+            'name' => 'dndck4',
+            'desc' => 'Scald Drag and Drop integration - CKEditor 4 widgets',
+            'path' => '%base_path%sites/all/modules/contrib/scald/modules/fields/mee/plugins/dndck4/',
+            'buttons' => array(
+              'ScaldAtom' => array(
+                'icon' => 'icons/atom.png',
+                'label' => 'Edit atom properties',
+              ),
+            ),
+          ),
           'drupalbreaks' => array(
             'name' => 'drupalbreaks',
             'desc' => 'Plugin for inserting Drupal teaser and page breaks.',
