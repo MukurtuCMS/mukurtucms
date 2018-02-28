@@ -59,6 +59,7 @@ dependencies[] = media_bulk_upload
 dependencies[] = media_feeds
 dependencies[] = media_wysiwyg
 dependencies[] = mediaelement
+dependencies[] = mee
 dependencies[] = menu
 dependencies[] = modernizr
 dependencies[] = mollom
