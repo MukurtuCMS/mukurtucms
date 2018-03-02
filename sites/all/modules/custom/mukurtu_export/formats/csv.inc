@@ -376,7 +376,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
 
             // Check if already exported, prevent infinite recursion
             if(isset($encoded_content['__exported_key_list'][$referenced_entity_type][$ref_bundle_type][$new_entity_key])) {
-              return;
+                continue;
             }
 
             // Encode referenced content
