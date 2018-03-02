@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This module is heavily based on Node Export (https://www.drupal.org/project/node_export) and uses a significant amount of code
+ * from that project.
+ */
+
+
 define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]"); 
 
 /**

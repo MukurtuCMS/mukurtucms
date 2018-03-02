@@ -156,6 +156,9 @@ function mukurtu_export_format_selection_form_submit($form, &$form_state) {
  * Form for selecting which fields to export
  */
 function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
+  // Blacklist any Mukurtu specific book-keeping fields that definitely don't need to be exported
+  $field_blacklist = array('field_pre_actions');
+
   $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
 
   $form['export_fields'] = array(
@@ -213,6 +216,12 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       );
 
       foreach($fields_info as $field_name => $field) {
+        if(in_array($field_name, $field_blacklist)) {
+            continue;
+            //            $form['export_fields'][$entity_type][$bundle_name][$field_name]['#type'] = 'hidden';
+            //            $form['export_fields'][$entity_type][$bundle_name][$field_name]['#default_value'] = FALSE;
+        }
+
         $form['export_fields'][$entity_type][$bundle_name][$field_name] = array(
           '#type' => 'checkbox',
           '#title' => $field['label'],
