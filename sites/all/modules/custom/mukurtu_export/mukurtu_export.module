@@ -28,6 +28,7 @@ define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]");
         'type' => MENU_LOCAL_TASK,
         'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
         'file' => 'mukurtu_export.pages.inc',
+        'weight' => 105,
       );
 
       $items['atom/%scald_atom/mukurtu-export'] = array(
@@ -39,6 +40,7 @@ define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]");
         'type' => MENU_LOCAL_TASK,
         'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
         'file' => 'mukurtu_export.pages.inc',
+        'weight' => 105,
       );
 
       return $items;
