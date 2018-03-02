@@ -284,6 +284,11 @@ function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $del
     foreach(array_keys($encoded_content[$encoded_entity_type]) as $encoded_bundle_name) {
       $csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'] = array_keys($encoded_content[$encoded_entity_type][$encoded_bundle_name]);
 
+      // Convert header field names to friendly labels
+      foreach($csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'] as $k => $v) {
+          $csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'][$k] = _mukurtu_export_csv_get_header_label($encoded_entity_type, $encoded_bundle_name, $v);
+      }
+
       foreach (array_keys($encoded_content[$encoded_entity_type][$encoded_bundle_name]) as $header_value) {
         foreach (array_keys($encoded_list[$encoded_entity_type][$encoded_bundle_name]) as $encoded_entity_key) {
           $field_value = isset($encoded_content[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_entity_key]) ? $encoded_content[$encoded_entity_type][$encoded_bundle_name][$header_value][$encoded_entity_key] : NULL;
@@ -295,6 +300,20 @@ function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $del
   }
 
   return $csv_output;
+}
+
+function _mukurtu_export_csv_get_header_label($entity_type, $bundle_name, $field_name) {
+    if($field_name == 'title') {
+        return 'Title';
+    }
+
+    $info = field_info_instance($entity_type, $field_name, $bundle_name);
+    if(!$info) {
+        return $field_name;
+    }
+
+    $label = $info['label'];
+    return $label;
 }
 
 /**
