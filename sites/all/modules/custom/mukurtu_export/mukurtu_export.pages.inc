@@ -157,7 +157,12 @@ function mukurtu_export_format_selection_form_submit($form, &$form_state) {
  */
 function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
   // Blacklist any Mukurtu specific book-keeping fields that definitely don't need to be exported
-  $field_blacklist = array('field_pre_actions');
+  $field_blacklist = array(
+      'all' => array('field_pre_actions'),
+      'node' => array(
+          'digital_heritage' => array()
+      )
+  );
 
   $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
 
@@ -216,10 +221,14 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       );
 
       foreach($fields_info as $field_name => $field) {
-        if(in_array($field_name, $field_blacklist)) {
+        // Check global blacklist
+        if(in_array($field_name, $field_blacklist['all'])) {
             continue;
-            //            $form['export_fields'][$entity_type][$bundle_name][$field_name]['#type'] = 'hidden';
-            //            $form['export_fields'][$entity_type][$bundle_name][$field_name]['#default_value'] = FALSE;
+        }
+
+        // Check specific blacklist
+        if(!empty($field_blacklist[$entity_type][$bundle_name]) && in_array($field_name, $field_blacklist[$entity_type][$bundle_name])) {
+            continue;
         }
 
         $form['export_fields'][$entity_type][$bundle_name][$field_name] = array(
