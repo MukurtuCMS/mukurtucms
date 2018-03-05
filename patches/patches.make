@@ -73,6 +73,15 @@ projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid
 ; Alter required field tamper to allow 0 as value
 projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
 
+;;; Fullcalendar Create
+; Contributed patch:
+; 1. Send params to event create as $_GET instead of $_POST
+; 2. Use link instead of modal for creating event from clicking on day.
+projects[fullcalendar_create][patch][] = https://www.drupal.org/files/issues/fullcalendar_create_no_modal-1885688-28.patch
+; Custom patch:
+; Pass the calendar NID to the add event form, and set the destination to return to the calendar after adding event.
+projects[fullcalendar_create][patch][] = contrib/alter_add_event_link_path.patch
+
 ;;; Organic Groups
 ; Allow Groups Audience field for Feeds Mapping
 projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-mapper.patch

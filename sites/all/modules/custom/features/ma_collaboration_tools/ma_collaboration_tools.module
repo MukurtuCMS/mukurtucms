@@ -159,7 +159,9 @@ function ma_collaboration_tools_add_content_to_section_link($entity) {
   }
   $target_type_path = str_replace('_', '-', $target_type);
   if (og_user_access_entity('create ' . $target_type . ' content', 'node', $entity)) {
-    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $target_type_path . '/' . $entity->nid);
+    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $target_type_path . '/' . $entity->nid, [
+      'query' => drupal_get_destination(),
+    ]);
   }
 }
 

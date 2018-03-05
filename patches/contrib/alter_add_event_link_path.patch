@@ -1,0 +1,16 @@
+diff --git a/js/fullcalendar_create.fullcalendar.js b/js/fullcalendar_create.fullcalendar.js
+index d5bfad6..edbd89a 100644
+--- a/js/fullcalendar_create.fullcalendar.js
++++ b/js/fullcalendar_create.fullcalendar.js
+@@ -101,7 +101,10 @@ function nodeadd (settings, submit) {
+       break;
+ 
+     default:
+-      window.location.assign('//' + window.location.host + '/node/add/' + settings.node_type + query);
++      // Mukurtu patch -- pass the calendar NID to the add event form.
++      var viewDomKey = Object.keys(Drupal.settings.views.ajaxViews)[0];
++      var calendarNid = Drupal.settings.views.ajaxViews[viewDomKey].view_args;
++      window.location.assign('//' + window.location.host + '/node/add/' + settings.node_type + '/' + calendarNid + query + '&destination=node/' + calendarNid);
+   }
+ }
+ 

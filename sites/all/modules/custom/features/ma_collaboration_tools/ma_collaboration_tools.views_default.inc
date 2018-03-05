@@ -732,6 +732,12 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['style_options']['advanced'] = TRUE;
   $handler->display->display_options['style_options']['timeformatMonth'] = 'h(:mm)t';
   $handler->display->display_options['style_options']['theme'] = FALSE;
+  $handler->display->display_options['style_options']['fullcalendar_create']['select'] = TRUE;
+  $handler->display->display_options['style_options']['fullcalendar_create']['method'] = 'link';
+  $handler->display->display_options['style_options']['fullcalendar_create']['node_type'] = 'event';
+  $handler->display->display_options['style_options']['fullcalendar_create']['date_field'] = array(
+    'field_oa_date' => 'field_oa_date',
+  );
   /* Relationship: Entity Reference: Referenced Entity */
   $handler->display->display_options['relationships']['field_event_calendar_section_target_id']['id'] = 'field_event_calendar_section_target_id';
   $handler->display->display_options['relationships']['field_event_calendar_section_target_id']['table'] = 'field_data_field_event_calendar_section';

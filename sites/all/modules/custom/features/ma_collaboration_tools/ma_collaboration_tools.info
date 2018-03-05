@@ -13,6 +13,7 @@ dependencies[] = file
 dependencies[] = file_entity
 dependencies[] = flag
 dependencies[] = fullcalendar
+dependencies[] = fullcalendar_create
 dependencies[] = geofield
 dependencies[] = list
 dependencies[] = ma_base_theme
