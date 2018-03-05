@@ -160,7 +160,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
   $field_blacklist = array(
       'all' => array('field_pre_actions'),
       'node' => array(
-          'digital_heritage' => array()
+          'digital_heritage' => array('field_community_record_parent')
       )
   );
 
