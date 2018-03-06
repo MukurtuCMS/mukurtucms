@@ -1071,7 +1071,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -1122,7 +1122,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 9,
+      'weight' => 11,
     ),
   );
 
@@ -1183,7 +1183,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 10,
     ),
   );
 
@@ -1235,7 +1235,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 11,
+      'weight' => 13,
     ),
   );
 
@@ -1306,7 +1306,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -1402,7 +1402,7 @@ http://www.whitehouse.gov/',
         'year_range' => '-3:+3',
       ),
       'type' => 'date_popup',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -1514,7 +1514,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'geocoder',
-      'weight' => 7,
+      'weight' => 9,
     ),
   );
 
@@ -1615,7 +1615,59 @@ http://www.whitehouse.gov/',
         'progress_indicator' => 'throbber',
       ),
       'type' => 'media_generic',
-      'weight' => 4,
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-event-field_pre_actions'.
+  $field_instances['node-event-field_pre_actions'] = array(
+    'bundle' => 'event',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 12,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+        'treeable' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -1715,7 +1767,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 10,
+      'weight' => 12,
     ),
   );
 
@@ -1769,7 +1821,7 @@ http://www.whitehouse.gov/',
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -1857,7 +1909,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -1935,7 +1987,53 @@ http://www.whitehouse.gov/',
         'manualcrop_thumblist' => 0,
       ),
       'type' => 'media_generic',
-      'weight' => 5,
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_discussion_post-field_pre_actions'.
+  $field_instances['node-oa_discussion_post-field_pre_actions'] = array(
+    'bundle' => 'oa_discussion_post',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+        'treeable' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -1985,7 +2083,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -2049,7 +2147,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -2353,7 +2451,7 @@ http://www.whitehouse.gov/',
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -2440,7 +2538,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -2522,7 +2620,7 @@ http://www.whitehouse.gov/',
         'progress_indicator' => 'throbber',
       ),
       'type' => 'media_generic',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -2573,7 +2671,53 @@ http://www.whitehouse.gov/',
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 2,
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_wiki_page-field_pre_actions'.
+  $field_instances['node-oa_wiki_page-field_pre_actions'] = array(
+    'bundle' => 'oa_wiki_page',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+        'treeable' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -2623,7 +2767,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -2687,7 +2831,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
