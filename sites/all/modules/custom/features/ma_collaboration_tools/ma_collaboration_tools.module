@@ -121,7 +121,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
     if (count($node->content['og_group_ref'][0]['#items']) < 2) {
       unset($node->content['field_item_privacy_setting'][0]['#markup']);
     }
-    else{
+    else {
       if ($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == 'any') {
         $text = 'Item is shared with members that belong to ANY of the above Protocols.';
       }
@@ -132,6 +132,19 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
     }
   }
 
+  if ($view_mode == 'full' && $node->type == 'event') {
+
+    $date = &$node->content['field_oa_date'][0]['#markup'];
+
+    // For events with a repeating date, add a field label "Next: " for the next event date. This provides info clarification, and makes the next date align with the repeating date description.
+    if (strpos($date, '<div class="date-repeat-rule">') !== false) {
+      $closing_div_pos = strpos ($date, '</div>') + 6;
+      $rrdiv = substr($date, 0, $closing_div_pos);
+      $rest = substr($date, $closing_div_pos);
+      $date =$rrdiv  . '<div class="label-inline">Next:&nbsp;</div>' . $rest;
+    }
+
+  }
 }
 
 /**
@@ -354,7 +367,7 @@ function ma_collaboration_tools_find_next_event($items) {
 /**
  * Implements hook_theme()
  *
- * Taken from OA.
+ * Taken from OA. Simplified.
  */
 function ma_collaboration_tools_theme() {
 
@@ -368,22 +381,9 @@ function ma_collaboration_tools_theme() {
       ),
     ),
   );
-
-  $displays = array('event_details', 'event_details_list');
-  foreach ($displays as $display) {
-    $key = 'views_view_fields__event_detail__' . $display;
-    $filename = str_replace('_', '-', $key);
-    $theme[$key] = array(
-      'template'  => $filename,
-      'base hook' => 'views_view_fields',
-      'preprocess functions' => array(
-        'template_preprocess',
-        'template_preprocess_views_view_fields',
-      ),
-      'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL),
-      'path' => drupal_get_path('module', 'ma_collaboration_tools') . '/templates',
-    );
-  }
-
   return $theme;
 }
+
+
+
+

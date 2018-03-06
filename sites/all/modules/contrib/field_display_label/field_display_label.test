@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * @file
+ * Test file for Field Display Label module.
+ */
+
+class FieldDisplayLabelTestCase extends DrupalWebTestCase {
+
+  protected $privilegedUser;
+
+  protected $labelForm;
+
+  protected $labelDisplay;
+
+  /**
+   * Give display information to the SimpleTest system.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Field Display Label',
+      'description' => 'Test the functionality of the Field Display Label module.',
+      'group' => 'Fields',
+    );
+  }
+
+  /**
+   * Set up the test environment.
+   */
+  public function setUp() {
+    parent::setUp(array('text', 'field_display_label'));
+    $this->labelForm = $this->randomName(8);
+    $this->labelDisplay = $this->randomName(10);
+
+    // Create and log in our privileged user.
+    $this->privilegedUser = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'administer content types',
+      'administer nodes',
+      'create page content',
+    ));
+    $this->drupalLogin($this->privilegedUser);
+  }
+
+  /**
+   * Create new text field and test display label.
+   */
+  public function testEditFieldLabel() {
+    $field = array(
+      'fields[_add_new_field][label]' => 'Test field',
+      'fields[_add_new_field][field_name]' => 'test_field',
+      'fields[_add_new_field][type]' => 'text',
+      'fields[_add_new_field][widget_type]' => 'text_textfield',
+    );
+    $this->drupalPost('admin/structure/types/manage/page/fields', $field, t('Save'));
+
+    $field_settings = array('field[settings][max_length]' => 255);
+
+    $this->drupalPost('admin/structure/types/manage/page/fields/field_test_field/field-settings', $field_settings, t('Save field settings'));
+    $this->drupalget('admin/structure/types/manage/page/fields/field_test_field');
+    $this->assertText('Display label');
+
+    $field_settings = array(
+      'instance[label]' => $this->labelForm,
+      'instance[display_label]' => $this->labelDisplay,
+      'instance[required]' => 1,
+      'instance[description]' => '',
+      'instance[widget][settings][size]' => 60,
+      'instance[settings][text_processing]' => 0,
+      'field_test_field[und][0][value]' => '',
+      'field[cardinality]' => 1,
+      'field[settings][max_length]' => 255,
+    );
+
+    $this->drupalPost('admin/structure/types/manage/page/fields/field_test_field',
+      $field_settings,
+      t('Save settings'));
+
+
+    $this->drupalGet('node/add/page');
+    $this->assertText($this->labelForm);
+
+    $node = array();
+    $node['title'] = $this->randomName(8);
+    $node['body[und][0][value]'] = $this->randomName(16);
+    $node['field_test_field[und][0][value]'] = $this->randomName(20);
+
+    $this->drupalPost('node/add/page', $node, t('Save'));
+    $this->assertText($this->labelDisplay);
+  }
+}

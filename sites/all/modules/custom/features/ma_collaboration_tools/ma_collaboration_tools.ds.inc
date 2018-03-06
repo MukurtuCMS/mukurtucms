@@ -127,6 +127,50 @@ function ma_collaboration_tools_ds_field_settings_info() {
   );
   $export['node|document_library|full'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|event|full';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'event';
+  $ds_fieldsetting->view_mode = 'full';
+  $ds_fieldsetting->settings = array(
+    'calendar_date' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:10:{s:5:"label";s:6:"hidden";s:9:"formatter";s:21:"events_date_formatter";s:11:"delta_limit";s:1:"0";s:12:"delta_offset";s:1:"0";s:14:"delta_reversed";i:0;s:18:"formatter_settings";a:0:{}s:7:"context";s:25:"argument_entity_id:node_1";s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";}s:4:"type";s:12:"entity_field";s:7:"subtype";s:18:"node:field_oa_date";}',
+        'load_terms' => 0,
+        'ft' => array(),
+        'field_formatter_label' => '',
+      ),
+    ),
+    'comments' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'body' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'clearfix',
+        ),
+      ),
+    ),
+    'field_oa_geo_location' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'classes' => 'right-col-block',
+          'lb' => 'Location',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|event|full'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -155,6 +199,32 @@ return ma_collaboration_tools_add_content_to_section_link($entity);
     'use_token' => 0,
   );
   $export['add_content_to_collab_sect_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'calendar_date';
+  $ds_field->label = 'Calendar Date';
+  $ds_field->field_type = 7;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'event|*';
+  $ds_field->properties = array(
+    'default' => array(),
+    'settings' => array(
+      'show_title' => array(
+        'type' => 'checkbox',
+      ),
+      'title_wrapper' => array(
+        'type' => 'textfield',
+        'description' => 'Eg: h1, h2, p',
+      ),
+      'ctools' => array(
+        'type' => 'ctools',
+      ),
+    ),
+  );
+  $export['calendar_date'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -573,16 +643,16 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'title',
-        1 => 'body',
+        1 => 'field_oa_date',
         2 => 'field_oa_address',
+        3 => 'body',
         4 => 'field_oa_media',
-        5 => 'field_oa_date',
-        6 => 'field_oa_geo_location',
-        7 => 'path',
-        8 => 'redirect',
+        5 => 'path',
+        6 => 'redirect',
       ),
       'hidden' => array(
-        3 => 'field_event_calendar_section',
+        7 => 'field_oa_geo_location',
+        8 => 'field_event_calendar_section',
         9 => 'field_community_ref',
         10 => 'og_group_ref',
         11 => 'field_item_privacy_setting',
@@ -591,14 +661,14 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     ),
     'fields' => array(
       'title' => 'ds_content',
-      'body' => 'ds_content',
-      'field_oa_address' => 'ds_content',
-      'field_event_calendar_section' => 'hidden',
-      'field_oa_media' => 'ds_content',
       'field_oa_date' => 'ds_content',
-      'field_oa_geo_location' => 'ds_content',
+      'field_oa_address' => 'ds_content',
+      'body' => 'ds_content',
+      'field_oa_media' => 'ds_content',
       'path' => 'ds_content',
       'redirect' => 'ds_content',
+      'field_oa_geo_location' => 'hidden',
+      'field_event_calendar_section' => 'hidden',
       'field_community_ref' => 'hidden',
       'og_group_ref' => 'hidden',
       'field_item_privacy_setting' => 'hidden',
@@ -620,6 +690,58 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|event|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|event|full';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'event';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'ds_2col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'calendar_date',
+        1 => 'group_event_details',
+        2 => 'field_oa_date',
+        3 => 'body',
+        4 => 'field_oa_address',
+        5 => 'field_oa_media',
+        6 => 'comments',
+        7 => 'field_event_calendar_section',
+      ),
+      'right' => array(
+        8 => 'field_oa_geo_location',
+      ),
+    ),
+    'fields' => array(
+      'calendar_date' => 'left',
+      'group_event_details' => 'left',
+      'field_oa_date' => 'left',
+      'body' => 'left',
+      'field_oa_address' => 'left',
+      'field_oa_media' => 'left',
+      'comments' => 'left',
+      'field_event_calendar_section' => 'left',
+      'field_oa_geo_location' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['node|event|full'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

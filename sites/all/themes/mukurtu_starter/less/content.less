@@ -566,8 +566,8 @@ a:hover {
   }
 }
 
-// Collaboration Section Pages
-.node-calendar.view-mode-full {
+// Collaboration Pages
+.node-calendar.view-mode-full, .node-event.view-mode-full {
 
   // Blocks in right column
   .group-right {
@@ -1305,7 +1305,7 @@ a.tooltips span {
 
 
 // Events
-// Taken from OA with minor mods.
+// Based on OA, then modified.
 .event-date-wrapper {
   height: 5em;
   width: 5em;
@@ -1393,7 +1393,45 @@ a.tooltips span {
 .event-list li {
   list-style: none;
 }
+
 .view-oa-event-list li {
   overflow: hidden;
   clear: both;
 }
+
+// Events not based on OA
+.node-event.view-mode-full {
+
+  // Calendar icon
+  .event-date-wrapper {
+    height: 7em !important;
+    width: 7em !important;
+    .event-date-month-wrapper {
+      height: 1.96em !important;
+    }
+    .event-date-month {
+      font-size: 1.4em !important;
+    }
+    .event-date-day {
+      font-size: 3.5em !important;
+    }
+  }
+
+  // Fields to the right of calendar icon
+  .group-event-details {
+
+    .label-inline {
+      width: 70px;
+      text-align: right;
+    }
+    .field-name-field-oa-address, .field-name-field-oa-date, .field-name-calendar-date {
+      margin-bottom: 0.1em !important;
+    }
+  }
+
+  .field-name-body {
+    clear: both;
+    font-size: 1.3em;
+  }
+}
+

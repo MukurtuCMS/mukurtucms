@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Main file for Field Display Label module.
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function field_display_label_form_field_ui_field_edit_form_alter(&$form, $form_state, $form_id) {
+  if (!isset($form['instance'])) {
+    return;
+  }
+  $form['instance']['display_label'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Display label'),
+    '#description' => t('A separate label for viewing this field. Leave blank to use the default field label.'),
+    '#default_value' => isset($form['#instance']['display_label']) ? $form['#instance']['display_label'] : '',
+    '#weight' => $form['instance']['label']['#weight'] + 1,
+  );
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function field_display_label_preprocess_field(&$variables) {
+  $field = field_info_instance($variables['element']['#entity_type'], $variables['element']['#field_name'], $variables['element']['#bundle']);
+  if (isset($field['display_label']) && strlen(trim($field['display_label'])) > 0) {
+    if (module_exists('i18n_field')) {
+      $variables['label'] = check_plain(i18n_field_translate_property($field, 'display_label'));
+    }
+    else {
+      $variables['label'] = check_plain($field['display_label']);
+    }
+  }
+}
+
+/**
+ * Implements hook_i18n_object_info().
+ */
+function field_display_label_i18n_object_info_alter(&$info) {
+  if (!isset($info['field_instance'])) {
+    return;
+  }
+  $info['field_instance']['string translation']['properties']['display_label'] = t('Display label');
+}

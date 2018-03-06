@@ -10117,7 +10117,9 @@ a:hover {
   padding-top: 10px;
 }
 .node-calendar.view-mode-full .group-right .panel,
-.node-calendar.view-mode-full .group-right .right-col-block {
+.node-event.view-mode-full .group-right .panel,
+.node-calendar.view-mode-full .group-right .right-col-block,
+.node-event.view-mode-full .group-right .right-col-block {
   background: #F8F7F7;
   border-radius: 5px;
   border-color: #ddd !important;
@@ -10125,20 +10127,27 @@ a:hover {
   margin-bottom: 20px;
 }
 .node-calendar.view-mode-full .group-right .panel .view,
-.node-calendar.view-mode-full .group-right .right-col-block .view {
+.node-event.view-mode-full .group-right .panel .view,
+.node-calendar.view-mode-full .group-right .right-col-block .view,
+.node-event.view-mode-full .group-right .right-col-block .view {
   padding: 15px;
 }
 .node-calendar.view-mode-full .group-right .right-col-block .label-above,
-.node-calendar.view-mode-full .group-right .panel-title {
+.node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .group-right .panel-title,
+.node-event.view-mode-full .group-right .panel-title {
   font-size: 20px;
   font-weight: 400;
   text-transform: none;
 }
 .node-calendar.view-mode-full .group-right .right-col-block .label-above,
-.node-calendar.view-mode-full .group-right .panel-heading {
+.node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .group-right .panel-heading,
+.node-event.view-mode-full .group-right .panel-heading {
   background: #E3E2E1;
 }
-.node-calendar.view-mode-full .group-right .right-col-block .label-above {
+.node-calendar.view-mode-full .group-right .right-col-block .label-above,
+.node-event.view-mode-full .group-right .right-col-block .label-above {
   padding: 10px 15px;
 }
 .field-name-protocol-dh-items,
@@ -10789,4 +10798,30 @@ a:hover {
 .view-oa-event-list li {
   overflow: hidden;
   clear: both;
+}
+.node-event.view-mode-full .event-date-wrapper {
+  height: 7em !important;
+  width: 7em !important;
+}
+.node-event.view-mode-full .event-date-wrapper .event-date-month-wrapper {
+  height: 1.96em !important;
+}
+.node-event.view-mode-full .event-date-wrapper .event-date-month {
+  font-size: 1.4em !important;
+}
+.node-event.view-mode-full .event-date-wrapper .event-date-day {
+  font-size: 3.5em !important;
+}
+.node-event.view-mode-full .group-event-details .label-inline {
+  width: 70px;
+  text-align: right;
+}
+.node-event.view-mode-full .group-event-details .field-name-field-oa-address,
+.node-event.view-mode-full .group-event-details .field-name-field-oa-date,
+.node-event.view-mode-full .group-event-details .field-name-calendar-date {
+  margin-bottom: 0.1em !important;
+}
+.node-event.view-mode-full .field-name-body {
+  clear: both;
+  font-size: 1.3em;
 }

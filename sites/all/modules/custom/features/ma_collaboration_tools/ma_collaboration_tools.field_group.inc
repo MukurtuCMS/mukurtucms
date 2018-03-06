@@ -272,10 +272,44 @@ function ma_collaboration_tools_field_group_info() {
   );
   $field_groups['group_collab_actions|node|document_library|full'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_event_details|node|event|full';
+  $field_group->group_name = 'group_event_details';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'event';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Event Details',
+    'weight' => '1',
+    'children' => array(
+      0 => 'field_event_calendar_section',
+      1 => 'field_oa_address',
+      2 => 'field_oa_date',
+    ),
+    'format_type' => 'html-element',
+    'format_settings' => array(
+      'formatter' => '',
+      'instance_settings' => array(
+        'element' => 'div',
+        'show_label' => 0,
+        'label_element' => 'div',
+        'classes' => 'group-event-details field-group-html-element',
+        'attributes' => '',
+        'required_fields' => 1,
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_event_details|node|event|full'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Access');
   t('Actions');
+  t('Event Details');
   t('Visibility');
 
   return $field_groups;

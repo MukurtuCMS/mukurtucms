@@ -171,7 +171,7 @@ function ma_collaboration_tools_field_default_field_bases() {
     'settings' => array(
       'backend' => 'default',
       'srid' => 4326,
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'geofield',

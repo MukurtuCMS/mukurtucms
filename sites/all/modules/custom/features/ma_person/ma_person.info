@@ -151,4 +151,5 @@ features[variable][] = node_options_person
 features[variable][] = node_preview_person
 features[variable][] = node_submitted_person
 features[variable][] = pathauto_node_person_pattern
+features[variable][] = pathauto_taxonomy_term_interpersonal_relationship_pattern
 features_exclude[field_group][group_metadata_div|node|person|person_teaser] = group_metadata_div|node|person|person_teaser

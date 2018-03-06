@@ -473,10 +473,10 @@ function ma_collaboration_tools_strongarm() {
           'weight' => '0',
         ),
         'path' => array(
-          'weight' => '7',
+          'weight' => '5',
         ),
         'redirect' => array(
-          'weight' => '8',
+          'weight' => '6',
         ),
       ),
       'display' => array(),
