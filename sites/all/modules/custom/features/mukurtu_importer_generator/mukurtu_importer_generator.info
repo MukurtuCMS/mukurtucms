@@ -1,0 +1,10 @@
+name = Mukurtu Importer Generator
+core = 7.x
+package = Features
+dependencies[] = ctools
+dependencies[] = feeds
+dependencies[] = feeds_tamper
+features[ctools][] = feeds:feeds_importer_default:1
+features[ctools][] = feeds_tamper:feeds_tamper_default:2
+features[features_api][] = api:2
+features[feeds_importer][] = mukurtu_import_node_digital_heritage

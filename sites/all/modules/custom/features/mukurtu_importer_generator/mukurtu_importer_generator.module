@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Importer Generator feature.
+ */
+
+include_once 'mukurtu_importer_generator.features.inc';
