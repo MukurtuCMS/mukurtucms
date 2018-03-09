@@ -39,9 +39,15 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   'unique' => 1,
                   'language' => 'und',
               ),
+              2 => array(
+                  'source' => 'Title',
+                  'target' => 'title',
+                  'unique' => 1,
+                  'language' => 'und',
+              ),
           );
 
-          $mapping_i = 2;
+          $mapping_i = 3;
 
           foreach($fields_info as $field_name => $field_value) {
               $field = field_info_field($field_name);
