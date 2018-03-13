@@ -30,13 +30,6 @@ function mukurtu_importer_generator_feeds_importer_default() {
           $importer_name = "Mukurtu Import: {$entity_info['label']} - {$ids['label']}";
           $importer_desc = "Mukurtu roundtrip importer for {$entity_info['label']} - {$ids['label']}";
 
-          // Get title label
-          $title_source = '';
-          $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
-          if(isset($extra_fields['title']['label'])) {
-              $title_source = $extra_fields['title']['label'];
-          }
-
           $mappings = array(
               0 => array(
                   'source' => 'guid',
@@ -54,14 +47,21 @@ function mukurtu_importer_generator_feeds_importer_default() {
 
           $mapping_i = 2;
 
-          // Title. Not all types have the extra title field.
-          if($title_source != '') {
-              $mappings[$mapping_i++] = array(
-                  'source' => $title_source,
-                  'target' => 'title',
-                  'unique' => 1,
-                  'language' => 'und',
-              );
+          // Extra fields (title, etc)
+          $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
+          if(!empty($extra_fields)) {
+              foreach($extra_fields as $extra_field_name => $extra_field) {
+                  // Skip path/redirect fields
+                  if(in_array($extra_field_name, array('path', 'redirect'))) {
+                      continue;
+                  }
+                  $mappings[$mapping_i++] = array(
+                      'source' => $extra_field['label'],
+                      'target' => $extra_field_name,
+                      'unique' => 1,
+                      'language' => 'und',
+                  );
+              }
           }
 
           foreach($fields_info as $field_name => $field_value) {
@@ -76,7 +76,6 @@ function mukurtu_importer_generator_feeds_importer_default() {
               );
 
               switch($field['type']) {
-              // Taxonomy Terms
               case 'atom_reference':
               case 'node_reference':
               case 'entityreference':
@@ -87,6 +86,11 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   $mappings[$mapping_i]['term_search'] = 0;
                   $mappings[$mapping_i]['autocreate'] = 1;
                   break;
+              case 'geofield':
+                  $mappings[$mapping_i]['target'] = "{$field_name}:wkt";
+                  break;
+              default:
+                  //                  watchdog(WATCHDOG_NOTICE, "unhandled {$field['type']}");
               }
 
               $mapping_i++;
