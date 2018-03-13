@@ -16,7 +16,11 @@ function mukurtu_importer_generator_feeds_importer_default() {
       if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom', 'taxonomy_term'))) {
           continue;
       }
+      $processor_name = $entity_type == 'node' ? 'FeedsNodeProcessor' : 'FeedsEntityProcessor' . ucfirst($entity_type);
       $entity_info = entity_get_info($entity_type);
+
+      // ID name
+      $entity_id_name = $entity_info['entity keys']['id'];
 
       foreach($entity_info['bundles'] as $bundle_name => $ids) {
           $fields_info = field_info_instances($entity_type, $bundle_name);
@@ -26,6 +30,13 @@ function mukurtu_importer_generator_feeds_importer_default() {
           $importer_name = "Mukurtu Import: {$entity_info['label']} - {$ids['label']}";
           $importer_desc = "Mukurtu roundtrip importer for {$entity_info['label']} - {$ids['label']}";
 
+          // Get title label
+          $title_source = '';
+          $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
+          if(isset($extra_fields['title']['label'])) {
+              $title_source = $extra_fields['title']['label'];
+          }
+
           $mappings = array(
               0 => array(
                   'source' => 'guid',
@@ -34,20 +45,24 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   'language' => 'und',
               ),
               1 => array(
-                  'source' => 'nid',
-                  'target' => 'nid',
-                  'unique' => 1,
-                  'language' => 'und',
-              ),
-              2 => array(
-                  'source' => 'Title',
-                  'target' => 'title',
+                  'source' => $entity_id_name,
+                  'target' => $entity_id_name,
                   'unique' => 1,
                   'language' => 'und',
               ),
           );
 
-          $mapping_i = 3;
+          $mapping_i = 2;
+
+          // Title. Not all types have the extra title field.
+          if($title_source != '') {
+              $mappings[$mapping_i++] = array(
+                  'source' => $title_source,
+                  'target' => 'title',
+                  'unique' => 1,
+                  'language' => 'und',
+              );
+          }
 
           foreach($fields_info as $field_name => $field_value) {
               $field = field_info_field($field_name);
@@ -75,61 +90,61 @@ function mukurtu_importer_generator_feeds_importer_default() {
               }
 
               $mapping_i++;
-
-              // Create feed importer
-              $feeds_importer = new stdClass();
-              $feeds_importer->disabled = FALSE;
-              $feeds_importer->api_version = 1;
-              $feeds_importer->id = $id;
-              $feeds_importer->config = array(
-                  'name' => $importer_name,
-                  'description' => $importer_desc,
-                  'fetcher' => array(
-                      'plugin_key' => 'FeedsFileFetcher',
-                      'config' => array(
-                          'direct' => 0,
-                          'allowed_extensions' => 'csv',
-                          'directory' => 'private://feeds',
-                          'allowed_schemes' => array(
-                              0 => 'public',
-                              1 => 'private',
-                          ),
-                          'delete_uploaded_file' => TRUE,
-                      ),
-                  ),
-                  'parser' => array(
-                      'plugin_key' => 'FeedsCSVParser',
-                      'config' => array(
-                          'delimiter' => ',',
-                          'no_headers' => 0,
-                          'encoding' => 'UTF-8',
-                      ),
-                  ),
-                  'processor' => array(
-                      'plugin_key' => 'FeedsNodeProcessor',
-                      'config' => array(
-                          'update_existing' => '2',
-                          'expire' => '-1',
-                          'mappings' => $mappings,
-                          'input_format' => 'filtered_html',
-                          'author' => '1',
-                          'authorize' => 1,
-                          'skip_hash_check' => 0,
-                          'bundle' => $bundle_name,
-                          'update_non_existent' => 'skip',
-                          'insert_new' => 1,
-                          'language' => 'und',
-                      ),
-                  ),
-                  'content_type' => '',
-                  'update' => 0,
-                  'import_period' => '-1',
-                  'expire_period' => 3600,
-                  'import_on_create' => 1,
-                  'process_in_background' => 0,
-              );
-              $export[$id] = $feeds_importer;
           }
+
+          // Create feed importer
+          $feeds_importer = new stdClass();
+          $feeds_importer->disabled = FALSE;
+          $feeds_importer->api_version = 1;
+          $feeds_importer->id = $id;
+          $feeds_importer->config = array(
+              'name' => $importer_name,
+              'description' => $importer_desc,
+              'fetcher' => array(
+                  'plugin_key' => 'FeedsFileFetcher',
+                  'config' => array(
+                      'direct' => 0,
+                      'allowed_extensions' => 'csv',
+                      'directory' => 'private://feeds',
+                      'allowed_schemes' => array(
+                          0 => 'public',
+                          1 => 'private',
+                      ),
+                      'delete_uploaded_file' => TRUE,
+                  ),
+              ),
+              'parser' => array(
+                  'plugin_key' => 'FeedsCSVParser',
+                  'config' => array(
+                      'delimiter' => ',',
+                      'no_headers' => 0,
+                      'encoding' => 'UTF-8',
+                  ),
+              ),
+              'processor' => array(
+                  'plugin_key' => $processor_name,
+                  'config' => array(
+                      'update_existing' => '2',
+                      'expire' => '-1',
+                      'mappings' => $mappings,
+                      'input_format' => 'filtered_html',
+                      'author' => '1',
+                      'authorize' => 1,
+                      'skip_hash_check' => 0,
+                      'bundle' => $bundle_name,
+                      'update_non_existent' => 'skip',
+                      'insert_new' => 1,
+                      'language' => 'und',
+                  ),
+              ),
+              'content_type' => '',
+              'update' => 0,
+              'import_period' => '-1',
+              'expire_period' => 3600,
+              'import_on_create' => 1,
+              'process_in_background' => 0,
+          );
+          $export[$id] = $feeds_importer;
       }
   }
 

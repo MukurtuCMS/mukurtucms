@@ -4,7 +4,7 @@
  * mukurtu_importer_generator.feeds_tamper_default.inc
  */
 
-function _mukurtu_importer_generator_add_explode_tamper(&$tampers, $importer_id, $field_name, $source) {
+function _mukurtu_importer_generator_add_explode_tamper(&$tampers, $importer_id, $field_name, $source, $weight = 0) {
     $tamper_field_name = str_replace('field_', '', $field_name);
     $tamper_id = "{$importer_id}-{$tamper_field_name}-explode";
 
@@ -20,12 +20,12 @@ function _mukurtu_importer_generator_add_explode_tamper(&$tampers, $importer_id,
         'limit' => '',
         'real_separator' => ';',
     );
-    //    $feeds_tamper->weight = 0;
+    $feeds_tamper->weight = $weight;
     $feeds_tamper->description = 'Explode';
     $tampers[$tamper_id] = $feeds_tamper;
 }
 
-function _mukurtu_importer_generator_add_trim_tamper(&$tampers, $importer_id, $field_name, $source) {
+function _mukurtu_importer_generator_add_trim_tamper(&$tampers, $importer_id, $field_name, $source, $weight = 0) {
     $tamper_field_name = str_replace('field_', '', $field_name);
     $tamper_id = "{$importer_id}-{$tamper_field_name}-trim";
 
@@ -40,12 +40,12 @@ function _mukurtu_importer_generator_add_trim_tamper(&$tampers, $importer_id, $f
         'mask' => '',
         'side' => 'trim',
     );
-    //    $feeds_tamper->weight = 0;
+    $feeds_tamper->weight = $weight;
     $feeds_tamper->description = 'Trim';
     $tampers[$tamper_id] = $feeds_tamper;
 }
 
-function _mukurtu_importer_generator_add_required_tamper(&$tampers, $importer_id, $field_name, $source) {
+function _mukurtu_importer_generator_add_required_tamper(&$tampers, $importer_id, $field_name, $source, $weight = 0) {
     $tamper_field_name = str_replace('field_', '', $field_name);
     $tamper_id = "{$importer_id}-{$tamper_field_name}-required";
 
@@ -60,12 +60,12 @@ function _mukurtu_importer_generator_add_required_tamper(&$tampers, $importer_id
         'invert' => 0,
         'log' => 1,
     );
-    //    $feeds_tamper->weight = 0;
+    $feeds_tamper->weight = $weight;
     $feeds_tamper->description = 'Required field';
     $tampers[$tamper_id] = $feeds_tamper;
 }
 
-function _mukurtu_importer_generator_add_require_valid_node_tamper(&$tampers, $importer_id, $field_name, $source, $node_type) {
+function _mukurtu_importer_generator_add_require_valid_node_tamper(&$tampers, $importer_id, $field_name, $source, $node_type, $weight = 0) {
     $tamper_field_name = str_replace('field_', '', $field_name);
     $tamper_id = "{$importer_id}-{$tamper_field_name}-required_valid_{$node_type}";
 
@@ -80,7 +80,7 @@ function _mukurtu_importer_generator_add_require_valid_node_tamper(&$tampers, $i
         'allow_empty' => 1,
         'node_type' => $node_type,
     );
-    //    $feeds_tamper->weight = 0;
+    $feeds_tamper->weight = $weight;
     $feeds_tamper->description = "Require valid {$node_type}";
     $tampers[$tamper_id] = $feeds_tamper;
 }
