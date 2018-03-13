@@ -213,12 +213,16 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       );
 
       // Title
-      $form['export_fields'][$entity_type][$bundle_name]['title'] = array(
-        '#type' => 'checkbox',
-        '#title' => t('Title'),
-        '#default_value' => isset($defaults[$entity_type][$bundle_name]['title']) ? $defaults[$entity_type][$bundle_name]['title'] : TRUE,
-        '#weight' => -1
-      );
+      $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
+      if(isset($extra_fields['title']['label'])) {
+          $title_label = $extra_fields['title']['label'];
+          $form['export_fields'][$entity_type][$bundle_name]['title'] = array(
+              '#type' => 'checkbox',
+              '#title' => $title_label,
+              '#default_value' => isset($defaults[$entity_type][$bundle_name]['title']) ? $defaults[$entity_type][$bundle_name]['title'] : TRUE,
+              '#weight' => -1
+          );
+      }
 
       foreach($fields_info as $field_name => $field) {
         // Check global blacklist
