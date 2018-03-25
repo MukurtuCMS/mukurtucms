@@ -10821,7 +10821,10 @@ a:hover {
 .node-event.view-mode-full .group-event-details .field-name-calendar-date {
   margin-bottom: 0.1em !important;
 }
-.node-event.view-mode-full .field-name-body {
+.node-event.view-mode-full .field-name-body,
+.node-event.view-mode-full .comment-wrapper {
   clear: both;
+}
+.node-event.view-mode-full .field-name-body {
   font-size: 1.3em;
 }
