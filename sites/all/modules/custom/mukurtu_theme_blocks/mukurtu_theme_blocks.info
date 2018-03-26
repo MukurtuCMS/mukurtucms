@@ -1,0 +1,9 @@
+; $Id$
+name = Mukurtu Theme Blocks
+description = Contains blocks for the default Mukurtu theme
+dependencies[] = colorbox
+dependencies[] = features
+dependencies[] = context
+package = Mukurtu
+core = 7.x
+files[] = mukurtu_theme_blocks.module
