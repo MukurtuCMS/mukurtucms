@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_breadcrumb().
@@ -18,7 +19,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_breadcrumb($variables) {
+function bootstrap_breadcrumb(array $variables) {
   // Use the Path Breadcrumbs theme function if it should be used instead.
   if (_bootstrap_use_path_breadcrumbs()) {
     return path_breadcrumbs_breadcrumb($variables);
@@ -30,13 +31,15 @@ function bootstrap_breadcrumb($variables) {
   // Determine if we are to display the breadcrumb.
   $bootstrap_breadcrumb = bootstrap_setting('breadcrumb');
   if (($bootstrap_breadcrumb == 1 || ($bootstrap_breadcrumb == 2 && arg(0) == 'admin')) && !empty($breadcrumb)) {
-    $output = theme('item_list', array(
-      'attributes' => array(
+    $build = array(
+      '#theme' => 'item_list__breadcrumb',
+      '#attributes' => array(
         'class' => array('breadcrumb'),
       ),
-      'items' => $breadcrumb,
-      'type' => 'ol',
-    ));
+      '#items' => $breadcrumb,
+      '#type' => 'ol',
+    );
+    $output = drupal_render($build);
   }
   return $output;
 }

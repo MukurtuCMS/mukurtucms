@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * List of available hook and alter APIs for use in your sub-theme.
@@ -21,7 +22,7 @@
  *
  * @see _bootstrap_colorize_text()
  */
-function hook_bootstrap_colorize_text_alter(&$texts) {
+function hook_bootstrap_colorize_text_alter(array &$texts) {
   // This matches the exact string: "My Unique Button Text".
   $texts['matches'][t('My Unique Button Text')] = 'primary';
 
@@ -45,7 +46,7 @@ function hook_bootstrap_colorize_text_alter(&$texts) {
  *
  * @see _bootstrap_iconize_text()
  */
-function hook_bootstrap_iconize_text_alter(&$texts) {
+function hook_bootstrap_iconize_text_alter(array &$texts) {
   // This matches the exact string: "My Unique Button Text".
   $texts['matches'][t('My Unique Button Text')] = 'heart';
 
@@ -88,7 +89,7 @@ function hook_bootstrap_iconize_text_alter(&$texts) {
  * @see form_builder()
  * @see drupal_process_form()
  */
-function hook_form_process($element, &$form_state, &$form) {
+function hook_form_process(array $element, array &$form_state, array &$form) {
   return $element;
 }
 
@@ -124,7 +125,7 @@ function hook_form_process($element, &$form_state, &$form) {
  * @see form_builder()
  * @see drupal_process_form()
  */
-function hook_form_process_HOOK($element, &$form_state, &$form) {
+function hook_form_process_HOOK(array $element, array &$form_state, array &$form) {
   return $element;
 }
 
@@ -150,7 +151,7 @@ function hook_form_process_HOOK($element, &$form_state, &$form) {
  *
  * @see bootstrap_element_info_alter()
  */
-function hook_pre_render($element) {
+function hook_pre_render(array $element) {
   return $element;
 }
 
@@ -180,7 +181,7 @@ function hook_pre_render($element) {
  *
  * @see bootstrap_element_info_alter()
  */
-function hook_pre_render_HOOK($element) {
+function hook_pre_render_HOOK(array $element) {
   return $element;
 }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_mark().
@@ -19,7 +20,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_mark($variables) {
+function bootstrap_mark(array $variables) {
   global $user;
   if ($user->uid) {
     if ($variables['type'] == MARK_NEW) {

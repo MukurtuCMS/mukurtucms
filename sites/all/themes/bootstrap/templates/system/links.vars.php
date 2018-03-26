@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "links" theme hook [pre]process functions.
@@ -9,11 +10,14 @@
  *
  * See theme function for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see theme_links()
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_links(&$variables) {
+function bootstrap_preprocess_links(array &$variables) {
   if (isset($variables['attributes']) && isset($variables['attributes']['class'])) {
     $string = is_string($variables['attributes']['class']);
     if ($string) {

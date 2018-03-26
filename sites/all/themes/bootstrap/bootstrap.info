@@ -51,7 +51,7 @@ settings[bootstrap_table_bordered] = 0
 settings[bootstrap_table_condensed] = 0
 settings[bootstrap_table_hover] = 1
 settings[bootstrap_table_striped] = 1
-settings[bootstrap_table_responsive] = 1
+settings[bootstrap_table_responsive] = -1
 
 ; Breadcrumbs
 ; --------------
@@ -208,9 +208,9 @@ multipliers[screen-md-max][] = 2x
 multipliers[screen-lg-min][] = 1.5x
 multipliers[screen-lg-min][] = 2x
 
-; Information added by Drupal.org packaging script on 2017-05-25
-version = "7.x-3.14"
+; Information added by Drupal.org packaging script on 2018-01-26
+version = "7.x-3.19"
 core = "7.x"
 project = "bootstrap"
-datestamp = "1495748288"
+datestamp = "1516989514"
 

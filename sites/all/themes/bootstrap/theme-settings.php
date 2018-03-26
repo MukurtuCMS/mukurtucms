@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * theme-settings.php
@@ -20,7 +21,7 @@ bootstrap_include('bootstrap', 'includes/cdn.inc');
 function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_id = NULL) {
   // Do not add Bootstrap specific settings to non-bootstrap based themes,
   // including a work-around for a core bug affecting admin themes.
-  // @see https://drupal.org/node/943212
+  // @see https://www.drupal.org/node/943212
   $theme = !empty($form_state['build_info']['args'][0]) ? $form_state['build_info']['args'][0] : FALSE;
   if (isset($form_id) || $theme === FALSE || !in_array('bootstrap', _bootstrap_get_base_themes($theme, TRUE))) {
     return;
@@ -66,7 +67,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#group' => 'bootstrap',
   );
 
-  //Container
+  // Container.
   $form['general']['container'] = array(
     '#type' => 'fieldset',
     '#title' => t('Container'),
@@ -78,7 +79,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#title' => t('Fluid container'),
     '#default_value' => bootstrap_setting('fluid_container', $theme),
     '#description' => t('Use <code>.container-fluid</code> class. See <a href="!url">Fluid container</a>', array(
-      '!url' => 'http://getbootstrap.com/css/#grid-example-fluid',
+      '!url' => 'https://getbootstrap.com/docs/3.3/css/#grid-example-fluid',
     )),
   );
 
@@ -105,8 +106,8 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#title' => t('Colorize Buttons'),
     '#default_value' => bootstrap_setting('button_colorize', $theme),
     '#description' => t('Adds classes to buttons based on their text value. See: <a href="!bootstrap_url" target="_blank">Buttons</a> and <a href="!api_url" target="_blank">hook_bootstrap_colorize_text_alter()</a>', array(
-      '!bootstrap_url' => 'http://getbootstrap.com/css/#buttons',
-      '!api_url' => 'http://drupal-bootstrap.org/apis/hook_bootstrap_colorize_text_alter',
+      '!bootstrap_url' => 'https://getbootstrap.com/docs/3.3/css/#buttons',
+      '!api_url' => 'https://drupal-bootstrap.org/apis/hook_bootstrap_colorize_text_alter',
     )),
   );
   $form['general']['buttons']['bootstrap_button_iconize'] = array(
@@ -114,7 +115,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#title' => t('Iconize Buttons'),
     '#default_value' => bootstrap_setting('button_iconize', $theme),
     '#description' => t('Adds icons to buttons based on the text value. See: <a href="!api_url" target="_blank">hook_bootstrap_iconize_text_alter()</a>', array(
-      '!api_url' => 'http://drupal-bootstrap.org/apis/hook_bootstrap_iconize_text_alter',
+      '!api_url' => 'https://drupal-bootstrap.org/apis/hook_bootstrap_iconize_text_alter',
     )),
   );
 
@@ -171,7 +172,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#type' => 'select',
     '#title' => t('Default image shape'),
     '#description' => t('Add classes to an <code>&lt;img&gt;</code> element to easily style images in any project. Note: Internet Explorer 8 lacks support for rounded corners. See: <a href="!bootstrap_url" target="_blank">Image Shapes</a>', array(
-      '!bootstrap_url' => 'http://getbootstrap.com/css/#images-shapes',
+      '!bootstrap_url' => 'https://getbootstrap.com/docs/3.3/css/#images-shapes',
     )),
     '#default_value' => bootstrap_setting('image_shape', $theme),
     '#empty_option' => t('None'),
@@ -220,10 +221,15 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#description' => t('Add zebra-striping to any table row within the <code>&lt;tbody&gt;</code>. <strong>Note:</strong> Striped tables are styled via the <code>:nth-child</code> CSS selector, which is not available in Internet Explorer 8.'),
   );
   $form['general']['tables']['bootstrap_table_responsive'] = array(
-    '#type' => 'checkbox',
+    '#type' => 'select',
     '#title' => t('Responsive tables'),
     '#default_value' => bootstrap_setting('table_responsive', $theme),
-    '#description' => t('Makes tables responsive by wrapping them in <code>.table-responsive</code> to make them scroll horizontally up to small devices (under 768px). When viewing on anything larger than 768px wide, you will not see any difference in these tables.'),
+    '#description' => t('Wraps tables with <code>.table-responsive</code> to make them horizontally scroll when viewing them on devices under 768px. When viewing on devices larger than 768px, you will not see a difference in the presentational aspect of these tables. The <code>Automatic</code> option will only apply this setting for front-end facing tables, not the tables in administrative areas.'),
+    '#options' => array(
+      -1 => t('Automatic'),
+      0 => t('Disabled'),
+      1 => t('Enabled'),
+    ),
   );
 
   // Components.
@@ -310,7 +316,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#default_value' => bootstrap_setting('navbar_inverse', $theme),
   );
 
-  // Pager
+  // Pager.
   $form['components']['pager'] = array(
     '#type' => 'fieldset',
     '#title' => t('Pagination'),
@@ -336,7 +342,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#type' => 'fieldset',
     '#title' => t('Region wells'),
     '#description' => t('Enable the <code>.well</code>, <code>.well-sm</code> or <code>.well-lg</code> classes for specified regions. See: documentation on <a href="!wells" target="_blank">Bootstrap Wells</a>.', array(
-      '!wells' => 'http://getbootstrap.com/components/#wells',
+      '!wells' => 'https://getbootstrap.com/docs/3.3/components/#wells',
     )),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -520,7 +526,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#type' => 'fieldset',
     '#title' => t('Tooltips'),
     '#description' => t('Inspired by the excellent jQuery.tipsy plugin written by Jason Frame; Tooltips are an updated version, which don\'t rely on images, use CSS3 for animations, and data-attributes for local title storage. See <a href="!url" target="_blank">Bootstrap tooltips</a> for more documentation.', array(
-      '!url' => 'http://getbootstrap.com/javascript/#tooltips',
+      '!url' => 'https://getbootstrap.com/docs/3.3/javascript/#tooltips',
     )),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -616,7 +622,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#title' => t('Suppress jQuery version error message'),
     '#default_value' => bootstrap_setting('toggle_jquery_error', $theme),
     '#description' => t('Enable this if the version of jQuery has been upgraded to 1.9+ using a method other than the <a href="!jquery_update" target="_blank">jQuery Update</a> module.', array(
-      '!jquery_update' => 'https://drupal.org/project/jquery_update',
+      '!jquery_update' => 'https://www.drupal.org/project/jquery_update',
     )),
   );
 

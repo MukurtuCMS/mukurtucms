@@ -1,8 +1,11 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_fieldset().
  */
+
+/* @noinspection PhpDocMissingThrowsInspection */
 
 /**
  * Returns HTML for a fieldset form element and its children.
@@ -20,6 +23,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_fieldset($variables) {
+function bootstrap_fieldset(array $variables) {
+  /* @noinspection PhpUnhandledExceptionInspection */
   return theme('bootstrap_panel', $variables);
 }

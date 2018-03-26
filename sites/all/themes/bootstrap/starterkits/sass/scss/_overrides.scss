@@ -46,7 +46,7 @@ html {
 }
 body {
   // Fix horizontal scrolling on iOS devices.
-  // http://drupal.org/node/1870076
+  // https://www.drupal.org/node/1870076
   position: relative;
   &.admin-expanded.admin-vertical.admin-nw .navbar,
   &.admin-expanded.admin-vertical.admin-sw .navbar {
@@ -265,7 +265,6 @@ fieldset legend.panel-heading {
 }
 fieldset .panel-body {
   clear: both;
-  display: inherit;
 }
 fieldset .panel-heading a.panel-title {
   color: inherit;
@@ -852,20 +851,24 @@ body.navbar-tray-open.navbar-vertical.navbar-fixed {
  * Icon styles.
  */
 a {
-  &.icon-before .glyphicon {
+  &.icon-before .glyphicon,
+  & .glyphicon.icon-before {
     margin-right: .25em;
   }
-  &.icon-after .glyphicon {
+  &.icon-after .glyphicon,
+  & .glyphicon.icon-after {
     margin-left: .25em;
   }
 }
 
 .btn {
-  &.icon-before .glyphicon {
+  &.icon-before .glyphicon,
+  & .glyphicon.icon-before {
     margin-left: -.25em;
     margin-right: .25em;
   }
-  &.icon-after .glyphicon {
+  &.icon-after .glyphicon,
+  & .glyphicon.icon-after {
     margin-left: .25em;
     margin-right: -.25em;
   }

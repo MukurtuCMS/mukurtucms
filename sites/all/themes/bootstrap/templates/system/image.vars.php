@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "image" theme hook [pre]process functions.
@@ -9,11 +10,14 @@
  *
  * See theme function for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see theme_image()
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_image(&$variables) {
+function bootstrap_preprocess_image(array &$variables) {
   // Add image shape, if necessary.
   if ($shape = bootstrap_setting('image_shape')) {
     _bootstrap_add_class($shape, $variables);

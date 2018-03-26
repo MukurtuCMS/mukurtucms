@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "button" theme hook [pre]process functions.
@@ -9,13 +10,16 @@
  *
  * See theme function for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see bootstrap_button()
  * @see theme_button()
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_button(&$vars) {
-  $element = &$vars['element'];
+function bootstrap_preprocess_button(array &$variables) {
+  $element = &$variables['element'];
 
   // Drupal buttons should be of type 'submit'.
   // @see https://www.drupal.org/node/2540452
