@@ -7551,7 +7551,8 @@ body {
   padding: 0px;
   overflow-x: hidden;
 }
-header {
+header,
+.hero-image {
   margin-top: 0px !important;
   border: 0px !important;
   padding-left: 0px !important;
@@ -7764,4 +7765,33 @@ footer header {
   .footer .block {
     padding-bottom: 30px;
   }
+}
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  line-height: 1em;
+  font-size: 40px;
+  width: 100%;
+  background: url(../images/icons/chevrondown.svg) no-repeat 0% 50%;
+  background-position: bottom center;
+  padding-bottom: 50px;
+}
+@media (min-width: 768px) {
+  .hero-text {
+    font-size: 60px;
+    width: 80%;
+  }
+}
+@media (min-width: 992px) {
+  .hero-text {
+    font-size: 72px;
+    width: 60%;
+  }
+}
+.hero-image > img {
+  min-height: 225px;
 }

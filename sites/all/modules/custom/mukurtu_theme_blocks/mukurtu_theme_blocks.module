@@ -4,6 +4,9 @@ function mukurtu_theme_blocks_block_info() {
     $blocks['mukurtu_theme_footer'] = array(
         'info' => t('Mukurtu Theme Default Footer'),
     );
+    $blocks['mukurtu_theme_frontpage_hero'] = array(
+        'info' => t('Mukurtu Theme Frontpage Hero Image'),
+    );
 
     return $blocks;
 }
@@ -12,11 +15,12 @@ function mukurtu_theme_blocks_block_view($delta = '') {
     switch($delta) {
     case 'mukurtu_theme_footer':
         return _mukurtu_theme_blocks_footer();
+    case 'mukurtu_theme_frontpage_hero':
+        return _mukurtu_theme_blocks_hero();
     }
 }
 
 function _mukurtu_theme_blocks_footer() {
-    //    $block['subject'] = "SUBJECT";
     $block['content'] = '<div class="contact">';
 
     // Email contact
@@ -67,5 +71,16 @@ function _mukurtu_theme_blocks_footer() {
         $block['content'] .= "<div class='copyright col-md-pull-8 col-md-4 col-xs-12'>$copyright</div>";
     }
 
+    return $block;
+}
+
+function _mukurtu_theme_blocks_hero() {
+    $slogan = variable_get('site_slogan', '');
+    $hero_image = theme_get_setting('mukurtu_theme_frontpage_hero_image', '');
+    if($hero_image == '') {
+        $image_url = drupal_get_path('theme', 'mukurtu') . '/images/frontpage-hero.png';
+    }
+
+    $block['content'] = "<div class=\"col-xs-12 hero-image\"><img class=\"img-responsive\" src=$image_url /><div class=\"hero-text\">$slogan</div></div>";
     return $block;
 }

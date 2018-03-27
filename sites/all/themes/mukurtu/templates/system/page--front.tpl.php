@@ -129,12 +129,11 @@
   </div>
 </header>
 
-<div class="main-container <?php print $container_class; ?>">
-
-  <header role="banner" id="page-header">
+<header role="banner" id="page-header">
     <?php print render($page['header']); ?>
-  </header> <!-- /#page-header -->
+</header> <!-- /#page-header -->
 
+<div class="main-container <?php print $container_class; ?>">
   <div class="row">
 
     <?php if (!empty($page['sidebar_first'])): ?>
