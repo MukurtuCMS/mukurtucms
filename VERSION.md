@@ -1,3 +1,8 @@
+## Mukurtu 2.0.9
+- Upgraded Drupal core from 7.56 to 7.58. Includes two critical security updates.
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
 ## Mukurtu 2.0.8
 - Added an initial beta implementation of Mukurtu Taxonomy Records, a system that provides the ability to enhance taxonomy terms with additional content
 - Added the “Person” content type, which can be used as a taxonomy record, to provide additional metadata about a specific person
