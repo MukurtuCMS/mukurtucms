@@ -1,0 +1,79 @@
+//// Primary color link container
+.primary-color-link-container {
+    background-color: @brand-primary;
+
+    &:hover,
+    &:focus {
+        background-color: @mukurtu-navbar-default-link-hover-bg;
+    }
+
+    a {
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+}
+
+//// Left side image/right side text
+//@left-right-height: 130px;
+@left-right-height: 100%;
+
+.left-right-image-title {
+    padding-bottom: 30px;
+
+    > div {
+        //background-color: @brand-primary;
+        .primary-color-link-container;
+    }
+
+    // Right side
+    div.field:nth-of-type(2) {
+        float:right;
+        width: 60%;
+        text-align: center;
+        height: @left-right-height;
+        position: absolute;
+        right: 0;
+
+        h3 {
+            margin: auto;
+            line-height: @left-right-height;
+            text-align: center;
+            height: 100%;
+            display: table;
+
+            a {
+                display: table-cell;
+                vertical-align: middle;
+                color: #fff;
+                font-size: 14px;
+                font-weight: bold;
+                height: 100%;
+            }
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                a {
+                    font-size: 15px;
+                }
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                a {
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+
+    // Left side
+    div.field:nth-of-type(3) {
+        float:left;
+        width: 40%;
+        img {
+            height: @left-right-height;
+        }
+    }
+}

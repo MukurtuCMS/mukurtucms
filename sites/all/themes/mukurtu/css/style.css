@@ -7719,6 +7719,71 @@ header,
   color: #e5ab48;
   text-decoration: none;
 }
+.primary-color-link-container {
+  background-color: #159ec4;
+}
+.primary-color-link-container:hover,
+.primary-color-link-container:focus {
+  background-color: #138aab;
+}
+.primary-color-link-container a:hover,
+.primary-color-link-container a:focus {
+  text-decoration: none;
+}
+.left-right-image-title {
+  padding-bottom: 30px;
+}
+.left-right-image-title > div {
+  background-color: #159ec4;
+}
+.left-right-image-title > div:hover,
+.left-right-image-title > div:focus {
+  background-color: #138aab;
+}
+.left-right-image-title > div a:hover,
+.left-right-image-title > div a:focus {
+  text-decoration: none;
+}
+.left-right-image-title div.field:nth-of-type(2) {
+  float: right;
+  width: 60%;
+  text-align: center;
+  height: 100%;
+  position: absolute;
+  right: 0;
+}
+.left-right-image-title div.field:nth-of-type(2) h3 {
+  margin: auto;
+  line-height: 100%;
+  text-align: center;
+  height: 100%;
+  display: table;
+}
+.left-right-image-title div.field:nth-of-type(2) h3 a {
+  display: table-cell;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  height: 100%;
+}
+@media (min-width: 768px) {
+  .left-right-image-title div.field:nth-of-type(2) h3 a {
+    font-size: 15px;
+  }
+}
+@media (min-width: 992px) {
+  .left-right-image-title div.field:nth-of-type(2) h3 a {
+    font-size: 16px;
+  }
+}
+.left-right-image-title div.field:nth-of-type(3) {
+  float: left;
+  width: 40%;
+}
+.left-right-image-title div.field:nth-of-type(3) img {
+  height: 100%;
+}
 footer header {
   margin-top: 0px !important;
   border: 0px !important;
@@ -7794,4 +7859,146 @@ footer header {
 }
 .hero-image > img {
   min-height: 225px;
+  width: 100%;
+}
+.front .main-container section h2 {
+  text-align: center;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size: 35px;
+  color: #464646;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+.view-mukurtu-frontpage-featured-content a:hover,
+.view-mukurtu-frontpage-featured-content a:focus {
+  text-decoration: none;
+}
+.view-mukurtu-frontpage-featured-content .views-row {
+  padding-bottom: 30px;
+}
+.view-mukurtu-frontpage-featured-content .field-name-featured-content-view-link {
+  position: absolute;
+  background-color: #159ec4;
+  padding: 10px;
+}
+.view-mukurtu-frontpage-featured-content .field-name-featured-content-view-link:hover,
+.view-mukurtu-frontpage-featured-content .field-name-featured-content-view-link:focus {
+  background-color: #138aab;
+}
+.view-mukurtu-frontpage-featured-content .field-name-featured-content-view-link a {
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
+  background-position: center right;
+  padding-right: 15px;
+}
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset img {
+  margin: auto;
+  width: 100%;
+}
+.view-mukurtu-frontpage-featured-content .field-name-featured-content-type {
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  padding-top: 20px;
+  text-align: center;
+  text-transform: uppercase;
+}
+@media (min-width: 992px) {
+  .view-mukurtu-frontpage-featured-content .field-name-featured-content-type {
+    font-size: 15px;
+  }
+}
+.view-mukurtu-frontpage-featured-content .field-name-title h2 {
+  margin-top: 0px;
+}
+.view-mukurtu-frontpage-featured-content .field-name-title h2 a {
+  color: #138aab;
+  font-size: 26px;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
+  background-position: center right;
+  padding-right: 20px;
+}
+.view-mukurtu-frontpage-featured-content .field-name-title h2 a:hover,
+.view-mukurtu-frontpage-featured-content .field-name-title h2 a:focus {
+  color: #e6ab49;
+}
+.view-mukurtu-frontpage-featured-content .field-name-field-summary {
+  font-size: 13px;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  .view-mukurtu-frontpage-featured-content .views-row-3 {
+    display: none;
+  }
+  .view-mukurtu-frontpage-featured-content .field-name-title h2 a {
+    font-size: 30px;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  }
+}
+@media (min-width: 992px) {
+  .view-mukurtu-frontpage-featured-content .views-row-3 {
+    display: block;
+  }
+  .view-mukurtu-frontpage-featured-content .field-name-field-summary {
+    font-size: 16px;
+  }
+}
+.view-mukurtu-frontpage-browse-by-community {
+  padding-bottom: 30px;
+}
+.view-mukurtu-frontpage-browse-by-community > div {
+  background-color: #159ec4;
+}
+.view-mukurtu-frontpage-browse-by-community > div:hover,
+.view-mukurtu-frontpage-browse-by-community > div:focus {
+  background-color: #138aab;
+}
+.view-mukurtu-frontpage-browse-by-community > div a:hover,
+.view-mukurtu-frontpage-browse-by-community > div a:focus {
+  text-decoration: none;
+}
+.view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(2) {
+  float: right;
+  width: 60%;
+  text-align: center;
+  height: 100%;
+  position: absolute;
+  right: 0;
+}
+.view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(2) h3 {
+  margin: auto;
+  line-height: 100%;
+  text-align: center;
+  height: 100%;
+  display: table;
+}
+.view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(2) h3 a {
+  display: table-cell;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  height: 100%;
+}
+@media (min-width: 768px) {
+  .view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(2) h3 a {
+    font-size: 15px;
+  }
+}
+@media (min-width: 992px) {
+  .view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(2) h3 a {
+    font-size: 16px;
+  }
+}
+.view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(3) {
+  float: left;
+  width: 40%;
+}
+.view-mukurtu-frontpage-browse-by-community div.field:nth-of-type(3) img {
+  height: 100%;
 }
