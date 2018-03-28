@@ -8,7 +8,7 @@
 /**
  * The current system version.
  */
-define('VERSION', '7.56');
+define('VERSION', '7.58');
 
 /**
  * Core API compatibility.
@@ -1176,15 +1176,7 @@ function variable_initialize($conf = array()) {
     $variables = $cached->data;
   }
   else {
-    // The variable cache was not available. It might mean that we are running
-    // on an empty database. In that case, just redirect the user to install.php,
-    // unless we've already been there.
-    if (!db_table_exists('variable') && !drupal_installation_attempted()) {
-      include_once DRUPAL_ROOT . '/includes/install.inc';
-      install_goto('install.php');
-    }
-
-    // Avoid a stampede.
+    // Cache miss. Avoid a stampede.
     $name = 'variable_init';
     if (!lock_acquire($name, 1)) {
       // Another request is building the variable cache.
@@ -2640,6 +2632,10 @@ function _drupal_bootstrap_configuration() {
   timer_start('page');
   // Initialize the configuration, including variables from settings.php.
   drupal_settings_initialize();
+
+  // Sanitize unsafe keys from the request.
+  require_once DRUPAL_ROOT . '/includes/request-sanitizer.inc';
+  DrupalRequestSanitizer::sanitize();
 }
 
 /**
