@@ -7831,6 +7831,11 @@ footer header {
     padding-bottom: 30px;
   }
 }
+.main-container section.block {
+  background: linear-gradient(#e6e6e6, #ffffff);
+  background-repeat: no-repeat;
+  background-size: 100% 12px;
+}
 .hero-text {
   position: absolute;
   top: 50%;
