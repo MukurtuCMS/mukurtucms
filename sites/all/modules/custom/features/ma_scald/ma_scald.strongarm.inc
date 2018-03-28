@@ -265,6 +265,18 @@ function ma_scald_strongarm() {
       'mukurtu_scald_recording' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -311,6 +323,14 @@ function ma_scald_strongarm() {
           ),
           'mukurtu_scald_taxonomy_thumbnail' => array(
             'weight' => '0',
+            'visible' => FALSE,
+          ),
+          'mukurtu_featured_content' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_browse_by_grid' => array(
+            'weight' => '3',
             'visible' => FALSE,
           ),
         ),
@@ -566,6 +586,22 @@ function ma_scald_strongarm() {
       'parseable' => TRUE,
       'formats' => array(),
       'provider' => 'scald',
+    ),
+    'mukurtu_featured_content' => array(
+      'name' => 'mukurtu_featured_content',
+      'title' => 'Mukurtu Featured Content',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_browse_by_grid' => array(
+      'name' => 'mukurtu_browse_by_grid',
+      'title' => 'Mukurtu Browse By Grid',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
     ),
   );
   $export['scald_custom_contexts'] = $strongarm;

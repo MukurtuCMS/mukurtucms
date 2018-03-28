@@ -489,7 +489,6 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
-      'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
@@ -501,10 +500,7 @@ function ma_scald_default_scald_context_config() {
       '*' => 'default',
     ),
   );
-  $context_config->data = array(
-    'width' => '',
-    'height' => '',
-  );
+  $context_config->data = array();
   $export['sdl_library_item'] = $context_config;
 
   $context_config = new stdClass();
