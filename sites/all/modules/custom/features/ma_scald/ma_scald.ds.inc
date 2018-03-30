@@ -661,6 +661,230 @@ function ma_scald_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|sketchfab|form';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'sketchfab';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_scald_protocol',
+        2 => 'scald_tags',
+        3 => 'group_scald_addtional_fields',
+        5 => 'group_scald_accordion',
+        6 => 'scald_thumbnail',
+        7 => 'scald_authors',
+        8 => 'field_scald_description',
+        9 => 'redirect',
+      ),
+      'hidden' => array(
+        4 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'field_scald_protocol' => 'ds_content',
+      'scald_tags' => 'ds_content',
+      'group_scald_addtional_fields' => 'ds_content',
+      '_add_existing_field' => 'hidden',
+      'group_scald_accordion' => 'ds_content',
+      'scald_thumbnail' => 'ds_content',
+      'scald_authors' => 'ds_content',
+      'field_scald_description' => 'ds_content',
+      'redirect' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|sketchfab|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|sketchfab|ma_colorbox';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'sketchfab';
+  $ds_layout->view_mode = 'ma_colorbox';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+        1 => 'group_scald_atom_metadata',
+        2 => 'field_scald_protocol',
+        3 => 'scald_authors',
+        4 => 'scald_tags',
+        5 => 'field_scald_description',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+      'group_scald_atom_metadata' => 'ds_content',
+      'field_scald_protocol' => 'ds_content',
+      'scald_authors' => 'ds_content',
+      'scald_tags' => 'ds_content',
+      'field_scald_description' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|sketchfab|ma_colorbox'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|sketchfab|ma_scald_search_results';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'sketchfab';
+  $ds_layout->view_mode = 'ma_scald_search_results';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|sketchfab|ma_scald_search_results'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|sketchfab|mukurtu_scald_dictionary_media';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'sketchfab';
+  $ds_layout->view_mode = 'mukurtu_scald_dictionary_media';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'scald_thumbnail',
+        1 => 'atom',
+        2 => 'scald_tags',
+      ),
+    ),
+    'fields' => array(
+      'scald_thumbnail' => 'ds_content',
+      'atom' => 'ds_content',
+      'scald_tags' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|sketchfab|mukurtu_scald_dictionary_media'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|sketchfab|mukurtu_scald_recording';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'sketchfab';
+  $ds_layout->view_mode = 'mukurtu_scald_recording';
+  $ds_layout->layout = 'ds_3col_stacked_equal_width';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'header' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'header',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'header' => 'div',
+      'left' => 'div',
+      'middle' => 'div',
+      'right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['scald_atom|sketchfab|mukurtu_scald_recording'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'scald_atom|sketchfab|mukurtu_scald_related_items';
+  $ds_layout->entity_type = 'scald_atom';
+  $ds_layout->bundle = 'sketchfab';
+  $ds_layout->view_mode = 'mukurtu_scald_related_items';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'atom',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['scald_atom|sketchfab|mukurtu_scald_related_items'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'scald_atom|video|default';
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'video';

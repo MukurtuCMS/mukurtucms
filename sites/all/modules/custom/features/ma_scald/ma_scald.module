@@ -261,6 +261,14 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
 
       // Set metadata
       $entity = $form['atom' . $atom_index]['#entity'];
+
+      // $entity is empty on our custom scald_sketchfab provider (for reasons unknown), so do not
+      // alter any fields as we need $entity hereforth. This is fine as sketchfab and any other custom
+      // scald providers can have any custom metadata handling done within the provider code.
+      if (!$entity) {
+        return;
+      }
+
       if(isset($entity->base_id)) {
 	$file = file_load($entity->base_id);
       }
@@ -449,6 +457,9 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
     if($atom->provider == 'scald_soundcloud') {
         scald_soundcloud_scald_prerender($atom, $context, $options, $mode);
     }
+
+    // For Sketchfab atoms, this hook is not fired as scald_sketchfab_scald_prerender catches it first, which we want.
+    // If for some reason this hook starts firing on Sketchfab atoms, do something similar to what we do for Soundcloud atoms above.
 
     if($mode == 'player') {
         if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {

@@ -1,0 +1,9 @@
+.scald-menu .add-buttons .add-sketchfab {
+  background: url('../icons/sketchfab-large-inverted.png') 50% 50% no-repeat;
+}
+
+.dnd-library-wrapper .editor-item .meta.type-sketchfab {
+  background-image: url('../icons/sketchfab.png');
+}
+
+

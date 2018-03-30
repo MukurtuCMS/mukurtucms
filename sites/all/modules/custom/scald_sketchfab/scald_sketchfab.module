@@ -1,0 +1,291 @@
+<?php
+/**
+ * @file
+ * Defines a Sketchfab provider for Scald.
+ */
+
+/**
+ * Implements hook_scald_atom_providers().
+ *
+ * Tell Scald that we'll be providing some video atoms.
+ */
+function scald_sketchfab_scald_atom_providers() {
+  return array(
+    'sketchfab' => 'Sketchfab model',
+  );
+  /*
+   * This code will never be hit, but is necessary to mark the string
+   * for translation on localize.d.o
+   * @codingStandardsIgnoreStart
+   */
+  t('Sketchfab model');
+  // @codingStandardsIgnoreEnd
+}
+
+/**
+ * Implements hook_scald_add_form().
+ */
+function scald_sketchfab_scald_add_form(&$form, &$form_state) {
+  $form['identifier'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Sketchfab ID'),
+    '#description' => t('32-digit alphanumeric Sketchfab ID'),
+    '#element_validate' => array('scald_sketchfab_validate_id'),
+    '#required' => TRUE,
+    '#default_value' => '',
+  );
+
+}
+
+/**
+ * Implements hook_scald_add_form_fill().
+ */
+function scald_sketchfab_scald_add_form_fill(&$atom, $form, $form_state) {
+
+  // Get the identifier.
+  $identifier = $form_state['values']['identifier'];
+  $atom->base_id = $identifier;
+
+  // Get sketchfab metadata
+  $sketch_info = scald_sketchfab_get_info($form_state['values']['identifier']);
+
+  // Prefill atom title.
+  $atom->title = $sketch_info->name;
+
+  // Prefill atom author.
+  $atom->scald_authors[LANGUAGE_NONE][0] = array(
+    'tid' => 0,
+    'taxonomy_term' => (object) (array('name' => $sketch_info->user->displayName)),
+  );
+
+  // Prefill atom tags using both the sketchfab categories and tags.
+  $tags = array_merge($sketch_info->categories, $sketch_info->tags);
+  if (count ($tags)) {
+    foreach ($tags as $index => $tag) {
+      $atom->scald_tags[LANGUAGE_NONE][] = array(
+        'tid' => $index,
+        'taxonomy_term' => (object) (array('name' => $tag->name)),
+      );
+    }
+  }
+
+
+  // Prefill the atom thumbnail with the first sufficiently large thumbnail, of the available thumbnails.
+  // (some of the thumbnails are too small to look good).
+  // If there are no good thumbnails, the renderer will fall back to the default sketchfab thumbnail.
+  if (count($sketch_info->thumbnails->images)) {
+    foreach ($sketch_info->thumbnails->images as $thumbnail) {
+      if ($thumbnail->width >= 215) { // 215px is the width of the DH browse thumbnails.
+        $thumb_file = drupal_http_request($thumbnail->url);
+        if ($thumb_file->code == 200) {
+          if ($directory = ScaldAtomController::getThumbnailPath('sketchfab')) {
+            $dest = $directory . '/sketchfab-' . $identifier . '.jpg';
+            $file = file_save_data($thumb_file->data, $dest);
+            if ($file) {
+              // Set the file status to temporary.
+              db_update('file_managed')
+                ->condition('fid', $file->fid)
+                ->fields(['status' => 0])
+                ->execute();
+              $atom->scald_thumbnail[LANGUAGE_NONE][0] = (array) $file;
+              break; // We have a good thumbnail. Use this one.
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Prefill the atom description.
+  if ($description = $sketch_info->description) {
+    $atom->field_scald_description[LANGUAGE_NONE][0]['value'] = $description;
+  }
+
+}
+
+/**
+ * Implements hook_scald_fetch().
+ */
+function scald_sketchfab_scald_fetch($atom, $type) {
+  $items = field_get_items('scald_atom', $atom, 'scald_thumbnail');
+  if ($items && file_exists($items[0]['uri'])) {
+    $atom->file_source = $atom->thumbnail_source = $items[0]['uri'];
+  }
+}
+
+/**
+ * Implements hook_scald_prerender().
+ */
+function scald_sketchfab_scald_prerender($atom, $context, $options, $mode) {
+  if ($atom->type == 'sketchfab') { // This is not actually necessary, though I am unclear why, so leaving in for good measure.
+    if ($mode == 'atom') { // Not sure this line is necessary either
+
+      switch ($context) {
+        case 'ma_colorbox':
+        case 'mukurtu_scald_media_assets_edit_':
+        case 'full':
+          $atom->rendered->player = [
+            '#theme' => 'scald_sketchfab_player',
+            '#vars' => [
+              'sketchfab_id' => $atom->base_id,
+              'thumbnail' => $atom->rendered->thumbnail_source_url,
+              'title' => check_plain($atom->title),
+            ],
+            '#atom' => $atom,
+          ];
+          break;
+
+        default:
+
+          // Thumbnail
+          if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
+            $image_styles = [
+              'ma_scald_search_results' => 'medium',
+              'mukurtu_scald_related_items' => 'related_items_teaser'
+            ];
+            $thumbnail_image = theme_image_style([
+              'style_name' => $image_styles[$context],
+              'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
+            ]);
+          }
+          // If no atom thumbnail, use our default thumbnail.
+          else {
+            $image_widths = [
+              'ma_scald_search_results' => '220',
+              'mukurtu_scald_related_items' => '280'
+            ];
+            $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'scald_sketchfab') . '/default_thumbnails/default_sketchfab_thumbnail_' . $image_widths[$context] . '.jpg">';
+          }
+
+          $atom->rendered->player = ['#markup' => l($thumbnail_image, $options['link'], ['html' => TRUE])];
+
+          break;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function scald_sketchfab_theme() {
+  return array(
+    'scald_sketchfab_player' => array(
+      'variables' => array(
+        'vars' => NULL,
+        'atom' => NULL,
+      ),
+      'template' => 'templates/scald_sketchfab_player',
+    ),
+  );
+}
+
+// Not sure where this is supposed to be called from but it works fine without it.
+///**
+// * scald_sketchfab_register.
+// */
+//function scald_sketchfab_register($sketchfab) {
+//
+//  // Check if the sketchfab model has already been imported to prevent duplicate.
+//  $old = scald_sketchfab_already_imported($sketchfab);
+//  if ($old) {
+//    return FALSE;
+//  }
+//
+//  // Create an atom.
+//  $atom = new ScaldAtom('sketchfab', 'scald_sketchfab', array(
+//    'base_id' => $sketchfab,
+//    'title' => $sketchfab->title,
+//  ));
+//
+//  // And save it.
+//  $atom_sid = scald_atom_save($atom);
+//  // Finally, return this id.
+//  return $atom_sid;
+//}
+
+/**
+ * Checks if a sketchfab model has already been imported, based on its ID.
+ *
+ * @param string $id
+ *   The video identifier.
+ *
+ * @return mixed
+ *   FALSE if the video was never imported, the scald identifier of
+ *   the video otherwise.
+ */
+function scald_sketchfab_already_imported($id) {
+  $query = array('provider' => 'scald_sketchfab', 'base_id' => $id);
+  return scald_search($query, FALSE, TRUE);
+}
+
+
+/**
+ * Form element validation handler for Sketchfab URL.
+ */
+function scald_sketchfab_validate_id($element, &$form_state) {
+  $sketchfab_id = $form_state['values']['identifier'];
+  if ($sketch_info = scald_sketchfab_get_info($sketchfab_id)) {
+    if (scald_sketchfab_already_imported($sketchfab_id)) {
+      form_error($element, t('Sketchfab model already imported.'));
+    }
+  }
+  else {
+    form_error($element, t('Invalid Sketchfab ID.'));
+  }
+
+}
+
+
+/**
+ * Parse a Sketchfab ID and check validity.
+ */
+function scald_sketchfab_get_info($sketchfab_id) {
+  if ($sketchfab_id = filter_xss_bad_protocol($sketchfab_id)) { // this filter is just-in-case.
+    if ($sketch_info = json_decode(file_get_contents('https://sketchfab.com/v3/models/' . $sketchfab_id))) {
+      return $sketch_info;
+    }
+  }
+}
+
+
+///**
+// * Implements hook_wysiwyg_plugin().
+// */
+//function scald_sketchfab_wysiwyg_plugin($editor, $version) {
+//  switch ($editor) {
+//    case 'ckeditor':
+//      return array(
+//        'scald_sketchfab_defer_plugin' => array(
+//          'path' => drupal_get_path('module', 'scald_sketchfab') . '/scald_sketchfab_defer_plugin/',
+//          'buttons' => array(
+//            'scald_sketchfab_defer_button' => t('Defer Youtube videos'),
+//          ),
+//          'load' => TRUE,
+//        ),
+//      );
+//  }
+//}
+
+
+
+///**
+// * A function in order to pass the JS file to the ckeditor plugin.
+// *
+// * @param array $element
+// *   The element array.
+// *
+// * @return array
+// *   Return the text format element with a settings in order to add the JS file.
+// */
+//function scald_sketchfab_add_defer_video_plugin_js($element) {
+//  global $base_url, $base_path;
+//  $element['#attached']['js'][] = array(
+//    'type' => 'setting',
+//    'data' => array(
+//      'defer_youtube_video_js' => $base_url . $base_path . drupal_get_path('module', 'scald_sketchfab') . '/js/scald_sketchfab_defer_library.js',
+//    ),
+//  );
+//
+//  return $element;
+//}
