@@ -8091,6 +8091,77 @@ footer header {
 .view-mode-search_result .field-name-field-media-asset img {
   width: 100%;
 }
+.grid-view {
+  padding-top: 60px;
+}
+.grid-view .view-header {
+  position: absolute;
+  top: 0;
+}
+.grid-view .view-content {
+  height: 100%;
+}
+.grid-view .text-center {
+  width: 100%;
+  float: left;
+  margin-top: 10%;
+}
+.grid-view .views-row {
+  width: 100% !important;
+  float: left;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+@media (min-width: 768px) {
+  .grid-view .views-row {
+    width: 45% !important;
+  }
+}
+@media (min-width: 992px) {
+  .grid-view .views-row {
+    width: 30% !important;
+  }
+}
+@media (min-width: 1600px) {
+  .grid-view .views-row {
+    width: 20% !important;
+  }
+}
+.grid-view .views-row.views-row-first {
+  border-top: none !important;
+}
+.grid-view .view-mode-search_result .field {
+  display: none;
+}
+.grid-view .view-mode-search_result .field-name-title,
+.grid-view .view-mode-search_result .field-name-field-media-asset {
+  display: block;
+}
+.grid-view .view-mode-search_result .field-name-title h2,
+.grid-view .view-mode-search_result .field-name-field-media-asset h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.grid-view .view-mode-search_result .field-name-title h2 {
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+}
+.grid-view .view-mode-search_result .field-name-field-media-asset {
+  padding-top: 30px;
+}
+.grid-view .view-mode-search_result .col-xs-4,
+.grid-view .view-mode-search_result .col-xs-8 {
+  width: 100%;
+}
+.grid-view:after {
+  content: '';
+  display: block;
+  clear: both;
+}
 .view-mukurtu-frontpage-browse-by-community {
   padding-bottom: 30px;
 }

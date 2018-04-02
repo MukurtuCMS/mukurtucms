@@ -1,19 +1,19 @@
 jQuery(document).ready(function($){
     function refereshPanelAccordion() {
-	var width = $(window).width();
-	if(width < 768) {
-	    $(".pane-content.collapse").each( function () {
-		$(this).collapse("hide");
-	    });
-	} else {
-	    $(".pane-content.collapse").each( function () {
-		$(this).collapse("show");
-	    });
-	}
+		var width = $(window).width();
+		if(width < 768) {
+			$(".pane-content.collapse").each( function () {
+			$(this).collapse("hide");
+			});
+		} else {
+			$(".pane-content.collapse").each( function () {
+			$(this).collapse("show");
+			});
+		}
     }
 
     function mukurtuOnResize() {
-	refereshPanelAccordion();
+		refereshPanelAccordion();
     }
     window.onresize = mukurtuOnResize;
     mukurtuOnResize();

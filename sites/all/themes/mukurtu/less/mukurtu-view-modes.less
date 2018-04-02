@@ -51,3 +51,93 @@
         }
     }
 }
+
+
+// Grid View
+.grid-view {
+    padding-top: 60px;
+
+    .view-header {
+        position: absolute;
+        top: 0;
+    }
+
+    .view-content {
+        height: 100%;
+    }
+
+    // Pager
+    .text-center {
+        width: 100%;
+        float: left;
+        margin-top: 10%;
+    }
+
+    .views-row {
+        width: 100% !important;
+        float: left;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            width: 45% !important;
+        }
+    
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            width: 30% !important;
+        }
+
+        // Extra large Desktop
+        @media (min-width: 1600px) {
+            width: 20% !important;
+        }
+
+        &.views-row-first {
+            border-top: none !important;
+        }
+    }
+
+    .view-mode-search_result {
+        .field {
+            display: none;
+        }
+        .field-name-title,
+        .field-name-field-media-asset {
+            display: block;
+
+            h2 {
+                font-size: 16px;
+                font-weight: bold;
+            }
+        }
+
+        .field-name-title {
+            h2 {
+                background-image: url(../images/icons/chevronright.svg);
+                background-repeat: no-repeat;
+                background-position: 95% 0%;
+                background-size: 12px;
+                min-height: 20px;
+                padding-right: 25px;
+            }
+        }
+
+        .field-name-field-media-asset {
+            padding-top: 30px;
+        }
+
+        .col-xs-4,
+        .col-xs-8 {
+            width: 100%;
+        }
+    }
+}
+
+
+.grid-view:after {
+    content: '';
+    display: block;
+    clear: both;
+}
