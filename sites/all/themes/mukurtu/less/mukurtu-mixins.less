@@ -1,3 +1,9 @@
+.section-shadow {
+    background: linear-gradient(#E6E6E6, #FFF);
+    background-repeat: no-repeat;
+    background-size: 100% 12px;
+}
+
 //// Primary color link container
 .primary-color-link-container {
     background-color: @brand-primary;
@@ -26,7 +32,8 @@
     }
 
     // Right side
-    div.field:nth-of-type(2) {
+    .field-name-title {
+    //div.field:nth-of-type(2) {
         float:right;
         width: 60%;
         text-align: center;
@@ -40,6 +47,8 @@
             text-align: center;
             height: 100%;
             display: table;
+            margin-top: 0px;
+            margin-bottom: 0px;
 
             a {
                 display: table-cell;
@@ -67,7 +76,8 @@
     }
 
     // Left side
-    div.field:nth-of-type(3) {
+    .field-name-field-community-image-thumbnail {
+    //div.field:nth-of-type(3) {
         float:left;
         width: 40%;
         img {

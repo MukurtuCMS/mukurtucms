@@ -1,7 +1,7 @@
 // Full width on mobile
 html, body {
     width: 100%;
-    height: 100%;
+    //height: 100vh;
     margin: 0px;
     padding: 0px;
     overflow-x: hidden;
@@ -13,6 +13,26 @@ header,
 	border: 0px !important;
 	padding-left: 0px !important;
 	padding-right: 0px !important;
+}
+
+.fullwidth {
+	width: 100vw;
+	position: relative;
+	left: 50%;
+	right: 50%;
+	margin-left: -50vw;
+	margin-right: -50vw;
+}
+
+.not-front .main-container {
+	padding-left: @grid-gutter-width;
+	padding-right: @grid-gutter-width;
+
+	// Desktop
+	@media (min-width: @screen-md-min) {	
+		padding-left: @mukurtu-main-container-padding;
+		padding-right: @mukurtu-main-container-padding;
+	}
 }
 
 /*#navbar-collapse {
@@ -111,18 +131,27 @@ header,
 		margin-right: @grid-gutter-width !important;
 	}
 	@media (min-width: @screen-md-min) {
-		margin-right: (@grid-gutter-width * 5) !important;
+		//margin-right: (@grid-gutter-width * 5) !important;
+		margin-right: @mukurtu-main-container-padding !important;
 	}
 }
 
 // Logo and collapse menu
 .navbar.container-fluid > #mukurtu-collapse-menu-container.container-fluid {
+	.navbar-header {
+		margin-left: @grid-gutter-width;
+
+		// Desktop
+		@media (min-width: @screen-md-min) {
+			margin-left: @mukurtu-main-container-padding;
+		}
+	}
+
 	// Logo
 	.logo {
 		img {
 			// Mobile
 			width: 60px;
-			margin-left: @grid-gutter-width;
 
 			// Tablet
 			@media (min-width: @screen-sm-min) {
@@ -132,7 +161,6 @@ header,
 			// Desktop
 			@media (min-width: @screen-md-min) {
 				width: 100px;
-				margin-left: (@grid-gutter-width * 5);
 			}
 		}
 	}
@@ -156,9 +184,13 @@ header,
 					border-right: none;
 				}
 
+				&.active,
 				&:hover,
 	    		&:focus {
 					border-bottom: @navbar-mukurtu-accent-height solid @brand-secondary;
+					a {
+						background-color: @navbar-default-bg;
+					}
 				}
 
 				> a {
@@ -204,6 +236,68 @@ header,
 		      		color: @mukurtu-navbar-collapse-link-hover-color;
 		      		text-decoration: none;
 			  	}
+			}
+		}
+	}
+}
+
+// Page Headers
+.page-header {
+	.fullwidth;
+	.section-shadow;
+	background-position: bottom;
+	padding-bottom: 30px;
+	margin-bottom: 0px;
+	text-align: center;
+	font-size: 30px;
+	font-family: @font-family-sans-serif-light;
+	border-bottom: none;
+
+	// Desktop
+	@media (min-width: @screen-md-min) {
+		font-size: 44px;
+	}
+}
+
+#breadcrumb {
+	.fullwidth;
+	background: linear-gradient(#b7873a, @brand-secondary);
+	height: 12px;
+	margin-bottom: 60px;
+
+	.breadcrumb {
+		margin-top: 12px;
+		padding-top: 0px;
+		background-color: @brand-secondary;
+		height: 36px;
+		border-radius: 0px;
+		color: #fff;
+
+		a {
+			color: #fff;
+
+			&:hover,
+			&.active {
+				color: @text-color;
+				text-decoration: none;
+			}
+		}
+
+		padding-left: @grid-gutter-width;
+		// Desktop
+		@media (min-width: @screen-md-min) {
+			padding-left: (@mukurtu-main-container-padding);
+		}
+
+		> li + li:before {
+			content: " >> ";
+			color: #fff;
+		}
+
+		li.first {
+			// Desktop
+			@media (min-width: @screen-md-min) {
+				padding-left: @grid-gutter-width;
 			}
 		}
 	}

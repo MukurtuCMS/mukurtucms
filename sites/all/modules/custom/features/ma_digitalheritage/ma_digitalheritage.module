@@ -321,7 +321,7 @@ function ma_digitalheritage_node_view($node, $view_mode) {
       // If no media items at all on the DH item and in grid view, put a placeholder image
       if (!$node->field_media_asset) {
         $node->content['field_media_asset'][0]['#markup'] = '
-      <div class="col-md-4 col-md-push-8 field field-name-field-media-asset field-type-atom-reference field-label-hidden">
+      <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
         <div class="field-items">
             <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
         </div>

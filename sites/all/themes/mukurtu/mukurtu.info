@@ -52,6 +52,7 @@ settings[mukurtu_theme_frontpage_hero_image] = ''
 ; ;;;;;;;;;;;;;;;;;;;;;
 ;
 scripts[] = js/scripts.js
+scripts[] = js/mukurturesize.js
 ;scripts[] = js/masonry.pkgd.min.js
 ;scripts[] = 'bootstrap/js/affix.js'
 ;scripts[] = 'bootstrap/js/alert.js'

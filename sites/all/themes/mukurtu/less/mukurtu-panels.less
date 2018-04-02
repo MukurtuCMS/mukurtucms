@@ -1,0 +1,53 @@
+@pane-background-color: #EEECEC;
+
+.panel-panel {
+    &.left {
+        padding-top: 50px;
+    }
+
+    a {
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+
+        .pane-title {
+            &:hover {
+                background-color: @link-color;
+            }
+        }
+    }
+
+    .pane-title {
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        padding: 20px 15px 20px 15px;
+        margin-bottom: 0px;
+        letter-spacing: @mukurtu-expanded-letter-spacing;
+        background: @brand-primary;
+        text-transform: uppercase;
+        background-image: url(../images/icons/chevrondown.svg);
+        background-repeat: no-repeat;
+        background-position: 95% 50%;
+        background-size: 20px;
+    }
+
+    .pane-content {
+        &.collapse {
+            background-color: @pane-background-color;
+        }
+
+        .facetapi-facetapi-checkbox-links {
+            padding: 10px 20px 20px 14px;
+
+            .leaf {
+                padding-bottom: 5px;
+
+                input {
+                    margin-right: 20px;
+                }
+            }
+        }
+    }
+}
