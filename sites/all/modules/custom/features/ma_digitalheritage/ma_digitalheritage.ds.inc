@@ -149,10 +149,24 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
-    'field_media_asset' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-4 col-md-push-8',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_category' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
         ),
       ),
     ),
@@ -468,7 +482,7 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_2col';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
@@ -482,8 +496,10 @@ function ma_digitalheritage_ds_layout_settings_info() {
         7 => 'field_coverage',
         8 => 'field_coverage_description',
         9 => 'field_related_dh_items',
-        10 => 'field_transcription',
-        11 => 'field_related_dictionary_words',
+        10 => 'field_related_dictionary_words',
+        11 => 'field_transcription',
+      ),
+      'bottom' => array(
         12 => 'comments',
       ),
       'right' => array(
@@ -521,9 +537,9 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_coverage' => 'left',
       'field_coverage_description' => 'left',
       'field_related_dh_items' => 'left',
-      'field_transcription' => 'left',
       'field_related_dictionary_words' => 'left',
-      'comments' => 'left',
+      'field_transcription' => 'left',
+      'comments' => 'bottom',
       'dh_related_items_teasers' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',
@@ -550,17 +566,25 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'layout_class' => array(
         '' => '',
       ),
+      'left' => array(
+        'digital-heritage-body' => 'digital-heritage-body',
+      ),
+      'right' => array(
+        'metadata-sidebar' => 'metadata-sidebar',
+      ),
     ),
     'wrappers' => array(
+      'top' => 'div',
       'left' => 'div',
       'right' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
   );
   $export['node|digital_heritage|full'] = $ds_layout;
 
@@ -607,11 +631,13 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'search_result';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
+      'left' => array(
         0 => 'field_media_asset',
+      ),
+      'right' => array(
         1 => 'title',
         2 => 'group_list_view_fields',
         3 => 'field_community_ref',
@@ -620,12 +646,12 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
-      'field_media_asset' => 'ds_content',
-      'title' => 'ds_content',
-      'group_list_view_fields' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'field_category' => 'ds_content',
-      'field_summary' => 'ds_content',
+      'field_media_asset' => 'left',
+      'title' => 'right',
+      'group_list_view_fields' => 'right',
+      'field_community_ref' => 'right',
+      'field_category' => 'right',
+      'field_summary' => 'right',
     ),
     'limit' => array(
       'field_media_asset' => '1',
@@ -636,7 +662,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'left' => 'div',
+      'right' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

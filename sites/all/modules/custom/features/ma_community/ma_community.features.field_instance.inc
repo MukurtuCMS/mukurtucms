@@ -350,7 +350,7 @@ function ma_community_field_default_field_instances() {
           'link' => 1,
           'override' => 0,
         ),
-        'type' => 'mukurtu_scald_thumbnail_image',
+        'type' => 'mukurtu_browse_by_grid',
         'weight' => 1,
       ),
     ),

@@ -150,7 +150,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '2',
+    'weight' => '1',
     'children' => array(
       0 => 'field_community_ref',
       1 => 'field_summary',
@@ -161,7 +161,8 @@ function ma_digitalheritage_field_group_info() {
     'format_settings' => array(
       'label' => 'List View Fields',
       'instance_settings' => array(
-        'classes' => 'col-md-8 col-md-pull-4',
+        'id' => '',
+        'classes' => '',
         'description' => '',
         'show_label' => '0',
         'label_element' => 'h3',

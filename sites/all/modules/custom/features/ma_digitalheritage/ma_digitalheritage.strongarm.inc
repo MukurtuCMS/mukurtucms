@@ -141,7 +141,9 @@ clearfix';
   $strongarm->api_version = 1;
   $strongarm->name = 'ds_classes_regions';
   $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8';
+col-md-4 col-md-push-8
+digital-heritage-body|Digital Heritage Full
+metadata-sidebar|Metadata Sidebar';
   $export['ds_classes_regions'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -287,6 +289,9 @@ col-md-4 col-md-push-8';
         'custom_settings' => FALSE,
       ),
       'taxonomy_record_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
         'custom_settings' => TRUE,
       ),
     ),
