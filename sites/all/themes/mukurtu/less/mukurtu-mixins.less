@@ -4,6 +4,47 @@
     background-size: 100% 12px;
 }
 
+// Links
+.mukurtu-standard-link {
+    color: @link-color;
+
+    &:hover,
+    &:focus {
+        color: @brand-secondary;
+        text-decoration: none;
+    }
+}
+
+// Fields
+.metadata-field-label {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: @mukurtu-expanded-letter-spacing;
+    padding-bottom: 5px;
+}
+
+.metadata-primary-field-label {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: @mukurtu-expanded-letter-spacing;
+    padding-bottom: 5px;
+
+    // Desktop
+    @media (min-width: @screen-md-min) {
+        font-size: 18px;
+    }
+}
+
+.metadata-field-padding {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+
 //// Primary color link container
 .primary-color-link-container {
     background-color: @brand-primary;
