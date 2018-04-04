@@ -705,8 +705,8 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'left' => array(
         0 => 'calendar_date',
         1 => 'group_event_details',
-        2 => 'field_oa_date',
-        3 => 'body',
+        2 => 'body',
+        3 => 'field_oa_date',
         4 => 'field_oa_address',
         5 => 'field_oa_media',
         6 => 'comments',
@@ -719,8 +719,8 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'fields' => array(
       'calendar_date' => 'left',
       'group_event_details' => 'left',
-      'field_oa_date' => 'left',
       'body' => 'left',
+      'field_oa_date' => 'left',
       'field_oa_address' => 'left',
       'field_oa_media' => 'left',
       'comments' => 'left',
