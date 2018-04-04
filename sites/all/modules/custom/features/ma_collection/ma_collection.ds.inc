@@ -12,6 +12,44 @@ function ma_collection_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|collection|collections_browse';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'collection';
+  $ds_fieldsetting->view_mode = 'collections_browse';
+  $ds_fieldsetting->settings = array(
+    'collection_item_count' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'node_link' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link text' => 'View Collection',
+        'link class' => '',
+        'wrapper' => '',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|collection|collections_browse'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|collection|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'collection';
@@ -26,16 +64,6 @@ function ma_collection_ds_field_settings_info() {
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
-    ),
-    'og_group_ref' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_community_ref' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
     ),
   );
   $export['node|collection|default'] = $ds_fieldsetting;
@@ -81,6 +109,32 @@ function ma_collection_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'collection_item_count';
+  $ds_field->label = 'Collection Item Count';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php 
+$count = ma_collection_get_item_count($entity);
+if($count == 1) {
+   print t(\'@count item\', array( \'@count\' => $count)); 
+} else {
+   print t(\'@count items\', array( \'@count\' => $count)); 
+}
+
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['collection_item_count'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'collections_title_with_count';
   $ds_field->label = 'Collections title with count';
   $ds_field->field_type = 5;
@@ -123,6 +177,56 @@ function ma_collection_ds_custom_fields_info() {
  */
 function ma_collection_ds_layout_settings_info() {
   $export = array();
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|collection|collections_browse';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'collection';
+  $ds_layout->view_mode = 'collections_browse';
+  $ds_layout->layout = 'bootstrap_6_6';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_collection_image',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'collection_item_count',
+        3 => 'field_collection_summary',
+        4 => 'node_link',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'left',
+      'title' => 'right',
+      'collection_item_count' => 'right',
+      'field_collection_summary' => 'right',
+      'node_link' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'left' => array(
+        'large-teaser-image' => 'large-teaser-image',
+      ),
+      'right' => array(
+        'large-teaser-box' => 'large-teaser-box',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|collection|collections_browse'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -388,6 +492,24 @@ function ma_collection_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|personal_collection|form'] = $ds_layout;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_view_modes_info().
+ */
+function ma_collection_ds_view_modes_info() {
+  $export = array();
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'collections_browse';
+  $ds_view_mode->label = 'Collections Browse';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+  );
+  $export['collections_browse'] = $ds_view_mode;
 
   return $export;
 }

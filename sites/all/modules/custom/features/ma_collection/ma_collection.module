@@ -379,6 +379,32 @@ function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
   return $output;
 }
 
+// Helper function to get the item count of a collection, including subcollections
+function ma_collection_get_item_count($entity) {
+    $item_count = 0;
+    if(!empty($entity->field_collections_child_coll[LANGUAGE_NONE])) {
+        foreach($entity->field_collections_child_coll[LANGUAGE_NONE] as $sctarget) {
+            $subcollection = $node_load($sctarget['target_id']);
+            $item_count += ma_collection_get_item_count($subcollection);
+        }
+    }
+
+    $coll_wrapper = entity_metadata_wrapper('node', $entity);
+    $items = $coll_wrapper->field_digital_heritage_items->value();
+    if (count($items)) {
+        if (user_access('bypass content access control')) {
+            $item_count += count($items);
+        }
+        else {
+            foreach ($items as $item) {
+                if (node_access('view', $item)) {
+                    $item_count++;
+                }
+            }
+        }
+    }
+    return $item_count;
+}
 
 /**
  * Implements hook_menu().

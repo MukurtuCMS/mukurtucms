@@ -53,6 +53,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'default' => array(
         'label' => 'above',
         'module' => 'text',
@@ -104,6 +110,16 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 0,
+      ),
       'default' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -163,6 +179,13 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
       'default' => array(
         'label' => 'above',
         'module' => 'text',
@@ -220,6 +243,12 @@ function ma_collection_field_default_field_instances() {
 
 ',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'default' => array(
         'label' => 'above',
         'settings' => array(),
@@ -276,6 +305,12 @@ function ma_collection_field_default_field_instances() {
     'description' => 'This collection is a sub-collection of the top-level collection shown here. To remove this sub-collection from the top-level collection, or to move its position within the collections tree, edit the top-level collection.
 ',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
       'default' => array(
         'label' => 'above',
         'settings' => array(),
@@ -327,6 +362,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
       'default' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -390,6 +431,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'default' => array(
         'label' => 'above',
         'module' => 'text',
@@ -443,6 +490,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
       'default' => array(
         'label' => 'above',
         'settings' => array(),
@@ -490,6 +543,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'default' => array(
         'label' => 'above',
         'module' => 'mukurtu_related_items_formatter',
@@ -551,6 +610,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
       'default' => array(
         'label' => 'above',
         'settings' => array(),
@@ -600,6 +665,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'default' => array(
         'label' => 'above',
         'settings' => array(),
@@ -646,6 +717,12 @@ function ma_collection_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
       'default' => array(
         'label' => 'above',
         'module' => 'textformatter',
