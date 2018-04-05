@@ -1,0 +1,124 @@
+.node-type-community {
+    // No top level shadow divider on community pages
+    .page-header {
+        background: none;
+    }
+}
+
+.node-community.view-mode-full {
+    .col-sm-9 {
+        >.field {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    }
+        
+    // Full width banner image
+    .field-name-field-community-image {
+        .fullwidth;
+        img {
+            width: 100%;
+        }
+    }
+
+    // Description
+    .field-name-body {
+        font-size: 16px;
+        color: @text-color;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 18px;
+        }
+    }
+
+    // Recent Digital Heritage
+    .field-name-community-dh-items {
+        .label-above {
+            font-weight: bold;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            text-transform: uppercase;
+            font-size: 18px;
+            padding-bottom: 20px;
+        }
+    }
+
+    // Sidebar
+    .metadata-wrapper {
+        >.field {
+            .metadata-field-padding;
+
+            margin-top: 20px;
+            border-top: 5px solid @brand-secondary;
+            border-radius: 0px;
+            background-color: @mukurtu-navbar-collapse-bg;
+            padding-top: 0px;
+            padding-bottom: 20px;
+
+            h2,
+            .block-title {
+                .metadata-field-label;
+            }
+
+            a {
+                .mukurtu-standard-link;
+            }
+    
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                margin-left: @grid-gutter-width;
+            }
+
+            .views-row {
+                padding-bottom: 12px;
+            }
+        }
+
+        .field-name-community-membership-status {
+            .primary-color-link-container;
+
+            // Middle chevron
+            .chevron-right;
+            background-position: 95% 50%;
+
+            border-top: none;
+            padding-top: 20px;
+
+            a {
+                .metadata-field-label;
+                color: #fff;
+            }
+        }
+    }
+
+    // Footer
+    .view-community-dh-items .view-footer {
+        text-align: center;
+    }
+    .view-footer {
+        padding-top: 20px;
+
+        .btn {
+            border: none;
+        }
+
+        .btn-default,
+        .btn-default:hover {
+            background-color: inherit;
+        }
+
+        a {
+            .arrow-right;
+            .mukurtu-standard-link;
+            padding-right: 20px;
+            font-weight: bold;
+        }
+    }
+}
+
+.view-community-dh-items {
+    .views-row {
+        .chevron-right;
+        background-position: 99% 25%;
+    }
+}

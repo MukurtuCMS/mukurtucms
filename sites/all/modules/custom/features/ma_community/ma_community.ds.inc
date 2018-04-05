@@ -62,8 +62,8 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'featured_collections' => array(
-      'weight' => '10',
+    'community_membership_status' => array(
+      'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -87,18 +87,13 @@ function ma_community_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'group_management_links' => array(
-      'weight' => '2',
+    'featured_collections' => array(
+      'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'group_members' => array(
       'weight' => '5',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'title' => array(
-      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -181,6 +176,24 @@ function ma_community_ds_custom_fields_info() {
     'block_render' => '3',
   );
   $export['community_dh_items'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'community_membership_status';
+  $ds_field->label = 'Community Membership Status';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'community|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php print drupal_render(_render_subscribe_link($entity)); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['community_membership_status'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -403,31 +416,29 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'community';
   $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_2col_stacked';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'header' => array(
-        0 => 'field_community_image',
-        1 => 'title',
+      'right' => array(
+        0 => 'community_membership_status',
+        4 => 'group_members',
+        5 => 'community_protocol_items',
+        6 => 'field_parent_community',
+        7 => 'field_child_communities',
+        8 => 'community_browse_all_dh_link',
+        9 => 'featured_collections',
+      ),
+      'top' => array(
+        1 => 'field_community_image',
       ),
       'left' => array(
-        2 => 'group_management_links',
-        3 => 'body',
-        4 => 'community_dh_items',
-      ),
-      'right' => array(
-        5 => 'group_members',
-        6 => 'community_protocol_items',
-        7 => 'field_parent_community',
-        8 => 'field_child_communities',
-        9 => 'community_browse_all_dh_link',
-        10 => 'featured_collections',
+        2 => 'body',
+        3 => 'community_dh_items',
       ),
     ),
     'fields' => array(
-      'field_community_image' => 'header',
-      'title' => 'header',
-      'group_management_links' => 'left',
+      'community_membership_status' => 'right',
+      'field_community_image' => 'top',
       'body' => 'left',
       'community_dh_items' => 'left',
       'group_members' => 'right',
@@ -443,17 +454,17 @@ function ma_community_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'header' => 'div',
+      'top' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'footer' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
   );
   $export['node|community|full'] = $ds_layout;
 

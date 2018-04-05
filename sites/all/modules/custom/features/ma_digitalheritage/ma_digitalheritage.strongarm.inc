@@ -143,7 +143,9 @@ clearfix';
   $strongarm->value = 'col-md-8 col-md-pull-4
 col-md-4 col-md-push-8
 digital-heritage-body|Digital Heritage Full
-metadata-sidebar|Metadata Sidebar';
+metadata-sidebar|Metadata Sidebar
+large-teaser-box|Large Teaser Box
+large-teaser-image|Large Teaser Image';
   $export['ds_classes_regions'] = $strongarm;
 
   $strongarm = new stdClass();

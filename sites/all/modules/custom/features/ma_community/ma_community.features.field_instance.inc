@@ -277,7 +277,7 @@ function ma_community_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',

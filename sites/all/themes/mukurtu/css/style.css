@@ -7929,6 +7929,10 @@ header,
   min-height: 20px;
   padding-right: 25px;
 }
+.arrow-right {
+  background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
+  background-position: center right;
+}
 footer header {
   margin-top: 0px !important;
   border: 0px !important;
@@ -8080,11 +8084,11 @@ footer header {
   margin-top: 0px;
 }
 .view-mukurtu-frontpage-featured-content .field-name-title h2 a {
+  background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
+  background-position: center right;
   color: #138aab;
   font-size: 26px;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
-  background-position: center right;
   padding-right: 20px;
 }
 .view-mukurtu-frontpage-featured-content .field-name-title h2 a:hover,
@@ -8429,13 +8433,16 @@ footer header {
   padding-top: 30px;
   border-bottom: 5px solid #e5e1e1;
 }
+.view-community-dh-items > .view-content .views-row-first,
 .view-digital-heritage-grid-list > .view-content .views-row-first {
   border-top: 5px solid #eeeaea;
 }
+.view-community-dh-items > .view-content .views-row,
 .view-digital-heritage-grid-list > .view-content .views-row {
   padding-top: 30px;
   padding-bottom: 30px;
 }
+.view-community-dh-items .views-row,
 .view-digital-heritage-grid-list .views-row {
   border-bottom: 5px solid #eeeaea;
 }
@@ -8617,4 +8624,136 @@ footer header {
 }
 .page-collections .pane-ma-search-api-ma-custom-sorts .pane-title {
   padding: 10px 12px;
+}
+.node-type-community .page-header {
+  background: none;
+}
+.node-community.view-mode-full .col-sm-9 > .field {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.node-community.view-mode-full .field-name-field-community-image {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+.node-community.view-mode-full .field-name-field-community-image img {
+  width: 100%;
+}
+.node-community.view-mode-full .field-name-body {
+  font-size: 16px;
+  color: #464646;
+}
+@media (min-width: 992px) {
+  .node-community.view-mode-full .field-name-body {
+    font-size: 18px;
+  }
+}
+.node-community.view-mode-full .field-name-community-dh-items .label-above {
+  font-weight: bold;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-size: 18px;
+  padding-bottom: 20px;
+}
+.node-community.view-mode-full .metadata-wrapper > .field {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 20px;
+  border-top: 5px solid #e6ab49;
+  border-radius: 0px;
+  background-color: #f8f7f7;
+  padding-top: 0px;
+  padding-bottom: 20px;
+}
+.node-community.view-mode-full .metadata-wrapper > .field h2,
+.node-community.view-mode-full .metadata-wrapper > .field .block-title {
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+.node-community.view-mode-full .metadata-wrapper > .field a {
+  color: #138aab;
+}
+.node-community.view-mode-full .metadata-wrapper > .field a:hover,
+.node-community.view-mode-full .metadata-wrapper > .field a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+@media (min-width: 992px) {
+  .node-community.view-mode-full .metadata-wrapper > .field {
+    margin-left: 30px;
+  }
+}
+.node-community.view-mode-full .metadata-wrapper > .field .views-row {
+  padding-bottom: 12px;
+}
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status {
+  background-color: #159ec4;
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  border-top: none;
+  padding-top: 20px;
+}
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover,
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status:focus {
+  background-color: #138aab;
+}
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:hover,
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:focus {
+  text-decoration: none;
+}
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a {
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+  color: #fff;
+}
+.node-community.view-mode-full .view-community-dh-items .view-footer {
+  text-align: center;
+}
+.node-community.view-mode-full .view-footer {
+  padding-top: 20px;
+}
+.node-community.view-mode-full .view-footer .btn {
+  border: none;
+}
+.node-community.view-mode-full .view-footer .btn-default,
+.node-community.view-mode-full .view-footer .btn-default:hover {
+  background-color: inherit;
+}
+.node-community.view-mode-full .view-footer a {
+  background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
+  background-position: center right;
+  color: #138aab;
+  padding-right: 20px;
+  font-weight: bold;
+}
+.node-community.view-mode-full .view-footer a:hover,
+.node-community.view-mode-full .view-footer a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.view-community-dh-items .views-row {
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 99% 25%;
 }
