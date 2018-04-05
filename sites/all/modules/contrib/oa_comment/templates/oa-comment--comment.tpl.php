@@ -68,7 +68,7 @@
 ?>
 <div class='oa-list oa-comment well clearfix'>
   <div class="user-picture pull-left">
-    <span><?php print $user_picture; ?></span>
+    <span><?php // Mukurtu uncomment this when we want profile pics print $user_picture; ?></span>
   </div>
   <div class="accordion" id="oa-reply-accordion-<?php print $comment->cid; ?>">
     <div class="accordion-toggle">
@@ -78,7 +78,9 @@
           <div class="user-info">
             <?php print t('By') . " $author"; ?>
             <?php print t(' on '); ?>
-            <span class="oa-date"> <?php print $created; ?></span>
+            <span class="oa-date"> <?php
+              // Mukurtu custom formatting of date
+              print format_date($comment->created, 'custom', "F j, Y - g:ia"); ?></span>
             <span class="comment-label"><?php print $comment_link; ?></span>
             <?php if ($status == 'comment-unpublished'): ?>
               <span class="label mark-unpublished"><span class="marker">unpublished</span></span>

@@ -175,9 +175,10 @@ function oa_comment_preprocess_comment(&$vars) {
   if (!empty($vars['elements']['field_oa_related'])) {
     $vars['paragraphs'] = render($vars['elements']['field_oa_related']);
   }
-  // Get the user picture.
-  $user_details = oa_users_build_user_details(user_load($comment->uid), 'oa_medium_thumbnail');
-  $vars['user_picture'] = $user_details['picture'];
+
+  // Mukurtu patch. No profile picture for now.
+  // $user_details = oa_users_build_user_details(user_load($comment->uid), 'oa_medium_thumbnail');
+  // $vars['user_picture'] = $user_details['picture'];
   $vars['body'] = (!empty($comment->comment_body[LANGUAGE_NONE][0]['safe_value']))
     ? oa_comment_filter_body($comment->comment_body[LANGUAGE_NONE][0]['safe_value'])
     : NULL;
