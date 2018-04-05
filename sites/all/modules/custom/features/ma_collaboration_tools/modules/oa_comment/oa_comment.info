@@ -1,7 +1,7 @@
-name = Open Atrium Comments
-description = Configure core comments
+name = Open Atrium Comments (Mukurtu)
+description = Configure core comments - customized to work in Mukurtu. Do not update this with the OA version.
 core = 7.x
-package = Open Atrium
+package = Features
 dependencies[] = comment
 dependencies[] = ctools
 dependencies[] = fasttoggle_comment
@@ -30,9 +30,8 @@ files[] = views/views_handler_field_oa_comment_last_date.inc
 files[] = views/views_handler_argument_oa_comment_paragraph_and_current_ids.inc
 files[] = views/views_handler_sort_oa_comment_last_date.inc
 
-; Information added by Drupal.org packaging script on 2017-12-14
+; edited by Mukurtu to prevent auto updates
 version = "7.x-2.17"
 core = "7.x"
-project = "oa_comment"
-datestamp = "1513284787"
+
 

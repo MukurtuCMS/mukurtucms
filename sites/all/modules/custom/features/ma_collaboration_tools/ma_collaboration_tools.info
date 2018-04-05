@@ -21,6 +21,7 @@ dependencies[] = geofield_map
 dependencies[] = list
 dependencies[] = ma_base_theme
 dependencies[] = media
+dependencies[] = oa_comment
 dependencies[] = oa_date
 dependencies[] = og
 dependencies[] = og_ui
