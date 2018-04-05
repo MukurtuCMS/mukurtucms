@@ -33,24 +33,22 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
-  /* Relationship: File: Paragraphs item using Attachments */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['reverse_field_oa_media_paragraphs_item']['id'] = 'reverse_field_oa_media_paragraphs_item';
   $handler->display->display_options['relationships']['reverse_field_oa_media_paragraphs_item']['table'] = 'file_managed';
   $handler->display->display_options['relationships']['reverse_field_oa_media_paragraphs_item']['field'] = 'reverse_field_oa_media_paragraphs_item';
-  /* Relationship: field_oa_related_node */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['field_oa_related_node']['id'] = 'field_oa_related_node';
   $handler->display->display_options['relationships']['field_oa_related_node']['table'] = 'paragraphs_item';
   $handler->display->display_options['relationships']['field_oa_related_node']['field'] = 'field_oa_related_node';
   $handler->display->display_options['relationships']['field_oa_related_node']['relationship'] = 'reverse_field_oa_media_paragraphs_item';
   $handler->display->display_options['relationships']['field_oa_related_node']['ui_name'] = 'field_oa_related_node';
-  $handler->display->display_options['relationships']['field_oa_related_node']['label'] = 'field_oa_related_node';
-  /* Relationship: field_oa_related_comment */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['field_oa_related_comment']['id'] = 'field_oa_related_comment';
   $handler->display->display_options['relationships']['field_oa_related_comment']['table'] = 'paragraphs_item';
   $handler->display->display_options['relationships']['field_oa_related_comment']['field'] = 'field_oa_related_comment';
   $handler->display->display_options['relationships']['field_oa_related_comment']['relationship'] = 'reverse_field_oa_media_paragraphs_item';
   $handler->display->display_options['relationships']['field_oa_related_comment']['ui_name'] = 'field_oa_related_comment';
-  $handler->display->display_options['relationships']['field_oa_related_comment']['label'] = 'field_oa_related_comment';
   /* Relationship: field_oa_media_node */
   $handler->display->display_options['relationships']['reverse_field_oa_media_node']['id'] = 'reverse_field_oa_media_node';
   $handler->display->display_options['relationships']['reverse_field_oa_media_node']['table'] = 'file_managed';
@@ -219,6 +217,34 @@ function oa_comment_views_default_views() {
       'label' => 'File Usage: All IDs in usage with this content',
     ),
   );
+  $translatables['oa_comment_media'] = array(
+    t('Master'),
+    t('Documents/Media'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('reverse_field_oa_media_paragraphs_item'),
+    t('field_oa_related_node'),
+    t('field_oa_related_comment'),
+    t('field_oa_media_node'),
+    t('author'),
+    t('author_paragraph'),
+    t('author_media'),
+    t('author_node'),
+    t('User who uploaded'),
+    t('[title_1]'),
+    t('Name'),
+    t('[name_2]'),
+    t('[name_1]'),
+    t('[picture_2]'),
+    t('[picture_1]'),
+    t('All'),
+    t('Media attached to content & comments'),
+    t('Open Atrium'),
+  );
   $export['oa_comment_media'] = $view;
 
   $view = new view();
@@ -240,10 +266,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['exposed_form']['type'] = 'oa_form';
-  $handler->display->display_options['exposed_form']['options']['expose_sort_order'] = FALSE;
-  $handler->display->display_options['exposed_form']['options']['autosubmit'] = TRUE;
-  $handler->display->display_options['exposed_form']['options']['collapsed_filter'] = 1;
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'load_more';
   $handler->display->display_options['pager']['options']['items_per_page'] = '20';
   $handler->display->display_options['pager']['options']['offset'] = '0';
@@ -393,7 +416,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['fields']['name']['element_type'] = 'span';
   $handler->display->display_options['fields']['name']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['name']['element_default_classes'] = FALSE;
-  /* Field: User: Picture */
+  /* Field: Broken/missing handler */
   $handler->display->display_options['fields']['field_user_picture']['id'] = 'field_user_picture';
   $handler->display->display_options['fields']['field_user_picture']['table'] = 'field_data_field_user_picture';
   $handler->display->display_options['fields']['field_user_picture']['field'] = 'field_user_picture';
@@ -402,13 +425,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['fields']['field_user_picture']['element_type'] = 'span';
   $handler->display->display_options['fields']['field_user_picture']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_user_picture']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['field_user_picture']['click_sort_column'] = 'fid';
-  $handler->display->display_options['fields']['field_user_picture']['settings'] = array(
-    'image_style' => 'oa_medium_thumbnail',
-    'image_link' => '',
-  );
-  $handler->display->display_options['fields']['field_user_picture']['group_column'] = 'entity_id';
-  /* Field: Content: Groups audience */
+  /* Field: Field: Protocol */
   $handler->display->display_options['fields']['og_group_ref']['id'] = 'og_group_ref';
   $handler->display->display_options['fields']['og_group_ref']['table'] = 'og_membership';
   $handler->display->display_options['fields']['og_group_ref']['field'] = 'og_group_ref';
@@ -417,7 +434,6 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['fields']['og_group_ref']['element_class'] = 'label';
   $handler->display->display_options['fields']['og_group_ref']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['og_group_ref']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['og_group_ref']['click_sort_column'] = 'target_id';
   $handler->display->display_options['fields']['og_group_ref']['settings'] = array(
     'link' => 1,
   );
@@ -431,7 +447,6 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['fields']['oa_section_ref']['element_class'] = 'label';
   $handler->display->display_options['fields']['oa_section_ref']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['oa_section_ref']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['oa_section_ref']['click_sort_column'] = 'target_id';
   $handler->display->display_options['fields']['oa_section_ref']['settings'] = array(
     'link' => 1,
   );
@@ -520,7 +535,7 @@ function oa_comment_views_default_views() {
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Groups audience (og_group_ref:target_id) */
+  /* Filter criterion: Field: Protocol (og_group_ref) */
   $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
   $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
   $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
@@ -536,7 +551,7 @@ function oa_comment_views_default_views() {
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Section (oa_section_ref:target_id) */
+  /* Filter criterion: Content: Section (oa_section_ref) */
   $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
   $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
   $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
@@ -594,16 +609,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['allow']['path_override'] = 0;
   $handler->display->display_options['allow']['title_override'] = 'title_override';
   $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['exposed_form_configure'] = 'exposed_form_configure';
   $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['exposed_form_overrides'] = array(
-    'filters' => array(
-      'type' => '',
-      'flagged' => '',
-      'og_group_ref_target_id' => 'pane_and_exposed',
-      'oa_section_ref_target_id' => 'pane_and_exposed',
-    ),
-  );
   $handler->display->display_options['argument_input'] = array(
     'gid' => array(
       'type' => 'none',
@@ -684,11 +690,10 @@ function oa_comment_views_default_views() {
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Groups audience (og_group_ref:target_id) */
+  /* Filter criterion: Field: Protocol (og_group_ref) */
   $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
   $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
   $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['value'] = 'All';
   $handler->display->display_options['filters']['og_group_ref_target_id']['group'] = 1;
   $handler->display->display_options['filters']['og_group_ref_target_id']['exposed'] = TRUE;
   $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator_id'] = 'og_group_ref_target_id_op';
@@ -701,7 +706,7 @@ function oa_comment_views_default_views() {
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Section (oa_section_ref:target_id) */
+  /* Filter criterion: Content: Section (oa_section_ref) */
   $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
   $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
   $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
@@ -756,16 +761,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['allow']['path_override'] = 0;
   $handler->display->display_options['allow']['title_override'] = 'title_override';
   $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['exposed_form_configure'] = 'exposed_form_configure';
   $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['exposed_form_overrides'] = array(
-    'filters' => array(
-      'type' => '',
-      'flagged' => '',
-      'og_group_ref_target_id' => 'pane_and_exposed',
-      'oa_section_ref_target_id' => 'pane_and_exposed',
-    ),
-  );
   $handler->display->display_options['argument_input'] = array(
     'gid' => array(
       'type' => 'none',
@@ -847,11 +843,10 @@ function oa_comment_views_default_views() {
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Groups audience (og_group_ref:target_id) */
+  /* Filter criterion: Field: Protocol (og_group_ref) */
   $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
   $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
   $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['value'] = 'All';
   $handler->display->display_options['filters']['og_group_ref_target_id']['group'] = 1;
   $handler->display->display_options['filters']['og_group_ref_target_id']['exposed'] = TRUE;
   $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator_id'] = 'og_group_ref_target_id_op';
@@ -864,7 +859,7 @@ function oa_comment_views_default_views() {
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Content: Section (oa_section_ref:target_id) */
+  /* Filter criterion: Content: Section (oa_section_ref) */
   $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
   $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
   $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
@@ -919,16 +914,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['allow']['path_override'] = 0;
   $handler->display->display_options['allow']['title_override'] = 'title_override';
   $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['exposed_form_configure'] = 'exposed_form_configure';
   $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['exposed_form_overrides'] = array(
-    'filters' => array(
-      'type' => '',
-      'flagged' => '',
-      'og_group_ref_target_id' => 'pane_and_exposed',
-      'oa_section_ref_target_id' => 'pane_and_exposed',
-    ),
-  );
   $handler->display->display_options['argument_input'] = array(
     'gid' => array(
       'type' => 'none',
@@ -948,6 +934,44 @@ function oa_comment_views_default_views() {
     ),
   );
   $handler->display->display_options['inherit_panels_path'] = '1';
+  $translatables['oa_comment_topics'] = array(
+    t('Master'),
+    t('Topics'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('Load more'),
+    t('NoTopics'),
+    t('There are no topics to list.'),
+    t('author'),
+    t('OG membership from node'),
+    t('archived'),
+    t('Comments'),
+    t('commentuid'),
+    t('Last Comment'),
+    t('.'),
+    t(','),
+    t('Type'),
+    t('Include archived content'),
+    t('Groups audience'),
+    t('Open Atrium Section'),
+    t('Open Atrium'),
+    t('User Topics'),
+    t('Your Topics'),
+    t('All'),
+    t('User replied to Topics'),
+    t('Your Reply Topics'),
+  );
   $export['oa_comment_topics'] = $view;
 
   return $export;

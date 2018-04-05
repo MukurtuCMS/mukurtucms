@@ -2,10 +2,10 @@ name = Open Atrium Comments (Mukurtu)
 description = Configure core comments - customized to work in Mukurtu. Do not update this with the OA version.
 core = 7.x
 package = Features
+version = 7.x-2.17
 dependencies[] = comment
 dependencies[] = ctools
 dependencies[] = fasttoggle_comment
-; dependencies[] = oa_core // Commented out by Mukurtu
 dependencies[] = strongarm
 dependencies[] = views
 dependencies[] = views_content
@@ -29,9 +29,3 @@ files[] = views/views_handler_field_oa_comment_timestamp_updated_comments.inc
 files[] = views/views_handler_field_oa_comment_last_date.inc
 files[] = views/views_handler_argument_oa_comment_paragraph_and_current_ids.inc
 files[] = views/views_handler_sort_oa_comment_last_date.inc
-
-; edited by Mukurtu to prevent auto updates
-version = "7.x-2.17"
-core = "7.x"
-
-
