@@ -10831,3 +10831,8 @@ a:hover {
 .field-name-follow-unfollow button {
   margin-bottom: 5px;
 }
+.class-follow-unfollow-popup ul {
+  padding: 0;
+  margin: 0;
+  margin-left: 10px;
+}

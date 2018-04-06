@@ -173,6 +173,21 @@ function ma_collaboration_tools_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_following_protocols' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_following_users' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_un_following_users' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|event|full'] = $ds_fieldsetting;
 

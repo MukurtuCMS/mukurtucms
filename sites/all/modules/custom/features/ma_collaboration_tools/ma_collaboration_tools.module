@@ -391,14 +391,14 @@ function ma_collaboration_tools_theme() {
 function ma_collaboration_tools_follow_unfollow($entity) {
   global $user;
 
-  $reason = [];
+  $reasons = [];
 
   // Individually following
   if (isset($entity->field_following_users[LANGUAGE_NONE])) {
     foreach ($entity->field_following_users[LANGUAGE_NONE] AS $following_user) {
       if ($user->uid == $following_user['target_id']) {
         $following = TRUE;
-        $reason[] = 'Individually following';
+        $reasons[] = 'Individually following';
         break;
       }
     }
@@ -409,7 +409,8 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   if (isset($entity->field_following_protocols[LANGUAGE_NONE])) {
     foreach ($entity->field_following_protocols[LANGUAGE_NONE] AS $following_protocol) {
       if (og_is_member('node', $following_protocol['target_id'])) {
-        $following_by_protocol[] = $following_protocol['entity']->title;
+        $following_protocol_node = node_load ($following_protocol['target_id']);
+        $following_by_protocol[] = $following_protocol_node->title;
         $following = TRUE;
       }
     }
@@ -417,12 +418,12 @@ function ma_collaboration_tools_follow_unfollow($entity) {
 
   // Individually unfollowing
   if (count($following_by_protocol)) {
-    $reason[] = 'Member of: ' . implode(', ', $following_by_protocol);
+    $reasons[] = 'Member of: ' . implode(', ', $following_by_protocol);
     if (isset($entity->field_un_following_users[LANGUAGE_NONE])) {
-      foreach ($entity->field_un_following_users[LANGUAGE_NONE] AS $following_user) {
-        if ($user->uid == $following_user->target_id) {
+      foreach ($entity->field_un_following_users[LANGUAGE_NONE] AS $unfollowing_user) {
+        if ($user->uid == $unfollowing_user['target_id']) {
           $following = FALSE;
-          $reason[] = 'Individually unfollowing';
+          $reasons[] = 'Individually unfollowing';
           break;
         }
       }
@@ -431,7 +432,7 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   // Has no explicitly followed, followed by group, or unfollowed.
   if (is_null($following)) {
     $following = FALSE;
-    $reason[] = 'Never followed';
+    $reasons[] = 'Never followed';
   }
 
   // Create output.
@@ -443,12 +444,24 @@ function ma_collaboration_tools_follow_unfollow($entity) {
     $output = l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
     $link_text = "Follow to receive notifications.";
   }
-  $popup_output = implode('<br />', $reason);
+  if (count($reasons) > 1) {
+    $popup_output = theme_item_list([
+      'items' => $reasons,
+      'title' => '',
+      'type' => 'ul',
+      'attributes' => []
+    ]);
+  }
+  else {
+    $popup_output = $reasons[0];
+  }
   require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
   $popup_attributes = array (
     'style' => 'Bent white',
     'origin' => 'top-left',
     'expand' => 'top-left',
+    'width' => '200',
+    'class' => 'follow-unfollow-popup',
     // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
   );
   $output .= popup_element($link_text, $popup_output, $popup_attributes);
@@ -462,23 +475,46 @@ function ma_collaboration_tools_follow_unfollow($entity) {
  */
 function ma_collaboration_tools_menu() {
   $items['node/%node/follow'] = array(
-    'page callback' => 'ma_collaboration_tools_follow',
-    'page arguments' => array(1),
+    'page callback' => 'ma_collaboration_tools_follow_unfollow_process',
+    'page arguments' => array(1, 'follow'),
     'access callback' => TRUE,
   );
   $items['node/%node/unfollow'] = array(
-    'page callback' => 'ma_collaboration_tools_unfollow',
-    'page arguments' => array(1),
+    'page callback' => 'ma_collaboration_tools_follow_unfollow_process',
+    'page arguments' => array(1, 'unfollow'),
     'access callback' => TRUE,
   );
   return $items;
 }
 
-function ma_collaboration_tools_unfollow($node) {
-  dpm ($node->nid);
-  drupal_goto('node/' . $node->nid);
-}
-function ma_collaboration_tools_follow($node) {
-  dpm ($node->nid);
+/**
+ * Callback to process the user clicking the follow or unfollow button.
+ */
+function ma_collaboration_tools_follow_unfollow_process($node, $op) {
+  global $user;
+  $nw = entity_metadata_wrapper ('node', $node);
+  if ($op=='follow') {
+    $nw->field_following_users[] = $user->uid;
+    $new_unfollowing_users = [];
+    $unfollowing_users = $nw->field_un_following_users->value();
+    foreach ($unfollowing_users as $unfollowing_user) {
+      if ($unfollowing_user->uid <> $user->uid) {
+        $new_unfollowing_users[] = $unfollowing_user->uid;
+      }
+    }
+    $nw->field_un_following_users->set($new_unfollowing_users);
+  }
+  else {
+    $nw->field_un_following_users[] = $user->uid;
+    $new_following_users = [];
+    $following_users = $nw->field_un_following_users->value();
+    foreach ($following_users as $following_user) {
+      if ($following_user->uid <> $user->uid) {
+        $new_following_users[] = $following_user->uid;
+      }
+    }
+    $nw->field_following_users->set($new_following_users);
+  }
+  $nw->save();
   drupal_goto('node/' . $node->nid);
 }
