@@ -305,11 +305,78 @@ function ma_collaboration_tools_field_group_info() {
   );
   $field_groups['group_event_details|node|event|full'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_following|node|event|form';
+  $field_group->group_name = 'group_following';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'event';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Following',
+    'weight' => '6',
+    'children' => array(
+      0 => 'field_following_protocols',
+      1 => 'field_following_users',
+      2 => 'field_un_following_users',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Following',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-following field-group-fieldset',
+        'description' => '<p>Users that are following an event are emailed updates when there are any changes to the event, or comments on the event.</p>
+<p>Protocol Stewards may add their protocol(s) here if this event is within that protocol, and all members of that protocol will then be following the event. Individual users may also follow the event independently of their protocol memberships. They can also unfollow an event even if they would otherwise be following it due to protocol membership.</p>',
+      ),
+      'formatter' => 'collapsible',
+    ),
+  );
+  $field_groups['group_following|node|event|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_following|node|event|full';
+  $field_group->group_name = 'group_following';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'event';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Following',
+    'weight' => '6',
+    'children' => array(
+      0 => 'field_following_protocols',
+      1 => 'field_following_users',
+      2 => 'field_un_following_users',
+      3 => 'follow_unfollow',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'show_label' => 1,
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'fast',
+        'classes' => 'group-following field-group-div',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_following|node|event|full'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Access');
   t('Actions');
   t('Event Details');
+  t('Following');
   t('Visibility');
 
   return $field_groups;

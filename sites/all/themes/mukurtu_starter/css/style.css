@@ -10828,3 +10828,6 @@ a:hover {
 .node-event.view-mode-full .field-name-body {
   font-size: 1.3em;
 }
+.field-name-follow-unfollow button {
+  margin-bottom: 5px;
+}

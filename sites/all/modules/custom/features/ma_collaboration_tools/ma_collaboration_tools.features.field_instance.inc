@@ -1095,7 +1095,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1122,7 +1122,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -1183,7 +1183,130 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 10,
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance: 'node-event-field_following_protocols'.
+  $field_instances['node-event-field_following_protocols'] = array(
+    'bundle' => 'event',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'The selected Protocols\' members will follow this event. Individually, they may choose to un-follow it.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 13,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_following_protocols',
+    'label' => 'Following Protocols',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 14,
+    ),
+  );
+
+  // Exported field_instance: 'node-event-field_following_users'.
+  $field_instances['node-event-field_following_users'] = array(
+    'bundle' => 'event',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Individual users following this event, irrespective of their Protocol membership.
+',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 14,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_following_users',
+    'label' => 'Following Users',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 15,
     ),
   );
 
@@ -1211,7 +1334,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1235,7 +1358,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -1459,7 +1582,7 @@ http://www.whitehouse.gov/',
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'ical' => array(
         'label' => 'above',
@@ -1514,7 +1637,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'geocoder',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -1671,6 +1794,67 @@ http://www.whitehouse.gov/',
     ),
   );
 
+  // Exported field_instance: 'node-event-field_un_following_users'.
+  $field_instances['node-event-field_un_following_users'] = array(
+    'bundle' => 'event',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Members of a Following Protocol that have specifically elected not to follow this event.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 15,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_un_following_users',
+    'label' => 'UnFollowing Users',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 16,
+    ),
+  );
+
   // Exported field_instance: 'node-event-og_group_ref'.
   $field_instances['node-event-og_group_ref'] = array(
     'bundle' => 'event',
@@ -1699,7 +1883,7 @@ http://www.whitehouse.gov/',
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 31,
       ),
       'ical' => array(
         'label' => 'hidden',
@@ -1767,7 +1951,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 12,
+      'weight' => 13,
     ),
   );
 
@@ -2846,19 +3030,26 @@ http://www.whitehouse.gov/',
   t('Enter the Discussion Post Content Here');
   t('Enter the content of the document or wiki here.');
   t('Event Date');
+  t('Following Protocols');
+  t('Following Users');
   t('Geocoded Location');
   t('Groups audience');
   t('If checked, show the node detail page (Drupal default behavior).  If unchecked, show the first file attachment.');
+  t('Individual users following this event, irrespective of their Protocol membership.
+');
   t('Item Sharing Settings');
   t('Location');
   t('Location Address and/or link, i.e.,
 1600 Pennsylvania Avenue, NW
 Washington, DC 20500
 http://www.whitehouse.gov/');
+  t('Members of a Following Protocol that have specifically elected not to follow this event.');
   t('Pre-Actions');
   t('Protocol');
   t('Section');
   t('Show page instead of file?');
+  t('The selected Protocols\' members will follow this event. Individually, they may choose to un-follow it.');
+  t('UnFollowing Users');
   t('iCal File');
 
   return $field_instances;

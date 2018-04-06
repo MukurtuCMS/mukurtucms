@@ -147,6 +147,11 @@ function ma_collaboration_tools_ds_field_settings_info() {
         'field_formatter_label' => '',
       ),
     ),
+    'follow_unfollow' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'comments' => array(
       'weight' => '4',
       'label' => 'hidden',
@@ -271,6 +276,24 @@ return ma_collaboration_tools_edit_collab_section_link($entity);
     'use_token' => 0,
   );
   $export['edit_collab_section_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'follow_unfollow';
+  $ds_field->label = 'Follow / UnFollow';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php return ma_collaboration_tools_follow_unfollow($entity) ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['follow_unfollow'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -648,16 +671,20 @@ function ma_collaboration_tools_ds_layout_settings_info() {
         3 => 'field_oa_address',
         4 => 'body',
         5 => 'field_oa_media',
-        6 => 'path',
-        7 => 'redirect',
-        8 => '_add_existing_field',
+        6 => 'group_following',
+        7 => 'path',
+        8 => 'redirect',
+        13 => 'field_following_protocols',
+        15 => 'field_following_users',
+        16 => 'field_un_following_users',
+        17 => '_add_existing_field',
       ),
       'hidden' => array(
         9 => 'field_oa_geo_location',
         10 => 'field_event_calendar_section',
         11 => 'field_community_ref',
         12 => 'og_group_ref',
-        13 => 'field_item_privacy_setting',
+        14 => 'field_item_privacy_setting',
       ),
     ),
     'fields' => array(
@@ -667,14 +694,18 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'field_oa_address' => 'ds_content',
       'body' => 'ds_content',
       'field_oa_media' => 'ds_content',
+      'group_following' => 'ds_content',
       'path' => 'ds_content',
       'redirect' => 'ds_content',
-      '_add_existing_field' => 'ds_content',
       'field_oa_geo_location' => 'hidden',
       'field_event_calendar_section' => 'hidden',
       'field_community_ref' => 'hidden',
       'og_group_ref' => 'hidden',
+      'field_following_protocols' => 'ds_content',
       'field_item_privacy_setting' => 'hidden',
+      'field_following_users' => 'ds_content',
+      'field_un_following_users' => 'ds_content',
+      '_add_existing_field' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -702,30 +733,40 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
-        0 => 'calendar_date',
-        1 => 'group_event_details',
-        2 => 'body',
-        3 => 'field_oa_date',
-        4 => 'field_oa_address',
-        5 => 'field_oa_media',
-        6 => 'comments',
-        7 => 'field_event_calendar_section',
-      ),
       'right' => array(
-        8 => 'field_oa_geo_location',
+        0 => 'follow_unfollow',
+        3 => 'field_following_protocols',
+        4 => 'field_following_users',
+        8 => 'field_un_following_users',
+        12 => 'field_oa_geo_location',
+        13 => 'group_following',
+      ),
+      'left' => array(
+        1 => 'calendar_date',
+        2 => 'group_event_details',
+        5 => 'field_oa_date',
+        6 => 'body',
+        7 => 'field_oa_address',
+        9 => 'field_oa_media',
+        10 => 'field_event_calendar_section',
+        11 => 'comments',
       ),
     ),
     'fields' => array(
+      'follow_unfollow' => 'right',
       'calendar_date' => 'left',
       'group_event_details' => 'left',
-      'body' => 'left',
+      'field_following_protocols' => 'right',
+      'field_following_users' => 'right',
       'field_oa_date' => 'left',
+      'body' => 'left',
       'field_oa_address' => 'left',
+      'field_un_following_users' => 'right',
       'field_oa_media' => 'left',
-      'comments' => 'left',
       'field_event_calendar_section' => 'left',
+      'comments' => 'left',
       'field_oa_geo_location' => 'right',
+      'group_following' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
