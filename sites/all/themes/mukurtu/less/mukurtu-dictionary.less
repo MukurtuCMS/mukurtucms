@@ -1,0 +1,126 @@
+// Dictionary Browse
+.page-dictionary {
+    // No top level shadow divider
+    .page-header {
+        background: none;
+    }
+
+    .facet-glossary {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        >a {
+            display: none;
+        }
+
+        .pane-content {
+            background: none;
+        }
+
+        .facetapi-search-api-glossary {
+            width: 100%;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: table;
+            }
+
+            // Don't display glossary letters that aren't clickable, on small screens
+            .no-content {
+                display: none;
+
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    display: table-cell;
+                }
+            }
+
+            .active {
+                font-weight: bold;
+                color: @text-color;
+            }
+
+            li {
+                display: inline;
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    display: table-cell;
+                    width: 1%;
+                }
+                
+                a {
+                    .mukurtu-standard-link;
+                    font-weight: bold;
+                    font-size: 17px;
+                }
+            }
+        }
+    }
+}
+
+.view-dictionary-words {
+    width: 100%;
+    >div.view-content {
+        .views-row {
+
+        }
+    }
+
+    .views-row-odd {
+        clear: left;
+    }
+}
+.node-dictionary-word.view-mode-dictionary_word_summary {
+    .field-name-field-word-entry {
+        div.paragraphs-item-dictionary-word-bundle {
+            // Hide additional entries
+            display: none;
+            margin-bottom: @grid-gutter-width;
+            background-color: @mukurtu-navbar-collapse-bg;
+            padding-bottom: 30px;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                height: 290px;
+            }
+
+            .field {
+                padding-left: 30px;
+                padding-top: 10px;
+            }
+
+            .field-name-field-alternate-spelling {
+                .primary-color-link-container;
+                .chevron-right-middle;
+                background-size: 18px;
+                height: 68px;
+                padding: 0px 0px 0px 10px;
+
+                a {
+                    .font-light;
+                    display: inherit;
+                    font-size: 26px;
+                    color: #fff;
+                    padding-left: 20px;
+                    line-height: 68px;
+                }
+            }
+
+            .field-name-field-translation {
+                font-weight: bold;
+                font-size: 20px;
+            }
+
+            .field-name-field-dictionary-word-recording {
+                .field-label {
+                    .font-light;
+                    font-size: 17px;
+                }
+            }
+        }
+
+        // Show first entry
+        div:first-of-type {
+            display: block;
+        }
+    }
+}

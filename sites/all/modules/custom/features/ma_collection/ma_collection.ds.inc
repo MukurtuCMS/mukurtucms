@@ -56,14 +56,27 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'collections_tree' => array(
-      'weight' => '6',
+      'weight' => '8',
       'label' => 'above',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'In this collection',
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
+    ),
+    'field_digital_heritage_items' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
   );
   $export['node|collection|default'] = $ds_fieldsetting;
@@ -234,31 +247,31 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'collection';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
-        0 => 'title',
-        1 => 'field_collection_image',
+      'top' => array(
+        0 => 'field_collection_image',
+        1 => 'title',
         2 => 'field_collection_summary',
-        3 => 'field_description',
-        4 => 'field_collection_credit',
+        3 => 'field_collection_credit',
+        4 => 'field_description',
+      ),
+      'left' => array(
         5 => 'field_digital_heritage_items',
+      ),
+      'right' => array(
         6 => 'collections_tree',
-        7 => 'field_community_ref',
-        8 => 'og_group_ref',
       ),
     ),
     'fields' => array(
-      'title' => 'ds_content',
-      'field_collection_image' => 'ds_content',
-      'field_collection_summary' => 'ds_content',
-      'field_description' => 'ds_content',
-      'field_collection_credit' => 'ds_content',
-      'field_digital_heritage_items' => 'ds_content',
-      'collections_tree' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'og_group_ref' => 'ds_content',
+      'field_collection_image' => 'top',
+      'title' => 'top',
+      'field_collection_summary' => 'top',
+      'field_collection_credit' => 'top',
+      'field_description' => 'top',
+      'field_digital_heritage_items' => 'left',
+      'collections_tree' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -266,7 +279,10 @@ function ma_collection_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

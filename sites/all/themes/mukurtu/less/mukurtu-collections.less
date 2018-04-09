@@ -29,31 +29,17 @@
 
     // Collection Title
     .field-name-title {
+        .title-accent-bar;
         padding-top: 20px;
 
         a {
-            font-family: @font-family-sans-serif-light;
+            .font-light;
             font-size: 26px;
             color: #fff;
 
             // Desktop
             @media (min-width: @screen-md-min) {
                 font-size: 37px;
-            }
-        }
-
-        // Title accent bar
-        &::after {
-            content : "";
-            display: inline-block;
-            left: 0;
-            height: 1px;
-            width: 136px;
-            border-bottom: 6px solid @brand-secondary;
-
-            // Tablet
-            @media (min-width: @screen-sm-min) {
-                top: -25px;
             }
         }
     }
@@ -204,6 +190,218 @@
 
         .pane-title {
             padding: 10px 12px;
+        }
+    }
+}
+
+.node-collection.view-mode-full {
+    >div:first-of-type {
+        .fullwidth;
+        .primary-color-link-container;
+
+        // Column
+        >div:first-of-type {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        &::after {
+            .section-shadow;
+            .default-background-container;
+            content: "";
+            display: block;
+            height: 10px;
+        }
+
+        // Collection description fields
+        .field {
+            text-align: center;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                text-align: left;
+            }
+        }
+
+        // Collection Image
+        .field-name-field-collection-image {
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                float: left;
+                width: 50%;
+            }
+        }
+
+        .field-name-title,
+        .field-name-field-description,
+        .field-name-field-collection-summary,
+        .field-name-field-collection-credit {
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                float: right;
+                width: 50%;
+                padding-left: @grid-gutter-width;
+            }
+        }
+
+        // Collection Title
+        .field-name-title {
+            .font-light;
+            .title-accent-bar;
+            color: #fff;
+            font-size: 40px;
+
+            &::after {
+                position: relative;
+                top: -40px;
+            }
+        
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                padding-top: 50px;
+                font-size: 56px;
+
+                &::after {
+                    top: -60px;
+                }
+            }
+
+            h2 {
+                padding-bottom: 20px;
+            }
+        }
+
+        // Collection Description
+        .field-name-field-description {
+            .fullwidth;
+            .default-background-container;
+            float: left;
+            clear: both;
+            padding-top: 50px;
+            padding-bottom: 50px;
+            padding-left: 10%;
+            padding-right: 10%;
+
+            font-size: 16px;
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 18px;
+            }
+        }
+
+        // Collection Summary & Credit
+        .field-name-field-collection-summary,
+        .field-name-field-collection-credit {
+            padding-bottom: 20px;
+            color: @teaser-text-color;
+            font-size: 16px;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 20px;
+            }
+        }
+
+        .field-name-field-collection-credit {
+            font-size: 14px;
+            .label-inline {
+                display: inline;
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 18px;
+            }
+        }
+    }
+
+    // Collection Items Div
+    >div:nth-of-type(2) {
+        padding-top: 30px;
+
+        // Collection tree view
+        >div:first-of-type {
+            padding-bottom: 50px;
+        }
+    }
+
+    // Collection Items
+    .field-name-field-digital-heritage-items {
+        .label-above {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 18px;
+            }
+        }
+
+        // Grid view CSS
+        .view-mode-search_result {
+            .mukurtu-standard-grid-sizing;
+            .item-grid-view;
+            .view-border;
+            .row {
+                padding-top: 30px;
+                padding-bottom: 30px;
+            }
+        }
+    }
+
+    // Subcollection tree
+    .field-name-collections-tree {
+        background-color: @mukurtu-navbar-collapse-bg;
+        border-bottom: 5px solid @mukurtu-view-row-divider-color;
+        padding-bottom: 30px;
+
+        a {
+            .mukurtu-standard-link;
+        }
+
+        .current {
+            color: @mukurtu-navbar-default-link-active-color;
+        }
+    
+        .label-above {
+            .mukurtu-pane-label;
+        }
+
+        .collections-tree {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    }
+}
+
+// Collection node page
+.node-type-collection {
+    // Hide normal title header
+    h1.page-header {
+        display: none;
+    }
+
+    .main-container {
+        >.row {
+            section {
+                // Move local tasks menu
+                .btn-group {
+                    position: absolute;
+                    top:0;
+                    left:0;
+                    z-index: 1500;
+
+                    .dropdown-menu {
+                        position: relative;
+                        clear: left;
+                    }
+                }
+            }
         }
     }
 }

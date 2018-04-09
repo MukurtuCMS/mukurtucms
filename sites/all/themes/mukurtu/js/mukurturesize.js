@@ -2,7 +2,7 @@ jQuery(document).ready(function($){
     function refereshPanelAccordion() {
 		var width = $(window).width();
 		if(width < 768) {
-			$(".pane-content.collapse").each( function () {
+		    $(".pane-content.collapse)").not('.facet-glossary').each( function () {
 			$(this).collapse("hide");
 			});
 		} else {

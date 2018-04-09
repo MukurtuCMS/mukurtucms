@@ -7759,6 +7759,7 @@ header,
   background-repeat: no-repeat;
   background-size: 100% 12px;
   background-position: bottom;
+  padding-top: 30px;
   padding-bottom: 30px;
   margin-bottom: 0px;
   text-align: center;
@@ -7783,7 +7784,7 @@ header,
   margin-right: -50vw;
   background: linear-gradient(#b7873a, #e6ab49);
   height: 12px;
-  margin-bottom: 60px;
+  margin-bottom: 36px;
 }
 #breadcrumb .breadcrumb {
   margin-top: 12px;
@@ -7821,6 +7822,23 @@ header,
   background-repeat: no-repeat;
   background-size: 100% 12px;
 }
+.font-light {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+}
+.title-accent-bar::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  height: 1px;
+  width: 136px;
+  border-bottom: 6px solid #e6ab49;
+}
+@media (min-width: 768px) {
+  .title-accent-bar::after {
+    top: -25px;
+  }
+}
 .mukurtu-standard-link {
   color: #138aab;
 }
@@ -7854,6 +7872,16 @@ header,
   padding-top: 10px;
   padding-bottom: 10px;
 }
+.mukurtu-pane-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 20px 15px 20px 15px;
+  margin-bottom: 0px;
+  letter-spacing: 1.2px;
+  background: #159ec4;
+  text-transform: uppercase;
+}
 .primary-color-link-container {
   background-color: #159ec4;
 }
@@ -7864,6 +7892,9 @@ header,
 .primary-color-link-container a:hover,
 .primary-color-link-container a:focus {
   text-decoration: none;
+}
+.default-background-container {
+  background-color: #ffffff;
 }
 .left-right-image-title {
   padding-bottom: 30px;
@@ -7929,9 +7960,77 @@ header,
   min-height: 20px;
   padding-right: 25px;
 }
+.chevron-right-middle {
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+}
 .arrow-right {
   background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
   background-position: center right;
+}
+.item-grid-view .field {
+  display: none;
+}
+.item-grid-view .field-name-title,
+.item-grid-view .field-name-field-media-asset {
+  display: block;
+}
+.item-grid-view .field-name-title h2,
+.item-grid-view .field-name-field-media-asset h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.item-grid-view .field-name-title h2 {
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+}
+.item-grid-view .field-name-title a {
+  color: #138aab;
+}
+.item-grid-view .field-name-title a:hover,
+.item-grid-view .field-name-title a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.item-grid-view .field-name-field-media-asset {
+  padding-top: 10px;
+}
+.item-grid-view .col-xs-4,
+.item-grid-view .col-xs-8 {
+  width: 100%;
+}
+.mukurtu-standard-grid-sizing {
+  width: 100% !important;
+  float: left;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+@media (min-width: 768px) {
+  .mukurtu-standard-grid-sizing {
+    width: 45% !important;
+  }
+}
+@media (min-width: 992px) {
+  .mukurtu-standard-grid-sizing {
+    width: 30% !important;
+  }
+}
+@media (min-width: 1600px) {
+  .mukurtu-standard-grid-sizing {
+    width: 20% !important;
+  }
+}
+.mukurtu-standard-grid-sizing.views-row-first {
+  border-top: none !important;
 }
 footer header {
   margin-top: 0px !important;
@@ -8011,8 +8110,9 @@ footer header {
   width: 100%;
 }
 .front .main-container section h2 {
-  text-align: center;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  text-align: center;
   font-size: 35px;
   color: #464646;
   padding-top: 20px;
@@ -8086,9 +8186,10 @@ footer header {
 .view-mukurtu-frontpage-featured-content .field-name-title h2 a {
   background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
   background-position: center right;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
   color: #138aab;
   font-size: 26px;
-  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   padding-right: 20px;
 }
 .view-mukurtu-frontpage-featured-content .field-name-title h2 a:hover,
@@ -8104,8 +8205,9 @@ footer header {
     display: none;
   }
   .view-mukurtu-frontpage-featured-content .field-name-title h2 a {
-    font-size: 30px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 300;
+    font-size: 30px;
   }
 }
 @media (min-width: 992px) {
@@ -8141,8 +8243,9 @@ footer header {
   }
 }
 .view-mode-search_result .field-name-title h2 {
-  font-size: 18px;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  font-size: 18px;
   margin-top: 0px;
 }
 @media (min-width: 768px) {
@@ -8216,6 +8319,14 @@ footer header {
   background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
+}
+.grid-view .view-mode-search_result .field-name-title a {
+  color: #138aab;
+}
+.grid-view .view-mode-search_result .field-name-title a:hover,
+.grid-view .view-mode-search_result .field-name-title a:focus {
+  color: #e6ab49;
+  text-decoration: none;
 }
 .grid-view .view-mode-search_result .field-name-field-media-asset {
   padding-top: 10px;
@@ -8480,16 +8591,6 @@ footer header {
 .large-teaser-box .field-name-title {
   padding-top: 20px;
 }
-.large-teaser-box .field-name-title a {
-  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  font-size: 26px;
-  color: #fff;
-}
-@media (min-width: 992px) {
-  .large-teaser-box .field-name-title a {
-    font-size: 37px;
-  }
-}
 .large-teaser-box .field-name-title::after {
   content: "";
   display: inline-block;
@@ -8501,6 +8602,17 @@ footer header {
 @media (min-width: 768px) {
   .large-teaser-box .field-name-title::after {
     top: -25px;
+  }
+}
+.large-teaser-box .field-name-title a {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  font-size: 26px;
+  color: #fff;
+}
+@media (min-width: 992px) {
+  .large-teaser-box .field-name-title a {
+    font-size: 37px;
   }
 }
 .large-teaser-box .field-name-collection-item-count {
@@ -8624,6 +8736,266 @@ footer header {
 }
 .page-collections .pane-ma-search-api-ma-custom-sorts .pane-title {
   padding: 10px 12px;
+}
+.node-collection.view-mode-full > div:first-of-type {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background-color: #159ec4;
+}
+.node-collection.view-mode-full > div:first-of-type:hover,
+.node-collection.view-mode-full > div:first-of-type:focus {
+  background-color: #138aab;
+}
+.node-collection.view-mode-full > div:first-of-type a:hover,
+.node-collection.view-mode-full > div:first-of-type a:focus {
+  text-decoration: none;
+}
+.node-collection.view-mode-full > div:first-of-type > div:first-of-type {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.node-collection.view-mode-full > div:first-of-type::after {
+  background: linear-gradient(#e6e6e6, #ffffff);
+  background-repeat: no-repeat;
+  background-size: 100% 12px;
+  background-color: #ffffff;
+  content: "";
+  display: block;
+  height: 10px;
+}
+.node-collection.view-mode-full > div:first-of-type .field {
+  text-align: center;
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field {
+    text-align: left;
+  }
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-image {
+    float: left;
+    width: 50%;
+  }
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-title,
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-description,
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-summary,
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
+    float: right;
+    width: 50%;
+    padding-left: 30px;
+  }
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-title {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  color: #fff;
+  font-size: 40px;
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-title::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  height: 1px;
+  width: 136px;
+  border-bottom: 6px solid #e6ab49;
+}
+@media (min-width: 768px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-title::after {
+    top: -25px;
+  }
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-title::after {
+  position: relative;
+  top: -40px;
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-title {
+    padding-top: 50px;
+    font-size: 56px;
+  }
+  .node-collection.view-mode-full > div:first-of-type .field-name-title::after {
+    top: -60px;
+  }
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-title h2 {
+  padding-bottom: 20px;
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-field-description {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background-color: #ffffff;
+  float: left;
+  clear: both;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  padding-left: 10%;
+  padding-right: 10%;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-description {
+    font-size: 18px;
+  }
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-field-collection-summary,
+.node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
+  padding-bottom: 20px;
+  color: #333333;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-summary,
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
+    font-size: 20px;
+  }
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
+  font-size: 14px;
+}
+.node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit .label-inline {
+  display: inline;
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
+    font-size: 18px;
+  }
+}
+.node-collection.view-mode-full > div:nth-of-type(2) {
+  padding-top: 30px;
+}
+.node-collection.view-mode-full > div:nth-of-type(2) > div:first-of-type {
+  padding-bottom: 50px;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
+    font-size: 18px;
+  }
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+  width: 100% !important;
+  float: left;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  border-bottom: 5px solid #eeeaea;
+}
+@media (min-width: 768px) {
+  .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+    width: 45% !important;
+  }
+}
+@media (min-width: 992px) {
+  .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+    width: 30% !important;
+  }
+}
+@media (min-width: 1600px) {
+  .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+    width: 20% !important;
+  }
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result.views-row-first {
+  border-top: none !important;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field {
+  display: none;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset {
+  display: block;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2 {
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a {
+  color: #138aab;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:hover,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset {
+  padding-top: 10px;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-4,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-8 {
+  width: 100%;
+}
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.node-collection.view-mode-full .field-name-collections-tree {
+  background-color: #f8f7f7;
+  border-bottom: 5px solid #eeeaea;
+  padding-bottom: 30px;
+}
+.node-collection.view-mode-full .field-name-collections-tree a {
+  color: #138aab;
+}
+.node-collection.view-mode-full .field-name-collections-tree a:hover,
+.node-collection.view-mode-full .field-name-collections-tree a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.node-collection.view-mode-full .field-name-collections-tree .current {
+  color: #555555;
+}
+.node-collection.view-mode-full .field-name-collections-tree .label-above {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 20px 15px 20px 15px;
+  margin-bottom: 0px;
+  letter-spacing: 1.2px;
+  background: #159ec4;
+  text-transform: uppercase;
+}
+.node-collection.view-mode-full .field-name-collections-tree .collections-tree {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.node-type-collection h1.page-header {
+  display: none;
+}
+.node-type-collection .main-container > .row section .btn-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1500;
+}
+.node-type-collection .main-container > .row section .btn-group .dropdown-menu {
+  position: relative;
+  clear: left;
 }
 .node-type-community .page-header {
   background: none;
@@ -8756,4 +9128,119 @@ footer header {
   min-height: 20px;
   padding-right: 25px;
   background-position: 99% 25%;
+}
+.page-dictionary .page-header {
+  background: none;
+}
+.page-dictionary .facet-glossary {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.page-dictionary .facet-glossary > a {
+  display: none;
+}
+.page-dictionary .facet-glossary .pane-content {
+  background: none;
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .page-dictionary .facet-glossary .facetapi-search-api-glossary {
+    display: table;
+  }
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary .no-content {
+  display: none;
+}
+@media (min-width: 768px) {
+  .page-dictionary .facet-glossary .facetapi-search-api-glossary .no-content {
+    display: table-cell;
+  }
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary .active {
+  font-weight: bold;
+  color: #464646;
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary li {
+  display: inline;
+}
+@media (min-width: 768px) {
+  .page-dictionary .facet-glossary .facetapi-search-api-glossary li {
+    display: table-cell;
+    width: 1%;
+  }
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary li a {
+  color: #138aab;
+  font-weight: bold;
+  font-size: 17px;
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary li a:hover,
+.page-dictionary .facet-glossary .facetapi-search-api-glossary li a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.view-dictionary-words {
+  width: 100%;
+}
+.view-dictionary-words .views-row-odd {
+  clear: left;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle {
+  display: none;
+  margin-bottom: 30px;
+  background-color: #f8f7f7;
+  padding-bottom: 30px;
+}
+@media (min-width: 992px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle {
+    height: 290px;
+  }
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field {
+  padding-left: 30px;
+  padding-top: 10px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling {
+  background-color: #159ec4;
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  background-size: 18px;
+  height: 68px;
+  padding: 0px 0px 0px 10px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling:hover,
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling:focus {
+  background-color: #138aab;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a:hover,
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a:focus {
+  text-decoration: none;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  display: inherit;
+  font-size: 26px;
+  color: #fff;
+  padding-left: 20px;
+  line-height: 68px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-translation {
+  font-weight: bold;
+  font-size: 20px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .field-label {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  font-size: 17px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div:first-of-type {
+  display: block;
 }

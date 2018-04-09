@@ -180,6 +180,9 @@ function ma_collection_strongarm() {
       'featured_content' => array(
         'custom_settings' => FALSE,
       ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
