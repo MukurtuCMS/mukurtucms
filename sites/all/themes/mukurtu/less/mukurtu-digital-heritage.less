@@ -55,3 +55,85 @@
         .view-border;
     }
 }
+
+// Community Record Tabs
+#quicktabs-community-record {
+    .quicktabs-tabs {
+        .fullwidth;
+        height: 52px;
+        background: none;
+        background-color: @mukurtu-navbar-collapse-bg;
+        padding: 0px;
+
+        li {
+            height: 100%;
+            margin: 0px;
+            border-left: 1px solid rgba(70, 70, 70, 0.25);
+
+            a {
+                font-weight: bold;
+                font-size: 16px;
+                height: 100%;
+                background: none;
+                line-height: 44px;
+            }
+
+            &:hover {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+
+                a {
+                    color: #fff;
+                }
+            }
+
+            // Active CR tab
+            &.active {
+                background: none;
+                background-color: @brand-primary;
+                a {
+                    color: #fff;
+                }
+
+                // Active CR down arrow icon
+                &::after {
+                    .arrow-down;
+                    content: "";
+                    position: relative;
+                    top: 100%;
+                    background-size: 20px 12px;
+                    left: 46%;
+                    height: 12px;
+                    z-index: 10;
+                    padding: 36px 0px 20px 20px;
+                }
+            }
+
+            &:first-of-type {
+                border-left: none;
+            }
+        }
+
+        // Drop shadow for CR tabs
+        &::after {
+            .section-shadow;
+            content: "";
+            height: 12px;
+            display: block;
+            position: relative;
+            top: 100%;
+        }
+    }
+}
+
+// Community record quicktab container
+#quicktabs-container-community-record {
+    padding-top: 50px;
+}
+
+// Digital Heritage Node Page
+.node-type-digital-heritage {
+    // Hide title header background
+    h1.page-header {
+        background: none;
+    }
+}
