@@ -8560,6 +8560,14 @@ footer header {
 .view-digital-heritage-grid-list .views-row {
   border-bottom: 5px solid #eeeaea;
 }
+.record-drop-shadow::after {
+  background: linear-gradient(#e6e6e6, #ffffff);
+  background-repeat: no-repeat;
+  background-size: 100% 12px;
+  content: "";
+  height: 12px;
+  display: block;
+}
 #quicktabs-community-record .quicktabs-tabs {
   width: 100vw;
   position: relative;
@@ -8576,6 +8584,30 @@ footer header {
   height: 100%;
   margin: 0px;
   border-left: 1px solid rgba(70, 70, 70, 0.25);
+  background-color: #f8f7f7;
+  display: inline;
+  width: 100%;
+  text-align: center;
+  padding-left: 0px;
+}
+#quicktabs-community-record .quicktabs-tabs li::after {
+  background: linear-gradient(#e6e6e6, #ffffff);
+  background-repeat: no-repeat;
+  background-size: 100% 12px;
+  content: "";
+  height: 12px;
+  display: block;
+}
+@media (min-width: 768px) {
+  #quicktabs-community-record .quicktabs-tabs li {
+    display: block;
+    width: auto;
+    text-align: left;
+    padding-left: 10px;
+  }
+  #quicktabs-community-record .quicktabs-tabs li::after {
+    content: none;
+  }
 }
 #quicktabs-community-record .quicktabs-tabs li a {
   font-weight: bold;
@@ -8597,32 +8629,39 @@ footer header {
 #quicktabs-community-record .quicktabs-tabs li.active a {
   color: #fff;
 }
-#quicktabs-community-record .quicktabs-tabs li.active::after {
-  background: url(../images/icons/triangle_arrow_down.svg) no-repeat 0% 50%;
-  content: "";
-  position: relative;
-  top: 100%;
-  background-size: 20px 12px;
-  left: 46%;
-  height: 12px;
-  z-index: 10;
-  padding: 36px 0px 20px 20px;
+@media (min-width: 768px) {
+  #quicktabs-community-record .quicktabs-tabs li.active::after {
+    background: url(../images/icons/triangle_arrow_down.svg) no-repeat 0% 50%;
+    content: "";
+    position: relative;
+    bottom: 1px;
+    background-size: 20px 12px;
+    left: 44%;
+    z-index: 10;
+  }
 }
 #quicktabs-community-record .quicktabs-tabs li:first-of-type {
   border-left: none;
 }
-#quicktabs-community-record .quicktabs-tabs::after {
-  background: linear-gradient(#e6e6e6, #ffffff);
-  background-repeat: no-repeat;
-  background-size: 100% 12px;
-  content: "";
-  height: 12px;
-  display: block;
-  position: relative;
-  top: 100%;
+@media (min-width: 768px) {
+  #quicktabs-community-record .quicktabs-tabs::after {
+    background: linear-gradient(#e6e6e6, #ffffff);
+    background-repeat: no-repeat;
+    background-size: 100% 12px;
+    content: "";
+    height: 12px;
+    display: block;
+    position: relative;
+    top: 100%;
+  }
 }
 #quicktabs-container-community-record {
-  padding-top: 50px;
+  padding-top: 80px;
+}
+@media (min-width: 768px) {
+  #quicktabs-container-community-record {
+    padding-top: 50px;
+  }
 }
 .node-type-digital-heritage h1.page-header {
   background: none;

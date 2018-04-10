@@ -985,7 +985,7 @@ function ma_digitalheritage_page_alter(&$data) {
             $dh_tabs[] = array(
               'type' => 'node',
               'nid' => $community_record->nid,
-              'view_mode' => 'community_record',
+              'view_mode' => 'full',
               'title' => $community_record_tab_title,
               'hide_title' => 0,
               #'weight' => 0,

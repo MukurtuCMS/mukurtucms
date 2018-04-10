@@ -57,6 +57,15 @@
 }
 
 // Community Record Tabs
+.record-drop-shadow {
+    &::after {
+        .section-shadow;
+        content: "";
+        height: 12px;
+        display: block;
+    }
+}
+
 #quicktabs-community-record {
     .quicktabs-tabs {
         .fullwidth;
@@ -69,6 +78,27 @@
             height: 100%;
             margin: 0px;
             border-left: 1px solid rgba(70, 70, 70, 0.25);
+            background-color: @mukurtu-navbar-collapse-bg;
+
+            // Stack and center CR tabs on mobile, add drop shadow for each li
+            display: inline;
+            width: 100%;
+            text-align: center;
+            .record-drop-shadow;
+            padding-left: 0px;
+
+            // Stack CR tabs left->right on non-mobile
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: block;
+                width: auto;
+                text-align: left;
+                padding-left: 10px;
+
+                &::after {
+                    content:none;
+                }
+            }
 
             a {
                 font-weight: bold;
@@ -95,16 +125,17 @@
                 }
 
                 // Active CR down arrow icon
-                &::after {
-                    .arrow-down;
-                    content: "";
-                    position: relative;
-                    top: 100%;
-                    background-size: 20px 12px;
-                    left: 46%;
-                    height: 12px;
-                    z-index: 10;
-                    padding: 36px 0px 20px 20px;
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    &::after {
+                        .arrow-down;
+                        content: "";
+                        position: relative;
+                        bottom: 1px;
+                        background-size: 20px 12px;
+                        left: 44%;
+                        z-index: 10;
+                    }
                 }
             }
 
@@ -114,20 +145,28 @@
         }
 
         // Drop shadow for CR tabs
+        // Tablet
         &::after {
-            .section-shadow;
-            content: "";
-            height: 12px;
-            display: block;
-            position: relative;
-            top: 100%;
+            @media (min-width: @screen-sm-min) {
+                .section-shadow;
+                content: "";
+                height: 12px;
+                display: block;
+                position: relative;
+                top: 100%;
+            }
         }
     }
 }
 
 // Community record quicktab container
 #quicktabs-container-community-record {
-    padding-top: 50px;
+    padding-top: 80px;
+
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        padding-top: 50px;
+    }
 }
 
 // Digital Heritage Node Page
