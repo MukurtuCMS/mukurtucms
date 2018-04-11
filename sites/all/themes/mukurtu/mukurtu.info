@@ -24,13 +24,15 @@ regions[page_bottom]    = 'Page bottom'
 ;; Stylesheets
 ;;;;;;;;;;;;;;;;;;;;;
 
-stylesheets[all][] = css/style.css
+;stylesheets[all][] = css/style.css
+;stylesheets[all][] = css/style-blue-gold.css
 stylesheets[all][] = font-awesome/css/font-awesome.min.css
 
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Settings
 ;;;;;;;;;;;;;;;;;;;;;
+settings[mukurtu_theme_color_scheme] = 'blue-gold'
 settings[mukurtu_theme_email_us_message] = 'Email us at'
 settings[mukurtu_theme_contact_email] = 'support@mukurtu.org'
 settings[mukurtu_theme_twitter_message] = 'Follow us'

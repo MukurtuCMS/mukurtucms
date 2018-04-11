@@ -11,6 +11,22 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
     //'#group' => 'mukurtu',
   );
 
+  //// Color Scheme
+  $form['mukurtu']['colors'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Color Scheme'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  // Pick color scheme
+  $form['mukurtu']['colors']['mukurtu_theme_color_scheme'] = array(
+    '#type' => 'radios',
+    '#title' => t('Select default color scheme for the Mukurtu theme'),
+    '#default_value' => theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu'),
+    '#options' => array('blue-gold' => 'Blue & Gold', 'red-bone' => 'Red & Bone')
+  );
+  
   //// Footer.
   $form['mukurtu']['footer'] = array(
     '#type' => 'fieldset',
