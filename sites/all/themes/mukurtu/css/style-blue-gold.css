@@ -8399,21 +8399,24 @@ footer header {
 .view-mukurtu-frontpage-browse-by-community .field-name-field-community-image-thumbnail img {
   height: 100%;
 }
-.top-bottom-image-title .field-name-title {
+.top-bottom-image-title {
+  padding-bottom: 30px;
+}
+.top-bottom-image-title .field-name-taxonomy-title-browse-link {
   background-color: #159ec4;
   padding: 10px;
   min-height: 100px;
   line-height: 100px;
 }
-.top-bottom-image-title .field-name-title:hover,
-.top-bottom-image-title .field-name-title:focus {
+.top-bottom-image-title .field-name-taxonomy-title-browse-link:hover,
+.top-bottom-image-title .field-name-taxonomy-title-browse-link:focus {
   background-color: #138aab;
 }
-.top-bottom-image-title .field-name-title a:hover,
-.top-bottom-image-title .field-name-title a:focus {
+.top-bottom-image-title .field-name-taxonomy-title-browse-link a:hover,
+.top-bottom-image-title .field-name-taxonomy-title-browse-link a:focus {
   text-decoration: none;
 }
-.top-bottom-image-title .field-name-title h3 {
+.top-bottom-image-title .field-name-taxonomy-title-browse-link h3 {
   background-image: url(../images/icons/chevronright.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
