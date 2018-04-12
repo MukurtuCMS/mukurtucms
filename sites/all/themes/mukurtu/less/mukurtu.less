@@ -266,7 +266,7 @@ header,
 
 #breadcrumb {
 	.fullwidth;
-	background: linear-gradient(#b7873a, @brand-secondary);
+	background: linear-gradient(@mukurtu-breadcrumb-gradient-color, @brand-secondary);
 	height: 12px;
 	margin-bottom: 36px;
 
@@ -276,10 +276,10 @@ header,
 		background-color: @brand-secondary;
 		height: 36px;
 		border-radius: 0px;
-		color: #fff;
+		color: @mukurtu-breadcrumb-non-link-color;
 
 		a {
-			color: #fff;
+			color: @mukurtu-breadcrumb-link-color;
 
 			&:hover,
 			&.active {
@@ -296,7 +296,7 @@ header,
 
 		> li + li:before {
 			content: " >> ";
-			color: #fff;
+			color: @mukurtu-breadcrumb-non-link-color;
 		}
 
 		li.first {

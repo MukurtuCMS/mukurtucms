@@ -7792,11 +7792,11 @@ header,
   background-color: #e6ab49;
   height: 36px;
   border-radius: 0px;
-  color: #fff;
+  color: #464646;
   padding-left: 30px;
 }
 #breadcrumb .breadcrumb a {
-  color: #fff;
+  color: #ffffff;
 }
 #breadcrumb .breadcrumb a:hover,
 #breadcrumb .breadcrumb a.active {
@@ -7810,7 +7810,7 @@ header,
 }
 #breadcrumb .breadcrumb > li + li:before {
   content: " >> ";
-  color: #fff;
+  color: #464646;
 }
 @media (min-width: 992px) {
   #breadcrumb .breadcrumb li.first {
@@ -8398,6 +8398,41 @@ footer header {
 }
 .view-mukurtu-frontpage-browse-by-community .field-name-field-community-image-thumbnail img {
   height: 100%;
+}
+.top-bottom-image-title .field-name-title {
+  background-color: #159ec4;
+  padding: 10px;
+  min-height: 100px;
+  line-height: 100px;
+}
+.top-bottom-image-title .field-name-title:hover,
+.top-bottom-image-title .field-name-title:focus {
+  background-color: #138aab;
+}
+.top-bottom-image-title .field-name-title a:hover,
+.top-bottom-image-title .field-name-title a:focus {
+  text-decoration: none;
+}
+.top-bottom-image-title .field-name-title h3 {
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  vertical-align: middle;
+  margin: auto;
+  display: inline-block;
+  padding: 20px;
+  background-position: 99% 50%;
+  background-size: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+}
+.top-bottom-image-title .field-name-scald-thumbnail img {
+  width: 100%;
 }
 .panel-panel.left {
   padding-top: 50px;

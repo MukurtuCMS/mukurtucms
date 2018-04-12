@@ -145,6 +145,21 @@ function ma_base_theme_image_default_styles() {
     ),
   );
 
+  // Exported image style: mukurtu_theme_7_4_ratio.
+  $styles['mukurtu_theme_7_4_ratio'] = array(
+    'label' => 'Mukurtu theme 7:4 ratio',
+    'effects' => array(
+      14 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 700,
+          'height' => 400,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
   // Exported image style: related_items_teaser.
   $styles['related_items_teaser'] = array(
     'label' => 'Related Items Teaser',

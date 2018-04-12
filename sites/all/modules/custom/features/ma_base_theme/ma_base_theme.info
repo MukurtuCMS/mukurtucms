@@ -265,6 +265,7 @@ features[image][] = digital_heritage_full_content
 features[image][] = full
 features[image][] = mukurtu_theme_3_2_ratio
 features[image][] = mukurtu_theme_4_3_ratio
+features[image][] = mukurtu_theme_7_4_ratio
 features[image][] = related_items_teaser
 features[menu_custom][] = menu-log-in-log-out
 features[menu_links][] = menu-log-in-log-out_log-in:user/login
