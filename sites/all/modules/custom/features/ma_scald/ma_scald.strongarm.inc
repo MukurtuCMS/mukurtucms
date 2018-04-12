@@ -277,6 +277,9 @@ function ma_scald_strongarm() {
       'mukurtu_browse_by_grid' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_browse_by_grid_7_4' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -330,6 +333,10 @@ function ma_scald_strongarm() {
             'visible' => FALSE,
           ),
           'mukurtu_browse_by_grid' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_browse_by_grid_7_4' => array(
             'weight' => '3',
             'visible' => FALSE,
           ),
@@ -598,6 +605,14 @@ function ma_scald_strongarm() {
     'mukurtu_browse_by_grid' => array(
       'name' => 'mukurtu_browse_by_grid',
       'title' => 'Mukurtu Browse By Grid',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_browse_by_grid_7_4' => array(
+      'name' => 'mukurtu_browse_by_grid_7_4',
+      'title' => 'Mukurtu Browse By Grid 7:4',
       'description' => '',
       'render_language' => 'XHTML',
       'parseable' => TRUE,
