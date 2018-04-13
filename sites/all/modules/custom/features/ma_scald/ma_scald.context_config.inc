@@ -181,6 +181,44 @@ function ma_scald_default_scald_context_config() {
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
   $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_featured_content';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'default',
+    ),
+    'file' => array(
+      '*' => 'default',
+    ),
+    'image' => array(
+      '*' => 'default',
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '100%',
+    'height' => '100%',
+  );
+  $export['mukurtu_featured_content'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
   $context_config->context = 'mukurtu_scald_banner_image';
   $context_config->transcoder = array(
     'audio' => array(
@@ -334,6 +372,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'video' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
   );
   $context_config->data = array(
@@ -498,9 +537,13 @@ function ma_scald_default_scald_context_config() {
     ),
     'video' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
   );
-  $context_config->data = array();
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
   $export['sdl_library_item'] = $context_config;
 
   $context_config = new stdClass();

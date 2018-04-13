@@ -8151,6 +8151,7 @@ footer header {
   position: absolute;
   background-color: #159ec4;
   padding: 10px;
+  z-index: 1;
 }
 .view-mukurtu-frontpage-featured-content .field-name-featured-content-view-link:hover,
 .view-mukurtu-frontpage-featured-content .field-name-featured-content-view-link:focus {
@@ -8169,6 +8170,9 @@ footer header {
 .view-mukurtu-frontpage-featured-content .field-name-field-media-asset img {
   margin: auto;
   width: 100%;
+}
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .scald-atom .mejs-container {
+  height: 66.67% !important;
 }
 .view-mukurtu-frontpage-featured-content .field-name-featured-content-type {
   font-weight: bold;
@@ -8542,6 +8546,9 @@ footer header {
 }
 .digital-heritage-body .field-name-field-media-asset img {
   margin: auto;
+}
+.digital-heritage-body .field-name-field-media-asset .scald-atom {
+  padding-bottom: 30px;
 }
 .digital-heritage-body > .field {
   padding-left: 20px;

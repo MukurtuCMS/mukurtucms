@@ -14,6 +14,7 @@
         position: absolute;
         background-color: @brand-primary;
         padding: 10px;
+        z-index: 1;
 
         &:hover,
         &:focus {
@@ -36,6 +37,12 @@
         img {
             margin: auto;
             width: 100%;
+        }
+
+        .scald-atom {
+            .mejs-container {
+                height: 66.67% !important;
+            }
         }
     }
 
