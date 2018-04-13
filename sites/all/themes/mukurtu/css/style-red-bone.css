@@ -7873,13 +7873,13 @@ header,
   padding-bottom: 10px;
 }
 .mukurtu-pane-label {
-  color: #fff;
+  color: #ac143a;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
   margin-bottom: 0px;
   letter-spacing: 1.2px;
-  background: #ac143a;
+  background: #d9d4c2;
   text-transform: uppercase;
 }
 .primary-color-link-container {
@@ -8445,24 +8445,24 @@ footer header {
   text-decoration: none;
 }
 .panel-panel a .pane-title:hover {
-  background-color: #ac143a;
+  background-color: #c9c2a8;
 }
 .panel-panel .pane-title {
-  color: #fff;
+  color: #ac143a;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
   margin-bottom: 0px;
   letter-spacing: 1.2px;
-  background: #ac143a;
+  background: #d9d4c2;
   text-transform: uppercase;
-  background-image: url(../images/icons/chevrondown.svg);
+  background-image: url(../images/icons/chevrondown_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 50%;
   background-size: 20px;
 }
 .panel-panel .pane-content.collapse {
-  background-color: #eeecec;
+  background-color: #f1efe9;
 }
 .panel-panel .pane-content .facetapi-facetapi-checkbox-links {
   padding: 10px 20px 20px 14px;
@@ -9118,13 +9118,13 @@ footer header {
   color: #555555;
 }
 .node-collection.view-mode-full .field-name-collections-tree .label-above {
-  color: #fff;
+  color: #ac143a;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
   margin-bottom: 0px;
   letter-spacing: 1.2px;
-  background: #ac143a;
+  background: #d9d4c2;
   text-transform: uppercase;
 }
 .node-collection.view-mode-full .field-name-collections-tree .collections-tree {

@@ -1,5 +1,3 @@
-@pane-background-color: #EEECEC;
-
 .panel-panel {
     &.left {
         padding-top: 50px;
@@ -13,14 +11,14 @@
 
         .pane-title {
             &:hover {
-                background-color: @link-color;
+                background-color: @mukurtu-default-container-bg-hover-color;
             }
         }
     }
 
     .pane-title {
         .mukurtu-pane-label;
-        background-image: url(../images/icons/chevrondown.svg);
+        background-image: url(@mukurtu-panel-chevron-down-path);
         background-repeat: no-repeat;
         background-position: 95% 50%;
         background-size: 20px;
@@ -28,7 +26,7 @@
 
     .pane-content {
         &.collapse {
-            background-color: @pane-background-color;
+            background-color: @mukurtu-panel-pane-content-background-color;
         }
 
         .facetapi-facetapi-checkbox-links {

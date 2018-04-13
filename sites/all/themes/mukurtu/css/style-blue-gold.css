@@ -7873,7 +7873,7 @@ header,
   padding-bottom: 10px;
 }
 .mukurtu-pane-label {
-  color: #fff;
+  color: #ffffff;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
@@ -8448,7 +8448,7 @@ footer header {
   background-color: #138aab;
 }
 .panel-panel .pane-title {
-  color: #fff;
+  color: #ffffff;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
@@ -9118,7 +9118,7 @@ footer header {
   color: #555555;
 }
 .node-collection.view-mode-full .field-name-collections-tree .label-above {
-  color: #fff;
+  color: #ffffff;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
