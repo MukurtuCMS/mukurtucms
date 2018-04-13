@@ -198,13 +198,13 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
     ),
     'file' => array(
       '*' => 'default',
     ),
     'image' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
     ),
     'video' => array(
       '*' => 'mukurtu_default',
@@ -369,6 +369,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'image' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'video' => array(
       '*' => 'default',
@@ -528,12 +529,14 @@ function ma_scald_default_scald_context_config() {
   $context_config->player = array(
     'audio' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'file' => array(
       '*' => 'default',
     ),
     'image' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'video' => array(
       '*' => 'default',

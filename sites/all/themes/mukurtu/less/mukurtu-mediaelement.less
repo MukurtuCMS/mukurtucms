@@ -1,0 +1,67 @@
+.mejs-container {
+    background: transparent;
+
+    .mejs-controls {
+        background: transparent;
+
+        .mejs-time {
+            color: @mukurtu-mejs-text-color;
+        }
+
+        .mejs-time-rail {
+            .mejs-time-loaded {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs-time-current {
+                background: @mukurtu-mejs-time-rail-current-color;
+            }
+        }
+
+        .mejs-horizontal-volume-slider {
+            .mejs-horizontal-volume-total {
+                background: @mukurtu-mejs-time-rail-loaded-color;
+            }
+            .mejs-horizontal-volume-current {
+                background: @mukurtu-mejs-time-rail-current-color;
+            }
+        }
+
+        .mejs-button {
+            button {
+                background: transparent url(@mukurtu-mejs-controls-icon-path) no-repeat;
+            }
+        }
+
+        .mejs-play {
+            height: 50px;
+            width: 40px;
+
+            button {
+                background: transparent url(@mukurtu-mejs-play-icon-path) no-repeat;
+                background-size: 20px;
+                height: 100%;
+                width: 100%;
+            }
+        }
+        .mejs-pause {
+            height: 50px;
+            width: 40px;
+
+            button {
+                background-position: 0px -16px;
+            }
+        }
+
+        .mejs-unmute button {
+            background-position: -16px 0px;
+        }
+
+        .mejs-mute button {
+            background-position: -16px -16px;
+        }
+
+        .mejs-fullscreen-button button {
+            background-position: -32px 0px;
+        }
+    }
+}

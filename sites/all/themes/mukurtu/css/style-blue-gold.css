@@ -8137,6 +8137,56 @@ footer header {
   background-color: #138aab;
   text-decoration: none;
 }
+.mejs-container {
+  background: transparent;
+}
+.mejs-container .mejs-controls {
+  background: transparent;
+}
+.mejs-container .mejs-controls .mejs-time {
+  color: #464646;
+}
+.mejs-container .mejs-controls .mejs-time-rail .mejs-time-loaded {
+  background: #e5e1e1;
+}
+.mejs-container .mejs-controls .mejs-time-rail .mejs-time-current {
+  background: #d1cbcb;
+}
+.mejs-container .mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-total {
+  background: #e5e1e1;
+}
+.mejs-container .mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-current {
+  background: #d1cbcb;
+}
+.mejs-container .mejs-controls .mejs-button button {
+  background: transparent url(../images/icons/controls_gold.svg) no-repeat;
+}
+.mejs-container .mejs-controls .mejs-play {
+  height: 50px;
+  width: 40px;
+}
+.mejs-container .mejs-controls .mejs-play button {
+  background: transparent url(../images/icons/play_red.svg) no-repeat;
+  background-size: 20px;
+  height: 100%;
+  width: 100%;
+}
+.mejs-container .mejs-controls .mejs-pause {
+  height: 50px;
+  width: 40px;
+}
+.mejs-container .mejs-controls .mejs-pause button {
+  background-position: 0px -16px;
+}
+.mejs-container .mejs-controls .mejs-unmute button {
+  background-position: -16px 0px;
+}
+.mejs-container .mejs-controls .mejs-mute button {
+  background-position: -16px -16px;
+}
+.mejs-container .mejs-controls .mejs-fullscreen-button button {
+  background-position: -32px 0px;
+}
 .nav.tabs--primary li {
   width: 100%;
 }
