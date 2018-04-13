@@ -44,6 +44,16 @@
                 height: 66.67% !important;
             }
         }
+
+        // Shrink audio controls on featured content
+        .mejs-container {
+            &.mejs-audio {
+                margin: auto;
+                .mejs-controls {
+                    width: 80%;
+                }
+            }
+        }
     }
 
     .field-name-featured-content-type {

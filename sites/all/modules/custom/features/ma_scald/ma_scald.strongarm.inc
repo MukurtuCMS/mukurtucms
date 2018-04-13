@@ -94,6 +94,24 @@ function ma_scald_strongarm() {
       'mukurtu_scald_recording' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_scald_taxonomy_thumbnail' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_browse_by_grid_7_4' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -132,6 +150,10 @@ function ma_scald_strongarm() {
           ),
           'mukurtu_scald_media_assets_edit_' => array(
             'weight' => '0',
+            'visible' => TRUE,
+          ),
+          'mukurtu_featured_content' => array(
+            'weight' => '1',
             'visible' => TRUE,
           ),
         ),

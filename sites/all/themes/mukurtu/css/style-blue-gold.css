@@ -8140,6 +8140,9 @@ footer header {
 .mejs-container {
   background: transparent;
 }
+.mejs-container .mejs-inner .mejs-mediaelement video {
+  background: #000;
+}
 .mejs-container .mejs-controls {
   background: transparent;
 }
@@ -8223,6 +8226,12 @@ footer header {
 }
 .view-mukurtu-frontpage-featured-content .field-name-field-media-asset .scald-atom .mejs-container {
   height: 66.67% !important;
+}
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs-container.mejs-audio {
+  margin: auto;
+}
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs-container.mejs-audio .mejs-controls {
+  width: 80%;
 }
 .view-mukurtu-frontpage-featured-content .field-name-featured-content-type {
   font-weight: bold;
