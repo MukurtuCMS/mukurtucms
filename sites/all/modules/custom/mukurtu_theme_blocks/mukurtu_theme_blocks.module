@@ -76,11 +76,20 @@ function _mukurtu_theme_blocks_footer() {
 
 function _mukurtu_theme_blocks_hero() {
     $slogan = variable_get('site_slogan', '');
-    $hero_image = theme_get_setting('mukurtu_theme_frontpage_hero_image', '');
-    if($hero_image == '') {
-        $image_url = drupal_get_path('theme', 'mukurtu') . '/images/frontpage-hero.png';
+    // Default image
+    $image_url = drupal_get_path('theme', 'mukurtu') . '/images/frontpage-hero.png';
+
+    // Load custom image, if specified
+    $hero_image_fid = theme_get_setting('mukurtu_theme_frontpage_hero_image');
+
+    if($hero_image_fid) {
+        $hero_image = file_load($hero_image_fid);
+        if(isset($hero_image->uri)) {
+            $image_url = file_create_url($hero_image->uri);
+        }
     }
 
+    // Build markup
     $block['content'] = "<div class=\"col-xs-12 hero-image\"><img class=\"img-responsive\" src=$image_url /><div class=\"hero-text\">$slogan</div></div>";
     return $block;
 }
