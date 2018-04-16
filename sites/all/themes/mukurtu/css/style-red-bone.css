@@ -7889,6 +7889,9 @@ header,
 .primary-color-link-container:focus {
   background-color: #c9c2a8;
 }
+.primary-color-link-container a {
+  color: #ac143a;
+}
 .primary-color-link-container a:hover,
 .primary-color-link-container a:focus {
   text-decoration: none;
@@ -7905,6 +7908,9 @@ header,
 .left-right-image-title > div:hover,
 .left-right-image-title > div:focus {
   background-color: #c9c2a8;
+}
+.left-right-image-title > div a {
+  color: #ac143a;
 }
 .left-right-image-title > div a:hover,
 .left-right-image-title > div a:focus {
@@ -8431,6 +8437,9 @@ section ol.breadcrumb {
 .view-mukurtu-frontpage-browse-by-community > div:focus {
   background-color: #c9c2a8;
 }
+.view-mukurtu-frontpage-browse-by-community > div a {
+  color: #ac143a;
+}
 .view-mukurtu-frontpage-browse-by-community > div a:hover,
 .view-mukurtu-frontpage-browse-by-community > div a:focus {
   text-decoration: none;
@@ -8489,6 +8498,9 @@ section ol.breadcrumb {
 .top-bottom-image-title .field-name-taxonomy-title-browse-link:hover,
 .top-bottom-image-title .field-name-taxonomy-title-browse-link:focus {
   background-color: #c9c2a8;
+}
+.top-bottom-image-title .field-name-taxonomy-title-browse-link a {
+  color: #ac143a;
 }
 .top-bottom-image-title .field-name-taxonomy-title-browse-link a:hover,
 .top-bottom-image-title .field-name-taxonomy-title-browse-link a:focus {
@@ -8800,6 +8812,9 @@ section ol.breadcrumb {
 .large-teaser-box:focus {
   background-color: #c9c2a8;
 }
+.large-teaser-box a {
+  color: #ac143a;
+}
 .large-teaser-box a:hover,
 .large-teaser-box a:focus {
   text-decoration: none;
@@ -8925,6 +8940,9 @@ section ol.breadcrumb {
 #views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn:focus {
   background-color: #c9c2a8;
 }
+#views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn a {
+  color: #ac143a;
+}
 #views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn a:hover,
 #views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn a:focus {
   text-decoration: none;
@@ -8977,6 +8995,9 @@ section ol.breadcrumb {
 .node-collection.view-mode-full > div:first-of-type:hover,
 .node-collection.view-mode-full > div:first-of-type:focus {
   background-color: #c9c2a8;
+}
+.node-collection.view-mode-full > div:first-of-type a {
+  color: #ac143a;
 }
 .node-collection.view-mode-full > div:first-of-type a:hover,
 .node-collection.view-mode-full > div:first-of-type a:focus {
@@ -9311,6 +9332,9 @@ section ol.breadcrumb {
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status:focus {
   background-color: #c9c2a8;
 }
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a {
+  color: #ac143a;
+}
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:hover,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:focus {
   text-decoration: none;
@@ -9446,6 +9470,9 @@ section ol.breadcrumb {
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling:hover,
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling:focus {
   background-color: #c9c2a8;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a {
+  color: #ac143a;
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a:hover,
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a:focus {
