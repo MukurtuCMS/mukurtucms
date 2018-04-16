@@ -34,6 +34,7 @@
     }
 
     .field-name-field-media-asset {
+        position: relative;
         img {
             margin: auto;
             width: 100%;
@@ -49,6 +50,10 @@
         .mejs-container {
             &.mejs-audio {
                 margin: auto;
+                position: absolute;
+                bottom: 0;
+                background: @mukurtu-mejs-background-color;
+                width: 100% !important;
                 .mejs-controls {
                     width: 80%;
                 }

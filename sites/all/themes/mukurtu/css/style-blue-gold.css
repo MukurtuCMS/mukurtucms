@@ -8137,6 +8137,14 @@ footer header {
   background-color: #138aab;
   text-decoration: none;
 }
+#breadcrumb .breadcrumb {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+section ol.breadcrumb {
+  display: none;
+}
 .mejs-container {
   background: transparent;
 }
@@ -8220,6 +8228,9 @@ footer header {
   background-position: center right;
   padding-right: 15px;
 }
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset {
+  position: relative;
+}
 .view-mukurtu-frontpage-featured-content .field-name-field-media-asset img {
   margin: auto;
   width: 100%;
@@ -8229,6 +8240,10 @@ footer header {
 }
 .view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs-container.mejs-audio {
   margin: auto;
+  position: absolute;
+  bottom: 0;
+  background: #ffffff;
+  width: 100% !important;
 }
 .view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs-container.mejs-audio .mejs-controls {
   width: 80%;
