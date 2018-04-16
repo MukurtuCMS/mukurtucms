@@ -201,7 +201,7 @@ function ma_scald_default_scald_context_config() {
       '*' => 'mukurtu_default',
     ),
     'file' => array(
-      '*' => 'default',
+      '*' => 'mukurtu_default',
     ),
     'image' => array(
       '*' => 'mukurtu_default',
@@ -366,6 +366,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
@@ -533,6 +534,7 @@ function ma_scald_default_scald_context_config() {
     ),
     'file' => array(
       '*' => 'default',
+      'settings' => array(),
     ),
     'image' => array(
       '*' => 'default',
