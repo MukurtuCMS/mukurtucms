@@ -1,0 +1,211 @@
+<?php
+
+/**
+ * @file
+ * Subscribe API for the Message and Message notify modules.
+ */
+include_once 'message_subscribe_ui.features.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function message_subscribe_ui_menu() {
+  $items = array();
+  $items['user/%user/message-subscribe'] = array(
+    'title' => 'Subscriptions',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'message_subscribe_ui_tab',
+    'page arguments' => array(1),
+    'access callback' => 'message_subscribe_ui_tab_access',
+    'access arguments' => array(1),
+  );
+
+  foreach (array_keys(message_subscribe_flag_get_flags()) as $flag_name) {
+    // Find the currect view name from a set variable, defaults according to the
+    // flag's entity type, e.g. 'user' defaults to 'subscribe_user'.
+    $items['user/%user/message-subscribe/' . $flag_name] = array(
+      'title callback' => 'message_subscribe_ui_tab_title',
+      'title arguments' => array(1, $flag_name),
+      'page callback' => 'message_subscribe_ui_tab',
+      'page arguments' => array(1, $flag_name),
+      'access callback' => 'message_subscribe_ui_tab_access',
+      'access arguments' => array(1, $flag_name),
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function message_subscribe_permission() {
+  return array(
+    'administer message subscribe' =>  array(
+      'title' => t('Administer message subscribe'),
+      'description' => t('Administer user subscriptions.'),
+    ),
+  );
+}
+
+/**
+ * Access callback; Determine if  user can access a tab.
+ *
+ * @param $account
+ *   The user object.
+ * @param $flag_name
+ *   The flag name.
+ */
+function message_subscribe_ui_tab_access($account, $flag_name = NULL) {
+  global $user;
+
+  if (!$flag_name) {
+    // We are inside /message-subscribe so get the first flag.
+    $flag_name = key(message_subscribe_flag_get_flags());
+  }
+
+
+  if (!$flag = flag_get_flag($flag_name)) {
+    // No flag, or flag is disabled.
+    return;
+  }
+
+  if (isset($rel_flag->status) && $rel_flag->status === FALSE) {
+    // The flag is disabled.
+    return;
+  }
+
+  if (user_access('administer message subscribe')) {
+    return TRUE;
+  }
+
+  if (!$flag->user_access('unflag', $account) || $account->uid != $user->uid) {
+    return;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Title callback; Return the flag name and flagging count.
+ *
+ * @param $account
+ *   The user object.
+ * @param $flag_name
+ *   The flag name.
+ */
+function message_subscribe_ui_tab_title($account, $flag_name = NULL) {
+  global $user;
+
+  if (!$flag_name) {
+    // We are inside /message-subscribe so get the first flag.
+    $flag_name = key(message_subscribe_flag_get_flags());
+  }
+  $flag = flag_get_flag($flag_name);
+
+  $count = 0;
+  // Get the message subscribe count from the page view.
+  if ($view = message_subscribe_ui_get_view($account, $flag_name)) {
+    $view->get_total_rows = TRUE;
+    $view->preview();
+    $count = $view->total_rows;
+  }
+
+  $params = array(
+    '@flag' => $flag->title,
+    '@count' => $count,
+    '@name' => format_username($account),
+  );
+
+  return $account->uid == $user->uid ? t('@flag you follow (@count)', $params) : t('@flag @name follows (@count)', $params);
+}
+
+/**
+ * Page callback; Call a view to show the user subscription in a flag.
+ *
+ * @param $account
+ *   The user object.
+ * @param $flag_name
+ *   The flag name.
+ *
+ * @return
+ *   A rendered View, or NULL if View was not found.
+ */
+function message_subscribe_ui_tab($account, $flag_name = NULL) {
+  if (!$flag_name) {
+    // We are inside /message-subscribe so get the first flag.
+    $flag_name = key(message_subscribe_flag_get_flags());
+  }
+
+  $view = message_subscribe_ui_get_view($account, $flag_name);
+  return $view ? $view->preview() : '';
+}
+
+/**
+ * API Call to grab the view object of a message subscribe page.
+ *
+ * @param $account
+ *   The user object.
+ * @param $flag_name
+ *   The message subscribe flag.
+ *
+ * @return bool|view
+ *   The view, or FALSE if the view was not found
+ */
+function message_subscribe_ui_get_view($account, $flag_name) {
+  $flag = flag_get_flag($flag_name);
+
+  $entity_type = FLAG_API_VERSION == 3 ? $flag->entity_type : $flag->content_type;
+
+  $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
+  list($view_name, $display_id) = explode(':', variable_get('message_' . $flag->name, $prefix . $entity_type . ':default'));
+
+  if (!$view = views_get_view($view_name)) {
+    // View doesn't exist.
+    $params = array('%name' => $view_name);
+    watchdog('message_subscribe', 'View %name does not exist.', $params);
+    drupal_set_message(t('There View %name does not exist.', $params), 'error');
+    return FALSE;
+  }
+  $view->set_display($display_id);
+  $view->set_arguments(array($account->uid));
+
+  // Change the flag's relationship to point to our flag.
+  $relationships = $view->display_handler->get_option('relationships');
+  foreach ($relationships as $key => $relationship) {
+    if (strpos($key, 'flag_') !== 0) {
+      // Not a flag relationship.
+      continue;
+    }
+
+    // Check that the flag is valid.
+    $rel_flag = flag_get_flag($relationship['flag']);
+    if (empty($rel_flag) || (isset($rel_flag->status) && $rel_flag->status === FALSE)) {
+      $params = array('%name' => $relationship['flag']);
+      watchdog('message_subscribe', 'Flag %name is not setup correctly. It is probably disabled or have no bundles configured.', $params);
+      drupal_set_message(t('Flag %name is not setup correctly. It is probably disabled or have no bundles configured.', $params), 'error');
+      return FALSE;
+    }
+
+    // Indicate we need to set the relationship.
+    $rel_set = FALSE;
+
+    if (strpos($relationship['flag'], $prefix) === 0) {
+      // "Subscribe" flag.
+      $rel_set = TRUE;
+    }
+    elseif (strpos($relationship['flag'], 'email') === 0) {
+      // "Email" flag.
+      $rel_set = TRUE;
+      $flag_name = 'email_' . str_replace($prefix, '', $flag_name);
+    }
+
+    if ($rel_set) {
+      $relationships[$key]['flag'] = $flag_name;
+      $view->display_handler->set_option('relationships', $relationships);
+    }
+  }
+  return $view;
+}

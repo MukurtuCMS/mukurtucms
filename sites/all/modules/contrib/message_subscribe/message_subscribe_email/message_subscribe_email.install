@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the message_subscribe_email module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Change message subscription to the new views and create a new field.
+ */
+function message_subscribe_email_install() {
+  $variables = array(
+    'message_subscribe_node' => 'subscribe_node_email:default',
+    'message_subscribe_term' => 'subscribe_taxonomy_term_email:default',
+    'message_subscribe_user' => 'subscribe_user_email:default',
+    // Setup OG in case it exists.
+    'message_subscribe_og' => 'subscribe_node_email:default',
+  );
+
+  foreach ($variables as $name => $value) {
+    variable_set($name, $value);
+  }
+
+  // Add "message subscribe email" field to users.
+  $field_name = 'message_subscribe_email';
+  if (!field_info_field($field_name)) {
+    $field = array(
+      'field_name' => $field_name,
+      'type' => 'list_boolean',
+      'entity_types' => array('user'),
+      'cardinality' => 1,
+      'settings' => array(
+        'allowed_values' => array(0 => 'Don\'t email', 1 => 'Email'),
+        'allowed_values_function' => '',
+      ),
+    );
+    $field = field_create_field($field);
+  }
+
+  if (!field_info_instance('user', $field_name, 'user')) {
+    $instance = array(
+      'field_name' => $field_name,
+      'bundle' => 'user',
+      'entity_type' => 'user',
+      'label' => t('Email subscriptions'),
+      'description' => t('Email option will be checked automatically when subscribing to something.'),
+      'required' => FALSE,
+      'display_label' => 1,
+      'default_value' => array(0 => array('value' => 1)),
+      'widget' => array(
+        'settings' => array(
+        ),
+        'type' => 'options_onoff',
+        'weight' => 0,
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function message_subscribe_email_uninstall() {
+  // Delete field instance from user.
+  $field = field_info_instance('user', 'message_subscribe_email', 'user');
+  field_delete_instance($field);
+
+  // Revert message to default values if they haven't been changed.
+  $variables = array(
+    'message_subscribe_node' => 'subscribe_node_email:default',
+    'message_subscribe_term' => 'subscribe_taxonomy_term_email:default',
+    'message_subscribe_user' => 'subscribe_user_email:default',
+    // Revert OG in case it exists.
+    'message_subscribe_og' => 'subscribe_node_email:default',
+  );
+
+  foreach ($variables as $name => $value) {
+    if (variable_get($name) == $value) {
+      variable_del($name);
+    }
+  }
+}

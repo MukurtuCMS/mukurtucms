@@ -1,0 +1,474 @@
+<?php
+
+/**
+ * @file
+ * Test for the Message subscribe module.
+ */
+
+/**
+ * Test getting context from entity.
+ */
+class MessageSubscribeContextTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Get context',
+      'description' => 'Get context from an entity.',
+      'group' => 'Message subscribe',
+      'dependencies' => array('og'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('message_subscribe', 'taxonomy', 'og');
+
+    $user1 = $this->drupalCreateUser();
+    $user2 = $this->drupalCreateUser();
+    $user3 = $this->drupalCreateUser();
+
+    // Create group node-type.
+    $type = $this->drupalCreateContentType();
+    $group_type = $type->type;
+    og_create_field(OG_GROUP_FIELD, 'node', $group_type);
+
+    // Create node-type.
+    $type = $this->drupalCreateContentType();
+    $node_type = $type->type;
+    og_create_field(OG_AUDIENCE_FIELD, 'node', $node_type);
+
+    // Create vocabulary and terms.
+    $vocabulary = new stdClass();
+    $vocabulary->name = 'Terms';
+    $vocabulary->machine_name = 'terms';
+    taxonomy_vocabulary_save($vocabulary);
+
+    // Create terms.
+    $tids = array();
+    for ($i = 1; $i <= 3; $i++) {
+      $term = new stdClass();
+      $term->name = "term $i";
+      $term->vid = $vocabulary->vid;
+      taxonomy_term_save($term);
+      $tids[] = $term->tid;
+    }
+
+    // Create a multiple terms-reference field.
+    $field = array(
+      'translatable' => FALSE,
+      'entity_types' => array('node'),
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => 'terms',
+            'parent' => 0,
+          ),
+        ),
+      ),
+      'field_name' => 'field_terms_ref',
+      'type' => 'taxonomy_term_reference',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    $field = field_create_field($field);
+    $instance = array(
+      'field_name' => 'field_terms_ref',
+      'bundle' => $node_type,
+      'entity_type' => 'node',
+    );
+    field_create_instance($instance);
+
+    // Create OG group.
+    $settings = array();
+    $settings['type'] = $group_type;
+    $settings[OG_GROUP_FIELD][LANGUAGE_NONE][0]['value'] = 1;
+    $settings['uid'] = $user3->uid;
+    $group = $this->drupalCreateNode($settings);
+
+    // Create node.
+    $settings = array();
+    $settings['type'] = $node_type;
+    $settings['uid'] = $user1->uid;
+    $node = $this->drupalCreateNode($settings);
+
+    // Assign node to terms.
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $wrapper->field_terms_ref->set($tids);
+    $wrapper->save();
+
+    // Assign node to group.
+    og_group('node', $group->nid, array('entity_type' => 'node', 'entity' => $node));
+
+    // Add comment.
+    $comment = (object) array(
+      'subject' => 'topic',
+      'nid' => $node->nid,
+      'uid' => $user2->uid,
+      'cid' => FALSE,
+      'pid' => 0,
+      'homepage' => '',
+      'language' => LANGUAGE_NONE,
+    );
+    comment_save($comment);
+
+    $this->node = $node;
+    $this->group = $group;
+    $this->comment = $comment;
+    $this->tids = $tids;
+  }
+
+  function testGetBasicContext() {
+    $node = $this->node;
+    $group = $this->group;
+    $comment = $this->comment;
+
+    // Get context from comment.
+    $context = message_subscribe_get_basic_context('comment', $comment);
+
+    $expected_context = array();
+    $expected_context['comment'] = drupal_map_assoc(array($comment->cid));
+    $expected_context['node'] = drupal_map_assoc(array(
+      $node->nid,
+      $group->nid,
+    ));
+
+    $expected_context['user'] = drupal_map_assoc(array(
+      $comment->uid,
+      $node->uid,
+      $group->uid,
+    ));
+
+    $expected_context['taxonomy_term'] = drupal_map_assoc($this->tids);
+
+    $this->assertEqual($context, $expected_context, 'Correct context from comment.');
+
+    // Pass existing context.
+    $subscribe_options = array('skip context' => TRUE);
+    $original_context = array('node' => array(1 => 1), 'user' => array(1 => 1));
+    $context = message_subscribe_get_basic_context('comment', $comment, $subscribe_options, $original_context);
+
+    $this->assertEqual($original_context, $context, 'Correct context when skiping context.');
+  }
+}
+
+
+/**
+ * Test getting subscribes from context.
+ */
+class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Get subscribers',
+      'description' => 'Get subscribers from content.',
+      'group' => 'Message subscribe',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('message_subscribe', 'flag', 'taxonomy');
+
+    // Create node-type.
+    $node_type = 'article';
+
+    // Enable flags.
+    $flags = flag_get_default_flags(TRUE);
+
+    $flag = $flags['subscribe_node'];
+    $flag->types[] = $node_type;
+    $flag->save();
+    $flag->enable();
+
+    $flag = $flags['subscribe_user'];
+    $flag->save();
+    $flag->enable();
+
+    // Reset our cache so our permissions show up.
+    drupal_static_reset('flag_get_flags');
+
+    // Reset permissions so that permissions for this flag are available.
+    $this->checkPermissions(array(), TRUE);
+
+    $user1 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+    $user2 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+
+    // Create node.
+    $settings = array();
+    $settings['type'] = $node_type;
+    $settings['uid'] = $user1->uid;
+    $node = $this->drupalCreateNode($settings);
+
+    // User1 and User2 flags node1.
+    flag('flag', 'subscribe_node', $node->nid, $user1);
+    flag('flag', 'subscribe_node', $node->nid, $user2);
+    // User2 flags User1.
+    flag('flag', 'subscribe_user', $user1->uid, $user2);
+
+    // Create a dummy message-type.
+    $message_type = message_type_create('foo', array('message_text' => array(LANGUAGE_NONE => array(array('value' => 'Example text.')))));
+    $message_type->save();
+
+    $this->node = $node;
+    $this->user1 = $user1;
+    $this->user2 = $user2;
+
+    // Override default notifiers.
+    variable_set('message_subscribe_default_notifiers', array());
+  }
+
+  /**
+   * Test getting the subscribers list.
+   */
+  function testGetSubscribers() {
+    $message = message_create('foo', array('uid' => $this->user1->uid));
+
+    $node = $this->node;
+    $user2 = $this->user2;
+
+    $uids = message_subscribe_get_subscribers('node', $node, $message);
+
+    // Assert subscribers data.
+    $expected_uids = array(
+      $user2->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+          'subscribe_user',
+        ),
+      ),
+    );
+
+    $this->assertEqual($uids, $expected_uids, 'All expected subscribers were fetched.');
+
+    $user3 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+    $user4 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+    flag('flag', 'subscribe_node', $node->nid, $user3);
+    flag('flag', 'subscribe_node', $node->nid, $user4);
+
+    // Get subscribers from a given "last uid".
+    $subscribe_options = array('last uid' => $user2->uid);
+    $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
+    $this->assertEqual(array_keys($uids), array($user3->uid, $user4->uid), 'All subscribers from "last uid" were fetched.');
+
+    // Get a range of subscribers.
+    $subscribe_options['range'] = 1;
+    $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
+    $this->assertEqual(array_keys($uids), array($user3->uid), 'All subscribers from "last uid" and "range" were fetched.');
+  }
+
+  /**
+   * Testing the exclusion of the entity author from the subscribers lists.
+   */
+  function testGetSubscribersExcludeSelf() {
+    // Test the affect of the variable when set to FALSE (do not notify self).
+    variable_set('message_subscribe_notify_own_actions', FALSE);
+    $message = message_create('foo', array('uid' => $this->user1->uid));
+
+    $node = $this->node;
+    $user1 = $this->user1;
+    $user2 = $this->user2;
+
+    $uids = message_subscribe_get_subscribers('node', $node, $message);
+
+    // Assert subscribers data.
+    $expected_uids = array(
+      $user2->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+          'subscribe_user',
+        ),
+      ),
+    );
+    $this->assertEqual($uids, $expected_uids, 'All subscribers except for the triggering user were fetched.');
+
+    // Test the affect of the variable when set to TRUE (Notify self).
+    variable_set('message_subscribe_notify_own_actions', TRUE);
+
+    $uids = message_subscribe_get_subscribers('node', $node, $message);
+
+    // Assert subscribers data.
+    $expected_uids = array(
+      $user1->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+        ),
+      ),
+      $user2->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+          'subscribe_user',
+        ),
+      ),
+    );
+    $this->assertEqual($uids, $expected_uids, 'All subscribers including the triggering user were fetched.');
+  }
+
+  /**
+   * Assert subscribers list is entity-access aware.
+   */
+  function testEntityAccess() {
+    // Make sure we are notifying ourselves for this test.
+    variable_set('message_subscribe_notify_own_actions', TRUE);
+
+    $message = message_create('foo', array());
+
+    $node = $this->node;
+    $node->status = NODE_NOT_PUBLISHED;
+    node_save($node);
+
+    // Add permission to view own unpublished content.
+    user_role_change_permissions(DRUPAL_AUTHENTICATED_RID, array('view own unpublished content' => TRUE));
+
+    // Set the node to be unpublished.
+    $user1 = $this->user1;
+    $user2 = $this->user2;
+
+    $subscribe_options['entity access'] = TRUE;
+    $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
+    $this->assertEqual(array_keys($uids), array($user1->uid), 'Only user with access to node returned for subscribers list.');
+
+    $subscribe_options['entity access'] = FALSE;
+    $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
+    $this->assertEqual(array_keys($uids), array($user1->uid, $user2->uid), 'All users (even without access) returned for subscribers list.');
+  }
+}
+
+
+/**
+ * Test queue integration.
+ */
+class MessageSubscribeQueueTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Queue API',
+      'description' => 'Test integration with queue API.',
+      'group' => 'Message subscribe',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('message_subscribe');
+
+    // Override default notifiers.
+    variable_set('message_subscribe_default_notifiers', array());
+
+    // Enable using queue.
+    variable_set('message_subscribe_use_queue', TRUE);
+
+    // Create a dummy message-type.
+    $message_type = message_type_create('foo', array('message_text' => array(LANGUAGE_NONE => array(array('value' => 'Example text.')))));
+    $message_type->save();
+
+    // Create node-type.
+    $type = $this->drupalCreateContentType();
+    $node_type = $type->type;
+
+    // Create node.
+    $user1 = $this->drupalCreateUser();
+    $settings = array();
+    $settings['type'] = $node_type;
+    $settings['uid'] = $user1->uid;
+    $this->node = $this->drupalCreateNode($settings);
+  }
+
+  /**
+   * Test base queue processing logic.
+   */
+  function testQueue() {
+    $node = $this->node;
+    $message = message_create('foo', array());
+
+    $subscribe_options = array();
+    $subscribe_options['save message'] = FALSE;
+
+    try {
+      $message = message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
+      $this->fail('Can add a non-saved message to the queue.');
+    }
+    catch (Exception $e) {
+      $this->pass('Cannot add a non-saved message to the queue.');
+    }
+
+    // Assert message was saved and added to queue.
+    $uids = array_fill(1, 10, array());
+    $subscribe_options = array(
+      'uids' => $uids,
+      'skip context' => TRUE,
+      'range' => 3,
+    );
+    $queue = DrupalQueue::get('message_subscribe');
+    $this->assertEqual($queue->numberOfItems(), 0, 'Queue is empty');
+    message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
+    $this->assertTrue($message->mid, 'Message was saved');
+    $this->assertEqual($queue->numberOfItems(), 1, 'Message added to queue.');
+
+    // Assert queue-item is processed and updated. We mock subscription
+    // of users to the message. It will not be sent, as the default
+    // notifier is disabled.
+    $item = $queue->claimItem();
+    $item_id = $item->item_id;
+
+    // Add the queue information, and the user IDs to process.
+    $subscribe_options['queue'] = array(
+      'uids' => $uids,
+      'item' => $item,
+      'end time' => FALSE,
+    );
+
+    message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
+
+    // Reclaim the new item, and assert the "last UID" was updated.
+    $item = $queue->claimItem();
+    $this->assertNotEqual($item_id, $item->item_id, 'Queue item was updated.');
+    $this->assertEqual($item->data['subscribe_options']['last uid'], 3, 'Last processed user ID was updated.');
+  }
+
+  /**
+   * Test cron-based queue handling. These are very basic checks that ensure
+   * the cron worker callback functions as expected. No formal subscription
+   * processing is triggered here.
+   */
+  function testQueueCron() {
+    $node = $this->node;
+    $message = message_create('foo', array());
+    $queue = DrupalQueue::get('message_subscribe');
+
+    // Start with a control case.
+    message_subscribe_send_message('node', $node, $message, array(), array());
+    $this->assertEqual($queue->numberOfItems(), 1, 'Message item 1 added to queue.');
+    $this->cronRun();
+    $this->assertEqual($queue->numberOfItems(), 0, 'Message item 1 processed by cron.');
+
+    // Now try a case where the message entity is deleted before any related
+    // queue items can be processed.
+    message_subscribe_send_message('node', $node, $message, array(), array());
+    $this->assertEqual($queue->numberOfItems(), 1, 'Message item 2 added to queue.');
+    $message->delete();
+    // Assert message was deleted.
+    $this->assertFalse(message_load($message->mid), 'Message entity deleted.');
+    $this->cronRun();
+    $this->assertEqual($queue->numberOfItems(), 0, 'Message item 2 processed by cron.');
+  }
+}

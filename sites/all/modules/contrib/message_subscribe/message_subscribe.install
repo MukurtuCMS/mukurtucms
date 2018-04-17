@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the message_subscribe module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Delete message_subscribe_default_notifiers variable from the database.
+ */
+function message_subscribe_uninstall() {
+  variable_del('message_subscribe_default_notifiers');
+  variable_del('message_subscribe_flag_prefix');
+  variable_del('message_subscribe_use_queue');
+  variable_del('message_subscribe_notify_own_actions');
+}

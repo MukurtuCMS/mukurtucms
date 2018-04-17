@@ -1,0 +1,22 @@
+name = Message subscribe UI
+description = Message subscribe UI
+core = 7.x
+package = Message
+php = 5.2.4
+version = 7.x-1.0
+project = message_subscribe_ui
+dependencies[] = message_subscribe
+dependencies[] = views
+dependencies[] = views_content
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:1
+features[views_view][] = subscribe_node
+features[views_view][] = subscribe_taxonomy_term
+features[views_view][] = subscribe_user
+
+; Information added by Drupal.org packaging script on 2014-03-30
+version = "7.x-1.0-rc2"
+core = "7.x"
+project = "message_subscribe"
+datestamp = "1396169645"
+

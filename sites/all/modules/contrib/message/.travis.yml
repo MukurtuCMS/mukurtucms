@@ -1,0 +1,51 @@
+language: php
+sudo: false
+
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+
+mysql:
+  database: message
+  username: root
+  encoding: utf8
+
+addons:
+  apt:
+    packages:
+    - php5-cgi
+    - php5-mysql
+
+install:
+
+  # Add composer's global bin directory to the path
+  # See: https://github.com/drush-ops/drush#install---composer
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+
+  # Install drush globally
+  - composer global require drush/drush:7.0
+
+before_script:
+  # Navigate out of module directory to prevent blown stack by recursive module
+  # lookup.
+  - cd ../..
+
+  # Create new site, stubbing sendmail path with true to prevent delivery errors
+  # and manually resolving drush path
+  - mysql -e 'create database message'
+  - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/message --enable=simpletest message
+
+  # Reference and enable message in build site.
+  - ln -s $(readlink -e $(cd -)) message/drupal/sites/all/modules/message
+  - cd message/drupal
+  - drush dl entity ctools features views token
+  - drush --yes pm-enable message message_example
+
+  # Start a web server on port 8080, run in the background.
+  - drush runserver 127.0.0.1:8080 > ~/php-server.log 2>&1 &
+
+script:
+  - php scripts/run-tests.sh --php $(which php) --concurrency 4 --verbose --color --url 127.0.0.1:8080 Message 2>&1 | tee /tmp/simpletest-result.txt
+  - egrep -i "([1-9]+ fail)|(Fatal error)|([1-9]+ exception)" /tmp/simpletest-result.txt && exit 1
+  - exit 0
