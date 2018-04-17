@@ -209,6 +209,39 @@ function ma_dictionary_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|dictionary_word|dictionary_word_summary';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'dictionary_word';
+  $ds_layout->view_mode = 'dictionary_word_summary';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'field_word_entry',
+      ),
+    ),
+    'fields' => array(
+      'field_word_entry' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|dictionary_word|dictionary_word_summary'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|dictionary_word|form';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'dictionary_word';
@@ -376,6 +409,16 @@ function ma_dictionary_ds_view_modes_info() {
     'paragraphs_item' => 'paragraphs_item',
   );
   $export['dictionary_teaser'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'dictionary_word_summary';
+  $ds_view_mode->label = 'Dictionary Word Summary';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+    'paragraphs_item' => 'paragraphs_item',
+  );
+  $export['dictionary_word_summary'] = $ds_view_mode;
 
   return $export;
 }
