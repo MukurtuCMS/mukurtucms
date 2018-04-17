@@ -12,6 +12,24 @@
     .mejs-controls {
         background: transparent;
 
+        // Shrink controls on mobile
+        width: 240px;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            width: 350px;
+        }
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            width: 330px;
+        }
+
+        // Large Desktop
+        @media (min-width: @screen-lg-min) {
+            width: 100%;
+        }
+
         .mejs-time {
             color: @mukurtu-mejs-text-color;
         }

@@ -7975,6 +7975,11 @@ header,
   padding-right: 25px;
   background-position: 95% 50%;
 }
+.chevron-dropdown {
+  background-image: url(../images/icons/chevron_dropdown_blue.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 50%;
+}
 .arrow-right {
   background: url(../images/icons/triangle_arrow_right.svg) no-repeat 0% 50%;
   background-position: center right;
@@ -8159,6 +8164,22 @@ section ol.breadcrumb {
 }
 .mejs-container .mejs-controls {
   background: transparent;
+  width: 240px;
+}
+@media (min-width: 768px) {
+  .mejs-container .mejs-controls {
+    width: 350px;
+  }
+}
+@media (min-width: 992px) {
+  .mejs-container .mejs-controls {
+    width: 330px;
+  }
+}
+@media (min-width: 1200px) {
+  .mejs-container .mejs-controls {
+    width: 100%;
+  }
 }
 .mejs-container .mejs-controls .mejs-time {
   color: #464646;
@@ -9383,6 +9404,109 @@ section ol.breadcrumb {
 }
 .page-dictionary .page-header {
   background: none;
+}
+.page-dictionary .dictionary-facets {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #159ec4;
+}
+.page-dictionary .dictionary-facets-region {
+  margin: auto;
+  float: none;
+}
+@media (min-width: 768px) {
+  .page-dictionary .dictionary-facets-region {
+    width: 83%;
+  }
+}
+.page-dictionary .dictionary-facets-region .panel-pane {
+  padding: 10px 15px 10px 15px;
+}
+.page-dictionary .dictionary-facets-region .dropdown button {
+  background-image: url(../images/icons/chevron_dropdown_blue.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 50%;
+  height: 60px;
+  width: 100%;
+  color: #464646;
+  background-color: #f8f7f7;
+  border-color: #f8f7f7;
+  text-align: left;
+}
+.page-dictionary .dictionary-facets-region .dropdown:hover,
+.page-dictionary .dictionary-facets-region .dropdown.open,
+.page-dictionary .dictionary-facets-region .dropdown.open:hover,
+.page-dictionary .dictionary-facets-region .dropdown.open:focus,
+.page-dictionary .dictionary-facets-region .dropdown.open > .dropdown-toggle.btn-primary:focus {
+  color: #464646;
+  background-color: #f8f7f7;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu {
+  width: 100%;
+  color: #464646;
+  background-color: #f8f7f7;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul {
+  padding-left: 10px;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li {
+  list-style-type: none;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li a {
+  color: #138aab;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li a:hover,
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li a.facetapi-checkbox {
+  padding-left: 5px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .pane-title {
+  display: none;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all #edit-search-api-views-fulltext-wrapper {
+  padding: 10px 15px 10px 15px;
+  clear: left;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all #edit-search-api-views-fulltext-wrapper label {
+  display: none;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget {
+  padding: 10px 15px 10px 15px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget .views-widget {
+  height: 60px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget input,
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget button,
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget .btn {
+  height: 60px;
+  width: 100%;
+  margin-top: 0px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget.views-reset-button .btn {
+  line-height: 47px;
+  font-weight: normal;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  background-color: #159ec4;
+  border-color: #fff;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget .views-submit-button {
+  padding: 0px 12px 0px 8px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget #edit-submit-dictionary-words {
+  font-size: 20px;
+  background-color: #e6ab49;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 .page-dictionary .facet-glossary {
   padding-top: 30px;

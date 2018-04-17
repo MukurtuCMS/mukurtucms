@@ -26,6 +26,23 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
     '#default_value' => theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu'),
     '#options' => array('blue-gold' => 'Blue & Gold', 'red-bone' => 'Red & Bone')
   );
+
+  //// Default Images
+  $form['mukurtu']['images'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default Images'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  // Default audio thumbnail
+  $form['mukurtu']['images']['mukurtu_theme_default_audio_image'] = array(
+    '#title' => t('Default Audio Thumbnail'),
+    '#type' => 'managed_file',
+    '#description' => t('The image to be used when an audio atom does not have a thumbnail.'),
+    '#default_value' => variable_get('mukurtu_theme_default_audio_image', ''),
+    '#upload_location' => 'public://',
+  );
   
   //// Footer.
   $form['mukurtu']['footer'] = array(
@@ -94,7 +111,7 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
     '#title' => t('Hero Image'),
     '#type' => 'managed_file',
     '#description' => t(''),
-    '#default_value' => variable_get('mukurtu_theme_frontpage_hero_image', ''),
-    '#upload_location' => 'public://',
+    '#default_value' => theme_get_setting('mukurtu_theme_frontpage_hero_image'),
+    '#upload_location' => 'public://theme/mukurtu/',
   );
 }

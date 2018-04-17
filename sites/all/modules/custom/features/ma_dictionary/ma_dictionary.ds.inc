@@ -72,11 +72,6 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word_bundle';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'field_alternate_spelling' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
     'field_definition' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -111,11 +106,6 @@ function ma_dictionary_ds_field_settings_info() {
         'ft' => array(
           'classes' => 'col-md-12',
         ),
-      ),
-    ),
-    'field_source' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
     'field_translation' => array(
@@ -231,23 +221,23 @@ function ma_dictionary_ds_layout_settings_info() {
         1 => 'group_tabs',
         2 => 'redirect',
         3 => 'path',
-        4 => '_add_existing_field',
-        7 => 'field_related_dictionary_words',
+        6 => 'field_related_dictionary_words',
+        7 => 'group_dictionary_word_basic',
         8 => 'field_dictionary_word_related_dh',
-        9 => 'group_dictionary_word_basic',
-        10 => 'field_word_list',
-        11 => 'group_dictionary_word_relations',
-        12 => 'og_group_ref',
-        13 => 'field_item_privacy_setting',
-        14 => 'title',
-        15 => 'field_dictionary_word_language',
-        16 => 'field_word_entry',
-        17 => 'field_tags',
-        18 => 'field_additional_media',
+        9 => 'field_word_list',
+        10 => 'group_dictionary_word_relations',
+        11 => 'og_group_ref',
+        12 => 'field_item_privacy_setting',
+        13 => 'title',
+        14 => 'field_dictionary_word_language',
+        15 => 'field_word_entry',
+        16 => 'field_tags',
+        17 => 'field_additional_media',
+        18 => '_add_existing_field',
       ),
       'hidden' => array(
-        5 => 'field_language_community',
-        6 => 'field_community_ref',
+        4 => 'field_language_community',
+        5 => 'field_community_ref',
       ),
     ),
     'fields' => array(
@@ -255,12 +245,11 @@ function ma_dictionary_ds_layout_settings_info() {
       'group_tabs' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
-      '_add_existing_field' => 'ds_content',
       'field_language_community' => 'hidden',
       'field_community_ref' => 'hidden',
       'field_related_dictionary_words' => 'ds_content',
-      'field_dictionary_word_related_dh' => 'ds_content',
       'group_dictionary_word_basic' => 'ds_content',
+      'field_dictionary_word_related_dh' => 'ds_content',
       'field_word_list' => 'ds_content',
       'group_dictionary_word_relations' => 'ds_content',
       'og_group_ref' => 'ds_content',
@@ -270,6 +259,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_word_entry' => 'ds_content',
       'field_tags' => 'ds_content',
       'field_additional_media' => 'ds_content',
+      '_add_existing_field' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -365,6 +355,7 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_layout;
 

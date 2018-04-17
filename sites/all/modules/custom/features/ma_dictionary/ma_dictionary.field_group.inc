@@ -62,12 +62,13 @@ function ma_dictionary_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Basic',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-dictionary_word-basic field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-dictionary_word-basic field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_dictionary_word_basic|node|dictionary_word|form'] = $field_group;
@@ -93,12 +94,13 @@ function ma_dictionary_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Relations',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-dictionary_word-relations field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-dictionary_word-relations field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_dictionary_word_relations|node|dictionary_word|form'] = $field_group;

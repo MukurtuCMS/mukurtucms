@@ -22,3 +22,12 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
         }
     }
 }
+
+function mukurtu_preprocess_panels_pane(&$variables) {
+    // Add custom theme suggestions for the dictionary browse page search facets
+    if($variables['display']->storage_id == 'page_dictionary_browse__dictionary-browse-theme-v2') {
+        if($variables['pane']->panel == 'search_facets' && $variables['pane']->subtype != 'views--exp-dictionary_words-all') {
+            $variables['theme_hook_suggestions'][] = 'panels_pane__block__dictionary_browse';
+        }
+    }
+}

@@ -199,6 +199,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 9,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -264,6 +270,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 5,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -313,6 +325,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'taxonomy_term_reference_link',
         'weight' => 1,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -359,6 +377,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 22,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -414,6 +438,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 23,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -457,6 +487,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 24,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -516,10 +552,15 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
+        'type' => 'hidden',
         'weight' => 25,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -581,6 +622,12 @@ function ma_dictionary_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
+        'weight' => 3,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 3,
       ),
       'search_result' => array(
@@ -646,6 +693,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 7,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -694,6 +747,15 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'paragraphs_view',
         'weight' => 0,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'dictionary_word_summary',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 1,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -771,6 +833,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 8,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -836,6 +904,12 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'textformatter_list',
         'weight' => 6,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1394,6 +1468,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1447,6 +1528,12 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 6,
       ),
       'dictionary_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
+      'dictionary_word_summary' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1517,6 +1604,16 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'mukurtu_scald_dictionary_media',
         'weight' => 5,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_scald_recording',
+        'weight' => 2,
       ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
@@ -1593,6 +1690,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 4,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1660,6 +1763,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1715,6 +1824,12 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 7,
       ),
       'dictionary_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
+      'dictionary_word_summary' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1779,6 +1894,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 1,
       ),
+      'dictionary_word_summary' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1838,6 +1959,13 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 2,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
       ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
