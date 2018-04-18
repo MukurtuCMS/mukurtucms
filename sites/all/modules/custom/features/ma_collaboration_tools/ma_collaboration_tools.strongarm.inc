@@ -693,7 +693,15 @@ function ma_collaboration_tools_strongarm() {
         'flag_subscribe_section_content' => array(
           'full' => array(
             'weight' => '9',
+            'visible' => FALSE,
+          ),
+          'default' => array(
+            'weight' => '10',
             'visible' => TRUE,
+          ),
+          'ical' => array(
+            'weight' => '33',
+            'visible' => FALSE,
           ),
         ),
       ),
@@ -746,17 +754,6 @@ function ma_collaboration_tools_strongarm() {
     ),
   );
   $export['field_bundle_settings_node__oa_wiki_page'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'flag_default_flag_status';
-  $strongarm->value = array(
-    'subscribe_section_content' => TRUE,
-    'subscribe_node' => FALSE,
-    'trash' => FALSE,
-  );
-  $export['flag_default_flag_status'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -918,50 +915,6 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->name = 'menu_parent_oa_wiki_page';
   $strongarm->value = 'main-menu:0';
   $export['menu_parent_oa_wiki_page'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'message_subscribe_default_notifiers';
-  $strongarm->value = array(
-    'email' => 'email',
-  );
-  $export['message_subscribe_default_notifiers'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'message_subscribe_flag_prefix';
-  $strongarm->value = 'subscribe';
-  $export['message_subscribe_flag_prefix'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'message_subscribe_node';
-  $strongarm->value = 'subscribe_node:default';
-  $export['message_subscribe_node'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'message_subscribe_notify_own_actions';
-  $strongarm->value = 0;
-  $export['message_subscribe_notify_own_actions'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'message_subscribe_section_content';
-  $strongarm->value = 'mukurtu_collab_subscriptions:default';
-  $export['message_subscribe_section_content'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'message_subscribe_use_queue';
-  $strongarm->value = 0;
-  $export['message_subscribe_use_queue'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

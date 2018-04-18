@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * A global views field that provides site's base url.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function views_base_url_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'views_base_url') . '/includes/views',
+  );
+}

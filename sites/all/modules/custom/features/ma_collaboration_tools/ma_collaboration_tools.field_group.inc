@@ -353,8 +353,7 @@ function ma_collaboration_tools_field_group_info() {
       0 => 'field_following_protocols',
       1 => 'field_following_users',
       2 => 'field_un_following_users',
-      3 => 'flag_subscribe_section_content',
-      4 => 'follow_unfollow',
+      3 => 'follow_unfollow',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

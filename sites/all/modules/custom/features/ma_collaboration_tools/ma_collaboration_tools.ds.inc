@@ -746,11 +746,10 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'right' => array(
         8 => 'field_oa_geo_location',
         9 => 'group_following',
-        10 => 'flag_subscribe_section_content',
-        11 => 'follow_unfollow',
-        12 => 'field_following_protocols',
-        13 => 'field_following_users',
-        14 => 'field_un_following_users',
+        10 => 'follow_unfollow',
+        11 => 'field_following_protocols',
+        12 => 'field_following_users',
+        13 => 'field_un_following_users',
       ),
     ),
     'fields' => array(
@@ -764,7 +763,6 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'field_event_calendar_section' => 'left',
       'field_oa_geo_location' => 'right',
       'group_following' => 'right',
-      'flag_subscribe_section_content' => 'right',
       'follow_unfollow' => 'right',
       'field_following_protocols' => 'right',
       'field_following_users' => 'right',
