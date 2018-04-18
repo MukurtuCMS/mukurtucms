@@ -9490,6 +9490,135 @@ section ol.breadcrumb {
   padding-right: 25px;
   background-position: 99% 25%;
 }
+.node-type-dictionary-word h1.page-header {
+  background: none;
+}
+.dictionary-word-body {
+  /*     .field-name-title {
+        background-color: @brand-primary;
+        font-family: @font-family-sans-serif-light;
+        color: @mukurtu-default-container-font-color;
+        margin-bottom: 30px;
+
+        // Triangle accent
+        &::after {
+            content : "";
+            display: inline-block;
+            position: absolute;
+            left: 40px;
+            top: 38px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 24px 0 24px 27px;
+            border-color: transparent transparent transparent @brand-primary;
+            z-index: -1;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                top: 60px;
+            }
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                top: 75px;
+            }
+        }
+
+        h2 {
+            padding: 15px 15px 15px 25px;
+
+            font-size: 30px;
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 44px;
+            }
+        } 
+    }*/
+}
+.dictionary-word-entry-field {
+  padding-left: 25px;
+}
+@media (min-width: 768px) {
+  .paragraphs-item-dictionary-word-bundle.view-mode-full .dictionary-word-entry-left-brick {
+    padding-right: 0px;
+  }
+  .paragraphs-item-dictionary-word-bundle.view-mode-full .dictionary-word-entry-right-brick {
+    padding-left: 0px;
+  }
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field {
+  padding-bottom: 20px;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field .label-above {
+  background-color: #eeeaea;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 5px 5px 5px 20px;
+  margin-bottom: 10px;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field a {
+  color: #ac143a;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field a:hover,
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field a:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-alternate-spelling {
+  background-color: #ac143a;
+  color: #ac143a;
+  margin-bottom: 30px;
+  padding: 5px 5px 5px 20px;
+  font-size: 30px;
+}
+@media (min-width: 992px) {
+  .paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-alternate-spelling {
+    font-size: 44px;
+  }
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-alternate-spelling::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 40px;
+  top: 28px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 24px 0 24px 27px;
+  border-color: transparent transparent transparent #ac143a;
+  z-index: -1;
+}
+@media (min-width: 992px) {
+  .paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-alternate-spelling::after {
+    top: 48px;
+  }
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-translation {
+  padding-left: 25px;
+  font-weight: bold;
+  font-size: 17px;
+}
+@media (min-width: 992px) {
+  .paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-translation {
+    font-size: 22px;
+  }
+}
+.paragraphs-item-dictionary-word-bundle.view-mode-full .sample-sentence {
+  padding-bottom: 10px;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 17px;
+}
+@media (min-width: 992px) {
+  .paragraphs-item-dictionary-word-bundle.view-mode-full .sample-sentence {
+    font-size: 18px;
+  }
+}
 .page-dictionary .page-header {
   background: none;
 }

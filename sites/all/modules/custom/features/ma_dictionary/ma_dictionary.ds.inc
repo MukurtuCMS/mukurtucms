@@ -72,46 +72,60 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word_bundle';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'field_alternate_spelling' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'field_definition' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-12',
+          'lb-col' => TRUE,
         ),
       ),
     ),
     'field_dictionary_word_recording' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-12',
           'lb' => 'Recording(s)',
+          'lb-col' => TRUE,
         ),
       ),
     ),
     'field_part_of_speech' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-4',
+          'lb-col' => TRUE,
         ),
       ),
     ),
     'field_pronunciation' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-4',
+          'lb-col' => TRUE,
         ),
       ),
     ),
     'field_sample_sentence' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-12',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_source' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
         ),
       ),
     ),
     'field_translation' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-4',
+          'lb-col' => TRUE,
         ),
       ),
     ),
@@ -157,7 +171,7 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'dictionary_word';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_2col_stacked';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
@@ -172,9 +186,6 @@ function ma_dictionary_ds_layout_settings_info() {
         6 => 'field_tags',
         7 => 'field_word_list',
       ),
-      'footer' => array(
-        8 => 'field_additional_media',
-      ),
     ),
     'fields' => array(
       'field_word_entry' => 'left',
@@ -185,25 +196,30 @@ function ma_dictionary_ds_layout_settings_info() {
       'og_group_ref' => 'right',
       'field_tags' => 'right',
       'field_word_list' => 'right',
-      'field_additional_media' => 'footer',
     ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
       ),
+      'left' => array(
+        'dictionary-word-body' => 'dictionary-word-body',
+      ),
+      'right' => array(
+        'metadata-sidebar' => 'metadata-sidebar',
+      ),
     ),
     'wrappers' => array(
-      'header' => 'div',
+      'top' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'footer' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|default'] = $ds_layout;
 
@@ -351,37 +367,55 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'paragraphs_item';
   $ds_layout->bundle = 'dictionary_word_bundle';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_6_6_bricks';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
+      'top' => array(
         0 => 'field_alternate_spelling',
-        1 => 'field_source',
-        2 => 'field_translation',
-        3 => 'field_pronunciation',
-        4 => 'field_part_of_speech',
+        1 => 'field_translation',
+      ),
+      'topleft' => array(
+        2 => 'field_pronunciation',
+      ),
+      'topright' => array(
+        3 => 'field_part_of_speech',
+      ),
+      'central' => array(
+        4 => 'field_definition',
         5 => 'field_dictionary_word_recording',
-        6 => 'field_definition',
-        7 => 'field_sample_sentence',
+        6 => 'field_sample_sentence',
+        7 => 'field_source',
       ),
     ),
     'fields' => array(
-      'field_alternate_spelling' => 'ds_content',
-      'field_source' => 'ds_content',
-      'field_translation' => 'ds_content',
-      'field_pronunciation' => 'ds_content',
-      'field_part_of_speech' => 'ds_content',
-      'field_dictionary_word_recording' => 'ds_content',
-      'field_definition' => 'ds_content',
-      'field_sample_sentence' => 'ds_content',
+      'field_alternate_spelling' => 'top',
+      'field_translation' => 'top',
+      'field_pronunciation' => 'topleft',
+      'field_part_of_speech' => 'topright',
+      'field_definition' => 'central',
+      'field_dictionary_word_recording' => 'central',
+      'field_sample_sentence' => 'central',
+      'field_source' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
       ),
+      'topleft' => array(
+        'dictionary-word-entry-left-brick' => 'dictionary-word-entry-left-brick',
+      ),
+      'topright' => array(
+        'dictionary-word-entry-right-brick' => 'dictionary-word-entry-right-brick',
+      ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'top' => 'div',
+      'topleft' => 'div',
+      'topright' => 'div',
+      'central' => 'div',
+      'bottomleft' => 'div',
+      'bottomright' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

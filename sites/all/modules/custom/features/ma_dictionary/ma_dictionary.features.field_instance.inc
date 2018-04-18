@@ -194,9 +194,8 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
+        'type' => 'hidden',
         'weight' => 9,
       ),
       'dictionary_word_summary' => array(
@@ -1525,7 +1524,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 4,
       ),
       'dictionary_teaser' => array(
         'label' => 'above',
@@ -1674,7 +1673,12 @@ function ma_dictionary_field_default_field_instances() {
           'textformatter_comma_full_stop' => 0,
           'textformatter_comma_override' => 0,
           'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(),
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
           'textformatter_separator_custom' => '',
           'textformatter_separator_custom_class' => 'textformatter-separator',
           'textformatter_separator_custom_tag' => 'span',
@@ -1682,7 +1686,7 @@ function ma_dictionary_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'dictionary_teaser' => array(
         'label' => 'above',
@@ -1755,7 +1759,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'dictionary_teaser' => array(
         'label' => 'above',
@@ -1821,7 +1825,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'dictionary_teaser' => array(
         'label' => 'above',
@@ -1882,11 +1886,11 @@ function ma_dictionary_field_default_field_instances() {
     'description' => 'Reference to a resource from which the dictionary entry is derived, for example if the entry comes from specific reference material, a regional dialect, etc.',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
+        'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 7,
       ),
       'dictionary_teaser' => array(
         'label' => 'hidden',
@@ -1947,11 +1951,11 @@ function ma_dictionary_field_default_field_instances() {
     'description' => 'The word entry term translated (if appropriate) to the primary language of the site.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 1,
       ),
       'dictionary_teaser' => array(
         'label' => 'hidden',
