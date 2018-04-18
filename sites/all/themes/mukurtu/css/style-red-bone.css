@@ -8132,6 +8132,94 @@ footer header {
   padding-top: 20px;
   padding-bottom: 10px;
 }
+.pager-text {
+  color: #ac143a;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.pager-text:hover,
+.pager-text:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+.pager-text:hover,
+.pager-text:focus {
+  background: transparent;
+  border: none;
+}
+ul.pagination li.active {
+  color: #ac143a;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+ul.pagination li.active:hover,
+ul.pagination li.active:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+ul.pagination li.active:hover,
+ul.pagination li.active:focus {
+  background: transparent;
+  border: none;
+}
+ul.pagination li.active span {
+  color: #ac143a;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #464646;
+  background: transparent;
+}
+ul.pagination li.active span:hover,
+ul.pagination li.active span:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+ul.pagination li.active span:hover,
+ul.pagination li.active span:focus {
+  background: transparent;
+  border: none;
+}
+ul.pagination li.active span:hover,
+ul.pagination li.active span:focus {
+  color: #464646;
+}
+ul.pagination li.active span::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 20%;
+  bottom: 0;
+  height: 6px;
+  width: 20px;
+  border-bottom: 6px solid #d9d4c2;
+}
+ul.pagination li a {
+  color: #ac143a;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+ul.pagination li a:hover,
+ul.pagination li a:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+ul.pagination li a:hover,
+ul.pagination li a:focus {
+  background: transparent;
+  border: none;
+}
 .scald-atom .field-name-download-atom {
   text-align: center;
   padding-top: 30px;
