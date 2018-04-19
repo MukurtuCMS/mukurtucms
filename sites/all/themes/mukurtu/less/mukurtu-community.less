@@ -1,3 +1,4 @@
+.node-type-cultural-protocol-group,
 .node-type-community {
     // No top level shadow divider on community pages
     .page-header {
@@ -5,6 +6,7 @@
     }
 }
 
+.node-cultural-protocol-group.view-mode-full,
 .node-community.view-mode-full {
     .col-sm-9 {
         >.field {
@@ -14,6 +16,7 @@
     }
         
     // Full width banner image
+    .field-name-field-protocol-image,
     .field-name-field-community-image {
         .fullwidth;
         img {
@@ -33,6 +36,7 @@
     }
 
     // Recent Digital Heritage
+    .field-name-protocol-dh-items,
     .field-name-community-dh-items {
         .label-above {
             font-weight: bold;
@@ -56,8 +60,13 @@
             padding-bottom: 20px;
 
             h2,
-            .block-title {
+            .block-title,
+            .label-above {
                 .metadata-field-label;
+            }
+
+            .label-above {
+                padding-top: 20px;
             }
 
             a {
@@ -73,6 +82,15 @@
                 padding-bottom: 12px;
             }
         }
+
+        .field-name-og-group-ref {
+            .textformatter-list {
+                padding-left: 0px;
+                padding-top: 10px;
+                list-style-type: none;
+            }
+        }
+
 
         .field-name-community-membership-status {
             .primary-color-link-container;

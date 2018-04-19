@@ -72,7 +72,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -130,7 +130,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -180,7 +180,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -231,7 +231,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -282,7 +282,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -392,7 +392,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -450,7 +450,7 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -515,7 +515,7 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -583,7 +583,7 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -659,7 +659,7 @@ Strict - This cultural protocol and the items within it are shared with, visible
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -740,7 +740,7 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
