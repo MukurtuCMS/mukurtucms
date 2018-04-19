@@ -9092,6 +9092,7 @@ section ol.breadcrumb {
 .page-collections .pane-ma-search-api-ma-custom-sorts .pane-title {
   padding: 10px 12px;
 }
+.node-word-list.view-mode-full > div:first-of-type,
 .node-collection.view-mode-full > div:first-of-type {
   width: 100vw;
   position: relative;
@@ -9101,21 +9102,28 @@ section ol.breadcrumb {
   margin-right: -50vw;
   background-color: #d9d4c2;
 }
+.node-word-list.view-mode-full > div:first-of-type:hover,
 .node-collection.view-mode-full > div:first-of-type:hover,
+.node-word-list.view-mode-full > div:first-of-type:focus,
 .node-collection.view-mode-full > div:first-of-type:focus {
   background-color: #c9c2a8;
 }
+.node-word-list.view-mode-full > div:first-of-type a,
 .node-collection.view-mode-full > div:first-of-type a {
   color: #ac143a;
 }
+.node-word-list.view-mode-full > div:first-of-type a:hover,
 .node-collection.view-mode-full > div:first-of-type a:hover,
+.node-word-list.view-mode-full > div:first-of-type a:focus,
 .node-collection.view-mode-full > div:first-of-type a:focus {
   text-decoration: none;
 }
+.node-word-list.view-mode-full > div:first-of-type > div:first-of-type,
 .node-collection.view-mode-full > div:first-of-type > div:first-of-type {
   padding-left: 0px;
   padding-right: 0px;
 }
+.node-word-list.view-mode-full > div:first-of-type::after,
 .node-collection.view-mode-full > div:first-of-type::after {
   background: linear-gradient(#e6e6e6, #ffffff);
   background-repeat: no-repeat;
@@ -9125,36 +9133,45 @@ section ol.breadcrumb {
   display: block;
   height: 10px;
 }
+.node-word-list.view-mode-full > div:first-of-type .field,
 .node-collection.view-mode-full > div:first-of-type .field {
   text-align: center;
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field,
   .node-collection.view-mode-full > div:first-of-type .field {
     text-align: left;
   }
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-image,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-image {
     float: left;
     width: 50%;
   }
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-title,
   .node-collection.view-mode-full > div:first-of-type .field-name-title,
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-description,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-description,
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-summary,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-summary,
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-credit,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
     float: right;
     width: 50%;
     padding-left: 30px;
   }
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-title,
 .node-collection.view-mode-full > div:first-of-type .field-name-title {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
   color: #fff;
   font-size: 40px;
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
 .node-collection.view-mode-full > div:first-of-type .field-name-title::after {
   content: "";
   display: inline-block;
@@ -9164,26 +9181,32 @@ section ol.breadcrumb {
   border-bottom: 6px solid #d9d4c2;
 }
 @media (min-width: 768px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
   .node-collection.view-mode-full > div:first-of-type .field-name-title::after {
     top: -25px;
   }
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
 .node-collection.view-mode-full > div:first-of-type .field-name-title::after {
   position: relative;
   top: -40px;
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-title,
   .node-collection.view-mode-full > div:first-of-type .field-name-title {
     padding-top: 50px;
     font-size: 56px;
   }
+  .node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
   .node-collection.view-mode-full > div:first-of-type .field-name-title::after {
     top: -60px;
   }
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-title h2,
 .node-collection.view-mode-full > div:first-of-type .field-name-title h2 {
   padding-bottom: 20px;
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-field-description,
 .node-collection.view-mode-full > div:first-of-type .field-name-field-description {
   width: 100vw;
   position: relative;
@@ -9201,39 +9224,50 @@ section ol.breadcrumb {
   font-size: 16px;
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-description,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-description {
     font-size: 18px;
   }
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-summary,
 .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-summary,
+.node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-credit,
 .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
   padding-bottom: 20px;
   color: #333333;
   font-size: 16px;
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-summary,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-summary,
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-credit,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
     font-size: 20px;
   }
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-credit,
 .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
   font-size: 14px;
 }
+.node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-credit .label-inline,
 .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit .label-inline {
   display: inline;
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full > div:first-of-type .field-name-field-collection-credit,
   .node-collection.view-mode-full > div:first-of-type .field-name-field-collection-credit {
     font-size: 18px;
   }
 }
+.node-word-list.view-mode-full > div:nth-of-type(2),
 .node-collection.view-mode-full > div:nth-of-type(2) {
   padding-top: 30px;
 }
+.node-word-list.view-mode-full > div:nth-of-type(2) > div:first-of-type,
 .node-collection.view-mode-full > div:nth-of-type(2) > div:first-of-type {
   padding-bottom: 50px;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .label-above,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
   position: absolute;
   top: -20px;
@@ -9244,10 +9278,12 @@ section ol.breadcrumb {
   letter-spacing: 1.2px;
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .label-above,
   .node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
     font-size: 18px;
   }
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
   width: 100% !important;
   float: left;
@@ -9256,35 +9292,45 @@ section ol.breadcrumb {
   border-bottom: 5px solid #eeeaea;
 }
 @media (min-width: 768px) {
+  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
   .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
     width: 45% !important;
   }
 }
 @media (min-width: 992px) {
+  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
   .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
     width: 30% !important;
   }
 }
 @media (min-width: 1600px) {
+  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
   .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
     width: 20% !important;
   }
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result.views-row-first,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result.views-row-first {
   border-top: none !important;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field {
   display: none;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset {
   display: block;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2 {
   font-size: 16px;
   font-weight: bold;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2 {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
@@ -9293,41 +9339,54 @@ section ol.breadcrumb {
   min-height: 20px;
   padding-right: 25px;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a {
   color: #ac143a;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:hover,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:hover,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:focus,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:focus {
   color: #d9d4c2;
   text-decoration: none;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset {
   padding-top: 10px;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-4,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-4,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-8,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-8 {
   width: 100%;
 }
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row {
   padding-top: 30px;
   padding-bottom: 30px;
 }
+.node-word-list.view-mode-full .field-name-collections-tree,
 .node-collection.view-mode-full .field-name-collections-tree {
   background-color: #f8f7f7;
   border-bottom: 5px solid #eeeaea;
   padding-bottom: 30px;
 }
+.node-word-list.view-mode-full .field-name-collections-tree a,
 .node-collection.view-mode-full .field-name-collections-tree a {
   color: #ac143a;
 }
+.node-word-list.view-mode-full .field-name-collections-tree a:hover,
 .node-collection.view-mode-full .field-name-collections-tree a:hover,
+.node-word-list.view-mode-full .field-name-collections-tree a:focus,
 .node-collection.view-mode-full .field-name-collections-tree a:focus {
   color: #d9d4c2;
   text-decoration: none;
 }
+.node-word-list.view-mode-full .field-name-collections-tree .current,
 .node-collection.view-mode-full .field-name-collections-tree .current {
   color: #555555;
 }
+.node-word-list.view-mode-full .field-name-collections-tree .label-above,
 .node-collection.view-mode-full .field-name-collections-tree .label-above {
   color: #ac143a;
   font-size: 14px;
@@ -9338,19 +9397,23 @@ section ol.breadcrumb {
   background: #d9d4c2;
   text-transform: uppercase;
 }
+.node-word-list.view-mode-full .field-name-collections-tree .collections-tree,
 .node-collection.view-mode-full .field-name-collections-tree .collections-tree {
   padding-top: 30px;
   padding-bottom: 30px;
 }
+.node-type-word-list h1.page-header,
 .node-type-collection h1.page-header {
   display: none;
 }
+.node-type-word-list .main-container > .row section .btn-group,
 .node-type-collection .main-container > .row section .btn-group {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1500;
 }
+.node-type-word-list .main-container > .row section .btn-group .dropdown-menu,
 .node-type-collection .main-container > .row section .btn-group .dropdown-menu {
   position: relative;
   clear: left;
@@ -9493,49 +9556,6 @@ section ol.breadcrumb {
 .node-type-dictionary-word h1.page-header {
   background: none;
 }
-.dictionary-word-body {
-  /*     .field-name-title {
-        background-color: @brand-primary;
-        font-family: @font-family-sans-serif-light;
-        color: @mukurtu-default-container-font-color;
-        margin-bottom: 30px;
-
-        // Triangle accent
-        &::after {
-            content : "";
-            display: inline-block;
-            position: absolute;
-            left: 40px;
-            top: 38px;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 24px 0 24px 27px;
-            border-color: transparent transparent transparent @brand-primary;
-            z-index: -1;
-
-            // Tablet
-            @media (min-width: @screen-sm-min) {
-                top: 60px;
-            }
-
-            // Desktop
-            @media (min-width: @screen-md-min) {
-                top: 75px;
-            }
-        }
-
-        h2 {
-            padding: 15px 15px 15px 25px;
-
-            font-size: 30px;
-            // Desktop
-            @media (min-width: @screen-md-min) {
-                font-size: 44px;
-            }
-        } 
-    }*/
-}
 .dictionary-word-entry-field {
   padding-left: 25px;
 }
@@ -9618,6 +9638,9 @@ section ol.breadcrumb {
   .paragraphs-item-dictionary-word-bundle.view-mode-full .sample-sentence {
     font-size: 18px;
   }
+}
+.node-word-list.view-mode-full .comment-wrapper {
+  clear: left;
 }
 .page-dictionary .page-header {
   background: none;

@@ -1132,11 +1132,11 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 3,
       ),
       'full' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1193,7 +1193,7 @@ function ma_dictionary_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'ma_colorbox',
+        'type' => 'mukurtu_featured_content',
         'weight' => 0,
       ),
       'teaser' => array(
@@ -1243,11 +1243,11 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 1,
       ),
       'full' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1295,11 +1295,11 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 2,
       ),
       'full' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1356,7 +1356,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1404,14 +1404,14 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 4,
       ),
       'full' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'mukurtu_display_formatters_paged_node',
         'settings' => array(
-          'item_view_mode' => 'teaser',
+          'item_view_mode' => 'dictionary_word_summary',
           'items_per_page' => 10,
         ),
         'type' => 'mukurtu_paged_node_formatter',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
