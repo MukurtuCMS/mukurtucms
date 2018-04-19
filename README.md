@@ -1,4 +1,4 @@
-# Mukurtu CMS 2.0.9
+# Mukurtu CMS 2.0.10
 ### [Release Notes](VERSION.md)
 
 ## Contents

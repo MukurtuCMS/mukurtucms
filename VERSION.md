@@ -1,3 +1,8 @@
+## Mukurtu 2.0.10
+- Critical security update for Display Suite from 2.14 to 2.15.
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
 ## Mukurtu 2.0.9
 - Upgraded Drupal core from 7.56 to 7.58. Includes two critical security updates.
 #### Manual Upgrade Steps
