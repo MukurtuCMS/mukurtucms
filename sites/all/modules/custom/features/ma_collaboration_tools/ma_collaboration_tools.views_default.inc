@@ -35,12 +35,10 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
-  /* Relationship: Flags: subscribe_section_content */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['flag_content_rel']['id'] = 'flag_content_rel';
   $handler->display->display_options['relationships']['flag_content_rel']['table'] = 'node';
   $handler->display->display_options['relationships']['flag_content_rel']['field'] = 'flag_content_rel';
-  $handler->display->display_options['relationships']['flag_content_rel']['required'] = 0;
-  $handler->display->display_options['relationships']['flag_content_rel']['flag'] = 'subscribe_section_content';
   /* Field: Content: Event Date */
   $handler->display->display_options['fields']['field_oa_date_1']['id'] = 'field_oa_date_1';
   $handler->display->display_options['fields']['field_oa_date_1']['table'] = 'field_data_field_oa_date';
@@ -118,7 +116,7 @@ function ma_collaboration_tools_views_default_views() {
     'image_style' => 'thumbnail',
   );
   $handler->display->display_options['fields']['field_oa_media']['delta_offset'] = '0';
-  /* Field: Flags: Flag link */
+  /* Field: Broken/missing handler */
   $handler->display->display_options['fields']['ops']['id'] = 'ops';
   $handler->display->display_options['fields']['ops']['table'] = 'flagging';
   $handler->display->display_options['fields']['ops']['field'] = 'ops';
@@ -261,14 +259,11 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['defaults']['use_ajax'] = FALSE;
   $handler->display->display_options['use_ajax'] = TRUE;
   $handler->display->display_options['defaults']['relationships'] = FALSE;
-  /* Relationship: Flags: trash */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['flag_content_rel']['id'] = 'flag_content_rel';
   $handler->display->display_options['relationships']['flag_content_rel']['table'] = 'node';
   $handler->display->display_options['relationships']['flag_content_rel']['field'] = 'flag_content_rel';
   $handler->display->display_options['relationships']['flag_content_rel']['label'] = 'archived';
-  $handler->display->display_options['relationships']['flag_content_rel']['required'] = 0;
-  $handler->display->display_options['relationships']['flag_content_rel']['flag'] = 'trash';
-  $handler->display->display_options['relationships']['flag_content_rel']['user_scope'] = 'any';
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Content: Event Date */
   $handler->display->display_options['fields']['field_oa_date_1']['id'] = 'field_oa_date_1';
@@ -403,7 +398,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['filters']['field_oa_date_value']['field'] = 'field_oa_date_value';
   $handler->display->display_options['filters']['field_oa_date_value']['operator'] = '>=';
   $handler->display->display_options['filters']['field_oa_date_value']['default_date'] = 'now';
-  /* Filter criterion: Flags: Flagged */
+  /* Filter criterion: Broken/missing handler */
   $handler->display->display_options['filters']['flagged']['id'] = 'flagged';
   $handler->display->display_options['filters']['flagged']['table'] = 'flagging';
   $handler->display->display_options['filters']['flagged']['field'] = 'flagged';
@@ -455,7 +450,7 @@ function ma_collaboration_tools_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('flag'),
+    t('flag_content_rel'),
     t('Date'),
     t('[field_oa_address]
 [field_event_link]'),
@@ -975,14 +970,11 @@ Calendar link: [base_url][path]
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
-  /* Relationship: Flags: trash */
+  /* Relationship: Broken/missing handler */
   $handler->display->display_options['relationships']['flag_content_rel']['id'] = 'flag_content_rel';
   $handler->display->display_options['relationships']['flag_content_rel']['table'] = 'node';
   $handler->display->display_options['relationships']['flag_content_rel']['field'] = 'flag_content_rel';
   $handler->display->display_options['relationships']['flag_content_rel']['label'] = 'archived';
-  $handler->display->display_options['relationships']['flag_content_rel']['required'] = 0;
-  $handler->display->display_options['relationships']['flag_content_rel']['flag'] = 'trash';
-  $handler->display->display_options['relationships']['flag_content_rel']['user_scope'] = 'any';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -1133,7 +1125,7 @@ Calendar link: [base_url][path]
     3 => 0,
     4 => 0,
   );
-  /* Filter criterion: Flags: Flagged */
+  /* Filter criterion: Broken/missing handler */
   $handler->display->display_options['filters']['flagged']['id'] = 'flagged';
   $handler->display->display_options['filters']['flagged']['table'] = 'flagging';
   $handler->display->display_options['filters']['flagged']['field'] = 'flagged';

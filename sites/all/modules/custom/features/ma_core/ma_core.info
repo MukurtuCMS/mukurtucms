@@ -38,7 +38,6 @@ dependencies[] = field_group
 dependencies[] = file_entity
 dependencies[] = file_entity_link
 dependencies[] = filter
-dependencies[] = flag
 dependencies[] = geofield_gmap
 dependencies[] = geofield_map
 dependencies[] = googleanalytics

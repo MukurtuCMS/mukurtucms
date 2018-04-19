@@ -27,61 +27,6 @@ function ma_collaboration_tools_views_api($module = NULL, $api = NULL) {
 }
 
 /**
- * Implements hook_flag_default_flags().
- */
-function ma_collaboration_tools_flag_default_flags() {
-  $flags = array();
-  // Exported flag: "Section Content Subscribe".
-  $flags['subscribe_section_content'] = array(
-    'entity_type' => 'node',
-    'title' => 'Section Content Subscribe',
-    'global' => 0,
-    'types' => array(
-      0 => 'oa_discussion_post',
-      1 => 'oa_wiki_page',
-      2 => 'event',
-    ),
-    'flag_short' => 'Follow',
-    'flag_long' => 'Follow to receive messages related to this content',
-    'flag_message' => 'Following',
-    'unflag_short' => 'UnFollow',
-    'unflag_long' => 'UnFollow to stop receiving messages about this content',
-    'unflag_message' => 'UnFollowed',
-    'unflag_denied_text' => '',
-    'link_type' => 'normal',
-    'weight' => -7,
-    'show_in_links' => array(
-      'full' => 'full',
-      'teaser' => 0,
-      'rss' => 0,
-      'search_index' => 0,
-      'search_result' => 0,
-      'ical' => 0,
-      'diff_standard' => 0,
-      'token' => 0,
-      'thumbed' => 0,
-      'community_record' => 0,
-      'map_popup' => 0,
-      'taxonomy_record_teaser' => 0,
-      'person_teaser' => 0,
-      'revision' => 0,
-    ),
-    'show_as_field' => 1,
-    'show_on_form' => 0,
-    'access_author' => '',
-    'show_contextual_link' => 0,
-    'i18n' => 0,
-    'module' => 'ma_collaboration_tools',
-    'locked' => array(
-      0 => 'name',
-    ),
-    'api_version' => 3,
-  );
-  return $flags;
-
-}
-
-/**
  * Implements hook_node_info().
  */
 function ma_collaboration_tools_node_info() {
