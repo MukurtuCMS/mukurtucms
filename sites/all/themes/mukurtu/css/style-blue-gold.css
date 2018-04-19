@@ -8930,9 +8930,9 @@ section ol.breadcrumb {
 }
 @media (min-width: 768px) {
   .large-teaser-box {
-    position: absolute;
+    padding-bottom: 99999px;
+    margin-bottom: -99999px;
     text-align: left;
-    padding-bottom: 0px;
   }
 }
 .large-teaser-box .field {
@@ -9012,6 +9012,7 @@ section ol.breadcrumb {
 @media (min-width: 768px) {
   .view-collections .row {
     margin: 0px;
+    overflow: hidden;
   }
 }
 @media (min-width: 768px) {
