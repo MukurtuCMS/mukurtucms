@@ -67,6 +67,26 @@ function ma_dictionary_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|word_list|full';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'word_list';
+  $ds_fieldsetting->view_mode = 'full';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'comments' => array(
+      'weight' => '6',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+  );
+  $export['node|word_list|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'paragraphs_item|dictionary_word_bundle|default';
   $ds_fieldsetting->entity_type = 'paragraphs_item';
   $ds_fieldsetting->bundle = 'dictionary_word_bundle';
@@ -360,6 +380,56 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_link_custom' => '',
   );
   $export['node|dictionary_word|search_result'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|word_list|full';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'word_list';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'field_collection_image',
+        1 => 'title',
+        2 => 'field_collection_summary',
+        3 => 'field_collection_credit',
+        4 => 'field_description',
+      ),
+      'bottom' => array(
+        5 => 'field_words',
+        6 => 'comments',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'top',
+      'title' => 'top',
+      'field_collection_summary' => 'top',
+      'field_collection_credit' => 'top',
+      'field_description' => 'top',
+      'field_words' => 'bottom',
+      'comments' => 'bottom',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|word_list|full'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
