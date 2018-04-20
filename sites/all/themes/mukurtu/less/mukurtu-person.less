@@ -28,16 +28,38 @@
     .field-name-title {
         .chevron-right;
         background-position: 95% 50%;
-        .font-light;
-        font-size: 30px;
+
+        h2 {
+            margin-top: 0px;
+
+            a {
+                .font-light;
+                font-size: 24px;
+
+                // Desktop
+                @media (min-width: @screen-md-min) {
+                    font-size: 30px;
+                }
+            }
+        }
     }
 
+    .field-name-field-media-asset {
+        img {
+            padding-top: 10px;
+        }
+    }
+    
     .field-name-field-summary {
         padding-bottom: 20px;
     }
 
     .field {
-        font-size: 17px;
+        font-size: 16px;
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 17px;
+        }
 
         .label-inline {
             display: inline;
@@ -50,6 +72,11 @@
         }
 
         a {
+            font-size: 16px;
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 17px;
+            }
             .mukurtu-standard-link;
         }
     }

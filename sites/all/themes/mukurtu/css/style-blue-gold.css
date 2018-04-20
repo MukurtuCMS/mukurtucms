@@ -9977,15 +9977,33 @@ section ol.breadcrumb {
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
+}
+.view-mode-taxonomy_record_teaser .field-name-title h2 {
+  margin-top: 0px;
+}
+.view-mode-taxonomy_record_teaser .field-name-title h2 a {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
-  font-size: 30px;
+  font-size: 24px;
+}
+@media (min-width: 992px) {
+  .view-mode-taxonomy_record_teaser .field-name-title h2 a {
+    font-size: 30px;
+  }
+}
+.view-mode-taxonomy_record_teaser .field-name-field-media-asset img {
+  padding-top: 10px;
 }
 .view-mode-taxonomy_record_teaser .field-name-field-summary {
   padding-bottom: 20px;
 }
 .view-mode-taxonomy_record_teaser .field {
-  font-size: 17px;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .view-mode-taxonomy_record_teaser .field {
+    font-size: 17px;
+  }
 }
 .view-mode-taxonomy_record_teaser .field .label-inline {
   display: inline;
@@ -9996,7 +10014,13 @@ section ol.breadcrumb {
   display: inline;
 }
 .view-mode-taxonomy_record_teaser .field a {
+  font-size: 16px;
   color: #138aab;
+}
+@media (min-width: 992px) {
+  .view-mode-taxonomy_record_teaser .field a {
+    font-size: 17px;
+  }
 }
 .view-mode-taxonomy_record_teaser .field a:hover,
 .view-mode-taxonomy_record_teaser .field a:focus {
