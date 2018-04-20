@@ -391,12 +391,44 @@ function ma_collaboration_tools_theme() {
 function ma_collaboration_tools_follow_unfollow($entity) {
   global $user;
 
+  list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons($entity, $user->uid);
+
+  // Create output.
+  if ($following) {
+    $output = l('<button class="btn btn-default">UnFollow</button>', 'node/' . $entity->nid . '/unfollow', ['html' => TRUE]);
+    $link_text = "You are receiving notifications.";
+  }
+  else {
+    $output = l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
+    $link_text = "Follow to receive notifications.";
+  }
+
+  require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
+  $popup_attributes = array (
+    'style' => 'Bent white',
+    'origin' => 'top-left',
+    'expand' => 'top-left',
+    'width' => '200',
+    'class' => 'follow-unfollow-popup',
+    // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
+  );
+  $output .= popup_element($link_text, $reasons, $popup_attributes);
+
+  return $output;
+
+}
+
+/**
+ * Returns if a given user is following a given node and why. Called from a few different places, including the Following view.
+ */
+function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) {
+
   $reasons = [];
 
   // Individually following
   if (isset($entity->field_following_users[LANGUAGE_NONE])) {
     foreach ($entity->field_following_users[LANGUAGE_NONE] AS $following_user) {
-      if ($user->uid == $following_user['target_id']) {
+      if ($uid == $following_user['target_id']) {
         $following = TRUE;
         $reasons[] = 'Individually following';
         break;
@@ -408,7 +440,7 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   $following_by_protocol = [];
   if (isset($entity->field_following_protocols[LANGUAGE_NONE])) {
     foreach ($entity->field_following_protocols[LANGUAGE_NONE] AS $following_protocol) {
-      if (og_is_member('node', $following_protocol['target_id'])) {
+      if (og_is_member('node', $following_protocol['target_id'], 'user', $uid)) {
         $following_protocol_node = node_load ($following_protocol['target_id']);
         $following_by_protocol[] = $following_protocol_node->title;
         $following = TRUE;
@@ -421,7 +453,7 @@ function ma_collaboration_tools_follow_unfollow($entity) {
     $reasons[] = 'Member of: ' . implode(', ', $following_by_protocol);
     if (isset($entity->field_un_following_users[LANGUAGE_NONE])) {
       foreach ($entity->field_un_following_users[LANGUAGE_NONE] AS $unfollowing_user) {
-        if ($user->uid == $unfollowing_user['target_id']) {
+        if ($uid == $unfollowing_user['target_id']) {
           $following = FALSE;
           $reasons[] = 'Individually unfollowing';
           break;
@@ -430,22 +462,15 @@ function ma_collaboration_tools_follow_unfollow($entity) {
     }
   }
   // Has no explicitly followed, followed by group, or unfollowed.
-  if (is_null($following)) {
+  if (!isset($following)) {
     $following = FALSE;
     $reasons[] = 'Never followed';
+
   }
 
-  // Create output.
-  if ($following) {
-    $output = l('<button class="btn btn-default">UnFollow</button>', 'node/' . $entity->nid . '/unfollow', ['html' => TRUE]);
-    $link_text = "You are receiving notifications.";
-  }
-  else {
-    $output = l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
-    $link_text = "Follow to receive notifications.";
-  }
+  // Build reasons into a list if multiple, otherwise return single reason.
   if (count($reasons) > 1) {
-    $popup_output = theme_item_list([
+    $reasons = theme_item_list([
       'items' => $reasons,
       'title' => '',
       'type' => 'ul',
@@ -453,37 +478,41 @@ function ma_collaboration_tools_follow_unfollow($entity) {
     ]);
   }
   else {
-    $popup_output = $reasons[0];
+    $reasons = $reasons[0];
   }
-  require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
-  $popup_attributes = array (
-    'style' => 'Bent white',
-    'origin' => 'top-left',
-    'expand' => 'top-left',
-    'width' => '200',
-    'class' => 'follow-unfollow-popup',
-    // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
-  );
-  $output .= popup_element($link_text, $popup_output, $popup_attributes);
 
-  return $output;
+  // Return results.
+  return [$following, $reasons];
 
 }
+
 
 /**
  * Implementation of hook_menu().
  */
 function ma_collaboration_tools_menu() {
+
   $items['node/%node/follow'] = array(
     'page callback' => 'ma_collaboration_tools_follow_unfollow_process',
     'page arguments' => array(1, 'follow'),
     'access callback' => TRUE,
   );
+
   $items['node/%node/unfollow'] = array(
     'page callback' => 'ma_collaboration_tools_follow_unfollow_process',
     'page arguments' => array(1, 'unfollow'),
     'access callback' => TRUE,
   );
+
+  $items['user/%user/following'] = array(
+    'title' => 'Following',
+    'page callback' => 'ma_collaboration_tools_following_view',
+    'page arguments' => array(1),
+    'access callback' => 'ma_collaboration_tools_following_view_access',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -517,4 +546,50 @@ function ma_collaboration_tools_follow_unfollow_process($node, $op) {
   }
   $nw->save();
   drupal_goto('node/' . $node->nid);
+}
+
+/**
+ * Access callback; Determine if  user can view the Following tab on a given profile page.
+ */
+function ma_collaboration_tools_following_view_access($account) {
+  global $user;
+  // Can view if own profile page
+  if ($user->uid == $account->uid) {
+    return TRUE;
+  }
+  // Can view if admin or Mukurtu admin
+  $admin = user_role_load_by_name('administrator');
+  $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
+  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+    return TRUE;
+  }
+}
+
+/**
+ * Page callback; Call a view to show what the the user's Followings.
+ */
+function ma_collaboration_tools_following_view($account) {
+  $view = views_get_view('mukurtu_collab_subscriptions');
+  $view->set_arguments(array($account->uid));
+  return $view->preview();
+}
+
+/**
+ * Implements hook_views_post_execute.
+ */
+function ma_collaboration_tools_views_post_execute(&$view) {
+
+  // Filter down the Following view. Views UI could not handle this, so we are doing it here.
+  // It would be better to do this in a views query alter so that pagers could work (as now there is no paging),
+  // plus more efficient, but I do not think it is possible. If this becomes slow then will need to set a hidden field
+  // on the child collab nodes which contains following lists of users which can be queried.
+  if ($view->name == "mukurtu_collab_subscriptions") {
+    $uid = $view->args[0];
+    foreach ($view->result as $i => $row) {
+      list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons(node_load ($row->nid), $uid);
+      if (!$following) {
+       unset ($view->result[$i]);
+      }
+    }
+  }
 }

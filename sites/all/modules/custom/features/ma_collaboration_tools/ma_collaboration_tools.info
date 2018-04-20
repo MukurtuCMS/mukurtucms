@@ -282,6 +282,7 @@ features[variable][] = pathauto_node_oa_ical_importer_pattern
 features[variable][] = pathauto_node_oa_wiki_page_pattern
 features[views_view][] = event_detail
 features[views_view][] = event_list
+features[views_view][] = mukurtu_collab_subscriptions
 features[views_view][] = oa_fullcalendar
 features[views_view][] = open_atrium_news
 features_exclude[dependencies][node_reference] = node_reference
