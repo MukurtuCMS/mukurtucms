@@ -131,6 +131,16 @@ function ma_digitalheritage_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_contributor' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_creator' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
     'field_licence_trad' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -610,8 +620,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
         7 => 'field_coverage',
         8 => 'field_coverage_description',
         9 => 'field_related_dh_items',
-        10 => 'field_related_dictionary_words',
-        11 => 'field_transcription',
+        10 => 'field_transcription',
+        11 => 'field_related_dictionary_words',
       ),
       'bottom' => array(
         12 => 'comments',
@@ -651,8 +661,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_coverage' => 'left',
       'field_coverage_description' => 'left',
       'field_related_dh_items' => 'left',
-      'field_related_dictionary_words' => 'left',
       'field_transcription' => 'left',
+      'field_related_dictionary_words' => 'left',
       'comments' => 'bottom',
       'dh_related_items_teasers' => 'right',
       'field_community_ref' => 'right',
