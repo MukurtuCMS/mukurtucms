@@ -7839,6 +7839,19 @@ header,
     top: -25px;
   }
 }
+.section-accent-bar::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  height: 5px;
+  width: 100px;
+  border-bottom: 5px solid #d9d4c2;
+}
+@media (min-width: 768px) {
+  .section-accent-bar::after {
+    top: -25px;
+  }
+}
 .mukurtu-standard-link {
   color: #ac143a;
 }
@@ -7986,6 +7999,21 @@ header,
 }
 .arrow-down {
   background: url(../images/icons/triangle_arrow_down_red.svg) no-repeat 0% 50%;
+}
+.nav-bottom-triangle::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 47px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 11px 10px 0 10px;
+  border-color: #ac143a transparent transparent transparent;
+  z-index: -1;
 }
 .item-grid-view .field {
   display: none;
@@ -9911,4 +9939,215 @@ section ol.breadcrumb {
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div:first-of-type {
   display: block;
+}
+.record-filter {
+  border-bottom: 5px solid #ac143a;
+}
+.record-filter .nav-pills li a {
+  border-radius: 0px;
+  font-weight: bold;
+  font-size: 16px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.record-filter .nav-pills li a:hover {
+  background-color: #9a1134;
+  color: #fff;
+}
+.record-filter .nav-pills li.active::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 47px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 11px 10px 0 10px;
+  border-color: #ac143a transparent transparent transparent;
+  z-index: -1;
+}
+.view-mode-taxonomy_record_teaser .field-name-title {
+  background-image: url(../images/icons/chevronright_red.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  font-size: 30px;
+}
+.view-mode-taxonomy_record_teaser .field-name-field-summary {
+  padding-bottom: 20px;
+}
+.view-mode-taxonomy_record_teaser .field {
+  font-size: 17px;
+}
+.view-mode-taxonomy_record_teaser .field .label-inline {
+  display: inline;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.view-mode-taxonomy_record_teaser .field .textformatter-list {
+  display: inline;
+}
+.view-mode-taxonomy_record_teaser .field a {
+  color: #ac143a;
+}
+.view-mode-taxonomy_record_teaser .field a:hover,
+.view-mode-taxonomy_record_teaser .field a:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+.node-person.view-mode-full .owl-carousel {
+  text-align: center;
+}
+.node-person.view-mode-full .view-content {
+  padding-top: 20px;
+}
+.node-person.view-mode-full .metadata-sidebar {
+  padding-top: 30px;
+}
+@media (min-width: 768px) {
+  .node-person.view-mode-full .metadata-sidebar {
+    padding-top: 0px;
+  }
+}
+.node-person.view-mode-full .field-name-field-node-aggregate {
+  font-weight: bold;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.node-person.view-mode-full .field-name-scald-thumbnail img {
+  margin: auto;
+}
+.node-person.view-mode-full .field-name-field-related-people .field::after {
+  content: none;
+}
+.node-person.view-mode-full .field-name-field-related-people .col-sm-12 {
+  padding: 0px 0px 0px 10px;
+}
+.node-person.view-mode-full .field-name-field-related-people .field-name-field-related-person {
+  padding: 0px;
+}
+.node-person.view-mode-full .field-name-field-related-people .field-name-field-relationship-type {
+  padding: 0px 0px 0px 5px;
+  margin-top: -10px;
+}
+.node-person.view-mode-full .field-name-table-of-contents h3 {
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.node-person.view-mode-full .field-name-table-of-contents ul {
+  list-style-type: none;
+  padding-left: 0px;
+}
+.node-person.view-mode-full .field-name-table-of-contents ul li {
+  background: url(../images/icons/triangle_arrow_right_bone.svg) no-repeat 0% 50%;
+  background-position: center right;
+  padding-left: 20px;
+  background-position: center left;
+}
+.node-person.view-mode-full .field-name-table-of-contents ul li a {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  font-size: 22px;
+}
+.node-person.view-mode-related_person_teaser .col-xs-3,
+.node-person.view-mode-related_person_teaser .col-xs-9,
+.node-person.view-mode-related_person_teaser .field {
+  padding: 0px;
+}
+.node-person.view-mode-related_person_teaser .field-name-title {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+.node-person.view-mode-related_person_teaser .field-name-title h4 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.node-person.view-mode-related_person_teaser .field-name-field-media-asset {
+  padding-top: 10px;
+}
+.paragraphs-items-field-sections-full {
+  /*h3 {
+        font-weight: bold;
+        font-size: 20px;
+        padding-top: 6px;
+        padding-bottom: 12px;
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            font-size: 23px;
+        }
+    }*/
+}
+.paragraphs-items-field-sections-full .paragraphs-item-text-section {
+  font-size: 16px;
+}
+@media (min-width: 768px) {
+  .paragraphs-items-field-sections-full .paragraphs-item-text-section {
+    font-size: 19px;
+  }
+}
+.paragraphs-items-field-sections-full .paragraphs-item-text-section > div .col-sm-12 {
+  padding-bottom: 20px;
+}
+.paragraphs-items-field-sections-full .paragraphs-item-text-section > div .col-sm-12::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  height: 5px;
+  width: 100px;
+  border-bottom: 5px solid #d9d4c2;
+}
+@media (min-width: 768px) {
+  .paragraphs-items-field-sections-full .paragraphs-item-text-section > div .col-sm-12::after {
+    top: -25px;
+  }
+}
+.paragraphs-items-field-sections-full h3 {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size: 36px;
+}
+@media (min-width: 768px) {
+  .paragraphs-items-field-sections-full h3 {
+    font-size: 44px;
+  }
+}
+.paragraphs-items-field-sections-full h2 {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size: 30px;
+  padding-top: 6px;
+  padding-bottom: 12px;
+}
+@media (min-width: 768px) {
+  .paragraphs-items-field-sections-full h2 {
+    font-size: 36px;
+  }
+}
+.paragraphs-items-field-sections-full h4 {
+  font-weight: bold;
+  font-size: 18px;
+  padding-bottom: 12px;
+}
+@media (min-width: 768px) {
+  .paragraphs-items-field-sections-full h4 {
+    font-size: 22px;
+  }
+}
+.paragraphs-items-field-sections-full h5 {
+  font-weight: bold;
+  font-size: 16px;
+}
+@media (min-width: 768px) {
+  .paragraphs-items-field-sections-full h5 {
+    font-size: 19px;
+  }
 }

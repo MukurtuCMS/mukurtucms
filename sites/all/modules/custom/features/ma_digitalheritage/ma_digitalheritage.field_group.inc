@@ -185,11 +185,8 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Location',
-    'weight' => '4',
-    'children' => array(
-      0 => 'field_coverage',
-      1 => 'field_coverage_description',
-    ),
+    'weight' => '22',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'Location',
@@ -218,10 +215,8 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Media',
-    'weight' => '1',
-    'children' => array(
-      0 => 'field_media_asset',
-    ),
+    'weight' => '21',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'Media',
@@ -250,13 +245,8 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Metadata',
-    'weight' => '3',
-    'children' => array(
-      0 => 'field_community_ref',
-      1 => 'field_category',
-      2 => 'field_date',
-      3 => 'field_description',
-    ),
+    'weight' => '23',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'Metadata',

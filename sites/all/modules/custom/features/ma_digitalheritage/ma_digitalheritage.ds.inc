@@ -212,7 +212,7 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'taxonomy_record_teaser';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -794,35 +794,25 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'taxonomy_record_teaser';
-  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->layout = 'bootstrap_3_9';
   $ds_layout->settings = array(
     'regions' => array(
-      'central' => array(
-        0 => 'title',
-        1 => 'group_media_div',
-        2 => 'field_media_asset',
-        3 => 'group_metadata_div',
-        4 => 'field_description',
-        5 => 'field_date',
-        6 => 'group_location_div',
-        7 => 'field_community_ref',
-        8 => 'field_coverage',
-        9 => 'field_coverage_description',
-        10 => 'field_category',
+      'left' => array(
+        0 => 'field_media_asset',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'field_summary',
+        3 => 'field_community_ref',
+        4 => 'field_category',
       ),
     ),
     'fields' => array(
-      'title' => 'central',
-      'group_media_div' => 'central',
-      'field_media_asset' => 'central',
-      'group_metadata_div' => 'central',
-      'field_description' => 'central',
-      'field_date' => 'central',
-      'group_location_div' => 'central',
-      'field_community_ref' => 'central',
-      'field_coverage' => 'central',
-      'field_coverage_description' => 'central',
-      'field_category' => 'central',
+      'field_media_asset' => 'left',
+      'title' => 'right',
+      'field_summary' => 'right',
+      'field_community_ref' => 'right',
+      'field_category' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -830,7 +820,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'central' => 'div',
+      'left' => 'div',
+      'right' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',

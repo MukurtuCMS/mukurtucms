@@ -28,6 +28,22 @@
     }
 }
 
+.section-accent-bar {
+    &::after {
+        content : "";
+        display: inline-block;
+        left: 0;
+        height: 5px;
+        width: 100px;
+        border-bottom: 5px solid @brand-secondary;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            top: -25px;
+        }
+    }
+}
+
 // Links
 .mukurtu-standard-link {
     color: @link-color;
@@ -198,6 +214,23 @@
     //background-position: center bottom;
 }
 
+.nav-bottom-triangle {
+    &::after {
+        content : "";
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        top: 47px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 11px 10px 0 10px;
+        border-color: @brand-primary transparent transparent transparent;
+        z-index: -1;
+    }
+}
 
 // Item grid view
 // Take a search result view of an entity, hide all fields except title and media

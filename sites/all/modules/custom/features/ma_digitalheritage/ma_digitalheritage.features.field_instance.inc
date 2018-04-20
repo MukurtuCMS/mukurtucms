@@ -122,7 +122,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -221,7 +221,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 52,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -320,7 +320,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 51,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -437,7 +437,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 3,
       ),
       'taxonomy_record_teaser' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'textformatter',
         'settings' => array(
           'textformatter_class' => 'textformatter-list',
@@ -458,7 +458,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 6,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -571,7 +571,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 45,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -670,7 +670,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 49,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -770,7 +770,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 48,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -908,11 +908,11 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 2,
       ),
       'taxonomy_record_teaser' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'node_reference',
         'settings' => array(),
         'type' => 'node_reference_default',
-        'weight' => 5,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -1054,7 +1054,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1227,35 +1227,9 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
-        'module' => 'geofield_map',
-        'settings' => array(
-          'geofield_map_baselayers_hybrid' => 1,
-          'geofield_map_baselayers_map' => 1,
-          'geofield_map_baselayers_physical' => 1,
-          'geofield_map_baselayers_satellite' => 1,
-          'geofield_map_center' => array(
-            'geocode' => 'Find my location',
-            'lat' => '',
-            'lon' => '',
-          ),
-          'geofield_map_controltype' => 'default',
-          'geofield_map_draggable' => 1,
-          'geofield_map_height' => '300px',
-          'geofield_map_maptype' => 'map',
-          'geofield_map_max_zoom' => 0,
-          'geofield_map_min_zoom' => 0,
-          'geofield_map_mtc' => 'standard',
-          'geofield_map_overview' => 0,
-          'geofield_map_overview_opened' => 0,
-          'geofield_map_pancontrol' => 1,
-          'geofield_map_scale' => 1,
-          'geofield_map_scrollwheel' => 0,
-          'geofield_map_streetview_show' => 1,
-          'geofield_map_width' => '100%',
-          'geofield_map_zoom' => 8,
-        ),
-        'type' => 'geofield_map_map',
-        'weight' => 5,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1365,10 +1339,9 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 6,
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1499,7 +1472,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1600,16 +1573,9 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
-        'module' => 'services_views',
-        'settings' => array(
-          'data_element_key' => '',
-          'skip_empty_values' => 0,
-          'skip_safe' => 0,
-          'skip_text_format' => 1,
-          'term_name' => 1,
-        ),
-        'type' => 'services',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1718,13 +1684,10 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 28,
       ),
       'taxonomy_record_teaser' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 300,
-        ),
-        'type' => 'text_summary_or_trimmed',
-        'weight' => 3,
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -1827,7 +1790,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 47,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1941,7 +1904,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 55,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2044,7 +2007,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2153,7 +2116,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 43,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2259,7 +2222,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2362,7 +2325,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 42,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2464,7 +2427,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2595,7 +2558,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
-        'weight' => 2,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -2768,7 +2731,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2923,7 +2886,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 53,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3011,7 +2974,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3103,7 +3066,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3212,7 +3175,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3311,7 +3274,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 46,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3409,7 +3372,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 54,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3516,7 +3479,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3623,7 +3586,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3736,7 +3699,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 40,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3839,9 +3802,10 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
+        'module' => 'text',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 18,
+        'type' => 'text_default',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -3956,7 +3920,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4059,7 +4023,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4154,7 +4118,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 50,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -4289,7 +4253,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 44,
       ),
       'teaser' => array(
         'label' => 'above',
