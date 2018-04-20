@@ -10009,6 +10009,11 @@ section ol.breadcrumb {
 .node-person.view-mode-full .view-content {
   padding-top: 20px;
 }
+.node-person.view-mode-full .view-mukurtu-records-referenced-content .row {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 5px solid #eeeaea;
+}
 .node-person.view-mode-full .metadata-sidebar {
   padding-top: 30px;
 }
