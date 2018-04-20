@@ -306,15 +306,6 @@ function ma_core_user_default_permissions() {
     'module' => 'filter',
   );
 
-  // Exported permission: 'administer flags'.
-  $permissions['administer flags'] = array(
-    'name' => 'administer flags',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'flag',
-  );
-
   // Exported permission: 'administer geofield_gmap'.
   $permissions['administer geofield_gmap'] = array(
     'name' => 'administer geofield_gmap',

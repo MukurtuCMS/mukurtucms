@@ -170,7 +170,6 @@ features[user_permission][] = administer features
 features[user_permission][] = administer fieldgroups
 features[user_permission][] = administer files
 features[user_permission][] = administer filters
-features[user_permission][] = administer flags
 features[user_permission][] = administer geofield_gmap
 features[user_permission][] = administer geofield_map configuration
 features[user_permission][] = administer google analytics
