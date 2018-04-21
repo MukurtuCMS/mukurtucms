@@ -415,6 +415,25 @@ function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
 }
 
 /**
+ * Internal function used by the helper functions.
+ */
+function _ma_cultural_protocol_get_node_types_in_cps() {
+  return [
+    'optional' => [
+      'collection',
+    ],
+    'required' => [
+      'digital_heritage',
+      'dictionary_word',
+      'calendar',
+      'discussion_space',
+      'document_library',
+    ],
+    'collab_pages' => ma_collaboration_tools_child_node_types(),
+  ];
+}
+
+/**
  * Helper function returns whether a node type *can* be in a CP (including collab pages)
  */
 function ma_cultural_protocol_node_type_can_have_cp($node_type) {
@@ -444,35 +463,3 @@ function ma_cultural_protocol_node_type_must_have_cp($node_type) {
   }
 }
 
-/**
- * Helper function returns whether a node type is a collaboration page (NOT a collaboration section).
- */
-function ma_cultural_protocol_node_type_is_collab_page($node_type) {
-  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
-  if (in_array($node_type, $node_types['collab_pages'])) {
-    return TRUE;
-  }
-}
-
-/**
- * Internal function used by the helper functions.
- */
-function _ma_cultural_protocol_get_node_types_in_cps() {
-  return [
-    'optional' => [
-      'collection',
-    ],
-    'required' => [
-      'digital_heritage',
-      'dictionary_word',
-      'calendar',
-      'discussion_space',
-      'document_library',
-     ],
-    'collab_pages' => [
-      'oa_discussion_post',
-      'oa_wiki_page',
-      'event'
-    ]
-  ];
-}

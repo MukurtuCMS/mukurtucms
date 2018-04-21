@@ -25,7 +25,7 @@ function ma_collaboration_tools_page_alter(&$data) {
       $query = new EntityFieldQuery();
       $result = $query
         ->entityCondition('entity_type', 'node')
-        ->entityCondition('bundle', ma_collaboration_tools_cp_section_node_types(), 'IN')
+        ->entityCondition('bundle', ma_collaboration_tools_parent_node_types(), 'IN')
         ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
         ->fieldCondition('og_group_ref', 'target_id', $nid)
         ->execute();
@@ -89,15 +89,53 @@ function ma_collaboration_tools_page_alter(&$data) {
 }
 
 /**
- * Helper function returns CP section node types
+ * Overall map of the collab pages types, to be used by the helper functions below.
  */
-function ma_collaboration_tools_cp_section_node_types() {
+function ma_collaboration_tools_collab_node_types_map() {
   return [
-    'calendar',
-    'discussion_space',
-    'document_library',
+    'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
+    'oa_discussion_post' => ['parent' => 'discussion_space', 'ref_field' => ''],
+    'oa_wiki_page' => ['parent' => 'document_library', 'ref_field' => ''],
   ];
 }
+
+/**
+ * Get the collab child node types
+ */
+function ma_collaboration_tools_child_node_types() {
+  return array_keys(ma_collaboration_tools_collab_node_types_map());
+}
+
+/**
+ * Get the collab parent node types
+ */
+function ma_collaboration_tools_parent_node_types() {
+  $parent_types = [];
+  foreach (ma_collaboration_tools_collab_node_types_map() as $child_type => $child_type_props) {
+    $parent_types[] = $child_type_props['parent'];
+  }
+  return $parent_types;
+}
+
+/**
+ * Get the child type from the parent type.
+ */
+function ma_collaboration_tools_get_child_from_parent($parent_type) {
+  foreach (ma_collaboration_tools_collab_node_types_map() as $child_type => $child_type_props) {
+    if ($child_type_props['parent'] == $parent_type) {
+      return $child_type;
+    }
+  }
+}
+
+/**
+ * Get the child type ref field to its parent.
+ */
+function ma_collaboration_tools_get_child_ref_field_to_parent($child_type) {
+  return ma_collaboration_tools_collab_node_types_map()[$child_type]['ref_field'];
+}
+
+
 
 /**
  * Implements hook_preprocess_page.
@@ -117,7 +155,7 @@ function ma_collaboration_tools_preprocess_page(&$variables) {
 function ma_collaboration_tools_node_view($node, $view_mode) {
 
   // Update the item privacy text on the Collab section pages node view, to make more sense in this context and to hide it if there is only one protocol.
-  if ($view_mode == 'full' && in_array($node->type, ma_collaboration_tools_cp_section_node_types())) {
+  if ($view_mode == 'full' && in_array($node->type, ma_collaboration_tools_parent_node_types())) {
     if (count($node->content['og_group_ref'][0]['#items']) < 2) {
       unset($node->content['field_item_privacy_setting'][0]['#markup']);
     }
@@ -147,32 +185,22 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
   }
 }
 
-/**
- * Get a map of the section page type to its content page type.
- */
-function ma_collaboration_tools_section_type_to_page_type_map() {
-  return [
-    'calendar' => 'event',
-    'discussion_space' => 'oa_discussion_post',
-    'document_library' => 'oa_wiki_page'
-  ];
-}
 
 /**
  * DS custom field.
  *
- * Add content to collab section link.
+ * Add content to collab parent link.
  */
 function ma_collaboration_tools_add_content_to_section_link($entity) {
-  $target_type = ma_collaboration_tools_section_type_to_page_type_map()[$entity->type];
-  $node_disp_name = node_type_get_names()[$target_type];
+  $child_type = ma_collaboration_tools_get_child_from_parent($entity->type);
+  $node_disp_name = node_type_get_names()[$child_type];
   $pronoun = 'a';
   if (in_array(strtolower($node_disp_name{0}), ['a','e','i','o','u'])) {
     $pronoun = 'an';
   }
-  $target_type_path = str_replace('_', '-', $target_type);
-  if (og_user_access_entity('create ' . $target_type . ' content', 'node', $entity)) {
-    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $target_type_path . '/' . $entity->nid, [
+  $child_type_path = str_replace('_', '-', $child_type);
+  if (og_user_access_entity('create ' . $child_type . ' content', 'node', $entity)) {
+    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $child_type_path . '/' . $entity->nid, [
       'query' => drupal_get_destination(),
     ]);
   }
@@ -195,13 +223,13 @@ function ma_collaboration_tools_edit_collab_section_link($entity) {
  * Implements hook_node_presave().
  */
 function ma_collaboration_tools_node_presave($node) {
-  if (ma_cultural_protocol_node_type_is_collab_page($node->type)) {
+  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
 
-    // Copy the protocol, community, and item sharing field values for the collab pages from their parent section.
-    $collab_page_w = entity_metadata_wrapper('node', $node);
-    $collab_section_w = entity_metadata_wrapper('node', $collab_page_w->{ma_collaboration_tools_get_collab_page_section_page_field_ref($node->type)}->value());
-    $collab_page_w->field_item_privacy_setting->set($collab_section_w->field_item_privacy_setting->value());
-    $protocols = $collab_section_w->og_group_ref->value();
+    // Copy the protocol, community, and item sharing field values for the child pages from their parent pages.
+    $child_page_w = entity_metadata_wrapper('node', $node);
+    $parent_page_w = entity_metadata_wrapper('node', $child_page_w->{ma_collaboration_tools_get_child_ref_field_to_parent($node->type)}->value());
+    $child_page_w->field_item_privacy_setting->set($parent_page_w->field_item_privacy_setting->value());
+    $protocols = $parent_page_w->og_group_ref->value();
     $protocol_nids = [];
     $community_nids = [];
     foreach ($protocols as $protocol) {
@@ -209,23 +237,11 @@ function ma_collaboration_tools_node_presave($node) {
       $community_nids[] = $protocol->og_group_ref[LANGUAGE_NONE][0]['target_id'];
     }
     if (count($protocol_nids)) {
-      $collab_page_w->og_group_ref->set(array_unique($protocol_nids));
-      $collab_page_w->field_community_ref->set(array_unique($community_nids));
+      $child_page_w->og_group_ref->set(array_unique($protocol_nids));
+      $child_page_w->field_community_ref->set(array_unique($community_nids));
     }
 
   }
-}
-
-/**
- * Helper function to get the collab page entity ref to its parent section field name.
- */
-function ma_collaboration_tools_get_collab_page_section_page_field_ref($collab_page_node_type) {
-  $field_map = [
-    'event' => 'field_event_calendar_section',
-    'oa_discussion_post' => '',
-    'oa_wiki_page' => '',
-  ];
-  return $field_map[$collab_page_node_type];
 }
 
 /**
@@ -233,16 +249,16 @@ function ma_collaboration_tools_get_collab_page_section_page_field_ref($collab_p
  */
 function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
 
-  // On Collab Pages (not collab section)
+  // On Collab child pages
   $node_type = str_replace('_node_form', '', $form_id, $count);
-  if ($count && ma_cultural_protocol_node_type_is_collab_page($node_type)) {
+  if ($count && in_array($node_type, ma_collaboration_tools_child_node_types())) {
 
     // Adding a new collab page.
     if (is_null($form['nid']['#value'])) {
 
       // Prepopulate the reference to the section page with the argument from the URL.
       if (is_numeric(arg(3))) {
-        $ref_field = ma_collaboration_tools_get_collab_page_section_page_field_ref($node_type);
+        $ref_field = ma_collaboration_tools_get_child_ref_field_to_parent($node_type);
         $form[$ref_field][LANGUAGE_NONE]['#value'] = arg(3);
       }
     }

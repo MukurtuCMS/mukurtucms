@@ -333,8 +333,8 @@ function ma_core_create_content_block() {
           'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
         ];
         if (module_exists('ma_collaboration_tools')) {
-          foreach (ma_collaboration_tools_cp_section_node_types() as $collab_section_type) {
-            $link_sources[$collab_section_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid;
+          foreach (ma_collaboration_tools_parent_node_types() as $parent_type) {
+            $link_sources[$parent_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid;
           }
         }
         break;
