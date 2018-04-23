@@ -10836,6 +10836,16 @@ a:hover {
   margin: 0;
   margin-left: 10px;
 }
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency label {
+  float: left;
+  margin-right: 1em;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency .form-control {
+  width: auto;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency #edit-submit {
+  display: none;
+}
 .view-mukurtu-collab-subscriptions ul {
   padding-left: 1em;
 }

@@ -47,6 +47,45 @@ function ma_profile_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'user-user-field_notifications_freq_def'.
+  $field_instances['user-user-field_notifications_freq_def'] = array(
+    'bundle' => 'user',
+    'default_value' => array(
+      0 => array(
+        'value' => 'Immediately',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'This can be overridden per content.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'user',
+    'field_name' => 'field_notifications_freq_def',
+    'label' => 'Notifications Email Frequency Default',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 8,
+    ),
+  );
+
   // Exported field_instance: 'user-user-og_user_node'.
   $field_instances['user-user-og_user_node'] = array(
     'bundle' => 'user',
@@ -109,14 +148,16 @@ function ma_profile_field_default_field_instances() {
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
   // Translatables
   // Included for use with string extractors like potx.
   t('Communities');
+  t('Notifications Email Frequency Default');
   t('Request message');
+  t('This can be overridden per content.');
   t('This is the text a user may send to the group administrators.');
 
   return $field_instances;

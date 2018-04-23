@@ -609,3 +609,42 @@ function ma_collaboration_tools_views_post_execute(&$view) {
     }
   }
 }
+
+/**
+ * Notification default frequency form (header of the Following view).
+ */
+function ma_collaboration_tools_notification_frequency($form, &$form_state) {
+  $account = user_load(arg(1));
+  $def_val = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'now';
+  global $user;
+  $form = [
+    'notification_frequency_default' => [
+      '#type' => 'select',
+      '#title' => t('Notification Frequency Default: '),
+      '#options' => field_info_field('field_notifications_freq_def')['settings']['allowed_values'],
+      '#default_value' => $def_val,
+      '#disabled' => $user->uid <> $account->uid ? TRUE : FALSE,
+      '#attributes' => [
+        'onChange' => 'this.form.submit();',
+      ],
+    ],
+    'submit' => [
+      '#type' => 'submit',
+      '#value' => 'Submit',
+    ],
+  ];
+  return $form;
+}
+
+/**
+ * Submit handler for the notification frequency sets the value on the user object.
+ */
+function ma_collaboration_tools_notification_frequency_submit ($form, &$form_state) {
+  $account = user_load(arg(1));
+  $existing_freq =& $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
+  $new_freq = $form_state['values']['notification_frequency_default'];
+  if ($existing_freq <> $new_freq) {
+    $existing_freq = $new_freq;
+    user_save($account);
+  }
+}

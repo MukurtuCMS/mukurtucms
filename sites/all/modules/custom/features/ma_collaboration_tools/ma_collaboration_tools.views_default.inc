@@ -786,6 +786,14 @@ function ma_collaboration_tools_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* Header: Global: PHP */
+  $handler->display->display_options['header']['php']['id'] = 'php';
+  $handler->display->display_options['header']['php']['table'] = 'views';
+  $handler->display->display_options['header']['php']['field'] = 'php';
+  $handler->display->display_options['header']['php']['php_output'] = '<?php
+$form = drupal_get_form(\'ma_collaboration_tools_notification_frequency\');
+print drupal_render($form);
+?>';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
