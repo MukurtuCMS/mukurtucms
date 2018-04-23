@@ -7917,6 +7917,7 @@ header,
 }
 .left-right-image-title > div {
   background-color: #d9d4c2;
+  position: static;
 }
 .left-right-image-title > div:hover,
 .left-right-image-title > div:focus {
@@ -7930,12 +7931,15 @@ header,
   text-decoration: none;
 }
 .left-right-image-title .field-name-title {
-  float: right;
   width: 60%;
   text-align: center;
   height: 100%;
   position: absolute;
-  right: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-20%, -60%);
+  padding-left: 20px;
+  padding-right: 20px;
 }
 .left-right-image-title .field-name-title h3 {
   margin: auto;
@@ -8592,6 +8596,7 @@ section ol.breadcrumb {
 }
 .view-mukurtu-frontpage-browse-by-community > div {
   background-color: #d9d4c2;
+  position: static;
 }
 .view-mukurtu-frontpage-browse-by-community > div:hover,
 .view-mukurtu-frontpage-browse-by-community > div:focus {
@@ -8605,12 +8610,15 @@ section ol.breadcrumb {
   text-decoration: none;
 }
 .view-mukurtu-frontpage-browse-by-community .field-name-title {
-  float: right;
   width: 60%;
   text-align: center;
   height: 100%;
   position: absolute;
-  right: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-20%, -60%);
+  padding-left: 20px;
+  padding-right: 20px;
 }
 .view-mukurtu-frontpage-browse-by-community .field-name-title h3 {
   margin: auto;

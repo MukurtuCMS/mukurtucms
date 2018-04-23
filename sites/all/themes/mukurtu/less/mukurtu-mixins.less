@@ -127,17 +127,20 @@
 
     > div {
         .primary-color-link-container;
+        position: static;
     }
 
     // Right side
     .field-name-title {
-    //div.field:nth-of-type(2) {
-        float:right;
         width: 60%;
         text-align: center;
         height: @left-right-height;
         position: absolute;
-        right: 0;
+        top: 50%;
+        left: 50%;
+        transform: translate(-20%, -60%);
+        padding-left: 20px;
+        padding-right: 20px;
 
         h3 {
             margin: auto;
@@ -175,7 +178,6 @@
 
     // Left side
     .field-name-field-community-image-thumbnail {
-    //div.field:nth-of-type(3) {
         float:left;
         width: 40%;
         img {
@@ -211,7 +213,6 @@
 
 .arrow-down {
     background: url(@mukurtu-arrow-down-path) no-repeat 0% 50%;
-    //background-position: center bottom;
 }
 
 .nav-bottom-triangle {
