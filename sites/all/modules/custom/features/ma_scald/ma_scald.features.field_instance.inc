@@ -3151,7 +3151,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'image',
         'settings' => array(
-          'image_link' => 'content',
+          'image_link' => '',
           'image_style' => 'mukurtu_theme_4_3_ratio',
         ),
         'type' => 'image',
@@ -3161,7 +3161,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'image',
         'settings' => array(
-          'image_link' => 'content',
+          'image_link' => '',
           'image_style' => 'mukurtu_theme_7_4_ratio',
         ),
         'type' => 'image',
@@ -3171,7 +3171,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'image',
         'settings' => array(
-          'image_link' => 'content',
+          'image_link' => '',
           'image_style' => 'mukurtu_theme_3_2_ratio',
         ),
         'type' => 'image',

@@ -1,5 +1,25 @@
 .nav.tabs--primary {
-    li {
+    ul,li {
+        display: inline;
+        a {
+            .mukurtu-standard-link;
+        }
+
+        a:hover {
+            background-color: transparent;
+        }
+    }
+
+    &.dropdown-menu {
+        li {
+             a.active {
+                color: @text-color;
+                border: none;
+            }
+        }
+    }
+
+    &.dropdown-menu li {
         width: 100%;
     }
 }

@@ -23,11 +23,19 @@
  */
 function mukurtu_menu_local_tasks(array &$variables) {
   $output = '';
+
   if (!empty($variables['primary'])) {
-      $variables['primary']['#prefix'] = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . t('Item Menu ') . '<span class="caret"></span></button>';
-    $variables['primary']['#prefix'] .= '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
-    $variables['primary']['#prefix'] .= '<ul class="dropdown-menu tabs--primary nav nav-tabs">';
-    $variables['primary']['#suffix'] = '</ul></div>';
+      if($variables['primary'][0]['#link']['path'] != 'user/register') {
+          $variables['primary']['#prefix'] = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . t('Page Menu ') . '<span class="caret"></span></button>';
+
+          $variables['primary']['#prefix'] .= '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
+          $variables['primary']['#prefix'] .= '<ul class="dropdown-menu tabs--primary nav nav-tabs">';
+          $variables['primary']['#suffix'] = '</ul></div>';
+      } else {
+          $variables['primary']['#prefix'] = '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
+          $variables['primary']['#prefix'] .= '<ul class="tabs--primary nav nav-tabs">';
+          $variables['primary']['#suffix'] = '</ul>';
+      }
     $output .= drupal_render($variables['primary']);
   }
 

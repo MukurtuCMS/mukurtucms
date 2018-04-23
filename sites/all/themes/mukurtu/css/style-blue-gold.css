@@ -8341,7 +8341,30 @@ section ol.breadcrumb {
 .mejs-container .mejs-controls .mejs-fullscreen-button button {
   background-position: -32px 0px;
 }
+.nav.tabs--primary ul,
 .nav.tabs--primary li {
+  display: inline;
+}
+.nav.tabs--primary ul a,
+.nav.tabs--primary li a {
+  color: #138aab;
+}
+.nav.tabs--primary ul a:hover,
+.nav.tabs--primary li a:hover,
+.nav.tabs--primary ul a:focus,
+.nav.tabs--primary li a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.nav.tabs--primary ul a:hover,
+.nav.tabs--primary li a:hover {
+  background-color: transparent;
+}
+.nav.tabs--primary.dropdown-menu li a.active {
+  color: #464646;
+  border: none;
+}
+.nav.tabs--primary.dropdown-menu li {
   width: 100%;
 }
 .view-mukurtu-frontpage-featured-content a:hover,
