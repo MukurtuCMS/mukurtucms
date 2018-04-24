@@ -19,6 +19,15 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
                 $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'collection-grid.js'));
                 drupal_add_js($js);
                 break;
+        case 'digital_heritage':
+            // Load Owl Carousel
+            $library = libraries_get_path('owlcarousel');
+            $css = join(DIRECTORY_SEPARATOR, array(libraries_get_path('owlcarousel'), 'assets', 'owl.carousel.min.css'));
+            drupal_add_css($css);
+            $js = join(DIRECTORY_SEPARATOR, array(libraries_get_path('owlcarousel'), 'owl.carousel.min.js'));
+            drupal_add_js($js);
+            $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-carousel.js'));
+            drupal_add_js($js);
         }
     }
 }

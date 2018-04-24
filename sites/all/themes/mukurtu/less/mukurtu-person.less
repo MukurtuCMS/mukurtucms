@@ -166,6 +166,7 @@
     }
 }
 
+// Related people, tiny thumbnail image
 .node-person.view-mode-related_person_teaser {
     .col-xs-3,
     .col-xs-9,
@@ -185,6 +186,11 @@
 
     .field-name-field-media-asset {
         padding-top: 10px;
+    }
+
+    // Hide extra images
+    .field-name-field-media-asset >div:not(:first-child) {
+        display: none;
     }
 }
 

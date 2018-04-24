@@ -8019,6 +8019,28 @@ header,
   border-color: #159ec4 transparent transparent transparent;
   z-index: -1;
 }
+.carousel-nav-right::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 0 15px 15px;
+  border-color: transparent transparent transparent #e6ab49;
+  z-index: 2;
+}
+.carousel-nav-left::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 15px 15px 0;
+  border-color: transparent #e6ab49 transparent transparent;
+  z-index: 2;
+}
 .item-grid-view .field {
   display: none;
 }
@@ -8251,6 +8273,40 @@ ul.pagination li a:hover,
 ul.pagination li a:focus {
   background: transparent;
   border: none;
+}
+.mukurtu-owl-carousel-single .owl-nav {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+.mukurtu-owl-carousel-single .owl-nav .owl-prev::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 15px 15px 0;
+  border-color: transparent #e6ab49 transparent transparent;
+  z-index: 2;
+}
+.mukurtu-owl-carousel-single .owl-nav .owl-next::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 0 15px 15px;
+  border-color: transparent transparent transparent #e6ab49;
+  z-index: 2;
+}
+.mukurtu-owl-carousel-single .owl-item img {
+  display: inherit;
+  width: inherit;
+}
+.mukurtu-owl-carousel-single .owl-item .field-name-scald-thumbnail {
+  text-align: center;
 }
 .scald-atom .field-name-download-atom {
   text-align: center;
@@ -8930,13 +8986,16 @@ section ol.breadcrumb {
 }
 @media (min-width: 768px) {
   #quicktabs-community-record .quicktabs-tabs li.active::after {
-    background: url(../images/icons/triangle_arrow_down.svg) no-repeat 0% 50%;
     content: "";
+    display: inline-block;
     position: relative;
-    bottom: 1px;
-    background-size: 20px 12px;
-    left: 44%;
-    z-index: 10;
+    left: 50%;
+    margin-left: -9%;
+    top: -1px;
+    border-style: solid;
+    border-width: 15px 15px 0 15px;
+    border-color: #159ec4 transparent transparent transparent;
+    z-index: 2;
   }
 }
 #quicktabs-community-record .quicktabs-tabs li:first-of-type {
@@ -9049,6 +9108,7 @@ section ol.breadcrumb {
 @media (min-width: 992px) {
   .large-teaser-box .field-name-node-link {
     display: block;
+    padding-bottom: 20px;
   }
   .large-teaser-box .field-name-node-link a {
     background-image: url(../images/icons/chevronright.svg);
@@ -10135,6 +10195,9 @@ section ol.breadcrumb {
 }
 .node-person.view-mode-related_person_teaser .field-name-field-media-asset {
   padding-top: 10px;
+}
+.node-person.view-mode-related_person_teaser .field-name-field-media-asset > div:not(:first-child) {
+  display: none;
 }
 .paragraphs-items-field-sections-full {
   /*h3 {

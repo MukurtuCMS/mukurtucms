@@ -7903,7 +7903,7 @@ header,
   background-color: #c9c2a8;
 }
 .primary-color-link-container a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .primary-color-link-container a:hover,
 .primary-color-link-container a:focus {
@@ -7924,7 +7924,7 @@ header,
   background-color: #c9c2a8;
 }
 .left-right-image-title > div a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .left-right-image-title > div a:hover,
 .left-right-image-title > div a:focus {
@@ -8018,6 +8018,28 @@ header,
   border-width: 11px 10px 0 10px;
   border-color: #ac143a transparent transparent transparent;
   z-index: -1;
+}
+.carousel-nav-right::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 0 15px 15px;
+  border-color: transparent transparent transparent #d9d4c2;
+  z-index: 2;
+}
+.carousel-nav-left::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 15px 15px 0;
+  border-color: transparent #d9d4c2 transparent transparent;
+  z-index: 2;
 }
 .item-grid-view .field {
   display: none;
@@ -8251,6 +8273,40 @@ ul.pagination li a:hover,
 ul.pagination li a:focus {
   background: transparent;
   border: none;
+}
+.mukurtu-owl-carousel-single .owl-nav {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+.mukurtu-owl-carousel-single .owl-nav .owl-prev::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 15px 15px 0;
+  border-color: transparent #d9d4c2 transparent transparent;
+  z-index: 2;
+}
+.mukurtu-owl-carousel-single .owl-nav .owl-next::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 0 15px 15px;
+  border-color: transparent transparent transparent #d9d4c2;
+  z-index: 2;
+}
+.mukurtu-owl-carousel-single .owl-item img {
+  display: inherit;
+  width: inherit;
+}
+.mukurtu-owl-carousel-single .owl-item .field-name-scald-thumbnail {
+  text-align: center;
 }
 .scald-atom .field-name-download-atom {
   text-align: center;
@@ -8603,7 +8659,7 @@ section ol.breadcrumb {
   background-color: #c9c2a8;
 }
 .view-mukurtu-frontpage-browse-by-community > div a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .view-mukurtu-frontpage-browse-by-community > div a:hover,
 .view-mukurtu-frontpage-browse-by-community > div a:focus {
@@ -8668,7 +8724,7 @@ section ol.breadcrumb {
   background-color: #c9c2a8;
 }
 .top-bottom-image-title .field-name-taxonomy-title-browse-link a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .top-bottom-image-title .field-name-taxonomy-title-browse-link a:hover,
 .top-bottom-image-title .field-name-taxonomy-title-browse-link a:focus {
@@ -8930,13 +8986,16 @@ section ol.breadcrumb {
 }
 @media (min-width: 768px) {
   #quicktabs-community-record .quicktabs-tabs li.active::after {
-    background: url(../images/icons/triangle_arrow_down_red.svg) no-repeat 0% 50%;
     content: "";
+    display: inline-block;
     position: relative;
-    bottom: 1px;
-    background-size: 20px 12px;
-    left: 44%;
-    z-index: 10;
+    left: 50%;
+    margin-left: -9%;
+    top: -1px;
+    border-style: solid;
+    border-width: 15px 15px 0 15px;
+    border-color: #ac143a transparent transparent transparent;
+    z-index: 2;
   }
 }
 #quicktabs-community-record .quicktabs-tabs li:first-of-type {
@@ -8981,7 +9040,7 @@ section ol.breadcrumb {
   background-color: #c9c2a8;
 }
 .large-teaser-box a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .large-teaser-box a:hover,
 .large-teaser-box a:focus {
@@ -9049,6 +9108,7 @@ section ol.breadcrumb {
 @media (min-width: 992px) {
   .large-teaser-box .field-name-node-link {
     display: block;
+    padding-bottom: 20px;
   }
   .large-teaser-box .field-name-node-link a {
     background-image: url(../images/icons/chevronright_red.svg);
@@ -9110,7 +9170,7 @@ section ol.breadcrumb {
   background-color: #c9c2a8;
 }
 #views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn a {
-  color: #ac143a;
+  color: #ffffff;
 }
 #views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn a:hover,
 #views-exposed-form-collections-all .views-exposed-form .views-exposed-widget .btn a:focus {
@@ -9170,7 +9230,7 @@ section ol.breadcrumb {
 }
 .node-word-list.view-mode-full > div:first-of-type a,
 .node-collection.view-mode-full > div:first-of-type a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .node-word-list.view-mode-full > div:first-of-type a:hover,
 .node-collection.view-mode-full > div:first-of-type a:hover,
@@ -9602,7 +9662,7 @@ section ol.breadcrumb {
 }
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status a,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status a:hover,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:hover,
@@ -9680,7 +9740,7 @@ section ol.breadcrumb {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .field .label-above {
-  background-color: #eeeaea;
+  background-color: #d9d4c2;
   font-weight: bold;
   font-size: 14px;
   text-transform: uppercase;
@@ -9698,7 +9758,7 @@ section ol.breadcrumb {
 }
 .paragraphs-item-dictionary-word-bundle.view-mode-full .field-name-field-alternate-spelling {
   background-color: #ac143a;
-  color: #ac143a;
+  color: #ffffff;
   margin-bottom: 30px;
   padding: 5px 5px 5px 20px;
   font-size: 30px;
@@ -9944,7 +10004,7 @@ section ol.breadcrumb {
   background-color: #c9c2a8;
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a {
-  color: #ac143a;
+  color: #ffffff;
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a:hover,
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a:focus {
@@ -10135,6 +10195,9 @@ section ol.breadcrumb {
 }
 .node-person.view-mode-related_person_teaser .field-name-field-media-asset {
   padding-top: 10px;
+}
+.node-person.view-mode-related_person_teaser .field-name-field-media-asset > div:not(:first-child) {
+  display: none;
 }
 .paragraphs-items-field-sections-full {
   /*h3 {

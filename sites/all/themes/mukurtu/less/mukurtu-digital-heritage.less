@@ -132,13 +132,16 @@
                 // Tablet
                 @media (min-width: @screen-sm-min) {
                     &::after {
-                        .arrow-down;
-                        content: "";
+                        content : "";
+                        display: inline-block;
                         position: relative;
-                        bottom: 1px;
-                        background-size: 20px 12px;
-                        left: 44%;
-                        z-index: 10;
+                        left: 50%;
+                        margin-left: -9%;
+                        top: -1px;
+                        border-style: solid;
+                        border-width: 15px 15px 0 15px;
+                        border-color: @brand-primary transparent transparent transparent;
+                        z-index: 2;
                     }
                 }
             }
