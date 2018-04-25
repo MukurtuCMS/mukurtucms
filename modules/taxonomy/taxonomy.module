@@ -1418,17 +1418,13 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
     if (!isset($vid) || $tag->vid == $vid) {
       // Make sure we have a completed loaded taxonomy term.
       if (isset($tag->name)) {
-        // Commas and quotes in tag names are special cases, so encode 'em.
-        if (strpos($tag->name, ',') !== FALSE || strpos($tag->name, '"') !== FALSE) {
-          $typed_tags[] = '"' . str_replace('"', '""', $tag->name) . '"';
-        }
-        else {
-          $typed_tags[] = $tag->name;
-        }
+        // Mukurtu patch -- no special treatment for commas and quotes
+        $typed_tags[] = $tag->name;
       }
     }
   }
-  return implode(', ', $typed_tags);
+  // Mukurtu patch -- delimit by the semicolon instead of comma
+  return implode('; ', $typed_tags);
 }
 
 /**
@@ -1765,7 +1761,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     }
 
     // Translate term names into actual terms.
-    $typed_terms = drupal_explode_tags($tags);
+    $typed_terms = ma_core_taxonomy_explode_tags($tags);
     foreach ($typed_terms as $typed_term) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.
