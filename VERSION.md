@@ -1,3 +1,10 @@
+## Mukurtu 2.0.11
+- Critical security update for Drupal core from 7.58 to 7.59.
+- Critical security update for Media module from 2.10 to 2.19.
+- Non-critical udate for File Entity module from 2.4 to 2.20, to go along with the Media module updte.
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
 ## Mukurtu 2.0.10
 - Critical security update for Display Suite from 2.14 to 2.15.
 #### Manual Upgrade Steps
