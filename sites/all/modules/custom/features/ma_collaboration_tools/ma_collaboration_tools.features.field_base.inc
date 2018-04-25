@@ -34,6 +34,37 @@ function ma_collaboration_tools_field_default_field_bases() {
     'type' => 'file',
   );
 
+  // Exported field_base: 'field_custom_notification_freq'.
+  $field_bases['field_custom_notification_freq'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_custom_notification_freq',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'double_field',
+    'settings' => array(
+      'first' => array(
+        'maxlength' => 255,
+        'precision' => 10,
+        'scale' => 2,
+        'size' => 'normal',
+        'type' => 'int',
+      ),
+      'second' => array(
+        'maxlength' => 255,
+        'precision' => 10,
+        'scale' => 2,
+        'size' => 'normal',
+        'type' => 'varchar',
+      ),
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'double_field',
+  );
+
   // Exported field_base: 'field_event_calendar_section'.
   $field_bases['field_event_calendar_section'] = array(
     'active' => 1,

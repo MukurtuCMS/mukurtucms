@@ -1450,22 +1450,34 @@ a.tooltips span {
   }
 }
 
-// User following view
-.view-mukurtu-collab-subscriptions {
-  #ma-collaboration-tools-notification-frequency {
-    label {
-      float: left;
-      margin-right: 1em;
-    }
-    .form-control {
-      width: auto;
-    }
-    #edit-submit {
-      display: none;
-    }
+// Following popup
+.class-follow-unfollow-popup {
+  label {
+    font-weight: normal;
   }
   ul {
-    padding-left: 1em;
+    margin-bottom: 1em;
+  }
+  li {
+    margin-left: 1em;
+  }
+ .notification-popup-header {
+   font-weight: bold;
+ }
+}
+
+// The notification frequency form (in two places)
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default, .class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node {
+  label {
+    float: left;
+    margin-right: 0.5em;
+  }
+  .form-control {
+    width: auto;
+  }
+  #edit-submit {
+    display: none;
   }
 }
+
 

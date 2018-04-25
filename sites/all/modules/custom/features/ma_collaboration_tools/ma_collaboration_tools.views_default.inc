@@ -791,7 +791,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['header']['php']['table'] = 'views';
   $handler->display->display_options['header']['php']['field'] = 'php';
   $handler->display->display_options['header']['php']['php_output'] = '<?php
-$form = drupal_get_form(\'ma_collaboration_tools_notification_frequency\');
+$form = drupal_get_form(\'ma_collaboration_tools_notification_frequency_default\');
 print drupal_render($form);
 ?>';
   /* No results behavior: Global: Text area */

@@ -412,23 +412,49 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   // Create output.
   if ($following) {
     $output = l('<button class="btn btn-default">UnFollow</button>', 'node/' . $entity->nid . '/unfollow', ['html' => TRUE]);
-    $link_text = "You are receiving notifications.";
+    $output .= "<br />You are receiving notifications. ";
   }
   else {
     $output = l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
-    $link_text = "Follow to receive notifications.";
+    $output .= "<br />Follow to receive notifications. ";
   }
 
+  // Popup text Following.
+  if ($following) {
+    $popup_text = '<p class="notification-popup-header">You are receiving notifications on this item because:</p>';
+  }
+  else {
+    $popup_text = '<p class="notification-popup-header">You are not receiving notifications on this item because:</p>';
+  }
+  $popup_text .= $reasons;
+
+  if ($following) {
+    // Popup text Frequency.
+    $popup_text .= '<p><span class="notification-popup-header">Notification frequency:</span> ';
+    $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $user->field_notifications_freq_def['und'][0]['value'] : 'right away';
+    $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $user);
+    if ($node_freq) {
+      $popup_text .= $node_freq . ' (using override)';
+    }
+    else {
+      $popup_text .= $def_freq . ' ' . l('(using default)', '/user/' . $user->uid . '/following');
+    }
+    $popup_text .= '</p>';
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node', $entity->nid, $def_freq, $node_freq);
+    $popup_text .= drupal_render($form);
+  }
+
+  // Generate the popup
   require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
   $popup_attributes = array (
     'style' => 'Bent white',
     'origin' => 'top-left',
     'expand' => 'top-left',
-    'width' => '200',
+    'width' => '400',
     'class' => 'follow-unfollow-popup',
     // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
   );
-  $output .= popup_element($link_text, $reasons, $popup_attributes);
+  $output .= popup_element('Details.', $popup_text, $popup_attributes);
 
   return $output;
 
@@ -446,7 +472,7 @@ function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) 
     foreach ($entity->field_following_users[LANGUAGE_NONE] AS $following_user) {
       if ($uid == $following_user['target_id']) {
         $following = TRUE;
-        $reasons[] = 'Individually following';
+        $reasons[] = 'you have individually followed this item';
         break;
       }
     }
@@ -466,12 +492,12 @@ function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) 
 
   // Individually unfollowing
   if (count($following_by_protocol)) {
-    $reasons[] = 'Member of: ' . implode(', ', $following_by_protocol);
+    $reasons[] = 'you are a member of: ' . implode(', ', $following_by_protocol);
     if (isset($entity->field_un_following_users[LANGUAGE_NONE])) {
       foreach ($entity->field_un_following_users[LANGUAGE_NONE] AS $unfollowing_user) {
         if ($uid == $unfollowing_user['target_id']) {
           $following = FALSE;
-          $reasons[] = 'Individually unfollowing';
+          $reasons[] = 'you have individually unfollowed this item';
           break;
         }
       }
@@ -480,22 +506,17 @@ function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) 
   // Has no explicitly followed, followed by group, or unfollowed.
   if (!isset($following)) {
     $following = FALSE;
-    $reasons[] = 'Never followed';
+    $reasons[] = 'you have never followed this item';
 
   }
 
-  // Build reasons into a list if multiple, otherwise return single reason.
-  if (count($reasons) > 1) {
-    $reasons = theme_item_list([
-      'items' => $reasons,
-      'title' => '',
-      'type' => 'ul',
-      'attributes' => []
-    ]);
-  }
-  else {
-    $reasons = $reasons[0];
-  }
+  // Build reasons into a list, even if just one.
+  $reasons = theme_item_list([
+    'items' => $reasons,
+    'title' => '',
+    'type' => 'ul',
+    'attributes' => []
+  ]);
 
   // Return results.
   return [$following, $reasons];
@@ -611,11 +632,11 @@ function ma_collaboration_tools_views_post_execute(&$view) {
 }
 
 /**
- * Notification default frequency form (header of the Following view).
+ * Notification default frequency form  (header of the Following view).
  */
-function ma_collaboration_tools_notification_frequency($form, &$form_state) {
+function ma_collaboration_tools_notification_frequency_default($form, &$form_state) {
   $account = user_load(arg(1));
-  $def_val = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'now';
+  $def_val = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
   global $user;
   $form = [
     'notification_frequency_default' => [
@@ -639,12 +660,82 @@ function ma_collaboration_tools_notification_frequency($form, &$form_state) {
 /**
  * Submit handler for the notification frequency sets the value on the user object.
  */
-function ma_collaboration_tools_notification_frequency_submit ($form, &$form_state) {
+function ma_collaboration_tools_notification_frequency_default_submit ($form, &$form_state) {
   $account = user_load(arg(1));
   $existing_freq =& $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
   $new_freq = $form_state['values']['notification_frequency_default'];
   if ($existing_freq <> $new_freq) {
     $existing_freq = $new_freq;
     user_save($account);
+  }
+}
+
+function ma_collaboration_tools_get_user_node_notification_frequency($node, $user) {
+  if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
+    foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
+      if ($custom_frequency['first'] == $user->uid) {
+        return $custom_frequency['second'];
+      }
+    }
+  }
+}
+
+/**
+ * Notification node frequency form (in the node frequency popup as well as a column in the Following view).
+ */
+function ma_collaboration_tools_notification_frequency_node($form, &$form_state, $nid, $def_freq, $node_freq) {
+
+  $options = ['use default' => 'Use Default (' . ucwords($def_freq) . ')'] + field_info_field('field_notifications_freq_def')['settings']['allowed_values'];
+  $form = [
+    'notification_frequency_node' => [
+      '#type' => 'select',
+      '#title' => t('Override: '),
+      '#options' => $options,
+      '#default_value' => isset($node_freq) ? $node_freq : 'use default',
+      '#attributes' => [
+        'onChange' => 'this.form.submit();',
+      ],
+    ],
+    'nid' => [
+      '#type' => 'value',
+      '#value' => $nid,
+    ],
+    'submit' => [
+      '#type' => 'submit',
+      '#value' => 'Submit',
+    ],
+  ];
+  return $form;
+}
+
+/**
+ * Submit handler for the notification frequency sets the value on the node for the user, or unsets it if using default.
+ */
+function ma_collaboration_tools_notification_frequency_node_submit ($form, &$form_state) {
+  global $user;
+  $val = $form_state['values']['notification_frequency_node'];
+  $node = node_load ($form_state['values']['nid']);
+  if ($val == 'use default') {
+    foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $i => $custom_frequency) {
+      if ($custom_frequency['first'] == $user->uid) {
+        unset ($node->field_custom_notification_freq[LANGUAGE_NONE][$i]);
+        node_save($node);
+        return;
+      }
+    }
+  }
+  else {
+    if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
+      foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $i => $custom_frequency) {
+        if ($custom_frequency['first'] == $user->uid) {
+          unset ($node->field_custom_notification_freq[LANGUAGE_NONE][$i]);
+        }
+      }
+    }
+    $node->field_custom_notification_freq[LANGUAGE_NONE][] = [
+      'first' => $user->uid,
+      'second' => $val,
+    ];
+    node_save($node);
   }
 }

@@ -1122,7 +1122,91 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 12,
+      'weight' => 13,
+    ),
+  );
+
+  // Exported field_instance: 'node-event-field_custom_notification_freq'.
+  $field_instances['node-event-field_custom_notification_freq'] = array(
+    'bundle' => 'event',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'double_field',
+        'settings' => array(
+          'first' => array(
+            'format' => '_none',
+            'hidden' => 0,
+            'prefix' => '',
+            'suffix' => ':&nbsp;',
+          ),
+          'second' => array(
+            'format' => '_none',
+            'hidden' => 0,
+            'prefix' => '',
+            'suffix' => '',
+          ),
+          'style' => 'inline',
+        ),
+        'type' => 'double_field_unformatted_list',
+        'weight' => 16,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_custom_notification_freq',
+    'label' => 'Custom Notification Frequencies',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'double_field',
+      'settings' => array(
+        'first' => array(
+          'general' => array(
+            'prefix' => '',
+            'required' => 1,
+            'suffix' => '',
+          ),
+          'textfield' => array(
+            'placeholder' => '',
+            'size' => 10,
+          ),
+        ),
+        'inline' => 1,
+        'second' => array(
+          'general' => array(
+            'prefix' => '',
+            'required' => 1,
+            'suffix' => '',
+          ),
+          'textfield' => array(
+            'placeholder' => '',
+            'size' => 10,
+          ),
+        ),
+        'treeable' => 0,
+      ),
+      'type' => 'textfield_&_textfield',
+      'weight' => 17,
     ),
   );
 
@@ -1188,7 +1272,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 11,
+      'weight' => 12,
     ),
   );
 
@@ -1423,7 +1507,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 14,
+      'weight' => 15,
     ),
   );
 
@@ -1698,7 +1782,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'geocoder',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -2042,7 +2126,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 13,
+      'weight' => 14,
     ),
   );
 
@@ -3116,6 +3200,7 @@ http://www.whitehouse.gov/',
   t('Body');
   t('Calendar');
   t('Community');
+  t('Custom Notification Frequencies');
   t('Describe the Event');
   t('Description');
   t('Enter the Discussion Post Content Here');

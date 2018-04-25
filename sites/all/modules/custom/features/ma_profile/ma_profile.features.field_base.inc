@@ -26,9 +26,9 @@ function ma_profile_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        'now' => 'Immediately',
-        'daily' => 'Daily Digest',
-        'weekly' => 'Weekly Digest',
+        'right away' => 'Right Away',
+        'daily digest' => 'Daily Digest',
+        'weekly digest' => 'Weekly Digest',
       ),
       'allowed_values_function' => '',
       'treeable' => 0,

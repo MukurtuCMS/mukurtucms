@@ -10836,16 +10836,28 @@ a:hover {
   margin: 0;
   margin-left: 10px;
 }
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency label {
-  float: left;
-  margin-right: 1em;
+.class-follow-unfollow-popup label {
+  font-weight: normal;
 }
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency .form-control {
+.class-follow-unfollow-popup ul {
+  margin-bottom: 1em;
+}
+.class-follow-unfollow-popup li {
+  margin-left: 1em;
+}
+.class-follow-unfollow-popup .notification-popup-header {
+  font-weight: bold;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default label,
+.class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node label {
+  float: left;
+  margin-right: 0.5em;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default .form-control,
+.class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node .form-control {
   width: auto;
 }
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency #edit-submit {
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default #edit-submit,
+.class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node #edit-submit {
   display: none;
-}
-.view-mukurtu-collab-subscriptions ul {
-  padding-left: 1em;
 }

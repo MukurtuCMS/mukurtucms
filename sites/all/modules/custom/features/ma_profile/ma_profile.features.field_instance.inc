@@ -52,7 +52,7 @@ function ma_profile_field_default_field_instances() {
     'bundle' => 'user',
     'default_value' => array(
       0 => array(
-        'value' => 'Immediately',
+        'value' => 'right away',
       ),
     ),
     'deleted' => 0,
