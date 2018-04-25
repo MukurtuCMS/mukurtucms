@@ -168,7 +168,7 @@ function media_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     foreach ($items as $item) {
       $elements[$delta] = $element;
       $elements[$delta]['#default_value'] = $item;
-      $elements[$delta]['#weight'] = $delta;
+      $elements[$delta]['#weight'] = isset($item['_weight']) ? $item['_weight'] : $delta;
       $delta++;
     }
     // And then add one more empty row for new uploads except when this is a
