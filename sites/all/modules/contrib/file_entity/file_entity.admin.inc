@@ -385,6 +385,7 @@ function file_entity_admin_files() {
   foreach ($files as $file) {
     $file_type = file_type_load($file->type);
     $account = isset($accounts[$file->uid]) ? $accounts[$file->uid] : NULL;
+    $total_count = (int) isset($result[$file->fid]->total_count) ? $result[$file->fid]->total_count : 0;
     $options[$file->fid] = array(
       'title' => array(
         'data' => array(
@@ -397,7 +398,7 @@ function file_entity_admin_files() {
       'size' => format_size($file->filesize),
       'author' => theme('username', array('account' => $account)),
       'timestamp' => format_date($file->timestamp, 'short'),
-      'usage' => format_plural((int) $result[$file->fid]->total_count, '1 place', '@count places'),
+      'usage' => format_plural($total_count, '1 place', '@count places'),
     );
 
     // Show a warning for files that do not exist.
@@ -611,6 +612,7 @@ function file_entity_list_types_page() {
     switch ($type->ctools_type) {
       // Configuration is in code.
       case 'Default':
+      case t('Default'):
         if (!empty($type->disabled)) {
           $row[] = l(t('enable'), $admin_path . '/enable');
         }
@@ -621,6 +623,7 @@ function file_entity_list_types_page() {
 
       // Configuration is in DB.
       case 'Normal':
+      case t('Normal'):
         if (!empty($type->disabled)) {
           $status = l(t('enable'), $admin_path . '/enable');
         }
@@ -632,6 +635,7 @@ function file_entity_list_types_page() {
 
       // Configuration is in code, but overridden in DB.
       case 'Overridden':
+      case t('Overridden'):
         if (!empty($type->disabled)) {
           $row[] = l(t('enable'), $admin_path . '/enable');
         }
@@ -1083,11 +1087,28 @@ function file_entity_settings_form($form, &$form_state) {
     '#element_validate' => array('_file_generic_settings_max_filesize'),
   );
 
+  $form['file_entity_default_file_directory'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default file directory'),
+    '#default_value' => variable_get('file_entity_default_file_directory', ''),
+    '#maxlength' => NULL,
+  );
+  if (module_exists('token')) {
+    $form['file_entity_default_file_directory']['#description'] = t('Optional subdirectory within the upload destination where files will be stored if the file is uploaded through the file entity overview page and the directory is not specified otherwise. Do not include preceding or trailing slashes. This field supports tokens.  Suggest using: [current-date:custom:Y]/[current-date:custom:m]/[current-date:custom:d]');
+    $form['file_entity_default_file_directory']['tokens'] = array(
+      '#theme' => 'token_tree',
+      '#dialog' => TRUE,
+    );
+  }
+  else {
+    $form['file_entity_default_file_directory']['#description'] = t('Optional subdirectory within the upload destination where files will be stored if the file is uploaded through the file entity overview page and the directory is not specified otherwise. Do not include preceding or trailing slashes.');
+  }
+
   $form['file_entity_default_allowed_extensions'] = array(
     '#type' => 'textfield',
     '#title' => t('Default allowed file extensions'),
     '#default_value' => variable_get('file_entity_default_allowed_extensions', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm'),
-    '#description' => t('Separate extensions with a space or comma and do not include the leading dot.'),
+    '#description' => t('Separate extensions with a space and do not include the leading dot.'),
     '#maxlength' => NULL,
   );
 
@@ -1138,6 +1159,19 @@ function file_entity_settings_form($form, &$form_state) {
     '#title' => t('Skip available fields.'),
     '#default_value' => variable_get('file_entity_file_upload_wizard_skip_fields', FALSE),
     '#description' => t('The field selection step is only available if the file type the file belongs to has any available fields. If this step is skipped, any fields on the file will be left blank.'),
+  );
+  $form['file_replace_options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('File replace optons'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#description' => t('Default settings for how to handle file name changes during replace.'),
+  );
+  $form['file_replace_options']['file_entity_file_replace_options_keep_original_filename'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Keep original file name'),
+    '#default_value' => variable_get('file_entity_file_replace_options_keep_original_filename', FALSE),
+    '#description' => t('Rename the newly uploaded file to the name of the original file. This action cannot be undone.'),
   );
 
   return system_settings_form($form);
