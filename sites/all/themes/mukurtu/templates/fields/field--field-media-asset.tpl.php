@@ -53,7 +53,7 @@
     }
     $carousel_class = "";
     if(count($items) > 1) {
-        $carousel_class = "slick-carousel";
+        $carousel_class = "slick-carousel-single slick-carousel";
         print "<h1>Standard Carousel Test</h1>";
     }
 ?>
@@ -82,12 +82,12 @@
     }
     $carousel_class = "";
     if(count($items) > 1) {
-        $carousel_class = "slick-carousel-slider-for";
+        $carousel_class = "slick-carousel-slider-for slick-carousel";
     }
 ?>
 <?php if (count($items) > 1): ?>
 <h2>DH Multiple Media Items Carousel Test</h2>
-<div class="slick-carousel-slider-nav">
+<div class="slick-carousel-slider-nav slick-carousel">
     <?php foreach ($items as $delta => $item): ?>
       <div class="<?php print $delta % 2 ? 'odd' : 'even'; ?>">
          <?php

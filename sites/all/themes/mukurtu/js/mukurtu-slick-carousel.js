@@ -1,6 +1,6 @@
 jQuery(document).ready(function($){
     $(window).load(function() {
-	$('.slick-carousel').slick({
+	$('.slick-carousel-single').slick({
 	    dots: true,
 	    infinite: true,
 	    speed: 300,

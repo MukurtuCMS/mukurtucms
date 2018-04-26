@@ -8276,11 +8276,11 @@ ul.pagination li a:focus {
   background: transparent;
   border: none;
 }
-.slick-carousel button.slick-arrow,
+.slick-carousel-single button.slick-arrow,
 .slick-carousel-slider-for button.slick-arrow {
   height: 50px;
 }
-.slick-carousel .slick-prev::before,
+.slick-carousel-single .slick-prev::before,
 .slick-carousel-slider-for .slick-prev::before {
   content: "";
   display: inline-block;
@@ -8293,7 +8293,7 @@ ul.pagination li a:focus {
   border-color: transparent #d9d4c2 transparent transparent;
   z-index: 2;
 }
-.slick-carousel .slick-next::before,
+.slick-carousel-single .slick-next::before,
 .slick-carousel-slider-for .slick-next::before {
   content: "";
   display: inline-block;
@@ -8306,20 +8306,20 @@ ul.pagination li a:focus {
   border-color: transparent transparent transparent #d9d4c2;
   z-index: 2;
 }
-.slick-carousel .slick-slide .field-name-download-atom,
+.slick-carousel-single .slick-slide .field-name-download-atom,
 .slick-carousel-slider-for .slick-slide .field-name-download-atom {
   padding-bottom: 20px;
 }
-.slick-carousel .slick-slide img,
+.slick-carousel-single .slick-slide img,
 .slick-carousel-slider-for .slick-slide img {
   display: inherit;
   width: inherit;
 }
-.slick-carousel .slick-slide .scald-file-icon,
+.slick-carousel-single .slick-slide .scald-file-icon,
 .slick-carousel-slider-for .slick-slide .scald-file-icon {
   display: inline;
 }
-.slick-carousel .slick-slide .field-name-scald-thumbnail,
+.slick-carousel-single .slick-slide .field-name-scald-thumbnail,
 .slick-carousel-slider-for .slick-slide .field-name-scald-thumbnail {
   text-align: center;
 }
