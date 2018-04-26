@@ -155,6 +155,7 @@ features[scald_context_config][] = ma_colorbox
 features[scald_context_config][] = ma_scald_search_results
 features[scald_context_config][] = mukurtu_browse_by_grid
 features[scald_context_config][] = mukurtu_browse_by_grid_7_4
+features[scald_context_config][] = mukurtu_carousel_thumbnail
 features[scald_context_config][] = mukurtu_featured_content
 features[scald_context_config][] = mukurtu_scald_banner_image
 features[scald_context_config][] = mukurtu_scald_dictionary_media

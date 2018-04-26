@@ -1,4 +1,5 @@
-.slick-carousel {
+.slick-carousel,
+.slick-carousel-slider-for {
     button.slick-arrow {
         height: 50px;
     }
@@ -27,6 +28,26 @@
 
         .field-name-scald-thumbnail {
             text-align: center;
+        }
+    }
+}
+
+.slick-carousel-slider-nav {
+    .slick-slide {
+        padding: 10px;
+    }
+
+    .slick-prev {
+        .carousel-nav-left;
+        &::before {
+            top: -5px;
+        }
+    }
+
+    .slick-next {
+        .carousel-nav-right;
+        &::before {
+            top: -5px;
         }
     }
 }

@@ -67,6 +67,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -146,6 +152,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -224,6 +236,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
@@ -310,6 +328,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
@@ -414,6 +438,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 2,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -486,6 +516,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 3,
       ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -579,6 +615,16 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 1,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'mukurtu_theme_3_2_ratio',
+        ),
+        'type' => 'image',
+        'weight' => 0,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'hidden',
         'module' => 'image',
@@ -671,6 +717,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -744,6 +796,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -812,6 +870,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 3,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
@@ -902,6 +966,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 6,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -962,6 +1032,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 4,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'hidden',
@@ -1031,6 +1107,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 5,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1099,6 +1181,16 @@ function ma_scald_field_default_field_instances() {
         ),
         'type' => 'image',
         'weight' => 1,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'mukurtu_theme_3_2_ratio',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'hidden',
@@ -1189,6 +1281,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 15,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1315,6 +1413,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 9,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 9,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1406,6 +1510,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 16,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1514,6 +1624,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 11,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1607,6 +1723,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 14,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1732,6 +1854,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 19,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1828,6 +1956,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 10,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 10,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1943,6 +2077,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 13,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2053,6 +2193,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 8,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2154,6 +2300,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 17,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -2266,6 +2418,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 6,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2363,6 +2521,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 5,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -2474,6 +2638,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 12,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2573,6 +2743,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 7,
       ),
       'mukurtu_browse_by_grid_7_4' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -2688,6 +2864,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 18,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2793,6 +2975,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 4,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2889,8 +3077,13 @@ function ma_scald_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => TRUE,
+          'use_content_language' => TRUE,
+          'view_mode' => 'default',
+        ),
+        'type' => 'entityreference_entity_view',
         'weight' => 1,
       ),
       'ma_colorbox' => array(
@@ -2924,6 +3117,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 1,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'hidden',
@@ -2995,8 +3194,13 @@ function ma_scald_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => TRUE,
+          'use_content_language' => TRUE,
+          'view_mode' => 'default',
+        ),
+        'type' => 'entityreference_entity_view',
         'weight' => 2,
       ),
       'ma_colorbox' => array(
@@ -3030,6 +3234,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 2,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
       ),
       'mukurtu_featured_content' => array(
         'label' => 'above',
@@ -3167,6 +3377,16 @@ function ma_scald_field_default_field_instances() {
         'type' => 'image',
         'weight' => 0,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'mukurtu_theme_3_2_ratio',
+        ),
+        'type' => 'image',
+        'weight' => 0,
+      ),
       'mukurtu_featured_content' => array(
         'label' => 'hidden',
         'module' => 'image',
@@ -3272,9 +3492,8 @@ function ma_scald_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'hidden',
         'weight' => 7,
       ),
       'ma_colorbox' => array(
@@ -3288,6 +3507,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'mukurtu_scald_dictionary_media' => array(
         'label' => 'above',
@@ -3352,6 +3577,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
+      ),
       'mukurtu_scald_dictionary_media' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3414,6 +3645,12 @@ function ma_scald_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'mukurtu_scald_dictionary_media' => array(
         'label' => 'above',
@@ -3498,6 +3735,12 @@ function ma_scald_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 2,
       ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'mukurtu_scald_dictionary_media' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3550,6 +3793,12 @@ function ma_scald_field_default_field_instances() {
         'weight' => 3,
       ),
       'ma_scald_search_results' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -3613,6 +3862,16 @@ function ma_scald_field_default_field_instances() {
         ),
         'type' => 'image',
         'weight' => 1,
+      ),
+      'mukurtu_carousel_thumbnail' => array(
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'mukurtu_theme_3_2_ratio',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
       'mukurtu_scald_dictionary_media' => array(
         'label' => 'above',

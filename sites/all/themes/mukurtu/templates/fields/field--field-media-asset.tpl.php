@@ -54,6 +54,7 @@
     $carousel_class = "";
     if(count($items) > 1) {
         $carousel_class = "slick-carousel";
+        print "<h1>Standard Carousel Test</h1>";
     }
 ?>
 <div class="<?php print $classes; ?>"<?php print $attributes; ?>>
@@ -68,3 +69,50 @@
     <?php endforeach; ?>
   </div>
 </div>
+
+
+
+
+
+
+<?php
+    $id="mukurtu-carousel";
+    if(isset($element['#object']->nid)) {
+       $id .= '-' . $element['#object']->nid;
+    }
+    $carousel_class = "";
+    if(count($items) > 1) {
+        $carousel_class = "slick-carousel-slider-for";
+    }
+?>
+<?php if (count($items) > 1): ?>
+<h2>DH Multiple Media Items Carousel Test</h2>
+<div class="slick-carousel-slider-nav">
+    <?php foreach ($items as $delta => $item): ?>
+      <div class="<?php print $delta % 2 ? 'odd' : 'even'; ?>">
+         <?php
+             $sid = $element['#object']->field_media_asset[LANGUAGE_NONE][$delta]['sid'];
+//             $atom = scald_atom_load($sid);
+//dpm($atom);
+             $rendered_thumnail = scald_render($sid, 'mukurtu_carousel_thumbnail');
+             if($rendered_thumnail) {
+                 print $rendered_thumnail;
+             }
+//print $sid;
+         ?>
+      </div>
+    <?php endforeach; ?>
+</div>
+<div class="<?php print $classes; ?>"<?php print $attributes; ?>>
+  <?php if (!$label_hidden): ?>
+    <div class="field-label"<?php print $title_attributes; ?>><?php print $label ?>:&nbsp;</div>
+  <?php endif; ?>
+  <div id="<?php print $id; ?>" class="<?php print $carousel_class; ?> field-items"<?php print $content_attributes; ?>>
+    <?php foreach ($items as $delta => $item): ?>
+      <div class="<?php print $delta % 2 ? 'odd' : 'even'; ?>"<?php print $item_attributes[$delta]; ?>>
+         <?php print render($item); ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</div>
+<?php endif; ?>
