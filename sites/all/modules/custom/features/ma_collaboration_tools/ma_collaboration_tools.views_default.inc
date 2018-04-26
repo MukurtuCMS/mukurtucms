@@ -724,23 +724,18 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
-    'og_group_ref' => 'og_group_ref',
-    'field_event_calendar_section' => 'field_event_calendar_section',
-    'type' => 'type',
     'title' => 'title',
-    'timestamp' => 'timestamp',
+    'type' => 'type',
+    'field_event_calendar_section' => 'field_event_calendar_section',
+    'nothing' => 'nothing',
     'changed' => 'changed',
-    'body' => 'body',
-    'ops' => 'ops',
+    'php' => 'php',
+    'php_1' => 'php_1',
+    'php_2' => 'php_2',
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
-    'og_group_ref' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'field_event_calendar_section' => array(
+    'title' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
@@ -754,14 +749,14 @@ function ma_collaboration_tools_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
-    'title' => array(
+    'field_event_calendar_section' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
     ),
-    'timestamp' => array(
+    'nothing' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
@@ -773,26 +768,29 @@ function ma_collaboration_tools_views_default_views() {
       'separator' => '',
       'empty_column' => 0,
     ),
-    'body' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
+    'php' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
     ),
-    'ops' => array(
+    'php_1' => array(
       'align' => '',
       'separator' => '',
-      'empty_column' => 0,
+      'empty_column' => 1,
+    ),
+    'php_2' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 1,
     ),
   );
   /* Header: Global: PHP */
   $handler->display->display_options['header']['php']['id'] = 'php';
   $handler->display->display_options['header']['php']['table'] = 'views';
   $handler->display->display_options['header']['php']['field'] = 'php';
+  $handler->display->display_options['header']['php']['empty'] = TRUE;
   $handler->display->display_options['header']['php']['php_output'] = '<?php
-$form = drupal_get_form(\'ma_collaboration_tools_notification_frequency_default\');
-print drupal_render($form);
+print ma_collaboration_tools_show_default_notification_frequency_form($view);
 ?>';
   /* No results behavior: Global: Text area */
   $handler->display->display_options['empty']['area']['id'] = 'area';
@@ -845,8 +843,7 @@ print drupal_render($form);
   $handler->display->display_options['fields']['php']['label'] = 'Reason Following';
   $handler->display->display_options['fields']['php']['use_php_setup'] = 0;
   $handler->display->display_options['fields']['php']['php_output'] = '<?php
-list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons($data->_field_data[\'nid\'][\'entity\'], $view->args[0]);
-print $reasons;
+print ma_collaboration_tools_show_following_reasons($view, $data);
 ?>
 
 ';
@@ -859,7 +856,7 @@ print $reasons;
   $handler->display->display_options['fields']['php_1']['label'] = 'Unfollow';
   $handler->display->display_options['fields']['php_1']['use_php_setup'] = 0;
   $handler->display->display_options['fields']['php_1']['php_output'] = '<?php
-print l(\'<button class="btn btn-default">UnFollow</button>\', \'node/\' . $data->nid . \'/unfollow\', [\'html\' => TRUE, \'query\' => drupal_get_destination()]);
+print ma_collaboration_tools_show_unfollow_button_in_view($view, $data) 
 ?>
 ';
   $handler->display->display_options['fields']['php_1']['use_php_click_sortable'] = '0';
@@ -869,6 +866,7 @@ print l(\'<button class="btn btn-default">UnFollow</button>\', \'node/\' . $data
   $handler->display->display_options['fields']['php_2']['table'] = 'views';
   $handler->display->display_options['fields']['php_2']['field'] = 'php';
   $handler->display->display_options['fields']['php_2']['label'] = 'Notification Frequency';
+  $handler->display->display_options['fields']['php_2']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['php_2']['use_php_setup'] = 0;
   $handler->display->display_options['fields']['php_2']['php_output'] = '<?php
 print ma_collaboration_tools_generate_notication_frequency_form($view, $data);

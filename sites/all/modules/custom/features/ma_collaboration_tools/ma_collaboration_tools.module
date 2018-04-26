@@ -456,16 +456,52 @@ function ma_collaboration_tools_follow_unfollow($entity) {
 
 }
 
+
 /**
- * Helper function for the Following view to generate the notification frequency per node form.
+ * Helper function for Following view to show the default notification frequency form in the header.
+ */
+function ma_collaboration_tools_show_default_notification_frequency_form($view) {
+  global $user;
+  if ($view->args[0] == $user->uid) {
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_default');
+    return drupal_render($form);
+  }
+}
+
+/**
+ * Helper function for Following view to show Unfollow button.
+ */
+function ma_collaboration_tools_show_unfollow_button_in_view($view, $data) {
+  global $user;
+  if ($view->args[0] == $user->uid) {
+    return l('<button class="btn btn-default">UnFollow</button>', 'node/' . $data->nid . '/unfollow', [
+      'html' => TRUE,
+      'query' => drupal_get_destination()
+    ]);
+  }
+}
+
+/**
+ * Helper function for Following view to show the Following reasons.
+ */
+function ma_collaboration_tools_show_following_reasons($view, $data) {
+  list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons($data->_field_data['nid']['entity'], $view->args[0]);
+  return $reasons;
+}
+
+/**
+ * Helper function for Following view to show the per-node notification frequency form.
  */
 function ma_collaboration_tools_generate_notication_frequency_form($view, $data) {
-  $user = user_load($view->args[0]);
-  $entity = $data->_field_data['nid']['entity'];
-  $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $user->field_notifications_freq_def['und'][0]['value'] : 'right away';
-  $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $user);
-  $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
-  return drupal_render($form);
+  global $user;
+  if ($view->args[0] == $user->uid) {
+    $viewed_user = user_load($view->args[0]);
+    $entity = $data->_field_data['nid']['entity'];
+    $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $viewed_user->field_notifications_freq_def['und'][0]['value'] : 'right away';
+    $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $viewed_user);
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
+    return drupal_render($form);
+  }
 }
 
 /**
