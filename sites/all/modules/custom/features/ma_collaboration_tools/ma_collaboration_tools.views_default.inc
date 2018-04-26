@@ -864,6 +864,17 @@ print l(\'<button class="btn btn-default">UnFollow</button>\', \'node/\' . $data
 ';
   $handler->display->display_options['fields']['php_1']['use_php_click_sortable'] = '0';
   $handler->display->display_options['fields']['php_1']['php_click_sortable'] = '';
+  /* Field: Global: PHP */
+  $handler->display->display_options['fields']['php_2']['id'] = 'php_2';
+  $handler->display->display_options['fields']['php_2']['table'] = 'views';
+  $handler->display->display_options['fields']['php_2']['field'] = 'php';
+  $handler->display->display_options['fields']['php_2']['label'] = 'Notification Frequency';
+  $handler->display->display_options['fields']['php_2']['use_php_setup'] = 0;
+  $handler->display->display_options['fields']['php_2']['php_output'] = '<?php
+print ma_collaboration_tools_generate_notication_frequency_form($view, $data);
+?>';
+  $handler->display->display_options['fields']['php_2']['use_php_click_sortable'] = '0';
+  $handler->display->display_options['fields']['php_2']['php_click_sortable'] = '';
   /* Sort criterion: Content: Updated date */
   $handler->display->display_options['sorts']['changed']['id'] = 'changed';
   $handler->display->display_options['sorts']['changed']['table'] = 'node';
@@ -894,6 +905,7 @@ print l(\'<button class="btn btn-default">UnFollow</button>\', \'node/\' . $data
     t('Updated date'),
     t('Reason Following'),
     t('Unfollow'),
+    t('Notification Frequency'),
   );
   $export['mukurtu_collab_subscriptions'] = $view;
 

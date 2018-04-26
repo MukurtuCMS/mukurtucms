@@ -10828,36 +10828,59 @@ a:hover {
 .node-event.view-mode-full .field-name-body {
   font-size: 1.3em;
 }
-.field-name-follow-unfollow button {
-  margin-bottom: 5px;
+.field-name-follow-unfollow .notifications-message {
+  margin-top: 5px;
+}
+.class-follow-unfollow-popup a {
+  color: #337ab7 !important;
+  text-decoration: none !important;
+}
+.class-follow-unfollow-popup a:hover,
+.class-follow-unfollow-popup a:focus {
+  color: #23527c !important;
+}
+.class-follow-unfollow-popup .notification-popup-reasons-header {
+  font-weight: bold;
 }
 .class-follow-unfollow-popup ul {
   padding: 0;
   margin: 0;
   margin-left: 10px;
-}
-.class-follow-unfollow-popup label {
-  font-weight: normal;
-}
-.class-follow-unfollow-popup ul {
   margin-bottom: 1em;
 }
 .class-follow-unfollow-popup li {
   margin-left: 1em;
 }
-.class-follow-unfollow-popup .notification-popup-header {
+.class-follow-unfollow-popup .form-item-notification-frequency-node label {
+  float: left;
+  margin-right: 0.5em;
   font-weight: bold;
 }
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default label,
-.class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node label {
+.class-follow-unfollow-popup .form-item-notification-frequency-node .form-control {
+  width: auto;
+}
+.class-follow-unfollow-popup button {
+  display: none;
+}
+.class-follow-unfollow-popup .link-to-following-view {
+  font-weight: bold;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default label {
   float: left;
   margin-right: 0.5em;
 }
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default .form-control,
-.class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node .form-control {
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default .form-control {
   width: auto;
 }
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default #edit-submit,
-.class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node #edit-submit {
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default button {
+  display: none;
+}
+.view-mukurtu-collab-subscriptions .views-field-php-2 label {
+  display: none;
+}
+.view-mukurtu-collab-subscriptions .views-field-php-2 .form-control {
+  width: auto;
+}
+.view-mukurtu-collab-subscriptions .views-field-php-2 button {
   display: none;
 }

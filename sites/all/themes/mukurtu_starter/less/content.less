@@ -1436,38 +1436,55 @@ a.tooltips span {
   }
 }
 
-// Following link and text
+// Follow / Unfollow notification text.
 .field-name-follow-unfollow {
-  button {
-    margin-bottom: 5px;
+  .notifications-message {
+    margin-top: 5px;
   }
 }
+
+// Following / Notification popup.
 .class-follow-unfollow-popup {
+  a {
+    color: #337ab7 !important;
+    text-decoration: none !important;
+  }
+  a:hover, a:focus {
+    color: #23527c !important;
+  }
+  .notification-popup-reasons-header {
+    font-weight: bold;
+  }
   ul {
     padding: 0;
     margin: 0;
     margin-left: 10px;
-  }
-}
-
-// Following popup
-.class-follow-unfollow-popup {
-  label {
-    font-weight: normal;
-  }
-  ul {
     margin-bottom: 1em;
   }
   li {
     margin-left: 1em;
   }
- .notification-popup-header {
-   font-weight: bold;
- }
+  // The notification node frequency form in the popup.
+  .form-item-notification-frequency-node {
+    label {
+      float: left;
+      margin-right: 0.5em;
+      font-weight: bold;
+    }
+    .form-control {
+      width: auto;
+    }
+  }
+  button {
+    display: none
+  }
+  .link-to-following-view {
+    font-weight: bold;
+  }
 }
 
-// The notification frequency form (in two places)
-.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default, .class-follow-unfollow-popup #ma-collaboration-tools-notification-frequency-node {
+// The notification default frequency form in the header of the Following view.
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default {
   label {
     float: left;
     margin-right: 0.5em;
@@ -1475,9 +1492,24 @@ a.tooltips span {
   .form-control {
     width: auto;
   }
-  #edit-submit {
-    display: none;
+  button {
+    display: none
   }
 }
+
+// The notification node frequency form per node in the Following view.
+.view-mukurtu-collab-subscriptions .views-field-php-2 {
+  label {
+    display: none;
+  }
+  .form-control {
+    width: auto;
+  }
+  button {
+    display: none
+  }
+}
+
+
 
 

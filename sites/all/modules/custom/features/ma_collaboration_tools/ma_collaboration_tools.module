@@ -410,39 +410,35 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   list ($following, $reasons) = ma_collaboration_tools_get_following_status_and_reasons($entity, $user->uid);
 
   // Create output.
+  $output = '';
   if ($following) {
-    $output = l('<button class="btn btn-default">UnFollow</button>', 'node/' . $entity->nid . '/unfollow', ['html' => TRUE]);
-    $output .= "<br />You are receiving notifications. ";
+    $output .= l('<button class="btn btn-default">UnFollow</button>', 'node/' . $entity->nid . '/unfollow', ['html' => TRUE]);
+    $output .= '<div class="notifications-message">You are receiving notifications.</div>';
   }
   else {
-    $output = l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
-    $output .= "<br />Follow to receive notifications. ";
+    $output .= l('<button class="btn btn-default">Follow</button>', 'node/' . $entity->nid . '/follow', ['html' => TRUE]);
+    $output .= '<div class="notifications-message">Follow to receive notifications.</div>';
   }
 
   // Popup text Following.
   if ($following) {
-    $popup_text = '<p class="notification-popup-header">You are receiving notifications on this item because:</p>';
+    $popup_text = '<p class="notification-popup-reasons-header">You are receiving notifications on this item because:</p>';
   }
   else {
-    $popup_text = '<p class="notification-popup-header">You are not receiving notifications on this item because:</p>';
+    $popup_text = '<p class="notification-popup-reasons-header">You are not receiving notifications on this item because:</p>';
   }
   $popup_text .= $reasons;
 
   if ($following) {
-    // Popup text Frequency.
-    $popup_text .= '<p><span class="notification-popup-header">Notification frequency:</span> ';
+    // Popup text node notification frequency form.
     $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $user->field_notifications_freq_def['und'][0]['value'] : 'right away';
     $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $user);
-    if ($node_freq) {
-      $popup_text .= $node_freq . ' (using override)';
-    }
-    else {
-      $popup_text .= $def_freq . ' ' . l('(using default)', '/user/' . $user->uid . '/following');
-    }
-    $popup_text .= '</p>';
-    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node', $entity->nid, $def_freq, $node_freq);
+    $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
     $popup_text .= drupal_render($form);
   }
+
+  // Add link to Following view.
+  $popup_text .= '<span class="link-to-following-view">' . l('See all content you are following.', '/user/' . $user->uid . '/following') . '</span>';
 
   // Generate the popup
   require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
@@ -458,6 +454,18 @@ function ma_collaboration_tools_follow_unfollow($entity) {
 
   return $output;
 
+}
+
+/**
+ * Helper function for the Following view to generate the notification frequency per node form.
+ */
+function ma_collaboration_tools_generate_notication_frequency_form($view, $data) {
+  $user = user_load($view->args[0]);
+  $entity = $data->_field_data['nid']['entity'];
+  $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $user->field_notifications_freq_def['und'][0]['value'] : 'right away';
+  $node_freq = ma_collaboration_tools_get_user_node_notification_frequency($entity, $user);
+  $form = drupal_get_form('ma_collaboration_tools_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
+  return drupal_render($form);
 }
 
 /**
@@ -632,7 +640,7 @@ function ma_collaboration_tools_views_post_execute(&$view) {
 }
 
 /**
- * Notification default frequency form  (header of the Following view).
+ * Notification default frequency form (header of the Following view).
  */
 function ma_collaboration_tools_notification_frequency_default($form, &$form_state) {
   $account = user_load(arg(1));
@@ -651,14 +659,13 @@ function ma_collaboration_tools_notification_frequency_default($form, &$form_sta
     ],
     'submit' => [
       '#type' => 'submit',
-      '#value' => 'Submit',
     ],
   ];
   return $form;
 }
 
 /**
- * Submit handler for the notification frequency sets the value on the user object.
+ * Submit handler for the notification default frequency sets the value on the user object.
  */
 function ma_collaboration_tools_notification_frequency_default_submit ($form, &$form_state) {
   $account = user_load(arg(1));
@@ -670,6 +677,9 @@ function ma_collaboration_tools_notification_frequency_default_submit ($form, &$
   }
 }
 
+/**
+ * Get the notification frequency for a given node and user.
+ */
 function ma_collaboration_tools_get_user_node_notification_frequency($node, $user) {
   if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
     foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
@@ -689,7 +699,7 @@ function ma_collaboration_tools_notification_frequency_node($form, &$form_state,
   $form = [
     'notification_frequency_node' => [
       '#type' => 'select',
-      '#title' => t('Override: '),
+      '#title' => t('Notification frequency: '),
       '#options' => $options,
       '#default_value' => isset($node_freq) ? $node_freq : 'use default',
       '#attributes' => [
@@ -702,7 +712,6 @@ function ma_collaboration_tools_notification_frequency_node($form, &$form_state,
     ],
     'submit' => [
       '#type' => 'submit',
-      '#value' => 'Submit',
     ],
   ];
   return $form;
@@ -738,4 +747,19 @@ function ma_collaboration_tools_notification_frequency_node_submit ($form, &$for
     ];
     node_save($node);
   }
+}
+
+/**
+ * Implementation of hook_forms()
+ *
+ * This is required because we are using the same form multiple times on the (Following) page. This allows for multiple form IDs calling the same form definition.
+ */
+function ma_collaboration_tools_forms($form_id, $args) {
+  $forms = [];
+  if (strpos($form_id, 'ma_collaboration_tools_notification_frequency_node_') === 0) {
+    $forms[$form_id] = array(
+      'callback' => 'ma_collaboration_tools_notification_frequency_node',
+    );
+  }
+  return $forms;
 }
