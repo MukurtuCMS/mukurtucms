@@ -4,7 +4,7 @@ jQuery(document).ready(function($){
 	    autoHeight:true,
 	    loop:true,
 	    center:true,
-	    margin:50,
+	    margin:100,
 	    nav:true,
 	    navText:['',''],
 	    dots: true,

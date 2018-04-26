@@ -20,13 +20,15 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
                 drupal_add_js($js);
                 break;
         case 'digital_heritage':
-            // Load Owl Carousel
-            $library = libraries_get_path('owlcarousel');
-            $css = join(DIRECTORY_SEPARATOR, array(libraries_get_path('owlcarousel'), 'assets', 'owl.carousel.min.css'));
+            // Add slick carousel
+            $slick = libraries_get_path('slick');
+            $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick.css'));
             drupal_add_css($css);
-            $js = join(DIRECTORY_SEPARATOR, array(libraries_get_path('owlcarousel'), 'owl.carousel.min.js'));
+            $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick-theme.css'));
+            drupal_add_css($css);
+            $js = join(DIRECTORY_SEPARATOR, array($slick, 'slick.min.js'));
             drupal_add_js($js);
-            $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-carousel.js'));
+            $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-slick-carousel.js'));
             drupal_add_js($js);
         }
     }

@@ -1,3 +1,32 @@
+.slick-carousel {
+    .slick-prev {
+        .carousel-nav-left;
+    }
+
+    .slick-next {
+        .carousel-nav-right;
+    }
+
+    .slick-slide {
+        .field-name-download-atom {
+            padding-bottom: 20px;
+        }
+
+        img {
+            display: inherit;
+            width: inherit;
+        }
+
+        .scald-file-icon {
+            display: inline;
+        }
+
+        .field-name-scald-thumbnail {
+            text-align: center;
+        }
+    }
+}
+
 .mukurtu-owl-carousel-single {
     .owl-nav {
         position: absolute;
@@ -14,13 +43,49 @@
     }
 
     .owl-item {
+        .field-name-download-atom {
+            padding-bottom: 20px;
+        }
+
         img {
             display: inherit;
             width: inherit;
         }
 
+        .scald-file-icon {
+            display: inline;
+        }
+
         .field-name-scald-thumbnail {
             text-align: center;
+        }
+    }
+
+    .owl-dots {
+        position: absolute;
+        bottom: -30px;
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+
+        .owl-dot {
+            display: inline-block;
+
+            span {
+                background: none repeat scroll 0 0 @mukurtu-primary-field-divider-color;
+                border-radius: 20px;
+                display: block;
+                height: 12px;
+                margin: 5px 7px;
+                //opacity: 0.5;
+                width: 12px;
+            }
+
+            &.active {
+                span {
+                    background: none repeat scroll 0 0 @brand-secondary;
+                }
+            }
         }
     }
 }
