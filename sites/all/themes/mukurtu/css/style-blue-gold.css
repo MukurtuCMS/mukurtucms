@@ -8324,7 +8324,10 @@ ul.pagination li a:focus {
   text-align: center;
 }
 .slick-carousel-slider-nav .slick-slide {
-  padding: 10px;
+  margin: 10px;
+}
+.slick-carousel-slider-nav .slick-current {
+  border-bottom: 6px solid #e6ab49;
 }
 .slick-carousel-slider-nav .slick-prev::before {
   content: "";
