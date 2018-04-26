@@ -443,7 +443,7 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   // Generate the popup
   require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
   $popup_attributes = array (
-    'style' => 'Bent white',
+    'style' => 'White',
     'origin' => 'top-left',
     'expand' => 'top-left',
     'width' => '400',
