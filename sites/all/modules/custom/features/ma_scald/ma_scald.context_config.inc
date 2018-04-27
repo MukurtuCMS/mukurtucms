@@ -389,6 +389,50 @@ function ma_scald_default_scald_context_config() {
   $context_config = new stdClass();
   $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
   $context_config->api_version = 1;
+  $context_config->context = 'mukurtu_multi_page_carousel';
+  $context_config->transcoder = array(
+    'audio' => array(
+      '*' => 'passthrough',
+    ),
+    'file' => array(
+      '*' => 'passthrough',
+    ),
+    'gallery' => array(
+      '*' => 'passthrough',
+    ),
+    'image' => array(
+      '*' => 'passthrough',
+    ),
+    'video' => array(
+      '*' => 'passthrough',
+    ),
+  );
+  $context_config->player = array(
+    'audio' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'file' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'gallery' => array(
+      '*' => 'default',
+    ),
+    'image' => array(
+      '*' => 'mukurtu_default',
+    ),
+    'video' => array(
+      '*' => 'mukurtu_default',
+    ),
+  );
+  $context_config->data = array(
+    'width' => '',
+    'height' => '',
+  );
+  $export['mukurtu_multi_page_carousel'] = $context_config;
+
+  $context_config = new stdClass();
+  $context_config->disabled = FALSE; /* Edit this to true to make a default context_config disabled initially */
+  $context_config->api_version = 1;
   $context_config->context = 'mukurtu_scald_banner_image';
   $context_config->transcoder = array(
     'audio' => array(

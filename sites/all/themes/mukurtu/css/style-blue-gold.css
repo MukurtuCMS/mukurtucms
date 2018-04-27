@@ -8323,6 +8323,48 @@ ul.pagination li a:focus {
 .slick-carousel-slider-for .slick-slide .field-name-scald-thumbnail {
   text-align: center;
 }
+.slick-carousel-multipage .slick-slide {
+  margin: 10px;
+}
+.slick-carousel-multipage .current-page {
+  border: 4px solid #e6ab49;
+}
+.slick-carousel-multipage .slick-prev::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 10px;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 15px 15px 0;
+  border-color: transparent #e6ab49 transparent transparent;
+  z-index: 2;
+}
+.slick-carousel-multipage .slick-prev::before {
+  top: -5px;
+}
+.slick-carousel-multipage .slick-next::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  top: 10px;
+  margin: auto;
+  border-style: solid;
+  border-width: 15px 0 15px 15px;
+  border-color: transparent transparent transparent #e6ab49;
+  z-index: 2;
+}
+.slick-carousel-multipage .slick-next::before {
+  top: -5px;
+}
+.mukurtu-page-number {
+  text-align: center;
+}
+.mukurtu-page-number .placeholder {
+  font-weight: bold;
+}
 .slick-carousel-slider-nav .slick-slide {
   margin: 10px;
 }

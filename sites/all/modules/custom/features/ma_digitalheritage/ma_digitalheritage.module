@@ -938,8 +938,15 @@ function ma_digitalheritage_page_alter(&$data) {
 
       // Book pages
       if ($node->field_book_children OR $node->field_book_parent) {
-          drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
-          $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
+          // Future use of ma_digital_heritage_book_page_build_carousel is deprecated. Still use it in the case where
+          // the old mukurtu_starter theme is still in use, or a sub-theme of mukurtu_starter.
+          // Themes going forward should implement this in the template layer.
+          global $theme;
+          $theme_list = list_themes();
+          if($theme == 'mukurtu_starter' || (isset($theme_list[$theme]->base_themes) && isset($theme_list[$theme]->base_themes['mukurtu_starter']))) {
+              drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
+              $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
+          }
       }
 
       // Community Records

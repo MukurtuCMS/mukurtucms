@@ -118,6 +118,9 @@ function ma_scald_strongarm() {
       'mukurtu_scald_tiny_thumbnail' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -163,6 +166,10 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'mukurtu_carousel_thumbnail' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
             'weight' => '1',
             'visible' => FALSE,
           ),
@@ -238,6 +245,9 @@ function ma_scald_strongarm() {
       'mukurtu_scald_tiny_thumbnail' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -275,6 +285,10 @@ function ma_scald_strongarm() {
             'visible' => FALSE,
           ),
           'mukurtu_carousel_thumbnail' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
             'weight' => '1',
             'visible' => FALSE,
           ),
@@ -353,6 +367,9 @@ function ma_scald_strongarm() {
       'mukurtu_carousel_thumbnail' => array(
         'custom_settings' => TRUE,
       ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -418,6 +435,10 @@ function ma_scald_strongarm() {
             'visible' => FALSE,
           ),
           'mukurtu_carousel_thumbnail' => array(
+            'weight' => '3',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
             'weight' => '3',
             'visible' => FALSE,
           ),
@@ -493,6 +514,9 @@ function ma_scald_strongarm() {
       'person_teaser' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_multi_page_carousel' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -526,6 +550,10 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'mukurtu_carousel_thumbnail' => array(
+            'weight' => '1',
+            'visible' => FALSE,
+          ),
+          'mukurtu_multi_page_carousel' => array(
             'weight' => '1',
             'visible' => FALSE,
           ),
@@ -741,6 +769,14 @@ function ma_scald_strongarm() {
     'mukurtu_carousel_thumbnail' => array(
       'name' => 'mukurtu_carousel_thumbnail',
       'title' => 'Mukurtu Carousel Thumbnail',
+      'description' => '',
+      'render_language' => 'XHTML',
+      'parseable' => TRUE,
+      'formats' => array(),
+    ),
+    'mukurtu_multi_page_carousel' => array(
+      'name' => 'mukurtu_multi_page_carousel',
+      'title' => 'Mukurtu Multi-page Carousel',
       'description' => '',
       'render_language' => 'XHTML',
       'parseable' => TRUE,

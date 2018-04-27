@@ -157,6 +157,7 @@ features[scald_context_config][] = mukurtu_browse_by_grid
 features[scald_context_config][] = mukurtu_browse_by_grid_7_4
 features[scald_context_config][] = mukurtu_carousel_thumbnail
 features[scald_context_config][] = mukurtu_featured_content
+features[scald_context_config][] = mukurtu_multi_page_carousel
 features[scald_context_config][] = mukurtu_scald_banner_image
 features[scald_context_config][] = mukurtu_scald_dictionary_media
 features[scald_context_config][] = mukurtu_scald_media_assets_edit_
