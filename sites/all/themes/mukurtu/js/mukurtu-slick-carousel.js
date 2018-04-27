@@ -24,7 +24,7 @@ jQuery(document).ready(function($){
 	    slidesToScroll: 1,
 	    asNavFor: '.slick-carousel-slider-for',
 //	    dots: true,
-	    centerMode: true,
+	    centerMode: false,
 	    focusOnSelect: true
 	});
     });

@@ -66,6 +66,20 @@ jQuery(document).ready(function($){
 		$('.slick-carousel').slick('resize');
 		mukurtuMediaelementResize();
 	    });
+
+	    $("a.quicktabs-tab-node").on('click', function() {
+		$('.slick-initialized').hide();
+		$('.slick-initialized').show();
+		var event = window.document.createEvent('UIEvents');
+		event.initUIEvent('resize', true, false, window, 0);
+		window.dispatchEvent(event);
+		event.initUIEvent('orientationchange', true, false, window, 0);
+		window.dispatchEvent(event);
+
+		// Click the active element on the CR page's slider
+		var tabID = ($(this)[0].id).replace("-tab-", "-tabpage-");
+		$('#' + tabID + " .slick-carousel-slider-nav .slick-active").click();
+	    });
 	}
 
 	// Add MediaElement Listeners
