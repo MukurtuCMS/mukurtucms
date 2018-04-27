@@ -263,6 +263,15 @@ function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
       }
     }
 
+    // Fix OG bug that og_group_ref field, although set to not required, will not validate (as if required) when the node
+    // is being edited by certain users. This field does get set in the node_presave according to its parent,
+    // but the (buggy) validation happens before that. This simply removes the validation, taken from https://www.drupal.org/project/og/issues/2179367
+    foreach ($form['#validate'] as $index => $method) {
+      if ($method == 'og_form_group_reference_validate') {
+        unset($form['#validate'][$index]);
+      }
+    }
+
     // Unfollowing Users should be viewable to anyone that can edit this node, but not editable. Only the users themselves should be able to do that through the Unfollow button.
     $form['field_un_following_users']['#disabled'] = TRUE;
 
