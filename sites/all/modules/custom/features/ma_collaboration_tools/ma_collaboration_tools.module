@@ -245,6 +245,31 @@ function ma_collaboration_tools_node_presave($node) {
 }
 
 /**
+ * Implements hook_node_postsave().
+ */
+function ma_collaboration_tools_node_postsave($node, $op) {
+  if ($op == 'update' && in_array($node->type, ma_collaboration_tools_parent_node_types())) {
+
+    // When updating a parent page, load all its child pages and resave them, which will cause them to get their
+    // protocol, community, and item sharing fields updated according to the parent, in case it was changed.
+    // This needs to happen in a postsave hook, or else the parent won't be updated ahead of the child updates
+    // in ma_collaboration_tools_node_presave().
+    $child_target_field = ma_collaboration_tools_get_child_ref_field_to_parent(ma_collaboration_tools_get_child_from_parent($node->type));
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->fieldCondition($child_target_field, 'target_id', $node->nid)
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      foreach(array_keys($result['node']) as $child_nid) {
+        $child_node = node_load ($child_nid);
+        node_save($child_node);
+      }
+    }
+  }
+}
+
+/**
  *  Implements hook_form_alter().
  */
 function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {

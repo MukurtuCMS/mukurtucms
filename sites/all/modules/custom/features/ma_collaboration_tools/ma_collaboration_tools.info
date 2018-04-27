@@ -18,6 +18,7 @@ dependencies[] = fullcalendar_create
 dependencies[] = geocoder
 dependencies[] = geofield
 dependencies[] = geofield_map
+dependencies[] = hook_post_action
 dependencies[] = list
 dependencies[] = ma_base_theme
 dependencies[] = media

@@ -1,0 +1,10 @@
+name = Hook Post Action
+description = Introduces new Drupal hooks, hook_entity_postsave, hook_entity_postinsert, hook_entity_postupdate, hook_entity_postdelete, hook_node_postsave, hook_node_postinsert, hook_node_postupdate, hook_node_postdelete
+core = 7.x
+package = Drupal
+; Information added by Drupal.org packaging script on 2016-05-05
+version = "7.x-1.0-beta2"
+core = "7.x"
+project = "hook_post_action"
+datestamp = "1462439602"
+
