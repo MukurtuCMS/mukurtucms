@@ -335,7 +335,9 @@ function ma_digitalheritage_node_view($node, $view_mode) {
         // Users (especially new admins) are sometimes viewing community records independently of the parent record and getting confused
         // because they think it is a standalone record.  Add a link back to the parent record to avoid confusion.
         // Only show to users with edit rights, only concerned about unintentional edits.
-        if(!empty($node->field_community_record_parent)) {
+        $current_page_node = menu_get_object();
+        $current_page_nid = isset($current_page_node) ? $current_page_node->nid : 0;
+        if(!empty($node->field_community_record_parent) && ($current_page_nid != $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
             $parent_record = node_load($node->field_community_record_parent[$node->language][0]['target_id']);
             if($parent_record && node_access('update', $node)) {
 
