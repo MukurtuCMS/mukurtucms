@@ -15,10 +15,10 @@ function mukurtu_preprocess_html(&$variables) {
 function mukurtu_preprocess_page(&$vars, $hook = null){
     if (isset($vars['node'])) {
         switch ($vars['node']->type) {
-            case 'collection':
-                $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'collection-grid.js'));
-                drupal_add_js($js);
-                break;
+        case 'collection':
+            $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'collection-grid.js'));
+            drupal_add_js($js);
+            break;
         case 'digital_heritage':
             // Add slick carousel
             $slick = libraries_get_path('slick');
@@ -30,6 +30,9 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
             drupal_add_js($js);
             $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-slick-carousel.js'));
             drupal_add_js($js);
+
+            // Add custom DH template suggestion so we can render any multipage nav before the CR quicktabs
+            $vars['theme_hook_suggestions'][] = 'page__node__digital_heritage';
         }
     }
 }
@@ -65,3 +68,7 @@ function mukurtu_preprocess_field(&$variables, $hook) {
         }
     }
 }
+
+/*function mukurtu_process_qt_quicktabs_tabset(&$vars) {
+    kpr($vars);
+    }*/

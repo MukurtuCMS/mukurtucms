@@ -17,8 +17,10 @@ jQuery(document).ready(function($){
 	    infinite: false,
 	    initialSlide: initialDHPage,
 	    speed: 300,
+	    swipe: true,
+	    swipeToSlide: true,
 	    slidesToShow: 3,
-	    slidesToScroll: 3,
+	    slidesToScroll: 1,
 	    adaptiveHeight: true,
 	    mobileFirst: true,
 	    responsive: [
@@ -26,35 +28,35 @@ jQuery(document).ready(function($){
 		    breakpoint: 768,
 		    settings: {
 			slidesToShow: 5,
-			slidesToScroll: 5
+			slidesToScroll: 1
 		    }
 		},
 		{
 		    breakpoint: 992,
 		    settings: {
 			slidesToShow: 7,
-			slidesToScroll: 7
+			slidesToScroll: 1
 		    }
 		},
 		{
 		    breakpoint: 1200,
 		    settings: {
 			slidesToShow: 9,
-			slidesToScroll: 9
+			slidesToScroll: 1
 		    }
 		},
 		{
 		    breakpoint: 1600,
 		    settings: {
 			slidesToShow: 11,
-			slidesToScroll: 11
+			slidesToScroll: 1
 		    }
 		},
 		{
 		    breakpoint: 2000,
 		    settings: {
 			slidesToShow: 15,
-			slidesToScroll: 15
+			slidesToScroll: 11
 		    }
 		}
 	    ]
@@ -64,6 +66,7 @@ jQuery(document).ready(function($){
 	$('.slick-carousel-slider-for').slick({
 	    slidesToShow: 1,
 	    slidesToScroll: 1,
+	    swipeToSlide: true,
 	    arrows: false,
 	    fade: true,
 	    adaptiveHeight: true,
@@ -73,8 +76,8 @@ jQuery(document).ready(function($){
 	$('.slick-carousel-slider-nav').slick({
 	    slidesToShow: 3,
 	    slidesToScroll: 1,
+	    swipeToSlide: true,
 	    asNavFor: '.slick-carousel-slider-for',
-//	    dots: true,
 	    centerMode: false,
 	    focusOnSelect: true
 	});
