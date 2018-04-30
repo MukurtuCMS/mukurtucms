@@ -196,7 +196,7 @@ $pages = $first_page->field_book_children[LANGUAGE_NONE];
             $classes .= 'current-page';
         }
         $sid = $first_page->field_media_asset[LANGUAGE_NONE][0]['sid'];
-        print "<div class=\"$classes\">";
+        print "<div class=\"$classes\"><span class=\"mukurtu-loader\"></span>";
         $url = url(drupal_get_path_alias('node/' . $first_page->nid));
         print "<a href='$url'>";
         print scald_render($sid, 'mukurtu_multi_page_carousel');
@@ -215,7 +215,7 @@ $pages = $first_page->field_book_children[LANGUAGE_NONE];
         }
 
         $sid = $child_node->field_media_asset[LANGUAGE_NONE][0]['sid'];
-        print "<div class=\"$classes\">";
+        print "<div class=\"$classes\"><span class=\"mukurtu-loader\"></span>";
         $url = url(drupal_get_path_alias('node/' . $child_node->nid));
         print "<a href='$url'>";
         print scald_render($sid, 'mukurtu_multi_page_carousel');

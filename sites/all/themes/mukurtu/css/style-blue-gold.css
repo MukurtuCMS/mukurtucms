@@ -8323,6 +8323,23 @@ ul.pagination li a:focus {
 .slick-carousel-slider-for .slick-slide .field-name-scald-thumbnail {
   text-align: center;
 }
+.mukurtu-loader-loading {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 25px;
+  border: 8px solid #e5e1e1;
+  border-radius: 50%;
+  border-top: 8px solid #159ec4;
+  border-bottom: 8px solid #159ec4;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+.mukurtu-loader-background {
+  opacity: 0.5;
+}
 .slick-carousel-multipage .slick-slide {
   margin: 10px;
 }
@@ -8401,69 +8418,70 @@ ul.pagination li a:focus {
 .slick-carousel-slider-nav .slick-next::before {
   top: -5px;
 }
-.mukurtu-owl-carousel-single .owl-nav {
-  position: absolute;
-  top: 50%;
-  width: 100%;
+/*
+.mukurtu-owl-carousel-single {
+    .owl-nav {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+
+        .owl-prev {
+            .carousel-nav-left;
+        }
+
+        .owl-next {
+            .carousel-nav-right;
+        }
+    }
+
+    .owl-item {
+        .field-name-download-atom {
+            padding-bottom: 20px;
+        }
+
+        img {
+            display: inherit;
+            width: inherit;
+        }
+
+        .scald-file-icon {
+            display: inline;
+        }
+
+        .field-name-scald-thumbnail {
+            text-align: center;
+        }
+    }
+
+    .owl-dots {
+        position: absolute;
+        bottom: -30px;
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+
+        .owl-dot {
+            display: inline-block;
+
+            span {
+                background: none repeat scroll 0 0 @mukurtu-primary-field-divider-color;
+                border-radius: 20px;
+                display: block;
+                height: 12px;
+                margin: 5px 7px;
+                //opacity: 0.5;
+                width: 12px;
+            }
+
+            &.active {
+                span {
+                    background: none repeat scroll 0 0 @brand-secondary;
+                }
+            }
+        }
+    }
 }
-.mukurtu-owl-carousel-single .owl-nav .owl-prev::before {
-  content: "";
-  display: inline-block;
-  position: absolute;
-  left: 0;
-  top: 10px;
-  margin: auto;
-  border-style: solid;
-  border-width: 15px 15px 15px 0;
-  border-color: transparent #e6ab49 transparent transparent;
-  z-index: 2;
-}
-.mukurtu-owl-carousel-single .owl-nav .owl-next::before {
-  content: "";
-  display: inline-block;
-  position: absolute;
-  right: 0;
-  top: 10px;
-  margin: auto;
-  border-style: solid;
-  border-width: 15px 0 15px 15px;
-  border-color: transparent transparent transparent #e6ab49;
-  z-index: 2;
-}
-.mukurtu-owl-carousel-single .owl-item .field-name-download-atom {
-  padding-bottom: 20px;
-}
-.mukurtu-owl-carousel-single .owl-item img {
-  display: inherit;
-  width: inherit;
-}
-.mukurtu-owl-carousel-single .owl-item .scald-file-icon {
-  display: inline;
-}
-.mukurtu-owl-carousel-single .owl-item .field-name-scald-thumbnail {
-  text-align: center;
-}
-.mukurtu-owl-carousel-single .owl-dots {
-  position: absolute;
-  bottom: -30px;
-  display: inline-block;
-  text-align: center;
-  width: 100%;
-}
-.mukurtu-owl-carousel-single .owl-dots .owl-dot {
-  display: inline-block;
-}
-.mukurtu-owl-carousel-single .owl-dots .owl-dot span {
-  background: none repeat scroll 0 0 #e5e1e1;
-  border-radius: 20px;
-  display: block;
-  height: 12px;
-  margin: 5px 7px;
-  width: 12px;
-}
-.mukurtu-owl-carousel-single .owl-dots .owl-dot.active span {
-  background: none repeat scroll 0 0 #e6ab49;
-}
+*/
 .scald-atom .field-name-download-atom {
   text-align: center;
   padding-top: 30px;

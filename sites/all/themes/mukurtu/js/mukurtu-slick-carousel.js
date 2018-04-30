@@ -61,6 +61,14 @@ jQuery(document).ready(function($){
 		}
 	    ]
 	});
+
+	// Loader animation when clicking a page in the multi-page carousel
+	$(".slick-carousel-multipage .slick-slide").click(function () { 
+	    if(!$(this).find(".mukurtu-loader").hasClass("mukurtu-loader-loading")) {
+		$(this).find("img").addClass("mukurtu-loader-background");
+		$(this).find(".mukurtu-loader").addClass("mukurtu-loader-loading");
+	    }
+	});
 	
 	// Digital Heritage Multiple Media Items
 	$('.slick-carousel-slider-for').slick({
