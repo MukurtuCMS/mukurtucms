@@ -192,7 +192,7 @@ $pages = $first_page->field_book_children[LANGUAGE_NONE];
     if(!empty($first_page->field_media_asset[LANGUAGE_NONE])) {
         $classes = "";
         if($first_page->nid == $multipage_node->nid) {
-            $initial_slide = $page;
+            $initial_slide = $dh_page;
             $classes .= 'current-page';
         }
         $sid = $first_page->field_media_asset[LANGUAGE_NONE][0]['sid'];
@@ -222,6 +222,8 @@ $pages = $first_page->field_book_children[LANGUAGE_NONE];
         print "</a></div>";
     }
     drupal_add_js(array('mukurtu' => array('dh_multipage_initial_slide' => $initial_slide)), 'setting');
+    $initial_slide++;
+    $dh_page++;
   ?>
 </div>
 <div class="mukurtu-page-number"><?php print t("Page %current of @total", array('%current' => $initial_slide, '@total' => $dh_page)); ?></div>
