@@ -525,6 +525,20 @@ col-md-4 col-md-push-8';
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'node_view_permissions_fixity_check';
+  $strongarm->value = 1;
+  $export['node_view_permissions_fixity_check'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_view_permissions_following_notification';
+  $strongarm->value = 1;
+  $export['node_view_permissions_following_notification'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'page_manager_node_view_disabled';
   $strongarm->value = TRUE;
   $export['page_manager_node_view_disabled'] = $strongarm;
