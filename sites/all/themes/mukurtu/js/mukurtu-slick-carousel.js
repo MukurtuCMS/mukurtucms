@@ -10,7 +10,12 @@ jQuery(document).ready(function($){
 	});
 
 	// Digital Heritage Multi-page
-	var initialDHPage = Drupal.settings.mukurtu.dh_multipage_initial_slide;
+	try {
+	    var initialDHPage = Drupal.settings.mukurtu.dh_multipage_initial_slide;
+	}
+	catch(err) {
+	    var initialDHPage = 0;
+	}
 	$('.slick-carousel-multipage').slick({
 	    dots: false,
 	    focusOnSelect: true,
