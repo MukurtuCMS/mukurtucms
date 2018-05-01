@@ -9076,9 +9076,15 @@ section ol.breadcrumb {
 }
 .panel-panel .pane-content .facetapi-facetapi-checkbox-links .leaf {
   padding-bottom: 5px;
+  overflow: auto;
 }
 .panel-panel .pane-content .facetapi-facetapi-checkbox-links .leaf input {
-  margin-right: 20px;
+  margin: auto;
+  width: 10%;
+}
+.panel-panel .pane-content .facetapi-facetapi-checkbox-links .leaf a {
+  float: right;
+  width: 80%;
 }
 .view-border {
   border-bottom: 5px solid #eeeaea;
