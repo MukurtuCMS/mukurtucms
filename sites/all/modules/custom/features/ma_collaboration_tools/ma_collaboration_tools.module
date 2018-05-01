@@ -309,6 +309,9 @@ function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
     }
     $valid_protocols_with_titles = ma_cultural_protocol_get_cps_user_is_steward();
     $referenceable_cps = $existing_protocols_with_titles + $valid_protocols_with_titles;
+//    dpm ($existing_protocols_with_titles, 'existing');
+//    dpm ($valid_protocols_with_titles, 'valid');
+//    dpm ($referenceable_cps, 'referenceable');
     $form['field_following_protocols'][LANGUAGE_NONE]['#options'] = $referenceable_cps;
 
   }
