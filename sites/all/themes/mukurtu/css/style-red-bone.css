@@ -8377,10 +8377,38 @@ ul.pagination li a:focus {
   top: -5px;
 }
 .mukurtu-page-number {
-  text-align: center;
+  padding: 10px;
+  text-align: right;
 }
 .mukurtu-page-number .placeholder {
   font-weight: bold;
+}
+.mukurtu-page-select-wrapper {
+  width: 140px;
+}
+.mukurtu-page-select-wrapper::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  left: 125px;
+  margin: auto;
+  top: 18px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 6px 0 6px;
+  border-color: #d9d4c2 transparent transparent transparent;
+}
+.mukurtu-page-select form {
+  color: #464646;
+  font-size: 14px;
+  font-weight: bold;
+}
+.mukurtu-page-select form select {
+  -webkit-appearance: none;
+  border: none;
+  background: #f8f7f7;
+  padding: 10px 20px;
 }
 .slick-carousel-slider-nav .slick-slide {
   margin: 10px;

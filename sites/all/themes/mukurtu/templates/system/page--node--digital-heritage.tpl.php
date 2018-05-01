@@ -185,10 +185,13 @@ if(isset($multipage_node->field_book_children) && count($multipage_node->field_b
 }
 $pages = $first_page->field_book_children[LANGUAGE_NONE];
 ?>
+<div class="row">
 <div id="mukurtu-multipage-carousel" class="slick-carousel slick-carousel-multipage">
   <?php
     $dh_page = 0;
     $initial_slide = 0;
+    $options = array();
+    $options[-1] = t("Skip to page");
     if(!empty($first_page->field_media_asset[LANGUAGE_NONE])) {
         $classes = "";
         if($first_page->nid == $multipage_node->nid) {
@@ -201,6 +204,7 @@ $pages = $first_page->field_book_children[LANGUAGE_NONE];
         print "<a href='$url'>";
         print scald_render($sid, 'mukurtu_multi_page_carousel');
         print "</a></div>";
+        $options[$dh_page] = $first_page->title;
     }
 
     foreach($first_page->field_book_children[LANGUAGE_NONE] as $child_page) {
@@ -220,13 +224,26 @@ $pages = $first_page->field_book_children[LANGUAGE_NONE];
         print "<a href='$url'>";
         print scald_render($sid, 'mukurtu_multi_page_carousel');
         print "</a></div>";
+        $options[$dh_page] = $child_node->title;
     }
     drupal_add_js(array('mukurtu' => array('dh_multipage_initial_slide' => $initial_slide)), 'setting');
     $initial_slide++;
     $dh_page++;
   ?>
 </div>
-<div class="mukurtu-page-number"><?php print t("Page %current of @total", array('%current' => $initial_slide, '@total' => $dh_page)); ?></div>
+<div class="mukurtu-page-number col-xs-6"><?php print t("Page %current of @total", array('%current' => $initial_slide, '@total' => $dh_page)); ?></div>
+<div class="mukurtu-page-select col-xs-6">
+   <form name="digital-heritage-multi-page-page-select">
+      <div class="mukurtu-page-select-wrapper"><select>
+        <?php
+        foreach($options as $delta => $option) {
+            print "<option value=\"$delta\">$option</option>";
+        }
+        ?>
+      </select></div>
+   </form>
+</div>
+</div>
 <?php endif; ?>
 <?php
 ///////////////////////////////////////////////////

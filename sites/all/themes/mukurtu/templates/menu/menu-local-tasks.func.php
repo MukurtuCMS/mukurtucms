@@ -26,7 +26,7 @@ function mukurtu_menu_local_tasks(array &$variables) {
 
   if (!empty($variables['primary'])) {
       if($variables['primary'][0]['#link']['path'] != 'user/register') {
-          $variables['primary']['#prefix'] = '<div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . t('Page Menu ') . '<span class="caret"></span></button>';
+          $variables['primary']['#prefix'] = '<div id="mukurtu-local-tasks-dropdown" class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . t('Page Menu ') . '<span class="caret"></span></button>';
 
           $variables['primary']['#prefix'] .= '<h2 class="element-invisible">' . t('Primary tabs') . '</h2>';
           $variables['primary']['#prefix'] .= '<ul class="dropdown-menu tabs--primary nav nav-tabs">';
