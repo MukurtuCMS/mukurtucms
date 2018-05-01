@@ -141,7 +141,7 @@ function ma_collaboration_tools_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
