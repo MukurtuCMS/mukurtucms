@@ -287,6 +287,79 @@ function ma_collaboration_tools_node_postsave($node, $op) {
   }
 }
 
+
+/**
+ * Implements hook_node_update().
+ */
+function ma_collaboration_tools_node_update($node) {
+
+  $op = 'Update';
+
+  // Create a Following Notification node after a child collab node is created or updated, then send emails to the immediate recipients.\
+
+  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+    $cw = entity_metadata_wrapper('node', $node);
+
+    // Build the notify list.
+    $notify_list = [];
+    // Following due to protocol membership
+    $following_protocols = $cw->field_following_protocols->value();
+    if (count($following_protocols)) {
+      foreach ($following_protocols as $following_protocol) {
+        $notify_list = array_merge($notify_list, og_get_group_members_properties($following_protocol, [], 'members', 'node'));
+      }
+    }
+    // Individually following
+    $notify_list = array_merge($notify_list, array_column($node->field_following_users[LANGUAGE_NONE], 'target_id'));
+    // Remove duplicates
+    $notify_list = array_unique($notify_list);
+    // Remove individually unfollowing
+    $notify_list = array_diff($notify_list, array_column($node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
+
+    // Build notify_frequency lists.
+    $notify_frequency = [
+      'right away' => [],
+      'daily digest' => [],
+      'weekly digest' => [],
+    ];
+    $notify_freq_map = [];
+    if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
+      foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
+        $notify_freq_map[$custom_frequency['first']] = $custom_frequency['second'];
+      }
+    }
+    foreach ($notify_list as $notify_uuid) {
+      if (array_key_exists($notify_uuid, $notify_freq_map)) {
+        $notify_frequency[$notify_freq_map[$notify_uuid]][] = $notify_uuid;
+      }
+      else {
+        $account = user_load($notify_uuid);
+        $def_user_frequency = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
+        $notify_frequency[$def_user_frequency][] = $notify_uuid;
+      }
+    }
+
+    // Create and save the Following Notification node.
+    $values = array(
+      'type' => 'following_notification',
+      'uid' => 1,
+      'status' => 1,
+    );
+    $notification = entity_create('node', $values);
+    $notification_w = entity_metadata_wrapper('node', $notification);
+    $notification_w->title->set($op . ' notification for "' . $node->title . '""');
+    $body = 'The ' . $node->type . ' "' . $node->title . '", which you are following, was updated at ' . format_date($node->timestamp, 'long') . '.\n\nView the ' . $node->type . ': ' . $GLOBALS['base_url'] . '/' . $node->path['alias'] . '\n\nSee all content you are following: ' . $GLOBALS['base_url'] . '/user/[uid]/following'; // uid to be replaced during emailing.
+    $notification_w->body->set(array('value' => $body));
+    $notification_w->field_following_content->set($node->nid);
+    $notification_w->field_notify_immediately->set($notify_frequency['right away']);
+    $notification_w->field_notify_day->set($notify_frequency['daily digest']);
+    $notification_w->field_notify_week->set($notify_frequency['weekly digest']);
+    $notification_w->save();
+
+  }
+}
+
+
 /**
  *  Implements hook_form_alter().
  */
