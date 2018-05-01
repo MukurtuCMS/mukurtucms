@@ -20,6 +20,7 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
             drupal_add_js($js);
             break;
         case 'digital_heritage':
+        case 'person':
             // Add slick carousel
             $slick = libraries_get_path('slick');
             $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick.css'));

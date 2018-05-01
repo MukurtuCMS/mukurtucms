@@ -363,9 +363,12 @@ function ma_person_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'mukurtu_display_formatters_image_carousel',
-        'settings' => array(),
-        'type' => 'mukurtu_image_carousel_formatter',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
         'weight' => 0,
       ),
       'full' => array(

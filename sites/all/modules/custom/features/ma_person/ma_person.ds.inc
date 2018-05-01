@@ -22,6 +22,13 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_media_asset' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
+      ),
+    ),
     'field_node_aggregate' => array(
       'formatter_settings' => array(
         'ft' => array(
