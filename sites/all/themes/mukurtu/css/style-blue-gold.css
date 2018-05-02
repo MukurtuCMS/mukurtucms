@@ -8320,7 +8320,7 @@ ul.pagination li.pager-first,
 ul.pagination li.pager-last {
   display: none;
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   ul.pagination li.pager-first,
   ul.pagination li.pager-last {
     display: inline;

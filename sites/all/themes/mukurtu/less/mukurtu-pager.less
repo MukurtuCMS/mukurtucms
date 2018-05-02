@@ -55,13 +55,13 @@ ul.pagination {
             .pager-text;
         }
 
-        // On very small screens, hide First/Last shortcuts
+        // On small screens, hide First/Last shortcuts
         &.pager-first,
         &.pager-last {
             display: none;
 
-            // Tablet
-            @media (min-width: @screen-sm-min) {
+            // Desktop
+            @media (min-width: @screen-md-min) {
                 display: inline;
             }
         }
