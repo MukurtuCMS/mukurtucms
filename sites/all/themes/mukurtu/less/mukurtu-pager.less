@@ -1,10 +1,17 @@
 .pager-text {
     .mukurtu-standard-link;
     border: none;
-    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: @mukurtu-expanded-letter-spacing;
+
+    padding: 6px 6px;
+    font-size: 13px;
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        padding: 6px 6px;
+        font-size: 16px;
+    }
 
     &:hover,
     &:focus {
@@ -37,7 +44,7 @@ ul.pagination {
                     left: 20%;
                     bottom: 0;
                     height: 6px;
-                    width: 20px;
+                    width: 15px;
                     border-bottom: 6px solid @brand-secondary;
                 }
             }
@@ -46,6 +53,17 @@ ul.pagination {
         // Other pages
         a {
             .pager-text;
+        }
+
+        // On very small screens, hide First/Last shortcuts
+        &.pager-first,
+        &.pager-last {
+            display: none;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: inline;
+            }
         }
     }
 }

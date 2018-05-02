@@ -8203,15 +8203,22 @@ footer header {
 .pager-text {
   color: #138aab;
   border: none;
-  font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1.2px;
+  padding: 6px 6px;
+  font-size: 13px;
 }
 .pager-text:hover,
 .pager-text:focus {
   color: #e6ab49;
   text-decoration: none;
+}
+@media (min-width: 768px) {
+  .pager-text {
+    padding: 6px 6px;
+    font-size: 16px;
+  }
 }
 .pager-text:hover,
 .pager-text:focus {
@@ -8221,15 +8228,22 @@ footer header {
 ul.pagination li.active {
   color: #138aab;
   border: none;
-  font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1.2px;
+  padding: 6px 6px;
+  font-size: 13px;
 }
 ul.pagination li.active:hover,
 ul.pagination li.active:focus {
   color: #e6ab49;
   text-decoration: none;
+}
+@media (min-width: 768px) {
+  ul.pagination li.active {
+    padding: 6px 6px;
+    font-size: 16px;
+  }
 }
 ul.pagination li.active:hover,
 ul.pagination li.active:focus {
@@ -8239,10 +8253,11 @@ ul.pagination li.active:focus {
 ul.pagination li.active span {
   color: #138aab;
   border: none;
-  font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1.2px;
+  padding: 6px 6px;
+  font-size: 13px;
   color: #464646;
   background: transparent;
 }
@@ -8250,6 +8265,12 @@ ul.pagination li.active span:hover,
 ul.pagination li.active span:focus {
   color: #e6ab49;
   text-decoration: none;
+}
+@media (min-width: 768px) {
+  ul.pagination li.active span {
+    padding: 6px 6px;
+    font-size: 16px;
+  }
 }
 ul.pagination li.active span:hover,
 ul.pagination li.active span:focus {
@@ -8267,26 +8288,43 @@ ul.pagination li.active span::after {
   left: 20%;
   bottom: 0;
   height: 6px;
-  width: 20px;
+  width: 15px;
   border-bottom: 6px solid #e6ab49;
 }
 ul.pagination li a {
   color: #138aab;
   border: none;
-  font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1.2px;
+  padding: 6px 6px;
+  font-size: 13px;
 }
 ul.pagination li a:hover,
 ul.pagination li a:focus {
   color: #e6ab49;
   text-decoration: none;
 }
+@media (min-width: 768px) {
+  ul.pagination li a {
+    padding: 6px 6px;
+    font-size: 16px;
+  }
+}
 ul.pagination li a:hover,
 ul.pagination li a:focus {
   background: transparent;
   border: none;
+}
+ul.pagination li.pager-first,
+ul.pagination li.pager-last {
+  display: none;
+}
+@media (min-width: 768px) {
+  ul.pagination li.pager-first,
+  ul.pagination li.pager-last {
+    display: inline;
+  }
 }
 .slick-carousel-single button.slick-arrow,
 .slick-carousel-slider-for button.slick-arrow {
