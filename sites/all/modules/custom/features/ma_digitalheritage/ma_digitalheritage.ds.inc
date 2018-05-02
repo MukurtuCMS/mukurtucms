@@ -912,6 +912,7 @@ function ma_digitalheritage_ds_view_modes_info() {
   $ds_view_mode->label = 'Featured Content';
   $ds_view_mode->entities = array(
     'node' => 'node',
+    'paragraphs_item' => 'paragraphs_item',
   );
   $export['featured_content'] = $ds_view_mode;
 

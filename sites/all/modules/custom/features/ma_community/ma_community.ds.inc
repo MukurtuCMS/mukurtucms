@@ -308,8 +308,8 @@ function ma_community_ds_layout_settings_info() {
       'right' => array(
         2 => 'links',
         3 => 'admin_actions',
-        4 => 'group_register',
-        5 => 'group_group',
+        4 => 'group_group',
+        5 => 'group_register',
       ),
     ),
     'fields' => array(
@@ -317,10 +317,14 @@ function ma_community_ds_layout_settings_info() {
       'comments' => 'left',
       'links' => 'right',
       'admin_actions' => 'right',
-      'group_register' => 'right',
       'group_group' => 'right',
+      'group_register' => 'right',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'header' => 'div',
       'left' => 'div',
@@ -332,6 +336,7 @@ function ma_community_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|community|default'] = $ds_layout;
 

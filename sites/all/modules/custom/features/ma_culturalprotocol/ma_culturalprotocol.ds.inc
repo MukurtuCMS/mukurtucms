@@ -165,43 +165,45 @@ function ma_culturalprotocol_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
-    'hide_empty_regions' => 0,
-    'hide_sidebars' => 0,
     'regions' => array(
       'header' => array(
         0 => 'title',
       ),
       'left' => array(
-        0 => 'comments',
-        1 => 'field_media',
+        1 => 'comments',
         2 => 'body',
-        3 => 'group_register',
+        5 => 'group_register',
       ),
       'right' => array(
-        0 => 'author',
-        1 => 'admin_actions',
+        3 => 'author',
+        4 => 'admin_actions',
       ),
     ),
     'fields' => array(
       'title' => 'header',
       'comments' => 'left',
-      'field_media' => 'left',
       'body' => 'left',
-      'group_register' => 'left',
       'author' => 'right',
       'admin_actions' => 'right',
+      'group_register' => 'left',
     ),
     'classes' => array(
-      'header' => array(
-        'grid-6' => 'grid-6',
-      ),
-      'left' => array(
-        'grid-6' => 'grid-6',
-      ),
-      'right' => array(
-        'grid-4' => 'grid-4',
+      'layout_class' => array(
+        '' => '',
       ),
     ),
+    'wrappers' => array(
+      'header' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'footer' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|cultural_protocol_group|default'] = $ds_layout;
 

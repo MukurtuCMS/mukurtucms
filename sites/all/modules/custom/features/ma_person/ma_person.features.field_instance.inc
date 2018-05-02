@@ -31,6 +31,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'date_default',
         'weight' => 2,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'date',
@@ -130,6 +136,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'date_default',
         'weight' => 3,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'date',
@@ -225,6 +237,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 25,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
@@ -293,6 +311,12 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'entityreference_entity_view',
         'weight' => 7,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
       ),
       'full' => array(
         'label' => 'above',
@@ -370,6 +394,16 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'ma_colorbox',
         'weight' => 0,
+      ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -455,6 +489,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 27,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
@@ -527,6 +567,12 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'mukurtu_referenced_content_formatter',
         'weight' => 6,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -605,6 +651,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 28,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -664,6 +716,12 @@ function ma_person_field_default_field_instances() {
         ),
         'type' => 'paragraphs_view',
         'weight' => 4,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'full' => array(
         'label' => 'above',
@@ -742,6 +800,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'paragraphs_view',
         'weight' => 5,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
       'full' => array(
         'label' => 'hidden',
         'module' => 'paragraphs',
@@ -819,6 +883,12 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 26,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'full' => array(
         'label' => 'above',

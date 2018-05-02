@@ -139,7 +139,7 @@ function ma_person_strongarm() {
         'custom_settings' => FALSE,
       ),
       'featured_content' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'related_person_teaser' => array(
         'custom_settings' => TRUE,
