@@ -12,6 +12,21 @@ function mukurtu_preprocess_html(&$variables) {
     }
 }
 
+/**
+ * Helper function to include slick carousel css & files
+ */
+function _mukurtu_include_slick_carousel() {
+    $slick = libraries_get_path('slick');
+    $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick.css'));
+    drupal_add_css($css);
+    $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick-theme.css'));
+    drupal_add_css($css);
+    $js = join(DIRECTORY_SEPARATOR, array($slick, 'slick.min.js'));
+    drupal_add_js($js);
+    $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-slick-carousel.js'));
+    drupal_add_js($js);
+}
+
 function mukurtu_preprocess_page(&$vars, $hook = null){
     if (isset($vars['node'])) {
         switch ($vars['node']->type) {
@@ -21,20 +36,16 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
             break;
         case 'digital_heritage':
         case 'person':
-            // Add slick carousel
-            $slick = libraries_get_path('slick');
-            $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick.css'));
-            drupal_add_css($css);
-            $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick-theme.css'));
-            drupal_add_css($css);
-            $js = join(DIRECTORY_SEPARATOR, array($slick, 'slick.min.js'));
-            drupal_add_js($js);
-            $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-slick-carousel.js'));
-            drupal_add_js($js);
+            _mukurtu_include_slick_carousel();
 
             // Add custom DH template suggestion so we can render any multipage nav before the CR quicktabs
             $vars['theme_hook_suggestions'][] = 'page__node__digital_heritage';
         }
+    }
+
+    // Taxonomy terms w/Mukurtu Records
+    if(isset($vars['page']['content']['system_main']['term_heading']['term']['field_mukurtu_records'])) {
+        _mukurtu_include_slick_carousel();
     }
 }
 
@@ -69,7 +80,3 @@ function mukurtu_preprocess_field(&$variables, $hook) {
         }
     }
 }
-
-/*function mukurtu_process_qt_quicktabs_tabset(&$vars) {
-    kpr($vars);
-    }*/
