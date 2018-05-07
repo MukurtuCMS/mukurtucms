@@ -8587,6 +8587,10 @@ ul.pagination li.pager-last {
   letter-spacing: 1.2px;
   background: #d9d4c2;
   text-transform: uppercase;
+  background-image: url(../images/icons/chevrondown_red.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 50%;
+  background-size: 20px;
 }
 #homebox.homebox-mukurtu_dashboard .portlet-content {
   padding: 20px;
