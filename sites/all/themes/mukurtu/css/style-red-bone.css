@@ -8564,6 +8564,36 @@ ul.pagination li.pager-last {
     }
 }
 */
+#homebox.homebox-mukurtu_dashboard .portlet-header {
+  background-color: #d9d4c2;
+}
+#homebox.homebox-mukurtu_dashboard .portlet-header:hover,
+#homebox.homebox-mukurtu_dashboard .portlet-header:focus {
+  background-color: #c9c2a8;
+}
+#homebox.homebox-mukurtu_dashboard .portlet-header a {
+  color: #ffffff;
+}
+#homebox.homebox-mukurtu_dashboard .portlet-header a:hover,
+#homebox.homebox-mukurtu_dashboard .portlet-header a:focus {
+  text-decoration: none;
+}
+#homebox.homebox-mukurtu_dashboard .portlet-header .portlet-title {
+  color: #ac143a;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 20px 15px 20px 15px;
+  margin-bottom: 0px;
+  letter-spacing: 1.2px;
+  background: #d9d4c2;
+  text-transform: uppercase;
+}
+#homebox.homebox-mukurtu_dashboard .portlet-content {
+  padding: 20px;
+}
+#homebox.homebox-mukurtu_dashboard .portlet-content dd {
+  padding-bottom: 20px;
+}
 .quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs {
   width: 100vw;
   position: relative;
