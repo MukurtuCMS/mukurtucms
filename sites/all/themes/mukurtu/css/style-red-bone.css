@@ -10073,13 +10073,14 @@ section ol.breadcrumb {
 .node-cultural-protocol-group.view-mode-full .view-footer .btn-default:hover,
 .node-community.view-mode-full .view-footer .btn-default:hover {
   background-color: inherit;
+  padding: 5px 0;
 }
 .node-cultural-protocol-group.view-mode-full .view-footer a,
 .node-community.view-mode-full .view-footer a {
   background: url(../images/icons/triangle_arrow_right_bone.svg) no-repeat 0% 50%;
   background-position: center right;
   color: #ac143a;
-  padding-right: 20px;
+  padding-right: 15px;
   font-weight: bold;
 }
 .node-cultural-protocol-group.view-mode-full .view-footer a:hover,
