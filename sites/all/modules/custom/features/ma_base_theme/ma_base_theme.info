@@ -34,6 +34,7 @@ dependencies[] = mediafield
 dependencies[] = menu
 dependencies[] = menu_attributes
 dependencies[] = modernizr
+dependencies[] = mukurtu_theme_blocks
 dependencies[] = node_reference
 dependencies[] = options
 dependencies[] = panels_bootstrap_layouts

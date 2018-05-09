@@ -18,4 +18,21 @@
             padding-bottom: 20px;
         }
     }
+
+    // Basic responsive handling for the dashboard. Doesn't work well, homebox does too much itself client side
+    .homebox-column-wrapper-2,
+    .homebox-column-wrapper-3,
+    .homebox-column-wrapper-4 {
+        width: 100% !important;
+
+        // Display on tablet or above
+        @media (min-width: @screen-sm-min) {
+            width: 50% !important;
+        }
+
+        // Display on tablet or above
+        @media (min-width: @screen-md-min) {
+            width: 33% !important;
+        }
+    }
 }

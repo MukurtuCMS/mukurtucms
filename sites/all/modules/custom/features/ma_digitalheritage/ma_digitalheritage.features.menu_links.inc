@@ -29,6 +29,7 @@ function ma_digitalheritage_menu_default_menu_links() {
     'expanded' => 0,
     'weight' => -49,
     'customized' => 1,
+    'parent_identifier' => 'main-menu_add-content:node/add',
   );
   // Exported menu link: main-menu_-digital-heritage:node/add/digital-heritage.
   $menu_links['main-menu_-digital-heritage:node/add/digital-heritage'] = array(
@@ -49,6 +50,7 @@ function ma_digitalheritage_menu_default_menu_links() {
     'expanded' => 0,
     'weight' => -50,
     'customized' => 1,
+    'parent_identifier' => 'main-menu_add-content:node/add',
   );
 
   // Translatables
