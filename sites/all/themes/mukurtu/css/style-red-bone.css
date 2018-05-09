@@ -7761,7 +7761,7 @@ header,
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
 }
@@ -7769,7 +7769,7 @@ header,
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
@@ -7841,7 +7841,7 @@ header,
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
 }
@@ -9164,7 +9164,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
 }
@@ -9275,7 +9275,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   vertical-align: middle;
@@ -9599,9 +9599,12 @@ body #admin-menu {
     background-image: url(../images/icons/chevronright_red.svg);
     background-repeat: no-repeat;
     background-position: 95% 0%;
-    background-size: contain;
+    background-size: 12px;
     min-height: 20px;
     padding-right: 25px;
+    background-position: 97% 44%;
+    padding-top: 20px;
+    padding-bottom: 20px;
     font-weight: bold;
     font-size: 14px;
     color: #fff;
@@ -9940,7 +9943,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
 }
@@ -10132,7 +10135,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
@@ -10202,7 +10205,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   background-position: 99% 25%;
@@ -10477,7 +10480,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
@@ -10559,7 +10562,7 @@ body #admin-menu {
   background-image: url(../images/icons/chevronright_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
-  background-size: contain;
+  background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
