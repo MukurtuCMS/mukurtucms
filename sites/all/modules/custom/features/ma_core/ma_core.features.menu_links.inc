@@ -10,6 +10,29 @@
 function ma_core_menu_default_menu_links() {
   $menu_links = array();
 
+  // Exported menu link: main-menu_add-content:node/add.
+  $menu_links['main-menu_add-content:node/add'] = array(
+    'menu_name' => 'main-menu',
+    'link_path' => 'node/add',
+    'router_path' => 'node/add',
+    'link_title' => 'Add Content',
+    'options' => array(
+      'attributes' => array(),
+      'item_attributes' => array(
+        'id' => '',
+        'class' => '',
+        'style' => '',
+      ),
+      'identifier' => 'main-menu_add-content:node/add',
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 1,
+    'expanded' => 1,
+    'weight' => -50,
+    'customized' => 1,
+  );
   // Exported menu link: main-menu_dashboard:dashboard.
   $menu_links['main-menu_dashboard:dashboard'] = array(
     'menu_name' => 'main-menu',
@@ -96,6 +119,7 @@ function ma_core_menu_default_menu_links() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Add Content');
   t('Dashboard');
   t('Log in');
   t('Log out');

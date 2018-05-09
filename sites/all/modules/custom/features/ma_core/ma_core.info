@@ -138,6 +138,7 @@ features[filter][] = markdown
 features[filter][] = plain_text
 features[menu_custom][] = main-menu
 features[menu_custom][] = menu-browse-menu
+features[menu_links][] = main-menu_add-content:node/add
 features[menu_links][] = main-menu_dashboard:dashboard
 features[menu_links][] = main-menu_log-in:user/login
 features[menu_links][] = main-menu_log-out:user/logout
