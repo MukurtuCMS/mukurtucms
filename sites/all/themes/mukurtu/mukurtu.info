@@ -32,6 +32,7 @@ stylesheets[all][] = font-awesome/css/font-awesome.min.css
 ;;;;;;;;;;;;;;;;;;;;;
 ;; Settings
 ;;;;;;;;;;;;;;;;;;;;;
+settings[bootstrap_fluid_container] = 1
 settings[mukurtu_theme_color_scheme] = 'blue-gold'
 settings[mukurtu_theme_email_us_message] = 'Email us at'
 settings[mukurtu_theme_contact_email] = 'support@mukurtu.org'
