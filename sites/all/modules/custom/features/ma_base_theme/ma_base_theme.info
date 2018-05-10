@@ -26,7 +26,6 @@ dependencies[] = imagecache_coloractions
 dependencies[] = license
 dependencies[] = list
 dependencies[] = ma_core
-dependencies[] = ma_dictionary
 dependencies[] = ma_digitalheritage
 dependencies[] = ma_media
 dependencies[] = ma_scald
