@@ -1,8 +1,11 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_form_element().
  */
+
+/* @noinspection PhpDocMissingThrowsInspection */
 
 /**
  * Returns HTML for a form element.
@@ -55,7 +58,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_form_element(&$variables) {
+function bootstrap_form_element(array &$variables) {
   $element = &$variables['element'];
   $name = !empty($element['#name']) ? $element['#name'] : FALSE;
   $type = !empty($element['#type']) ? $element['#type'] : FALSE;
@@ -77,12 +80,12 @@ function bootstrap_form_element(&$variables) {
   );
 
   // Add wrapper ID for 'item' type.
-  if ($type && $type === 'item' && !empty($element['#markup']) && !empty($element['#id'])) {
+  if ($type && $type === 'item' && isset($element['#markup']) && !empty($element['#id'])) {
     $wrapper_attributes['id'] = $element['#id'];
   }
 
   // Check for errors and set correct error class.
-  if ((isset($element['#parents']) && form_get_error($element) !== NULL) || (!empty($element['#required']) && bootstrap_setting('forms_required_has_error'))) {
+  if ((isset($element['#parents']) && form_get_error($element) !== NULL) || (!empty($element['#required']) && (!isset($element['#value']) || $element['#value'] === '') && bootstrap_setting('forms_required_has_error'))) {
     $wrapper_attributes['class'][] = 'has-error';
   }
 
@@ -120,6 +123,7 @@ function bootstrap_form_element(&$variables) {
     $build['#theme_wrappers'] = array('container__form_element');
 
     // Render the label for the form element.
+    /* @noinspection PhpUnhandledExceptionInspection */
     $build['label'] = array(
       '#markup' => theme('form_element_label', $variables),
       '#weight' => $element['#title_display'] === 'before' ? 0 : 2,

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_file_upload_help().
@@ -21,7 +22,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_file_upload_help($variables) {
+function bootstrap_file_upload_help(array $variables) {
   // If popover's are disabled, just theme this normally.
   if (!bootstrap_setting('popover_enabled')) {
     return theme_file_upload_help($variables);

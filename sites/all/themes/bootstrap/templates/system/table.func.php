@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_table().
@@ -31,19 +32,7 @@
  *     - "data": The string to display in the table cell.
  *     - "header": Indicates this cell is a header.
  *     - Any HTML attributes, such as "colspan", to apply to the table cell.
- *     Here's an example for $rows:
- * @code
- *     $rows = array(
- *       // Simple row
- *       array(
- *         'Cell 1', 'Cell 2', 'Cell 3'
- *       ),
- *       // Row with attributes on the row and some of its cells.
- *       array(
- *         'data' => array('Cell 1', array('data' => 'Cell 2', 'colspan' => 2)), 'class' => array('funky')
- *       )
- *     );
- * @endcode
+ *     See theme_table() for a $rows example.
  *   - footer: An array containing the table footer. Each element of the array
  *     can be either a localized string or an associative array with the
  *     following keys:
@@ -65,26 +54,7 @@
  *       include a "data" attribute. To add attributes to COL elements, set the
  *       "data" attribute with an array of columns, each of which is an
  *       associative array of HTML attributes.
- *     Here's an example for $colgroup:
- * @code
- *     $colgroup = array(
- *       // COLGROUP with one COL element.
- *       array(
- *         array(
- *           'class' => array('funky'), // Attribute for the COL element.
- *         ),
- *       ),
- *       // Colgroup with attributes and inner COL elements.
- *       array(
- *         'data' => array(
- *           array(
- *             'class' => array('funky'), // Attribute for the COL element.
- *           ),
- *         ),
- *         'class' => array('jazzy'), // Attribute for the COLGROUP element.
- *       ),
- *     );
- * @endcode
+ *     See theme_table() for a $colgroup example.
  *     These optional tags are used to group and set properties on columns
  *     within a table. For example, one may easily group three columns and
  *     apply same background style to all.
@@ -99,7 +69,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_table($variables) {
+function bootstrap_table(array $variables) {
   $header = $variables['header'];
   $rows = $variables['rows'];
   $footer = $variables['footer'];

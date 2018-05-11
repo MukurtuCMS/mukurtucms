@@ -33,6 +33,7 @@ function ma_person_field_default_field_bases() {
       ),
       'timezone_db' => '',
       'todate' => '',
+      'treeable' => FALSE,
       'tz_handling' => 'none',
     ),
     'translatable' => 0,
@@ -62,6 +63,7 @@ function ma_person_field_default_field_bases() {
       ),
       'timezone_db' => '',
       'todate' => '',
+      'treeable' => FALSE,
       'tz_handling' => 'none',
     ),
     'translatable' => 0,
@@ -88,6 +90,7 @@ function ma_person_field_default_field_bases() {
         1 => 'Yes',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -107,7 +110,9 @@ function ma_person_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );
@@ -146,6 +151,7 @@ function ma_person_field_default_field_bases() {
         ),
       ),
       'target_type' => 'scald_atom',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -181,6 +187,7 @@ function ma_person_field_default_field_bases() {
         ),
       ),
       'target_type' => 'taxonomy_term',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -224,6 +231,7 @@ function ma_person_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -239,7 +247,9 @@ function ma_person_field_default_field_bases() {
     'indexes' => array(),
     'locked' => 0,
     'module' => 'paragraphs',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'paragraphs',
   );
@@ -277,6 +287,7 @@ function ma_person_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -303,6 +314,7 @@ function ma_person_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -322,7 +334,9 @@ function ma_person_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );
@@ -341,7 +355,9 @@ function ma_person_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -362,6 +378,7 @@ function ma_person_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -377,7 +394,9 @@ function ma_person_field_default_field_bases() {
     'indexes' => array(),
     'locked' => 0,
     'module' => 'paragraphs',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'paragraphs',
   );

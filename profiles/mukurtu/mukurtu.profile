@@ -17,11 +17,12 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_default_tax_terms' => array(),
     'mukurtu_default_menu_links' => array(),
     'mukurtu_create_default_pages' => array(),
-    'mukurtu_create_default_contexts' => array(),
+    //    'mukurtu_create_default_contexts' => array(),
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
     'mukurtu_cycle_search_api' => array(),
+    'mukurtu_revert_features' => array()
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -42,8 +43,8 @@ function mukurtu_set_misc_vars () {
 }
 
 function mukurtu_set_theme () {
-  theme_enable (array('mukurtu_starter'));
-  variable_set ('theme_default', 'mukurtu_starter');
+  theme_enable(array('bootstrap', 'mukurtu'));
+  variable_set ('theme_default', 'mukurtu');
   theme_disable (array('bartik', 'seven'));
 }
 
@@ -218,7 +219,7 @@ function mukurtu_create_default_contexts () {
 
   // frontpage context
   $context = new stdClass();
-  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->disabled = TRUE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'front_page';
   $context->description = '';

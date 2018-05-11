@@ -74,7 +74,7 @@ function ma_profile_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 3,
+        'weight' => 1,
       ),
     ),
     'ds_extras_field_template' => '',

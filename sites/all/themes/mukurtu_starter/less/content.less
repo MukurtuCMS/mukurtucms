@@ -124,7 +124,7 @@
   }
 }
 
-.field {
+.field, .cke_editable {
   .label-inline {
     float:left;
     font-weight: bold;
@@ -176,20 +176,18 @@
   }
 }
 
-
-//// Collections
-
-#edit-field-digital-heritage-items .field-label {
-  display: none;
-}
-
 //// Collections SAPI page
-// Hide the label on the search box. Not sure what I did on DH to not require this on that sapi page.
-#edit-search-api-views-fulltext-wrapper label {
-  display: none;
+.view-collections-grid-list {
+  .field-name-collections-title-with-count {
+    font-size: 30px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.1;
+    font-weight: 200;
+  }
 }
 
-//// DH node form
+//// Digital Heritage node form
 
 .node-type-digital-heritage, .page-node-add-digital-heritage {
 
@@ -202,6 +200,21 @@
   #edit-og-group-ref {
     display:none;
   }
+
+  #edit-field-original-date .help-block {
+    clear: both;
+    margin: 0;
+    margin-top: 50px;
+    padding: 0;
+  }
+
+  // Original Date field
+  #field-original-date-add-more-wrapper {
+    .form-group {
+      margin-bottom: 0;
+    }
+  }
+
 }
 
 //// Community node form
@@ -226,6 +239,17 @@
   }
 
 }
+
+// Collection node form
+#collection-node-form {
+
+  // Hide the default protocol field
+  #edit-og-group-ref {
+    display: none;
+  }
+
+}
+
 // Dictionary Word full node view
 .node-dictionary-word.view-mode-full, .node-word-list.view-mode-full {
 
@@ -328,13 +352,11 @@
 
 // toggle display via the grid/list clicker
 
-
 .view-digital-heritage-grid-list,
 .view-collections-grid-list,
 .view-dictionary-words {
   .view-header {
     float:right;
-    margin-top:-60px;
     margin-right: 20px;
 
     a {
@@ -425,6 +447,10 @@
 
 a:hover {
   text-decoration: none;
+}
+
+#edit-search-api-views-fulltext-wrapper label {
+  display: none;
 }
 
 // Dictionary-specific Grid / List view
@@ -581,9 +607,6 @@ a:hover {
   }
 }
 
-
-
-// This can probably be removed:
 .panel-panel .right-pane,
 .pane-block {
   background: #F8F7F7;
@@ -592,13 +615,13 @@ a:hover {
     background: #E3E2E1;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    padding: 5px 10px;
     padding: 10px 20px;
     font-size: 140%;
     font-weight: 400;
   }
   .pane-content {
     padding-left:20px;
+    padding-right:20px;
     padding-bottom:10px;
     .view-content {
       line-height:25px;
@@ -1164,3 +1187,108 @@ a.tooltips span {
    overflow-x: visible !important;
    overflow-y: visible !important;
 }
+
+// Add to Collection modal
+.modal-add-to-collection {
+
+  // The default position is too close to the top of the screen.
+  // top: 200px !important; // This only works in the full node view.
+  // TODO: get the modal to center vertically, or perhaps position where the mouse was clicked.
+
+  // Hide the header. Instead we add a cancel button. Keep the modal smaller.
+  .modal-header {
+    display: none;
+  }
+
+  .loading-spinner {
+    display: none; // width below not positioned properly, so simply hiding the spinner. It's a quick load and shouldn't matter. If there turns out to be sites with many, many Collection / Personal Collections and the modal loads slowly, then look at this again.
+    // width: 100% !important; // Need to fill to max as the default fixed width no good for dynamic width modal.
+   //  top: 25px !important;  // With the hidden header, we need to slightly reposition the spinner.
+  }
+}
+
+// Collections tree. Based on http://odyniec.net/articles/turning-lists-into-trees/.
+
+.collections-tree {
+
+  ul {
+    background: url(../collection_tree/vline.png) repeat-y;
+    margin-left: 10px;
+    padding: 0;
+  }
+  li {
+    padding: 0 12px;
+    line-height: 20px;
+    background: url(../collection_tree/node.png) no-repeat;
+    list-style-type: none;
+  }
+  li.last {
+    background: #fff url(../collection_tree/lastnode.png) no-repeat;
+  }
+  .parent {
+    background: none !important;
+  }
+  .current {
+    font-weight: bold;
+  }
+}
+.class-collections-tree-popup {
+  ul.collections-tree {
+    padding: 0;
+    margin: 0;
+  }
+  a {
+    color: #337ab7 !important;
+    text-decoration: none !important;
+  }
+  // Dynamic width (expand to whatever size is required to fit contents)
+  td.center {
+    white-space: nowrap;
+    .inner {
+      width: auto !important;
+    }
+  }
+
+}
+
+// File Fixity
+.view-mode-full {
+  .field-name-fixity-reports {
+    .label-above {
+      font-size: 1.5em;
+      text-transform: capitalize;
+      margin-top: 1em;
+    }
+    .views-row {
+      padding-bottom: 1em;
+      border-bottom: solid;
+      border-width: 1px;
+    }
+    .field-name-field-fixity-check-fails-details {
+      ul {
+        padding-left: 30px;
+        list-style-type: disc;
+        .fail {
+          color: red;
+        }
+        .pass {
+          color: green;
+        }
+        p {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+.fixity-check-fail-status {
+  font-weight: bold;
+  color: red;
+  text-transform: uppercase;
+}
+.fixity-check-pass-status {
+  font-weight: bold;
+  color: green;
+  text-transform: uppercase;
+}
+

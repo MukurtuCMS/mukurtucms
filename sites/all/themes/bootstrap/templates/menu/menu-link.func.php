@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_menu_link() and suggestion(s).
@@ -94,8 +95,8 @@ function bootstrap_menu_link__book_toc(array $variables) {
   if ($link) {
     $title = l($title, $href, $options);
   }
-  // Otherwise, filter the title if "html" is not set, otherwise l() will automatically
-  // sanitize using check_plain(), so no need to call that here.
+  // Otherwise, filter the title if "html" is not set, otherwise l() will
+  // automatically sanitize using check_plain(), so no need to call that here.
   elseif (empty($options['html'])) {
     $title = filter_xss_admin($title);
   }

@@ -546,10 +546,12 @@ function og_node_access($node, $op, $account) {
     }
 
     // mukurtu patch
-    // Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
+    // Edit perms on nodes-in-CP nodes should be determined by our custom logic, same as view perms
     // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
-    if ($op == 'update' && $node->type=='digital_heritage') {
-        return mukurtu_protocol_field_update_dh_dw_access($node);
+    if ($op == 'update') {
+      if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
+        return mukurtu_protocol_field_update_node_in_cp_access($node);
+      }
     }
     // end patch
 

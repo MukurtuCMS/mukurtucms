@@ -67,12 +67,19 @@ function ma_culturalprotocol_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 3,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'full' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -103,7 +110,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -121,16 +128,21 @@ function ma_culturalprotocol_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
+        'type' => 'hidden',
         'weight' => 20,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 22,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -158,6 +170,61 @@ function ma_culturalprotocol_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-cultural_protocol_group-field_pre_actions'.
+  $field_instances['node-cultural_protocol_group-field_pre_actions'] = array(
+    'bundle' => 'cultural_protocol_group',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
+    ),
+  );
+
   // Exported field_instance:
   // 'node-cultural_protocol_group-field_protocl_signup_permissions'.
   $field_instances['node-cultural_protocol_group-field_protocl_signup_permissions'] = array(
@@ -172,16 +239,21 @@ function ma_culturalprotocol_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
+        'type' => 'hidden',
         'weight' => 18,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -223,16 +295,21 @@ function ma_culturalprotocol_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
+        'type' => 'hidden',
         'weight' => 19,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -269,13 +346,15 @@ function ma_culturalprotocol_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'atom_reference',
-        'settings' => array(
-          'link' => 0,
-          'override' => 0,
-        ),
-        'type' => 'title',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 16,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -315,7 +394,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -330,19 +409,25 @@ function ma_culturalprotocol_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
+      'featured_content' => array(
+        'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'title',
-        'weight' => 17,
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -372,7 +457,7 @@ function ma_culturalprotocol_field_default_field_instances() {
         'context' => 'mukurtu_scald_media_assets_edit_',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -381,8 +466,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'bundle' => 'cultural_protocol_group',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
-Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ',
+    'description' => 'Open - This cultural protocol and the items within it are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
+Strict - This cultural protocol and the items within it are shared with, visible, and accessible to its cultural protocol members only ',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -396,11 +481,17 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'type' => 'hidden',
         'weight' => 13,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -461,11 +552,17 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'type' => 'hidden',
         'weight' => 11,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -529,11 +626,17 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'type' => 'list_default',
         'weight' => 15,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -585,10 +688,15 @@ Strict - This cultural protocol and the digital heritage items within are shared
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'og_ui',
         'settings' => array(),
-        'type' => 'og_list_default',
+        'type' => 'hidden',
         'weight' => 14,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
       ),
       'full' => array(
         'label' => 'above',
@@ -609,7 +717,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 6,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -658,7 +766,7 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'apply_chosen' => 1,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -686,11 +794,17 @@ Strict - This cultural protocol and the digital heritage items within are shared
         'type' => 'hidden',
         'weight' => 12,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -740,11 +854,12 @@ Strict - This cultural protocol and the digital heritage items within are shared
   t('Group roles and permissions');
   t('Group type');
   t('Membership List Options');
-  t('Open - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
-Strict - This cultural protocol and the digital heritage items within are shared with, visible, and accessible to its cultural protocol members only ');
+  t('Open - This cultural protocol and the items within it are shared with, visible, and accessible to any site visitor, regardless of protocol membership<br>
+Strict - This cultural protocol and the items within it are shared with, visible, and accessible to its cultural protocol members only ');
   t('Parent Community');
   t('Please select the Community to which this Cultural Protocol belongs. You may select multiple Communities. You may only select or deselect Parent Communities for which you are a Community Manager.
 ');
+  t('Pre-Actions');
   t('Select Group if you want this content type to be a group that can be associated to users, content and used for access settings.');
   t('Sharing Protocol');
   t('Signup Permissions');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "date_views_pager" theme hook [pre]process functions.
@@ -9,11 +10,14 @@
  *
  * See template for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see date-views-pager.tpl.php
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_date_views_pager(&$variables) {
+function bootstrap_preprocess_date_views_pager(array &$variables) {
   $mini = !empty($variables['mini']);
 
   // Link types.
@@ -44,7 +48,7 @@ function bootstrap_preprocess_date_views_pager(&$variables) {
   foreach ($types as $type => $text) {
     $item_classes = array($type);
 
-    $options = isset($variables[$type . '_options']) ? $variables[$type . '_options']: array();
+    $options = isset($variables[$type . '_options']) ? $variables[$type . '_options'] : array();
     $options += array('attributes' => array());
 
     $url = $variables[$type . '_url'];

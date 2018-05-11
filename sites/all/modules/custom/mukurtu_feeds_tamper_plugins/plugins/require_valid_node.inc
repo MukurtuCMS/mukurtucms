@@ -89,7 +89,7 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
             // If the node doesn't match the specified type, don't import the item and also notify the user why it failed
             if($referenced_node->type != $node_type) {
                 unset($result->items[$item_key]);
-                _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'did not reference the requried node type of "' . $node_type . '"');
+                _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'did not reference the required node type of "' . $node_type . '"');
                 return;
             }
             

@@ -51,6 +51,12 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['nid']['specify_validation'] = TRUE;
+  $handler->display->display_options['arguments']['nid']['validate']['type'] = 'node';
+  $handler->display->display_options['arguments']['nid']['validate_options']['types'] = array(
+    'digital_heritage' => 'digital_heritage',
+  );
+  $handler->display->display_options['arguments']['nid']['validate']['fail'] = 'ignore';
   $handler->display->display_options['arguments']['nid']['not'] = TRUE;
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
@@ -637,11 +643,11 @@ return FALSE;';
   $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
   $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
   $handler->display->display_options['fields']['field_contributor']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
-  /* Field: Content: Collection */
+  /* Field: Content: Collections */
   $handler->display->display_options['fields']['field_collection']['id'] = 'field_collection';
   $handler->display->display_options['fields']['field_collection']['table'] = 'field_data_field_collection';
   $handler->display->display_options['fields']['field_collection']['field'] = 'field_collection';
@@ -845,8 +851,8 @@ return FALSE;';
     t('Category'),
     t('Creator'),
     t('Contributor'),
-    t('Original Date'),
-    t('Collection'),
+    t('Original Date Description'),
+    t('Collections'),
     t('Category (field_category)'),
     t('Community Record Parent (field_community_record_parent)'),
     t('Is Community Record'),

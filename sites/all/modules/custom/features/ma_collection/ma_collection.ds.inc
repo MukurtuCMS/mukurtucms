@@ -12,19 +12,70 @@ function ma_collection_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|collection|collections_browse';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'collection';
+  $ds_fieldsetting->view_mode = 'collections_browse';
+  $ds_fieldsetting->settings = array(
+    'collection_item_count' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'node_link' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link text' => 'View Collection',
+        'link class' => '',
+        'wrapper' => '',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|collection|collections_browse'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|collection|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'collection';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'collections_tree' => array(
+      'weight' => '8',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'In this collection',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'field_digital_heritage_items' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
       ),
     ),
   );
@@ -42,13 +93,23 @@ function ma_collection_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_collection_image' => array(
+  );
+  $export['node|collection|search_result'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|personal_collection|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'personal_collection';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'field_digital_heritage_items' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
     ),
   );
-  $export['node|collection|search_result'] = $ds_fieldsetting;
+  $export['node|personal_collection|default'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -61,21 +122,65 @@ function ma_collection_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'collection_item_count';
+  $ds_field->label = 'Collection Item Count';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php 
+$count = ma_collection_get_item_count($entity);
+if($count == 1) {
+   print t(\'@count item\', array( \'@count\' => $count)); 
+} else {
+   print t(\'@count items\', array( \'@count\' => $count)); 
+}
+
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['collection_item_count'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'collections_title_with_count';
   $ds_field->label = 'Collections title with count';
   $ds_field->field_type = 5;
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'collection|search_result';
+  $ds_field->ui_limit = '';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<?php print ma_collection_collections_title_with_count ($entity); ?>',
+      'value' => '<?php print ma_collection_collections_title_with_count_and_tree_popup ($entity); ?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,
   );
   $export['collections_title_with_count'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'collections_tree';
+  $ds_field->label = 'Collections Tree';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php return ma_collection_collections_tree($entity); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['collections_tree'] = $ds_field;
 
   return $export;
 }
@@ -88,29 +193,85 @@ function ma_collection_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|collection|collections_browse';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'collection';
+  $ds_layout->view_mode = 'collections_browse';
+  $ds_layout->layout = 'bootstrap_6_6';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_collection_image',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'collection_item_count',
+        3 => 'field_collection_summary',
+        4 => 'node_link',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'left',
+      'title' => 'right',
+      'collection_item_count' => 'right',
+      'field_collection_summary' => 'right',
+      'node_link' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'left' => array(
+        'large-teaser-image' => 'large-teaser-image',
+      ),
+      'right' => array(
+        'large-teaser-box' => 'large-teaser-box',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|collection|collections_browse'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|collection|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'collection';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
-        0 => 'title',
-        1 => 'field_collection_image',
+      'top' => array(
+        0 => 'field_collection_image',
+        1 => 'title',
         2 => 'field_collection_summary',
-        3 => 'field_description',
-        4 => 'field_collection_credit',
+        3 => 'field_collection_credit',
+        4 => 'field_description',
+      ),
+      'left' => array(
         5 => 'field_digital_heritage_items',
+      ),
+      'right' => array(
+        6 => 'collections_tree',
       ),
     ),
     'fields' => array(
-      'title' => 'ds_content',
-      'field_collection_image' => 'ds_content',
-      'field_collection_summary' => 'ds_content',
-      'field_description' => 'ds_content',
-      'field_collection_credit' => 'ds_content',
-      'field_digital_heritage_items' => 'ds_content',
+      'field_collection_image' => 'top',
+      'title' => 'top',
+      'field_collection_summary' => 'top',
+      'field_collection_credit' => 'top',
+      'field_description' => 'top',
+      'field_digital_heritage_items' => 'left',
+      'collections_tree' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -118,13 +279,17 @@ function ma_collection_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|collection|default'] = $ds_layout;
 
@@ -138,38 +303,50 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'group_tabs',
-        2 => 'title',
-        3 => 'group_basic',
-        4 => 'field_collection_summary',
-        5 => 'group_digital_heritage_items',
-        6 => 'path',
-        7 => 'field_description',
-        8 => 'field_collection_image',
-        9 => 'redirect',
-        11 => 'field_digital_heritage_items',
-        12 => 'field_collection_credit',
+        0 => 'field_pre_actions',
+        1 => 'group_basic',
+        2 => 'group_tabs',
+        3 => 'group_items',
+        4 => 'path',
+        5 => 'group_collections_related',
+        6 => 'title',
+        7 => 'redirect',
+        9 => 'field_collection_summary',
+        10 => 'field_digital_heritage_items',
+        11 => 'og_group_ref',
+        12 => 'field_description',
+        14 => 'field_collection_image',
+        15 => 'field_item_privacy_setting',
+        16 => 'field_collection_credit',
+        17 => 'field_collections_parent_coll',
+        18 => 'field_collections_child_coll',
       ),
       'hidden' => array(
-        1 => 'group_digital_heritage',
-        10 => 'field_digital_heritage_count',
-        13 => '_add_existing_field',
+        8 => 'field_community_ref',
+        13 => 'field_digital_heritage_count',
+        19 => '_add_existing_field',
       ),
     ),
     'fields' => array(
-      'group_tabs' => 'ds_content',
-      'group_digital_heritage' => 'hidden',
-      'title' => 'ds_content',
+      'field_pre_actions' => 'ds_content',
       'group_basic' => 'ds_content',
-      'field_collection_summary' => 'ds_content',
-      'group_digital_heritage_items' => 'ds_content',
+      'group_tabs' => 'ds_content',
+      'group_items' => 'ds_content',
       'path' => 'ds_content',
-      'field_description' => 'ds_content',
-      'field_collection_image' => 'ds_content',
+      'group_collections_related' => 'ds_content',
+      'title' => 'ds_content',
       'redirect' => 'ds_content',
-      'field_digital_heritage_count' => 'hidden',
+      'field_community_ref' => 'hidden',
+      'field_collection_summary' => 'ds_content',
       'field_digital_heritage_items' => 'ds_content',
+      'og_group_ref' => 'ds_content',
+      'field_description' => 'ds_content',
+      'field_digital_heritage_count' => 'hidden',
+      'field_collection_image' => 'ds_content',
+      'field_item_privacy_setting' => 'ds_content',
       'field_collection_credit' => 'ds_content',
+      'field_collections_parent_coll' => 'ds_content',
+      'field_collections_child_coll' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -185,6 +362,7 @@ function ma_collection_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|collection|form'] = $ds_layout;
 
@@ -198,16 +376,16 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'field_collection_image',
-        1 => 'collections_title_with_count',
+        0 => 'collections_title_with_count',
+        1 => 'field_collection_image',
         2 => 'group_list_view_fields',
         3 => 'field_collection_summary',
         4 => 'field_collection_credit',
       ),
     ),
     'fields' => array(
-      'field_collection_image' => 'ds_content',
       'collections_title_with_count' => 'ds_content',
+      'field_collection_image' => 'ds_content',
       'group_list_view_fields' => 'ds_content',
       'field_collection_summary' => 'ds_content',
       'field_collection_credit' => 'ds_content',
@@ -225,8 +403,129 @@ function ma_collection_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|collection|search_result'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|personal_collection|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'personal_collection';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_collection_image',
+        1 => 'field_personal_coll_privacy',
+        2 => 'field_collection_summary',
+        3 => 'field_description',
+        4 => 'field_digital_heritage_items',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'ds_content',
+      'field_personal_coll_privacy' => 'ds_content',
+      'field_collection_summary' => 'ds_content',
+      'field_description' => 'ds_content',
+      'field_digital_heritage_items' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|personal_collection|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|personal_collection|form';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'personal_collection';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_pre_actions',
+        1 => 'title',
+        2 => 'group_tabs',
+        3 => 'redirect',
+        4 => 'field_personal_coll_privacy',
+        5 => 'path',
+        6 => 'field_collection_summary',
+        7 => 'field_description',
+        9 => 'field_digital_heritage_items',
+        10 => 'field_collection_image',
+        12 => 'group_basic',
+        13 => 'group_items',
+      ),
+      'hidden' => array(
+        8 => 'field_digital_heritage_count',
+        11 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'field_pre_actions' => 'ds_content',
+      'title' => 'ds_content',
+      'group_tabs' => 'ds_content',
+      'redirect' => 'ds_content',
+      'field_personal_coll_privacy' => 'ds_content',
+      'path' => 'ds_content',
+      'field_collection_summary' => 'ds_content',
+      'field_description' => 'ds_content',
+      'field_digital_heritage_count' => 'hidden',
+      'field_digital_heritage_items' => 'ds_content',
+      'field_collection_image' => 'ds_content',
+      '_add_existing_field' => 'hidden',
+      'group_basic' => 'ds_content',
+      'group_items' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|personal_collection|form'] = $ds_layout;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_view_modes_info().
+ */
+function ma_collection_ds_view_modes_info() {
+  $export = array();
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'collections_browse';
+  $ds_view_mode->label = 'Collections Browse';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+  );
+  $export['collections_browse'] = $ds_view_mode;
 
   return $export;
 }

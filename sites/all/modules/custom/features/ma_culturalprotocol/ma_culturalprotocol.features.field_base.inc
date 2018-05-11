@@ -32,6 +32,7 @@ function ma_culturalprotocol_field_default_field_bases() {
         'open' => 'Open group, anyone can join',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -57,6 +58,7 @@ function ma_culturalprotocol_field_default_field_bases() {
         1 => '',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -76,7 +78,9 @@ function ma_culturalprotocol_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );
@@ -95,7 +99,9 @@ function ma_culturalprotocol_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "table" theme hook [pre]process functions.
@@ -9,12 +10,15 @@
  *
  * See theme function for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see bootstrap_table()
  * @see theme_table()
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_table(&$variables) {
+function bootstrap_preprocess_table(array &$variables) {
   // Prepare classes array if necessary.
   if (!isset($variables['attributes']['class'])) {
     $variables['attributes']['class'] = array();
@@ -36,7 +40,7 @@ function bootstrap_preprocess_table(&$variables) {
  * @param array $variables
  *   The variables of the theme hook, passed by reference.
  */
-function _bootstrap_table_add_classes(&$classes, &$variables) {
+function _bootstrap_table_add_classes(array &$classes, array &$variables) {
   $context = $variables['context'];
 
   // Generic table class for all tables.
@@ -63,5 +67,6 @@ function _bootstrap_table_add_classes(&$classes, &$variables) {
   }
 
   // Responsive table.
-  $variables['responsive'] = isset($context['responsive']) ? $context['responsive'] : bootstrap_setting('table_responsive');
+  $responsive = (int) (isset($context['responsive']) ? $context['responsive'] : bootstrap_setting('table_responsive', NULL, 'bootstrap', -1));
+  $variables['responsive'] = $responsive === -1 ? !path_is_admin(current_path()) : !!$responsive;
 }

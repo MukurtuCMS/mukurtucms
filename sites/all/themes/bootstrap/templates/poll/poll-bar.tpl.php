@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Default theme implementation to display bar for a single choice in a poll.

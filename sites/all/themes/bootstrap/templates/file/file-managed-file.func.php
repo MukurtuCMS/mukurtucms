@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_file_managed_file().
@@ -18,7 +19,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_file_managed_file($variables) {
+function bootstrap_file_managed_file(array $variables) {
   $output = '';
   $element = $variables['element'];
 

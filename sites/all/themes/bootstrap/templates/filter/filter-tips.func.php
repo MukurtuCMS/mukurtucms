@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_filter_tips().
@@ -11,8 +12,9 @@
  *   An associative array containing:
  *   - tips: An array containing descriptions and a CSS ID in the form of
  *     'module-name/filter-id' (only used when $long is TRUE) for each
- *     filter in one or more text formats. Example:
- *     @code
+ *     filter in one or more text formats. Example:.
+ *
+ * @code
  *       array(
  *         'Full HTML' => array(
  *           0 => array(
@@ -21,7 +23,7 @@
  *           ),
  *         ),
  *       );
- *     @endcode
+ * @endcode
  *   - long: (optional) Whether the passed-in filter tips contain extended
  *     explanations, i.e. intended to be output on the path 'filter/tips'
  *     (TRUE), or are in a short format, i.e. suitable to be displayed below a
@@ -35,7 +37,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_filter_tips($variables) {
+function bootstrap_filter_tips(array $variables) {
   $format_id = arg(2);
   $current_path = current_path();
   $tips = _filter_tips(-1, TRUE);

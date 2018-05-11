@@ -24,6 +24,18 @@ dashboard*
 dashboard',
     'roles' => array(),
     'themes' => array(
+      'bootstrap' => array(
+        'region' => 'header',
+        'status' => 1,
+        'theme' => 'bootstrap',
+        'weight' => 0,
+      ),
+      'mukurtu' => array(
+        'region' => 'header',
+        'status' => 1,
+        'theme' => 'mukurtu',
+        'weight' => -49,
+      ),
       'mukurtu_starter' => array(
         'region' => 'header',
         'status' => 1,

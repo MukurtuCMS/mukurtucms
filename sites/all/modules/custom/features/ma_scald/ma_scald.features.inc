@@ -50,5 +50,20 @@ function ma_scald_image_default_styles() {
     ),
   );
 
+  // Exported image style: tiny_thumbnail.
+  $styles['tiny_thumbnail'] = array(
+    'label' => 'Tiny Thumbnail',
+    'effects' => array(
+      15 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 35,
+          'height' => 35,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
   return $styles;
 }

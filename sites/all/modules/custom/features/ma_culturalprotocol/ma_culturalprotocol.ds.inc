@@ -73,12 +73,12 @@ function ma_culturalprotocol_ds_field_settings_info() {
       'format' => 'default',
     ),
     'group_members' => array(
-      'weight' => '5',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'protocol_dh_items' => array(
-      'weight' => '4',
+      'weight' => '3',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -86,11 +86,6 @@ function ma_culturalprotocol_ds_field_settings_info() {
           'lb-col' => TRUE,
         ),
       ),
-    ),
-    'title' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
     ),
     'og_group_ref' => array(
       'formatter_settings' => array(
@@ -170,77 +165,27 @@ function ma_culturalprotocol_ds_layout_settings_info() {
   $ds_layout->view_mode = 'default';
   $ds_layout->layout = 'ds_2col_stacked';
   $ds_layout->settings = array(
-    'hide_empty_regions' => 0,
-    'hide_sidebars' => 0,
     'regions' => array(
       'header' => array(
         0 => 'title',
       ),
       'left' => array(
-        0 => 'comments',
-        1 => 'field_media',
+        1 => 'comments',
         2 => 'body',
-        3 => 'group_register',
+        5 => 'group_register',
       ),
       'right' => array(
-        0 => 'author',
-        1 => 'admin_actions',
+        3 => 'author',
+        4 => 'admin_actions',
       ),
     ),
     'fields' => array(
       'title' => 'header',
       'comments' => 'left',
-      'field_media' => 'left',
       'body' => 'left',
-      'group_register' => 'left',
       'author' => 'right',
       'admin_actions' => 'right',
-    ),
-    'classes' => array(
-      'header' => array(
-        'grid-6' => 'grid-6',
-      ),
-      'left' => array(
-        'grid-6' => 'grid-6',
-      ),
-      'right' => array(
-        'grid-4' => 'grid-4',
-      ),
-    ),
-  );
-  $export['node|cultural_protocol_group|default'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|cultural_protocol_group|full';
-  $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'cultural_protocol_group';
-  $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_2col_stacked';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'header' => array(
-        0 => 'field_protocol_image',
-        1 => 'title',
-      ),
-      'left' => array(
-        2 => 'group_management_links',
-        3 => 'body',
-        4 => 'protocol_dh_items',
-      ),
-      'right' => array(
-        5 => 'group_members',
-        6 => 'og_group_ref',
-      ),
-    ),
-    'fields' => array(
-      'field_protocol_image' => 'header',
-      'title' => 'header',
-      'group_management_links' => 'left',
-      'body' => 'left',
-      'protocol_dh_items' => 'left',
-      'group_members' => 'right',
-      'og_group_ref' => 'right',
+      'group_register' => 'left',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -258,6 +203,57 @@ function ma_culturalprotocol_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['node|cultural_protocol_group|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|cultural_protocol_group|full';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'cultural_protocol_group';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'field_protocol_image',
+      ),
+      'left' => array(
+        1 => 'body',
+        2 => 'group_management_links',
+        3 => 'protocol_dh_items',
+      ),
+      'right' => array(
+        4 => 'group_members',
+        5 => 'og_group_ref',
+      ),
+    ),
+    'fields' => array(
+      'field_protocol_image' => 'top',
+      'body' => 'left',
+      'group_management_links' => 'left',
+      'protocol_dh_items' => 'left',
+      'group_members' => 'right',
+      'og_group_ref' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|cultural_protocol_group|full'] = $ds_layout;
 

@@ -834,20 +834,24 @@ function mukurtu_taxonomy_records_entity_update($entity, $type) {
         $emw_node = entity_metadata_wrapper('node', $entity);
         $emw_node_original = entity_metadata_wrapper('node', $entity->original);
         foreach($taxonomy_fields as $taxonomy_field) {
-            if(isset($entity->{$taxonomy_field['field_name']})) {
+            if(!empty($entity->{$taxonomy_field['field_name']})) {
                 $new = array();
                 $old = array();
                 // Get the new taxonomy refs
-                foreach($emw_node->{$taxonomy_field['field_name']}->value() as $index => $ref) {
-                    if(isset($ref->tid)) {
-                        $new[] = $ref->tid;
+                if(!empty($emw_node->{$taxonomy_field['field_name']}->value())) {
+                    foreach($emw_node->{$taxonomy_field['field_name']}->value() as $index => $ref) {
+                        if(isset($ref->tid)) {
+                            $new[] = $ref->tid;
+                        }
                     }
-                }               
+                }
 
                 // Get the old taxonomy refs
-                foreach($emw_node_original->{$taxonomy_field['field_name']}->value() as $index => $ref) {
-                    if(isset($ref->tid)) {
-                        $old[] = $ref->tid;
+                if(!empty($emw_node_original->{$taxonomy_field['field_name']}->value())) {
+                    foreach($emw_node_original->{$taxonomy_field['field_name']}->value() as $index => $ref) {
+                        if(isset($ref->tid)) {
+                            $old[] = $ref->tid;
+                        }
                     }
                 }
 

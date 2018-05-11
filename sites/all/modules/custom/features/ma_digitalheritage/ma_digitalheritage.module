@@ -321,7 +321,7 @@ function ma_digitalheritage_node_view($node, $view_mode) {
       // If no media items at all on the DH item and in grid view, put a placeholder image
       if (!$node->field_media_asset) {
         $node->content['field_media_asset'][0]['#markup'] = '
-      <div class="col-md-4 col-md-push-8 field field-name-field-media-asset field-type-atom-reference field-label-hidden">
+      <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
         <div class="field-items">
             <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
         </div>
@@ -335,7 +335,9 @@ function ma_digitalheritage_node_view($node, $view_mode) {
         // Users (especially new admins) are sometimes viewing community records independently of the parent record and getting confused
         // because they think it is a standalone record.  Add a link back to the parent record to avoid confusion.
         // Only show to users with edit rights, only concerned about unintentional edits.
-        if(!empty($node->field_community_record_parent)) {
+        $current_page_node = menu_get_object();
+        $current_page_nid = isset($current_page_node) ? $current_page_node->nid : 0;
+        if(!empty($node->field_community_record_parent) && ($current_page_nid != $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
             $parent_record = node_load($node->field_community_record_parent[$node->language][0]['target_id']);
             if($parent_record && node_access('update', $node)) {
 
@@ -619,7 +621,13 @@ function ma_digitalheritage_add_book_page ($node) {
  */
 function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form_state) {
 
-  // Always hide these fields
+  // Add an after build callback to tweak elements that aren't available here yet
+  $form['#after_build'][] = 'ma_digitalheritage_dh_form_after_build';
+
+  // In the Collections field, edit the title of the options to show collection ancestors.
+  $form['field_collection'][LANGUAGE_NONE]['#options'] = ma_collection_add_ancestors_to_collections_titles($form['field_collection'][LANGUAGE_NONE]['#options']);
+
+  // Prevent editing book parent
   $form['field_book_parent']['#access'] = FALSE;
 
   // Grab Community Record parent on node edit and set page title
@@ -722,6 +730,19 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 
   }
 
+}
+
+/**
+ * After-build changes to the DH node form.
+ */
+function ma_digitalheritage_dh_form_after_build($form, &$form_state) {
+
+  // Do some cleanup of the Original Date field
+  unset($form['field_original_date'][LANGUAGE_NONE][0]['_separator']);
+  $form['field_original_date']['und'][0]['from']['month']['#options'][''] = ''; // hide the "N/A"
+  $form['field_original_date']['und'][0]['from']['day']['#options'][''] = ''; // hide the "N/A"
+
+  return $form;
 }
 
 /**
@@ -917,8 +938,15 @@ function ma_digitalheritage_page_alter(&$data) {
 
       // Book pages
       if ($node->field_book_children OR $node->field_book_parent) {
-          drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
-          $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
+          // Future use of ma_digital_heritage_book_page_build_carousel is deprecated. Still use it in the case where
+          // the old mukurtu_starter theme is still in use, or a sub-theme of mukurtu_starter.
+          // Themes going forward should implement this in the template layer.
+          global $theme;
+          $theme_list = list_themes();
+          if($theme == 'mukurtu_starter' || (isset($theme_list[$theme]->base_themes) && isset($theme_list[$theme]->base_themes['mukurtu_starter']))) {
+              drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
+              $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
+          }
       }
 
       // Community Records
@@ -945,6 +973,10 @@ function ma_digitalheritage_page_alter(&$data) {
           #'weight' => 0,
         );
 
+        $cr_tab_count = 1;
+        $cr_tab_index = 0;
+        $cr_redirect_source = !empty($_SESSION['mukurtu']['redirect_source']) ? $_SESSION['mukurtu']['redirect_source'] : -1;
+        $cr_redirect_parent = !empty($_SESSION['mukurtu']['redirect_dest']) ? $_SESSION['mukurtu']['redirect_dest'] : -1;
         foreach ($community_records as $community_record) {
 
           global $user;
@@ -962,17 +994,33 @@ function ma_digitalheritage_page_alter(&$data) {
             $dh_tabs[] = array(
               'type' => 'node',
               'nid' => $community_record->nid,
-              'view_mode' => 'community_record',
+              'view_mode' => 'full',
               'title' => $community_record_tab_title,
               'hide_title' => 0,
               #'weight' => 0,
             );
+
+            // If we are coming from a community record redirect, check if this is the correct CR.
+            if($community_record->nid == $cr_redirect_source) {
+                // Store the tab index for the community record doing the redirect
+                $cr_tab_index = $cr_tab_count;
+            }
+            $cr_tab_count++;
           }
 
           // User does not have view access to the Community Record. Create an empty tab (which does not render) to maintain tab index for direct linking to tabs
           else {
             $dh_tabs[] = array();
           }
+        }
+
+        // Set default tab in the case that we are coming from a community record redirect
+        if($cr_redirect_parent == $parent_dh->getIdentifier() && $cr_tab_index > 0) {
+            $tab_settings['default_tab'] = $cr_tab_index;
+
+            // Clear the redirect info, if the page is refreshed, we want to default back to the parent being default
+            unset($_SESSION['mukurtu']['redirect_source']);
+            unset($_SESSION['mukurtu']['redirect_dest']);
         }
 
         // Add the rendered quicktabs to the built page content
@@ -1229,4 +1277,14 @@ function ma_digitalheritage_form_node_delete_confirm_alter(&$form, &$form_state)
     $form['description']['#markup'] = "<p><b>This will delete all of its Community Records.</b></p>" . $form['description']['#markup'];
     drupal_set_title ("Are you sure you want to delete <i>" . $form['#node']->title . "</i> and all of its Community Records?",  PASS_THROUGH);
   }
+}
+
+/**
+ * Implements hook_redirect_alter().
+ */
+function ma_digitalheritage_redirect_alter($redirect) {
+    // Store most recent redirect per session.
+    // We want to use that information to set the default tab for community records.
+    $_SESSION['mukurtu']['redirect_source'] = str_replace('node/', '', $redirect->source);
+    $_SESSION['mukurtu']['redirect_dest'] = str_replace('node/', '', $redirect->redirect);
 }

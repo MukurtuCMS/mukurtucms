@@ -1730,7 +1730,6 @@ output {
 .form-control {
   display: block;
   width: 100%;
-  height: 34px;
   padding: 6px 12px;
   font-size: 14px;
   line-height: 1.42857143;
@@ -9723,16 +9722,20 @@ table .checkbox input[type="checkbox"] {
 .node-teaser .row {
   padding-bottom: 30px;
 }
-.field .label-inline {
+.field .label-inline,
+.cke_editable .label-inline {
   float: left;
   font-weight: bold;
 }
 .field .label-above,
-.field .field-label {
+.cke_editable .label-above,
+.field .field-label,
+.cke_editable .field-label {
   font-weight: bold;
   text-transform: uppercase;
 }
-.field ul {
+.field ul,
+.cke_editable ul {
   list-style-type: none;
   padding-left: 0;
   margin: 0;
@@ -9763,11 +9766,12 @@ table .checkbox input[type="checkbox"] {
 .mukurtu-collapsed-fieldset-div.collapsed .field-group-format-toggler a {
   background-image: url(../grey-right-arrow.png);
 }
-#edit-field-digital-heritage-items .field-label {
-  display: none;
-}
-#edit-search-api-views-fulltext-wrapper label {
-  display: none;
+.view-collections-grid-list .field-name-collections-title-with-count {
+  font-size: 30px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  line-height: 1.1;
+  font-weight: 200;
 }
 .node-type-digital-heritage,
 .page-node-add-digital-heritage {
@@ -9776,6 +9780,17 @@ table .checkbox input[type="checkbox"] {
 .node-type-digital-heritage #edit-og-group-ref,
 .page-node-add-digital-heritage #edit-og-group-ref {
   display: none;
+}
+.node-type-digital-heritage #edit-field-original-date .help-block,
+.page-node-add-digital-heritage #edit-field-original-date .help-block {
+  clear: both;
+  margin: 0;
+  margin-top: 50px;
+  padding: 0;
+}
+.node-type-digital-heritage #field-original-date-add-more-wrapper .form-group,
+.page-node-add-digital-heritage #field-original-date-add-more-wrapper .form-group {
+  margin-bottom: 0;
 }
 .node-type-community #edit-group-access,
 .page-node-add-community #edit-group-access {
@@ -9786,6 +9801,9 @@ table .checkbox input[type="checkbox"] {
   height: 20px;
 }
 #dictionary-word-node-form #edit-og-group-ref {
+  display: none;
+}
+#collection-node-form #edit-og-group-ref {
   display: none;
 }
 .node-dictionary-word.view-mode-full .scald-atom,
@@ -9876,7 +9894,6 @@ table .checkbox input[type="checkbox"] {
 .view-collections-grid-list .view-header,
 .view-dictionary-words .view-header {
   float: right;
-  margin-top: -60px;
   margin-right: 20px;
 }
 .view-digital-heritage-grid-list .view-header a,
@@ -9995,6 +10012,9 @@ table .checkbox input[type="checkbox"] {
 }
 a:hover {
   text-decoration: none;
+}
+#edit-search-api-views-fulltext-wrapper label {
+  display: none;
 }
 .view-dictionary-words .field-name-download-atom {
   display: none;
@@ -10139,7 +10159,6 @@ a:hover {
   background: #E3E2E1;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  padding: 5px 10px;
   padding: 10px 20px;
   font-size: 140%;
   font-weight: 400;
@@ -10147,6 +10166,7 @@ a:hover {
 .panel-panel .right-pane .pane-content,
 .pane-block .pane-content {
   padding-left: 20px;
+  padding-right: 20px;
   padding-bottom: 10px;
 }
 .panel-panel .right-pane .pane-content .view-content,
@@ -10608,4 +10628,77 @@ a:hover {
 .table-responsive {
   overflow-x: visible !important;
   overflow-y: visible !important;
+}
+.modal-add-to-collection .modal-header {
+  display: none;
+}
+.modal-add-to-collection .loading-spinner {
+  display: none;
+}
+.collections-tree ul {
+  background: url(../collection_tree/vline.png) repeat-y;
+  margin-left: 10px;
+  padding: 0;
+}
+.collections-tree li {
+  padding: 0 12px;
+  line-height: 20px;
+  background: url(../collection_tree/node.png) no-repeat;
+  list-style-type: none;
+}
+.collections-tree li.last {
+  background: #ffffff url(../collection_tree/lastnode.png) no-repeat;
+}
+.collections-tree .parent {
+  background: none !important;
+}
+.collections-tree .current {
+  font-weight: bold;
+}
+.class-collections-tree-popup ul.collections-tree {
+  padding: 0;
+  margin: 0;
+}
+.class-collections-tree-popup a {
+  color: #337ab7 !important;
+  text-decoration: none !important;
+}
+.class-collections-tree-popup td.center {
+  white-space: nowrap;
+}
+.class-collections-tree-popup td.center .inner {
+  width: auto !important;
+}
+.view-mode-full .field-name-fixity-reports .label-above {
+  font-size: 1.5em;
+  text-transform: capitalize;
+  margin-top: 1em;
+}
+.view-mode-full .field-name-fixity-reports .views-row {
+  padding-bottom: 1em;
+  border-bottom: solid;
+  border-width: 1px;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul {
+  padding-left: 30px;
+  list-style-type: disc;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul .fail {
+  color: red;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul .pass {
+  color: green;
+}
+.view-mode-full .field-name-fixity-reports .field-name-field-fixity-check-fails-details ul p {
+  margin-bottom: 0;
+}
+.fixity-check-fail-status {
+  font-weight: bold;
+  color: red;
+  text-transform: uppercase;
+}
+.fixity-check-pass-status {
+  font-weight: bold;
+  color: green;
+  text-transform: uppercase;
 }

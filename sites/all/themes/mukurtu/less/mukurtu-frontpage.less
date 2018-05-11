@@ -1,0 +1,58 @@
+.main-container {
+    section.block {
+        //background: linear-gradient(#E6E6E6, #FFF);
+        //background-repeat: no-repeat;
+        //background-size: 100% 12px;
+    }
+}
+
+
+.hero-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    line-height: 1em;
+    font-size: 40px;
+    width: 100%;
+
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        font-size: 60px;
+        width: 80%;
+    }
+
+    // Desktop
+    @media (min-width: @screen-md-min) {
+        font-size: 72px;
+        width: 60%;
+    }
+
+    background: url(@mukurtu-chevron-down-path) no-repeat 0% 50%;
+    background-position: bottom center;
+    padding-bottom: 50px;
+}
+
+.hero-image {
+    > img {
+        min-height: 225px;
+        width: 100%;
+    }
+}
+
+.front {
+    .main-container {
+        section {
+            h2 {
+                .font-light;
+                text-align: center;
+                font-size: 35px;
+                color: @text-color;
+                padding-top: 20px;
+                padding-bottom: 10px;
+            }
+        }
+    }
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_container().
@@ -23,7 +24,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_container($variables) {
+function bootstrap_container(array $variables) {
   $element = $variables['element'];
 
   // Ensure #attributes is set.

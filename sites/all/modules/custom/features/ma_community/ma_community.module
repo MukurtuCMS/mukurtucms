@@ -7,6 +7,24 @@
 include_once('ma_community.features.inc');
 
 /**
+ * Implements hook_boot().
+ */
+function ma_community_boot() {
+  global $conf;
+
+  $community_changes = array(
+      'Request group membership' => 'Request community membership',
+      'Unsubscribe from group' => 'Remove community membership',
+      'Are you sure you want to unsubscribe from the group %title?' => 'Are you sure you want to remove your membership from the community %title?',
+      'In order to join any group, you must <a href="!login">login</a>. After you have successfully done so, you will need to request membership again.' => 'In order to join any community, you must <a href="!login">login</a>. After you have successfully done so, you will need to request membership again.',
+      'You already have a pending membership for the group @group.' => 'You already have a pending membership for the community @group.',
+      'You are already a member of the group @group.' => 'You are already a member of the community @group.',
+      'Are you sure you want to join the group %title?' => 'Are you sure you want to join the community %title?',
+  );
+  $conf['locale_custom_strings_en'][''] = array_merge($conf['locale_custom_strings_en'][''], $community_changes);
+}
+
+/**
  * Implements hook_node_insert().
  */
 function ma_community_node_insert($node) {
@@ -41,6 +59,17 @@ function ma_community_node_access($node, $op, $account) {
     }
 
     return NODE_ACCESS_IGNORE;
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_community_form_og_ui_add_users_alter(&$form, &$form_state) {
+    // For the OG add user form, default to "Not an invitation"
+    if(isset($form['membership_fields']['og_membership_invitation'][LANGUAGE_NONE])){
+        $form['membership_fields']['og_membership_invitation'][LANGUAGE_NONE]['#default_value'] = 0;
+    }
 }
 
 /**

@@ -364,7 +364,8 @@ renderLibrary: function(data, editor) {
       })
       .bind('dragstart', function(e) {
         var dt = e.originalEvent.dataTransfer, $this = $(this);
-        var $img = $this.is('img') ? $this : $this.find('img');
+        // Mukurtu patch to allow dragging of div elements in addition to img elements.
+        var $img = ($this.is('img') || $this.is('div')) ? $this : $this.find('img');
         var id = $img.data('atom-id');
         dt.dropEffect = 'copy';
         dt.setData("Text", Drupal.dnd.Atoms[id].sas);

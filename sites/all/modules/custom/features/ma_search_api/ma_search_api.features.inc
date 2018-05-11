@@ -41,11 +41,20 @@ function ma_search_api_default_search_api_index() {
         "search_api_alter_add_aggregation" : {
           "status" : 1,
           "weight" : "0",
-          "settings" : { "fields" : { "search_api_aggregation_1" : {
+          "settings" : { "fields" : {
+              "search_api_aggregation_1" : {
                 "name" : "Translation Sort",
                 "type" : "first",
+                "separator" : "\\n\\n",
                 "fields" : [ "field_word_entry:field_translation" ],
                 "description" : "A First aggregation of the following fields: Word Entry \\u00bb Translation."
+              },
+              "search_api_aggregation_2" : {
+                "name" : "Node Title",
+                "type" : "first",
+                "separator" : "\\n\\n",
+                "fields" : [ "title" ],
+                "description" : "A First aggregation of the following fields: Title."
               }
             }
           }
@@ -67,8 +76,7 @@ function ma_search_api_default_search_api_index() {
               "field_word_entry:field_source" : true,
               "field_word_entry:field_definition" : true,
               "field_word_entry:field_sample_sentence" : true,
-              "field_word_entry:field_translation" : true,
-              "field_word_entry:field_transliteration" : true
+              "field_word_entry:field_translation" : true
             }
           }
         },
@@ -133,7 +141,64 @@ function ma_search_api_default_search_api_index() {
             "excerpt" : 1,
             "excerpt_length" : "256",
             "exclude_fields" : [],
-            "highlight" : "always"
+            "highlight" : "always",
+            "highlight_partial" : 0
+          }
+        },
+        "search_api_porter_stemmer" : {
+          "status" : 0,
+          "weight" : "35",
+          "settings" : {
+            "fields" : {
+              "title" : true,
+              "field_summary" : true,
+              "field_transcription" : true,
+              "field_date" : true,
+              "field_identifier" : true,
+              "field_source" : true,
+              "field_collection_credit" : true,
+              "field_collection_summary" : true,
+              "body:value" : true,
+              "field_book_children:title" : true,
+              "field_book_children:field_summary" : true,
+              "field_book_children:field_transcription" : true,
+              "field_book_children:field_date" : true,
+              "field_book_children:field_identifier" : true,
+              "field_book_children:field_source" : true,
+              "field_book_children:field_collection_credit" : true,
+              "field_book_children:field_collection_summary" : true,
+              "field_dh_type:name" : true,
+              "field_people:name" : true,
+              "field_category:name" : true,
+              "field_contributor:name" : true,
+              "field_coverage_description:value" : true,
+              "field_creator:name" : true,
+              "field_description:value" : true,
+              "field_format:name" : true,
+              "field_language:name" : true,
+              "field_subject:name" : true,
+              "field_tags:name" : true,
+              "field_tk_body:value" : true,
+              "field_word_entry:field_source" : true,
+              "field_word_entry:field_alternate_spelling" : true,
+              "field_word_entry:field_definition" : true,
+              "field_word_entry:field_sample_sentence" : true,
+              "field_word_entry:field_translation" : true,
+              "field_book_children:body:value" : true,
+              "field_book_children:field_dh_type:name" : true,
+              "field_book_children:field_category:name" : true,
+              "field_book_children:field_contributor:name" : true,
+              "field_book_children:field_coverage_description:value" : true,
+              "field_book_children:field_creator:name" : true,
+              "field_book_children:field_description:value" : true,
+              "field_book_children:field_format:name" : true,
+              "field_book_children:field_language:name" : true,
+              "field_book_children:field_subject:name" : true,
+              "field_book_children:field_tags:name" : true,
+              "field_book_children:field_tk_body:value" : true,
+              "field_word_entry:field_pronunciation:value" : true
+            },
+            "exceptions" : "texan=texa"
           }
         }
       },
@@ -143,6 +208,7 @@ function ma_search_api_default_search_api_index() {
         "changed" : { "type" : "date" },
         "comment_count" : { "type" : "integer" },
         "created" : { "type" : "date" },
+        "dh_original_year" : { "type" : "integer" },
         "field_book_children:author" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "user" },
         "field_book_children:body:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_book_children:field_category" : {
@@ -185,6 +251,8 @@ function ma_search_api_default_search_api_index() {
         "field_collection" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_collection_credit" : { "type" : "text" },
         "field_collection_summary" : { "type" : "text" },
+        "field_collections_child_coll" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_collections_parent_coll" : { "type" : "integer", "entity_type" : "node" },
         "field_community_ref" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_contributor:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_coverage:geo_type" : { "type" : "string" },
@@ -201,6 +269,7 @@ function ma_search_api_default_search_api_index() {
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
+        "field_original_date:timestamp" : { "type" : "integer" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
@@ -228,6 +297,7 @@ function ma_search_api_default_search_api_index() {
         "promote" : { "type" : "boolean" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
         "search_api_aggregation_1" : { "type" : "string" },
+        "search_api_aggregation_2" : { "type" : "string" },
         "search_api_language" : { "type" : "string" },
         "status" : { "type" : "boolean" },
         "sticky" : { "type" : "boolean" },
@@ -698,6 +768,36 @@ function ma_search_api_default_search_api_server() {
           "field_word_entry:field_alternate_spelling" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "search_api_aggregation_2" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "search_api_aggregation_2",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_original_date:timestamp" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_original_date_timestamp",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "dh_original_year" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "dh_original_year",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_collections_child_coll" : {
+            "table" : "search_api_db_default_node_index_field_collections_child_coll",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_collections_parent_coll" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_collections_parent_coll",
+            "type" : "integer",
             "boost" : "1.0"
           }
         }
