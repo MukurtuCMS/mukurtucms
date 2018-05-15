@@ -28,7 +28,7 @@ function ma_collection_preprocess_views_view(&$vars) {
 
 }
 
-function ma_collection_node_view($node, $view_mode) {
+function ma_collection_node_view($node, $view_mode, $langcode) {
 
   // On full node view of node types that can be added to a Collection, load the "Add to Collection" ctools modal JS.
   if ($view_mode == 'full') {
@@ -39,59 +39,18 @@ function ma_collection_node_view($node, $view_mode) {
 
   if ($node->type == 'collection') {
 
-    if ($view_mode == 'search_result') {
+      // If there is no collection image, try to find an appropriate one
+      if(empty($node->field_collection_image)) {
+          $sid = ma_collection_get_default_atom($node);
 
-      // In the Collections Grid/List view, if there is no image uploaded for a Collection node, use the first available image atom from the Digital Heritage items in that Collection. If none of the DH items have an image atom, use the thumbnail from the first available non-image atom from the DH items in that Collection. If that atom does not have an uploaded thumbnail, use the default thumbnail for that atom type.
-      // This will need some easy refactoring once other items than DH can go into a collection.
-
-      if (!count($node->field_collection_image)) {
-        $collection_emw = entity_metadata_wrapper('node', $node);
-
-        $replacement_image = "";
-        foreach ($collection_emw->field_digital_heritage_items->value() as $dh_item) {
-          $dh_item_emw = entity_metadata_wrapper('node', $dh_item);
-          if(isset($dh_item_emw->field_media_asset)) {
-            foreach ($dh_item_emw->field_media_asset->value() as $dh_item_media_index => $dh_item_media) {
-              if ($dh_item_media->provider == 'scald_image') {
-                $replacement_image = scald_render ($dh_item_emw->field_media_asset->get($dh_item_media_index)->value(), 'ma_scald_search_results');
-                break 2;
-              }
-              elseif (!$replacement_image) {
-                // Use the atom thumbnail if there is one
-                if (count($dh_item_media->scald_thumbnail)) {
-                  $replacement_image = theme_image_style (array (
-                    'style_name' => 'medium',
-                    'path' => $dh_item_media->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
-                  ));
-                }
-                // If no atom thumbnail, use our default thumbnails
-                else {
-                  $replacement_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $dh_item_media->type . '_thumbnail.jpg">';
-                }
-              }
-            }
+          if($sid) {
+              unset($node->content);
+              $node->field_collection_image[LANGUAGE_NONE][0]['sid'] = $sid;
+              node_build_content($node, $view_mode, $langcode);
           }
-        }
-
-        if (isset($replacement_image)) {
-          // Rewrite the image field
-          $node->content['field_collection_image'] = array(
-            '#theme' => 'field',
-            '#title' => 'Image',
-            '#access' => true,
-            '#formater' => 'ma_scald_search_results',
-            '#view_mode' => 'search_result',
-            '#label_display' => 'hidden',
-            '#field_name' => 'field_collection_image',
-            '#entity_type' => 'node',
-            '#bundle' => 'collection',
-            '#weight' => 0,
-            '#items' => array(0 => 1), // this just needs at least one value in it
-          );
-
-          $node->content['field_collection_image'][0]['#markup'] = $replacement_image;
-        }
       }
+      
+    if ($view_mode == 'search_result') {
 
       // Tooltip and links on DH grid/list views
       if (isset($node->content['field_collection_image'])) {
@@ -1007,4 +966,34 @@ function ma_collection_add_ancestors_to_collections_titles($collections) {
     }
   }
   return $collections;
+}
+
+
+/**
+ * Return a Scald atom sid to display for a collection that doesn't have an image set
+ */
+function ma_collection_get_default_atom($node) {
+    $collection_emw = entity_metadata_wrapper('node', $node);
+
+    // Search through collection items
+    foreach ($collection_emw->field_digital_heritage_items->value() as $collection_item) {
+        $collection_item_emw = entity_metadata_wrapper('node', $collection_item);
+
+        // Find the first item that has a media asset set
+        if(isset($collection_item_emw->field_media_asset)) {
+
+            // Look through those media assets
+            foreach ($collection_item_emw->field_media_asset->value() as $collection_item_media_index => $collection_item_media) {
+                // Return the first normal image
+                if ($collection_item_media->provider == 'scald_image') {
+                    $atom = $collection_item_emw->field_media_asset->get($collection_item_media_index)->value();
+
+                    // Check if the user has access to that image
+                    if(scald_atom_access('view', $atom)) {
+                        return $atom->sid;
+                    }
+                }
+            }
+        }
+    }
 }
