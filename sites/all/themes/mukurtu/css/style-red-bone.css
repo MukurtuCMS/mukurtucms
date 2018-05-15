@@ -9544,7 +9544,7 @@ body #admin-menu {
   padding-top: 20px;
 }
 .large-teaser-box .field-name-title {
-  padding-top: 20px;
+  padding-top: 15px;
 }
 .large-teaser-box .field-name-title::after {
   content: "";
