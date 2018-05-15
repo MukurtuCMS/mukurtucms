@@ -1,14 +1,15 @@
+// Shadow accent bar between sections
 .section-shadow {
     background: linear-gradient(#E6E6E6, #FFF);
     background-repeat: no-repeat;
     background-size: 100% 12px;
 }
 
+// "Light" font weight
 .font-light {
     font-family: @font-family-sans-serif-light;
     font-weight: 300;
 }
-
 
 // Horizontal bar accenting element
 .title-accent-bar {
@@ -297,6 +298,32 @@
     .col-xs-4,
     .col-xs-8 {
         width: 100%;
+    }
+}
+
+// Thumbnail on top, standard link container with title link on bottom
+.thumbnail-on-link {
+    padding-bottom: 15px;
+
+    .views-field-name {
+        .primary-color-link-container;
+        .chevron-right-middle;
+        height: 135px;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        position: relative;
+
+        .field-content {
+            display: inline-block; 
+            vertical-align: middle;
+            line-height: 135px;
+
+            a {
+                font-size: 16px;
+                font-weight: bold;
+            }
+        }
     }
 }
 

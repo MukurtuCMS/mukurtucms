@@ -31,7 +31,7 @@ function ma_views_pages_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'default';
-  $handler->display->display_options['style_options']['row_class'] = 'col-xs-6 col-md-3 image-grid';
+  $handler->display->display_options['style_options']['row_class'] = 'col-xs-12 col-sm-6 col-md-3 image-grid';
   $handler->display->display_options['style_options']['default_row_class'] = FALSE;
   $handler->display->display_options['style_options']['row_class_special'] = FALSE;
   $handler->display->display_options['row_plugin'] = 'fields';
@@ -79,6 +79,21 @@ function ma_views_pages_views_default_views() {
 return substr($path, strripos($path, \'/\') + 1);';
   $handler->display->display_options['fields']['php']['use_php_click_sortable'] = '0';
   $handler->display->display_options['fields']['php']['php_click_sortable'] = '';
+  /* Field: Taxonomy term: Thumbnail Image */
+  $handler->display->display_options['fields']['field_thumbnail_image']['id'] = 'field_thumbnail_image';
+  $handler->display->display_options['fields']['field_thumbnail_image']['table'] = 'field_data_field_thumbnail_image';
+  $handler->display->display_options['fields']['field_thumbnail_image']['field'] = 'field_thumbnail_image';
+  $handler->display->display_options['fields']['field_thumbnail_image']['label'] = '';
+  $handler->display->display_options['fields']['field_thumbnail_image']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['field_thumbnail_image']['alter']['path'] = '/digital-heritage/category/[php]';
+  $handler->display->display_options['fields']['field_thumbnail_image']['alter']['replace_spaces'] = TRUE;
+  $handler->display->display_options['fields']['field_thumbnail_image']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_thumbnail_image']['empty'] = '<a href="/digital-heritage/category/[php]"><img src="/sites/all/modules/custom/features/ma_digitalheritage/images/no_media_available.jpg"/></a>';
+  $handler->display->display_options['fields']['field_thumbnail_image']['click_sort_column'] = 'sid';
+  $handler->display->display_options['fields']['field_thumbnail_image']['type'] = 'mukurtu_browse_by_grid_7_4';
+  $handler->display->display_options['fields']['field_thumbnail_image']['settings'] = array(
+    'link' => '0',
+  );
   /* Field: Taxonomy term: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'taxonomy_term_data';
@@ -92,21 +107,6 @@ return substr($path, strripos($path, \'/\') + 1);';
   $handler->display->display_options['fields']['name']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['name']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['name']['element_label_colon'] = FALSE;
-  /* Field: Taxonomy term: Thumbnail Image */
-  $handler->display->display_options['fields']['field_thumbnail_image']['id'] = 'field_thumbnail_image';
-  $handler->display->display_options['fields']['field_thumbnail_image']['table'] = 'field_data_field_thumbnail_image';
-  $handler->display->display_options['fields']['field_thumbnail_image']['field'] = 'field_thumbnail_image';
-  $handler->display->display_options['fields']['field_thumbnail_image']['label'] = '';
-  $handler->display->display_options['fields']['field_thumbnail_image']['alter']['make_link'] = TRUE;
-  $handler->display->display_options['fields']['field_thumbnail_image']['alter']['path'] = '/digital-heritage/category/[php]';
-  $handler->display->display_options['fields']['field_thumbnail_image']['alter']['replace_spaces'] = TRUE;
-  $handler->display->display_options['fields']['field_thumbnail_image']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_thumbnail_image']['empty'] = '<a href="/digital-heritage/category/[php]"><img src="/sites/all/modules/custom/features/ma_digitalheritage/images/no_media_available.jpg"/></a>';
-  $handler->display->display_options['fields']['field_thumbnail_image']['click_sort_column'] = 'sid';
-  $handler->display->display_options['fields']['field_thumbnail_image']['type'] = 'mukurtu_scald_taxonomy_thumbnail';
-  $handler->display->display_options['fields']['field_thumbnail_image']['settings'] = array(
-    'link' => '0',
-  );
   /* Sort criterion: Taxonomy vocabulary: Weight */
   $handler->display->display_options['sorts']['weight']['id'] = 'weight';
   $handler->display->display_options['sorts']['weight']['table'] = 'taxonomy_vocabulary';
@@ -128,7 +128,6 @@ return substr($path, strripos($path, \'/\') + 1);';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page_1');
-  $handler->display->display_options['enabled'] = FALSE;
   $handler->display->display_options['path'] = 'categories-browse';
   $translatables['browse_digital_heritage_by_category'] = array(
     t('Master'),
@@ -142,8 +141,8 @@ return substr($path, strripos($path, \'/\') + 1);';
     t('.'),
     t(','),
     t('Edit Taxonomy Term'),
-    t('[name]'),
     t('<a href="/digital-heritage/category/[php]"><img src="/sites/all/modules/custom/features/ma_digitalheritage/images/no_media_available.jpg"/></a>'),
+    t('[name]'),
     t('Block'),
     t('Page'),
   );

@@ -7860,6 +7860,44 @@ header,
 .item-grid-view .col-xs-8 {
   width: 100%;
 }
+.thumbnail-on-link {
+  padding-bottom: 15px;
+}
+.thumbnail-on-link .views-field-name {
+  background-color: #159ec4;
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  height: 135px;
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+}
+.thumbnail-on-link .views-field-name:hover,
+.thumbnail-on-link .views-field-name:focus {
+  background-color: #138aab;
+}
+.thumbnail-on-link .views-field-name a {
+  color: #ffffff;
+}
+.thumbnail-on-link .views-field-name a:hover,
+.thumbnail-on-link .views-field-name a:focus {
+  text-decoration: none;
+}
+.thumbnail-on-link .views-field-name .field-content {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 135px;
+}
+.thumbnail-on-link .views-field-name .field-content a {
+  font-size: 16px;
+  font-weight: bold;
+}
 .mukurtu-standard-grid-sizing {
   width: 100% !important;
   float: left;
@@ -7972,6 +8010,11 @@ footer header {
 .hero-image > img {
   min-height: 225px;
   width: 100%;
+}
+.front .main-container section {
+  background: linear-gradient(#e6e6e6, #ffffff);
+  background-repeat: no-repeat;
+  background-size: 100% 12px;
 }
 .front .main-container section h2 {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -9187,6 +9230,44 @@ body #admin-menu {
   content: '';
   display: block;
   clear: both;
+}
+.image-grid {
+  padding-bottom: 15px;
+}
+.image-grid .views-field-name {
+  background-color: #159ec4;
+  background-image: url(../images/icons/chevronright.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  height: 135px;
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+}
+.image-grid .views-field-name:hover,
+.image-grid .views-field-name:focus {
+  background-color: #138aab;
+}
+.image-grid .views-field-name a {
+  color: #ffffff;
+}
+.image-grid .views-field-name a:hover,
+.image-grid .views-field-name a:focus {
+  text-decoration: none;
+}
+.image-grid .views-field-name .field-content {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 135px;
+}
+.image-grid .views-field-name .field-content a {
+  font-size: 16px;
+  font-weight: bold;
 }
 .view-mukurtu-frontpage-browse-by-community {
   padding-bottom: 30px;
