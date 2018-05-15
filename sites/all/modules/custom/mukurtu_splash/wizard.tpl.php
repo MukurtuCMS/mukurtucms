@@ -47,7 +47,7 @@ $toggle_link = l('Hide Wizard', 'wizard/toggle', $attribs);
 
     <h3>Configuring Communities</h3>
 
-    <span class="video-help-embedded"><iframe src="https://player.vimeo.com/video/123257330" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></span>
+    <span class="video-help-embedded"><iframe src="https://player.vimeo.com/video/190627553" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></span>
 
     <p>In the panels below, locate the box labelled 'Communities and Protocols'. We will be using this block for our next two lessons.</p>
 
@@ -71,7 +71,7 @@ $toggle_link = l('Hide Wizard', 'wizard/toggle', $attribs);
   <div id="tabs-4">
     <h3>Configuring Protocols</h3>
 
-    <span class="video-help-embedded"><iframe src="https://player.vimeo.com/video/123257729" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></span>
+    <span class="video-help-embedded"><iframe src="https://player.vimeo.com/video/190627575" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></span>
 
     <p>Cultural Protocols help define how content is shared within your Mukurtu CMS. Cultural Protocols can be added within each community you create and must be nested within a parent community. When you create a new community, a default cultural protocol is generated for sharing content within your community only. Notice that any time a member is added to your community, they are also added to this protocol.</p>
 
@@ -91,7 +91,7 @@ $toggle_link = l('Hide Wizard', 'wizard/toggle', $attribs);
   <!-- Categories -->
   <div id="tabs-5">
     <h3>Working with Categories</h3>
-    
+
     <p>Search and browse terms like categories and keywords not only help users locate specific digital heritage items, they link together similar kinds of digital heritage items, and aid users in discovering other items of interest.</p>
 
     <p>Sometimes, creating an entire list of categories in your CMS before working with content is a lot of responsibility to handle, so we have added a few recommendations below to get you started. These categories are a combination of the categories used in the first two instances of Mukurtu.</p>
