@@ -9109,14 +9109,16 @@ body #admin-menu {
     font-size: 16px;
   }
 }
-.view-mode-search_result .label-inline {
+.view-mode-search_result .label-inline,
+.view-mode-teaser .label-inline {
   letter-spacing: 1.2px;
   font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
 }
 @media (min-width: 768px) {
-  .view-mode-search_result .label-inline {
+  .view-mode-search_result .label-inline,
+  .view-mode-teaser .label-inline {
     font-size: 12px;
     line-height: 2;
     width: 100px;
@@ -9124,33 +9126,70 @@ body #admin-menu {
     clear: both;
   }
 }
-.view-mode-search_result .field {
+.view-mode-search_result .field,
+.view-mode-teaser .field {
   padding: 5px;
   font-size: 15px;
 }
 @media (min-width: 992px) {
-  .view-mode-search_result .field {
+  .view-mode-search_result .field,
+  .view-mode-teaser .field {
     font-size: 16px;
   }
 }
-.view-mode-search_result .field-name-title h2 {
+.view-mode-search_result .field-name-title h2,
+.view-mode-teaser .field-name-title h2 {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
   font-size: 18px;
   margin-top: 0px;
 }
 @media (min-width: 768px) {
-  .view-mode-search_result .field-name-title h2 {
+  .view-mode-search_result .field-name-title h2,
+  .view-mode-teaser .field-name-title h2 {
     font-size: 24px;
   }
 }
 @media (min-width: 992px) {
-  .view-mode-search_result .field-name-title h2 {
+  .view-mode-search_result .field-name-title h2,
+  .view-mode-teaser .field-name-title h2 {
     font-size: 30px;
   }
 }
-.view-mode-search_result .field-name-field-media-asset img {
+.view-mode-search_result .field-name-title h2 a,
+.view-mode-teaser .field-name-title h2 a {
+  color: #138aab;
+}
+.view-mode-search_result .field-name-title h2 a:hover,
+.view-mode-teaser .field-name-title h2 a:hover,
+.view-mode-search_result .field-name-title h2 a:focus,
+.view-mode-teaser .field-name-title h2 a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.view-mode-search_result .field-name-field-media-asset img,
+.view-mode-teaser .field-name-field-media-asset img {
   width: 100%;
+}
+.view-mode-teaser {
+  border-bottom: 5px solid #eeeaea;
+  padding: 20px 0px;
+}
+.view-mode-teaser .field.field-name-field-media-asset img {
+  width: 60%;
+  margin: auto;
+}
+.view-mode-teaser .field.field-name-featured-content-type {
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  padding-bottom: 20px;
+  text-transform: uppercase;
+}
+@media (min-width: 992px) {
+  .view-mode-teaser .field.field-name-featured-content-type {
+    font-size: 15px;
+  }
 }
 .grid-view {
   padding-top: 60px;

@@ -82,9 +82,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 1,
       ),
       'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(
+          'trim_length' => 255,
+        ),
+        'type' => 'text_summary_or_trimmed',
         'weight' => 3,
       ),
     ),
@@ -430,9 +433,13 @@ function ma_culturalprotocol_field_default_field_instances() {
         'weight' => 25,
       ),
       'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_scald_search_results',
         'weight' => 0,
       ),
     ),

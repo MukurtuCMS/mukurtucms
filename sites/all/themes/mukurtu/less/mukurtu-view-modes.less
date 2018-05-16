@@ -1,4 +1,5 @@
-.view-mode-search_result {
+.view-mode-search_result,
+.view-mode-teaser {
     .label-inline {
         letter-spacing: @mukurtu-expanded-letter-spacing;
         font-size: 10px;
@@ -41,6 +42,10 @@
             @media (min-width: @screen-md-min) {
                 font-size: 30px;
             }
+
+            a {
+                .mukurtu-standard-link;
+            }
         }
     }
 
@@ -52,6 +57,34 @@
     }
 }
 
+// Teaser specific
+.view-mode-teaser {
+    .view-border;
+    padding: 20px 0px;
+
+    .field {
+        // Media
+        &.field-name-field-media-asset {
+            img {
+                width: 60%;
+                margin: auto;
+            }
+        }
+
+        &.field-name-featured-content-type {
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            padding-bottom: 20px;
+            text-transform: uppercase;
+    
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                font-size: 15px;
+            }
+        }
+    }
+}
 
 // Grid View
 .grid-view {

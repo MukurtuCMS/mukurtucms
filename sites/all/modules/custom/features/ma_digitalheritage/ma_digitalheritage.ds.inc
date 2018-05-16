@@ -244,8 +244,13 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'digital_heritage';
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -255,9 +260,25 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
-    'field_media_asset' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_category' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
       ),
     ),
   );
@@ -850,25 +871,27 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'teaser';
-  $ds_layout->layout = 'bootstrap_9_3';
+  $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
-        0 => 'title',
-        1 => 'field_summary',
-        2 => 'field_community_ref',
-        3 => 'field_category',
+        0 => 'field_media_asset',
       ),
       'right' => array(
-        4 => 'field_media_asset',
+        1 => 'title',
+        2 => 'featured_content_type',
+        3 => 'field_community_ref',
+        4 => 'field_category',
+        5 => 'field_summary',
       ),
     ),
     'fields' => array(
-      'title' => 'left',
-      'field_summary' => 'left',
-      'field_community_ref' => 'left',
-      'field_category' => 'left',
-      'field_media_asset' => 'right',
+      'field_media_asset' => 'left',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'field_community_ref' => 'right',
+      'field_category' => 'right',
+      'field_summary' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
