@@ -7614,7 +7614,7 @@ header,
   left: 0;
   height: 1px;
   width: 136px;
-  border-bottom: 6px solid #d9d4c2;
+  border-bottom: 6px solid #ac143a;
 }
 @media (min-width: 768px) {
   .title-accent-bar::after {
@@ -7733,12 +7733,20 @@ header,
   margin-bottom: 0px;
 }
 .left-right-image-title .field-name-title h3 a {
+  color: #ac143a;
   display: table-cell;
   vertical-align: middle;
-  color: #fff;
   font-size: 14px;
   font-weight: bold;
   height: 100%;
+}
+.left-right-image-title .field-name-title h3 a:hover,
+.left-right-image-title .field-name-title h3 a:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+.left-right-image-title .field-name-title h3 a:hover {
+  color: #ac143a;
 }
 @media (min-width: 768px) {
   .left-right-image-title .field-name-title h3 a {
@@ -7758,7 +7766,7 @@ header,
   height: 100%;
 }
 .chevron-right {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -7766,7 +7774,7 @@ header,
   padding-right: 25px;
 }
 .chevron-right-middle {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -7775,7 +7783,7 @@ header,
   background-position: 95% 50%;
 }
 .chevron-dropdown {
-  background-image: url(../images/icons/chevron_dropdown_blue.svg);
+  background-image: url(../images/icons/chevron_dropdown_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 50%;
 }
@@ -7838,7 +7846,7 @@ header,
   font-weight: bold;
 }
 .item-grid-view .field-name-title h2 {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -7865,7 +7873,7 @@ header,
 }
 .thumbnail-on-link .views-field-name {
   background-color: #d9d4c2;
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -8555,14 +8563,14 @@ ul.pagination li.pager-last {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  background: linear-gradient(#99937f, #d9d4c2);
+  background: linear-gradient(#99937f, #c9c2a8);
   height: 12px;
   margin-bottom: 36px;
 }
 #breadcrumb .breadcrumb {
   margin-top: 12px;
   padding-top: 2px;
-  background-color: #d9d4c2;
+  background-color: #c9c2a8;
   height: 36px;
   border-radius: 0px;
   color: #464646;
@@ -9243,7 +9251,7 @@ body #admin-menu {
   font-weight: bold;
 }
 .grid-view .view-mode-search_result .field-name-title h2 {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -9275,7 +9283,7 @@ body #admin-menu {
 }
 .image-grid .views-field-name {
   background-color: #d9d4c2;
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -9347,12 +9355,20 @@ body #admin-menu {
   margin-bottom: 0px;
 }
 .view-mukurtu-frontpage-browse-by-community .field-name-title h3 a {
+  color: #ac143a;
   display: table-cell;
   vertical-align: middle;
-  color: #fff;
   font-size: 14px;
   font-weight: bold;
   height: 100%;
+}
+.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:hover,
+.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:focus {
+  color: #d9d4c2;
+  text-decoration: none;
+}
+.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:hover {
+  color: #ac143a;
 }
 @media (min-width: 768px) {
   .view-mukurtu-frontpage-browse-by-community .field-name-title h3 a {
@@ -9392,7 +9408,7 @@ body #admin-menu {
   text-decoration: none;
 }
 .top-bottom-image-title .field-name-taxonomy-title-browse-link h3 {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -9672,7 +9688,7 @@ body #admin-menu {
   left: 0;
   height: 1px;
   width: 136px;
-  border-bottom: 6px solid #d9d4c2;
+  border-bottom: 6px solid #ac143a;
 }
 @media (min-width: 768px) {
   .large-teaser-box .field-name-title::after {
@@ -9716,7 +9732,7 @@ body #admin-menu {
     padding-bottom: 20px;
   }
   .large-teaser-box .field-name-node-link a {
-    background-image: url(../images/icons/chevronright_red.svg);
+    background-image: url(../images/icons/chevronright_bone.svg);
     background-repeat: no-repeat;
     background-position: 95% 0%;
     background-size: 12px;
@@ -9846,6 +9862,10 @@ body #admin-menu {
 .node-collection.view-mode-full > div:first-of-type a:focus {
   text-decoration: none;
 }
+.node-word-list.view-mode-full > div:first-of-type:hover,
+.node-collection.view-mode-full > div:first-of-type:hover {
+  background-color: #d9d4c2;
+}
 .node-word-list.view-mode-full > div:first-of-type > div:first-of-type,
 .node-collection.view-mode-full > div:first-of-type > div:first-of-type {
   padding-left: 0px;
@@ -9896,7 +9916,7 @@ body #admin-menu {
 .node-collection.view-mode-full > div:first-of-type .field-name-title {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
-  color: #fff;
+  color: #464646;
   font-size: 40px;
 }
 .node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
@@ -9906,7 +9926,7 @@ body #admin-menu {
   left: 0;
   height: 1px;
   width: 136px;
-  border-bottom: 6px solid #d9d4c2;
+  border-bottom: 6px solid #ac143a;
 }
 @media (min-width: 768px) {
   .node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
@@ -10060,7 +10080,7 @@ body #admin-menu {
 }
 .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2 {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -10252,7 +10272,7 @@ body #admin-menu {
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status {
   background-color: #d9d4c2;
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -10260,6 +10280,7 @@ body #admin-menu {
   padding-right: 25px;
   background-position: 95% 50%;
   border-top: none;
+  background-color: #ac143a;
   padding-top: 20px;
 }
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover,
@@ -10278,6 +10299,12 @@ body #admin-menu {
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:focus {
   text-decoration: none;
 }
+.node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover,
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover {
+  background-color: #9a1134;
+}
+.node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status span,
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status span,
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status a,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a {
   font-size: 14px;
@@ -10322,7 +10349,7 @@ body #admin-menu {
   text-decoration: none;
 }
 .view-community-dh-items .views-row {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -10429,7 +10456,7 @@ body #admin-menu {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  background: #ac143a;
+  background: #d9d4c2;
 }
 .page-dictionary .dictionary-facets-region {
   margin: auto;
@@ -10444,7 +10471,7 @@ body #admin-menu {
   padding: 10px 15px 10px 15px;
 }
 .page-dictionary .dictionary-facets-region .dropdown button {
-  background-image: url(../images/icons/chevron_dropdown_blue.svg);
+  background-image: url(../images/icons/chevron_dropdown_red.svg);
   background-repeat: no-repeat;
   background-position: 95% 50%;
   height: 60px;
@@ -10508,20 +10535,24 @@ body #admin-menu {
   margin-top: 0px;
 }
 .page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget.views-reset-button .btn {
+  color: #ac143a;
   line-height: 47px;
   font-weight: normal;
   font-size: 20px;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  background-color: #ac143a;
+  background-color: #d9d4c2;
   border-color: #fff;
 }
 .page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget .views-submit-button {
   padding: 0px 12px 0px 8px;
 }
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget #edit-search-api-views-fulltext {
+  background-color: #fff;
+}
 .page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget #edit-submit-dictionary-words {
   font-size: 20px;
-  background-color: #d9d4c2;
+  background-color: #ac143a;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -10597,7 +10628,7 @@ body #admin-menu {
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling {
   background-color: #d9d4c2;
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
@@ -10624,7 +10655,7 @@ body #admin-menu {
   font-weight: 300;
   display: inherit;
   font-size: 26px;
-  color: #fff;
+  color: #ac143a;
   padding-left: 20px;
   line-height: 68px;
 }
@@ -10679,7 +10710,7 @@ body #admin-menu {
   margin-left: -15%;
 }
 .view-mode-taxonomy_record_teaser .field-name-title {
-  background-image: url(../images/icons/chevronright_red.svg);
+  background-image: url(../images/icons/chevronright_bone.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;

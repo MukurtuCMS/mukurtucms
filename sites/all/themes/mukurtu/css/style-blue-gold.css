@@ -7733,12 +7733,20 @@ header,
   margin-bottom: 0px;
 }
 .left-right-image-title .field-name-title h3 a {
+  color: #138aab;
   display: table-cell;
   vertical-align: middle;
-  color: #fff;
   font-size: 14px;
   font-weight: bold;
   height: 100%;
+}
+.left-right-image-title .field-name-title h3 a:hover,
+.left-right-image-title .field-name-title h3 a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.left-right-image-title .field-name-title h3 a:hover {
+  color: #159ec4;
 }
 @media (min-width: 768px) {
   .left-right-image-title .field-name-title h3 a {
@@ -9347,12 +9355,20 @@ body #admin-menu {
   margin-bottom: 0px;
 }
 .view-mukurtu-frontpage-browse-by-community .field-name-title h3 a {
+  color: #138aab;
   display: table-cell;
   vertical-align: middle;
-  color: #fff;
   font-size: 14px;
   font-weight: bold;
   height: 100%;
+}
+.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:hover,
+.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:focus {
+  color: #e6ab49;
+  text-decoration: none;
+}
+.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:hover {
+  color: #159ec4;
 }
 @media (min-width: 768px) {
   .view-mukurtu-frontpage-browse-by-community .field-name-title h3 a {
@@ -9846,6 +9862,10 @@ body #admin-menu {
 .node-collection.view-mode-full > div:first-of-type a:focus {
   text-decoration: none;
 }
+.node-word-list.view-mode-full > div:first-of-type:hover,
+.node-collection.view-mode-full > div:first-of-type:hover {
+  background-color: #159ec4;
+}
 .node-word-list.view-mode-full > div:first-of-type > div:first-of-type,
 .node-collection.view-mode-full > div:first-of-type > div:first-of-type {
   padding-left: 0px;
@@ -9896,7 +9916,7 @@ body #admin-menu {
 .node-collection.view-mode-full > div:first-of-type .field-name-title {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
-  color: #fff;
+  color: #ffffff;
   font-size: 40px;
 }
 .node-word-list.view-mode-full > div:first-of-type .field-name-title::after,
@@ -10251,7 +10271,6 @@ body #admin-menu {
 }
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status {
-  background-color: #159ec4;
   background-image: url(../images/icons/chevronright.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
@@ -10260,6 +10279,7 @@ body #admin-menu {
   padding-right: 25px;
   background-position: 95% 50%;
   border-top: none;
+  background-color: #159ec4;
   padding-top: 20px;
 }
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover,
@@ -10278,6 +10298,12 @@ body #admin-menu {
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a:focus {
   text-decoration: none;
 }
+.node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover,
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status:hover {
+  background-color: #138aab;
+}
+.node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status span,
+.node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status span,
 .node-cultural-protocol-group.view-mode-full .metadata-wrapper .field-name-community-membership-status a,
 .node-community.view-mode-full .metadata-wrapper .field-name-community-membership-status a {
   font-size: 14px;
@@ -10508,6 +10534,7 @@ body #admin-menu {
   margin-top: 0px;
 }
 .page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget.views-reset-button .btn {
+  color: #e6ab49;
   line-height: 47px;
   font-weight: normal;
   font-size: 20px;
@@ -10518,6 +10545,9 @@ body #admin-menu {
 }
 .page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget .views-submit-button {
   padding: 0px 12px 0px 8px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget #edit-search-api-views-fulltext {
+  background-color: #fff;
 }
 .page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget #edit-submit-dictionary-words {
   font-size: 20px;
@@ -10624,7 +10654,7 @@ body #admin-menu {
   font-weight: 300;
   display: inherit;
   font-size: 26px;
-  color: #fff;
+  color: #ffffff;
   padding-left: 20px;
   line-height: 68px;
 }

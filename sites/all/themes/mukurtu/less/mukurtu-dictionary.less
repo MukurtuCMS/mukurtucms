@@ -7,7 +7,7 @@
 
     .dictionary-facets {
         .fullwidth;
-        background: @brand-primary;
+        background: @mukurtu-dictionary-facets-pane-background-color;
     }
 
     .dictionary-facets-region {
@@ -104,12 +104,13 @@
             // Reset
             &.views-reset-button {
                 .btn {
+                    color: @mukurtu-dictionary-facets-pane-contrast-color;
                     line-height: 47px;
                     font-weight: normal;
                     font-size: 20px;
                     text-transform: uppercase;
                     letter-spacing: @mukurtu-expanded-letter-spacing;
-                    background-color: @brand-primary;
+                    background-color: @mukurtu-dictionary-facets-pane-background-color;
                     border-color: #fff;
                 }
             }
@@ -118,10 +119,15 @@
                 padding: 0px 12px 0px 8px;
             }
 
+            // Search Text box
+            #edit-search-api-views-fulltext {
+                background-color: #fff;
+            }
+
             // Search
             #edit-submit-dictionary-words {
                 font-size: 20px;
-                background-color: @brand-secondary;
+                background-color: @mukurtu-dictionary-facets-pane-contrast-color;
                 text-transform: uppercase;
                 font-weight: bold;
             }
@@ -184,11 +190,6 @@
 
 .view-dictionary-words {
     width: 100%;
-    >div.view-content {
-        .views-row {
-
-        }
-    }
 
     .views-row-odd {
         clear: left;
@@ -224,7 +225,7 @@
                     .font-light;
                     display: inherit;
                     font-size: 26px;
-                    color: #fff;
+                    color: @mukurtu-dictionary-term-title-color;
                     padding-left: 20px;
                     line-height: 68px;
                 }
