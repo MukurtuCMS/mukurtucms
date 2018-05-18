@@ -1,10 +1,18 @@
 // Define all variables for the red & bone color scheme
-@brand-primary: #AC143A;
-@brand-secondary: #D9D4C2;
+@brand-primary:         #AC143A;
+@brand-secondary:       #D9D4C2;
+@brand-primary-accent:  #9A1134;
+@brand-secondary-accent:#C9C2A8;
+@brand-text-color:      #464646;
+@brand-light:           #E5E9E9;
+@brand-light-accent:    #F8F7F7;
 
-@link-color:	 #AC143A;
-@text-color:	 #464646;
+@link-color:	 @brand-primary;
+@text-color:	 @brand-text-color;
+
 @teaser-text-color: #333333;
+
+// Footer
 @footer-text-color: #999999;
 @footer-link-weight: bold;
 @footer-link-color: #CCCCCC;
@@ -28,7 +36,7 @@
 @mukurtu-primary-field-divider-color:           #E5E1E1;
 
 // Mobile Menu/Collapse Navbar
-@mukurtu-navbar-collapse-bg:                     #F8F7F7;
+@mukurtu-navbar-collapse-bg:                     #F0EEE9;//#F8F7F7;
 @mukurtu-navbar-collapse-tablet-font-size:         19px;
 @mukurtu-navbar-collapse-font-size:                20px;
 @mukurtu-navbar-collapse-link-color:             #AC143A;
@@ -68,7 +76,7 @@
 // Media Element Controls
 @mukurtu-mejs-background-color: #fff;
 @mukurtu-mejs-text-color: #464646;
-@mukurtu-mejs-time-rail-loaded-color: #f1efe9;
+@mukurtu-mejs-time-rail-loaded-color: #fff;//#f1efe9;
 @mukurtu-mejs-time-rail-current-color: #C9C2A8;
 
 // Dictionary
@@ -79,12 +87,14 @@
 
 // Collections
 @mukurtu-collection-title-font-color: @text-color;
+@mukurtu-collection-pane-bg-color: @brand-light-accent;
 
 // Community
 @mukurtu-community-membership-status-color: @brand-primary;
 
 // Images
 @mukurtu-chevron-right-path: ~"../images/icons/chevronright_bone.svg";
+@mukurtu-chevron-right-contrast-path: ~"../images/icons/chevronright_red.svg";
 @mukurtu-chevron-down-path: ~"../images/icons/chevrondown_bone.svg";
 @mukurtu-chevron-dropdown-path: ~"../images/icons/chevron_dropdown_red.svg";
 @mukurtu-panel-chevron-down-path: ~"../images/icons/chevrondown_red.svg";

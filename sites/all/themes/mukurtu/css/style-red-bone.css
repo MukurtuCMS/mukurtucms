@@ -7782,6 +7782,16 @@ header,
   padding-right: 25px;
   background-position: 95% 50%;
 }
+.chevron-right-middle-contrast {
+  background-image: url(../images/icons/chevronright_bone.svg);
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  background-image: url(../images/icons/chevronright_red.svg);
+}
 .chevron-dropdown {
   background-image: url(../images/icons/chevron_dropdown_red.svg);
   background-repeat: no-repeat;
@@ -8294,7 +8304,7 @@ ul.pagination li.pager-last {
 .mukurtu-page-select form select {
   -webkit-appearance: none;
   border: none;
-  background: #f8f7f7;
+  background: #f0eee9;
   padding: 10px 20px;
 }
 .slick-carousel-slider-nav .slick-slide {
@@ -8459,14 +8469,14 @@ ul.pagination li.pager-last {
   margin-right: -50vw;
   height: 52px;
   background: none;
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
   padding: 0px;
 }
 .quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li {
   height: 100%;
   margin: 0px;
   border-left: 1px solid rgba(70, 70, 70, 0.25);
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
   display: inline;
   width: 100%;
   text-align: center;
@@ -8643,16 +8653,16 @@ section ol.breadcrumb {
   color: #464646;
 }
 .mejs__container .mejs__controls .mejs__time-rail .mejs__time-total {
-  background: #f1efe9;
+  background: #ffffff;
 }
 .mejs__container .mejs__controls .mejs__time-rail .mejs__time-loaded {
-  background: #f1efe9;
+  background: #ffffff;
 }
 .mejs__container .mejs__controls .mejs__time-rail .mejs__time-current {
   background: #c9c2a8;
 }
 .mejs__container .mejs__controls .mejs__horizontal-volume-slider .mejs__horizontal-volume-total {
-  background: #f1efe9;
+  background: #ffffff;
 }
 .mejs__container .mejs__controls .mejs__horizontal-volume-slider .mejs__horizontal-volume-current {
   background: #c9c2a8;
@@ -8720,13 +8730,13 @@ section ol.breadcrumb {
   color: #464646;
 }
 .mejs-container-old .mejs-controls .mejs-time-rail .mejs-time-loaded {
-  background: #f1efe9;
+  background: #ffffff;
 }
 .mejs-container-old .mejs-controls .mejs-time-rail .mejs-time-current {
   background: #c9c2a8;
 }
 .mejs-container-old .mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-total {
-  background: #f1efe9;
+  background: #ffffff;
 }
 .mejs-container-old .mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-current {
   background: #c9c2a8;
@@ -9496,7 +9506,7 @@ body #admin-menu {
 .metadata-sidebar .metadata-wrapper {
   border-top: 5px solid #d9d4c2;
   border-radius: 0px;
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
 }
 @media (min-width: 992px) {
   .metadata-sidebar .metadata-wrapper {
@@ -10144,6 +10154,7 @@ body #admin-menu {
   letter-spacing: 1.2px;
   background: #d9d4c2;
   text-transform: uppercase;
+  color: #464646;
 }
 .node-word-list.view-mode-full .field-name-collections-tree .collections-tree,
 .node-collection.view-mode-full .field-name-collections-tree .collections-tree {
@@ -10222,7 +10233,7 @@ body #admin-menu {
   margin-top: 20px;
   border-top: 5px solid #d9d4c2;
   border-radius: 0px;
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
   padding-top: 0px;
   padding-bottom: 20px;
 }
@@ -10477,8 +10488,8 @@ body #admin-menu {
   height: 60px;
   width: 100%;
   color: #464646;
-  background-color: #f8f7f7;
-  border-color: #f8f7f7;
+  background-color: #f0eee9;
+  border-color: #f0eee9;
   text-align: left;
 }
 .page-dictionary .dictionary-facets-region .dropdown:hover,
@@ -10487,12 +10498,12 @@ body #admin-menu {
 .page-dictionary .dictionary-facets-region .dropdown.open:focus,
 .page-dictionary .dictionary-facets-region .dropdown.open > .dropdown-toggle.btn-primary:focus {
   color: #464646;
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
 }
 .page-dictionary .dictionary-facets-region .dropdown-menu {
   width: 100%;
   color: #464646;
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
 }
 .page-dictionary .dictionary-facets-region .dropdown-menu ul {
   padding-left: 10px;
@@ -10614,7 +10625,7 @@ body #admin-menu {
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle {
   display: none;
   margin-bottom: 30px;
-  background-color: #f8f7f7;
+  background-color: #f0eee9;
   padding-bottom: 30px;
 }
 @media (min-width: 992px) {
@@ -10635,6 +10646,7 @@ body #admin-menu {
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
+  background-image: url(../images/icons/chevronright_red.svg);
   background-size: 18px;
   height: 68px;
   padding: 0px 0px 0px 10px;

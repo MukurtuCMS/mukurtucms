@@ -7782,6 +7782,15 @@ header,
   padding-right: 25px;
   background-position: 95% 50%;
 }
+.chevron-right-middle-contrast {
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-position: 95% 50%;
+  background-image: url(../images/icons/chevronright.svg);
+}
 .chevron-dropdown {
   background-image: url(../images/icons/chevron_dropdown_blue.svg);
   background-repeat: no-repeat;
@@ -10136,7 +10145,6 @@ body #admin-menu {
 }
 .node-word-list.view-mode-full .field-name-collections-tree .label-above,
 .node-collection.view-mode-full .field-name-collections-tree .label-above {
-  color: #ffffff;
   font-size: 14px;
   font-weight: bold;
   padding: 20px 15px 20px 15px;
@@ -10144,6 +10152,7 @@ body #admin-menu {
   letter-spacing: 1.2px;
   background: #159ec4;
   text-transform: uppercase;
+  color: #ffffff;
 }
 .node-word-list.view-mode-full .field-name-collections-tree .collections-tree,
 .node-collection.view-mode-full .field-name-collections-tree .collections-tree {
@@ -10627,13 +10636,13 @@ body #admin-menu {
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling {
   background-color: #159ec4;
-  background-image: url(../images/icons/chevronright.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
   background-position: 95% 50%;
+  background-image: url(../images/icons/chevronright.svg);
   background-size: 18px;
   height: 68px;
   padding: 0px 0px 0px 10px;

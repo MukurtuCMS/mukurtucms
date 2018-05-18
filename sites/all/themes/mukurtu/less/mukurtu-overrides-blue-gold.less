@@ -1,10 +1,18 @@
 // Define all variables for the blue & gold color scheme
-@brand-primary: #159EC4;
-@brand-secondary: #E6AB49;
+@brand-primary:         #159EC4;
+@brand-secondary:       #E6AB49;
+@brand-primary-accent:  #138AAB;
+@brand-secondary-accent:#F1B85A;
+@brand-text-color:      #464646;
+@brand-light:           #E5E9E9;
+@brand-light-accent:    #F8F7F7;
 
-@link-color:	 #138AAB;
-@text-color:	 #464646;
+@link-color:	 @brand-primary-accent;
+@text-color:	 @brand-text-color;
+
 @teaser-text-color: #333333;
+
+// Footer
 @footer-text-color: #999999;
 @footer-link-weight: bold;
 @footer-link-color: #CCCCCC;
@@ -79,12 +87,14 @@
 
 // Collections
 @mukurtu-collection-title-font-color: #fff;
+@mukurtu-collection-pane-bg-color: @mukurtu-navbar-collapse-bg;
 
 // Community
 @mukurtu-community-membership-status-color: @brand-primary;
 
 // Images
 @mukurtu-chevron-right-path: ~"../images/icons/chevronright.svg";
+@mukurtu-chevron-right-contrast-path: ~"../images/icons/chevronright.svg";
 @mukurtu-chevron-down-path: ~"../images/icons/chevrondown.svg";
 @mukurtu-chevron-dropdown-path: ~"../images/icons/chevron_dropdown_blue.svg";
 @mukurtu-panel-chevron-down-path: ~"../images/icons/chevrondown.svg";
