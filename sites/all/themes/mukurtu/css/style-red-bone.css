@@ -7740,14 +7740,6 @@ header,
   font-weight: bold;
   height: 100%;
 }
-.left-right-image-title .field-name-title h3 a:hover,
-.left-right-image-title .field-name-title h3 a:focus {
-  color: #d9d4c2;
-  text-decoration: none;
-}
-.left-right-image-title .field-name-title h3 a:hover {
-  color: #ac143a;
-}
 @media (min-width: 768px) {
   .left-right-image-title .field-name-title h3 a {
     font-size: 15px;
@@ -8670,6 +8662,18 @@ section ol.breadcrumb {
 .mejs__container .mejs__controls .mejs__time-rail .mejs__time-current {
   background: #c9c2a8;
 }
+.mejs__container .mejs__controls .mejs__horizontal-volume-button,
+.mejs__container .mejs__controls .mejs__mute,
+.mejs__container .mejs__controls .mejs__horizontal-volume-slider {
+  display: none;
+}
+@media (min-width: 768px) {
+  .mejs__container .mejs__controls .mejs__horizontal-volume-button,
+  .mejs__container .mejs__controls .mejs__mute,
+  .mejs__container .mejs__controls .mejs__horizontal-volume-slider {
+    display: block;
+  }
+}
 .mejs__container .mejs__controls .mejs__horizontal-volume-slider .mejs__horizontal-volume-total {
   background: #ffffff;
 }
@@ -9379,14 +9383,6 @@ body #admin-menu {
   font-size: 14px;
   font-weight: bold;
   height: 100%;
-}
-.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:hover,
-.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:focus {
-  color: #d9d4c2;
-  text-decoration: none;
-}
-.view-mukurtu-frontpage-browse-by-community .field-name-title h3 a:hover {
-  color: #ac143a;
 }
 @media (min-width: 768px) {
   .view-mukurtu-frontpage-browse-by-community .field-name-title h3 a {
@@ -10647,8 +10643,13 @@ body #admin-menu {
   }
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field {
-  padding-left: 30px;
+  padding-left: 10px;
   padding-top: 10px;
+}
+@media (min-width: 768px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field {
+    padding-left: 30px;
+  }
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling {
   background-color: #d9d4c2;
@@ -10692,6 +10693,9 @@ body #admin-menu {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
   font-size: 17px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .field-item {
+  padding-right: 30px;
 }
 .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .field-item .group-left {
   width: 80%;

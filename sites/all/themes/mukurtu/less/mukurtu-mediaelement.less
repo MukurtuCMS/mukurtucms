@@ -61,6 +61,18 @@
             }
         }
 
+        // Hide volume controls when screen is small
+        .mejs__horizontal-volume-button,
+        .mejs__mute,
+        .mejs__horizontal-volume-slider {
+            display: none;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: block;
+            }
+        }
+
         .mejs__horizontal-volume-slider {
             .mejs__horizontal-volume-total {
                 background: @mukurtu-mejs-time-rail-loaded-color;

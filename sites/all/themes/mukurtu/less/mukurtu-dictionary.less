@@ -210,8 +210,13 @@
             }
 
             .field {
-                padding-left: 30px;
+                padding-left: 10px;
                 padding-top: 10px;
+
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    padding-left: 30px;
+                }
             }
 
             .field-name-field-alternate-spelling {
@@ -243,6 +248,7 @@
                 }
 
                 .field-item {
+                    padding-right: 30px;
                     .group-left {
                         width: 80%;
                     }
