@@ -83,6 +83,37 @@ function ma_collection_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|collection|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'collection';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|collection|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|collection|search_result';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'collection';
@@ -98,6 +129,49 @@ function ma_collection_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|collection|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'collection';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_collection_credit' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_collection_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|collection|teaser'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|personal_collection|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'personal_collection';
@@ -110,6 +184,32 @@ function ma_collection_ds_field_settings_info() {
     ),
   );
   $export['node|personal_collection|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|personal_collection|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'personal_collection';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|personal_collection|teaser'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -295,6 +395,47 @@ function ma_collection_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|collection|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'collection';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'field_collection_image',
+        2 => 'featured_content_type',
+        3 => 'title',
+        4 => 'field_collection_summary',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'field_collection_image' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+      'field_collection_summary' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|collection|featured_content'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|collection|form';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'collection';
@@ -409,6 +550,50 @@ function ma_collection_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|collection|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'collection';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_collection_image',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'featured_content_type',
+        3 => 'field_collection_summary',
+        4 => 'field_collection_credit',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'left',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'field_collection_summary' => 'right',
+      'field_collection_credit' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|collection|teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|personal_collection|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'personal_collection';
@@ -508,6 +693,48 @@ function ma_collection_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|personal_collection|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|personal_collection|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'personal_collection';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'right' => array(
+        0 => 'title',
+        1 => 'field_collection_summary',
+        3 => 'featured_content_type',
+      ),
+      'left' => array(
+        2 => 'field_collection_image',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'right',
+      'field_collection_summary' => 'right',
+      'field_collection_image' => 'left',
+      'featured_content_type' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|personal_collection|teaser'] = $ds_layout;
 
   return $export;
 }

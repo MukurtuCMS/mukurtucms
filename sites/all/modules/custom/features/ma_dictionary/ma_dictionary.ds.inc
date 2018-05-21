@@ -46,6 +46,37 @@ function ma_dictionary_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|dictionary_word|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'dictionary_word';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|dictionary_word|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|dictionary_word|search_result';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'dictionary_word';
@@ -67,6 +98,68 @@ function ma_dictionary_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|dictionary_word|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'dictionary_word';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_word_entry' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|dictionary_word|teaser'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|word_list|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'word_list';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|word_list|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|word_list|full';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'word_list';
@@ -84,6 +177,46 @@ function ma_dictionary_ds_field_settings_info() {
     ),
   );
   $export['node|word_list|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|word_list|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'word_list';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_collection_credit' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_collection_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|word_list|teaser'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -278,6 +411,45 @@ function ma_dictionary_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|dictionary_word|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'dictionary_word';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'featured_content_type',
+        2 => 'title',
+        3 => 'field_word_entry',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+      'field_word_entry' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|dictionary_word|featured_content'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|dictionary_word|form';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'dictionary_word';
@@ -383,6 +555,84 @@ function ma_dictionary_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|dictionary_word|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'dictionary_word';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'title',
+        1 => 'featured_content_type',
+        2 => 'field_word_entry',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'central',
+      'featured_content_type' => 'central',
+      'field_word_entry' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|dictionary_word|teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|word_list|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'word_list';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'field_collection_image',
+        2 => 'featured_content_type',
+        3 => 'title',
+        4 => 'field_collection_summary',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'field_collection_image' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+      'field_collection_summary' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|word_list|featured_content'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|word_list|full';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'word_list';
@@ -430,6 +680,50 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|word_list|full'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|word_list|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'word_list';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_collection_image',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'featured_content_type',
+        3 => 'field_collection_summary',
+        4 => 'field_collection_credit',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'left',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'field_collection_summary' => 'right',
+      'field_collection_credit' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|word_list|teaser'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -495,6 +789,52 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|dictionary_word_bundle|featured_content';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'dictionary_word_bundle';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_alternate_spelling',
+      ),
+      'right' => array(
+        1 => 'field_translation',
+      ),
+      'bottom' => array(
+        2 => 'field_dictionary_word_recording',
+        3 => 'field_definition',
+      ),
+    ),
+    'fields' => array(
+      'field_alternate_spelling' => 'left',
+      'field_translation' => 'right',
+      'field_dictionary_word_recording' => 'bottom',
+      'field_definition' => 'bottom',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['paragraphs_item|dictionary_word_bundle|featured_content'] = $ds_layout;
 
   return $export;
 }

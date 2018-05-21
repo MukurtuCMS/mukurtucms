@@ -47,6 +47,37 @@ function ma_person_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|person|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'person';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '16',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|person|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|person|person_teaser';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'person';
@@ -101,6 +132,32 @@ function ma_person_ds_field_settings_info() {
     ),
   );
   $export['node|person|taxonomy_record_teaser'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|person|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'person';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|person|teaser'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -267,6 +324,45 @@ function ma_person_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|person|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|person|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'person';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'field_media_asset',
+        2 => 'featured_content_type',
+        3 => 'title',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'field_media_asset' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|person|featured_content'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -454,6 +550,46 @@ function ma_person_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|person|taxonomy_record_teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|person|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'person';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'right' => array(
+        0 => 'title',
+        2 => 'featured_content_type',
+      ),
+      'left' => array(
+        1 => 'field_media_asset',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'right',
+      'field_media_asset' => 'left',
+      'featured_content_type' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|person|teaser'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

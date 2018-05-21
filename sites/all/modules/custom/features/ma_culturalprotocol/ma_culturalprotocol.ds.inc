@@ -62,6 +62,37 @@ function ma_culturalprotocol_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|cultural_protocol_group|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'cultural_protocol_group';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|cultural_protocol_group|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|cultural_protocol_group|full';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'cultural_protocol_group';
@@ -96,6 +127,44 @@ function ma_culturalprotocol_ds_field_settings_info() {
     ),
   );
   $export['node|cultural_protocol_group|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|cultural_protocol_group|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'cultural_protocol_group';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'body' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|cultural_protocol_group|teaser'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -209,6 +278,47 @@ function ma_culturalprotocol_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|cultural_protocol_group|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'cultural_protocol_group';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'field_protocol_image_thumbnail',
+        2 => 'featured_content_type',
+        3 => 'title',
+        4 => 'body',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'field_protocol_image_thumbnail' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+      'body' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|cultural_protocol_group|featured_content'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|cultural_protocol_group|full';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'cultural_protocol_group';
@@ -256,6 +366,48 @@ function ma_culturalprotocol_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|cultural_protocol_group|full'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|cultural_protocol_group|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'cultural_protocol_group';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'right' => array(
+        0 => 'title',
+        2 => 'featured_content_type',
+        3 => 'body',
+      ),
+      'left' => array(
+        1 => 'field_protocol_image_thumbnail',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'right',
+      'field_protocol_image_thumbnail' => 'left',
+      'featured_content_type' => 'right',
+      'body' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|cultural_protocol_group|teaser'] = $ds_layout;
 
   return $export;
 }
