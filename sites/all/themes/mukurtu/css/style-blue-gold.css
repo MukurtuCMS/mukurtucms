@@ -7782,6 +7782,14 @@ header,
   padding-right: 25px;
   background-position: 95% 50%;
 }
+.chevron-right-contrast {
+  background-repeat: no-repeat;
+  background-position: 95% 0%;
+  background-size: 12px;
+  min-height: 20px;
+  padding-right: 25px;
+  background-image: url(../images/icons/chevronright.svg);
+}
 .chevron-right-middle-contrast {
   background-repeat: no-repeat;
   background-position: 95% 0%;
@@ -9065,14 +9073,13 @@ body #admin-menu {
 .view-mukurtu-frontpage-featured-content .field-name-field-media-asset .scald-atom .mejs-container {
   height: 66.67% !important;
 }
-.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs-container.mejs-audio {
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs__container.mejs__audio {
   margin: auto;
   position: absolute;
   bottom: 0;
-  background: #ffffff;
   width: 100% !important;
 }
-.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs-container.mejs-audio .mejs-controls {
+.view-mukurtu-frontpage-featured-content .field-name-field-media-asset .mejs__container.mejs__audio .mejs-controls {
   width: 80%;
 }
 .view-mukurtu-frontpage-featured-content .field-name-featured-content-type {
@@ -9417,12 +9424,13 @@ body #admin-menu {
   text-decoration: none;
 }
 .top-bottom-image-title .field-name-taxonomy-title-browse-link h3 {
-  background-image: url(../images/icons/chevronright.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
   background-size: 12px;
   min-height: 20px;
   padding-right: 25px;
+  background-image: url(../images/icons/chevronright.svg);
+  color: #e6ab49;
   vertical-align: middle;
   margin: auto;
   display: inline-block;
@@ -9545,6 +9553,9 @@ body #admin-menu {
 }
 .metadata-sidebar .field-name-field-licence-trad .popup-element {
   width: 50%;
+}
+.node-type-page .image {
+  max-width: 500px;
 }
 .digital-heritage-body .field-name-field-media-asset img {
   margin: auto;
