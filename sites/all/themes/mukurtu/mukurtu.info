@@ -40,6 +40,7 @@ settings[mukurtu_theme_twitter_message] = 'Follow us'
 settings[mukurtu_theme_twitter1] = 'mukurtu'
 settings[mukurtu_theme_twitter2] = 'mukurtusupport'
 settings[mukurtu_theme_copyright] = '© [year] Mukurtu CMS'
+settings[mukurtu_theme_frontpage_layout] = 'large-hero'
 settings[mukurtu_theme_frontpage_hero_image] = ''
 
 ; For information on choosing the desired method, please read the Drupal

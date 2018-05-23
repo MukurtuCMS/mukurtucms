@@ -7608,6 +7608,9 @@ header,
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
 }
+.standard-padding {
+  padding: 10px 20px;
+}
 .title-accent-bar::after {
   content: "";
   display: inline-block;
@@ -7998,7 +8001,7 @@ footer header {
 .page-node-edit #edit-oggroup-fieldset-body .form-item .input-group {
   display: none;
 }
-.hero-text {
+.bean-hero-image-one-column .field-name-field-hero-image-caption .field-item {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -8013,20 +8016,174 @@ footer header {
   padding-bottom: 50px;
 }
 @media (min-width: 768px) {
-  .hero-text {
+  .bean-hero-image-one-column .field-name-field-hero-image-caption .field-item {
     font-size: 60px;
     width: 80%;
   }
 }
 @media (min-width: 992px) {
-  .hero-text {
+  .bean-hero-image-one-column .field-name-field-hero-image-caption .field-item {
     font-size: 72px;
     width: 60%;
   }
 }
-.hero-image > img {
+.bean-hero-image-one-column .field-name-field-hero-image img {
   min-height: 225px;
   width: 100%;
+}
+.bean-hero-image-two-columns {
+  overflow: hidden;
+}
+.bean-hero-image-two-columns .row > div.col-sm-6 {
+  padding: 0px;
+}
+.bean-hero-image-two-columns .field-name-field-hero-image img {
+  margin: auto;
+  width: 100%;
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2) {
+  background-color: #159ec4;
+  height: 100%;
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2):hover,
+.bean-hero-image-two-columns .row > div:nth-of-type(2):focus {
+  background-color: #138aab;
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2) a {
+  color: #ffffff;
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2) a:hover,
+.bean-hero-image-two-columns .row > div:nth-of-type(2) a:focus {
+  text-decoration: none;
+}
+@media (min-width: 768px) {
+  .bean-hero-image-two-columns .row > div:nth-of-type(2) {
+    padding-bottom: 99999px;
+    margin-bottom: -99999px;
+  }
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-title .field-item {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  padding: 50px 20px 10px 20px;
+  color: #ffffff;
+  font-size: 40px;
+  text-align: center;
+  line-height: 1;
+}
+@media (min-width: 768px) {
+  .bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-title .field-item {
+    text-align: left;
+  }
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-message {
+  padding: 0px 40px 50px 40px;
+  color: #111111;
+  font-size: 16px;
+}
+@media (min-width: 768px) {
+  .bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-message {
+    padding: 0px 50px 0px 20px;
+  }
+}
+@media (min-width: 992px) {
+  .bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-message {
+    font-size: 17px;
+  }
+}
+.bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-message .mejs__container,
+.bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-message .mejs__controls {
+  border-radius: 24px;
+}
+.large-hero .hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  line-height: 1em;
+  font-size: 40px;
+  width: 100%;
+  background: url(../images/icons/chevrondown.svg) no-repeat 0% 50%;
+  background-position: bottom center;
+  padding-bottom: 50px;
+}
+@media (min-width: 768px) {
+  .large-hero .hero-text {
+    font-size: 60px;
+    width: 80%;
+  }
+}
+@media (min-width: 992px) {
+  .large-hero .hero-text {
+    font-size: 72px;
+    width: 60%;
+  }
+}
+.large-hero .hero-image img {
+  min-height: 225px;
+  width: 100%;
+}
+.hero-side-by-side {
+  overflow: hidden;
+}
+.hero-side-by-side .hero-left,
+.hero-side-by-side .hero-right {
+  padding: 0px;
+}
+.hero-side-by-side .hero-left img {
+  margin: auto;
+}
+.hero-side-by-side .hero-right {
+  background-color: #159ec4;
+  height: 100%;
+}
+.hero-side-by-side .hero-right:hover,
+.hero-side-by-side .hero-right:focus {
+  background-color: #138aab;
+}
+.hero-side-by-side .hero-right a {
+  color: #ffffff;
+}
+.hero-side-by-side .hero-right a:hover,
+.hero-side-by-side .hero-right a:focus {
+  text-decoration: none;
+}
+@media (min-width: 768px) {
+  .hero-side-by-side .hero-right {
+    padding-bottom: 99999px;
+    margin-bottom: -99999px;
+  }
+}
+.hero-side-by-side .hero-right .hero-text {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+  padding: 50px 20px 10px 20px;
+  color: #ffffff;
+  font-size: 40px;
+  text-align: center;
+  line-height: 1;
+}
+@media (min-width: 768px) {
+  .hero-side-by-side .hero-right .hero-text {
+    text-align: left;
+  }
+}
+.hero-side-by-side .hero-right .hero-welcome {
+  padding: 0px 20px 50px 20px;
+  color: #111111;
+  font-size: 16px;
+}
+@media (min-width: 768px) {
+  .hero-side-by-side .hero-right .hero-welcome {
+    padding: 0px 20px;
+  }
+}
+@media (min-width: 992px) {
+  .hero-side-by-side .hero-right .hero-welcome {
+    font-size: 17px;
+  }
 }
 .front .main-container section {
   background: linear-gradient(#e6e6e6, #ffffff);

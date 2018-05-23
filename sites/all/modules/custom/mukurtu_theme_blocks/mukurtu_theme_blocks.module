@@ -20,6 +20,101 @@ function mukurtu_theme_blocks_block_view($delta = '') {
     }
 }
 
+function mukurtu_theme_blocks_block_configure($delta = '') {
+    $form = array();
+
+    switch($delta) {
+    case 'mukurtu_theme_footer':
+        break;
+    case 'mukurtu_theme_frontpage_hero':
+        // Layout
+        $form['mukurtu_theme_block_frontpage_layout'] = array(
+            '#type' => 'radios',
+            '#title' => t('Layout'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_layout', 'large-hero'),
+            '#options' => array('large-hero' => 'Large hero image with welcome message, underneath', 'hero-side-by-side' => 'Smaller hero image with welcome message, side by side')
+        );
+
+        // Image
+        $form['mukurtu_theme_block_frontpage_hero_image'] = array(
+            '#title' => t('Hero Image'),
+            '#type' => 'managed_file',
+            '#description' => t('Select an image for the frontpage.'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_hero_image'),
+            '#upload_location' => 'public://mukurtu/',
+            '#upload_validators' => array(
+                'file_validate_extensions' => array('png jpg jpeg'),
+            ),
+        );
+
+        // Title
+        $form['mukurtu_theme_block_frontpage_title'] = array(
+            '#type' => 'textfield',
+            '#title' => t('Title'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_title', variable_get('site_slogan', '')),
+            '#description'   => t("The site title for the hero image/welcome message."),
+        );
+
+        // Welcome text
+        $form['mukurtu_theme_block_frontpage_welcome'] = array(
+            '#type' => 'textarea',
+            '#title' => t('Welcome Message'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_welcome', ''),
+            '#description'   => t("The text for the welcome message."),
+        );
+
+        $form['mukurtu_theme_block_frontpage_media'] = array(
+            '#type' => 'atom_reference',
+            '#title' => t('Welcome Media'),
+            '#default_value' => variable_get('mukurtu_theme_block_frontpage_media', ''),
+            '#description'   => t("An audio or video file for the welcome message."),
+        );
+        break;
+    }
+    return $form;
+}
+
+function mukurtu_theme_blocks_block_save($delta = '', $edit = array()) {
+    switch($delta) {
+    case 'mukurtu_theme_footer':
+        break;
+    case 'mukurtu_theme_frontpage_hero':
+        // Layout
+        variable_set('mukurtu_theme_block_frontpage_layout', $edit['mukurtu_theme_block_frontpage_layout']);
+        
+        // Image
+        $block = block_load('mukurtu_theme_blocks', $delta);
+
+        // Remove reference to old file
+        $old_image = variable_get('mukurtu_theme_block_frontpage_hero_image');
+        $file = file_load($old_image);
+        if($file) {
+            file_usage_delete($file, 'mukurtu_theme_blocks', 'block', $block->bid);
+        }
+        
+        if($edit['mukurtu_theme_block_frontpage_hero_image'] != 0) {
+            // Add reference to new file
+            $file = file_load($edit['mukurtu_theme_block_frontpage_hero_image']);
+            $file->status = FILE_STATUS_PERMANENT;
+            file_save($file);
+            file_usage_add($file, 'mukurtu_theme_blocks', 'block', $block->bid);
+
+            // Set new image value
+            variable_set('mukurtu_theme_block_frontpage_hero_image', $file->fid);
+        } else {
+            // File was removed
+            variable_set('mukurtu_theme_block_frontpage_hero_image', '');
+        }
+
+        // Title
+        variable_set('mukurtu_theme_block_frontpage_title', $edit['mukurtu_theme_block_frontpage_title']);
+
+        // Welcome
+        variable_set('mukurtu_theme_block_frontpage_welcome', $edit['mukurtu_theme_block_frontpage_welcome']);
+        break;
+    }
+}
+
 function _mukurtu_theme_blocks_footer() {
     $block['content'] = '<div class="contact">';
 
@@ -75,12 +170,20 @@ function _mukurtu_theme_blocks_footer() {
 }
 
 function _mukurtu_theme_blocks_hero() {
-    $slogan = variable_get('site_slogan', '');
+    // Layout
+    $layout = variable_get('mukurtu_theme_block_frontpage_layout', 'large-hero');
+
+    // Title
+    $slogan = variable_get('mukurtu_theme_block_frontpage_title', variable_get('site_slogan', ''));
+
+    // Welcome
+    $welcome = variable_get('mukurtu_theme_block_frontpage_welcome', '');
+
     // Default image
     $image_url = drupal_get_path('theme', 'mukurtu') . '/images/frontpage-hero.png';
 
     // Load custom image, if specified
-    $hero_image_fid = theme_get_setting('mukurtu_theme_frontpage_hero_image');
+    $hero_image_fid = variable_get('mukurtu_theme_block_frontpage_hero_image');
 
     if($hero_image_fid) {
         $hero_image = file_load($hero_image_fid);
@@ -90,6 +193,66 @@ function _mukurtu_theme_blocks_hero() {
     }
 
     // Build markup
-    $block['content'] = "<div class=\"col-xs-12 hero-image\"><img class=\"img-responsive\" src=$image_url /><div class=\"hero-text\">$slogan</div></div>";
+    $image_markup = theme_image(array(
+        'path' => $image_url,
+        'alt' => t('Front Page Hero Image'),
+        'attributes' => array('class' => array('img-responsive')),
+    ));
+  
+    $hero_image = array(
+        '#prefix' => '<div class="hero-image">',
+        '#suffix' => '</div>',
+        'hero-image' => array(
+            '#type' => 'markup',
+            '#markup' => $image_markup
+        ),
+    );
+        
+    $hero_title = array(
+        '#prefix' => '<div class="hero-text">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => $slogan,
+    );
+
+    $welcome = array(
+        '#prefix' => '<div class="hero-welcome">',
+        '#suffix' => '</div>',
+        '#type' => 'markup',
+        '#markup' => $welcome,
+    );
+
+    $block = array();
+   
+    switch($layout) {
+    case 'hero-side-by-side':
+        $block['content'] = array(
+            '#prefix' => '<div class="' . $layout . '">',
+            '#suffix' => '</div>',
+        );        
+        $block['content']['left'] = array(
+            '#prefix' => '<div class="hero-left col-sm-6">',
+            '#suffix' => '</div>',
+            'hero-image' => $hero_image,
+        );
+        $block['content']['right'] = array(
+             '#prefix' => '<div class="hero-right col-sm-6">',
+             '#suffix' => '</div>',
+             'hero-title' => $hero_title,
+             'welcome' => $welcome,
+        );
+        break;
+    case 'large-hero':
+        $block['content'] = array(
+            '#prefix' => '<div class="' . $layout . '">',
+            '#suffix' => '</div>',
+             'hero-image' => $hero_image,
+             'hero-title' => $hero_title,
+             'hero-welcome' => $welcome,
+        );
+
+        break;
+    }
+    
     return $block;
 }

@@ -99,11 +99,19 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   );
 
   //// Frontpage
-  $form['mukurtu']['frontpage'] = array(
+    $form['mukurtu']['frontpage'] = array(
     '#type' => 'fieldset',
     '#title' => t('Frontpage'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+  );
+
+  // Frontpage Layout
+  $form['mukurtu']['frontpage']['mukurtu_theme_frontpage_layout'] = array(
+    '#type' => 'radios',
+    '#title' => t('Frontpage Layout'),
+    '#default_value' => theme_get_setting('mukurtu_theme_frontpage_layout', 'mukurtu'),
+    '#options' => array('large-hero' => 'Large hero image', 'side-by-side' => 'Smaller hero image with welcome message')
   );
 
   // Hero Image

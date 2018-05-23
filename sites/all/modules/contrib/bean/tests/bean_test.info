@@ -1,0 +1,15 @@
+name = Bean Test
+description = Creates test plugins for bean
+core = 7.x
+
+dependencies[] = bean
+files[] = bean_test.module
+
+hidden = TRUE
+
+; Information added by Drupal.org packaging script on 2018-01-27
+version = "7.x-1.11+9-dev"
+core = "7.x"
+project = "bean"
+datestamp = "1517092687"
+
