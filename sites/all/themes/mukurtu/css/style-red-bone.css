@@ -10012,6 +10012,10 @@ body #admin-menu {
 .page-collections .pane-ma-search-api-ma-custom-sorts .pane-title {
   padding: 10px 12px;
 }
+.node-word-list.view-mode-full,
+.node-collection.view-mode-full {
+  padding-bottom: 40px;
+}
 .node-word-list.view-mode-full > div:first-of-type,
 .node-collection.view-mode-full > div:first-of-type {
   width: 100vw;
@@ -10288,6 +10292,15 @@ body #admin-menu {
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row {
   padding-top: 30px;
   padding-bottom: 30px;
+}
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .text-center,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .text-center {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
 }
 .node-word-list.view-mode-full .field-name-collections-tree,
 .node-collection.view-mode-full .field-name-collections-tree {
