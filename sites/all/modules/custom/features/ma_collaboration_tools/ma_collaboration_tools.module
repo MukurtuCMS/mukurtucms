@@ -310,11 +310,15 @@ function ma_collaboration_tools_node_update($node) {
       }
     }
     // Individually following
-    $notify_list = array_merge($notify_list, array_column($node->field_following_users[LANGUAGE_NONE], 'target_id'));
+    if (isset($node->field_following_users[LANGUAGE_NONE])) {
+      $notify_list = array_merge($notify_list, array_column($node->field_following_users[LANGUAGE_NONE], 'target_id'));
+    }
     // Remove duplicates
     $notify_list = array_unique($notify_list);
     // Remove individually unfollowing
-    $notify_list = array_diff($notify_list, array_column($node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
+    if (isset($node->field_un_following_users[LANGUAGE_NONE])) {
+      $notify_list = array_diff($notify_list, array_column($node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
+    }
 
     // Build notify_frequency lists.
     $notify_frequency = [
