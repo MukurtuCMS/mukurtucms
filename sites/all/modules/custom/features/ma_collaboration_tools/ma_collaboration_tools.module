@@ -287,16 +287,19 @@ function ma_collaboration_tools_node_postsave($node, $op) {
   }
 }
 
+/**
+ * Implements hook_node_insert().
+ */
+function ma_collaboration_tools_node_insert($node) {
+   ma_collaboration_tools_node_update($node, 'created');
+}
 
 /**
  * Implements hook_node_update().
  */
-function ma_collaboration_tools_node_update($node) {
+function ma_collaboration_tools_node_update($node, $op='updated') {
 
-  $op = 'Update';
-
-  // Create a Following Notification node after a child collab node is created or updated, then send emails to the immediate recipients.\
-
+  // Create a Following Notification node after a child collab node is created or updated.
   if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
     $cw = entity_metadata_wrapper('node', $node);
 
@@ -351,8 +354,10 @@ function ma_collaboration_tools_node_update($node) {
     );
     $notification = entity_create('node', $values);
     $notification_w = entity_metadata_wrapper('node', $notification);
-    $notification_w->title->set($op . ' notification for "' . $node->title . '""');
-    $body = 'The ' . $node->type . ' "' . $node->title . '", which you are following, was updated at ' . format_date($node->timestamp, 'long') . '.\n\nView the ' . $node->type . ': ' . $GLOBALS['base_url'] . '/' . $node->path['alias'] . '\n\nSee all content you are following: ' . $GLOBALS['base_url'] . '/user/[uid]/following'; // uid to be replaced during emailing.
+    $notification_w->title->set('"' . $node->title . '" has been ' . $op);
+    $body = 'The ' . $node->type . ' "' . $node->title . '", which you are following, was ' . $op . ' at ' . format_date($node->timestamp, 'long') . '.';
+    $body .= '\n\nView the ' . $node->type . ': ' . $GLOBALS['base_url'] . '/' . $node->path['alias'];
+    $body .= '\n\nSee all content you are following: ' . $GLOBALS['base_url'] . '/user/[uid]/following'; // uid to be replaced during emailing.
     $notification_w->body->set(array('value' => $body));
     $notification_w->field_following_content->set($node->nid);
     $notification_w->field_notify_immediately->set($notify_frequency['right away']);
