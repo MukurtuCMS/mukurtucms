@@ -149,16 +149,26 @@ function ma_core_og_get_users_per_role_and_group ($role_name, $group_bundle, $gi
 /**
  * Get all users of a group
  */
-function ma_core_og_get_users_in_group($gid) {
+function ma_core_og_get_uids_in_group($gid) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'user')
     ->fieldCondition('og_user_node', 'target_id', $gid);
-
   if ($results = $query->execute()) {
     $uids = array_keys($results['user']);
-    return user_load_multiple($uids);
+    return $uids;
   }
 }
+
+/**
+ * Get all users of a group
+ */
+function ma_core_og_get_users_in_group($gid) {
+  $uids = ma_core_og_get_uids_in_group($gid);
+  if (count($uids)) {
+    return user_load_multiple(ma_core_og_get_uids_in_group($gid));
+  }
+}
+
 
 /**
  * Helper function to load users by core role.

@@ -285,13 +285,69 @@ function ma_collaboration_tools_node_postsave($node, $op) {
       }
     }
   }
+
 }
 
 /**
  * Implements hook_node_insert().
  */
 function ma_collaboration_tools_node_insert($node) {
-   ma_collaboration_tools_node_update($node, 'created');
+
+  // Create a Following Notification when a child page is created.
+  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+    ma_collaboration_tools_node_update($node, 'created');
+  }
+
+  // After creating a Following notification, send out notifications for the "immediately" users
+  if ($node->type == 'following_notification') {
+    $fw = entity_metadata_wrapper('node', $node);
+    $notify_users = array_diff($fw->field_notify_immediately->raw(), $fw->field_users_notified->raw());
+    $successful_sends = ma_collaboration_tools_send_notification($notify_users, $fw);
+    // Update the notified users field.
+    if (count($successful_sends)) {  // "Successful sends" just means it passed drupal_mail. It does not guarantee delivery.
+      foreach ($successful_sends as $i => $successful_send) {
+        $node->field_users_notified[LANGUAGE_NONE][$i]['target_id'] = $successful_send;
+      }
+      field_attach_update('node', $node);
+    }
+  }
+
+}
+
+/**
+ * Helper function send a notification to a list of users.
+ */
+function ma_collaboration_tools_send_notification($notify_users, $fw) {
+  $successful_sends = [];
+  if (count($notify_users)) {
+    foreach ($notify_users as $uid) {
+      $body = str_replace('[uid]', $uid, $fw->body->value());
+      $params = [
+        'subject' => $fw->title->value(),
+        'body' => $body,
+      ];
+      $user = user_load($uid);
+      $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
+      if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
+        $successful_sends[] = $uid;
+      }
+    }
+  }
+  return $successful_sends;
+}
+
+/**
+ * Implements hook_mail().
+ *
+ * This is required to send an email.
+ */
+function ma_collaboration_tools_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'collab_notification':
+      $message['subject'] = $params['subject'];
+      $message['body'] = $params['body'];
+      break;
+  }
 }
 
 /**
@@ -299,7 +355,7 @@ function ma_collaboration_tools_node_insert($node) {
  */
 function ma_collaboration_tools_node_update($node, $op='updated') {
 
-  // Create a Following Notification node after a child collab node is created or updated.
+  // Create a Following Notification node after a child page is created or updated.
   if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
     $cw = entity_metadata_wrapper('node', $node);
 
@@ -355,10 +411,10 @@ function ma_collaboration_tools_node_update($node, $op='updated') {
     $notification = entity_create('node', $values);
     $notification_w = entity_metadata_wrapper('node', $notification);
     $notification_w->title->set('"' . $node->title . '" has been ' . $op);
-    $body = 'The ' . $node->type . ' "' . $node->title . '", which you are following, was ' . $op . ' at ' . format_date($node->timestamp, 'long') . '.';
-    $body .= '\n\nView the ' . $node->type . ': ' . $GLOBALS['base_url'] . '/' . $node->path['alias'];
-    $body .= '\n\nSee all content you are following: ' . $GLOBALS['base_url'] . '/user/[uid]/following'; // uid to be replaced during emailing.
-    $notification_w->body->set(array('value' => $body));
+    $body = "The " . $node->type . " \"" . $node->title . "\", which you are following, was " . $op . " at " . format_date($node->timestamp, "long") . ".";
+    $body .= "\n\nView the " . $node->type . ": " . $GLOBALS["base_url"] . "/" . $node->path["alias"];
+    $body .= "\n\nSee all content you are following: " . $GLOBALS["base_url"] . "/user/[uid]/following"; // uid to be replaced during emailing.
+    $notification_w->body->set(array("value" => $body));
     $notification_w->field_following_content->set($node->nid);
     $notification_w->field_notify_immediately->set($notify_frequency['right away']);
     $notification_w->field_notify_day->set($notify_frequency['daily digest']);
