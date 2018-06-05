@@ -293,38 +293,236 @@ function ma_collaboration_tools_node_postsave($node, $op) {
  */
 function ma_collaboration_tools_node_insert($node) {
 
+  ////
   // Create a Following Notification when a child page is created.
+  ////
   if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
-    ma_collaboration_tools_node_update($node, 'created');
-  }
 
-  // After creating a Following notification, send out notifications for the "immediately" users
-  if ($node->type == 'following_notification') {
-    $fw = entity_metadata_wrapper('node', $node);
-    $notify_users = array_diff($fw->field_notify_immediately->raw(), $fw->field_users_notified->raw());
-    $successful_sends = ma_collaboration_tools_send_notification($notify_users, $fw);
-    // Update the notified users field.
-    if (count($successful_sends)) {  // "Successful sends" just means it passed drupal_mail. It does not guarantee delivery.
-      foreach ($successful_sends as $i => $successful_send) {
-        $node->field_users_notified[LANGUAGE_NONE][$i]['target_id'] = $successful_send;
-      }
-      field_attach_update('node', $node);
-    }
+    // Create and save the Following Notification node.
+    $values = array(
+      'type' => 'following_notification',
+      'uid' => 1,
+      'status' => 1,
+    );
+    $notification = entity_create('node', $values);
+    $notification_w = entity_metadata_wrapper('node', $notification);
+    $notification_w->title->set($node->title . ' (notification)');
+    $notification_w = ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($node, $notification_w);
+    $notification_w->field_following_content->set($node->nid);
+    $notification_w->save();
+
+    // Attach the notification email field collection to the notification node.
+    ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'created');
   }
 
 }
 
 /**
- * Helper function send a notification to a list of users.
+ * Implements hook_node_update().
  */
-function ma_collaboration_tools_send_notification($notify_users, $fw) {
+function ma_collaboration_tools_node_update($node) {
+
+  // Create a Following Notification node after a child page is created or updated.
+  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+    $entity_new = $cw = entity_metadata_wrapper('node', $node);
+    $entity_old = entity_metadata_wrapper('node', $node->original);
+
+    // When updating a child page, only create a following email FC instance if certain fields are changed.
+    // If only a Following field is changed, instead update the Following node instead.
+    // This diff'ing code is taken from https://drupal.stackexchange.com/a/175186/83739.
+    $ignore_fields_list = [
+      'field_pre_actions',
+      'path',
+      'redirect',
+      'og_group_ref',
+      'field_community_ref',
+      'field_item_privacy_setting',
+      'field_custom_notification_freq',
+    ];
+    $following_fields = [
+      'field_following_protocols',
+      'field_following_users',
+      'field_un_following_users',
+    ];
+
+    $following_diff_list =  array();
+    $data = field_info_instances('node' ,$entity_new->getBundle());
+    $fields_list = array_keys($data);
+    $diff_list =  array();
+    foreach ($fields_list as $key => $field_name ) {
+      // Ignore if field name belong to ignore list
+      if(in_array($field_name, $ignore_fields_list )) {
+        continue;
+      }
+      $old_value = $entity_old->{$field_name}->raw();
+      $new_value = $entity_new->{$field_name}->raw();
+      // If both are empty - ignore
+      if(empty($old_value) && empty($new_value)) {
+        continue;
+      }
+      // If one of the value is not empty compared to the other
+      if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
+        // You can use field_get_items() to get the changed value.
+        if (in_array($field_name, $following_fields)) {
+          $following_diff_list[$field_name] = $data[$field_name]['label'];
+        }
+        else {
+          $diff_list[$field_name] = $data[$field_name]['label'];
+        }
+        continue;
+      }
+      if(!is_array($new_value) && $new_value != $old_value) {
+        if (in_array($field_name, $following_fields)) {
+          $following_diff_list[$field_name] = $data[$field_name]['label'];
+        }
+        else {
+          $diff_list[$field_name] = $data[$field_name]['label'];
+        }
+        continue;
+      }
+      if(is_array($new_value) && is_array($old_value)) {
+        if (isset($old_value['safe_value'])) { // These only show up in the old value regardless.
+          unset ($old_value['safe_value']);
+        }
+        if (isset($old_value['safe_summary'])) { // These only show up in the old value regardless.
+          unset ($old_value['safe_summary']);
+        }
+        $diff = array_merge(array_diff($new_value, $old_value), array_diff($old_value, $new_value));
+        if(!empty($diff)) {
+          if (in_array($field_name, $following_fields)) {
+            $following_diff_list[$field_name] = $data[$field_name]['label'];
+          }
+          else {
+            $diff_list[$field_name] = $data[$field_name]['label'];
+          }
+        }
+      }
+    }
+
+    // Get the Following node nid
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'following_notification')
+      ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
+      ->fieldCondition('field_following_content', 'target_id', $node->nid)
+      ->execute();
+    $following_nid = reset($result['node'])->nid;
+
+    $notification_w = entity_metadata_wrapper('node', $following_nid);
+
+    // First update the Following node, if there are changes to the following fields.
+    if (count($following_diff_list)) {
+      ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($node, $notification_w);
+      $notification_w->save();
+    }
+
+    // Then, if there are changes to the other fields, first unset the users_notified on the Following node, then add a new Following email FC.
+    if (count($diff_list)) {
+      $notification_w->field_users_notified->set([]);
+      ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'updated');
+    }
+
+  }
+
+}
+
+// Set the notification lists on a Following node wrapper (to be saved by calling function).
+function ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($child_node, $notification_w) {
+
+  $cw = entity_metadata_wrapper('node', $child_node);
+
+  // Build the notify list.
+  $notify_list = [];
+  // Following due to protocol membership
+  $following_protocols = $cw->field_following_protocols->value();
+  if (count($following_protocols)) {
+    foreach ($following_protocols as $following_protocol) {
+      $notify_list = array_merge($notify_list, og_get_group_members_properties($following_protocol, [], 'members', 'node'));
+    }
+  }
+  // Individually following
+  if (isset($child_node->field_following_users[LANGUAGE_NONE])) {
+    $notify_list = array_merge($notify_list, array_column($child_node->field_following_users[LANGUAGE_NONE], 'target_id'));
+  }
+  // Remove duplicates
+  $notify_list = array_unique($notify_list);
+  // Remove individually unfollowing
+  if (isset($child_node->field_un_following_users[LANGUAGE_NONE])) {
+    $notify_list = array_diff($notify_list, array_column($child_node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
+  }
+
+  // Build notify_frequency lists.
+  $notify_frequency = [
+    'right away' => [],
+    'daily digest' => [],
+    'weekly digest' => [],
+  ];
+  $notify_freq_map = [];
+  if (isset($child_node->field_custom_notification_freq[LANGUAGE_NONE])) {
+    foreach ($child_node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
+      $notify_freq_map[$custom_frequency['first']] = $custom_frequency['second'];
+    }
+  }
+  foreach ($notify_list as $notify_uuid) {
+    if (array_key_exists($notify_uuid, $notify_freq_map)) {
+      $notify_frequency[$notify_freq_map[$notify_uuid]][] = $notify_uuid;
+    }
+    else {
+      $account = user_load($notify_uuid);
+      $def_user_frequency = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
+      $notify_frequency[$def_user_frequency][] = $notify_uuid;
+    }
+  }
+
+  // Set the fields on the notification wrapper, and return the wrapper to be saved in calling function.
+  $notification_w->field_notify_immediately->set($notify_frequency['right away']);
+  $notification_w->field_notify_day->set($notify_frequency['daily digest']);
+  $notification_w->field_notify_week->set($notify_frequency['weekly digest']);
+  return $notification_w;
+}
+
+
+// Attach the notification email field collection to a given notification node.
+function ma_collaboration_tools_set_notification_email_fc($notification_w, $child_node, $op) {
+  $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
+  $fc_email->setHostEntity('node', node_load($notification_w->getIdentifier()));
+  $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
+  $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
+  $body = "The " . $child_node->type . " \"" . $child_node->title . "\", which you are following, was " . $op . " at " . format_date($child_node->timestamp, "long") . ".";
+  $body .= "\n\nView the " . $child_node->type . ": " . $GLOBALS["base_url"] . "/" . $child_node->path["alias"];
+  $body .= "\n\nSee all content you are following: " . $GLOBALS["base_url"] . "/user/[uid]/following"; // uid to be replaced during emailing.
+  $fce_w->field_notification_body->set($body);
+  $fce_w->field_notification_date_gene->set(time());
+  $fce_w->save();
+}
+
+
+/**
+ * Implements hook_field_collection_item_insert()
+ *
+ * After creating a new Following notification email FC, send out notifications for the "immediately" users and update the Following notification users notified field.
+ */
+function ma_collaboration_tools_field_collection_item_insert($fc_item){
+  if ($fc_item->field_name == 'field_notification_email') {
+    $fw = entity_metadata_wrapper('node', $fc_item->hostEntity());
+    $notify_users = array_diff($fw->field_notify_immediately->raw(), $fw->field_users_notified->raw());
+    $successful_sends = ma_collaboration_tools_send_notification($notify_users, $fc_item);
+    // Update the notified users field.
+    $fw->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
+  }
+}
+
+/**
+ * Helper function to send a notification to a list of users.
+ */
+function ma_collaboration_tools_send_notification($notify_users, $fc_item) {
   $successful_sends = [];
   if (count($notify_users)) {
     foreach ($notify_users as $uid) {
-      $body = str_replace('[uid]', $uid, $fw->body->value());
       $params = [
-        'subject' => $fw->title->value(),
-        'body' => $body,
+        'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
+        'body' => str_replace('[uid]', $uid, $fc_item->field_notification_body[LANGUAGE_NONE][0]['value']),
       ];
       $user = user_load($uid);
       $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
@@ -345,85 +543,10 @@ function ma_collaboration_tools_mail($key, &$message, $params) {
   switch ($key) {
     case 'collab_notification':
       $message['subject'] = $params['subject'];
-      $message['body'] = $params['body'];
+      $message['body'][] = $params['body'];
       break;
   }
 }
-
-/**
- * Implements hook_node_update().
- */
-function ma_collaboration_tools_node_update($node, $op='updated') {
-
-  // Create a Following Notification node after a child page is created or updated.
-  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
-    $cw = entity_metadata_wrapper('node', $node);
-
-    // Build the notify list.
-    $notify_list = [];
-    // Following due to protocol membership
-    $following_protocols = $cw->field_following_protocols->value();
-    if (count($following_protocols)) {
-      foreach ($following_protocols as $following_protocol) {
-        $notify_list = array_merge($notify_list, og_get_group_members_properties($following_protocol, [], 'members', 'node'));
-      }
-    }
-    // Individually following
-    if (isset($node->field_following_users[LANGUAGE_NONE])) {
-      $notify_list = array_merge($notify_list, array_column($node->field_following_users[LANGUAGE_NONE], 'target_id'));
-    }
-    // Remove duplicates
-    $notify_list = array_unique($notify_list);
-    // Remove individually unfollowing
-    if (isset($node->field_un_following_users[LANGUAGE_NONE])) {
-      $notify_list = array_diff($notify_list, array_column($node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
-    }
-
-    // Build notify_frequency lists.
-    $notify_frequency = [
-      'right away' => [],
-      'daily digest' => [],
-      'weekly digest' => [],
-    ];
-    $notify_freq_map = [];
-    if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
-      foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
-        $notify_freq_map[$custom_frequency['first']] = $custom_frequency['second'];
-      }
-    }
-    foreach ($notify_list as $notify_uuid) {
-      if (array_key_exists($notify_uuid, $notify_freq_map)) {
-        $notify_frequency[$notify_freq_map[$notify_uuid]][] = $notify_uuid;
-      }
-      else {
-        $account = user_load($notify_uuid);
-        $def_user_frequency = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
-        $notify_frequency[$def_user_frequency][] = $notify_uuid;
-      }
-    }
-
-    // Create and save the Following Notification node.
-    $values = array(
-      'type' => 'following_notification',
-      'uid' => 1,
-      'status' => 1,
-    );
-    $notification = entity_create('node', $values);
-    $notification_w = entity_metadata_wrapper('node', $notification);
-    $notification_w->title->set('"' . $node->title . '" has been ' . $op);
-    $body = "The " . $node->type . " \"" . $node->title . "\", which you are following, was " . $op . " at " . format_date($node->timestamp, "long") . ".";
-    $body .= "\n\nView the " . $node->type . ": " . $GLOBALS["base_url"] . "/" . $node->path["alias"];
-    $body .= "\n\nSee all content you are following: " . $GLOBALS["base_url"] . "/user/[uid]/following"; // uid to be replaced during emailing.
-    $notification_w->body->set(array("value" => $body));
-    $notification_w->field_following_content->set($node->nid);
-    $notification_w->field_notify_immediately->set($notify_frequency['right away']);
-    $notification_w->field_notify_day->set($notify_frequency['daily digest']);
-    $notification_w->field_notify_week->set($notify_frequency['weekly digest']);
-    $notification_w->save();
-
-  }
-}
-
 
 /**
  *  Implements hook_form_alter().

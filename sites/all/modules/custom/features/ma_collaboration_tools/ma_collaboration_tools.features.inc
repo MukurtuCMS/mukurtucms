@@ -63,6 +63,14 @@ function ma_collaboration_tools_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
+    'following_notification' => array(
+      'name' => t('Following Notification'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Title'),
+      'help' => '',
+    ),
     'oa_discussion_post' => array(
       'name' => t('Discussion Post'),
       'base' => 'node_content',

@@ -183,14 +183,8 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'following_notification';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'title' => array(
-      'weight' => '0',
-      'label' => 'inline',
-      'format' => 'default',
+    'field_notification_email' => array(
       'formatter_settings' => array(
-        'link' => '0',
-        'wrapper' => '',
-        'class' => '',
         'ft' => array(),
       ),
     ),
@@ -350,6 +344,36 @@ return ma_collaboration_tools_edit_collab_section_link($entity);
  */
 function ma_collaboration_tools_ds_layout_settings_info() {
   $export = array();
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'field_collection_item|field_notification_email|full';
+  $ds_layout->entity_type = 'field_collection_item';
+  $ds_layout->bundle = 'field_notification_email';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_notification_date_gene',
+        1 => 'field_notification_subject',
+        2 => 'field_notification_body',
+      ),
+    ),
+    'fields' => array(
+      'field_notification_date_gene' => 'ds_content',
+      'field_notification_subject' => 'ds_content',
+      'field_notification_body' => 'ds_content',
+    ),
+    'classes' => array(),
+    'wrappers' => array(),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => TRUE,
+    'layout_link_attribute' => FALSE,
+    'layout_link_custom' => '',
+  );
+  $export['field_collection_item|field_notification_email|full'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -819,23 +843,23 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'title',
-        1 => 'body',
-        2 => 'field_following_content',
-        3 => 'field_notify_immediately',
-        4 => 'field_notify_day',
-        5 => 'field_notify_week',
-        6 => 'field_users_notified',
+        0 => 'field_following_content',
+        1 => 'field_notify_immediately',
+        2 => 'field_notify_day',
+        3 => 'field_notify_week',
+        4 => 'field_users_notified',
+        5 => 'field_all_users_notified',
+        6 => 'field_notification_email',
       ),
     ),
     'fields' => array(
-      'title' => 'ds_content',
-      'body' => 'ds_content',
       'field_following_content' => 'ds_content',
       'field_notify_immediately' => 'ds_content',
       'field_notify_day' => 'ds_content',
       'field_notify_week' => 'ds_content',
       'field_users_notified' => 'ds_content',
+      'field_all_users_notified' => 'ds_content',
+      'field_notification_email' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(
