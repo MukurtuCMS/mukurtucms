@@ -97,8 +97,9 @@ function ma_community_form_community_node_form_alter(&$form, &$form_state) {
       $form['#group_children'][$checkbox_fieldname] = 'group_custom_tk_label_text';
       $form['#group_children'][$textfield_container] = 'group_custom_tk_label_text';
     }
-  }
 
+    $form['#group_children']['tk_label_export_link'] = 'group_custom_tk_label_text';
+  }
 
   // Hide the Child Communities field in all cases
   $form['field_child_communities']['#access'] = FALSE;
