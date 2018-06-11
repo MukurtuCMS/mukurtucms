@@ -313,6 +313,11 @@ function ma_collaboration_tools_node_insert($node) {
 
     // Attach the notification email field collection to the notification node.
     ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'created');
+
+    // Update field_all_users_notified
+    $notification_w = entity_metadata_wrapper('node',  $notification_w->getIdentifier()); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
+    ma_collaboration_tools_update_field_all_users_notified($notification_w);
+
   }
 
 }
@@ -329,7 +334,7 @@ function ma_collaboration_tools_node_update($node) {
 
     // When updating a child page, only create a following email FC instance if certain fields are changed.
     // If only a Following field is changed, instead update the Following node instead.
-    // This diff'ing code is taken from https://drupal.stackexchange.com/a/175186/83739.
+    // This diff'ing code is slightly modified from https://drupal.stackexchange.com/a/175186/83739.
     $ignore_fields_list = [
       'field_pre_actions',
       'path',
@@ -413,17 +418,40 @@ function ma_collaboration_tools_node_update($node) {
 
     // First update the Following node, if there are changes to the following fields.
     if (count($following_diff_list)) {
-      ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($node, $notification_w);
+      $notification_w = ma_collaboration_tools_set_notification_lists_on_following_node_wrapper($node, $notification_w);
       $notification_w->save();
     }
 
     // Then, if there are changes to the other fields, first unset the users_notified on the Following node, then add a new Following email FC.
     if (count($diff_list)) {
       $notification_w->field_users_notified->set([]);
+      $notification_w->save();
       ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'updated');
     }
 
+    // Update field_all_users_notified
+    if (count($following_diff_list) OR count ($diff_list)) {
+      $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
+      ma_collaboration_tools_update_field_all_users_notified($notification_w);
+    }
+
   }
+
+}
+
+// Update field_all_users_notified
+function ma_collaboration_tools_update_field_all_users_notified($notification_w) {
+  $all_users_to_notify = array_unique(array_merge($notification_w->field_notify_immediately->raw(), $notification_w->field_notify_day->raw(), $notification_w->field_notify_week->raw()));
+  $already_notified = $notification_w->field_users_notified->raw();
+  $all_users_notified = 1;
+  if (count(array_diff($all_users_to_notify, $already_notified))) {
+    $all_users_notified = 0;
+  }
+  if ($all_users_notified <>  $notification_w->field_all_users_notified->value()) {
+    $notification_w->field_all_users_notified->set($all_users_notified);
+    $notification_w->save();
+  }
+  //dpm ("all users notified for set to: " . $all_users_notified);
 
 }
 
