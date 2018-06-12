@@ -90,6 +90,16 @@ function ma_core_user_default_permissions() {
     'module' => 'contextual',
   );
 
+  // Exported permission: 'access mail logger'.
+  $permissions['access mail logger'] = array(
+    'name' => 'access mail logger',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'mail_logger',
+  );
+
   // Exported permission: 'access mollom statistics'.
   $permissions['access mollom statistics'] = array(
     'name' => 'access mollom statistics',
@@ -384,15 +394,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'locale',
-  );
-
-  // Exported permission: 'administer maillog'.
-  $permissions['administer maillog'] = array(
-    'name' => 'administer maillog',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'administer menu'.
@@ -796,15 +797,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'backup_migrate',
-  );
-
-  // Exported permission: 'delete maillog'.
-  $permissions['delete maillog'] = array(
-    'name' => 'delete maillog',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'delete own article content'.
@@ -1498,16 +1490,6 @@ function ma_core_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'advanced_help',
-  );
-
-  // Exported permission: 'view maillog'.
-  $permissions['view maillog'] = array(
-    'name' => 'view maillog',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'view own unpublished content'.
