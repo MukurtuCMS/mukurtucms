@@ -418,11 +418,18 @@ function ma_collaboration_tools_node_update($node) {
         continue;
       }
       if(is_array($new_value) && is_array($old_value)) {
-        if (isset($old_value['safe_value'])) { // These only show up in the old value regardless.
+        // Sometimes (but not always) the safe value & safe summary only show up in the old value. Skip it from the comparison.
+        if (isset($old_value['safe_value'])) {
           unset ($old_value['safe_value']);
         }
-        if (isset($old_value['safe_summary'])) { // These only show up in the old value regardless.
+        if (isset($old_value['safe_summary'])) {
           unset ($old_value['safe_summary']);
+        }
+        if (isset($new_value['safe_value'])) {
+          unset ($new_value['safe_value']);
+        }
+        if (isset($new_value['safe_summary'])) {
+          unset ($new_value['safe_summary']);
         }
         $diff = array_merge(array_diff($new_value, $old_value), array_diff($old_value, $new_value));
         if(!empty($diff)) {
