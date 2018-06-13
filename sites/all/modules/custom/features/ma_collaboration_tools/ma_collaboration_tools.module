@@ -529,7 +529,13 @@ function ma_collaboration_tools_set_notification_email_fc($notification_w, $chil
   $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
   $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
   $body = "The " . $child_node->type . " \"" . $child_node->title . "\", which you are following, was " . $op . " at " . format_date($child_node->timestamp, "long") . ".";
-  $body .= "\n\nView the " . $child_node->type . ": " . $GLOBALS["base_url"] . "/" . $child_node->path["alias"];
+  if ($op == 'created') {
+    $alias = pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
+  }
+  else {
+    $alias =  $child_node->path["alias"];
+  }
+  $body .= "\n\nView the " . $child_node->type . ": " . $GLOBALS["base_url"] . "/" . $alias;
   $fce_w->field_notification_body->set($body);
   $fce_w->field_notification_date_gene->set(time());
   $fce_w->save();
