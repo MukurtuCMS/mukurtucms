@@ -551,31 +551,29 @@ function ma_collaboration_tools_field_collection_item_insert($fc_item){
   if ($fc_item->field_name == 'field_notification_email') {
     $notification_w = entity_metadata_wrapper('node', $fc_item->hostEntity());
     $notify_users = array_diff($notification_w->field_notify_immediately->raw(), $notification_w->field_users_notified->raw());
-    $successful_sends = ma_collaboration_tools_send_single_notification($notify_users, $fc_item);
-    // Update the notified users field.
-    $notification_w->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
-  }
-}
 
-/**
- * Helper function to send a single notification to a list of users.
- */
-function ma_collaboration_tools_send_single_notification($notify_users, $fc_item) {
-  $successful_sends = [];
-  if (count($notify_users)) {
-    foreach ($notify_users as $uid) {
-      $params = [
-        'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
-        'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nSee all content you are following: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",
-      ];
-      $user = user_load($uid);
-      $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
-      if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
-        $successful_sends[] = $uid;
+    // Send notifications.
+    $successful_sends = [];
+    if (count($notify_users)) {
+      foreach ($notify_users as $uid) {
+        $params = [
+          'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
+          'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nSee all content you are following: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",
+        ];
+        $user = user_load($uid);
+        $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
+        if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
+          $successful_sends[] = $uid;
+        }
       }
+
+      // Update the notified users field.
+      if (count($successful_sends)) {
+        $notification_w->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
+      }
+
     }
   }
-  return $successful_sends;
 }
 
 /**
@@ -1225,38 +1223,22 @@ function ma_collaboration_tools_daily_notifications() {
 
     // Send the aggregate emails.
     foreach ($aggregated_fcs_all_users as $uid => $fc_items) {
-
-      // If there is just one item, then send it as a single notification (so that it gets a specific subject header).
-      if (count($fc_items) == 1) {
-        $following_nid = key($fc_items);
-        $fc_item = $fc_items[$following_nid];
-        // dpm ('just single for ' . $uid);
-        if (ma_collaboration_tools_send_single_notification([$uid], $fc_item)) {
-          $successful_sends[$uid][] = $following_nid;
-        }
+      $bodies = ["See all content you are following: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
+      $following_nids = [];
+      foreach ($fc_items as $following_nid => $fc_item) {
+        $following_nids[] = $following_nid;
+        $bodies[] = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
       }
-
-      // Build and send the aggregate email.
-      else {
-        // dpm('multiple items for ' . $uid);
-        $bodies = ["See all content you are following: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
-        $following_nids = [];
-        foreach ($fc_items as $following_nid => $fc_item) {
-          $following_nids[] = $following_nid;
-          $bodies[] = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
-        }
-        $body = implode("\n_________________________________________________________________\n\n", $bodies); // Using 65 character underscore as suggested here https://mailformat.dan.info/body/linelength.html
-        $params = [
-          'subject' => 'Items you are following have been created or updated.',
-          'body' => $body,
-        ];
-        $user = user_load($uid);
-        $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
-        if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
-          $successful_sends[$uid] = $following_nids;
-        }
+      $body = implode("\n_________________________________________________________________\n\n", $bodies); // Using 65 character underscore as suggested here https://mailformat.dan.info/body/linelength.html
+      $params = [
+        'subject' => 'Items you are following have been created or updated.',
+        'body' => $body,
+      ];
+      $user = user_load($uid);
+      $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
+      if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
+        $successful_sends[$uid] = $following_nids;
       }
-
     }
 
     // Update the Following nodes field_users_notified and then field_all_users_notified
