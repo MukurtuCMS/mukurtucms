@@ -299,6 +299,27 @@ function ma_collaboration_tools_node_postsave($node, $op) {
 }
 
 /**
+ * Implements hook_node_delete().
+ */
+function ma_collaboration_tools_node_delete($node) {
+  // If a child node is deleted, also delete its Following node.
+  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+    // Get the Following node nid
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'following_notification')
+      ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
+      ->fieldCondition('field_following_content', 'target_id', $node->nid)
+      ->execute();
+    $following_nid = reset($result['node'])->nid;
+    if ($following_nid) { // This condition should always be met.
+      node_delete($following_nid);
+    }
+  }
+}
+
+/**
  * Implements hook_node_insert().
  */
 function ma_collaboration_tools_node_insert($node) {
