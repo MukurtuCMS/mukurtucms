@@ -425,6 +425,11 @@ function ma_collaboration_tools_node_update($node) {
       ->execute();
     $following_nid = reset($result['node'])->nid;
 
+    if (!$following_nid) { // this should never happen but log an error in case it does.
+      watchdog('ma_collaboration_tools', 'There is no Following node for node %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+      return;
+    }
+
     $notification_w = entity_metadata_wrapper('node', $following_nid);
 
     // First update the Following node, if there are changes to the following fields.
