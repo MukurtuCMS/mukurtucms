@@ -558,7 +558,7 @@ function ma_collaboration_tools_field_collection_item_insert($fc_item){
       foreach ($notify_users as $uid) {
         $params = [
           'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
-          'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nSee all content you are following: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",
+          'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nManage your notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",
         ];
         $user = user_load($uid);
         $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
@@ -1175,20 +1175,45 @@ function ma_collaboration_tools_forms($form_id, $args) {
 }
 
 
+/**
+ * Implementation of hook_cronapi.
+ *
+ * This hook is provided by Elysia Cron, which allows for scheduled cron jobs.
+ */
 function ma_collaboration_tools_cronapi($op, $job = NULL) {
-
   $items['ma_collaboration_tools_daily_notifications'] = array(
     'description' => 'Send daily collaboration page notifications.',
     //'rule' => '0 2 * * *', // daily at 2am.
     'rule' => '* * * * *', // every minute (for testing)
   );
-
-
+  $items['ma_collaboration_tools_weekly_notifications'] = array(
+    'description' => 'Send weekly collaboration page notifications.',
+    //'rule' => '0 17 * * sun', // every sunday at 5pm
+    'rule' => '* * * * *', // every minute (for testing)
+  );
   return $items;
 }
 
+// Elysia cron notification callacks.
 function ma_collaboration_tools_daily_notifications() {
+  ma_collaboration_tools_send_scheduled_notifications('daily');
+}
+function ma_collaboration_tools_weekly_notifications() {
+  ma_collaboration_tools_send_scheduled_notifications('weekly');
+}
 
+// Send scheduled notifications, as called by the different schedule Elysia cron callbacks.
+function ma_collaboration_tools_send_scheduled_notifications($schedule) {
+  switch ($schedule) {
+    case 'daily':
+      $notification_field = 'field_notify_day';
+      break;
+    case 'weekly':
+      $notification_field = 'field_notify_week';
+      break;
+  }
+
+  // Get the following nodes that still have users to notify.
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'node')
@@ -1202,12 +1227,13 @@ function ma_collaboration_tools_daily_notifications() {
     $aggregated_fcs_all_users = [];
     foreach (array_keys($result['node']) as $nid) {
       $notification_w = entity_metadata_wrapper('node', $nid);
+
       // Get users to send to.
-      $users_already_sent = $notification_w->field_users_notified->raw() ? $notification_w->field_users_notified->raw() : [];
-      $users_scheduled_send = $notification_w->field_notify_day->raw() ? $notification_w->field_notify_day->raw() : [];
-      $users_immediate_send = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : []; // Also add the immedately send users. This happens if a user was following a node on a scheduled frequency, then changed their frequency (either default or specific to that node) to immediate. They will only get an update on that node after the schedule run, not immediately after update. Thereafter, they will updates on it immediately.
-      $users_to_send_to = array_merge($users_scheduled_send, $users_immediate_send);
-      $users_to_send_to = array_diff($users_to_send_to, $users_already_sent);
+      $users_to_send_to = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was following a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate. This ensures those notifications still get sent, during the next scheduled send (daily).
+      $users_to_send_to = array_merge($users_to_send_to, $notification_w->{$notification_field}->raw() ? $notification_w->{$notification_field}->raw() : []);
+      $users_to_send_to = array_diff($users_to_send_to, $notification_w->field_users_notified->raw() ? $notification_w->field_users_notified->raw() : []); // Do not send to users already notified.
+      $users_to_send_to = array_unique($users_to_send_to); // There never should be duplicates, but just in case.
+
       if (count($users_to_send_to)) {
         // Get the FC
         $latest_fc = $notification_w->field_notification_email->count();
@@ -1219,11 +1245,12 @@ function ma_collaboration_tools_daily_notifications() {
           }
         }
       }
+
     }
 
-    // Send the aggregate emails.
+    // Send the aggregate email(s), one per user.
     foreach ($aggregated_fcs_all_users as $uid => $fc_items) {
-      $bodies = ["See all content you are following: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
+      $bodies = ["This is your " . $schedule . " digest of notifications for " . variable_get('site_name') . ". You may manage these notifications at: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
       $following_nids = [];
       foreach ($fc_items as $following_nid => $fc_item) {
         $following_nids[] = $following_nid;
@@ -1231,7 +1258,7 @@ function ma_collaboration_tools_daily_notifications() {
       }
       $body = implode("\n_________________________________________________________________\n\n", $bodies); // Using 65 character underscore as suggested here https://mailformat.dan.info/body/linelength.html
       $params = [
-        'subject' => 'Items you are following have been created or updated.',
+        'subject' => 'Your ' . $schedule . ' notifications digest for ' . variable_get('site_name') . '.',
         'body' => $body,
       ];
       $user = user_load($uid);
