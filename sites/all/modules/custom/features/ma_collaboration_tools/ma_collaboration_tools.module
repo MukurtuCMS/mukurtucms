@@ -365,8 +365,10 @@ function ma_collaboration_tools_node_update($node) {
 
     // When updating a child page, only create a following email FC instance if certain fields are changed.
     // If only a Following field is changed, instead update the Following node instead.
-    // This diff'ing code is slightly modified from https://drupal.stackexchange.com/a/175186/83739.
-    $ignore_fields_list = [
+    // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
+    // Also using helper functions added to ma_core.
+    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
+    $ignore_fields = [
       'field_pre_actions',
       'path',
       'redirect',
@@ -375,7 +377,16 @@ function ma_collaboration_tools_node_update($node) {
       'field_item_privacy_setting',
       'field_custom_notification_freq',
     ];
-    $ignore_fields_list = array_merge ($ignore_fields_list, ma_collaboration_tools_get_all_child_ref_fields());
+    $properties_within_fields_to_ignore = [
+      'safe_value',
+      'safe_summary',
+      'all_day',
+      'show_repeat_settings',
+      'show_todate',
+      'offset',
+      'offset2',
+    ];
+    $ignore_fields = array_merge ($ignore_fields, ma_collaboration_tools_get_all_child_ref_fields());
     $following_fields = [
       'field_following_protocols',
       'field_following_users',
@@ -388,7 +399,7 @@ function ma_collaboration_tools_node_update($node) {
     $diff_list =  array();
     foreach ($fields_list as $key => $field_name ) {
       // Ignore if field name belong to ignore list
-      if(in_array($field_name, $ignore_fields_list )) {
+      if(in_array($field_name, $ignore_fields )) {
         continue;
       }
       $old_value = $entity_old->{$field_name}->raw();
@@ -418,21 +429,13 @@ function ma_collaboration_tools_node_update($node) {
         continue;
       }
       if(is_array($new_value) && is_array($old_value)) {
-        // Sometimes (but not always) the safe value & safe summary only show up in the old value. Skip it from the comparison.
-        if (isset($old_value['safe_value'])) {
-          unset ($old_value['safe_value']);
+        foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
+          recursive_unset($new_value, $property_to_ignore);
+          recursive_unset($old_value, $property_to_ignore);
         }
-        if (isset($old_value['safe_summary'])) {
-          unset ($old_value['safe_summary']);
-        }
-        if (isset($new_value['safe_value'])) {
-          unset ($new_value['safe_value']);
-        }
-        if (isset($new_value['safe_summary'])) {
-          unset ($new_value['safe_summary']);
-        }
-        $diff = array_merge(array_diff($new_value, $old_value), array_diff($old_value, $new_value));
-        if(!empty($diff)) {
+        $diff1 = array_diff_assoc_recursive($new_value, $old_value);
+        $diff2 = array_diff_assoc_recursive($old_value, $new_value);
+        if($diff1 or $diff2) {
           if (in_array($field_name, $following_fields)) {
             $following_diff_list[$field_name] = $data[$field_name]['label'];
           }
