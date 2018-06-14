@@ -1027,7 +1027,7 @@ function ma_collaboration_tools_follow_unfollow_process($node, $op) {
   else {
     $nw->field_un_following_users[] = $user->uid;
     $new_following_users = [];
-    $following_users = $nw->field_un_following_users->value();
+    $following_users = $nw->field_following_users->value();
     foreach ($following_users as $following_user) {
       if ($following_user->uid <> $user->uid) {
         $new_following_users[] = $following_user->uid;
