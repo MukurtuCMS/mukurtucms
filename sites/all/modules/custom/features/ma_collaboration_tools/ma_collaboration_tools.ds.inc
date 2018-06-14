@@ -183,7 +183,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'following_notification';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'field_notification_email' => array(
+    'field_notify_all' => array(
       'formatter_settings' => array(
         'ft' => array(),
       ),
@@ -847,9 +847,10 @@ function ma_collaboration_tools_ds_layout_settings_info() {
         1 => 'field_notify_immediately',
         2 => 'field_notify_day',
         3 => 'field_notify_week',
-        4 => 'field_users_notified',
-        5 => 'field_all_users_notified',
-        6 => 'field_notification_email',
+        4 => 'field_notify_all',
+        5 => 'field_users_notified',
+        6 => 'field_all_users_notified',
+        7 => 'field_notification_email',
       ),
     ),
     'fields' => array(
@@ -857,6 +858,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'field_notify_immediately' => 'ds_content',
       'field_notify_day' => 'ds_content',
       'field_notify_week' => 'ds_content',
+      'field_notify_all' => 'ds_content',
       'field_users_notified' => 'ds_content',
       'field_all_users_notified' => 'ds_content',
       'field_notification_email' => 'ds_content',

@@ -834,10 +834,10 @@ function ma_collaboration_tools_strongarm() {
           'weight' => '0',
         ),
         'path' => array(
-          'weight' => '8',
+          'weight' => '9',
         ),
         'redirect' => array(
-          'weight' => '9',
+          'weight' => '10',
         ),
       ),
       'display' => array(),

@@ -2316,7 +2316,7 @@ http://www.whitehouse.gov/',
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_key',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2342,7 +2342,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_onoff',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -2440,7 +2440,7 @@ http://www.whitehouse.gov/',
           'view_mode' => 'full',
         ),
         'type' => 'field_collection_view',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2465,7 +2465,79 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'field_collection_embed',
-      'weight' => 7,
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-following_notification-field_notify_all'.
+  $field_instances['node-following_notification-field_notify_all'] = array(
+    'bundle' => 'following_notification',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 8,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_notify_all',
+    'label' => 'Users to notify all',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
     ),
   );
 
@@ -2768,7 +2840,7 @@ http://www.whitehouse.gov/',
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2799,7 +2871,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -3905,6 +3977,7 @@ http://www.whitehouse.gov/');
   t('The selected Protocols\' members will follow this event. Individually, they may choose to un-follow it.');
   t('UnFollowing Users');
   t('Users notified (of created, or most recent update)');
+  t('Users to notify all');
   t('Users to notify at end of day');
   t('Users to notify at end of week');
   t('Users to notify immediately');

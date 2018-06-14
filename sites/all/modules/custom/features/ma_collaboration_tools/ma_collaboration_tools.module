@@ -488,7 +488,7 @@ function ma_collaboration_tools_node_update($node) {
 
 // Update field_all_users_notified
 function ma_collaboration_tools_update_field_all_users_notified($notification_w) {
-  $all_users_to_notify = array_unique(array_merge($notification_w->field_notify_immediately->raw(), $notification_w->field_notify_day->raw(), $notification_w->field_notify_week->raw()));
+  $all_users_to_notify = $notification_w->field_notify_all->raw();
   $already_notified = $notification_w->field_users_notified->raw();
   $all_users_notified = 1;
   if (count(array_diff($all_users_to_notify, $already_notified))) {
@@ -554,6 +554,8 @@ function ma_collaboration_tools_set_notification_lists_on_following_node_wrapper
   $notification_w->field_notify_immediately->set($notify_frequency['right away']);
   $notification_w->field_notify_day->set($notify_frequency['daily digest']);
   $notification_w->field_notify_week->set($notify_frequency['weekly digest']);
+  $notification_w->field_notify_all->set(array_merge($notify_frequency['right away'], $notify_frequency['daily digest'], $notify_frequency['weekly digest']));
+
   return $notification_w;
 }
 
@@ -1111,16 +1113,57 @@ function ma_collaboration_tools_notification_frequency_default($form, &$form_sta
 }
 
 /**
- * Submit handler for the notification default frequency sets the value on the user object.
+ * Submit handler for the notification default frequency form.
  */
 function ma_collaboration_tools_notification_frequency_default_submit ($form, &$form_state) {
+
+
   $account = user_load(arg(1));
-  $existing_freq =& $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
+  $existing_freq = $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
   $new_freq = $form_state['values']['notification_frequency_default'];
   if ($existing_freq <> $new_freq) {
-    $existing_freq = $new_freq;
+
+    // Update the notification default frequency on the user object.
+    $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] = $new_freq;
     user_save($account);
+
+    // Update the Following nodes for all child pages the user is following that are set to default frequency.
+    $frequency_field_map = [
+      'right away' => 'field_notify_immediately',
+      'daily digest' => 'field_notify_day',
+      'weekly digest' => 'field_notify_week',
+    ];
+    // Get all Following nodes the user is marked as a follower of.
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'following_notification')
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->fieldCondition('field_notify_all', 'target_id', $account->uid)
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      // Loop through these, and check the child page if this user is using their default notification frequency for that node, and if so, update the Following node.
+      foreach (array_keys($result['node']) as $nid) {
+        $notification_w = entity_metadata_wrapper('node', $nid);
+        $custom_notification_freqs = $notification_w->field_following_content->field_custom_notification_freq->value();
+        if (count($custom_notification_freqs)) {
+          foreach ($custom_notification_freqs as $custom_notification_freq) {
+            if ($custom_notification_freq['first'] = $account->uid) {
+              $user_custom_freq_for_this_node = 1;
+              break;
+            }
+          }
+        }
+        if (!$user_custom_freq_for_this_node) {
+          $notification_w->{$frequency_field_map[$existing_freq]}->set(array_diff($notification_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
+          $notification_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
+          $notification_w->save();
+        }
+      }
+    }
+
   }
+
 }
 
 /**
