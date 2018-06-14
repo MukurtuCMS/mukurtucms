@@ -375,7 +375,6 @@ function ma_collaboration_tools_node_update($node) {
       'og_group_ref',
       'field_community_ref',
       'field_item_privacy_setting',
-      'field_custom_notification_freq',
     ];
     $properties_within_fields_to_ignore = [
       'safe_value',
@@ -391,6 +390,7 @@ function ma_collaboration_tools_node_update($node) {
       'field_following_protocols',
       'field_following_users',
       'field_un_following_users',
+      'field_custom_notification_freq',
     ];
 
     $following_diff_list =  array();
