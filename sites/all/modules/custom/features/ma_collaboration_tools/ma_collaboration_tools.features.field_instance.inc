@@ -3530,7 +3530,7 @@ http://www.whitehouse.gov/',
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => '',
+        'apply_chosen' => 1,
         'treeable' => 0,
       ),
       'type' => 'options_select',
