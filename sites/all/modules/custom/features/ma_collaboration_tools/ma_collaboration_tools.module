@@ -95,7 +95,7 @@ function ma_collaboration_tools_collab_node_types_map() {
   return [
     'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
     'oa_discussion_post' => ['parent' => 'discussion_space', 'ref_field' => 'temp1'],
-    'oa_wiki_page' => ['parent' => 'document_library', 'ref_field' => 'temp2'],
+    'oa_wiki_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
   ];
 }
 
@@ -1308,7 +1308,7 @@ function ma_collaboration_tools_send_scheduled_notifications($schedule) {
       $notification_w = entity_metadata_wrapper('node', $nid);
 
       // Get users to send to.
-      $users_to_send_to = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was following a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate. This ensures those notifications still get sent, during the next scheduled send (daily).
+      $users_to_send_to = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was following a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate (either on the node or by switching to default wherein their default is immediate). This ensures those notifications still get sent, during the next scheduled send (ie. no later than daily).
       $users_to_send_to = array_merge($users_to_send_to, $notification_w->{$notification_field}->raw() ? $notification_w->{$notification_field}->raw() : []);
       $users_to_send_to = array_diff($users_to_send_to, $notification_w->field_users_notified->raw() ? $notification_w->field_users_notified->raw() : []); // Do not send to users already notified.
       $users_to_send_to = array_unique($users_to_send_to); // There never should be duplicates, but just in case.

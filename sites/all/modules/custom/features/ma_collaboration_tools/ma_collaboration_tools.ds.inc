@@ -191,6 +191,46 @@ function ma_collaboration_tools_ds_field_settings_info() {
   );
   $export['node|following_notification|full'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|oa_wiki_page|full';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'oa_wiki_page';
+  $ds_fieldsetting->view_mode = 'full';
+  $ds_fieldsetting->settings = array(
+    'follow_unfollow' => array(
+      'weight' => '5',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'comments' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_following_protocols' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_following_users' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_un_following_users' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_document_doc_lib_section' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|oa_wiki_page|full'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -950,15 +990,19 @@ function ma_collaboration_tools_ds_layout_settings_info() {
         2 => 'body',
         3 => 'field_oa_wiki_page_no_redirect',
         4 => 'field_oa_media',
-        5 => 'og_group_ref',
-        6 => 'oa_section_ref',
-        7 => 'field_item_privacy_setting',
-        8 => 'path',
-        9 => 'redirect',
+        6 => 'group_following',
+        7 => 'path',
+        8 => 'redirect',
+        11 => 'field_following_protocols',
+        12 => 'field_following_users',
+        13 => 'field_un_following_users',
       ),
       'hidden' => array(
+        5 => 'field_item_privacy_setting',
+        9 => 'og_group_ref',
         10 => 'field_community_ref',
-        11 => '_add_existing_field',
+        14 => 'field_custom_notification_freq',
+        15 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -967,12 +1011,16 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'body' => 'ds_content',
       'field_oa_wiki_page_no_redirect' => 'ds_content',
       'field_oa_media' => 'ds_content',
-      'og_group_ref' => 'ds_content',
-      'oa_section_ref' => 'ds_content',
-      'field_item_privacy_setting' => 'ds_content',
+      'field_item_privacy_setting' => 'hidden',
+      'group_following' => 'ds_content',
       'path' => 'ds_content',
       'redirect' => 'ds_content',
+      'og_group_ref' => 'hidden',
       'field_community_ref' => 'hidden',
+      'field_following_protocols' => 'ds_content',
+      'field_following_users' => 'ds_content',
+      'field_un_following_users' => 'ds_content',
+      'field_custom_notification_freq' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -991,6 +1039,58 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|oa_wiki_page|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|oa_wiki_page|full';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'oa_wiki_page';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'ds_2col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_document_doc_lib_section',
+        1 => 'body',
+        2 => 'field_oa_media',
+        3 => 'comments',
+      ),
+      'right' => array(
+        4 => 'group_following',
+        5 => 'follow_unfollow',
+        6 => 'field_following_protocols',
+        7 => 'field_following_users',
+        8 => 'field_un_following_users',
+      ),
+    ),
+    'fields' => array(
+      'field_document_doc_lib_section' => 'left',
+      'body' => 'left',
+      'field_oa_media' => 'left',
+      'comments' => 'left',
+      'group_following' => 'right',
+      'follow_unfollow' => 'right',
+      'field_following_protocols' => 'right',
+      'field_following_users' => 'right',
+      'field_un_following_users' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => 0,
+  );
+  $export['node|oa_wiki_page|full'] = $ds_layout;
 
   return $export;
 }

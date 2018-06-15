@@ -3516,7 +3516,7 @@ http://www.whitehouse.gov/',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'featured' => array(
         'label' => 'hidden',
@@ -3524,6 +3524,13 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -3568,10 +3575,15 @@ http://www.whitehouse.gov/',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'node_reference',
         'settings' => array(),
-        'type' => 'node_reference_default',
-        'weight' => 10,
+        'type' => 'hidden',
+        'weight' => 32,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3602,6 +3614,280 @@ http://www.whitehouse.gov/',
     ),
   );
 
+  // Exported field_instance:
+  // 'node-oa_wiki_page-field_custom_notification_freq'.
+  $field_instances['node-oa_wiki_page-field_custom_notification_freq'] = array(
+    'bundle' => 'oa_wiki_page',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_custom_notification_freq',
+    'label' => 'Custom Notification Frequencies',
+    'required' => FALSE,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'module' => 'double_field',
+      'settings' => array(
+        'first' => array(
+          'general' => array(
+            'prefix' => '',
+            'required' => TRUE,
+            'suffix' => '',
+          ),
+          'textfield' => array(
+            'placeholder' => '',
+            'size' => 10,
+          ),
+        ),
+        'inline' => TRUE,
+        'second' => array(
+          'general' => array(
+            'prefix' => '',
+            'required' => TRUE,
+            'suffix' => '',
+          ),
+          'textfield' => array(
+            'placeholder' => '',
+            'size' => 10,
+          ),
+        ),
+        'treeable' => FALSE,
+      ),
+      'type' => 'textfield_&_textfield',
+      'weight' => 16,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-oa_wiki_page-field_document_doc_lib_section'.
+  $field_instances['node-oa_wiki_page-field_document_doc_lib_section'] = array(
+    'bundle' => 'oa_wiki_page',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_document_doc_lib_section',
+    'label' => 'Document Library',
+    'required' => 1,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 17,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_wiki_page-field_following_protocols'.
+  $field_instances['node-oa_wiki_page-field_following_protocols'] = array(
+    'bundle' => 'oa_wiki_page',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'The selected Protocols\' members will follow this document. Individually, they may choose to un-follow it.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 6,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_following_protocols',
+    'label' => 'Following Protocols',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 12,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_wiki_page-field_following_users'.
+  $field_instances['node-oa_wiki_page-field_following_users'] = array(
+    'bundle' => 'oa_wiki_page',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Individual users following this document, irrespective of their Protocol membership.
+',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_following_users',
+    'label' => 'Following Users',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 13,
+    ),
+  );
+
   // Exported field_instance: 'node-oa_wiki_page-field_item_privacy_setting'.
   $field_instances['node-oa_wiki_page-field_item_privacy_setting'] = array(
     'bundle' => 'oa_wiki_page',
@@ -3615,10 +3901,15 @@ http://www.whitehouse.gov/',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 8,
+        'type' => 'hidden',
+        'weight' => 31,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3642,7 +3933,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 7,
+      'weight' => 5,
     ),
   );
 
@@ -3654,11 +3945,11 @@ http://www.whitehouse.gov/',
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'file',
         'settings' => array(),
-        'type' => 'file_default',
-        'weight' => 4,
+        'type' => 'file_table',
+        'weight' => 2,
       ),
       'featured' => array(
         'label' => 'hidden',
@@ -3668,6 +3959,13 @@ http://www.whitehouse.gov/',
         ),
         'type' => 'file_rendered',
         'weight' => 1,
+      ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'file',
+        'settings' => array(),
+        'type' => 'file_table',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3743,16 +4041,21 @@ http://www.whitehouse.gov/',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 7,
+        'type' => 'hidden',
+        'weight' => 30,
       ),
       'featured' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 4,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3792,10 +4095,15 @@ http://www.whitehouse.gov/',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 11,
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3825,13 +4133,13 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-oa_section_ref'.
-  $field_instances['node-oa_wiki_page-oa_section_ref'] = array(
+  // Exported field_instance: 'node-oa_wiki_page-field_un_following_users'.
+  $field_instances['node-oa_wiki_page-field_un_following_users'] = array(
     'bundle' => 'oa_wiki_page',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Members of a Following Protocol that have specifically elected not to follow this document.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -3841,7 +4149,28 @@ http://www.whitehouse.gov/',
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 9,
+        'weight' => 3,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3850,10 +4179,11 @@ http://www.whitehouse.gov/',
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'oa_section_ref',
-    'label' => 'Section',
+    'field_name' => 'field_un_following_users',
+    'label' => 'UnFollowing Users',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -3867,11 +4197,11 @@ http://www.whitehouse.gov/',
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => 1,
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 6,
+      'weight' => 14,
     ),
   );
 
@@ -3885,16 +4215,21 @@ http://www.whitehouse.gov/',
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'og_ui',
         'settings' => array(),
-        'type' => 'og_list_default',
-        'weight' => 2,
+        'type' => 'hidden',
+        'weight' => 29,
       ),
       'featured' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 7,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3935,7 +4270,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 5,
+      'weight' => 9,
     ),
   );
 
@@ -3951,6 +4286,7 @@ http://www.whitehouse.gov/',
   t('Date Generated');
   t('Describe the Event');
   t('Description');
+  t('Document Library');
   t('Email(s)');
   t('Enter the Discussion Post Content Here');
   t('Enter the content of the document or wiki here.');
@@ -3960,6 +4296,8 @@ http://www.whitehouse.gov/',
   t('Geocoded Location');
   t('Groups audience');
   t('If checked, show the node detail page (Drupal default behavior).  If unchecked, show the first file attachment.');
+  t('Individual users following this document, irrespective of their Protocol membership.
+');
   t('Individual users following this event, irrespective of their Protocol membership.
 ');
   t('Item Sharing Settings');
@@ -3968,12 +4306,14 @@ http://www.whitehouse.gov/',
 1600 Pennsylvania Avenue, NW
 Washington, DC 20500
 http://www.whitehouse.gov/');
+  t('Members of a Following Protocol that have specifically elected not to follow this document.');
   t('Members of a Following Protocol that have specifically elected not to follow this event.');
   t('Pre-Actions');
   t('Protocol');
   t('Section');
   t('Show page instead of file?');
   t('Subject');
+  t('The selected Protocols\' members will follow this document. Individually, they may choose to un-follow it.');
   t('The selected Protocols\' members will follow this event. Individually, they may choose to un-follow it.');
   t('UnFollowing Users');
   t('Users notified (of created, or most recent update)');
