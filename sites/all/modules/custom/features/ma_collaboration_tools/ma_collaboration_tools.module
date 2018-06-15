@@ -1262,13 +1262,11 @@ function ma_collaboration_tools_forms($form_id, $args) {
 function ma_collaboration_tools_cronapi($op, $job = NULL) {
   $items['ma_collaboration_tools_daily_notifications'] = array(
     'description' => 'Send daily collaboration page notifications.',
-    //'rule' => '0 2 * * *', // daily at 2am.
-    'rule' => '* * * * *', // every minute (for testing)
+    'rule' => '0 8 * * *', // every day at 2am
   );
   $items['ma_collaboration_tools_weekly_notifications'] = array(
     'description' => 'Send weekly collaboration page notifications.',
-    //'rule' => '0 17 * * sun', // every sunday at 5pm
-    'rule' => '* * * * *', // every minute (for testing)
+    'rule' => '0 8 * * MON', // every Monday at 8am
   );
   return $items;
 }
