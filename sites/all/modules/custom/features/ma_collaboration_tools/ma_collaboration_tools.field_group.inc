@@ -374,6 +374,68 @@ function ma_collaboration_tools_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_following|node|oa_discussion_post|form';
+  $field_group->group_name = 'group_following';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'oa_discussion_post';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Following',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_following_protocols',
+      1 => 'field_following_users',
+      2 => 'field_un_following_users',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Following',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'id' => '',
+        'classes' => 'group-following field-group-fieldset',
+        'description' => '<p>Users that are following a discussion post are emailed updates when there are any comments on the discussion post.</p>
+<p>Protocol Stewards may add their protocol(s) here if this discussion post is within that protocol, and all members of that protocol will then be following the discussion post. Individual users may also follow the discussion post independently of their protocol memberships. They can also unfollow an discussion post even if they would otherwise be following it due to protocol membership.</p>',
+      ),
+      'formatter' => 'collapsible',
+    ),
+  );
+  $field_groups['group_following|node|oa_discussion_post|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_following|node|oa_discussion_post|full';
+  $field_group->group_name = 'group_following';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'oa_discussion_post';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Following',
+    'weight' => '38',
+    'children' => array(
+      0 => 'field_following_protocols',
+      1 => 'field_following_users',
+      2 => 'field_un_following_users',
+      3 => 'follow_unfollow',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-following field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_following|node|oa_discussion_post|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_following|node|oa_wiki_page|default';
   $field_group->group_name = 'group_following';
   $field_group->entity_type = 'node';

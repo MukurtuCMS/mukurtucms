@@ -2895,6 +2895,13 @@ http://www.whitehouse.gov/',
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -2925,7 +2932,7 @@ http://www.whitehouse.gov/',
         'summary_rows' => 5,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 5,
+      'weight' => 2,
     ),
   );
 
@@ -2942,6 +2949,12 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'node_reference_default',
         'weight' => 10,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2973,6 +2986,298 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
+  // 'node-oa_discussion_post-field_custom_notification_freq'.
+  $field_instances['node-oa_discussion_post-field_custom_notification_freq'] = array(
+    'bundle' => 'oa_discussion_post',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'double_field',
+        'settings' => array(
+          'first' => array(
+            'format' => '_none',
+            'hidden' => 0,
+            'prefix' => '',
+            'suffix' => ':&nbsp;',
+          ),
+          'second' => array(
+            'format' => '_none',
+            'hidden' => 0,
+            'prefix' => '',
+            'suffix' => '',
+          ),
+          'style' => 'inline',
+        ),
+        'type' => 'double_field_unformatted_list',
+        'weight' => 12,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_custom_notification_freq',
+    'label' => 'Custom Notification Frequencies',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'double_field',
+      'settings' => array(
+        'first' => array(
+          'general' => array(
+            'prefix' => '',
+            'required' => 1,
+            'suffix' => '',
+          ),
+          'textfield' => array(
+            'placeholder' => '',
+            'size' => 10,
+          ),
+        ),
+        'inline' => 1,
+        'second' => array(
+          'general' => array(
+            'prefix' => '',
+            'required' => 1,
+            'suffix' => '',
+          ),
+          'textfield' => array(
+            'placeholder' => '',
+            'size' => 10,
+          ),
+        ),
+        'treeable' => 0,
+      ),
+      'type' => 'textfield_&_textfield',
+      'weight' => 10,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-oa_discussion_post-field_discussion_disc_space'.
+  $field_instances['node-oa_discussion_post-field_discussion_disc_space'] = array(
+    'bundle' => 'oa_discussion_post',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 13,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_discussion_disc_space',
+    'label' => 'Discussion Space',
+    'required' => 1,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 11,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-oa_discussion_post-field_following_protocols'.
+  $field_instances['node-oa_discussion_post-field_following_protocols'] = array(
+    'bundle' => 'oa_discussion_post',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 14,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_following_protocols',
+    'label' => 'Following Protocols',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 14,
+    ),
+  );
+
+  // Exported field_instance: 'node-oa_discussion_post-field_following_users'.
+  $field_instances['node-oa_discussion_post-field_following_users'] = array(
+    'bundle' => 'oa_discussion_post',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 15,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_following_users',
+    'label' => 'Following Users',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 15,
+    ),
+  );
+
+  // Exported field_instance:
   // 'node-oa_discussion_post-field_item_privacy_setting'.
   $field_instances['node-oa_discussion_post-field_item_privacy_setting'] = array(
     'bundle' => 'oa_discussion_post',
@@ -2990,6 +3295,12 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'list_default',
         'weight' => 8,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3013,7 +3324,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 3,
+      'weight' => 8,
     ),
   );
 
@@ -3036,6 +3347,13 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'hidden',
+        'module' => 'file',
+        'settings' => array(),
+        'type' => 'file_table',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3091,7 +3409,7 @@ http://www.whitehouse.gov/',
         'manualcrop_thumblist' => 0,
       ),
       'type' => 'media_generic',
-      'weight' => 6,
+      'weight' => 3,
     ),
   );
 
@@ -3112,6 +3430,12 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'list_default',
         'weight' => 11,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3141,8 +3465,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_discussion_post-oa_section_ref'.
-  $field_instances['node-oa_discussion_post-oa_section_ref'] = array(
+  // Exported field_instance:
+  // 'node-oa_discussion_post-field_un_following_users'.
+  $field_instances['node-oa_discussion_post-field_un_following_users'] = array(
     'bundle' => 'oa_discussion_post',
     'default_value' => NULL,
     'default_value_function' => '',
@@ -3157,6 +3482,27 @@ http://www.whitehouse.gov/',
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
+        'weight' => 16,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
         'weight' => 9,
       ),
       'teaser' => array(
@@ -3166,10 +3512,11 @@ http://www.whitehouse.gov/',
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'oa_section_ref',
-    'label' => 'Section',
+    'field_name' => 'field_un_following_users',
+    'label' => 'UnFollowing Users',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -3183,11 +3530,11 @@ http://www.whitehouse.gov/',
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
+        'apply_chosen' => '',
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 16,
     ),
   );
 
@@ -3211,6 +3558,12 @@ http://www.whitehouse.gov/',
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3251,7 +3604,7 @@ http://www.whitehouse.gov/',
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 2,
+      'weight' => 7,
     ),
   );
 
@@ -4286,6 +4639,7 @@ http://www.whitehouse.gov/',
   t('Date Generated');
   t('Describe the Event');
   t('Description');
+  t('Discussion Space');
   t('Document Library');
   t('Email(s)');
   t('Enter the Discussion Post Content Here');
