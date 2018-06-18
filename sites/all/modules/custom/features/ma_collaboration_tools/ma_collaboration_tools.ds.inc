@@ -86,7 +86,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'formatter_settings' => array(
         'show_title' => 0,
         'title_wrapper' => '',
-        'ctools' => 'a:3:{s:4:"conf";a:15:{s:23:"override_pager_settings";i:0;s:9:"use_pager";i:1;s:14:"nodes_per_page";s:2:"20";s:8:"pager_id";s:1:"1";s:6:"offset";s:1:"0";s:9:"more_link";i:0;s:10:"feed_icons";i:0;s:10:"panel_args";i:1;s:12:"link_to_view";i:0;s:4:"args";s:3:"aaa";s:3:"url";s:0:"";s:7:"display";s:7:"block_1";s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";}s:4:"type";s:5:"views";s:7:"subtype";s:17:"oa_comment_topics";}',
+        'ctools' => 'a:3:{s:4:"conf";a:16:{s:23:"override_pager_settings";i:0;s:9:"use_pager";i:1;s:14:"nodes_per_page";s:2:"20";s:8:"pager_id";s:1:"1";s:6:"offset";s:1:"0";s:9:"more_link";i:0;s:10:"feed_icons";i:0;s:10:"panel_args";i:0;s:12:"link_to_view";i:0;s:4:"args";s:0:"";s:3:"url";s:0:"";s:7:"display";s:7:"block_1";s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";s:7:"context";a:1:{i:0;s:0:"";}}s:4:"type";s:5:"views";s:7:"subtype";s:17:"oa_comment_topics";}',
         'load_terms' => 0,
         'ft' => array(),
       ),
@@ -666,34 +666,34 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
-      'right' => array(
-        0 => 'add_content_to_collab_sect_link',
-        2 => 'edit_collab_section_link',
-        5 => 'field_community_ref',
-        7 => 'group_collab_actions',
-        8 => 'og_group_ref',
-        9 => 'group_access',
-        10 => 'field_item_privacy_setting',
-      ),
       'left' => array(
-        1 => 'title',
-        3 => 'body',
+        0 => 'title',
+        2 => 'body',
         4 => 'discussion_space_topics_list',
         6 => 'comments',
       ),
+      'right' => array(
+        1 => 'add_content_to_collab_sect_link',
+        3 => 'edit_collab_section_link',
+        5 => 'field_community_ref',
+        7 => 'group_collab_actions',
+        8 => 'og_group_ref',
+        9 => 'field_item_privacy_setting',
+        10 => 'group_access',
+      ),
     ),
     'fields' => array(
-      'add_content_to_collab_sect_link' => 'right',
       'title' => 'left',
-      'edit_collab_section_link' => 'right',
+      'add_content_to_collab_sect_link' => 'right',
       'body' => 'left',
+      'edit_collab_section_link' => 'right',
       'discussion_space_topics_list' => 'left',
       'field_community_ref' => 'right',
       'comments' => 'left',
       'group_collab_actions' => 'right',
       'og_group_ref' => 'right',
-      'group_access' => 'right',
       'field_item_privacy_setting' => 'right',
+      'group_access' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(

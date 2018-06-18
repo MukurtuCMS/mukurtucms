@@ -471,62 +471,19 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['sorts']['last_date']['relationship'] = 'cid';
   $handler->display->display_options['sorts']['last_date']['group_type'] = 'max';
   $handler->display->display_options['sorts']['last_date']['order'] = 'DESC';
+  /* Contextual filter: Content: Discussion Space (field_discussion_disc_space) */
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['id'] = 'field_discussion_disc_space_target_id';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['table'] = 'field_data_field_discussion_disc_space';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['field'] = 'field_discussion_disc_space_target_id';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['default_action'] = 'default';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['default_argument_type'] = 'node';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['filter_groups']['groups'] = array(
     1 => 'AND',
     2 => 'OR',
     3 => 'OR',
-  );
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type']['id'] = 'type';
-  $handler->display->display_options['filters']['type']['table'] = 'node';
-  $handler->display->display_options['filters']['type']['field'] = 'type';
-  $handler->display->display_options['filters']['type']['value'] = array(
-    'oa_discussion_post' => 'oa_discussion_post',
-  );
-  $handler->display->display_options['filters']['type']['group'] = 1;
-  $handler->display->display_options['filters']['type']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['type']['expose']['operator_id'] = 'type_op';
-  $handler->display->display_options['filters']['type']['expose']['label'] = 'Type';
-  $handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
-  $handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
-  $handler->display->display_options['filters']['type']['expose']['multiple'] = TRUE;
-  $handler->display->display_options['filters']['type']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Field: Protocol (og_group_ref) */
-  $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['group'] = 1;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator_id'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['label'] = 'Groups audience';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['identifier'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Content: Section (oa_section_ref) */
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['group'] = 1;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator_id'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['label'] = 'Open Atrium Section';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['identifier'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
   );
   /* Filter criterion: Comment: ID */
   $handler->display->display_options['filters']['cid']['id'] = 'cid';
@@ -572,21 +529,13 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
   $handler->display->display_options['allow']['fields_override'] = 0;
   $handler->display->display_options['argument_input'] = array(
-    'gid' => array(
+    'field_discussion_disc_space_target_id' => array(
       'type' => 'none',
-      'context' => 'entity:fieldable_panels_pane.field-map-address',
+      'context' => 'entity:alphabetical_order_definition.cer',
       'context_optional' => 0,
       'panel' => '0',
       'fixed' => '',
-      'label' => 'OG membership: Group ID',
-    ),
-    'oa_section_ref_target_id' => array(
-      'type' => 'context',
-      'context' => 'entity:node.nid',
-      'context_optional' => 1,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'Content: Open Atrium Section (oa_section_ref)',
+      'label' => 'Content: Discussion Space (field_discussion_disc_space)',
     ),
   );
   $handler->display->display_options['inherit_panels_path'] = '1';
@@ -920,14 +869,14 @@ function oa_comment_views_default_views() {
     t('Last Comment'),
     t('.'),
     t(','),
-    t('Type'),
-    t('Groups audience'),
-    t('Open Atrium Section'),
+    t('All'),
     t('Open Atrium'),
     t('User Topics'),
     t('Your Topics'),
-    t('All'),
+    t('Type'),
     t('Include archived content'),
+    t('Groups audience'),
+    t('Open Atrium Section'),
     t('User replied to Topics'),
     t('Your Reply Topics'),
   );
