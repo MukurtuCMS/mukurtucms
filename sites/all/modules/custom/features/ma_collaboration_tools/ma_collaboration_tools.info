@@ -46,7 +46,6 @@ features[ds_field_settings][] = node|discussion_space|full
 features[ds_field_settings][] = node|document_library|full
 features[ds_field_settings][] = node|event|full
 features[ds_field_settings][] = node|following_notification|full
-features[ds_field_settings][] = node|oa_discussion_post|full
 features[ds_field_settings][] = node|oa_wiki_page|full
 features[ds_fields][] = add_content_to_collab_sect_link
 features[ds_fields][] = calendar_date

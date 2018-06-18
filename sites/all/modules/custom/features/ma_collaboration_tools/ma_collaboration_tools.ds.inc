@@ -79,30 +79,27 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'discussion_space_topics_list' => array(
-      'weight' => '2',
-      'label' => 'hidden',
-      'format' => 'default',
-      'formatter_settings' => array(
-        'show_title' => 0,
-        'title_wrapper' => '',
-        'ctools' => 'a:3:{s:4:"conf";a:16:{s:23:"override_pager_settings";i:0;s:9:"use_pager";i:1;s:14:"nodes_per_page";s:2:"20";s:8:"pager_id";s:1:"1";s:6:"offset";s:1:"0";s:9:"more_link";i:0;s:10:"feed_icons";i:0;s:10:"panel_args";i:0;s:12:"link_to_view";i:0;s:4:"args";s:0:"";s:3:"url";s:0:"";s:7:"display";s:7:"block_1";s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";s:7:"context";a:1:{i:0;s:0:"";}}s:4:"type";s:5:"views";s:7:"subtype";s:17:"oa_comment_topics";}',
-        'load_terms' => 0,
-        'ft' => array(),
-      ),
-    ),
     'edit_collab_section_link' => array(
       'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'generic_dynamic_field' => array(
+      'weight' => '2',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:16:{s:23:"override_pager_settings";i:0;s:9:"use_pager";i:1;s:14:"nodes_per_page";s:2:"20";s:8:"pager_id";s:1:"1";s:6:"offset";s:1:"0";s:9:"more_link";i:0;s:10:"feed_icons";i:0;s:10:"panel_args";i:0;s:12:"link_to_view";i:0;s:4:"args";s:0:"";s:3:"url";s:0:"";s:7:"display";s:7:"default";s:7:"context";a:1:{i:0;s:0:"";}s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";}s:4:"type";s:5:"views";s:7:"subtype";s:17:"oa_comment_topics";}',
+        'load_terms' => 0,
+        'ft' => array(
+          'lb' => 'Topics',
+        ),
+      ),
+    ),
     'title' => array(
       'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'comments' => array(
-      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -202,46 +199,6 @@ function ma_collaboration_tools_ds_field_settings_info() {
     ),
   );
   $export['node|following_notification|full'] = $ds_fieldsetting;
-
-  $ds_fieldsetting = new stdClass();
-  $ds_fieldsetting->api_version = 1;
-  $ds_fieldsetting->id = 'node|oa_discussion_post|full';
-  $ds_fieldsetting->entity_type = 'node';
-  $ds_fieldsetting->bundle = 'oa_discussion_post';
-  $ds_fieldsetting->view_mode = 'full';
-  $ds_fieldsetting->settings = array(
-    'follow_unfollow' => array(
-      'weight' => '6',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'comments' => array(
-      'weight' => '3',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'field_discussion_disc_space' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_following_protocols' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_following_users' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_un_following_users' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-  );
-  $export['node|oa_discussion_post|full'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -669,17 +626,16 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'left' => array(
         0 => 'title',
         2 => 'body',
-        4 => 'discussion_space_topics_list',
-        6 => 'comments',
+        4 => 'generic_dynamic_field',
       ),
       'right' => array(
         1 => 'add_content_to_collab_sect_link',
         3 => 'edit_collab_section_link',
         5 => 'field_community_ref',
+        6 => 'og_group_ref',
         7 => 'group_collab_actions',
-        8 => 'og_group_ref',
+        8 => 'group_access',
         9 => 'field_item_privacy_setting',
-        10 => 'group_access',
       ),
     ),
     'fields' => array(
@@ -687,13 +643,12 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'add_content_to_collab_sect_link' => 'right',
       'body' => 'left',
       'edit_collab_section_link' => 'right',
-      'discussion_space_topics_list' => 'left',
+      'generic_dynamic_field' => 'left',
       'field_community_ref' => 'right',
-      'comments' => 'left',
-      'group_collab_actions' => 'right',
       'og_group_ref' => 'right',
-      'field_item_privacy_setting' => 'right',
+      'group_collab_actions' => 'right',
       'group_access' => 'right',
+      'field_item_privacy_setting' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
