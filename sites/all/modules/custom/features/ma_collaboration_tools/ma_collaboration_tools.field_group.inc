@@ -109,7 +109,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Visibility',
-    'weight' => '4',
+    'weight' => '5',
     'children' => array(
       0 => 'og_group_ref',
       1 => 'field_item_privacy_setting',
@@ -226,7 +226,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Actions',
-    'weight' => '3',
+    'weight' => '4',
     'children' => array(
       0 => 'add_content_to_collab_sect_link',
       1 => 'edit_collab_section_link',

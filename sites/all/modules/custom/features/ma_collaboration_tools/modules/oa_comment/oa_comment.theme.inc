@@ -31,7 +31,7 @@ function oa_comment_theme($existing, $type, $theme, $path) {
         'preprocess functions' => array(
           'template_preprocess',
           'template_preprocess_views_view_fields',
-          'oa_core_preprocess_views_view_fields',
+          'ma_collaboration_tools_preprocess_views_view_fields',
         ),
         'arguments' => array(
           'view' => NULL,
@@ -53,7 +53,7 @@ function oa_comment_theme($existing, $type, $theme, $path) {
             'preprocess functions' => array(
               'template_preprocess',
               'template_preprocess_views_view_fields',
-              'oa_core_preprocess_views_view_fields',
+              'ma_collaboration_tools_preprocess_views_view_fields',
             ),
             'arguments' => array(
               'view' => NULL,

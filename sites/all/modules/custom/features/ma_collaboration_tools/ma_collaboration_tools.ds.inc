@@ -79,6 +79,18 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'discussion_space_topics_list' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:15:{s:23:"override_pager_settings";i:0;s:9:"use_pager";i:1;s:14:"nodes_per_page";s:2:"20";s:8:"pager_id";s:1:"1";s:6:"offset";s:1:"0";s:9:"more_link";i:0;s:10:"feed_icons";i:0;s:10:"panel_args";i:1;s:12:"link_to_view";i:0;s:4:"args";s:3:"aaa";s:3:"url";s:0:"";s:7:"display";s:7:"block_1";s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";}s:4:"type";s:5:"views";s:7:"subtype";s:17:"oa_comment_topics";}',
+        'load_terms' => 0,
+        'ft' => array(),
+      ),
+    ),
     'edit_collab_section_link' => array(
       'weight' => '1',
       'label' => 'hidden',
@@ -90,7 +102,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'format' => 'default',
     ),
     'comments' => array(
-      'weight' => '2',
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -351,6 +363,32 @@ return ma_collaboration_tools_add_content_to_section_link($entity);
     ),
   );
   $export['calendar_pane'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'discussion_space_topics_list';
+  $ds_field->label = 'Discussion Space Topics List';
+  $ds_field->field_type = 7;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'default' => array(),
+    'settings' => array(
+      'show_title' => array(
+        'type' => 'checkbox',
+      ),
+      'title_wrapper' => array(
+        'type' => 'textfield',
+        'description' => 'Eg: h1, h2, p',
+      ),
+      'ctools' => array(
+        'type' => 'ctools',
+      ),
+    ),
+  );
+  $export['discussion_space_topics_list'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -628,31 +666,33 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
-        0 => 'title',
-        3 => 'body',
-        4 => 'comments',
-      ),
       'right' => array(
-        1 => 'add_content_to_collab_sect_link',
+        0 => 'add_content_to_collab_sect_link',
         2 => 'edit_collab_section_link',
-        5 => 'group_collab_actions',
-        6 => 'field_community_ref',
-        7 => 'group_access',
+        5 => 'field_community_ref',
+        7 => 'group_collab_actions',
         8 => 'og_group_ref',
-        9 => 'field_item_privacy_setting',
+        9 => 'group_access',
+        10 => 'field_item_privacy_setting',
+      ),
+      'left' => array(
+        1 => 'title',
+        3 => 'body',
+        4 => 'discussion_space_topics_list',
+        6 => 'comments',
       ),
     ),
     'fields' => array(
-      'title' => 'left',
       'add_content_to_collab_sect_link' => 'right',
+      'title' => 'left',
       'edit_collab_section_link' => 'right',
       'body' => 'left',
+      'discussion_space_topics_list' => 'left',
+      'field_community_ref' => 'right',
       'comments' => 'left',
       'group_collab_actions' => 'right',
-      'field_community_ref' => 'right',
-      'group_access' => 'right',
       'og_group_ref' => 'right',
+      'group_access' => 'right',
       'field_item_privacy_setting' => 'right',
     ),
     'classes' => array(

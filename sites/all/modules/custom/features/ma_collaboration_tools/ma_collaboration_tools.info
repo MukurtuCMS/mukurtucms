@@ -51,6 +51,7 @@ features[ds_field_settings][] = node|oa_wiki_page|full
 features[ds_fields][] = add_content_to_collab_sect_link
 features[ds_fields][] = calendar_date
 features[ds_fields][] = calendar_pane
+features[ds_fields][] = discussion_space_topics_list
 features[ds_fields][] = edit_collab_section_link
 features[ds_fields][] = follow_unfollow
 features[ds_fields][] = upcoming_events

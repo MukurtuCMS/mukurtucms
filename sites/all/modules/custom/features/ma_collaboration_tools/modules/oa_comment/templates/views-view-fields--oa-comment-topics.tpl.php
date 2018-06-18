@@ -26,7 +26,7 @@
 ?>
 <div class='oa-list oa-discussion-topic well clearfix'>
   <div class='user-picture oa-pull-left'>
-    <?php print $field_user_picture; ?>
+    <?php // Mukurtu uncomment this when profile pics are more common. print $field_user_picture; ?>
   </div>
   <div class='oa-list-header oa-description oa-list-category oa-pull-right'>
     <div>

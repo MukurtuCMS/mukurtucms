@@ -1362,3 +1362,37 @@ function ma_collaboration_tools_send_scheduled_notifications($schedule) {
 
   }
 }
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ *
+ * Perform field-level replacement/processing here.
+ *
+ * Mukurtu copied and modified from oa_core_preprocess_views_view_fields.
+ */
+function ma_collaboration_tools_preprocess_views_view_fields(&$vars) {
+  $vars['index'] = $vars['view']->row_index;
+  $vars['display'] = $vars['view']->current_display;
+  $vars['count'] = count($vars['view']->result);
+  foreach ($vars['fields'] as $id => $field) {
+    $vars[$id] = $field->content;
+    switch ($id) {
+      case 'timestamp':
+        $vars[$id . '_raw'] = $field->raw;
+        break;
+
+      // Views for these fields are: oa_comment_topics, oa_comment_media.
+      // Mukurtu uncomment this if/when users get profile pics, and tweak as needed to make work.
+//      case 'field_user_picture':
+//      case 'picture':
+//        // Check for a missing user image in the view.
+//        if (!strip_tags($field->content, '<img>')) {
+//          // Add the user placeholder image.
+//          $vars[$id] = oa_core_get_user_picture_for_views_fields($field);
+//          // Also provide image to default views templates
+//          $vars['fields'][$id]->content = $vars[$id];
+//        }
+//        break;
+    }
+  }
+}
