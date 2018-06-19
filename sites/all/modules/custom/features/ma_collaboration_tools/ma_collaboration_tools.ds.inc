@@ -319,6 +319,24 @@ return ma_collaboration_tools_add_content_to_section_link($entity);
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'discussion_post_intro_field';
+  $ds_field->label = 'Discussion Post intro field';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'oa_discussion_post|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php return ma_collaboration_tools_discussion_post_intro($entity); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['discussion_post_intro_field'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'discussion_space_topics_list';
   $ds_field->label = 'Discussion Space Topics List';
   $ds_field->field_type = 7;
@@ -1024,29 +1042,29 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
-        0 => 'field_discussion_disc_space',
+        0 => 'discussion_post_intro_field',
         1 => 'body',
         2 => 'field_oa_media',
         3 => 'comments',
       ),
       'right' => array(
         4 => 'follow_unfollow',
-        5 => 'field_following_protocols',
-        6 => 'field_following_users',
-        7 => 'field_un_following_users',
-        8 => 'group_following',
+        5 => 'group_following',
+        6 => 'field_following_protocols',
+        7 => 'field_following_users',
+        8 => 'field_un_following_users',
       ),
     ),
     'fields' => array(
-      'field_discussion_disc_space' => 'left',
+      'discussion_post_intro_field' => 'left',
       'body' => 'left',
       'field_oa_media' => 'left',
       'comments' => 'left',
       'follow_unfollow' => 'right',
+      'group_following' => 'right',
       'field_following_protocols' => 'right',
       'field_following_users' => 'right',
       'field_un_following_users' => 'right',
-      'group_following' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(

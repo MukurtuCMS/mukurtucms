@@ -414,7 +414,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Following',
-    'weight' => '38',
+    'weight' => '7',
     'children' => array(
       0 => 'field_following_protocols',
       1 => 'field_following_users',
