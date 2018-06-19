@@ -159,8 +159,14 @@ table.comment-alter-diff {
   cursor: pointer;
 }
 
-.indented .indented .indented .indented .indented {
+/* Mukurtu modification */
+.indented .indented .indented .indented .indented .indented .indented .indented .indented {
   margin-left: 0;
+}
+
+/* Mukurtu modification */
+.indented {
+  margin-left: 25px;
 }
 
 @media (max-width: 767px) {
