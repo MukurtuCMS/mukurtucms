@@ -10884,3 +10884,71 @@ a:hover {
 .view-mukurtu-collab-subscriptions .views-field-php-2 button {
   display: none;
 }
+.view-oa-comment-topics h3 {
+  font-size: 12px;
+  line-height: 1.1;
+  color: #6D7074;
+  font-weight: bold;
+  font-style: normal;
+  text-transform: uppercase;
+  border-top: 4px solid #EAEAEA;
+  margin: 0;
+  padding-top: 1.3em;
+  padding-bottom: 1.3em;
+}
+.view-oa-comment-topics li {
+  border-top: 1px solid #EAEAEA;
+  padding: 10px 0;
+  font-size: 13px;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-list-header.oa-description {
+  overflow: visible;
+  text-align: right;
+  float: right;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic h5 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 2px 0;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-last {
+  display: inline-block;
+  text-align: right;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-last > a {
+  color: inherit;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-text {
+  display: none;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon {
+  position: relative;
+  display: inline-block;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon .oa-reply-count {
+  position: relative;
+  display: inline-block;
+  z-index: 2;
+  color: white;
+  width: 2em;
+  text-align: center;
+  margin: 0 3px 3px 3px;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon .oa-reply-count a {
+  color: inherit;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon i {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  font-size: 25px;
+  top: -0.1em;
+  margin: 0 3px;
+  color: rgba(64, 64, 64, 0.7);
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon.updated i {
+  color: rgba(150, 150, 0, 0.7);
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon.new i {
+  color: rgba(64, 161, 58, 0.7);
+}

@@ -1510,6 +1510,78 @@ a.tooltips span {
   }
 }
 
+// Discussion space topic list, taken from OA, then tweaked.
+.view-oa-comment-topics {
+  h3 {
+    font-size: 12px;
+    line-height: 1.1;
+    color: #6D7074;
+    font-weight: bold;
+    font-style: normal;
+    text-transform: uppercase;
+    border-top: 4px solid #EAEAEA;
+    margin: 0;
+    padding-top: 1.3em;
+    padding-bottom: 1.3em;
+  }
+  li {
+    border-top: 1px solid #EAEAEA;
+    padding: 10px 0;
+    font-size: 13px;
+  }
+  .oa-list.oa-discussion-topic {
+    .oa-list-header.oa-description {
+      overflow: visible;
+      text-align: right;
+      float: right;
+    }
+    h5 {
+      font-size: 16px;
+      font-weight: 500;
+      margin: 0 0 2px 0;
+    }
 
-
+    .oa-reply-last {
+      display: inline-block;
+      text-align: right;
+      > a {
+        color: inherit;
+      }
+    }
+    .oa-reply-text {
+      display: none;
+    }
+    .oa-reply-icon {
+      position: relative;
+      display: inline-block;
+      .oa-reply-count {
+        position: relative;
+        display: inline-block;
+        z-index: 2;
+        color: white;
+        width: 2em;
+        text-align: center;
+        margin: 0 3px 3px 3px;
+        a {
+          color: inherit;
+        }
+      }
+      i {
+        position: absolute;
+        z-index: 1;
+        left: 0;
+        font-size: 25px;
+        top: -0.1em;
+        margin: 0 3px;
+        color: rgba(64, 64, 64, 0.7);
+      }
+      &.updated i {
+        color: rgba(150, 150, 0, 0.7);;
+      }
+      &.new i {
+        color: rgba(64, 161, 58, 0.7);
+      }
+    }
+  }
+}
 

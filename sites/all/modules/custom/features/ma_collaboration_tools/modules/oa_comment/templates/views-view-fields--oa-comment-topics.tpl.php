@@ -24,15 +24,12 @@
  * @ingroup views_templates
  */
 ?>
-<div class='oa-list oa-discussion-topic well clearfix'>
+<div class='oa-list oa-discussion-topic clearfix'>
   <div class='user-picture oa-pull-left'>
     <?php // Mukurtu uncomment this when profile pics are more common. print $field_user_picture; ?>
   </div>
   <div class='oa-list-header oa-description oa-list-category oa-pull-right'>
     <div>
-      <?php if ($display != 'comment_topics'): ?>
-        <?php print $og_group_ref; ?>&nbsp;<?php print $oa_section_ref; ?>
-      <?php endif; ?>
       <?php if (!empty($new_mark)): ?>
         <span class="oa-reply-mark label <?php print $mark_class; ?>"><?php print $new_mark; ?></span>
       <?php endif; ?>

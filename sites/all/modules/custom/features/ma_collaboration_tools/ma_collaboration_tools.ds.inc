@@ -95,13 +95,9 @@ function ma_collaboration_tools_ds_field_settings_info() {
         'load_terms' => 0,
         'ft' => array(
           'lb' => 'Topics',
+          'lb-col' => TRUE,
         ),
       ),
-    ),
-    'title' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
     ),
   );
   $export['node|discussion_space|full'] = $ds_fieldsetting;
@@ -623,23 +619,21 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
-        0 => 'title',
-        2 => 'body',
-        4 => 'generic_dynamic_field',
-      ),
       'right' => array(
-        1 => 'add_content_to_collab_sect_link',
-        3 => 'edit_collab_section_link',
-        5 => 'field_community_ref',
-        6 => 'og_group_ref',
-        7 => 'group_collab_actions',
-        8 => 'group_access',
-        9 => 'field_item_privacy_setting',
+        0 => 'add_content_to_collab_sect_link',
+        2 => 'edit_collab_section_link',
+        4 => 'field_community_ref',
+        5 => 'og_group_ref',
+        6 => 'group_collab_actions',
+        7 => 'group_access',
+        8 => 'field_item_privacy_setting',
+      ),
+      'left' => array(
+        1 => 'body',
+        3 => 'generic_dynamic_field',
       ),
     ),
     'fields' => array(
-      'title' => 'left',
       'add_content_to_collab_sect_link' => 'right',
       'body' => 'left',
       'edit_collab_section_link' => 'right',

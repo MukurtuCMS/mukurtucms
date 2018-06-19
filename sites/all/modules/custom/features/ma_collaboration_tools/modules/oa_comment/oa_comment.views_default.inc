@@ -404,32 +404,6 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['fields']['name']['element_type'] = 'span';
   $handler->display->display_options['fields']['name']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['name']['element_default_classes'] = FALSE;
-  /* Field: Field: Protocol */
-  $handler->display->display_options['fields']['og_group_ref']['id'] = 'og_group_ref';
-  $handler->display->display_options['fields']['og_group_ref']['table'] = 'og_membership';
-  $handler->display->display_options['fields']['og_group_ref']['field'] = 'og_group_ref';
-  $handler->display->display_options['fields']['og_group_ref']['label'] = '';
-  $handler->display->display_options['fields']['og_group_ref']['element_type'] = 'span';
-  $handler->display->display_options['fields']['og_group_ref']['element_class'] = 'label';
-  $handler->display->display_options['fields']['og_group_ref']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['og_group_ref']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['og_group_ref']['settings'] = array(
-    'link' => 1,
-  );
-  $handler->display->display_options['fields']['og_group_ref']['group_column'] = 'entity_id';
-  /* Field: Content: Section */
-  $handler->display->display_options['fields']['oa_section_ref']['id'] = 'oa_section_ref';
-  $handler->display->display_options['fields']['oa_section_ref']['table'] = 'field_data_oa_section_ref';
-  $handler->display->display_options['fields']['oa_section_ref']['field'] = 'oa_section_ref';
-  $handler->display->display_options['fields']['oa_section_ref']['label'] = '';
-  $handler->display->display_options['fields']['oa_section_ref']['element_type'] = 'span';
-  $handler->display->display_options['fields']['oa_section_ref']['element_class'] = 'label';
-  $handler->display->display_options['fields']['oa_section_ref']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['oa_section_ref']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['oa_section_ref']['settings'] = array(
-    'link' => 1,
-  );
-  $handler->display->display_options['fields']['oa_section_ref']['group_column'] = 'entity_id';
   /* Field: MAX(Comment: Last updated date) */
   $handler->display->display_options['fields']['last_date_1']['id'] = 'last_date_1';
   $handler->display->display_options['fields']['last_date_1']['table'] = 'comment';
@@ -454,7 +428,8 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['fields']['created']['field'] = 'created';
   $handler->display->display_options['fields']['created']['label'] = '';
   $handler->display->display_options['fields']['created']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['created']['date_format'] = 'oa_date';
+  $handler->display->display_options['fields']['created']['date_format'] = 'custom';
+  $handler->display->display_options['fields']['created']['custom_date_format'] = 'F j, Y - g:ia';
   $handler->display->display_options['fields']['created']['second_date_format'] = 'oa_date';
   $handler->display->display_options['fields']['created']['oa_date'] = '0';
   /* Field: Comment: Author */
