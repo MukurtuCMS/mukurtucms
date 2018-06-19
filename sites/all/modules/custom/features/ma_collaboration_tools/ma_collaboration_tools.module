@@ -1266,7 +1266,7 @@ function ma_collaboration_tools_cronapi($op, $job = NULL) {
   );
   $items['ma_collaboration_tools_weekly_notifications'] = array(
     'description' => 'Send weekly collaboration page notifications.',
-    'rule' => '0 8 * * MON', // every Monday at 8am
+    'rule' => '0 8 * * 1', // every Monday at 8am
   );
   return $items;
 }
