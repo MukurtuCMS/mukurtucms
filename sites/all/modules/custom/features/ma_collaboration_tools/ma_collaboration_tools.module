@@ -304,16 +304,7 @@ function ma_collaboration_tools_node_postsave($node, $op) {
 function ma_collaboration_tools_node_delete($node) {
   // If a child node is deleted, also delete its Following node.
   if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
-    // Get the Following node nid
-    $query = new EntityFieldQuery();
-    $result = $query
-      ->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'following_notification')
-      ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
-      ->fieldCondition('field_following_content', 'target_id', $node->nid)
-      ->execute();
-    $following_nid = reset($result['node'])->nid;
-    if ($following_nid) { // This condition should always be met.
+    if ($following_nid = ma_collaboration_tools_get_following_nid($node->nid)) { // This condition should always be met.
       node_delete($following_nid);
     }
   }
@@ -327,6 +318,7 @@ function ma_collaboration_tools_node_insert($node) {
   ////
   // Create a Following Notification when a child page is created.
   ////
+
   if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
 
     // Create and save the Following Notification node.
@@ -358,7 +350,10 @@ function ma_collaboration_tools_node_insert($node) {
  */
 function ma_collaboration_tools_node_update($node) {
 
-  // Create a Following Notification node after a child page is created or updated.
+  ////
+  // Create a Following Notification when a child page is updated.
+  ////
+
   if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
     $entity_new = $cw = entity_metadata_wrapper('node', $node);
     $entity_old = entity_metadata_wrapper('node', $node->original);
@@ -446,21 +441,11 @@ function ma_collaboration_tools_node_update($node) {
       }
     }
 
-    // Get the Following node nid
-    $query = new EntityFieldQuery();
-    $result = $query
-      ->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'following_notification')
-      ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
-      ->fieldCondition('field_following_content', 'target_id', $node->nid)
-      ->execute();
-    $following_nid = reset($result['node'])->nid;
-
+    $following_nid = ma_collaboration_tools_get_following_nid($node->nid);
     if (!$following_nid) { // this should never happen but log an error in case it does.
       watchdog('ma_collaboration_tools', 'There is no Following node for node %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
       return;
     }
-
     $notification_w = entity_metadata_wrapper('node', $following_nid);
 
     // First update the Following node, if there are changes to the following fields.
@@ -483,7 +468,33 @@ function ma_collaboration_tools_node_update($node) {
     }
 
   }
+}
 
+
+/**
+ * Implements hook_comment_insert().
+ */
+function ma_collaboration_tools_comment_insert($comment) {
+
+  ////
+  // Create a Following Notification when a comment is added to a child node.
+  ////
+
+  $node = node_load($comment->nid);
+  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+    $following_nid = ma_collaboration_tools_get_following_nid($node->nid);
+    if (!$following_nid) { // this should never happen but log an error in case it does.
+      watchdog('ma_collaboration_tools', 'There is no Following node for node %nid', ['%nid' => $node->nid], WATCHDOG_ERROR);
+      return;
+    }
+    $notification_w = entity_metadata_wrapper('node', $following_nid);
+    // There's a new comment on this node, so reset the users notified on this to none.
+    $notification_w->field_users_notified->set([]);
+    $notification_w->save();
+    ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'commented on', $comment);
+    $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper
+    ma_collaboration_tools_update_field_all_users_notified($notification_w);
+  }
 }
 
 // Update field_all_users_notified
@@ -561,24 +572,35 @@ function ma_collaboration_tools_set_notification_lists_on_following_node_wrapper
 
 
 // Attach the notification email field collection to a given notification node.
-function ma_collaboration_tools_set_notification_email_fc($notification_w, $child_node, $op) {
+function ma_collaboration_tools_set_notification_email_fc($notification_w, $child_node, $op, $comment = NULL) {
   $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
   $fc_email->setHostEntity('node', node_load($notification_w->getIdentifier()));
   $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
-  $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
-  $body = "The " . $child_node->type . " \"" . $child_node->title . "\", which you are following, was " . $op . " at " . format_date($child_node->timestamp, "long") . ".";
-  if ($op == 'created') {
-    $alias = pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
-  }
-  else {
-    $alias =  $child_node->path["alias"];
-  }
-  $body .= "\n\nView the " . $child_node->type . ": " . $GLOBALS["base_url"] . "/" . $alias;
-  $fce_w->field_notification_body->set($body);
+
+  // Set the time
   $fce_w->field_notification_date_gene->set(time());
+
+  // Set the subject
+  $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
+
+  // Set the body
+  $node_type_label = strtolower(node_type_get_name($child_node));
+  switch ($op) {
+    case 'updated':
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was updated on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ".\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . $child_node->path["alias"];
+      break;
+    case 'created':
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", was created on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ", and you were added as a follower.\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
+      break;
+    case 'commented on':
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, had a comment added to it on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
+      break;
+  }
+  $fce_w->field_notification_body->set($body);
+
+  // Save the field collection.
   $fce_w->save();
 }
-
 
 /**
  * Implements hook_field_collection_item_insert()
@@ -1397,9 +1419,25 @@ function ma_collaboration_tools_preprocess_views_view_fields(&$vars) {
   }
 }
 
-// Helper function called by custom DS field.
+/**
+ * Helper function called by custom DS field.
+ */
 function ma_collaboration_tools_discussion_post_intro($entity) {
   $dp = node_load($entity->field_discussion_disc_space[LANGUAGE_NONE][0]['target_id']);
   $output = 'By ' . l($entity->name, $entity->uid) . ' on ' . date('F j, Y - g:ia', $entity->created) . ' in ' . l($dp->title, 'node/' . $dp->nid);
     return $output;
+}
+
+/**
+ * Helper function to get the following NID given child NID
+ */
+function ma_collaboration_tools_get_following_nid($child_nid) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'following_notification')
+    ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
+    ->fieldCondition('field_following_content', 'target_id', $child_nid)
+    ->execute();
+  return reset($result['node'])->nid;
 }
