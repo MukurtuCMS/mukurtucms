@@ -593,10 +593,16 @@ function ma_collaboration_tools_set_notification_email_fc($notification_w, $chil
       $body = "The " . $node_type_label . ' "' . $child_node->title . '", was created on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ", and you were added as a follower.\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
       break;
     case 'commented on':
-      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, had a comment added to it on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
+      $comment_author = user_load($comment->uid);
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was commented on, by ' . $comment_author->name . ' on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
       break;
   }
   $fce_w->field_notification_body->set($body);
+
+  // If this is a comment notification, set the comment ref.
+  if ($comment) {
+    $fce_w->field_notification_comment->set($comment->cid);
+  }
 
   // Save the field collection.
   $fce_w->save();
@@ -619,7 +625,12 @@ function ma_collaboration_tools_field_collection_item_insert($fc_item){
         $params = [
           'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
           'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nManage your notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",
+
         ];
+        if (isset($fc_item->field_notification_comment[LANGUAGE_NONE][0]['target_id'])) {
+          $params['comment_id'] = $fc_item->field_notification_comment[LANGUAGE_NONE][0]['target_id'];
+          $params['uid'] = $uid;
+        }
         $user = user_load($uid);
         $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
         if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
@@ -638,15 +649,46 @@ function ma_collaboration_tools_field_collection_item_insert($fc_item){
 
 /**
  * Implements hook_mail().
- *
- * This is required to send an email.
  */
 function ma_collaboration_tools_mail($key, &$message, $params) {
-  switch ($key) {
-    case 'collab_notification':
-      $message['subject'] = $params['subject'];
-      $message['body'][] = $params['body'];
-      break;
+
+  if ($key == 'collab_notification') {
+
+    // For comments on immediate-send notications
+    if (isset($message['params']['comment_id'])) {
+      $comment = comment_load($message['params']['comment_id']);
+
+      // Embed the comment in the email body. This requires rebuilding the email body from its
+      // standard format (that of how non-comment notifications, and comment notifications in digests appear).
+      $body_prefix = '((Reply above this line to post a comment))';
+      $split_body = preg_split("/.\n\nView the comment: /", $params['body']);
+      $comment_body = '| ' . drupal_html_to_text(wordwrap($comment->comment_body[LANGUAGE_NONE][0]['value'], 75, "\n| ", true)); // limit each line to 77 chars, including a "| " at the start of each line to denote quoted text.
+      $body_suffix = 'You may reply directly to this comment via email, or go to the comment at: ';
+      $params['body'] = $body_prefix . "\n\n" . $split_body[0] . ":\n\n" . $comment_body . $body_suffix . $split_body[1];
+//      $messageid_params['uid'] = $params['uid'];
+//      $message['body'][0] .= 'View original post: ' . url('mailcomment/redirect/' . mailcomment_build_messageid($messageid_params), ['absolute' => TRUE]);
+
+      // Add ability to reply to the comment via email, using an auth code in the Message-ID header.
+      // This is taken from mailcomment_message_notify_mail_alter().
+      $messageid_params = [];
+      $messageid_params['uid'] = $comment->uid;
+      $messageid_params['cid'] = $comment->cid;
+      $messageid_params['nid'] = $comment->nid;
+      $messageid_params['time'] = $comment->created;
+      $reply = variable_get('mailcomment_mailbox', variable_get('site_mail', ''));
+      $message['headers']['Reply-To'] = $reply;
+      $message['headers']['Message-ID'] = mailcomment_build_messageid($messageid_params);
+      $ancestor_msg_id = mailcomment_mail_comment_ancestor_message_id($messageid_params['nid'], $messageid_params['cid']);
+      if (isset($ancestor_msg_id)) { // TODO: test if this is necessary
+        $message['headers']['In-Reply-To'] = $ancestor_msg_id;
+      }
+
+    };
+
+    // All notifications (not just comments) need the body and subject set here.
+    $message['subject'] = $params['subject'];
+    $message['body'][] = $params['body'];
+
   }
 }
 
@@ -1355,7 +1397,7 @@ function ma_collaboration_tools_send_scheduled_notifications($schedule) {
         $following_nids[] = $following_nid;
         $bodies[] = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
       }
-      $body = implode("\n_________________________________________________________________\n\n", $bodies); // Using 65 character underscore as suggested here https://mailformat.dan.info/body/linelength.html
+      $body = implode("\n_____________________________________________________________________________\n\n", $bodies); // 77 chars wide
       $params = [
         'subject' => 'Your ' . $schedule . ' notifications digest for ' . variable_get('site_name') . '.',
         'body' => $body,
