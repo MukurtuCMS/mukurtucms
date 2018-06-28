@@ -24,6 +24,7 @@ function ma_collaboration_tools_page_alter(&$data) {
       // Get all section pages referencing that are in this CP.
       $query = new EntityFieldQuery();
       $result = $query
+        ->addMetaData('account', user_load(1))
         ->entityCondition('entity_type', 'node')
         ->entityCondition('bundle', ma_collaboration_tools_parent_node_types(), 'IN')
         ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
@@ -285,6 +286,7 @@ function ma_collaboration_tools_node_postsave($node, $op) {
     $child_target_field = ma_collaboration_tools_get_child_ref_field_to_parent(ma_collaboration_tools_get_child_from_parent($node->type));
     $query = new EntityFieldQuery();
     $result = $query
+      ->addMetaData('account', user_load(1))
       ->entityCondition('entity_type', 'node')
       ->fieldCondition($child_target_field, 'target_id', $node->nid)
       ->execute();
@@ -1200,6 +1202,7 @@ function ma_collaboration_tools_notification_frequency_default_submit ($form, &$
     // Get all Following nodes the user is marked as a follower of.
     $query = new EntityFieldQuery();
     $result = $query
+      ->addMetaData('account', user_load(1))
       ->entityCondition('entity_type', 'node')
       ->entityCondition('bundle', 'following_notification')
       ->propertyCondition('status', NODE_PUBLISHED)
@@ -1357,6 +1360,7 @@ function ma_collaboration_tools_send_scheduled_notifications($schedule) {
   // Get the following nodes that still have users to notify.
   $query = new EntityFieldQuery();
   $result = $query
+    ->addMetaData('account', user_load(1))
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'following_notification')
     ->propertyCondition('status', NODE_PUBLISHED)
@@ -1476,6 +1480,7 @@ function ma_collaboration_tools_discussion_post_intro($entity) {
 function ma_collaboration_tools_get_following_nid($child_nid) {
   $query = new EntityFieldQuery();
   $result = $query
+    ->addMetaData('account', user_load(1))
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'following_notification')
     ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
