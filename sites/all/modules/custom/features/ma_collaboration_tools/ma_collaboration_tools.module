@@ -181,7 +181,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
     }
   }
 
-  // On child collab pages, hide the "Following Users" field except to users that are Protocols Stewards of any of the child's CPs.
+  // On child collab pages, hide the "Following Users" and "Unfollowing Users" fields except to users that are Protocols Stewards of any of the child's CPs.
   if ($view_mode == 'full' && in_array($node->type, ma_collaboration_tools_child_node_types())) {
     $hide_following_users = 1;
     $groups_on_node = og_get_entity_groups('node', $node);
@@ -195,6 +195,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
     }
     if ($hide_following_users) {
       unset($node->content['field_following_users']);
+      unset($node->content['field_un_following_users']);
     }
   }
 
