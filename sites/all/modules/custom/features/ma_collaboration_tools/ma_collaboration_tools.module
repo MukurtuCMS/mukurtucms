@@ -942,6 +942,14 @@ function ma_collaboration_tools_follow_unfollow($entity) {
   );
   $output .= popup_element('Details.', $popup_text, $popup_attributes);
 
+  // The Follow button should only show up for users that are a member of one the child node's CPs,
+  // otherwise they should not be able to follow (even if they can view it due to open perms on the CPs)
+  if (!$following) { // Check if they aren't already following, because a user may be following, then removed from the group, so we need to leave the option for them to unfollow.
+    if (!ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($entity)) {
+      $output = '';
+    }
+  }
+
   return $output;
 
 }
@@ -1094,6 +1102,9 @@ function ma_collaboration_tools_follow_unfollow_process($node, $op) {
   global $user;
   $nw = entity_metadata_wrapper ('node', $node);
   if ($op=='follow') {
+    if (!ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node)) {
+      drupal_set_message ('You cannot follow this item because you are not a member of any of its Cultural Protocols.'); // This will only happen if a user tries to hit the follow URL directly, ie. it won't.
+    }
     $nw->field_following_users[] = $user->uid;
     $new_unfollowing_users = [];
     $unfollowing_users = $nw->field_un_following_users->value();

@@ -392,6 +392,20 @@ function ma_cultural_protocol_get_cps_user_is_steward() {
 }
 
 /*
+ * Checks if a user is a member of any of its CPs
+ */
+function ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node, $user = NULL) {
+  if (!$user) {
+    global $user;
+  }
+  foreach ($node->og_group_ref[LANGUAGE_NONE] as $cp) {
+    if (og_is_member('node', $cp['target_id'], 'user', $user)) {
+      return TRUE;
+    }
+  }
+}
+
+/*
  * Helper function for the CPs for user helper functions.
  */
 function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL) {
