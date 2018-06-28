@@ -1036,6 +1036,34 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'mailcomment_error_bounce';
+  $strongarm->value = 1;
+  $export['mailcomment_error_bounce'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'mailcomment_expiration';
+  $strongarm->value = '0';
+  $export['mailcomment_expiration'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'mailcomment_import_filter_mode';
+  $strongarm->value = 2;
+  $export['mailcomment_import_filter_mode'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'mailcomment_reply_text';
+  $strongarm->value = '((Reply above this line to post a comment))';
+  $export['mailcomment_reply_text'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'menu_options_calendar';
   $strongarm->value = array(
     0 => 'main-menu',

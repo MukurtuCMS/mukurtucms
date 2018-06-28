@@ -660,7 +660,7 @@ function ma_collaboration_tools_mail($key, &$message, $params) {
 
       // Embed the comment in the email body. This requires rebuilding the email body from its
       // standard format (that of how non-comment notifications, and comment notifications in digests appear).
-      $body_prefix = '((Reply above this line to post a comment))';
+      $body_prefix = variable_get('mailcomment_reply_text');
       $split_body = preg_split("/.\n\nView the comment: /", $params['body']);
       $comment_body = '| ' . drupal_html_to_text(wordwrap($comment->comment_body[LANGUAGE_NONE][0]['value'], 75, "\n| ", true)); // limit each line to 77 chars, including a "| " at the start of each line to denote quoted text.
       $body_suffix = 'You may reply directly to this comment via email, or go to the comment at: ';
