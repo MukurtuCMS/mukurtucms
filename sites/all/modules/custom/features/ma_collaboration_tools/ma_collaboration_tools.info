@@ -8,7 +8,6 @@ dependencies[] = double_field
 dependencies[] = ds
 dependencies[] = elysia_cron
 dependencies[] = entityreference
-dependencies[] = fasttoggle_comment
 dependencies[] = features
 dependencies[] = feeds
 dependencies[] = feeds_comment_processor
