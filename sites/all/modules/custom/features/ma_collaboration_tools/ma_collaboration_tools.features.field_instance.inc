@@ -11,6 +11,62 @@ function ma_collaboration_tools_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
+  // 'field_collection_item-field_notification_email-field_notification_author'.
+  $field_instances['field_collection_item-field_notification_email-field_notification_author'] = array(
+    'bundle' => 'field_notification_email',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
+      ),
+      'full' => array(
+        'label' => 'inline',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 1,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_notification_author',
+    'label' => 'Author (of node insert/update or comment)',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
   // 'field_collection_item-field_notification_email-field_notification_body'.
   $field_instances['field_collection_item-field_notification_email-field_notification_body'] = array(
     'bundle' => 'field_notification_email',
@@ -30,7 +86,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
     ),
     'display_label' => '',
@@ -55,7 +111,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -86,7 +142,7 @@ function ma_collaboration_tools_field_default_field_instances() {
           'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 2,
       ),
     ),
     'display_label' => '',
@@ -111,7 +167,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 2,
     ),
   );
 
@@ -199,7 +255,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
     ),
     'display_label' => '',
@@ -224,7 +280,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -4688,6 +4744,7 @@ http://www.whitehouse.gov/',
   // Included for use with string extractors like potx.
   t('All users notified (of created, or most recent update)');
   t('Attachments');
+  t('Author (of node insert/update or comment)');
   t('Body');
   t('Calendar');
   t('Comment');

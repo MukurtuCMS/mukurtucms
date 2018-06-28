@@ -589,17 +589,24 @@ function ma_collaboration_tools_set_notification_email_fc($notification_w, $chil
   $node_type_label = strtolower(node_type_get_name($child_node));
   switch ($op) {
     case 'updated':
-      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was updated on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ".\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . $child_node->path["alias"];
+      global $user;
+      $author_id = $user->uid;
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was updated by ' . $user->name . ' on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ".\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . $child_node->path["alias"];
       break;
     case 'created':
-      $body = "The " . $node_type_label . ' "' . $child_node->title . '", was created on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ", and you were added as a follower.\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
+      $author_id = $child_node->uid;
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", was created by ' . $child_node->name . ' on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ", and you were added as a follower.\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
       break;
     case 'commented on':
-      $comment_author = user_load($comment->uid);
-      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was commented on, by ' . $comment_author->name . ' on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
+      $author_id = $comment->uid;
+      $comment_author = user_load($author_id);
+      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was commented on by ' . $comment_author->name . ' on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
       break;
   }
   $fce_w->field_notification_body->set($body);
+
+  // Set the notification "author".
+  $fce_w->field_notification_author	->set($author_id);
 
   // If this is a comment notification, set the comment ref.
   if ($comment) {
@@ -621,9 +628,14 @@ function ma_collaboration_tools_field_collection_item_insert($fc_item){
     $notify_users = array_diff($notification_w->field_notify_immediately->raw(), $notification_w->field_users_notified->raw());
 
     // Send notifications.
-    $successful_sends = [];
+    $notification_author = $fc_item->field_notification_author[LANGUAGE_NONE][0]['target_id'];;
     if (count($notify_users)) {
       foreach ($notify_users as $uid) {
+        // Do not notify users of their *own* node creations / node edits / or comments.
+        if ($uid == $notification_author) {
+          $successful_sends[] = $uid;
+          continue;
+        }
         $params = [
           'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
           'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nManage your notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",

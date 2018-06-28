@@ -445,13 +445,15 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_notification_date_gene',
-        1 => 'field_notification_comment',
-        2 => 'field_notification_subject',
-        3 => 'field_notification_body',
+        1 => 'field_notification_author',
+        2 => 'field_notification_comment',
+        3 => 'field_notification_subject',
+        4 => 'field_notification_body',
       ),
     ),
     'fields' => array(
       'field_notification_date_gene' => 'ds_content',
+      'field_notification_author' => 'ds_content',
       'field_notification_comment' => 'ds_content',
       'field_notification_subject' => 'ds_content',
       'field_notification_body' => 'ds_content',
