@@ -1322,6 +1322,7 @@ function ma_core_user_default_permissions() {
       'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'comment',
   );

@@ -197,6 +197,11 @@ function ma_culturalprotocol_og_features_default_permissions() {
     ),
   );
 
+  // Exported og permission: 'node:language_community:administer comments'
+  $permissions['node:language_community:administer comments'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:language_community:create collection content'
   $permissions['node:language_community:create collection content'] = array(
     'roles' => array(),
@@ -209,6 +214,21 @@ function ma_culturalprotocol_og_features_default_permissions() {
 
   // Exported og permission: 'node:language_community:delete own collection content'
   $permissions['node:language_community:delete own collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:delete own comments'
+  $permissions['node:language_community:delete own comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:modify any comments'
+  $permissions['node:language_community:modify any comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:post comments'
+  $permissions['node:language_community:post comments'] = array(
     'roles' => array(),
   );
 

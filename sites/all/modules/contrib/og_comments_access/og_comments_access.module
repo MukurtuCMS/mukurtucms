@@ -1,0 +1,335 @@
+<?php
+
+/**
+ * @file
+ * Organic groups comments access.
+ */
+
+/**
+ * Implements hook_og_permission().
+ */
+function og_comments_access_og_permission() {
+  $items = array();
+  $items['administer comments'] = array(
+    'title' => t('Administer OG comments'),
+    'description' => t('Allows user to access on OG comments overview page.'),
+    'roles' => array(OG_ADMINISTRATOR_ROLE),
+    'default role' => array(OG_ADMINISTRATOR_ROLE),
+    'restrict access' => TRUE,
+  );
+  $items['modify any comments'] = array(
+    'title' => t('Modify any OG comments'),
+    'description' => t('Allows user to modify any OG comments.'),
+    'roles' => array(OG_ADMINISTRATOR_ROLE, OG_AUTHENTICATED_ROLE),
+    'default role' => array(OG_ADMINISTRATOR_ROLE),
+    'restrict access' => TRUE,
+  );
+  $items['delete own comments'] = array(
+    'title' => t('Delete own OG comments'),
+    'description' => t('Allows user to delete own OG comments.'),
+    'roles' => array(OG_ADMINISTRATOR_ROLE, OG_AUTHENTICATED_ROLE),
+    'default role' => array(OG_ADMINISTRATOR_ROLE, OG_AUTHENTICATED_ROLE),
+  );
+  $items['post comments'] = array(
+    'title' => t('Post OG comments'),
+    'description' => t('Allows user to post OG comments.'),
+    'default role' => array(OG_ADMINISTRATOR_ROLE, OG_AUTHENTICATED_ROLE),
+  );
+  return $items;
+}
+
+/**
+ * Add a menu item that should appear in the group admin page.
+ * Implements hook_og_ui_get_group_admin().
+ */
+function og_comments_access_og_ui_get_group_admin($group_type, $gid) {
+  $items = array();
+  if (_og_comments_access_administer($gid)) {
+    $items['administer_comments'] = array(
+      'title' => t('Comments'),
+      'description' => t('Administer comments of this group.'),
+      'href' => 'admin/comment',
+    );
+  }
+  return $items;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function og_comments_access_menu() {
+  $items['node/%node/comment'] = array(
+    'title' => 'Comments',
+    'description' => 'List and edit site comments and the comment approval queue.',
+    'page callback' => 'og_comments_access_admin',
+    'page arguments' => array('new', 1),
+    'access callback' => '_og_comments_access_administer',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'og_comments_access.admin.inc',
+    'weight' => 10,
+  );
+  // Tabs begin here.
+  $items['node/%node/comment/new'] = array(
+    'title' => 'Published comments',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['node/%node/comment/approval'] = array(
+    'title' => 'Unapproved comments',
+    'page callback' => 'og_comments_access_admin',
+    'page arguments' => array('approval', 1),
+    'access callback' => '_og_comments_access_administer',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'og_comments_access.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function og_comments_access_menu_alter(&$items) {
+  // Change the access callback for comment edition.
+  $items['comment/%comment/edit']['access callback'] = 'og_comments_access';
+  $items['comment/%comment/edit']['access arguments'] = array('edit', 1);
+  // Change the access callback for comment reply.
+  $items['comment/reply/%node']['access callback'] = 'og_comments_access_post_and_reply';
+  $items['comment/reply/%node']['access arguments'] = array(2);
+  // Change the access callback for comment delete.
+  $items['comment/%/delete']['access callback'] = '_og_comments_access_delete';
+  $items['comment/%/delete']['access arguments'] = array(1);
+}
+
+/**
+ * Override the access to delete a comment.
+ */
+function _og_comments_access_delete($cid) {
+  if ($comment = comment_load($cid)) {
+    if (isset($comment->nid)) {
+      $node = node_load($comment->nid);
+      if (!empty($node->og_group_ref['und'])) {
+        global $user;
+        $is_admin_comment = user_access('administer comments');
+        $is_owner = $comment->uid == $user->uid;
+        $access = FALSE;
+        foreach ($node->og_group_ref['und'] as $group) {
+          $access = $is_admin_comment || og_user_access('node', $group['target_id'], 'administer comments')
+          || ($is_owner && og_user_access('node', $group['target_id'], 'delete own comments'));
+          if ($access) {
+            break;
+          }
+        }
+        return $access;
+      }
+    }
+  }
+  return user_access('administer comments');
+}
+
+/**
+ * Override the access of administer comments page.
+ */
+function _og_comments_access_administer($group) {
+  return isset($group->nid) && og_is_group('node', $group->nid) && (user_access('administer comments')
+      || og_user_access('node', $group->nid, 'administer comments'));
+}
+
+/**
+ * Determines whether the current user has access to edit particular comment.
+ *
+ * @see comment_access()
+ */
+function og_comments_access($op, $comment, $account = NULL) {
+  global $user;
+
+  // Allow to specify a user.
+  if (!is_null($account)) {
+    $user = $account;
+  }
+
+  if ($op == 'edit' && isset($comment->nid)) {
+    // Load the comment node.
+    $node = node_load($comment->nid);
+
+    // Check if the user can administer the group.
+    $access = og_user_access_entity('administer group', 'node', $node, $user);
+    // Check if the user as the right permissions.
+    $access = $access || og_user_access_entity('modify any comments', 'node', $node, $user);
+    // We still check the usual permissions.
+    return (($user->uid && $user->uid == $comment->uid && $comment->status == COMMENT_PUBLISHED
+        && user_access('edit own comments', $user))) || user_access('administer comments', $user) || $access;
+  }
+}
+
+/**
+ * Custom access function for comment posting in a group content.
+ */
+function og_comments_access_post_and_reply($node) {
+  global $user;
+
+  $access = og_user_access_entity('administer group', 'node', $node, $user);
+  // Check if we are in a group context.
+  if (!is_null($access)) {
+    // Check if the user as the right permissions.
+    $access = $access || og_user_access_entity('post comments', 'node', $node, $user);
+    $access = $access || user_access('administer comments');
+  }
+  // If we are not we use the default permission.
+  else {
+    $access = user_access('post comments');
+  }
+
+  return $access;
+}
+
+
+/**
+ * Implements hook_node_view().
+ */
+function og_comments_access_node_view($node, $view_mode) {
+  $access = og_comments_access_post_and_reply($node);
+
+  // Unset the comment form if the user /
+  // is not in at least one of the node's group.
+  if (isset($node->content['links']['comment']) && !$access) {
+    $node->content['links']['comment']['#links']['comment-add']['#access'] = $access;
+  }
+  if (isset($node->content['comments']['comment_form'])) {
+    $node->content['comments']['comment_form']['#access'] = $access;
+  }
+}
+
+/**
+ * Implements hook_comment_view().
+ */
+function og_comments_access_comment_view($comment, $view_mode, $langcode) {
+  $node = node_load($comment->nid);
+  $access = $access = og_comments_access_post_and_reply($node);
+
+  // Unset the reply link if the user is /
+  // not in at least one of the node's group.
+  if (isset($comment->content['links']['comment']['#links']['comment-reply']) && !$access) {
+    unset($comment->content['links']['comment']['#links']['comment-reply']);
+  }
+
+  $access_edit = og_comments_access('edit', $comment);
+  if (!isset($comment->content['links']['comment']['#links']['comment-edit']) && $access_edit) {
+    $comment->content['links']['comment']['#links']['comment-edit'] = array(
+      'title' => t('edit'),
+      'href' => "comment/$comment->cid/edit",
+      'html' => TRUE,
+    );
+  }
+  if (!isset($comment->content['links']['comment']['#links']['comment-delete']) && _og_comments_access_delete($comment->cid)) {
+    $comment->content['links']['comment']['#links']['comment-delete'] = array(
+      'title' => t('delete'),
+      'href' => "comment/$comment->cid/delete",
+      'html' => TRUE,
+    );
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function og_comments_access_form_alter(&$form, &$form_state, $form_id) {
+  // Keep the original comment owner when group administrator edit a comment.
+  if ($form_id == 'comment_node_post_form') {
+    // Get the comment.
+    $comment = $form['#entity'];
+    // If it's an existing comment and the user /
+    // as the right to edit in the group.
+    if ($comment->cid && og_comments_access('edit', $comment)) {
+
+      // Do as if it was and administrator.
+      // See comment_form() in comment module.
+      $form['author']['#type'] = 'fieldset';
+      $form['author']['#title'] = t('Administration');
+      $form['author']['#collapsible'] = TRUE;
+      $form['author']['#collapsed'] = TRUE;
+      $form['author']['#weight'] = -2;
+
+      $author = (!$comment->uid && $comment->name ? $comment->name : $comment->registered_name);
+      $form['author']['name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Authored by'),
+        '#default_value' => $author,
+        '#maxlength' => 60,
+        '#size' => 30,
+        '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
+        '#autocomplete_path' => 'user/autocomplete',
+      );
+
+    }
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ */
+function og_comments_access_module_implements_alter(&$implementations, $hook) {
+  // We need to call this alter hook after all other entity_info_alter hooks.
+  if ($hook == 'entity_info_alter' && isset($implementations['og_comments_access'])) {
+    $group = $implementations['og_comments_access'];
+    unset($implementations['og_comments_access']);
+    $implementations['og_comments_access'] = $group;
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * @see entity_module_implements_alter()
+ */
+function og_comments_access_entity_info_alter(&$entity_info) {
+  // Change the entity callback for comment.
+  if (module_exists('comment')) {
+    $entity_info['comment']['access callback'] = 'og_comments_access_entity_metadata_comment_access';
+  }
+}
+
+/**
+ * Overwrite the default access callback for the comment entity.
+ *
+ * @see entity_metadata_comment_access
+ */
+function og_comments_access_entity_metadata_comment_access($op, $entity = NULL, $account = NULL) {
+  // When determining access to a comment, 'comment_access' does not take any
+  // access restrictions to the comment's associated node into account. If a
+  // comment has an associated node, the user must be able to view it in order
+  // to access the comment.
+  if (isset($entity->nid)) {
+    if (!entity_access('view', 'node', node_load($entity->nid), $account)) {
+      return FALSE;
+    }
+  }
+
+  // Comment administrators are allowed to perform all operations on all
+  // comments.
+  if (user_access('administer comments', $account)) {
+    return TRUE;
+  }
+
+  // Unpublished comments can never be accessed by non-admins.
+  if (isset($entity->status) && $entity->status == COMMENT_NOT_PUBLISHED) {
+    return FALSE;
+  }
+
+  if (isset($entity) && $op == 'update') {
+    // Adding OG group permission check.
+    if (!isset($account)) {
+      return og_comments_access('edit', $entity);
+    }
+    else {
+      return og_comments_access('edit', $entity, $account);
+    }
+  }
+  if (user_access('access comments', $account) && $op == 'view') {
+    return TRUE;
+  }
+  return FALSE;
+}

@@ -47,7 +47,7 @@
   <?php print render($content['comments']); ?>
   </div>
 
-  <?php if ($content['comment_form']): ?>
+  <?php if ($content['comment_form'] && $content['comment_form']['#access']): ?>
     <h2 class="title comment-form"><?php print t('Add comment'); ?></h2>
     <?php print render($content['comment_form']); ?>
   <?php endif; ?>
