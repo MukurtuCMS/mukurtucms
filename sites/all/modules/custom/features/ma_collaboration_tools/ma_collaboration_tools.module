@@ -677,9 +677,9 @@ function ma_collaboration_tools_mail($key, &$message, $params) {
       // standard format (that of how non-comment notifications, and comment notifications in digests appear).
       $body_prefix = variable_get('mailcomment_reply_text');
       $split_body = preg_split("/.\n\nView the comment: /", $params['body']);
-      $comment_body = '| ' . drupal_html_to_text(wordwrap($comment->comment_body[LANGUAGE_NONE][0]['value'], 75, "\n| ", true)); // limit each line to 77 chars, including a "| " at the start of each line to denote quoted text.
+      $comment_body = '| ' . drupal_html_to_text(wordwrap($comment->subject, 75, "\n| ", true)); // limit each line to 77 chars, including a "| " at the start of each line to denote quoted text.
       $body_suffix = 'You may reply directly to this comment via email, or go to the comment at: ';
-      $params['body'] = $body_prefix . "\n\n" . $split_body[0] . ":\n\n" . $comment_body . $body_suffix . $split_body[1];
+      $params['body'] = $body_prefix . "\n\n" . $split_body[0] . ":\n\n" . $comment_body . "\n" . $body_suffix . $split_body[1];
 //      $messageid_params['uid'] = $params['uid'];
 //      $message['body'][0] .= 'View original post: ' . url('mailcomment/redirect/' . mailcomment_build_messageid($messageid_params), ['absolute' => TRUE]);
 
