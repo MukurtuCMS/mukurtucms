@@ -295,8 +295,8 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['label'] = 'NoTopics';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no topics to list.';
-  $handler->display->display_options['empty']['area']['format'] = 'panopoly_wysiwyg_text';
+  $handler->display->display_options['empty']['area']['content'] = 'There are not yet any discussion topics in this space.';
+  $handler->display->display_options['empty']['area']['format'] = 'plain_text';
   /* Relationship: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
@@ -837,7 +837,7 @@ function oa_comment_views_default_views() {
     t('last »'),
     t('Load more'),
     t('NoTopics'),
-    t('There are no topics to list.'),
+    t('There are not yet any discussion topics in this space.'),
     t('author'),
     t('Comments'),
     t('commentuid'),
