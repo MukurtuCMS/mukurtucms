@@ -242,7 +242,7 @@ function ma_collaboration_tools_field_default_field_bases() {
         ),
         'target_bundles' => array(
           'event' => 'event',
-          'oa_discussion_post' => 'oa_discussion_post',
+          'discussion_post' => 'discussion_post',
           'document_page' => 'document_page',
         ),
       ),

@@ -302,9 +302,9 @@ function oa_comment_field_default_field_instances_template() {
   }
 
   // Exported field_instance:
-  // 'comment-comment_node_oa_discussion_post-field_oa_related'
-  $field_instances['comment-comment_node_oa_discussion_post-field_oa_related'] = array(
-    'bundle' => 'comment_node_oa_discussion_post',
+  // 'comment-comment_node_discussion_post-field_oa_related'
+  $field_instances['comment-comment_node_discussion_post-field_oa_related'] = array(
+    'bundle' => 'comment_node_discussion_post',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',

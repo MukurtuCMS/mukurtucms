@@ -48,8 +48,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:create oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:create oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:create discussion_post content'
+  $permissions['node:cultural_protocol_group:create discussion_post content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -86,8 +86,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete any oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:delete any oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete any discussion_post content'
+  $permissions['node:cultural_protocol_group:delete any discussion_post content'] = array(
     'roles' => array(),
   );
 
@@ -129,8 +129,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete own oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:delete own oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete own discussion_post content'
+  $permissions['node:cultural_protocol_group:delete own discussion_post content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -167,8 +167,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update any oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:update any oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update any discussion_post content'
+  $permissions['node:cultural_protocol_group:update any discussion_post content'] = array(
     'roles' => array(),
   );
 
@@ -210,8 +210,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update own oa_discussion_post content'
-  $permissions['node:cultural_protocol_group:update own oa_discussion_post content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update own discussion_post content'
+  $permissions['node:cultural_protocol_group:update own discussion_post content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',

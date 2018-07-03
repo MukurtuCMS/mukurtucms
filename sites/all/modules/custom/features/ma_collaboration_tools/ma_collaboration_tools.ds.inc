@@ -325,7 +325,7 @@ return ma_collaboration_tools_add_content_to_section_link($entity);
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'oa_discussion_post|*';
+  $ds_field->ui_limit = 'discussion_post|*';
   $ds_field->properties = array(
     'code' => array(
       'value' => '<?php return ma_collaboration_tools_discussion_post_intro($entity); ?>',
@@ -980,9 +980,9 @@ function ma_collaboration_tools_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|oa_discussion_post|form';
+  $ds_layout->id = 'node|discussion_post|form';
   $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'oa_discussion_post';
+  $ds_layout->bundle = 'discussion_post';
   $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
@@ -1041,13 +1041,13 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_link_custom' => '',
     'layout_disable_css' => FALSE,
   );
-  $export['node|oa_discussion_post|form'] = $ds_layout;
+  $export['node|discussion_post|form'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|oa_discussion_post|full';
+  $ds_layout->id = 'node|discussion_post|full';
   $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'oa_discussion_post';
+  $ds_layout->bundle = 'discussion_post';
   $ds_layout->view_mode = 'full';
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
@@ -1093,7 +1093,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_link_custom' => '',
     'layout_disable_css' => 0,
   );
-  $export['node|oa_discussion_post|full'] = $ds_layout;
+  $export['node|discussion_post|full'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
