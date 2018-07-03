@@ -95,7 +95,7 @@ function ma_collaboration_tools_page_alter(&$data) {
 function ma_collaboration_tools_collab_node_types_map() {
   return [
     'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
-    'discussion_post' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
+    'discussion_topic' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
     'document_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
   ];
 }
@@ -1492,7 +1492,7 @@ function ma_collaboration_tools_preprocess_views_view_fields(&$vars) {
 /**
  * Helper function called by custom DS field.
  */
-function ma_collaboration_tools_discussion_post_intro($entity) {
+function ma_collaboration_tools_discussion_topic_intro($entity) {
   $dp = node_load($entity->field_discussion_disc_space[LANGUAGE_NONE][0]['target_id']);
   $output = 'By ' . l($entity->name, $entity->uid) . ' on ' . date('F j, Y - g:ia', $entity->created) . ' in ' . l($dp->title, 'node/' . $dp->nid);
     return $output;

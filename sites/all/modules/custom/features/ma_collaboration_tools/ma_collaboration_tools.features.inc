@@ -77,10 +77,10 @@ function ma_collaboration_tools_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
-    'discussion_post' => array(
-      'name' => t('Discussion Post'),
+    'discussion_topic' => array(
+      'name' => t('Discussion Topic'),
       'base' => 'node_content',
-      'description' => t('A collaboration discussion post'),
+      'description' => t('A collaboration discussion topic'),
       'has_title' => '1',
       'title_label' => t('Title'),
       'help' => '',

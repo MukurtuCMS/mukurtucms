@@ -319,21 +319,21 @@ return ma_collaboration_tools_add_content_to_section_link($entity);
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
-  $ds_field->field = 'discussion_post_intro_field';
-  $ds_field->label = 'Discussion Post intro field';
+  $ds_field->field = 'discussion_topic_intro_field';
+  $ds_field->label = 'Discussion Topic intro field';
   $ds_field->field_type = 5;
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'discussion_post|*';
+  $ds_field->ui_limit = 'discussion_topic|*';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<?php return ma_collaboration_tools_discussion_post_intro($entity); ?>',
+      'value' => '<?php return ma_collaboration_tools_discussion_topic_intro($entity); ?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,
   );
-  $export['discussion_post_intro_field'] = $ds_field;
+  $export['discussion_topic_intro_field'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -980,9 +980,9 @@ function ma_collaboration_tools_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|discussion_post|form';
+  $ds_layout->id = 'node|discussion_topic|form';
   $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'discussion_post';
+  $ds_layout->bundle = 'discussion_topic';
   $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
@@ -1041,19 +1041,19 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_link_custom' => '',
     'layout_disable_css' => FALSE,
   );
-  $export['node|discussion_post|form'] = $ds_layout;
+  $export['node|discussion_topic|form'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|discussion_post|full';
+  $ds_layout->id = 'node|discussion_topic|full';
   $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'discussion_post';
+  $ds_layout->bundle = 'discussion_topic';
   $ds_layout->view_mode = 'full';
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
-        0 => 'discussion_post_intro_field',
+        0 => 'discussion_topic_intro_field',
         1 => 'body',
         2 => 'field_oa_media',
         3 => 'comments',
@@ -1067,7 +1067,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
-      'discussion_post_intro_field' => 'left',
+      'discussion_topic_intro_field' => 'left',
       'body' => 'left',
       'field_oa_media' => 'left',
       'comments' => 'left',
@@ -1093,7 +1093,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_link_custom' => '',
     'layout_disable_css' => 0,
   );
-  $export['node|discussion_post|full'] = $ds_layout;
+  $export['node|discussion_topic|full'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

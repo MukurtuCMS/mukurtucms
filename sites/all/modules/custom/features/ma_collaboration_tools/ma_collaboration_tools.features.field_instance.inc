@@ -2992,12 +2992,12 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-discussion_post-body'.
-  $field_instances['node-discussion_post-body'] = array(
-    'bundle' => 'discussion_post',
+  // Exported field_instance: 'node-discussion_topic-body'.
+  $field_instances['node-discussion_topic-body'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Enter the Discussion Post Content Here',
+    'description' => 'Enter the Discussion Topic Content Here',
     'display' => array(
       'default' => array(
         'label' => 'hidden',
@@ -3053,9 +3053,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-discussion_post-field_community_ref'.
-  $field_instances['node-discussion_post-field_community_ref'] = array(
-    'bundle' => 'discussion_post',
+  // Exported field_instance: 'node-discussion_topic-field_community_ref'.
+  $field_instances['node-discussion_topic-field_community_ref'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -3103,9 +3103,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-discussion_post-field_custom_notification_freq'.
-  $field_instances['node-discussion_post-field_custom_notification_freq'] = array(
-    'bundle' => 'discussion_post',
+  // 'node-discussion_topic-field_custom_notification_freq'.
+  $field_instances['node-discussion_topic-field_custom_notification_freq'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -3188,9 +3188,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-discussion_post-field_discussion_disc_space'.
-  $field_instances['node-discussion_post-field_discussion_disc_space'] = array(
-    'bundle' => 'discussion_post',
+  // 'node-discussion_topic-field_discussion_disc_space'.
+  $field_instances['node-discussion_topic-field_discussion_disc_space'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -3246,9 +3246,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-discussion_post-field_following_protocols'.
-  $field_instances['node-discussion_post-field_following_protocols'] = array(
-    'bundle' => 'discussion_post',
+  // 'node-discussion_topic-field_following_protocols'.
+  $field_instances['node-discussion_topic-field_following_protocols'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -3318,9 +3318,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-discussion_post-field_following_users'.
-  $field_instances['node-discussion_post-field_following_users'] = array(
-    'bundle' => 'discussion_post',
+  // Exported field_instance: 'node-discussion_topic-field_following_users'.
+  $field_instances['node-discussion_topic-field_following_users'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -3391,9 +3391,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-discussion_post-field_item_privacy_setting'.
-  $field_instances['node-discussion_post-field_item_privacy_setting'] = array(
-    'bundle' => 'discussion_post',
+  // 'node-discussion_topic-field_item_privacy_setting'.
+  $field_instances['node-discussion_topic-field_item_privacy_setting'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => array(
       0 => array(
         'value' => 'all',
@@ -3441,9 +3441,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-discussion_post-field_oa_media'.
-  $field_instances['node-discussion_post-field_oa_media'] = array(
-    'bundle' => 'discussion_post',
+  // Exported field_instance: 'node-discussion_topic-field_oa_media'.
+  $field_instances['node-discussion_topic-field_oa_media'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => array(),
     'deleted' => 0,
     'description' => '',
@@ -3526,9 +3526,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-discussion_post-field_pre_actions'.
-  $field_instances['node-discussion_post-field_pre_actions'] = array(
-    'bundle' => 'discussion_post',
+  // Exported field_instance: 'node-discussion_topic-field_pre_actions'.
+  $field_instances['node-discussion_topic-field_pre_actions'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => array(
       0 => array(
         'value' => 0,
@@ -3579,9 +3579,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-discussion_post-field_un_following_users'.
-  $field_instances['node-discussion_post-field_un_following_users'] = array(
-    'bundle' => 'discussion_post',
+  // 'node-discussion_topic-field_un_following_users'.
+  $field_instances['node-discussion_topic-field_un_following_users'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -3651,9 +3651,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-discussion_post-og_group_ref'.
-  $field_instances['node-discussion_post-og_group_ref'] = array(
-    'bundle' => 'discussion_post',
+  // Exported field_instance: 'node-discussion_topic-og_group_ref'.
+  $field_instances['node-discussion_topic-og_group_ref'] = array(
+    'bundle' => 'discussion_topic',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -4757,7 +4757,7 @@ http://www.whitehouse.gov/',
   t('Discussion Space');
   t('Document Library');
   t('Email(s)');
-  t('Enter the Discussion Post Content Here');
+  t('Enter the Discussion Topic Content Here');
   t('Enter the content of the document or wiki here.');
   t('Event Date');
   t('Following Protocols');

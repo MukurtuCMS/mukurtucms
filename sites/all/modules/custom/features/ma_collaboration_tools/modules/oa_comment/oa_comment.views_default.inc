@@ -479,7 +479,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['filters']['type_1']['table'] = 'node';
   $handler->display->display_options['filters']['type_1']['field'] = 'type';
   $handler->display->display_options['filters']['type_1']['value'] = array(
-    'discussion_post' => 'discussion_post',
+    'discussion_topic' => 'discussion_topic',
   );
   $handler->display->display_options['filters']['type_1']['group'] = 3;
   /* Filter criterion: Comment: ID */
@@ -542,7 +542,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'discussion_post' => 'discussion_post',
+    'discussion_topic' => 'discussion_topic',
   );
   $handler->display->display_options['filters']['type']['group'] = 1;
   $handler->display->display_options['filters']['type']['exposed'] = TRUE;
@@ -626,7 +626,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['filters']['type_1']['table'] = 'node';
   $handler->display->display_options['filters']['type_1']['field'] = 'type';
   $handler->display->display_options['filters']['type_1']['value'] = array(
-    'discussion_post' => 'discussion_post',
+    'discussion_topic' => 'discussion_topic',
   );
   $handler->display->display_options['filters']['type_1']['group'] = 3;
   /* Filter criterion: Comment: ID */
@@ -695,7 +695,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'discussion_post' => 'discussion_post',
+    'discussion_topic' => 'discussion_topic',
   );
   $handler->display->display_options['filters']['type']['group'] = 1;
   $handler->display->display_options['filters']['type']['exposed'] = TRUE;
@@ -779,7 +779,7 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['filters']['type_1']['table'] = 'node';
   $handler->display->display_options['filters']['type_1']['field'] = 'type';
   $handler->display->display_options['filters']['type_1']['value'] = array(
-    'discussion_post' => 'discussion_post',
+    'discussion_topic' => 'discussion_topic',
   );
   $handler->display->display_options['filters']['type_1']['group'] = 3;
   /* Filter criterion: Comment: ID */
