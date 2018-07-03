@@ -436,10 +436,10 @@ function ma_collaboration_tools_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_following|node|oa_wiki_page|default';
+  $field_group->identifier = 'group_following|node|document_page|default';
   $field_group->group_name = 'group_following';
   $field_group->entity_type = 'node';
-  $field_group->bundle = 'oa_wiki_page';
+  $field_group->bundle = 'document_page';
   $field_group->mode = 'default';
   $field_group->parent_name = '';
   $field_group->data = array(
@@ -461,15 +461,15 @@ function ma_collaboration_tools_field_group_info() {
       ),
     ),
   );
-  $field_groups['group_following|node|oa_wiki_page|default'] = $field_group;
+  $field_groups['group_following|node|document_page|default'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_following|node|oa_wiki_page|form';
+  $field_group->identifier = 'group_following|node|document_page|form';
   $field_group->group_name = 'group_following';
   $field_group->entity_type = 'node';
-  $field_group->bundle = 'oa_wiki_page';
+  $field_group->bundle = 'document_page';
   $field_group->mode = 'form';
   $field_group->parent_name = '';
   $field_group->data = array(
@@ -493,15 +493,15 @@ function ma_collaboration_tools_field_group_info() {
       'formatter' => 'collapsible',
     ),
   );
-  $field_groups['group_following|node|oa_wiki_page|form'] = $field_group;
+  $field_groups['group_following|node|document_page|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_following|node|oa_wiki_page|full';
+  $field_group->identifier = 'group_following|node|document_page|full';
   $field_group->group_name = 'group_following';
   $field_group->entity_type = 'node';
-  $field_group->bundle = 'oa_wiki_page';
+  $field_group->bundle = 'document_page';
   $field_group->mode = 'full';
   $field_group->parent_name = '';
   $field_group->data = array(
@@ -523,7 +523,7 @@ function ma_collaboration_tools_field_group_info() {
       ),
     ),
   );
-  $field_groups['group_following|node|oa_wiki_page|full'] = $field_group;
+  $field_groups['group_following|node|document_page|full'] = $field_group;
 
   // Translatables
   // Included for use with string extractors like potx.

@@ -57,8 +57,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:create oa_wiki_page content'
-  $permissions['node:cultural_protocol_group:create oa_wiki_page content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:create document_page content'
+  $permissions['node:cultural_protocol_group:create document_page content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -91,8 +91,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete any oa_wiki_page content'
-  $permissions['node:cultural_protocol_group:delete any oa_wiki_page content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete any document_page content'
+  $permissions['node:cultural_protocol_group:delete any document_page content'] = array(
     'roles' => array(),
   );
 
@@ -138,8 +138,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:delete own oa_wiki_page content'
-  $permissions['node:cultural_protocol_group:delete own oa_wiki_page content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:delete own document_page content'
+  $permissions['node:cultural_protocol_group:delete own document_page content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',
@@ -172,8 +172,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     'roles' => array(),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update any oa_wiki_page content'
-  $permissions['node:cultural_protocol_group:update any oa_wiki_page content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update any document_page content'
+  $permissions['node:cultural_protocol_group:update any document_page content'] = array(
     'roles' => array(),
   );
 
@@ -219,8 +219,8 @@ function ma_collaboration_tools_og_features_default_permissions() {
     ),
   );
 
-  // Exported og permission: 'node:cultural_protocol_group:update own oa_wiki_page content'
-  $permissions['node:cultural_protocol_group:update own oa_wiki_page content'] = array(
+  // Exported og permission: 'node:cultural_protocol_group:update own document_page content'
+  $permissions['node:cultural_protocol_group:update own document_page content'] = array(
     'roles' => array(
       'contributor' => 'contributor',
       'member' => 'member',

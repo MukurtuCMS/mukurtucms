@@ -96,7 +96,7 @@ function ma_collaboration_tools_collab_node_types_map() {
   return [
     'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
     'oa_discussion_post' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
-    'oa_wiki_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
+    'document_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
   ];
 }
 

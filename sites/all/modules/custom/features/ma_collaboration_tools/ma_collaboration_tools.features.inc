@@ -93,7 +93,7 @@ function ma_collaboration_tools_node_info() {
       'title_label' => t('Title'),
       'help' => '',
     ),
-    'oa_wiki_page' => array(
+    'document_page' => array(
       'name' => t('Document Page'),
       'base' => 'node_content',
       'description' => t('An collaboration Document/Wiki page'),

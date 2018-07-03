@@ -243,7 +243,7 @@ function ma_collaboration_tools_field_default_field_bases() {
         'target_bundles' => array(
           'event' => 'event',
           'oa_discussion_post' => 'oa_discussion_post',
-          'oa_wiki_page' => 'oa_wiki_page',
+          'document_page' => 'document_page',
         ),
       ),
       'target_type' => 'node',
@@ -789,13 +789,13 @@ function ma_collaboration_tools_field_default_field_bases() {
     'type' => 'file',
   );
 
-  // Exported field_base: 'field_oa_wiki_page_no_redirect'.
-  $field_bases['field_oa_wiki_page_no_redirect'] = array(
+  // Exported field_base: 'field_document_page_no_redirect'.
+  $field_bases['field_document_page_no_redirect'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_oa_wiki_page_no_redirect',
+    'field_name' => 'field_document_page_no_redirect',
     'indexes' => array(
       'value' => array(
         0 => 'value',

@@ -55,9 +55,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_anonymous_oa_wiki_page';
+  $strongarm->name = 'comment_anonymous_document_page';
   $strongarm->value = 0;
-  $export['comment_anonymous_oa_wiki_page'] = $strongarm;
+  $export['comment_anonymous_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -111,9 +111,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_default_mode_oa_wiki_page';
+  $strongarm->name = 'comment_default_mode_document_page';
   $strongarm->value = 1;
-  $export['comment_default_mode_oa_wiki_page'] = $strongarm;
+  $export['comment_default_mode_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -160,9 +160,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_default_per_page_oa_wiki_page';
+  $strongarm->name = 'comment_default_per_page_document_page';
   $strongarm->value = '50';
-  $export['comment_default_per_page_oa_wiki_page'] = $strongarm;
+  $export['comment_default_per_page_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -237,9 +237,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_form_location_oa_wiki_page';
+  $strongarm->name = 'comment_form_location_document_page';
   $strongarm->value = 1;
-  $export['comment_form_location_oa_wiki_page'] = $strongarm;
+  $export['comment_form_location_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -251,9 +251,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_oa_wiki_page';
+  $strongarm->name = 'comment_document_page';
   $strongarm->value = '2';
-  $export['comment_oa_wiki_page'] = $strongarm;
+  $export['comment_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -300,9 +300,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_preview_oa_wiki_page';
+  $strongarm->name = 'comment_preview_document_page';
   $strongarm->value = '1';
-  $export['comment_preview_oa_wiki_page'] = $strongarm;
+  $export['comment_preview_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -349,9 +349,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'comment_subject_field_oa_wiki_page';
+  $strongarm->name = 'comment_subject_field_document_page';
   $strongarm->value = 1;
-  $export['comment_subject_field_oa_wiki_page'] = $strongarm;
+  $export['comment_subject_field_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -398,9 +398,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'diff_enable_revisions_page_node_oa_wiki_page';
+  $strongarm->name = 'diff_enable_revisions_page_node_document_page';
   $strongarm->value = 1;
-  $export['diff_enable_revisions_page_node_oa_wiki_page'] = $strongarm;
+  $export['diff_enable_revisions_page_node_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -447,9 +447,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'diff_show_preview_changes_node_oa_wiki_page';
+  $strongarm->name = 'diff_show_preview_changes_node_document_page';
   $strongarm->value = 1;
-  $export['diff_show_preview_changes_node_oa_wiki_page'] = $strongarm;
+  $export['diff_show_preview_changes_node_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -496,9 +496,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'diff_view_mode_preview_node_oa_wiki_page';
+  $strongarm->name = 'diff_view_mode_preview_node_document_page';
   $strongarm->value = 'full';
-  $export['diff_view_mode_preview_node_oa_wiki_page'] = $strongarm;
+  $export['diff_view_mode_preview_node_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -914,7 +914,7 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'field_bundle_settings_node__oa_wiki_page';
+  $strongarm->name = 'field_bundle_settings_node__document_page';
   $strongarm->value = array(
     'view_modes' => array(
       'full' => array(
@@ -975,7 +975,7 @@ function ma_collaboration_tools_strongarm() {
       'display' => array(),
     ),
   );
-  $export['field_bundle_settings_node__oa_wiki_page'] = $strongarm;
+  $export['field_bundle_settings_node__document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1029,9 +1029,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'language_content_type_oa_wiki_page';
+  $strongarm->name = 'language_content_type_document_page';
   $strongarm->value = '0';
-  $export['language_content_type_oa_wiki_page'] = $strongarm;
+  $export['language_content_type_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1127,11 +1127,11 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'menu_options_oa_wiki_page';
+  $strongarm->name = 'menu_options_document_page';
   $strongarm->value = array(
     0 => 'main-menu',
   );
-  $export['menu_options_oa_wiki_page'] = $strongarm;
+  $export['menu_options_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1185,9 +1185,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'menu_parent_oa_wiki_page';
+  $strongarm->name = 'menu_parent_document_page';
   $strongarm->value = 'main-menu:0';
-  $export['menu_parent_oa_wiki_page'] = $strongarm;
+  $export['menu_parent_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1262,12 +1262,12 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'node_options_oa_wiki_page';
+  $strongarm->name = 'node_options_document_page';
   $strongarm->value = array(
     0 => 'status',
     1 => 'promote',
   );
-  $export['node_options_oa_wiki_page'] = $strongarm;
+  $export['node_options_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1314,9 +1314,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'node_preview_oa_wiki_page';
+  $strongarm->name = 'node_preview_document_page';
   $strongarm->value = '1';
-  $export['node_preview_oa_wiki_page'] = $strongarm;
+  $export['node_preview_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1370,9 +1370,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'node_submitted_oa_wiki_page';
+  $strongarm->name = 'node_submitted_document_page';
   $strongarm->value = 1;
-  $export['node_submitted_oa_wiki_page'] = $strongarm;
+  $export['node_submitted_document_page'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -1419,9 +1419,9 @@ function ma_collaboration_tools_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'pathauto_node_oa_wiki_page_pattern';
+  $strongarm->name = 'pathauto_node_document_page_pattern';
   $strongarm->value = 'document-page/[node:title]';
-  $export['pathauto_node_oa_wiki_page_pattern'] = $strongarm;
+  $export['pathauto_node_document_page_pattern'] = $strongarm;
 
   return $export;
 }

@@ -3970,9 +3970,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-body'.
-  $field_instances['node-oa_wiki_page-body'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-body'.
+  $field_instances['node-document_page-body'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Enter the content of the document or wiki here.',
@@ -4032,9 +4032,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_community_ref'.
-  $field_instances['node-oa_wiki_page-field_community_ref'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_community_ref'.
+  $field_instances['node-document_page-field_community_ref'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -4081,9 +4081,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-oa_wiki_page-field_custom_notification_freq'.
-  $field_instances['node-oa_wiki_page-field_custom_notification_freq'] = array(
-    'bundle' => 'oa_wiki_page',
+  // 'node-document_page-field_custom_notification_freq'.
+  $field_instances['node-document_page-field_custom_notification_freq'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -4148,9 +4148,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-oa_wiki_page-field_document_doc_lib_section'.
-  $field_instances['node-oa_wiki_page-field_document_doc_lib_section'] = array(
-    'bundle' => 'oa_wiki_page',
+  // 'node-document_page-field_document_doc_lib_section'.
+  $field_instances['node-document_page-field_document_doc_lib_section'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -4209,9 +4209,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_following_protocols'.
-  $field_instances['node-oa_wiki_page-field_following_protocols'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_following_protocols'.
+  $field_instances['node-document_page-field_following_protocols'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -4281,9 +4281,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_following_users'.
-  $field_instances['node-oa_wiki_page-field_following_users'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_following_users'.
+  $field_instances['node-document_page-field_following_users'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -4354,9 +4354,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_item_privacy_setting'.
-  $field_instances['node-oa_wiki_page-field_item_privacy_setting'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_item_privacy_setting'.
+  $field_instances['node-document_page-field_item_privacy_setting'] = array(
+    'bundle' => 'document_page',
     'default_value' => array(
       0 => array(
         'value' => 'all',
@@ -4403,9 +4403,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_oa_media'.
-  $field_instances['node-oa_wiki_page-field_oa_media'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_oa_media'.
+  $field_instances['node-document_page-field_oa_media'] = array(
+    'bundle' => 'document_page',
     'default_value' => array(),
     'deleted' => 0,
     'description' => '',
@@ -4493,9 +4493,9 @@ http://www.whitehouse.gov/',
   );
 
   // Exported field_instance:
-  // 'node-oa_wiki_page-field_oa_wiki_page_no_redirect'.
-  $field_instances['node-oa_wiki_page-field_oa_wiki_page_no_redirect'] = array(
-    'bundle' => 'oa_wiki_page',
+  // 'node-document_page-field_document_page_no_redirect'.
+  $field_instances['node-document_page-field_document_page_no_redirect'] = array(
+    'bundle' => 'document_page',
     'comment_alter' => 0,
     'default_value' => array(
       0 => array(
@@ -4531,7 +4531,7 @@ http://www.whitehouse.gov/',
       ),
     ),
     'entity_type' => 'node',
-    'field_name' => 'field_oa_wiki_page_no_redirect',
+    'field_name' => 'field_document_page_no_redirect',
     'label' => 'Show page instead of file?',
     'required' => 0,
     'settings' => array(
@@ -4548,9 +4548,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_pre_actions'.
-  $field_instances['node-oa_wiki_page-field_pre_actions'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_pre_actions'.
+  $field_instances['node-document_page-field_pre_actions'] = array(
+    'bundle' => 'document_page',
     'default_value' => array(
       0 => array(
         'value' => 0,
@@ -4599,9 +4599,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-field_un_following_users'.
-  $field_instances['node-oa_wiki_page-field_un_following_users'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-field_un_following_users'.
+  $field_instances['node-document_page-field_un_following_users'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -4671,9 +4671,9 @@ http://www.whitehouse.gov/',
     ),
   );
 
-  // Exported field_instance: 'node-oa_wiki_page-og_group_ref'.
-  $field_instances['node-oa_wiki_page-og_group_ref'] = array(
-    'bundle' => 'oa_wiki_page',
+  // Exported field_instance: 'node-document_page-og_group_ref'.
+  $field_instances['node-document_page-og_group_ref'] = array(
+    'bundle' => 'document_page',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,

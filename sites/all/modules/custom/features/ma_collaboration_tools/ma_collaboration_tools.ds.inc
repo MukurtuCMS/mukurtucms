@@ -198,9 +198,9 @@ function ma_collaboration_tools_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
-  $ds_fieldsetting->id = 'node|oa_wiki_page|full';
+  $ds_fieldsetting->id = 'node|document_page|full';
   $ds_fieldsetting->entity_type = 'node';
-  $ds_fieldsetting->bundle = 'oa_wiki_page';
+  $ds_fieldsetting->bundle = 'document_page';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
     'follow_unfollow' => array(
@@ -234,7 +234,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       ),
     ),
   );
-  $export['node|oa_wiki_page|full'] = $ds_fieldsetting;
+  $export['node|document_page|full'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -1097,9 +1097,9 @@ function ma_collaboration_tools_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|oa_wiki_page|form';
+  $ds_layout->id = 'node|document_page|form';
   $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'oa_wiki_page';
+  $ds_layout->bundle = 'document_page';
   $ds_layout->view_mode = 'form';
   $ds_layout->layout = 'ds_1col';
   $ds_layout->settings = array(
@@ -1108,7 +1108,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
         0 => 'field_pre_actions',
         1 => 'title',
         2 => 'body',
-        3 => 'field_oa_wiki_page_no_redirect',
+        3 => 'field_document_page_no_redirect',
         4 => 'field_oa_media',
         6 => 'group_following',
         7 => 'path',
@@ -1129,7 +1129,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'field_pre_actions' => 'ds_content',
       'title' => 'ds_content',
       'body' => 'ds_content',
-      'field_oa_wiki_page_no_redirect' => 'ds_content',
+      'field_document_page_no_redirect' => 'ds_content',
       'field_oa_media' => 'ds_content',
       'field_item_privacy_setting' => 'hidden',
       'group_following' => 'ds_content',
@@ -1158,13 +1158,13 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_link_custom' => '',
     'layout_disable_css' => FALSE,
   );
-  $export['node|oa_wiki_page|form'] = $ds_layout;
+  $export['node|document_page|form'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'node|oa_wiki_page|full';
+  $ds_layout->id = 'node|document_page|full';
   $ds_layout->entity_type = 'node';
-  $ds_layout->bundle = 'oa_wiki_page';
+  $ds_layout->bundle = 'document_page';
   $ds_layout->view_mode = 'full';
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
@@ -1210,7 +1210,7 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'layout_link_custom' => '',
     'layout_disable_css' => 0,
   );
-  $export['node|oa_wiki_page|full'] = $ds_layout;
+  $export['node|document_page|full'] = $ds_layout;
 
   return $export;
 }

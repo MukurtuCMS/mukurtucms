@@ -292,7 +292,7 @@ function oa_comment_features_template_info() {
  * Template callback for field_topic.
  *
  * Used as a template for other bundles.
- * References to oa_wiki_page will be replaced by features_template.
+ * References to document_page will be replaced by features_template.
  */
 function oa_comment_field_default_field_instances_template() {
   $field_instances = array();
