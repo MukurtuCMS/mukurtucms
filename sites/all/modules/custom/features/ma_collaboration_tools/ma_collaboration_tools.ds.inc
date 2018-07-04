@@ -109,6 +109,35 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'document_library';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'generic_dynamic_field' => array(
+      'weight' => '2',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 1,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:0:{}s:4:"type";s:11:"views_panes";s:7:"subtype";s:14:"documents-full";}',
+        'load_terms' => 0,
+        'ft' => array(
+          'lb' => 'Documents',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'generic_dynamic_field_2' => array(
+      'weight' => '5',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:0:{}s:4:"type";s:11:"views_panes";s:7:"subtype";s:14:"documents-mini";}',
+        'load_terms' => 0,
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'add_content_to_collab_sect_link' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -125,7 +154,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'format' => 'default',
     ),
     'comments' => array(
-      'weight' => '2',
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -398,6 +427,58 @@ return ma_collaboration_tools_edit_collab_section_link($entity);
     'use_token' => 0,
   );
   $export['follow_unfollow'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'generic_dynamic_field';
+  $ds_field->label = 'Generic Dynamic Field';
+  $ds_field->field_type = 7;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'default' => array(),
+    'settings' => array(
+      'show_title' => array(
+        'type' => 'checkbox',
+      ),
+      'title_wrapper' => array(
+        'type' => 'textfield',
+        'description' => 'Eg: h1, h2, p',
+      ),
+      'ctools' => array(
+        'type' => 'ctools',
+      ),
+    ),
+  );
+  $export['generic_dynamic_field'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'generic_dynamic_field_2';
+  $ds_field->label = 'Generic Dynamic Field 2';
+  $ds_field->field_type = 7;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'default' => array(),
+    'settings' => array(
+      'show_title' => array(
+        'type' => 'checkbox',
+      ),
+      'title_wrapper' => array(
+        'type' => 'textfield',
+        'description' => 'Eg: h1, h2, p',
+      ),
+      'ctools' => array(
+        'type' => 'ctools',
+      ),
+    ),
+  );
+  $export['generic_dynamic_field_2'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -873,16 +954,19 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'left' => array(
         0 => 'title',
         3 => 'body',
-        4 => 'comments',
+        4 => 'generic_dynamic_field',
+        6 => 'comments',
       ),
       'right' => array(
         1 => 'add_content_to_collab_sect_link',
         2 => 'edit_collab_section_link',
-        5 => 'group_collab_actions',
-        6 => 'field_community_ref',
-        7 => 'group_access',
+        5 => 'field_community_ref',
+        7 => 'group_documents',
         8 => 'og_group_ref',
         9 => 'field_item_privacy_setting',
+        10 => 'generic_dynamic_field_2',
+        11 => 'group_collab_actions',
+        12 => 'group_access',
       ),
     ),
     'fields' => array(
@@ -890,12 +974,15 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'add_content_to_collab_sect_link' => 'right',
       'edit_collab_section_link' => 'right',
       'body' => 'left',
-      'comments' => 'left',
-      'group_collab_actions' => 'right',
+      'generic_dynamic_field' => 'left',
       'field_community_ref' => 'right',
-      'group_access' => 'right',
+      'comments' => 'left',
+      'group_documents' => 'right',
       'og_group_ref' => 'right',
       'field_item_privacy_setting' => 'right',
+      'generic_dynamic_field_2' => 'right',
+      'group_collab_actions' => 'right',
+      'group_access' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
