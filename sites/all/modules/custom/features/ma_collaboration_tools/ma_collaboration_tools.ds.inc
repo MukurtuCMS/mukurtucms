@@ -111,10 +111,10 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->settings = array(
     'generic_dynamic_field' => array(
       'weight' => '2',
-      'label' => 'above',
+      'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
-        'show_title' => 1,
+        'show_title' => 0,
         'title_wrapper' => '',
         'ctools' => 'a:3:{s:4:"conf";a:0:{}s:4:"type";s:11:"views_panes";s:7:"subtype";s:14:"documents-full";}',
         'load_terms' => 0,
@@ -145,11 +145,6 @@ function ma_collaboration_tools_ds_field_settings_info() {
     ),
     'edit_collab_section_link' => array(
       'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'title' => array(
-      'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -951,26 +946,24 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
-        0 => 'title',
-        3 => 'body',
-        4 => 'generic_dynamic_field',
-        6 => 'comments',
-      ),
       'right' => array(
-        1 => 'add_content_to_collab_sect_link',
-        2 => 'edit_collab_section_link',
-        5 => 'field_community_ref',
-        7 => 'group_documents',
-        8 => 'og_group_ref',
-        9 => 'field_item_privacy_setting',
-        10 => 'generic_dynamic_field_2',
-        11 => 'group_collab_actions',
-        12 => 'group_access',
+        0 => 'add_content_to_collab_sect_link',
+        1 => 'edit_collab_section_link',
+        4 => 'field_community_ref',
+        6 => 'group_documents',
+        7 => 'og_group_ref',
+        8 => 'field_item_privacy_setting',
+        9 => 'generic_dynamic_field_2',
+        10 => 'group_collab_actions',
+        11 => 'group_access',
+      ),
+      'left' => array(
+        2 => 'body',
+        3 => 'generic_dynamic_field',
+        5 => 'comments',
       ),
     ),
     'fields' => array(
-      'title' => 'left',
       'add_content_to_collab_sect_link' => 'right',
       'edit_collab_section_link' => 'right',
       'body' => 'left',

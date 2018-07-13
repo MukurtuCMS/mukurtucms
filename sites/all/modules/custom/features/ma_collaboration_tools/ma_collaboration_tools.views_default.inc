@@ -27,7 +27,8 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'table';
   $handler->display->display_options['style_options']['columns'] = array(
     'title' => 'title',
@@ -42,6 +43,11 @@ function ma_collaboration_tools_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* Relationship: Content: Author */
+  $handler->display->display_options['relationships']['uid']['id'] = 'uid';
+  $handler->display->display_options['relationships']['uid']['table'] = 'node';
+  $handler->display->display_options['relationships']['uid']['field'] = 'uid';
+  $handler->display->display_options['relationships']['uid']['required'] = TRUE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -61,7 +67,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['sorts']['weight']['id'] = 'weight';
   $handler->display->display_options['sorts']['weight']['table'] = 'draggableviews_structure';
   $handler->display->display_options['sorts']['weight']['field'] = 'weight';
-  $handler->display->display_options['sorts']['weight']['draggableviews_setting_view'] = 'documents:full';
+  $handler->display->display_options['sorts']['weight']['draggableviews_setting_view'] = 'documents:mini';
   $handler->display->display_options['sorts']['weight']['draggableviews_setting_new_items_bottom_list'] = 0;
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
@@ -94,7 +100,39 @@ function ma_collaboration_tools_views_default_views() {
 
   /* Display: Full */
   $handler = $view->new_display('panel_pane', 'Full', 'full');
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'fields';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
   $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+  /* Field: Content: Attachments */
+  $handler->display->display_options['fields']['field_oa_media']['id'] = 'field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media']['table'] = 'field_data_field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media']['field'] = 'field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media']['label'] = '';
+  $handler->display->display_options['fields']['field_oa_media']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['field_oa_media']['alter']['path'] = 'node/[nid]';
+  $handler->display->display_options['fields']['field_oa_media']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_oa_media']['click_sort_column'] = 'fid';
+  $handler->display->display_options['fields']['field_oa_media']['type'] = 'file_rendered';
+  $handler->display->display_options['fields']['field_oa_media']['settings'] = array(
+    'file_view_mode' => 'preview',
+  );
+  $handler->display->display_options['fields']['field_oa_media']['delta_limit'] = '1';
+  $handler->display->display_options['fields']['field_oa_media']['delta_offset'] = '0';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -102,6 +140,60 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['title']['label'] = '';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_type'] = 'h3';
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  /* Field: User: Name */
+  $handler->display->display_options['fields']['name']['id'] = 'name';
+  $handler->display->display_options['fields']['name']['table'] = 'users';
+  $handler->display->display_options['fields']['name']['field'] = 'name';
+  $handler->display->display_options['fields']['name']['relationship'] = 'uid';
+  $handler->display->display_options['fields']['name']['label'] = '';
+  $handler->display->display_options['fields']['name']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['name']['element_label_colon'] = FALSE;
+  /* Field: Content: Post date */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'node';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['label'] = '';
+  $handler->display->display_options['fields']['created']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['created']['date_format'] = 'custom';
+  $handler->display->display_options['fields']['created']['custom_date_format'] = 'F j, Y';
+  $handler->display->display_options['fields']['created']['second_date_format'] = 'exif';
+  $handler->display->display_options['fields']['created']['oa_date'] = '0';
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = '';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'By [name] on [created]';
+  $handler->display->display_options['fields']['nothing']['alter']['path'] = 'node/[nid]';
+  $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
+  /* Field: Content: Attachments */
+  $handler->display->display_options['fields']['field_oa_media_1']['id'] = 'field_oa_media_1';
+  $handler->display->display_options['fields']['field_oa_media_1']['table'] = 'field_data_field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media_1']['field'] = 'field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media_1']['label'] = '';
+  $handler->display->display_options['fields']['field_oa_media_1']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_oa_media_1']['click_sort_column'] = 'fid';
+  $handler->display->display_options['fields']['field_oa_media_1']['delta_offset'] = '0';
+  /* Field: Content: Body */
+  $handler->display->display_options['fields']['body']['id'] = 'body';
+  $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
+  $handler->display->display_options['fields']['body']['field'] = 'body';
+  $handler->display->display_options['fields']['body']['label'] = '';
+  $handler->display->display_options['fields']['body']['alter']['trim_whitespace'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['max_length'] = '600';
+  $handler->display->display_options['fields']['body']['alter']['more_link'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['more_link_text'] = 'more...';
+  $handler->display->display_options['fields']['body']['alter']['more_link_path'] = 'node/[nid]';
+  $handler->display->display_options['fields']['body']['alter']['strip_tags'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['trim'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['html'] = TRUE;
+  $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['body']['settings'] = array(
+    'trim_length' => '600',
+  );
 
   /* Display: mini */
   $handler = $view->new_display('panel_pane', 'mini', 'mini');
@@ -113,6 +205,10 @@ function ma_collaboration_tools_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('author'),
+    t('Content'),
+    t('All'),
+    t('Full'),
     t('Items per page'),
     t('- All -'),
     t('Offset'),
@@ -120,9 +216,9 @@ function ma_collaboration_tools_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('Content'),
-    t('All'),
-    t('Full'),
+    t('Nid'),
+    t('By [name] on [created]'),
+    t('more...'),
     t('View panes'),
     t('mini'),
   );

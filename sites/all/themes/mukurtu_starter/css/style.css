@@ -10952,3 +10952,17 @@ a:hover {
 .view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon.new i {
   color: rgba(64, 161, 58, 0.7);
 }
+.view-documents .views-row {
+  border-top: 1px solid #EAEAEA;
+  padding: 15px 0 15px 0;
+}
+.view-documents h3 {
+  margin-top: 0;
+}
+.view-documents .views-field-field-oa-media {
+  float: right;
+}
+.view-documents .views-field-field-oa-media-1,
+.view-documents .views-field-body {
+  margin-top: 5px;
+}
