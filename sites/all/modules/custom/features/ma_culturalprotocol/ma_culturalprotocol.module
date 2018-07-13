@@ -447,6 +447,40 @@ function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL) {
 }
 
 /**
+ * Collab Pages functions shared with cultural protocol feature. Included here because ma_collaboration_tools can be disabled.
+ */
+
+/**
+ * Overall map of the collab pages types, to be used by the helper functions below.
+ */
+function ma_culturalprotocol_collab_node_types_map() {
+  return [
+    'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
+    'discussion_topic' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
+    'document_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
+  ];
+}
+
+/**
+ * Get the collab child node types
+ */
+function ma_culturalprotocol_collab_child_node_types() {
+  return array_keys(ma_culturalprotocol_collab_node_types_map());
+}
+
+/**
+ * Get the collab parent node types
+ */
+function ma_culturalprotocol_collab_parent_node_types() {
+  $parent_types = [];
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
+    $parent_types[] = $child_type_props['parent'];
+  }
+  return $parent_types;
+}
+
+
+/**
  * Internal function used by the helper functions.
  */
 function _ma_cultural_protocol_get_node_types_in_cps() {
@@ -461,7 +495,7 @@ function _ma_cultural_protocol_get_node_types_in_cps() {
       'discussion_space',
       'document_library',
     ],
-    'collab_pages' => ma_collaboration_tools_child_node_types(),
+    'collab_pages' => ma_culturalprotocol_collab_child_node_types(),
   ];
 }
 

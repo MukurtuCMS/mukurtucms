@@ -344,7 +344,7 @@ function ma_core_create_content_block() {
           'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
         ];
         if (module_exists('ma_collaboration_tools')) {
-          foreach (ma_collaboration_tools_parent_node_types() as $parent_type) {
+          foreach (ma_culturalprotocol_collab_parent_node_types() as $parent_type) {
             $link_sources[$parent_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid;
           }
         }

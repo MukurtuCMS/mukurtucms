@@ -26,7 +26,7 @@ function ma_collaboration_tools_page_alter(&$data) {
       $result = $query
         ->addMetaData('account', user_load(1))
         ->entityCondition('entity_type', 'node')
-        ->entityCondition('bundle', ma_collaboration_tools_parent_node_types(), 'IN')
+        ->entityCondition('bundle', ma_culturalprotocol_collab_parent_node_types(), 'IN')
         ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
         ->fieldCondition('og_group_ref', 'target_id', $nid)
         ->execute();
@@ -90,39 +90,10 @@ function ma_collaboration_tools_page_alter(&$data) {
 }
 
 /**
- * Overall map of the collab pages types, to be used by the helper functions below.
- */
-function ma_collaboration_tools_collab_node_types_map() {
-  return [
-    'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
-    'discussion_topic' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
-    'document_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
-  ];
-}
-
-/**
- * Get the collab child node types
- */
-function ma_collaboration_tools_child_node_types() {
-  return array_keys(ma_collaboration_tools_collab_node_types_map());
-}
-
-/**
- * Get the collab parent node types
- */
-function ma_collaboration_tools_parent_node_types() {
-  $parent_types = [];
-  foreach (ma_collaboration_tools_collab_node_types_map() as $child_type => $child_type_props) {
-    $parent_types[] = $child_type_props['parent'];
-  }
-  return $parent_types;
-}
-
-/**
  * Get the child type from the parent type.
  */
 function ma_collaboration_tools_get_child_from_parent($parent_type) {
-  foreach (ma_collaboration_tools_collab_node_types_map() as $child_type => $child_type_props) {
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
     if ($child_type_props['parent'] == $parent_type) {
       return $child_type;
     }
@@ -133,7 +104,7 @@ function ma_collaboration_tools_get_child_from_parent($parent_type) {
  * Get the child type ref field to its parent.
  */
 function ma_collaboration_tools_get_child_ref_field_to_parent($child_type) {
-  return ma_collaboration_tools_collab_node_types_map()[$child_type]['ref_field'];
+  return ma_culturalprotocol_collab_node_types_map()[$child_type]['ref_field'];
 }
 
 /**
@@ -141,7 +112,7 @@ function ma_collaboration_tools_get_child_ref_field_to_parent($child_type) {
  */
 function ma_collaboration_tools_get_all_child_ref_fields() {
   $ref_fields = [];
-  foreach (ma_collaboration_tools_collab_node_types_map() as $child_type => $child_type_props) {
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
     $ref_fields[] = $child_type_props['ref_field'];
   }
   return $ref_fields;
@@ -166,7 +137,7 @@ function ma_collaboration_tools_preprocess_page(&$variables) {
 function ma_collaboration_tools_node_view($node, $view_mode) {
 
   // Update the item privacy text on the parent node view, to make more sense in this context and to hide it if there is only one protocol.
-  if ($view_mode == 'full' && in_array($node->type, ma_collaboration_tools_parent_node_types())) {
+  if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
     if (count($node->content['og_group_ref'][0]['#items']) < 2) {
       unset($node->content['field_item_privacy_setting'][0]['#markup']);
     }
@@ -182,7 +153,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
   }
 
   // On child collab pages, hide the "Following Users" and "Unfollowing Users" fields except to users that are Protocols Stewards of any of the child's CPs.
-  if ($view_mode == 'full' && in_array($node->type, ma_collaboration_tools_child_node_types())) {
+  if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
     $hide_following_users = 1;
     $groups_on_node = og_get_entity_groups('node', $node);
     $groups_on_node = array_values($groups_on_node['node']);
@@ -253,7 +224,7 @@ function ma_collaboration_tools_edit_collab_section_link($entity) {
  * Implements hook_node_presave().
  */
 function ma_collaboration_tools_node_presave($node) {
-  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
 
     // Copy the protocol, community, and item sharing field values for the child pages from their parent pages.
     $child_page_w = entity_metadata_wrapper('node', $node);
@@ -278,7 +249,7 @@ function ma_collaboration_tools_node_presave($node) {
  * Implements hook_node_postsave().
  */
 function ma_collaboration_tools_node_postsave($node, $op) {
-  if ($op == 'update' && in_array($node->type, ma_collaboration_tools_parent_node_types())) {
+  if ($op == 'update' && in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
 
     // When updating a parent page, load all its child pages and resave them, which will cause them to get their
     // protocol, community, and item sharing fields updated according to the parent, in case it was changed.
@@ -306,7 +277,7 @@ function ma_collaboration_tools_node_postsave($node, $op) {
  */
 function ma_collaboration_tools_node_delete($node) {
   // If a child node is deleted, also delete its Following node.
-  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
     if ($following_nid = ma_collaboration_tools_get_following_nid($node->nid)) { // This condition should always be met.
       node_delete($following_nid);
     }
@@ -322,7 +293,7 @@ function ma_collaboration_tools_node_insert($node) {
   // Create a Following Notification when a child page is created.
   ////
 
-  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
 
     // Create and save the Following Notification node.
     $values = array(
@@ -357,7 +328,7 @@ function ma_collaboration_tools_node_update($node) {
   // Create a Following Notification when a child page is updated.
   ////
 
-  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
     $entity_new = $cw = entity_metadata_wrapper('node', $node);
     $entity_old = entity_metadata_wrapper('node', $node->original);
 
@@ -484,7 +455,7 @@ function ma_collaboration_tools_comment_insert($comment) {
   ////
 
   $node = node_load($comment->nid);
-  if (in_array($node->type, ma_collaboration_tools_child_node_types())) {
+  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
     $following_nid = ma_collaboration_tools_get_following_nid($node->nid);
     if (!$following_nid) { // this should never happen but log an error in case it does.
       watchdog('ma_collaboration_tools', 'There is no Following node for node %nid', ['%nid' => $node->nid], WATCHDOG_ERROR);
@@ -714,7 +685,7 @@ function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
 
   // On Collab child pages
   $node_type = str_replace('_node_form', '', $form_id, $count);
-  if ($count && in_array($node_type, ma_collaboration_tools_child_node_types())) {
+  if ($count && in_array($node_type, ma_culturalprotocol_collab_child_node_types())) {
 
     // Adding a new collab page.
     if (is_null($form['nid']['#value'])) {
