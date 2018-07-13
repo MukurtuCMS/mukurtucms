@@ -173,26 +173,6 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_following_protocols' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_following_users' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_un_following_users' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
-    'field_document_doc_lib_section' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
   );
   $export['node|document_page|full'] = $ds_fieldsetting;
 
@@ -1009,20 +989,22 @@ function ma_collaboration_tools_ds_layout_settings_info() {
         1 => 'title',
         2 => 'body',
         3 => 'field_document_page_no_redirect',
-        4 => 'field_oa_media',
+        4 => 'field_test',
+        5 => 'field_oa_media',
         6 => 'group_following',
         7 => 'path',
         8 => 'redirect',
-        11 => 'field_following_protocols',
-        12 => 'field_following_users',
-        13 => 'field_un_following_users',
+        13 => 'field_following_protocols',
+        15 => 'field_following_users',
+        16 => 'field_un_following_users',
       ),
       'hidden' => array(
-        5 => 'field_item_privacy_setting',
-        9 => 'og_group_ref',
-        10 => 'field_community_ref',
-        14 => 'field_custom_notification_freq',
-        15 => '_add_existing_field',
+        9 => 'field_item_privacy_setting',
+        10 => 'og_group_ref',
+        11 => 'field_community_ref',
+        12 => 'field_custom_notification_freq',
+        14 => 'field_document_doc_lib_section',
+        17 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -1030,17 +1012,19 @@ function ma_collaboration_tools_ds_layout_settings_info() {
       'title' => 'ds_content',
       'body' => 'ds_content',
       'field_document_page_no_redirect' => 'ds_content',
+      'field_test' => 'ds_content',
       'field_oa_media' => 'ds_content',
-      'field_item_privacy_setting' => 'hidden',
       'group_following' => 'ds_content',
       'path' => 'ds_content',
       'redirect' => 'ds_content',
+      'field_item_privacy_setting' => 'hidden',
       'og_group_ref' => 'hidden',
       'field_community_ref' => 'hidden',
+      'field_custom_notification_freq' => 'hidden',
       'field_following_protocols' => 'ds_content',
+      'field_document_doc_lib_section' => 'hidden',
       'field_following_users' => 'ds_content',
       'field_un_following_users' => 'ds_content',
-      'field_custom_notification_freq' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(

@@ -2108,7 +2108,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 10,
+      'weight' => 11,
     ),
   );
 
@@ -2175,7 +2175,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => FALSE,
       ),
       'type' => 'textfield_&_textfield',
-      'weight' => 16,
+      'weight' => 12,
     ),
   );
 
@@ -2237,63 +2237,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 17,
-    ),
-  );
-
-  // Exported field_instance:
-  // 'node-document_page-field_document_page_no_redirect'.
-  $field_instances['node-document_page-field_document_page_no_redirect'] = array(
-    'bundle' => 'document_page',
-    'comment_alter' => 0,
-    'default_value' => array(
-      0 => array(
-        'value' => 0,
-      ),
-    ),
-    'deleted' => 0,
-    'description' => 'If checked, show the node detail page (Drupal default behavior).  If unchecked, show the first file attachment.',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 30,
-      ),
-      'featured' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 4,
-      ),
-      'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 34,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_document_page_no_redirect',
-    'label' => 'Show page instead of file?',
-    'required' => 0,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'display_label' => 1,
-      ),
-      'type' => 'options_onoff',
-      'weight' => 3,
+      'weight' => 13,
     ),
   );
 
@@ -2487,7 +2431,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 5,
+      'weight' => 9,
     ),
   );
 
@@ -2500,9 +2444,11 @@ function ma_collaboration_tools_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'file',
-        'settings' => array(),
-        'type' => 'file_table',
+        'module' => 'file_entity',
+        'settings' => array(
+          'file_view_mode' => 'search_result',
+        ),
+        'type' => 'file_rendered',
         'weight' => 2,
       ),
       'featured' => array(
@@ -2516,9 +2462,11 @@ function ma_collaboration_tools_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'hidden',
-        'module' => 'file',
-        'settings' => array(),
-        'type' => 'file_table',
+        'module' => 'file_entity',
+        'settings' => array(
+          'file_view_mode' => 'collab_doc_attachments',
+        ),
+        'type' => 'file_rendered',
         'weight' => 2,
       ),
       'teaser' => array(
@@ -2528,9 +2476,11 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 4,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_oa_media',
-    'label' => 'Attachments',
+    'label' => 'Attachment(s)',
     'required' => 0,
     'settings' => array(
       'description_field' => 0,
@@ -2544,10 +2494,9 @@ function ma_collaboration_tools_field_default_field_instances() {
       'module' => 'media',
       'settings' => array(
         'allowed_schemes' => array(
+          'oembed' => 0,
           'private' => 'private',
           'public' => 'public',
-          'vimeo' => 'vimeo',
-          'youtube' => 'youtube',
         ),
         'allowed_types' => array(
           'audio' => 0,
@@ -2561,22 +2510,10 @@ function ma_collaboration_tools_field_default_field_instances() {
           'media_internet' => 'media_internet',
           'upload' => 'upload',
         ),
-        'manualcrop_crop_info' => TRUE,
-        'manualcrop_default_crop_area' => TRUE,
-        'manualcrop_enable' => FALSE,
-        'manualcrop_inline_crop' => FALSE,
-        'manualcrop_instant_crop' => FALSE,
-        'manualcrop_instant_preview' => TRUE,
-        'manualcrop_keyboard' => TRUE,
-        'manualcrop_maximize_default_crop_area' => FALSE,
-        'manualcrop_require_cropping' => array(),
-        'manualcrop_styles_list' => array(),
-        'manualcrop_styles_mode' => 'include',
-        'manualcrop_thumblist' => FALSE,
-        'progress_indicator' => 'throbber',
+        'treeable' => 0,
       ),
       'type' => 'media_generic',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -2768,7 +2705,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'og_complex',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -4741,6 +4678,7 @@ http://www.whitehouse.gov/',
   // Translatables
   // Included for use with string extractors like potx.
   t('All users notified (of created, or most recent update)');
+  t('Attachment(s)');
   t('Attachments');
   t('Author (of node insert/update or comment)');
   t('Body');
@@ -4762,7 +4700,6 @@ http://www.whitehouse.gov/',
   t('Following Users');
   t('Geocoded Location');
   t('Groups audience');
-  t('If checked, show the node detail page (Drupal default behavior).  If unchecked, show the first file attachment.');
   t('Individual users following this document, irrespective of their Protocol membership.
 ');
   t('Individual users following this event, irrespective of their Protocol membership.
@@ -4778,7 +4715,6 @@ http://www.whitehouse.gov/');
   t('Pre-Actions');
   t('Protocol');
   t('Section');
-  t('Show page instead of file?');
   t('Subject');
   t('The selected Protocols\' members will follow this document. Individually, they may choose to un-follow it.');
   t('The selected Protocols\' members will follow this event. Individually, they may choose to un-follow it.');

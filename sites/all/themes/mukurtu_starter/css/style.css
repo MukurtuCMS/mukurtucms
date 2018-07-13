@@ -10989,3 +10989,10 @@ a:hover {
   margin-bottom: 0px !important;
   margin-top: 10px;
 }
+.node-document-page.view-mode-full .field-name-field-media-title {
+  font-size: 1.5em;
+}
+.node-document-page.view-mode-full .file {
+  border-top: 1px solid #EAEAEA;
+  padding: 15px 0 15px 0;
+}
