@@ -10952,17 +10952,31 @@ a:hover {
 .view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon.new i {
   color: rgba(64, 161, 58, 0.7);
 }
-.view-documents .views-row {
+.view-documents.view-display-id-full .views-row {
   border-top: 1px solid #EAEAEA;
   padding: 15px 0 15px 0;
 }
-.view-documents h3 {
+.view-documents.view-display-id-full h3 {
   margin-top: 0;
 }
-.view-documents .views-field-field-oa-media {
+.view-documents.view-display-id-full .views-field-field-oa-media {
   float: right;
 }
-.view-documents .views-field-field-oa-media-1,
-.view-documents .views-field-body {
+.view-documents.view-display-id-full .views-field-field-oa-media-1,
+.view-documents.view-display-id-full .views-field-body {
   margin-top: 5px;
+}
+.view-documents.view-display-id-mini tr {
+  background-color: transparent !important;
+}
+.view-documents.view-display-id-mini td {
+  padding: 0;
+  border: none;
+}
+.view-documents.view-display-id-mini table {
+  margin-bottom: 0px !important;
+}
+.view-documents.view-display-id-mini .form-group {
+  margin-bottom: 0px !important;
+  margin-top: 10px;
 }
