@@ -10,6 +10,16 @@
 function ma_collaboration_tools_user_default_permissions() {
   $permissions = array();
 
+  // Exported permission: 'access draggableviews'.
+  $permissions['access draggableviews'] = array(
+    'name' => 'access draggableviews',
+    'roles' => array(
+      'anonymous user' => 'anonymous user',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'draggableviews',
+  );
+
   // Exported permission: 'create following_notification content'.
   $permissions['create following_notification content'] = array(
     'name' => 'create following_notification content',

@@ -236,6 +236,7 @@ features[og_features_permission][] = node:cultural_protocol_group:update own doc
 features[og_features_permission][] = node:cultural_protocol_group:update own event content
 features[og_features_role][] = node:cultural_protocol_group:contributor
 features[og_features_role][] = node:cultural_protocol_group:protocol steward
+features[user_permission][] = access draggableviews
 features[user_permission][] = create following_notification content
 features[user_permission][] = delete any following_notification content
 features[user_permission][] = delete own following_notification content

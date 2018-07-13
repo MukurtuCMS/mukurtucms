@@ -1512,3 +1512,20 @@ function ma_collaboration_tools_get_following_nid($child_nid) {
     ->execute();
   return reset($result['node'])->nid;
 }
+
+/**
+ * Implements hook_views_post_build.
+ */
+function ma_collaboration_tools_views_post_build(&$view) {
+  if ($view->name == 'documents' && $view->current_display == 'mini') {
+
+    // The provided draggable_views permission is per core role, but we need to permission according
+    // to whether the user has edit access to the Document Library, so we set the core permission to everyone and handle here instead.
+    $doclib = node_load($view->args[0]);
+    if (!$doclib OR !node_access('update', $doclib)) {
+      unset ($view->field['draggableviews']);
+    }
+
+  }
+
+}
