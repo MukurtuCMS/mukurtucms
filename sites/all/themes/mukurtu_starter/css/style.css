@@ -10955,12 +10955,21 @@ a:hover {
 .view-documents.view-display-id-full .views-row {
   border-top: 1px solid #EAEAEA;
   padding: 15px 0 15px 0;
+  min-height: 130px;
 }
 .view-documents.view-display-id-full h3 {
   margin-top: 0;
+  font-weight: 400;
+}
+.view-documents.view-display-id-full .views-more-link {
+  float: right;
+  margin-top: 10px;
 }
 .view-documents.view-display-id-full .views-field-field-oa-media {
   float: right;
+}
+.view-documents.view-display-id-full .views-field-field-oa-media ~ .views-field {
+  padding-right: 130px;
 }
 .view-documents.view-display-id-full .views-field-field-oa-media-1,
 .view-documents.view-display-id-full .views-field-body {
