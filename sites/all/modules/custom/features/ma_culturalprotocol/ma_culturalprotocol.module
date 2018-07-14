@@ -479,6 +479,12 @@ function ma_culturalprotocol_collab_parent_node_types() {
   return $parent_types;
 }
 
+/**
+ * Get all the collab node types
+ */
+function ma_culturalprotocol_all_collab_node_types() {
+  return array_merge(['following_notification'], ma_culturalprotocol_collab_parent_node_types(), ma_culturalprotocol_collab_child_node_types());
+}
 
 /**
  * Internal function used by the helper functions.

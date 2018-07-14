@@ -29,6 +29,14 @@ function mukurtu_splash_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  // Callback that toggles the Dictionary feature
+  $items['admin/manage-collaboration-tools'] = array(
+    'title' => 'Manage Collaboration Tools',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_splash_manage_collaboration_tools'),
+    'access arguments' => array('administer site configuration'),
+  );
+
   return $items;
 }
 
@@ -81,6 +89,27 @@ function ma_splash_toggle_dictionary () {
     drupal_set_message ('The Dictionary has been enabled.');
   }
   drupal_goto ('dashboard');
+}
+
+/**
+ * Manage Collaboration Tools form
+ */
+function ma_splash_manage_collaboration_tools($form, &$form_state) {
+
+  $form['#prefix'] = "<h3>Overview</h3><p>Collaboration Tools is beta functionality that allows Cultural Protocols to host collaborative content amongst its members. There are: <ul><li>Calendars, which contain Events</li><li>Discussion Spaces, which contain Discussion Topics</li><li>Document Libraries, which contain Document Pages</li></ul><p>The parent types -- Calendars, Discussion Spaces, and Document Libraries -- can belong to one or more Cultural Protocols. The child types -- Events, Discussion Topics, and Document Pages -- belong each to only one parent, inheriting their parent's Cultural Protocol(s).</p><p>Child content may be commented on by members of its Cultural Protocol(s). Comments may be nested, for subthreaded discussions.</p><p>Child content may be followed by individual users or all users of a Protocol, such that those users are emailed notifications whenever the content is updated or commented on. Users can limit their email notifications to daily or weekly digest formats. They can set a default notification frequency, and they can also override that frequency on a per-content basis, such that they are notified daily on changes/comments to content A, but immediately on changes/comments to content B.<p>Comment notifications, when sent immediately, may be replied to via email directly, which adds the email reply as its own comment. In this way, discussions can be carried out via email without logging on to the site.</p><p>Users are provided an overview page of all content they are following via a tab on their profile page. Here they can unfollow content, change their default notification frequency, and change their individual content notification freqencies.</p>";
+  
+  $form['submit_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('Click Here!'),
+  );
+
+  return $form;
+}
+
+/**
+ * Manage Collaboration Tools form submit handler
+ */
+function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
 }
 
 /**
@@ -480,6 +509,16 @@ function mukurtu_splash_block_site_config() {
               'description' => t('Go to the management page for Mukurtu specific modules.'),
           );
       }
+
+      if(user_access('administer site configuration')) {
+        $items[] = array (
+          'title' => 'Manage Collaboration Tools',
+          'href' => 'admin/manage-collaboration-tools',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('Enable, disable, and configure the Collaboration Tools'),
+        );
+      }
+
       $content = array ('content' => $items);
       $markup = theme('admin_block_content', $content);
 
