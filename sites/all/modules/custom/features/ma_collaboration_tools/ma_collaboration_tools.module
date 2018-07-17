@@ -1001,7 +1001,7 @@ function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) 
     foreach ($entity->field_following_users[LANGUAGE_NONE] AS $following_user) {
       if ($uid == $following_user['target_id']) {
         $following = TRUE;
-        $reasons[] = 'you have individually followed this item';
+        $reasons[] = 'you are individually following this item';
         break;
       }
     }
@@ -1026,7 +1026,7 @@ function ma_collaboration_tools_get_following_status_and_reasons($entity, $uid) 
       foreach ($entity->field_un_following_users[LANGUAGE_NONE] AS $unfollowing_user) {
         if ($uid == $unfollowing_user['target_id']) {
           $following = FALSE;
-          $reasons[] = 'you have individually unfollowed this item';
+          $reasons[] = 'you are individually unfollowing this item';
           break;
         }
       }
