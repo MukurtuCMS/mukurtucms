@@ -823,12 +823,12 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     'regions' => array(
       'left' => array(
         0 => 'discussion_topic_intro_field',
-        1 => 'body',
-        2 => 'field_oa_media',
-        3 => 'comments',
+        2 => 'body',
+        3 => 'field_oa_media',
+        4 => 'comments',
       ),
       'right' => array(
-        4 => 'follow_unfollow',
+        1 => 'follow_unfollow',
         5 => 'group_following',
         6 => 'field_following_protocols',
         7 => 'field_following_users',
@@ -837,10 +837,10 @@ function ma_collaboration_tools_ds_layout_settings_info() {
     ),
     'fields' => array(
       'discussion_topic_intro_field' => 'left',
+      'follow_unfollow' => 'right',
       'body' => 'left',
       'field_oa_media' => 'left',
       'comments' => 'left',
-      'follow_unfollow' => 'right',
       'group_following' => 'right',
       'field_following_protocols' => 'right',
       'field_following_users' => 'right',

@@ -1469,7 +1469,7 @@ function ma_collaboration_tools_preprocess_views_view_fields(&$vars) {
  */
 function ma_collaboration_tools_discussion_topic_intro($entity) {
   $dp = node_load($entity->field_discussion_disc_space[LANGUAGE_NONE][0]['target_id']);
-  $output = 'By ' . l($entity->name, $entity->uid) . ' on ' . date('F j, Y - g:ia', $entity->created) . ' in ' . l($dp->title, 'node/' . $dp->nid);
+  $output = 'By ' . l($entity->name, $entity->uid) . ' on ' . date('F j, Y - g:ia', $entity->created) . ' in ' . l($dp->title, 'node/' . $dp->nid . '.');
     return $output;
 }
 
