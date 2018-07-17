@@ -146,7 +146,7 @@ function ma_splash_manage_collaboration_tools($form, &$form_state) {
 
   $form['configure']['3'] = [
     '#type' => 'item',
-    '#markup' => t('3. For daily and weekly email notification digests to work on lower traffic sites, a cron job needs to be set up to run for the site by your system administrator. This is explained on ' . l('drupal.org', 'https://www.drupal.org/docs/7/setting-up-cron/overview') . '. The automated cron explained on that page works, but as it relies on user visits, low traffic sites might see late digest mailouts. For example, if someone comments on a collaboration document on Monday, and a user following that document has their notification frequency set to daily, but no one visits the site again until Thursday, the user will only receive the email notification on Thursday. On higher traffic sites, this should not be a problem, but lower traffic sites will want to set the cron job (or use a cron job service), referred to as the "second way" in the page linked above. A cron frequncy of every hour is sufficient.')
+    '#markup' => t('3. For replying via email to comments to work, and for daily and weekly email notification digests to work, a cron job needs to be set up to run on the site. Drupal\'s "automatic cron" method is not sufficient for this. Instead, have your system administrator set up a cron job (or use a cron service) as explained as the "second way" at ' . l('drupal.org', 'https://www.drupal.org/docs/7/setting-up-cron/overview') . '. Comments are imported from email replies on every cron run, so a frequency of at least every 5 minutes is recommended. There is no need to disable automatic cron.')
   ];
   $form['submit_button'] = [
     '#type' => 'submit',
