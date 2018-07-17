@@ -566,26 +566,15 @@ print ma_collaboration_tools_show_default_notification_frequency_form($view);
   $handler->display->display_options['fields']['type']['id'] = 'type';
   $handler->display->display_options['fields']['type']['table'] = 'node';
   $handler->display->display_options['fields']['type']['field'] = 'type';
-  /* Field: Content: Calendar */
-  $handler->display->display_options['fields']['field_event_calendar_section']['id'] = 'field_event_calendar_section';
-  $handler->display->display_options['fields']['field_event_calendar_section']['table'] = 'field_data_field_event_calendar_section';
-  $handler->display->display_options['fields']['field_event_calendar_section']['field'] = 'field_event_calendar_section';
-  $handler->display->display_options['fields']['field_event_calendar_section']['exclude'] = TRUE;
-  $handler->display->display_options['fields']['field_event_calendar_section']['alter']['alter_text'] = TRUE;
-  $handler->display->display_options['fields']['field_event_calendar_section']['alter']['text'] = 'Calendar: [title]';
-  $handler->display->display_options['fields']['field_event_calendar_section']['settings'] = array(
-    'bypass_access' => 0,
-    'link' => 1,
-  );
-  $handler->display->display_options['fields']['field_event_calendar_section']['group_columns'] = array(
-    'target_id' => 'target_id',
-  );
-  /* Field: Global: Custom text */
-  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
-  $handler->display->display_options['fields']['nothing']['table'] = 'views';
-  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
-  $handler->display->display_options['fields']['nothing']['label'] = 'Parent';
-  $handler->display->display_options['fields']['nothing']['alter']['text'] = '[field_event_calendar_section] ';
+  /* Field: Global: PHP */
+  $handler->display->display_options['fields']['php_3']['id'] = 'php_3';
+  $handler->display->display_options['fields']['php_3']['table'] = 'views';
+  $handler->display->display_options['fields']['php_3']['field'] = 'php';
+  $handler->display->display_options['fields']['php_3']['label'] = 'Parent';
+  $handler->display->display_options['fields']['php_3']['use_php_setup'] = 0;
+  $handler->display->display_options['fields']['php_3']['php_output'] = '<?php ma_collaboration_tools_show_parent($data->nid); ?>';
+  $handler->display->display_options['fields']['php_3']['use_php_click_sortable'] = '0';
+  $handler->display->display_options['fields']['php_3']['php_click_sortable'] = '';
   /* Field: Content: Updated date */
   $handler->display->display_options['fields']['changed']['id'] = 'changed';
   $handler->display->display_options['fields']['changed']['table'] = 'node';
@@ -653,10 +642,7 @@ print ma_collaboration_tools_generate_notication_frequency_form($view, $data);
     t('Not following any items.'),
     t('Title'),
     t('Type'),
-    t('Calendar'),
-    t('Calendar: [title]'),
     t('Parent'),
-    t('[field_event_calendar_section] '),
     t('Updated date'),
     t('Reason Following'),
     t('Unfollow'),
