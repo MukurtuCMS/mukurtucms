@@ -396,7 +396,7 @@ return ma_collaboration_tools_edit_collab_section_link($entity);
   $ds_field->ui_limit = '';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<?php return ma_culturalprotocol_follow_unfollow($entity) ?>',
+      'value' => '<?php return ma_culturalprotocol_follow_unfollow($entity); ?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,
