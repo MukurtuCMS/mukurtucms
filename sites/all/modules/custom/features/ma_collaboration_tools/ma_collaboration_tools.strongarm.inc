@@ -1392,7 +1392,7 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'pathauto_node_discussion_topic_pattern';
-  $strongarm->value = 'discussion-post/[node:title]';
+  $strongarm->value = 'discussion-topic/[node:title]';
   $export['pathauto_node_discussion_topic_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -1415,6 +1415,13 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->name = 'pathauto_node_event_pattern';
   $strongarm->value = 'event/[node:title]';
   $export['pathauto_node_event_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_following_notification_pattern';
+  $strongarm->value = '';
+  $export['pathauto_node_following_notification_pattern'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

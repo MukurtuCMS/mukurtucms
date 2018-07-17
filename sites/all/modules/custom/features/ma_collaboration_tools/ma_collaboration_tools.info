@@ -376,6 +376,7 @@ features[variable][] = pathauto_node_discussion_topic_pattern
 features[variable][] = pathauto_node_document_library_pattern
 features[variable][] = pathauto_node_document_page_pattern
 features[variable][] = pathauto_node_event_pattern
+features[variable][] = pathauto_node_following_notification_pattern
 features[variable][] = pathauto_node_oa_ical_importer_pattern
 features[views_view][] = documents
 features[views_view][] = event_list
