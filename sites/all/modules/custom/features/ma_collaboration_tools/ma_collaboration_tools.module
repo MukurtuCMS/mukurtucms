@@ -1193,7 +1193,6 @@ function ma_collaboration_tools_notification_frequency_default($form, &$form_sta
  */
 function ma_collaboration_tools_notification_frequency_default_submit ($form, &$form_state) {
 
-
   $account = user_load(arg(1));
   $existing_freq = $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
   $new_freq = $form_state['values']['notification_frequency_default'];

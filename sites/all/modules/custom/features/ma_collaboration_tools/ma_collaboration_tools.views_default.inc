@@ -43,11 +43,23 @@ function ma_collaboration_tools_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'There are no documents in this library yet.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Relationship: Content: Author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   $handler->display->display_options['relationships']['uid']['required'] = TRUE;
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['id'] = 'field_document_doc_lib_section_target_id';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['table'] = 'field_data_field_document_doc_lib_section';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['field'] = 'field_document_doc_lib_section_target_id';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['required'] = TRUE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -74,15 +86,16 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Contextual filter: Content: Document Library (field_document_doc_lib_section) */
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['id'] = 'field_document_doc_lib_section_target_id';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['table'] = 'field_data_field_document_doc_lib_section';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['field'] = 'field_document_doc_lib_section_target_id';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['default_argument_type'] = 'node';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section_target_id']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Nid */
+  $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['table'] = 'node';
+  $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'field_document_doc_lib_section_target_id';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
@@ -194,9 +207,29 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['body']['settings'] = array(
     'trim_length' => '600',
   );
+  $handler->display->display_options['argument_input'] = array(
+    'nid' => array(
+      'type' => 'user',
+      'context' => 'entity:alphabetical_order_definition.cer',
+      'context_optional' => 0,
+      'panel' => '0',
+      'fixed' => '',
+      'label' => 'Content: Nid',
+    ),
+  );
 
   /* Display: mini */
   $handler = $view->new_display('panel_pane', 'mini', 'mini');
+  $handler->display->display_options['argument_input'] = array(
+    'nid' => array(
+      'type' => 'user',
+      'context' => 'entity:alphabetical_order_definition.cer',
+      'context_optional' => 0,
+      'panel' => '0',
+      'fixed' => '',
+      'label' => 'Content: Nid',
+    ),
+  );
   $translatables['documents'] = array(
     t('Master'),
     t('more'),
@@ -205,7 +238,9 @@ function ma_collaboration_tools_views_default_views() {
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('There are no documents in this library yet.'),
     t('author'),
+    t('Content entity referenced from field_document_doc_lib_section'),
     t('Content'),
     t('All'),
     t('Full'),
