@@ -273,9 +273,37 @@ function ma_collaboration_tools_node_postsave($node, $op) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Warn users when deleting parent collab pages.
+ */
+function ma_collaboration_tools_form_node_delete_confirm_alter(&$form, &$form_state) {
+  if (in_array($form['#node']->type, ma_culturalprotocol_collab_parent_node_types())) {
+    $form['description']['#markup'] = '<div style="font-size: large; color: #d9534f;">WARNING: this will delete this page and all its child collaboration pages.</div><br />';
+  }
+}
+
+/**
  * Implements hook_node_delete().
  */
 function ma_collaboration_tools_node_delete($node) {
+
+  // When deleting parent collab pages, delete its children.
+  if (in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
+    $child_target_field = ma_collaboration_tools_get_child_ref_field_to_parent(ma_collaboration_tools_get_child_from_parent($node->type));
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->addMetaData('account', user_load(1))
+      ->entityCondition('entity_type', 'node')
+      ->fieldCondition($child_target_field, 'target_id', $node->nid)
+      ->execute();
+    if (isset($result['node']) && count($result['node'])) {
+      foreach(array_keys($result['node']) as $child_nid) {
+        node_delete($child_nid);
+      }
+    }
+  }
+
   // If a child node is deleted, also delete its Following node.
   if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
     if ($following_nid = ma_collaboration_tools_get_following_nid($node->nid)) { // This condition should always be met.
@@ -1514,5 +1542,4 @@ function ma_collaboration_tools_views_post_build(&$view) {
   }
 
 }
-
 
