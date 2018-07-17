@@ -691,9 +691,13 @@ function ma_collaboration_tools_form_alter(&$form, &$form_state, $form_id) {
     if (is_null($form['nid']['#value'])) {
 
       // Prepopulate the reference to the section page with the argument from the URL.
+      $ref_field = ma_collaboration_tools_get_child_ref_field_to_parent($node_type);
       if (is_numeric(arg(3))) {
-        $ref_field = ma_collaboration_tools_get_child_ref_field_to_parent($node_type);
         $form[$ref_field][LANGUAGE_NONE]['#value'] = arg(3);
+        $form_state['storage']['parent'] = arg(3);
+      }
+      elseif (arg(1) == 'ajax' && isset($form_state['storage']['parent'])) {
+        $form[$ref_field][LANGUAGE_NONE]['#value'] = $form_state['storage']['parent'];
       }
     }
 
