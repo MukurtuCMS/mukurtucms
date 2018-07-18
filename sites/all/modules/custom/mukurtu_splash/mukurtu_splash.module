@@ -161,6 +161,11 @@ function ma_splash_manage_collaboration_tools($form, &$form_state) {
 function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
   variable_set('collab_tools_enabled', $form_state['values']['collab_tools_enabled']);
   if ($form_state['values']['collab_tools_enabled']) {
+
+    // Enable the feature
+    module_enable(['ma_collaboration_tools']);
+
+    // Set the mailhandler mailbox
     variable_set('mailcomment_mailbox', $form_state['values']['address']);
     variable_set('collab_tools_email_domain', $form_state['values']['domain']);
     variable_set('collab_tools_email_username', $form_state['values']['name']);
@@ -192,12 +197,20 @@ function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
       ->key(array('mail' => 'collaboration_tools'))
       ->fields($mailbox)
       ->execute();
-    module_enable(['ma_collaboration_tools']);
+
+    // Show message
     drupal_set_message('Collaboration Tools settings saved.');
+    
   }
+
   else {
+
+    // Disable the feature
     module_disable(['ma_collaboration_tools']);
+
+    // Sow message
     drupal_set_message('Collaboration Tools settings saved.');
+
   }
 }
 
