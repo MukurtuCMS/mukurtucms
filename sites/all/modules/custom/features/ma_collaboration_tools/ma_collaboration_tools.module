@@ -47,6 +47,11 @@ function ma_collaboration_tools_page_alter(&$data) {
         }
         if (count($tabs)) {
 
+          // If we need to be on the last (newly created) tab (as linked from ma_core_create_content_block(), then redirect to that
+          if (arg(2) == 'last_tab') {
+            drupal_goto(drupal_get_path_alias('node/' . arg(1)), ['query' => ['qt-protocol-tabs' => count($tabs)]]);
+          }
+
           // Main CP tab
           $contents = '';
 
@@ -80,7 +85,7 @@ function ma_collaboration_tools_page_alter(&$data) {
             'style' => 'Excel',
             'hide_empty_tabs' => 1,
           ];
-          $built_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $tabs);
+          $built_tabs = quicktabs_build_quicktabs("protocol-tabs", $tab_settings, $tabs);
           $data['content']['system_main']['#markup'] = drupal_render($built_tabs);
 
         }
