@@ -103,6 +103,11 @@ projects[partial_date][patch][] = https://www.drupal.org/files/issues/add_proper
 ; Add ID to handle multiple carousels
 projects[owlcarousel][patch][] = contrib/0001-Add-ID-to-handle-multiple-carousels.patch
 
+;;; Quicktabs
+; Remember collaboration parent page tab on CP, so that when a child page is added, it will return to the parent tab.
+; This is from  https://www.drupal.org/files/issues/quicktabs-tab-history-1454486-35.patch with a very minor edit to the JS to only remember tab history for the CP quicktabs (otherwise it remembers tab history for Community Records as well, which we don't want).
+projects[quicktabs][patch][] = contrib/remember_cp_collab_tab.patch
+
 ;;; Scald
 ; Use simple dewplayer for audio
 projects[scald][patch][] = contrib/use_simple_dewplayer_for_audio.patch
