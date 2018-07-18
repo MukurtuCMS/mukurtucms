@@ -109,8 +109,18 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'document_library';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'add_content_to_collab_sect_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'edit_collab_section_link' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'generic_dynamic_field' => array(
-      'weight' => '2',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -125,7 +135,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       ),
     ),
     'generic_dynamic_field_2' => array(
-      'weight' => '5',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -138,18 +148,8 @@ function ma_collaboration_tools_ds_field_settings_info() {
         ),
       ),
     ),
-    'add_content_to_collab_sect_link' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'edit_collab_section_link' => array(
-      'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'comments' => array(
-      'weight' => '3',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -926,34 +926,34 @@ function ma_collaboration_tools_ds_layout_settings_info() {
   $ds_layout->layout = 'ds_2col';
   $ds_layout->settings = array(
     'regions' => array(
+      'left' => array(
+        0 => 'body',
+        3 => 'generic_dynamic_field',
+        4 => 'comments',
+      ),
       'right' => array(
-        0 => 'add_content_to_collab_sect_link',
-        1 => 'edit_collab_section_link',
-        4 => 'field_community_ref',
-        6 => 'group_documents',
-        7 => 'og_group_ref',
-        8 => 'field_item_privacy_setting',
-        9 => 'generic_dynamic_field_2',
+        1 => 'add_content_to_collab_sect_link',
+        2 => 'edit_collab_section_link',
+        5 => 'group_documents',
+        6 => 'field_community_ref',
+        7 => 'generic_dynamic_field_2',
+        8 => 'og_group_ref',
+        9 => 'field_item_privacy_setting',
         10 => 'group_collab_actions',
         11 => 'group_access',
       ),
-      'left' => array(
-        2 => 'body',
-        3 => 'generic_dynamic_field',
-        5 => 'comments',
-      ),
     ),
     'fields' => array(
+      'body' => 'left',
       'add_content_to_collab_sect_link' => 'right',
       'edit_collab_section_link' => 'right',
-      'body' => 'left',
       'generic_dynamic_field' => 'left',
-      'field_community_ref' => 'right',
       'comments' => 'left',
       'group_documents' => 'right',
+      'field_community_ref' => 'right',
+      'generic_dynamic_field_2' => 'right',
       'og_group_ref' => 'right',
       'field_item_privacy_setting' => 'right',
-      'generic_dynamic_field_2' => 'right',
       'group_collab_actions' => 'right',
       'group_access' => 'right',
     ),

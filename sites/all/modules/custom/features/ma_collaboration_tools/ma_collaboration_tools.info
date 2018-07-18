@@ -117,6 +117,7 @@ features[field_group][] = group_access|node|document_library|full
 features[field_group][] = group_collab_actions|node|calendar|full
 features[field_group][] = group_collab_actions|node|discussion_space|full
 features[field_group][] = group_collab_actions|node|document_library|full
+features[field_group][] = group_documents|node|document_library|full
 features[field_group][] = group_event_details|node|event|full
 features[field_group][] = group_following|node|discussion_topic|form
 features[field_group][] = group_following|node|discussion_topic|full

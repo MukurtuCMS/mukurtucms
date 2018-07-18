@@ -168,11 +168,11 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Visibility',
-    'weight' => '7',
+    'weight' => '6',
     'children' => array(
-      0 => 'og_group_ref',
+      0 => 'field_community_ref',
       1 => 'field_item_privacy_setting',
-      2 => 'field_community_ref',
+      2 => 'og_group_ref',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -254,7 +254,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Actions',
-    'weight' => '6',
+    'weight' => '5',
     'children' => array(
       0 => 'add_content_to_collab_sect_link',
       1 => 'edit_collab_section_link',
@@ -271,6 +271,33 @@ function ma_collaboration_tools_field_group_info() {
     ),
   );
   $field_groups['group_collab_actions|node|document_library|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_documents|node|document_library|full';
+  $field_group->group_name = 'group_documents';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'document_library';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Documents',
+    'weight' => '3',
+    'children' => array(
+      0 => 'generic_dynamic_field_2',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-documents field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_documents|node|document_library|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -528,6 +555,7 @@ function ma_collaboration_tools_field_group_info() {
   // Included for use with string extractors like potx.
   t('Access');
   t('Actions');
+  t('Documents');
   t('Event Details');
   t('Following');
   t('Visibility');
