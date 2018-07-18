@@ -1038,7 +1038,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1102,7 +1102,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1177,7 +1177,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1379,7 +1379,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1514,7 +1514,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1641,7 +1641,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
