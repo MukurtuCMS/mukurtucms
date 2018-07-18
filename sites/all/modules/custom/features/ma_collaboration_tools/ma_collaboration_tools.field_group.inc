@@ -111,9 +111,9 @@ function ma_collaboration_tools_field_group_info() {
     'label' => 'Visibility',
     'weight' => '3',
     'children' => array(
-      0 => 'og_group_ref',
+      0 => 'field_community_ref',
       1 => 'field_item_privacy_setting',
-      2 => 'field_community_ref',
+      2 => 'og_group_ref',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

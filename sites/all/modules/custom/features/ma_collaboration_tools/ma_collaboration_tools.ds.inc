@@ -74,21 +74,6 @@ function ma_collaboration_tools_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'discussion_space';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'generic_dynamic_field' => array(
-      'weight' => '1',
-      'label' => 'above',
-      'format' => 'default',
-      'formatter_settings' => array(
-        'show_title' => 0,
-        'title_wrapper' => '',
-        'ctools' => 'a:3:{s:4:"conf";a:1:{s:9:"arguments";a:1:{s:3:"nid";s:9:"%node:nid";}}s:4:"type";s:11:"views_panes";s:7:"subtype";s:40:"oa_comment_topics-discussion_topics_pane";}',
-        'load_terms' => 0,
-        'ft' => array(
-          'lb' => 'Topics',
-          'lb-col' => TRUE,
-        ),
-      ),
-    ),
     'add_content_to_collab_sect_link' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -98,6 +83,21 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
+    ),
+    'generic_dynamic_field' => array(
+      'weight' => '1',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'show_title' => 0,
+        'title_wrapper' => '',
+        'ctools' => 'a:3:{s:4:"conf";a:7:{s:9:"use_pager";i:0;s:8:"pager_id";s:1:"1";s:14:"items_per_page";s:1:"0";s:9:"arguments";a:1:{s:3:"nid";s:9:"%node:nid";}s:14:"override_title";i:0;s:19:"override_title_text";s:0:"";s:22:"override_title_heading";s:2:"h2";}s:4:"type";s:11:"views_panes";s:7:"subtype";s:32:"oa_comment_topics-comment_topics";}',
+        'load_terms' => 0,
+        'ft' => array(
+          'lb' => 'Topics',
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
   );
   $export['node|discussion_space|full'] = $ds_fieldsetting;

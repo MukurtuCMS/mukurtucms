@@ -315,6 +315,11 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['relationships']['cid_1']['id'] = 'cid_1';
   $handler->display->display_options['relationships']['cid_1']['table'] = 'node_comment_statistics';
   $handler->display->display_options['relationships']['cid_1']['field'] = 'cid';
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_discussion_disc_space_target_id']['id'] = 'field_discussion_disc_space_target_id';
+  $handler->display->display_options['relationships']['field_discussion_disc_space_target_id']['table'] = 'field_data_field_discussion_disc_space';
+  $handler->display->display_options['relationships']['field_discussion_disc_space_target_id']['field'] = 'field_discussion_disc_space_target_id';
+  $handler->display->display_options['relationships']['field_discussion_disc_space_target_id']['required'] = TRUE;
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -446,15 +451,16 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['sorts']['last_date']['relationship'] = 'cid';
   $handler->display->display_options['sorts']['last_date']['group_type'] = 'max';
   $handler->display->display_options['sorts']['last_date']['order'] = 'DESC';
-  /* Contextual filter: Content: Discussion Space (field_discussion_disc_space) */
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['id'] = 'field_discussion_disc_space_target_id';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['table'] = 'field_data_field_discussion_disc_space';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['field'] = 'field_discussion_disc_space_target_id';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['default_argument_type'] = 'node';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['field_discussion_disc_space_target_id']['summary_options']['items_per_page'] = '25';
+  /* Contextual filter: Content: Nid */
+  $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['table'] = 'node';
+  $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'field_discussion_disc_space_target_id';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['filter_groups']['groups'] = array(
     1 => 'AND',
     2 => 'OR',
@@ -504,318 +510,13 @@ function oa_comment_views_default_views() {
   $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
   $handler->display->display_options['allow']['fields_override'] = 0;
   $handler->display->display_options['argument_input'] = array(
-    'field_discussion_disc_space_target_id' => array(
-      'type' => 'none',
+    'nid' => array(
+      'type' => 'user',
       'context' => 'entity:alphabetical_order_definition.cer',
       'context_optional' => 0,
       'panel' => '0',
       'fixed' => '',
-      'label' => 'Content: Discussion Space (field_discussion_disc_space)',
-    ),
-  );
-  $handler->display->display_options['inherit_panels_path'] = '1';
-
-  /* Display: User Topics */
-  $handler = $view->new_display('panel_pane', 'User Topics', 'comment_user_topics');
-  $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['title'] = 'Your Topics';
-  $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Content: Author uid */
-  $handler->display->display_options['arguments']['uid']['id'] = 'uid';
-  $handler->display->display_options['arguments']['uid']['table'] = 'node';
-  $handler->display->display_options['arguments']['uid']['field'] = 'uid';
-  $handler->display->display_options['arguments']['uid']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['uid']['default_argument_type'] = 'user';
-  $handler->display->display_options['arguments']['uid']['default_argument_options']['user'] = TRUE;
-  $handler->display->display_options['arguments']['uid']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['uid']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['uid']['summary_options']['items_per_page'] = '25';
-  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
-  $handler->display->display_options['filter_groups']['groups'] = array(
-    1 => 'AND',
-    2 => 'OR',
-    3 => 'OR',
-  );
-  $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type']['id'] = 'type';
-  $handler->display->display_options['filters']['type']['table'] = 'node';
-  $handler->display->display_options['filters']['type']['field'] = 'type';
-  $handler->display->display_options['filters']['type']['value'] = array(
-    'discussion_topic' => 'discussion_topic',
-  );
-  $handler->display->display_options['filters']['type']['group'] = 1;
-  $handler->display->display_options['filters']['type']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['type']['expose']['operator_id'] = 'type_op';
-  $handler->display->display_options['filters']['type']['expose']['label'] = 'Type';
-  $handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
-  $handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
-  $handler->display->display_options['filters']['type']['expose']['multiple'] = TRUE;
-  $handler->display->display_options['filters']['type']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['flagged']['id'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['table'] = 'flagging';
-  $handler->display->display_options['filters']['flagged']['field'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['relationship'] = 'flag_content_rel';
-  $handler->display->display_options['filters']['flagged']['value'] = '0';
-  $handler->display->display_options['filters']['flagged']['group'] = 1;
-  $handler->display->display_options['filters']['flagged']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['flagged']['expose']['operator_id'] = '';
-  $handler->display->display_options['filters']['flagged']['expose']['label'] = 'Include archived content';
-  $handler->display->display_options['filters']['flagged']['expose']['operator'] = 'flagged_op';
-  $handler->display->display_options['filters']['flagged']['expose']['identifier'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Field: Protocol (og_group_ref) */
-  $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['group'] = 1;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator_id'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['label'] = 'Groups audience';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['identifier'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Content: Section (oa_section_ref) */
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['group'] = 1;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator_id'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['label'] = 'Open Atrium Section';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['identifier'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Comment: ID */
-  $handler->display->display_options['filters']['cid']['id'] = 'cid';
-  $handler->display->display_options['filters']['cid']['table'] = 'comment';
-  $handler->display->display_options['filters']['cid']['field'] = 'cid';
-  $handler->display->display_options['filters']['cid']['relationship'] = 'cid';
-  $handler->display->display_options['filters']['cid']['operator'] = 'empty';
-  $handler->display->display_options['filters']['cid']['group'] = 2;
-  /* Filter criterion: Comment: Approved */
-  $handler->display->display_options['filters']['status']['id'] = 'status';
-  $handler->display->display_options['filters']['status']['table'] = 'comment';
-  $handler->display->display_options['filters']['status']['field'] = 'status';
-  $handler->display->display_options['filters']['status']['relationship'] = 'cid';
-  $handler->display->display_options['filters']['status']['value'] = '1';
-  $handler->display->display_options['filters']['status']['group'] = 2;
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type_1']['id'] = 'type_1';
-  $handler->display->display_options['filters']['type_1']['table'] = 'node';
-  $handler->display->display_options['filters']['type_1']['field'] = 'type';
-  $handler->display->display_options['filters']['type_1']['value'] = array(
-    'discussion_topic' => 'discussion_topic',
-  );
-  $handler->display->display_options['filters']['type_1']['group'] = 3;
-  /* Filter criterion: Comment: ID */
-  $handler->display->display_options['filters']['cid_1']['id'] = 'cid_1';
-  $handler->display->display_options['filters']['cid_1']['table'] = 'comment';
-  $handler->display->display_options['filters']['cid_1']['field'] = 'cid';
-  $handler->display->display_options['filters']['cid_1']['relationship'] = 'cid';
-  $handler->display->display_options['filters']['cid_1']['operator'] = 'not empty';
-  $handler->display->display_options['filters']['cid_1']['group'] = 3;
-  $handler->display->display_options['pane_category']['name'] = 'Open Atrium';
-  $handler->display->display_options['pane_category']['weight'] = '0';
-  $handler->display->display_options['allow']['use_pager'] = 'use_pager';
-  $handler->display->display_options['allow']['items_per_page'] = 'items_per_page';
-  $handler->display->display_options['allow']['offset'] = 0;
-  $handler->display->display_options['allow']['link_to_view'] = 0;
-  $handler->display->display_options['allow']['more_link'] = 0;
-  $handler->display->display_options['allow']['path_override'] = 0;
-  $handler->display->display_options['allow']['title_override'] = 'title_override';
-  $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['argument_input'] = array(
-    'gid' => array(
-      'type' => 'none',
-      'context' => 'entity:fieldable_panels_pane.field-map-address',
-      'context_optional' => 0,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'OG membership: Group ID',
-    ),
-    'oa_section_ref_target_id' => array(
-      'type' => 'context',
-      'context' => 'entity:node.nid',
-      'context_optional' => 1,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'Content: Open Atrium Section (oa_section_ref)',
-    ),
-  );
-  $handler->display->display_options['inherit_panels_path'] = '1';
-
-  /* Display: User replied to Topics */
-  $handler = $view->new_display('panel_pane', 'User replied to Topics', 'comment_user_topics_replied');
-  $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['title'] = 'Your Reply Topics';
-  $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: User: Uid */
-  $handler->display->display_options['arguments']['uid_1']['id'] = 'uid_1';
-  $handler->display->display_options['arguments']['uid_1']['table'] = 'users';
-  $handler->display->display_options['arguments']['uid_1']['field'] = 'uid';
-  $handler->display->display_options['arguments']['uid_1']['relationship'] = 'uid_1';
-  $handler->display->display_options['arguments']['uid_1']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['uid_1']['default_argument_type'] = 'user';
-  $handler->display->display_options['arguments']['uid_1']['default_argument_options']['user'] = TRUE;
-  $handler->display->display_options['arguments']['uid_1']['summary']['number_of_records'] = '0';
-  $handler->display->display_options['arguments']['uid_1']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['uid_1']['summary_options']['items_per_page'] = '25';
-  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
-  $handler->display->display_options['filter_groups']['groups'] = array(
-    1 => 'AND',
-    2 => 'OR',
-    3 => 'OR',
-  );
-  $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type']['id'] = 'type';
-  $handler->display->display_options['filters']['type']['table'] = 'node';
-  $handler->display->display_options['filters']['type']['field'] = 'type';
-  $handler->display->display_options['filters']['type']['value'] = array(
-    'discussion_topic' => 'discussion_topic',
-  );
-  $handler->display->display_options['filters']['type']['group'] = 1;
-  $handler->display->display_options['filters']['type']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['type']['expose']['operator_id'] = 'type_op';
-  $handler->display->display_options['filters']['type']['expose']['label'] = 'Type';
-  $handler->display->display_options['filters']['type']['expose']['operator'] = 'type_op';
-  $handler->display->display_options['filters']['type']['expose']['identifier'] = 'type';
-  $handler->display->display_options['filters']['type']['expose']['multiple'] = TRUE;
-  $handler->display->display_options['filters']['type']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Broken/missing handler */
-  $handler->display->display_options['filters']['flagged']['id'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['table'] = 'flagging';
-  $handler->display->display_options['filters']['flagged']['field'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['relationship'] = 'flag_content_rel';
-  $handler->display->display_options['filters']['flagged']['value'] = '0';
-  $handler->display->display_options['filters']['flagged']['group'] = 1;
-  $handler->display->display_options['filters']['flagged']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['flagged']['expose']['operator_id'] = '';
-  $handler->display->display_options['filters']['flagged']['expose']['label'] = 'Include archived content';
-  $handler->display->display_options['filters']['flagged']['expose']['operator'] = 'flagged_op';
-  $handler->display->display_options['filters']['flagged']['expose']['identifier'] = 'flagged';
-  $handler->display->display_options['filters']['flagged']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Field: Protocol (og_group_ref) */
-  $handler->display->display_options['filters']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['table'] = 'og_membership';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['group'] = 1;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator_id'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['label'] = 'Groups audience';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['operator'] = 'og_group_ref_target_id_op';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['identifier'] = 'og_group_ref_target_id';
-  $handler->display->display_options['filters']['og_group_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Content: Section (oa_section_ref) */
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['id'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['table'] = 'field_data_oa_section_ref';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['field'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['group'] = 1;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator_id'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['label'] = 'Open Atrium Section';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['operator'] = 'oa_section_ref_target_id_op';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['identifier'] = 'oa_section_ref_target_id';
-  $handler->display->display_options['filters']['oa_section_ref_target_id']['expose']['remember_roles'] = array(
-    2 => '2',
-    1 => 0,
-    3 => 0,
-    4 => 0,
-  );
-  /* Filter criterion: Comment: ID */
-  $handler->display->display_options['filters']['cid']['id'] = 'cid';
-  $handler->display->display_options['filters']['cid']['table'] = 'comment';
-  $handler->display->display_options['filters']['cid']['field'] = 'cid';
-  $handler->display->display_options['filters']['cid']['relationship'] = 'cid';
-  $handler->display->display_options['filters']['cid']['operator'] = 'empty';
-  $handler->display->display_options['filters']['cid']['group'] = 2;
-  /* Filter criterion: Comment: Approved */
-  $handler->display->display_options['filters']['status']['id'] = 'status';
-  $handler->display->display_options['filters']['status']['table'] = 'comment';
-  $handler->display->display_options['filters']['status']['field'] = 'status';
-  $handler->display->display_options['filters']['status']['relationship'] = 'cid';
-  $handler->display->display_options['filters']['status']['value'] = '1';
-  $handler->display->display_options['filters']['status']['group'] = 2;
-  /* Filter criterion: Content: Type */
-  $handler->display->display_options['filters']['type_1']['id'] = 'type_1';
-  $handler->display->display_options['filters']['type_1']['table'] = 'node';
-  $handler->display->display_options['filters']['type_1']['field'] = 'type';
-  $handler->display->display_options['filters']['type_1']['value'] = array(
-    'discussion_topic' => 'discussion_topic',
-  );
-  $handler->display->display_options['filters']['type_1']['group'] = 3;
-  /* Filter criterion: Comment: ID */
-  $handler->display->display_options['filters']['cid_1']['id'] = 'cid_1';
-  $handler->display->display_options['filters']['cid_1']['table'] = 'comment';
-  $handler->display->display_options['filters']['cid_1']['field'] = 'cid';
-  $handler->display->display_options['filters']['cid_1']['relationship'] = 'cid';
-  $handler->display->display_options['filters']['cid_1']['operator'] = 'not empty';
-  $handler->display->display_options['filters']['cid_1']['group'] = 3;
-  $handler->display->display_options['pane_category']['name'] = 'Open Atrium';
-  $handler->display->display_options['pane_category']['weight'] = '0';
-  $handler->display->display_options['allow']['use_pager'] = 'use_pager';
-  $handler->display->display_options['allow']['items_per_page'] = 'items_per_page';
-  $handler->display->display_options['allow']['offset'] = 0;
-  $handler->display->display_options['allow']['link_to_view'] = 0;
-  $handler->display->display_options['allow']['more_link'] = 0;
-  $handler->display->display_options['allow']['path_override'] = 0;
-  $handler->display->display_options['allow']['title_override'] = 'title_override';
-  $handler->display->display_options['allow']['exposed_form'] = 'exposed_form';
-  $handler->display->display_options['allow']['fields_override'] = 0;
-  $handler->display->display_options['argument_input'] = array(
-    'gid' => array(
-      'type' => 'none',
-      'context' => 'entity:fieldable_panels_pane.field-map-address',
-      'context_optional' => 0,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'OG membership: Group ID',
-    ),
-    'oa_section_ref_target_id' => array(
-      'type' => 'context',
-      'context' => 'entity:node.nid',
-      'context_optional' => 1,
-      'panel' => '0',
-      'fixed' => '',
-      'label' => 'Content: Open Atrium Section (oa_section_ref)',
+      'label' => 'Content: Nid',
     ),
   );
   $handler->display->display_options['inherit_panels_path'] = '1';
@@ -842,18 +543,11 @@ function oa_comment_views_default_views() {
     t('Comments'),
     t('commentuid'),
     t('Last Comment'),
+    t('Content entity referenced from field_discussion_disc_space'),
     t('.'),
     t(','),
     t('All'),
     t('Open Atrium'),
-    t('User Topics'),
-    t('Your Topics'),
-    t('Type'),
-    t('Include archived content'),
-    t('Groups audience'),
-    t('Open Atrium Section'),
-    t('User replied to Topics'),
-    t('Your Reply Topics'),
   );
   $export['oa_comment_topics'] = $view;
 
