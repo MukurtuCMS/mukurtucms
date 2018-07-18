@@ -82,6 +82,10 @@ projects[fullcalendar_create][patch][] = https://www.drupal.org/files/issues/ful
 ; Pass the calendar NID to the add event form, and set the destination to return to the current node (CP or calendar) after adding event.
 projects[fullcalendar_create][patch][] = contrib/alter_add_event_link_path.patch
 
+;;; Mailhandler
+; Do not show the mailhandler need-to-create-mailbox message because it gets created by collab tools config and this would confuse users
+projects[mailhandler][patch][] = contrib/do_not_show_mailhandler_mailbox_message.patch
+
 ;;; Organic Groups
 ; Allow Groups Audience field for Feeds Mapping
 projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-mapper.patch
