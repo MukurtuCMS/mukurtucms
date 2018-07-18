@@ -10,6 +10,26 @@
 function ma_collaboration_tools_og_features_default_permissions() {
   $permissions = array();
 
+  // Exported og permission: 'node:community:administer comments'
+  $permissions['node:community:administer comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:delete own comments'
+  $permissions['node:community:delete own comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:modify any comments'
+  $permissions['node:community:modify any comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:post comments'
+  $permissions['node:community:post comments'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:cultural_protocol_group:create calendar content'
   $permissions['node:cultural_protocol_group:create calendar content'] = array(
     'roles' => array(
