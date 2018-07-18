@@ -29,6 +29,14 @@ function mukurtu_splash_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  // Callback that toggles the Dictionary feature
+  $items['manage-collaboration-tools'] = array(
+    'title' => 'Manage Collaboration Tools',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_splash_manage_collaboration_tools'),
+    'access arguments' => array('administer site configuration'),
+  );
+
   return $items;
 }
 
@@ -81,6 +89,116 @@ function ma_splash_toggle_dictionary () {
     drupal_set_message ('The Dictionary has been enabled.');
   }
   drupal_goto ('dashboard');
+}
+
+/**
+ * Manage Collaboration Tools form
+ */
+function ma_splash_manage_collaboration_tools($form, &$form_state) {
+
+  $form['#prefix'] = "<h3>Overview</h3><p>Collaboration Tools is beta functionality that allows Cultural Protocols to host collaborative content amongst its members. There are: <ul><li>Calendars, which contain Events</li><li>Discussion Spaces, which contain Discussion Topics</li><li>Document Libraries, which contain Document Pages</li></ul><p>The parent types -- Calendars, Discussion Spaces, and Document Libraries -- can belong to one or more Cultural Protocols. The child types -- Events, Discussion Topics, and Document Pages -- belong each to only one parent, inheriting their parent's Cultural Protocol(s).</p><p>Child content may be commented on by members of its Cultural Protocol(s). Comments may be nested, for subthreaded discussions.</p><p>Child content may be followed by individual users or all users of a Protocol, such that those users are emailed notifications whenever the content is updated or commented on. Users can limit their email notifications to daily or weekly digest formats. They can set a default notification frequency, and they can also override that frequency on a per-content basis, such that they are notified daily on changes/comments to content A, but immediately on changes/comments to content B.<p>Comment notifications, when sent immediately, may be replied to via email directly, which adds the email reply as its own comment. In this way, discussions can be carried out via email without logging on to the site.</p><p>Users are provided an overview page of all content they are following via a tab on their profile page. Here they can unfollow content, change their default notification frequency, and change their individual content notification freqencies.</p>";
+
+  $form['collab_tools_enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('<h4>Enable Collaboration Tools</h4><p>You are free to check or uncheck this without content loss -- collaboration content created while Collaboration Tools is enabled is not deleted if Collaboration Tools is subsequently disabled. Instead it just becomes hidden/inaccessible. Re-enabling Collaboration Tools will reinstate the content.</p>'),
+    '#default_value' => variable_get('collab_tools_enabled'),
+  ];
+  $form['configure'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Configure Email Notifications'),
+    '#states' => [
+      'visible' =>[
+        ':input[name="collab_tools_enabled"]' => array('checked' => TRUE),
+      ],
+    ],
+  ];
+  $form['configure']['1'] = [
+    '#type' => 'item',
+    '#markup' => t('1. The PHP IMAP extension needs to be enabled. Typical PHP installations do not have it enabled by default. Please contact your system administrator and/or webhost to ensure that this extension is enabled before proceeding.'),
+  ];
+  $form['configure']['2'] = [
+    '#type' => 'item',
+    '#markup' => t("2. An email account needs to be created that automatically handles email replies. This account needs to be separate from the " . l('system email', 'admin/config/system/site-information') . ", as it will be inundated with emails. It is highly preferable that this email account uses the same domain as the system email, or else users will see warnings when replying to email that the sending domain and reply-to domains are different, and the notifications may end up in users' spam folders. Please proceed with setting up a new IMAP email account then fill in the following fields:")
+  ];
+  $form['configure']['address'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email address'),
+    '#default_value' => variable_get('mailcomment_mailbox'),
+  );
+  $form['configure']['domain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Domain'),
+    '#default_value' => variable_get('collab_tools_email_domain'),
+    '#description' => t('The domain of the server used to collect mail (eg. imap.gmail.com).'),
+  );
+  $form['configure']['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Username'),
+    '#default_value' => variable_get('collab_tools_email_username'),
+    '#description' => t('This username is used while logging into this mailbox during mail retrieval.'),
+  );
+  $form['configure']['pass'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Password'),
+    '#default_value' => variable_get('collab_tools_email_password'),
+    '#description' => t('The password corresponding to the username above. Consider using a non-vital password, since this field is stored without encryption in the database.'),
+  );
+
+  $form['configure']['3'] = [
+    '#type' => 'item',
+    '#markup' => t('3. For replying via email to comments to work, and for daily and weekly email notification digests to work, a cron job needs to be set up to run on the site. Drupal\'s "automatic cron" method is not sufficient for this. Instead, have your system administrator set up a cron job (or use a cron service) as explained as the "second way" at ' . l('drupal.org', 'https://www.drupal.org/docs/7/setting-up-cron/overview') . '. Comments are imported from email replies on every cron run, so a frequency of at least every 5 minutes is recommended. There is no need to disable automatic cron.')
+  ];
+  $form['submit_button'] = [
+    '#type' => 'submit',
+    '#value' => t('Save Settings'),
+  ];
+  return $form;
+}
+
+/**
+ * Manage Collaboration Tools form submit handler
+ */
+function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
+  variable_set('collab_tools_enabled', $form_state['values']['collab_tools_enabled']);
+  if ($form_state['values']['collab_tools_enabled']) {
+    variable_set('mailcomment_mailbox', $form_state['values']['address']);
+    variable_set('collab_tools_email_domain', $form_state['values']['domain']);
+    variable_set('collab_tools_email_username', $form_state['values']['name']);
+    variable_set('collab_tools_email_password', $form_state['values']['pass']);
+    $mailbox = [
+      'mail' => 'collaboration_tools',
+      'admin_title' => 'collaboration_tools',
+      'settings' => serialize([
+        'type' => 'imap',
+        'folder' => 'INBOX',
+        'domain' => $form_state['values']['domain'],
+        'port' => '993',
+        'insecure' => 0,
+        'name' => $form_state['values']['name'],
+        'pass' => $form_state['values']['pass'],
+        'extraimap' => '/imap/ssl/novalidate-cert/norsh',
+        'limit' => '0',
+        'encoding' => 'UTF-8',
+        'flag_after_read' => 1,
+        'delete_after_read' => 0,
+        'fromheader' => 'From',
+        'security' => '0',
+        'replies' => '0',
+        'retrieve' => 'MailhandlerPhpImapRetrieve',
+        'readonly' => 0,
+      ]),
+    ];
+    db_merge('mailhandler_mailbox')
+      ->key(array('mail' => 'collaboration_tools'))
+      ->fields($mailbox)
+      ->execute();
+    module_enable(['ma_collaboration_tools']);
+    drupal_set_message('Collaboration Tools settings saved.');
+  }
+  else {
+    module_disable(['ma_collaboration_tools']);
+    drupal_set_message('Collaboration Tools settings saved.');
+  }
 }
 
 /**
@@ -480,6 +598,16 @@ function mukurtu_splash_block_site_config() {
               'description' => t('Go to the management page for Mukurtu specific modules.'),
           );
       }
+
+      if(user_access('administer site configuration')) {
+        $items[] = array (
+          'title' => 'Manage Collaboration Tools',
+          'href' => 'manage-collaboration-tools',
+          'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+          'description' => t('Enable, disable, and configure the Collaboration Tools'),
+        );
+      }
+
       $content = array ('content' => $items);
       $markup = theme('admin_block_content', $content);
 
@@ -1329,48 +1457,17 @@ function _render_subscribe_link($entity) {
   }
 }
 
+/**
+ * Render the OG links for a group.
+ */
 function mukurtu_splash_block_group_links() {
-  // links to manage the current group
-  $links = "";
-
-  $nid = arg(1);  // load group nid from url
-
-  if (is_numeric($nid)) {
-
-    $node = node_load($nid);
-
-    $result = _render_subscribe_link($node);
-    $result[0]['#attributes']['class'] = 'btn';
-    $subcribe_link_content = render($result);
-
-    $links .= $subcribe_link_content;
-
-    // confirm permission to create DH items
-    if (og_user_access('node',$node->nid,'create digital_heritage content')) {
-      $link_url = 'node/add/digital-heritage';
-
-      if ($node->type == 'community') {
-        $link_url .= '/'.$node->nid;
-      } else if ($node->type == 'cultural_protocol_group') {
-        $link_url .= '/'.$node->og_group_ref['und'][0]['target_id'].'/'.$node->nid;
-      }
-
-      $links .= l('Create Digital Heritage Content >>', $link_url, array('attributes'=>array('class'=>array('btn'))));
+  if (is_numeric(arg(1))) {
+    $node = node_load(arg(1));
+    if (og_is_group('node', $node)) {
+      $result = _render_subscribe_link($node);
     }
-
-    // confirm permission to create protocols
-    if ($node->type == 'community' && og_user_access('node',$node->nid,'create cultural_protocol_group content')) {
-
-      $links .= l('Create Cultural Protocol >>', 'node/add/cultural-protocol-group', array('attributes'=>array('class'=>array('btn')), 'query' => array('og_group_ref' => $node->nid)));
-    }
+    return '<span class="btn">' . render($result) . '</span>';
   }
-
-  $markup = $links;
-
-  $block = array(
-    '#markup' => $markup,
-  );
-  return $block;
 }
 
 /**

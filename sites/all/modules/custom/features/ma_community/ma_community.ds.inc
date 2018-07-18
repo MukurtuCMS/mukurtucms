@@ -62,18 +62,23 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'featured_collections' => array(
+    'create_content_block_ds_field' => array(
       'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'community_browse_all_dh_link' => array(
+    'featured_collections' => array(
       'weight' => '9',
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'community_browse_all_dh_link' => array(
+      'weight' => '8',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'community_dh_items' => array(
-      'weight' => '4',
+      'weight' => '3',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -83,7 +88,7 @@ function ma_community_ds_field_settings_info() {
       ),
     ),
     'community_protocol_items' => array(
-      'weight' => '6',
+      'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -93,7 +98,7 @@ function ma_community_ds_field_settings_info() {
       'format' => 'default',
     ),
     'group_members' => array(
-      'weight' => '5',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -411,8 +416,8 @@ function ma_community_ds_layout_settings_info() {
         1 => 'title',
       ),
       'left' => array(
-        2 => 'group_management_links',
-        3 => 'body',
+        2 => 'body',
+        3 => 'group_management_links',
         4 => 'community_dh_items',
       ),
       'right' => array(
@@ -422,13 +427,14 @@ function ma_community_ds_layout_settings_info() {
         8 => 'field_child_communities',
         9 => 'community_browse_all_dh_link',
         10 => 'featured_collections',
+        11 => 'create_content_block_ds_field',
       ),
     ),
     'fields' => array(
       'field_community_image' => 'header',
       'title' => 'header',
-      'group_management_links' => 'left',
       'body' => 'left',
+      'group_management_links' => 'left',
       'community_dh_items' => 'left',
       'group_members' => 'right',
       'community_protocol_items' => 'right',
@@ -436,6 +442,7 @@ function ma_community_ds_layout_settings_info() {
       'field_child_communities' => 'right',
       'community_browse_all_dh_link' => 'right',
       'featured_collections' => 'right',
+      'create_content_block_ds_field' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(

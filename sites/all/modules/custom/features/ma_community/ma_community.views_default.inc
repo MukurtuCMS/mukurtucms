@@ -118,7 +118,7 @@ function ma_community_views_default_views() {
   $handler->display->display_options['access']['type'] = 'none';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['query']['options']['query_comment'] = FALSE;
+  $handler->display->display_options['query']['options']['distinct'] = TRUE;
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '5';
@@ -127,6 +127,22 @@ function ma_community_views_default_views() {
   $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
+  /* Footer: Global: Text area */
+  $handler->display->display_options['footer']['area']['id'] = 'area';
+  $handler->display->display_options['footer']['area']['table'] = 'views';
+  $handler->display->display_options['footer']['area']['field'] = 'area';
+  $handler->display->display_options['footer']['area']['empty'] = TRUE;
+  $handler->display->display_options['footer']['area']['content'] = '<div class="add-manage-members-links">
+<div class="add-members-link btn btn-default btn-sm">
+<a href="/group/node/!1/admin/people/add-user">Add Members</a>
+</div>
+<div class="manage-members-link btn btn-default btn-sm">
+<a href="/group/node/!1/admin/people">Manage Members</a>
+</div>
+</div>
+';
+  $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  $handler->display->display_options['footer']['area']['tokenize'] = TRUE;
   /* Relationship: OG membership: OG membership from User */
   $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
   $handler->display->display_options['relationships']['og_membership_rel']['table'] = 'users';
@@ -136,19 +152,24 @@ function ma_community_views_default_views() {
   $handler->display->display_options['relationships']['og_users_roles']['table'] = 'og_membership';
   $handler->display->display_options['relationships']['og_users_roles']['field'] = 'og_users_roles';
   $handler->display->display_options['relationships']['og_users_roles']['relationship'] = 'og_membership_rel';
+  /* Field: User: Uid */
+  $handler->display->display_options['fields']['uid']['id'] = 'uid';
+  $handler->display->display_options['fields']['uid']['table'] = 'users';
+  $handler->display->display_options['fields']['uid']['field'] = 'uid';
+  $handler->display->display_options['fields']['uid']['label'] = '';
+  $handler->display->display_options['fields']['uid']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['uid']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['uid']['link_to_user'] = FALSE;
   /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
   $handler->display->display_options['fields']['name']['table'] = 'users';
   $handler->display->display_options['fields']['name']['field'] = 'name';
   $handler->display->display_options['fields']['name']['label'] = '';
-  $handler->display->display_options['fields']['name']['alter']['text'] = '[name]';
+  $handler->display->display_options['fields']['name']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['name']['alter']['path'] = 'user/[uid]';
   $handler->display->display_options['fields']['name']['element_label_colon'] = FALSE;
-  /* Field: OG membership: OG user roles in group */
-  $handler->display->display_options['fields']['og_roles']['id'] = 'og_roles';
-  $handler->display->display_options['fields']['og_roles']['table'] = 'og_membership';
-  $handler->display->display_options['fields']['og_roles']['field'] = 'og_roles';
-  $handler->display->display_options['fields']['og_roles']['relationship'] = 'og_membership_rel';
-  $handler->display->display_options['fields']['og_roles']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['name']['hide_alter_empty'] = FALSE;
+  $handler->display->display_options['fields']['name']['link_to_user'] = FALSE;
   /* Sort criterion: User: Name */
   $handler->display->display_options['sorts']['name']['id'] = 'name';
   $handler->display->display_options['sorts']['name']['table'] = 'users';
@@ -220,10 +241,17 @@ function ma_community_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('<div class="add-manage-members-links">
+<div class="add-members-link btn btn-default btn-sm">
+<a href="/group/node/!1/admin/people/add-user">Add Members</a>
+</div>
+<div class="manage-members-link btn btn-default btn-sm">
+<a href="/group/node/!1/admin/people">Manage Members</a>
+</div>
+</div>
+'),
     t('OG membership from user'),
     t('OG Roles from OG membership'),
-    t('[name]'),
-    t('OG user roles in group'),
     t('All'),
     t('Block'),
   );

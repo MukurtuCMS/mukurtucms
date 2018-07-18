@@ -135,56 +135,55 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
  * Implements hook_form_FORM_ID_alter().
  */
 function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_state) {
-    // Remove any languages that already have language communities
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node')
-        ->entityCondition('bundle', 'language_community')
-        ->addMetaData('account', user_load(1)); // Run the query as user 1.
+  
+  // Remove any languages that already have language communities
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'language_community')
+      ->addMetaData('account', user_load(1)); // Run the query as user 1.
 
-    $result = $query->execute();
+  $result = $query->execute();
 
-    // Building list of language tids for existing communities
-    $existing_language_tids = array();
-    if(isset($result['node'])) {
-        foreach($result['node'] as $result_node) {
-            $existing_language_community = node_load($result_node->nid);
-            if($existing_language_community && !empty($existing_language_community->field_community_language[LANGUAGE_NONE])) {
-                // Language communities only have one language association
-                $existing_language_tids[] = $existing_language_community->field_community_language[LANGUAGE_NONE][0]['tid'];
-            }
-        }
-    }
+  // Building list of language tids for existing communities
+  $existing_language_tids = array();
+  if(isset($result['node'])) {
+      foreach($result['node'] as $result_node) {
+          $existing_language_community = node_load($result_node->nid);
+          if($existing_language_community && !empty($existing_language_community->field_community_language[LANGUAGE_NONE])) {
+              // Language communities only have one language association
+              $existing_language_tids[] = $existing_language_community->field_community_language[LANGUAGE_NONE][0]['tid'];
+          }
+      }
+  }
 
-    // If this is a pre-existing language community, don't remove its own language tid from the list
-    if(!empty($form['#node']->field_community_language)) {
-        $existing_key = array_search($form['#node']->field_community_language[LANGUAGE_NONE][0]['tid'], $existing_language_tids);
-        if($existing_key >= 0) {
-            unset($existing_language_tids[$existing_key]);
-        }
-    }
+  // If this is a pre-existing language community, don't remove its own language tid from the list
+  if(!empty($form['#node']->field_community_language)) {
+      $existing_key = array_search($form['#node']->field_community_language[LANGUAGE_NONE][0]['tid'], $existing_language_tids);
+      if($existing_key >= 0) {
+          unset($existing_language_tids[$existing_key]);
+      }
+  }
 
-    // Remove those tids from the form options
-    foreach($existing_language_tids as $language_tid) {
-        if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
-            unset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid]);
-        }
-    }
+  // Remove those tids from the form options
+  foreach($existing_language_tids as $language_tid) {
+      if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
+          unset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid]);
+      }
+  }
 
-    // If a tid is passed as an argument, try and pre-populate fields
-    $args = arg();
-    $passed_tid = $args[count($args) - 1];
-    if(is_numeric($passed_tid) && $passed_tid > 0) {
-        $passed_term = taxonomy_term_load($passed_tid);
-        if(!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
-            if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
-                $form['field_community_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
-                $form['title']['#default_value'] = $passed_term->name . ' '. t('Language Community');
-            }
-        }
-    }
+  // If a tid is passed as an argument, try and pre-populate fields
+  $args = arg();
+  $passed_tid = $args[count($args) - 1];
+  if(is_numeric($passed_tid) && $passed_tid > 0) {
+      $passed_term = taxonomy_term_load($passed_tid);
+      if(!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
+          if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
+              $form['field_community_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
+              $form['title']['#default_value'] = $passed_term->name . ' '. t('Language Community');
+          }
+      }
+  }
 
-    // Hide the group element
-    $form['og_group_ref']['#access'] = FALSE;
 }
 
 /**
@@ -458,25 +457,27 @@ function ma_dictionary_node_access($node, $op, $account) {
     // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
     // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
     if($type == 'dictionary_word') {
-        $groups = og_get_groups_by_user(NULL, 'node');
-        foreach($groups as $group) {
-            $og_node = node_load($group);
-            if($og_node->type == 'language_community') {
-                if($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
-                    if(!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
-                        return NODE_ACCESS_ALLOW;
-                    }
-                }
-
-                if($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
-                    return NODE_ACCESS_ALLOW;
-                }
-
-                if($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
-                    return NODE_ACCESS_ALLOW;
-                }
+      $groups = og_get_groups_by_user(NULL, 'node');
+      if (count($groups)) {
+        foreach ($groups as $group) {
+          $og_node = node_load($group);
+          if ($og_node->type == 'language_community') {
+            if ($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
+              if (!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
+                return NODE_ACCESS_ALLOW;
+              }
             }
+
+            if ($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
+              return NODE_ACCESS_ALLOW;
+            }
+
+            if ($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
+              return NODE_ACCESS_ALLOW;
+            }
+          }
         }
+      }
     }
 
     return NODE_ACCESS_IGNORE;

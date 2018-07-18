@@ -1,0 +1,17 @@
+; Mail Comment ignores
+
+; These are test messages, not code
+; @TODO move to separate files?
+tests/mailcomment.test:51:style
+tests/mailcomment.test:53:style
+tests/mailcomment.test:56:style
+tests/mailcomment.test:64:style
+tests/mailcomment.test:66:style
+tests/mailcomment.test:72:style
+tests/mailcomment.test:73:style
+tests/mailcomment.test:76:style
+tests/mailcomment.test:80:style
+tests/mailcomment.test:81:style
+tests/mailcomment.test:82:style
+tests/mailcomment.test:120:style
+tests/mailcomment.test:122:style

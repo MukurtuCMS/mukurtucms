@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Provides click-to-create functionality for FullCalendar.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function fullcalendar_create_menu() {
+  $items = array();
+  $items['fullcalendar_create/%ctools_js/add/%'] = array(
+    'title' => 'Add',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('fullcalendar_create_add_form', 1, 3),
+    'access callback' => 'node_access',
+    'access arguments' => array('create', 3),
+  );
+  return $items;
+}
+
+/**
+ * Form constructor for the hours add form.
+ */
+function fullcalendar_create_add_form($form, &$form_state, $js, $type) {
+  global $user;
+  $node = (object) array(
+    'uid' => $user->uid,
+    'name' => (isset($user->name) ? $user->name : ''),
+    'type' => $type,
+    'language' => LANGUAGE_NONE,
+  );
+
+  $form_state['ajax'] = $js;
+  if (!empty($_POST['fullcalendar_create_date_field'])) {
+    $form_state['fullcalendar_create_date_field'] = $_POST['fullcalendar_create_date_field'];
+  }
+  $form_state['build_info']['args'] = array($node);
+  form_load_include($form_state, 'inc', 'node', 'node.pages');
+  ctools_include('modal');
+  $output = ctools_modal_form_wrapper($type . '_node_form', $form_state);
+  if (!$js) {
+    return $output;
+  }
+
+  $commands = $output;
+  if (!empty($form_state['executed'])) {
+    ctools_include('ajax');
+    $commands = array(
+      ctools_modal_command_dismiss(),
+      array(
+        'command' => 'fullcalendar_create_reload',
+      ),
+    );
+  }
+  print ajax_render($commands);
+  drupal_exit();
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensures that the dates are populated before other processing.
+ */
+function fullcalendar_create_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'date_combo_process_alter') {
+    $implementations = array('fullcalendar_create' => $implementations['fullcalendar_create']) + $implementations;
+  }
+}
+
+/**
+ * Implements hook_date_combo_process_alter().
+ *
+ * Populates the date fields. FullCalendar passes dates as ISO8601 in UTC.
+ */
+function fullcalendar_create_date_combo_process_alter(&$element, &$form_state, $context) {
+  if (empty($form_state['fullcalendar_create_date_field']) && !empty($_GET['fullcalendar_create_date_field'])) {
+    $form_state['fullcalendar_create_date_field'][$_GET['fullcalendar_create_date_field']] = $_GET['fullcalendar_create_date_field'];
+  }
+
+  if (empty($form_state['fullcalendar_create_date_field']) || !in_array($element['#field_name'], $form_state['fullcalendar_create_date_field'])) {
+    return;
+  }
+
+  // Check for an end date first.
+  if (isset($_POST['fullcalendar_create_end_date']) || isset($_GET['fullcalendar_create_end_date'])) {
+    $end_date = isset($_POST['fullcalendar_create_end_date']) ? new DateObject(check_plain($_POST['fullcalendar_create_end_date']), 'UTC') : new DateObject(check_plain($_GET['fullcalendar_create_end_date']));
+    $end_date = $end_date->format(DATE_FORMAT_DATETIME);
+  }
+  // Check for a start date.
+  if (isset($_POST['fullcalendar_create_start_date']) || isset($_GET['fullcalendar_create_start_date']) ) {
+    $start_date = isset($_POST['fullcalendar_create_start_date']) ? new DateObject(check_plain($_POST['fullcalendar_create_start_date']), 'UTC') : new DateObject(check_plain($_GET['fullcalendar_create_start_date']), 'UTC');;
+    $start_date = $start_date->format(DATE_FORMAT_DATETIME);
+    // If there was no end date, use the start date.
+    if (!isset($end_date)) {
+      $end_date = $start_date;
+    }
+    // Set in all four default value locations.
+    $element['#default_value']['value'] = $start_date;
+    $element['#default_value']['value2'] = $end_date;
+    $element['value']['#default_value'] = $start_date;
+    $element['value2']['#default_value'] = $end_date;
+  }
+}
+
+/**
+ * Implements hook_fullcalendar_api().
+ */
+function fullcalendar_create_fullcalendar_api() {
+  return array(
+    'api' => fullcalendar_api_version(),
+    'path' => drupal_get_path('module', 'fullcalendar_create') . '/includes',
+  );
+}

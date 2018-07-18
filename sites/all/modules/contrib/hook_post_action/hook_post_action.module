@@ -1,0 +1,54 @@
+<?php
+/**
+ * @param $entity
+ * @param $type
+ */
+function hook_post_action_entity_insert($entity, $type) {
+  drupal_register_shutdown_function('_hook_post_action_post_save', $entity, $type, 'insert');
+}
+
+/**
+ * @param $entity
+ * @param $type
+ */
+function hook_post_action_entity_update($entity, $type) {
+  drupal_register_shutdown_function('_hook_post_action_post_save', $entity, $type, 'update');
+}
+
+/**
+ * @param $entity
+ * @param $type
+ */
+function hook_post_action_entity_delete($entity, $type) {
+  drupal_register_shutdown_function('_hook_post_action_post_save', $entity, $type, 'delete');
+}
+
+/**
+ * @param $entity
+ * @param $type
+ * @param $op
+ */
+function _hook_post_action_post_save($entity, $type, $op) {
+  $entity_is_saved = FALSE;
+  $new_entity = NULL;
+
+  if ($op == 'insert' || $op == 'update') {
+    $entity_is_saved = TRUE;
+  }
+  if ($op == 'delete') {
+    list($id) = entity_extract_ids($type, $entity);
+    $new_entity = entity_load($type, array($id));
+    if (!$new_entity) {
+      $entity_is_saved = TRUE;
+    }
+  }
+  if ($entity_is_saved) {
+    module_invoke_all('entity_post' . $op, $entity, $type);
+    module_invoke_all('entity_postsave', $entity, $type, $op);
+
+    if ($type == 'node') {
+      module_invoke_all('node_post' . $op, $entity);
+      module_invoke_all('node_postsave', $entity, $op);
+    }
+  }
+}

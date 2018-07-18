@@ -116,14 +116,15 @@ function ma_profile_ds_layout_settings_info() {
         1 => 'googleanalytics',
         2 => 'contact',
         3 => 'locale',
-        4 => 'wysiwyg',
-        5 => 'picture',
-        6 => 'timezone',
-        7 => 'og_user_node',
-        8 => 'redirect',
+        4 => 'picture',
+        5 => 'timezone',
+        6 => 'og_user_node',
+        7 => 'redirect',
       ),
       'hidden' => array(
-        9 => '_add_existing_field',
+        8 => 'field_notifications_freq_def',
+        9 => 'ckeditor',
+        10 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -131,11 +132,12 @@ function ma_profile_ds_layout_settings_info() {
       'googleanalytics' => 'ds_content',
       'contact' => 'ds_content',
       'locale' => 'ds_content',
-      'wysiwyg' => 'ds_content',
       'picture' => 'ds_content',
       'timezone' => 'ds_content',
       'og_user_node' => 'ds_content',
       'redirect' => 'ds_content',
+      'field_notifications_freq_def' => 'hidden',
+      'ckeditor' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -151,6 +153,7 @@ function ma_profile_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['user|user|form'] = $ds_layout;
 

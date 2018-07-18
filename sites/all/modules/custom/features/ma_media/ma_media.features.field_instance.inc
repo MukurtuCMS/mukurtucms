@@ -18,6 +18,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -117,6 +124,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -216,6 +230,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'component_media_item' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -319,6 +340,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -821,6 +849,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 7,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -921,6 +956,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 12,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1018,6 +1060,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 5,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1118,6 +1167,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 4,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1221,6 +1277,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 6,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1321,6 +1384,12 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'Alternative text is used by screen readers, search engines, and when the image cannot be loaded. By adding alt text you improve accessibility and search engine optimization.',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1405,6 +1474,12 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'Title text is used in the tool tip when a user hovers their mouse over the image. Adding title text makes it easier to understand the context of an image and improves usability.',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1490,6 +1565,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1590,6 +1672,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 11,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1690,6 +1779,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 9,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1790,6 +1886,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 10,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1890,6 +1993,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 13,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1973,6 +2083,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_plain',
+        'weight' => 8,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2073,6 +2190,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 17,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2156,6 +2280,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 15,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2239,6 +2370,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2340,6 +2478,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'component_media_item' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -2444,6 +2589,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2545,6 +2697,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 16,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2628,6 +2787,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 14,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2914,6 +3080,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 2,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3014,6 +3187,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3113,6 +3293,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
       'component_media_item' => array(
         'label' => 'hidden',
         'module' => 'text',
@@ -3214,6 +3401,13 @@ function ma_media_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'collab_doc_attachments' => array(
+        'label' => 'inline',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_plain',
+        'weight' => 3,
+      ),
       'component_media_item' => array(
         'label' => 'above',
         'settings' => array(),

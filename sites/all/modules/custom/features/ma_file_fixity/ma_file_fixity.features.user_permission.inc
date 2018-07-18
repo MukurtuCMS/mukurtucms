@@ -60,5 +60,25 @@ function ma_file_fixity_user_default_permissions() {
     'module' => 'node',
   );
 
+  // Exported permission: 'view any fixity_check content'.
+  $permissions['view any fixity_check content'] = array(
+    'name' => 'view any fixity_check content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node_view_permissions',
+  );
+
+  // Exported permission: 'view own fixity_check content'.
+  $permissions['view own fixity_check content'] = array(
+    'name' => 'view own fixity_check content',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'node_view_permissions',
+  );
+
   return $permissions;
 }

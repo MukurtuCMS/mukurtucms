@@ -67,6 +67,11 @@ function ma_culturalprotocol_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'cultural_protocol_group';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'create_content_block_ds_field' => array(
+      'weight' => '7',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'group_management_links' => array(
       'weight' => '2',
       'label' => 'hidden',
@@ -78,7 +83,7 @@ function ma_culturalprotocol_ds_field_settings_info() {
       'format' => 'default',
     ),
     'protocol_dh_items' => array(
-      'weight' => '4',
+      'weight' => '3',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -225,22 +230,24 @@ function ma_culturalprotocol_ds_layout_settings_info() {
       ),
       'left' => array(
         2 => 'group_management_links',
-        3 => 'body',
-        4 => 'protocol_dh_items',
+        3 => 'protocol_dh_items',
+        4 => 'body',
       ),
       'right' => array(
         5 => 'group_members',
         6 => 'og_group_ref',
+        7 => 'create_content_block_ds_field',
       ),
     ),
     'fields' => array(
       'field_protocol_image' => 'header',
       'title' => 'header',
       'group_management_links' => 'left',
-      'body' => 'left',
       'protocol_dh_items' => 'left',
+      'body' => 'left',
       'group_members' => 'right',
       'og_group_ref' => 'right',
+      'create_content_block_ds_field' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -258,6 +265,7 @@ function ma_culturalprotocol_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|cultural_protocol_group|full'] = $ds_layout;
 

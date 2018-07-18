@@ -9777,10 +9777,6 @@ table .checkbox input[type="checkbox"] {
 .page-node-add-digital-heritage {
   /* hiding the og ref field for digital heritage items */
 }
-.node-type-digital-heritage #edit-og-group-ref,
-.page-node-add-digital-heritage #edit-og-group-ref {
-  display: none;
-}
 .node-type-digital-heritage #edit-field-original-date .help-block,
 .page-node-add-digital-heritage #edit-field-original-date .help-block {
   clear: both;
@@ -9799,12 +9795,6 @@ table .checkbox input[type="checkbox"] {
 #dictionary-word-node-form #dewplayer-2,
 #dictionary-word-node-form #dewplayer-1 {
   height: 20px;
-}
-#dictionary-word-node-form #edit-og-group-ref {
-  display: none;
-}
-#collection-node-form #edit-og-group-ref {
-  display: none;
 }
 .node-dictionary-word.view-mode-full .scald-atom,
 .node-word-list.view-mode-full .scald-atom,
@@ -10129,6 +10119,40 @@ a:hover {
 .node-community .group-right .field ul,
 .node-cultural-protocol-group .group-right .field ul {
   padding-top: 10px;
+}
+.node-calendar.view-mode-full .group-right .panel,
+.node-event.view-mode-full .group-right .panel,
+.node-calendar.view-mode-full .group-right .right-col-block,
+.node-event.view-mode-full .group-right .right-col-block {
+  background: #F8F7F7;
+  border-radius: 5px;
+  border-color: #ddd !important;
+  border: 1px solid;
+  margin-bottom: 20px;
+}
+.node-calendar.view-mode-full .group-right .panel .view,
+.node-event.view-mode-full .group-right .panel .view,
+.node-calendar.view-mode-full .group-right .right-col-block .view,
+.node-event.view-mode-full .group-right .right-col-block .view {
+  padding: 15px;
+}
+.node-calendar.view-mode-full .group-right .right-col-block .label-above,
+.node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .group-right .panel-title,
+.node-event.view-mode-full .group-right .panel-title {
+  font-size: 20px;
+  font-weight: 400;
+  text-transform: none;
+}
+.node-calendar.view-mode-full .group-right .right-col-block .label-above,
+.node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .group-right .panel-heading,
+.node-event.view-mode-full .group-right .panel-heading {
+  background: #E3E2E1;
+}
+.node-calendar.view-mode-full .group-right .right-col-block .label-above,
+.node-event.view-mode-full .group-right .right-col-block .label-above {
+  padding: 10px 15px;
 }
 .field-name-protocol-dh-items,
 .field-name-community-dh-items {
@@ -10701,4 +10725,283 @@ a:hover {
   font-weight: bold;
   color: green;
   text-transform: uppercase;
+}
+.event-date-wrapper {
+  height: 5em;
+  width: 5em;
+  margin: 5px;
+  margin-left: 0px;
+  border: 1px solid #AAA;
+  background: #F6F7FC;
+  float: left;
+  font-size: 10px;
+}
+.event-date-month-wrapper {
+  height: 1.4em;
+  background: #4791FF;
+  margin: 2px;
+}
+.event-date-month {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  display: block;
+  text-align: center;
+  font-size: 1em;
+  font-weight: normal;
+  color: #FFFFFF;
+}
+.event-label {
+  font-weight: bold;
+  float: left;
+  height: 0;
+}
+.event-item {
+  display: inline-block;
+  font-size: 1em;
+  padding-left: 8ex;
+  line-height: 1.4em;
+}
+.event-date-day {
+  display: block;
+  font-size: 2.5em;
+  line-height: 120%;
+  text-align: center;
+}
+.event-day,
+.event-time {
+  white-space: nowrap;
+}
+.event .addthisevent-drop {
+  margin: 10px;
+  float: right;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+.event-location .field-content {
+  display: inline-block;
+}
+.event-description .flag-subscribe-section-content {
+  display: none;
+}
+.event-header .event-icon {
+  float: left;
+  padding-right: 10px;
+}
+.event-header .location {
+  padding-top: 20px;
+}
+.event-details {
+  overflow: hidden;
+}
+.event-description ul,
+.event-list li {
+  list-style: none;
+}
+.view-oa-event-list li {
+  overflow: hidden;
+  clear: both;
+}
+.node-event.view-mode-full .event-date-wrapper {
+  height: 7em !important;
+  width: 7em !important;
+}
+.node-event.view-mode-full .event-date-wrapper .event-date-month-wrapper {
+  height: 1.96em !important;
+}
+.node-event.view-mode-full .event-date-wrapper .event-date-month {
+  font-size: 1.4em !important;
+}
+.node-event.view-mode-full .event-date-wrapper .event-date-day {
+  font-size: 3.5em !important;
+}
+.node-event.view-mode-full .group-event-details .label-inline {
+  width: 70px;
+  text-align: right;
+}
+.node-event.view-mode-full .group-event-details .field-name-field-oa-address,
+.node-event.view-mode-full .group-event-details .field-name-field-oa-date,
+.node-event.view-mode-full .group-event-details .field-name-calendar-date {
+  margin-bottom: 0.1em !important;
+}
+.node-event.view-mode-full .field-name-body,
+.node-event.view-mode-full .comment-wrapper {
+  clear: both;
+}
+.node-event.view-mode-full .field-name-body {
+  font-size: 1.3em;
+}
+.field-name-follow-unfollow .notifications-message {
+  margin-top: 5px;
+}
+.class-follow-unfollow-popup a {
+  color: #337ab7 !important;
+  text-decoration: none !important;
+}
+.class-follow-unfollow-popup a:hover,
+.class-follow-unfollow-popup a:focus {
+  color: #23527c !important;
+}
+.class-follow-unfollow-popup .notification-popup-reasons-header {
+  font-weight: bold;
+}
+.class-follow-unfollow-popup ul {
+  padding: 0;
+  margin: 0;
+  margin-left: 10px;
+  margin-bottom: 1em;
+}
+.class-follow-unfollow-popup li {
+  margin-left: 1em;
+}
+.class-follow-unfollow-popup .form-item-notification-frequency-node label {
+  float: left;
+  margin-right: 0.5em;
+  font-weight: bold;
+}
+.class-follow-unfollow-popup .form-item-notification-frequency-node .form-control {
+  width: auto;
+}
+.class-follow-unfollow-popup button {
+  display: none;
+}
+.class-follow-unfollow-popup .link-to-following-view {
+  font-weight: bold;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default label {
+  float: left;
+  margin-right: 0.5em;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default .form-control {
+  width: auto;
+}
+.view-mukurtu-collab-subscriptions #ma-collaboration-tools-notification-frequency-default button {
+  display: none;
+}
+.view-mukurtu-collab-subscriptions .views-field-php-2 label {
+  display: none;
+}
+.view-mukurtu-collab-subscriptions .views-field-php-2 .form-control {
+  width: auto;
+}
+.view-mukurtu-collab-subscriptions .views-field-php-2 button {
+  display: none;
+}
+.view-oa-comment-topics h3 {
+  font-size: 12px;
+  line-height: 1.1;
+  color: #6D7074;
+  font-weight: bold;
+  font-style: normal;
+  text-transform: uppercase;
+  border-top: 4px solid #EAEAEA;
+  margin: 0;
+  padding-top: 1.3em;
+  padding-bottom: 1.3em;
+}
+.view-oa-comment-topics li {
+  border-top: 1px solid #EAEAEA;
+  padding: 10px 0;
+  font-size: 13px;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-list-header.oa-description {
+  overflow: visible;
+  text-align: right;
+  float: right;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic h5 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 2px 0;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-last {
+  display: inline-block;
+  text-align: right;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-last > a {
+  color: inherit;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-text {
+  display: none;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon {
+  position: relative;
+  display: inline-block;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon .oa-reply-count {
+  position: relative;
+  display: inline-block;
+  z-index: 2;
+  color: white;
+  width: 2em;
+  text-align: center;
+  margin: 0 3px 3px 3px;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon .oa-reply-count a {
+  color: inherit;
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon i {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  font-size: 25px;
+  top: -0.1em;
+  margin: 0 3px;
+  color: rgba(64, 64, 64, 0.7);
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon.updated i {
+  color: rgba(150, 150, 0, 0.7);
+}
+.view-oa-comment-topics .oa-list.oa-discussion-topic .oa-reply-icon.new i {
+  color: rgba(64, 161, 58, 0.7);
+}
+.view-documents.view-display-id-full .views-row {
+  border-top: 1px solid #EAEAEA;
+  padding: 15px 0 15px 0;
+  min-height: 130px;
+}
+.view-documents.view-display-id-full h3 {
+  margin-top: 0;
+  font-weight: 400;
+}
+.view-documents.view-display-id-full .views-more-link {
+  float: right;
+  margin-top: 10px;
+}
+.view-documents.view-display-id-full .views-field-field-oa-media {
+  float: right;
+}
+.view-documents.view-display-id-full .views-field-field-oa-media ~ .views-field {
+  padding-right: 130px;
+}
+.view-documents.view-display-id-full .views-field-field-oa-media-1,
+.view-documents.view-display-id-full .views-field-body {
+  margin-top: 5px;
+}
+.view-documents.view-display-id-mini tr {
+  background-color: transparent !important;
+}
+.view-documents.view-display-id-mini td {
+  padding: 0;
+  border: none;
+}
+.view-documents.view-display-id-mini table {
+  margin-bottom: 0px !important;
+}
+.view-documents.view-display-id-mini .form-group {
+  margin-bottom: 0px !important;
+  margin-top: 10px;
+}
+.node-document-page.view-mode-full .field-name-field-media-title {
+  font-size: 1.5em;
+}
+.node-document-page.view-mode-full .file {
+  border-top: 1px solid #EAEAEA;
+  padding: 15px 0 15px 0;
+}
+.page-manage-collaboration-tools #edit-collab-tools-enabled {
+  float: left;
+  margin-top: 1em;
+  margin-right: 5px;
 }

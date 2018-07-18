@@ -370,56 +370,177 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
 }
 
 
-/**
+/*
  * Helper function used nodes-in-CP custom protocol field and scald protocol field (default OG) to reduce down the available groups the user is a member of to those the user has posting permissions on, because OG on its own is not handling this
  */
 function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
-  $groups_for_user = og_get_groups_by_user(null, 'node');
-  $allowed_groups_for_user[] = array();
-  foreach ($groups_for_user as $group_for_user) {
-    $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
-    if (array_intersect(array('contributor', 'protocol steward'), $roles_for_user_in_group)) {
-      $allowed_groups_for_user[] = $group_for_user;
+  $roles = [
+    'contributor',
+    'protocol steward'
+  ];
+  return ma_cultural_protocol_get_cps_for_user($roles, $community_nid);
+}
+
+/*
+ * CPs that a user is a Protocol Steward of.
+ */
+function ma_cultural_protocol_get_cps_user_is_steward() {
+  $roles = [
+    'protocol steward'
+  ];
+  return ma_cultural_protocol_get_cps_for_user($roles);
+}
+
+/*
+ * Checks if a user is a member of any of its CPs
+ */
+function ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node, $user = NULL) {
+  if (!$user) {
+    global $user;
+  }
+  foreach ($node->og_group_ref[LANGUAGE_NONE] as $cp) {
+    if (og_is_member('node', $cp['target_id'], 'user', $user)) {
+      return TRUE;
     }
   }
+}
 
-  // EFQ to get sub protocols for a community (or all if no community specified)
-  $query = new EntityFieldQuery();
-
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'cultural_protocol_group')
-    ->propertyCondition('status', NODE_PUBLISHED);
-  if ($community_nid) {
-    $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
-  }
-
-  $result = $query->execute();
-
-  if (isset($result['node'])) {
-    $protocol_items_nids = array_keys($result['node']);
-    $protocol_items = entity_load('node', $protocol_items_nids);
-
-    $cps = array();
-    foreach ($protocol_items as $protocol_item) {
-      if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
-        $cps[$protocol_item->nid] = $protocol_item->title;
+/*
+ * Helper function for the CPs for user helper functions.
+ */
+function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL) {
+  $groups_for_user = og_get_groups_by_user(null, 'node');
+  if (count($groups_for_user)) {
+    $allowed_groups_for_user[] = [];
+    foreach ($groups_for_user as $group_for_user) {
+      $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
+      if (array_intersect($roles, $roles_for_user_in_group)) {
+        $allowed_groups_for_user[] = $group_for_user;
       }
     }
-    return $cps;
-  }
 
+    // EFQ to get sub protocols for a community (or all if no community specified)
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'cultural_protocol_group')
+      ->propertyCondition('status', NODE_PUBLISHED);
+    if ($community_nid) {
+      $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
+    }
+
+    $result = $query->execute();
+
+    if (isset($result['node'])) {
+      $protocol_items_nids = array_keys($result['node']);
+      $protocol_items = entity_load('node', $protocol_items_nids);
+
+      $cps = [];
+      foreach ($protocol_items as $protocol_item) {
+        if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
+          $cps[$protocol_item->nid] = $protocol_item->title;
+        }
+      }
+      return $cps;
+    }
+  }
 }
 
 /**
- * Helper function returns whether a node type can be in a CP
+ * Collab Pages functions shared with cultural protocol feature. Included here because ma_collaboration_tools can be disabled.
+ */
+
+/**
+ * Overall map of the collab pages types, to be used by the helper functions below.
+ */
+function ma_culturalprotocol_collab_node_types_map() {
+  return [
+    'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
+    'discussion_topic' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
+    'document_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
+  ];
+}
+
+/**
+ * Get the collab child node types
+ */
+function ma_culturalprotocol_collab_child_node_types() {
+  return array_keys(ma_culturalprotocol_collab_node_types_map());
+}
+
+/**
+ * Get the collab parent node types
+ */
+function ma_culturalprotocol_collab_parent_node_types() {
+  $parent_types = [];
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
+    $parent_types[] = $child_type_props['parent'];
+  }
+  return $parent_types;
+}
+
+/**
+ * Get all the collab node types
+ */
+function ma_culturalprotocol_all_collab_node_types() {
+  return array_merge(['following_notification'], ma_culturalprotocol_collab_parent_node_types(), ma_culturalprotocol_collab_child_node_types());
+}
+
+/**
+ * Internal function used by the helper functions.
+ */
+function _ma_cultural_protocol_get_node_types_in_cps() {
+  return [
+    'optional' => [
+      'collection',
+    ],
+    'required' => [
+      'digital_heritage',
+      'dictionary_word',
+      'calendar',
+      'discussion_space',
+      'document_library',
+    ],
+    'collab_pages' => ma_culturalprotocol_collab_child_node_types(),
+  ];
+}
+
+/**
+ * Helper function returns whether a node type *can* be in a CP (including collab pages)
  */
 function ma_cultural_protocol_node_type_can_have_cp($node_type) {
-  $node_types_that_can_have_cp = [
-    'digital_heritage',
-    'dictionary_word',
-    'collection'
-  ];
-  if (in_array($node_type, $node_types_that_can_have_cp)) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['optional'], $node_types['required'], $node_types['collab_pages']))) {
     return TRUE;
+  }
+}
+
+/**
+ * Helper function returns whether a node type *can* be in a CP (not including collab pages)
+ */
+function ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['optional'], $node_types['required']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * Helper function returns whether a node type *must* be in a CP
+ */
+function ma_cultural_protocol_node_type_must_have_cp($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['required'], $node_types['collab_pages']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * This is an intermediary function, called by the custom follow-unfollow field.
+ * Need this to avoid error if ma_collaboration_tools is disabled.
+ */
+function ma_culturalprotocol_follow_unfollow($entity) {
+  if (module_exists('ma_collaboration_tools')) {
+    return ma_collaboration_tools_follow_unfollow($entity);
   }
 }

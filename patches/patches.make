@@ -73,6 +73,15 @@ projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid
 ; Alter required field tamper to allow 0 as value
 projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
 
+;;; Fullcalendar Create
+; Contributed patch:
+; 1. Send params to event create as $_GET instead of $_POST
+; 2. Use link instead of modal for creating event from clicking on day.
+projects[fullcalendar_create][patch][] = https://www.drupal.org/files/issues/fullcalendar_create_no_modal-1885688-28.patch
+; Custom patch:
+; Pass the calendar NID to the add event form, and set the destination to return to the current node (CP or calendar) after adding event.
+projects[fullcalendar_create][patch][] = contrib/alter_add_event_link_path.patch
+
 ;;; Organic Groups
 ; Allow Groups Audience field for Feeds Mapping
 projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-mapper.patch
@@ -97,6 +106,11 @@ projects[partial_date][patch][] = https://www.drupal.org/files/issues/add_proper
 ;;; Owl Carousel
 ; Add ID to handle multiple carousels
 projects[owlcarousel][patch][] = contrib/0001-Add-ID-to-handle-multiple-carousels.patch
+
+;;; Quicktabs
+; Remember collaboration parent page tab on CP, so that when a child page is added, it will return to the parent tab.
+; This is from  https://www.drupal.org/files/issues/quicktabs-tab-history-1454486-35.patch with a very minor edit to the JS to only remember tab history for the CP quicktabs (otherwise it remembers tab history for Community Records as well, which we don't want).
+projects[quicktabs][patch][] = contrib/remember_cp_collab_tab.patch
 
 ;;; Scald
 ; Use simple dewplayer for audio

@@ -13,6 +13,7 @@ function ma_core_init() {
 
   // Add the JS for jquery_ui_tooltips. Simply use the class "jquery_ui_tooltip" on any title attribute to use this
   drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/jquery_ui_tooltips.js');
+
 }
 
 /**
@@ -58,35 +59,69 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 }
 
 /**
- * Implements hook_views_pre_build().
+ * Implements hook_views_pre_view().
  */
-// Add the Add and Manage Members links to the group member list, for users with perm to do so
-// Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
-function ma_core_views_pre_build(&$view) {
+function ma_core_views_pre_view(&$view, &$display_id, &$args) {
   if ($view->name == 'group_members') {
-    $gid = arg(1);
-    if (og_user_access('node', $gid, 'manage members')) {
-        // We always want to show the buttons to users who can use them, so we need to have an empty
-        // "no results" message so that the view is actually displayed
-        $options = array(
-            'id' => 'empty_text',
-            'table' => 'views',
-            'field' => 'area',
-            'empty' => FALSE,
-            'content' => '',
-            'format' => 'filtered_html',
-            'tokenize' => 0,
-        );
-        $view->set_item('default', 'empty', 'empty_text', $options);
 
-        // Display the user management buttons
-        $output = '<div class="add-manage-members-links">';
-        $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
-        $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
-        $output .= '</div>';
-        $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html', 'empty' => 1));
+    // Hide the manage/add members links in footer unless user can admin this group.
+    if (is_numeric(arg(1))) {
+      $gid = arg(1);
+      if (!og_user_access('node', $gid, 'manage members')) {
+        $view->set_item_option('block_1', 'footer', 'area', 'content', NULL);
+      }
     }
   }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_core_views_pre_render(&$view) {
+  if ($view->name == 'group_members') {
+    if (is_numeric(arg(1))) {
+      $gid = arg(1);
+
+      // Add the user role(s) after the user names. This can't quite be done in view config alone.
+      $results = &$view->result;
+      $roles_order = [
+        'Community Manager',
+        'Protocol Steward',
+        'Contributor'
+      ];
+      foreach ($results as &$result) {
+        $roles = og_get_user_roles('node', $gid, $result->uid);
+        $formatted_roles = [];
+        foreach ($roles as $role) {
+          if ($role <> 'member') {
+            $formatted_roles[] = ucwords ($role);
+          }
+        }
+        if (count($formatted_roles)) {
+          usort ($formatted_roles, "ma_core_sort_og_roles");
+          $result->users_name = $result->users_name . ' (' . implode(', ', $formatted_roles) . ')';
+        }
+      }
+
+    }
+  }
+}
+
+/**
+ * Helper function to sort the OG roles so that Protocol Steward is listed ahead of Contributor.
+ */
+function ma_core_sort_og_roles($leftItem, $rightItem){
+  $order =  $roles_order = [
+    'Community Manager',
+    'Protocol Steward',
+    'Contributor'
+  ];
+
+  $flipped = array_flip($order);
+
+  $leftPos = $flipped[$leftItem];
+  $rightPos = $flipped[$rightItem];
+  return $leftPos >= $rightPos;
 }
 
 /**
@@ -115,16 +150,26 @@ function ma_core_og_get_users_per_role_and_group ($role_name, $group_bundle, $gi
 /**
  * Get all users of a group
  */
-function ma_core_og_get_users_in_group($gid) {
+function ma_core_og_get_uids_in_group($gid) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'user')
     ->fieldCondition('og_user_node', 'target_id', $gid);
-
   if ($results = $query->execute()) {
     $uids = array_keys($results['user']);
-    return user_load_multiple($uids);
+    return $uids;
   }
 }
+
+/**
+ * Get all users of a group
+ */
+function ma_core_og_get_users_in_group($gid) {
+  $uids = ma_core_og_get_uids_in_group($gid);
+  if (count($uids)) {
+    return user_load_multiple(ma_core_og_get_uids_in_group($gid));
+  }
+}
+
 
 /**
  * Helper function to load users by core role.
@@ -335,4 +380,105 @@ function ma_core_taxonomy_term_delete($term) {
             }
         }
     }
+}
+
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_core_block_info() {
+  $blocks['create_content'] = array(
+    'info' => t('Create Content'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_core_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'create_content':
+      $block['subject'] = t('Create Content');
+      $block['content'] = ma_core_create_content_block();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * The Create Content block which appears on the Community, CP, Calendar Section, Discussion Section, and Document Section node views.
+ */
+function ma_core_create_content_block() {
+
+  $nid = arg(1);
+  if (is_numeric($nid)) {
+    $node = node_load($nid);
+
+    switch ($node->type) {
+      case 'community':
+        $link_sources = [
+          'cultural_protocol_group' => '?og_group_ref=' . $nid,
+          'digital_heritage' => '/' . $nid,
+        ];
+        break;
+      case 'cultural_protocol_group':
+        $link_sources = [
+          'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
+        ];
+        if (module_exists('ma_collaboration_tools')) {
+          foreach (ma_culturalprotocol_collab_parent_node_types() as $parent_type) {
+            $link_sources[$parent_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid . '?destination=node/' . arg(1) . '/last_tab';
+          }
+        }
+        break;
+      default:
+        return; // Safeguard. This should never happen.
+    }
+
+    // Output the links
+    $links = "";
+    foreach ($link_sources as $target_type => $link_query) {
+      $target_type_link = str_replace('_', '-', $target_type);
+      if (og_user_access('node', $nid, 'create ' . $target_type . ' content')) {
+        $links .= '<div class="view-content"><a href="' . '/node/add/' . $target_type_link . $link_query . '">Create ' . node_type_get_names()[$target_type] . '</a></div>';
+      }
+    }
+
+    return $links;
+  }
+}
+
+/**
+ * Helper function recursively unset keys from an array.
+ */
+function recursive_unset(&$array, $unwanted_key) {
+  unset($array[$unwanted_key]);
+  foreach ($array as &$value) {
+    if (is_array($value)) {
+      recursive_unset($value, $unwanted_key);
+    }
+  }
+}
+
+/**
+ * Helper function to recursively compare arrays, including associative keys.
+ */
+function array_diff_assoc_recursive($array1, $array2) {
+  $difference=array();
+  foreach($array1 as $key => $value) {
+    if( is_array($value) ) {
+      if( !isset($array2[$key]) || !is_array($array2[$key]) ) {
+        $difference[$key] = $value;
+      } else {
+        $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+        if( !empty($new_diff) )
+          $difference[$key] = $new_diff;
+      }
+    } else if( !array_key_exists($key,$array2) || $array2[$key] !== $value ) {
+      $difference[$key] = $value;
+    }
+  }
+  return $difference;
 }
