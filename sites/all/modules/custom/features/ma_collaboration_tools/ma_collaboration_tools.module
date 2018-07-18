@@ -221,7 +221,9 @@ function ma_collaboration_tools_add_content_to_section_link($entity) {
 function ma_collaboration_tools_edit_collab_section_link($entity) {
   if (node_access('update', $entity)) {
     $node_disp_name = node_type_get_names()[$entity->type];
-    return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit');
+    return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit', [
+      'query' => ['destination' => 'node/' . arg(1)],
+    ]);
   }
 }
 
