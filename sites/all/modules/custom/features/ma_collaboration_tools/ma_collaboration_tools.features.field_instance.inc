@@ -966,12 +966,19 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => 'Enter the Discussion Topic Content Here',
     'display' => array(
+      'community_record' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'default' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'featured' => array(
         'label' => 'above',
@@ -1027,12 +1034,17 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'node_reference',
         'settings' => array(),
-        'type' => 'node_reference_default',
-        'weight' => 10,
+        'type' => 'hidden',
+        'weight' => 30,
       ),
       'full' => array(
         'label' => 'above',
@@ -1077,26 +1089,17 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'double_field',
-        'settings' => array(
-          'first' => array(
-            'format' => '_none',
-            'hidden' => 0,
-            'prefix' => '',
-            'suffix' => ':&nbsp;',
-          ),
-          'second' => array(
-            'format' => '_none',
-            'hidden' => 0,
-            'prefix' => '',
-            'suffix' => '',
-          ),
-          'style' => 'inline',
-        ),
-        'type' => 'double_field_unformatted_list',
-        'weight' => 12,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'full' => array(
         'label' => 'above',
@@ -1163,15 +1166,17 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
       'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 13,
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -1220,15 +1225,47 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 7,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 14,
+        'type' => 'textformatter_list',
+        'weight' => 5,
       ),
       'full' => array(
         'label' => 'above',
@@ -1292,15 +1329,47 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 15,
+        'type' => 'textformatter_list',
+        'weight' => 6,
       ),
       'full' => array(
         'label' => 'above',
@@ -1368,12 +1437,17 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 8,
+        'type' => 'hidden',
+        'weight' => 32,
       ),
       'full' => array(
         'label' => 'above',
@@ -1414,12 +1488,19 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
-      'default' => array(
-        'label' => 'above',
+      'community_record' => array(
+        'label' => 'hidden',
         'module' => 'file',
         'settings' => array(),
-        'type' => 'file_default',
-        'weight' => 6,
+        'type' => 'file_table',
+        'weight' => 2,
+      ),
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'file',
+        'settings' => array(),
+        'type' => 'file_table',
+        'weight' => 2,
       ),
       'featured' => array(
         'label' => 'above',
@@ -1503,12 +1584,17 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 11,
+        'type' => 'hidden',
+        'weight' => 33,
       ),
       'full' => array(
         'label' => 'above',
@@ -1552,15 +1638,47 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 9,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 16,
+        'type' => 'textformatter_list',
+        'weight' => 7,
       ),
       'full' => array(
         'label' => 'above',
@@ -1624,12 +1742,17 @@ function ma_collaboration_tools_field_default_field_instances() {
     'deleted' => 0,
     'description' => '',
     'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
       'default' => array(
         'label' => 'above',
-        'module' => 'og_ui',
         'settings' => array(),
-        'type' => 'og_list_default',
-        'weight' => 4,
+        'type' => 'hidden',
+        'weight' => 31,
       ),
       'featured' => array(
         'label' => 'above',
