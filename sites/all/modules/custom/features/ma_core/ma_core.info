@@ -319,6 +319,7 @@ features[variable][] = ds_extras_vd
 features[variable][] = entity_delete_log_entity_types
 features[variable][] = field_bundle_settings_node__article
 features[variable][] = field_bundle_settings_node__page
+features[variable][] = geofield_map_google_auth_method
 features[variable][] = jquery_update_compression_type
 features[variable][] = jquery_update_jquery_admin_version
 features[variable][] = jquery_update_jquery_cdn

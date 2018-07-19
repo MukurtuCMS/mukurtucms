@@ -148,6 +148,21 @@ function ma_splash_manage_collaboration_tools($form, &$form_state) {
     '#type' => 'item',
     '#markup' => t('3. For replying via email to comments to work, and for daily and weekly email notification digests to work, a cron job needs to be set up to run on the site. Drupal\'s "automatic cron" method is not sufficient for this. Instead, have your system administrator set up a cron job (or use a cron service) as explained as the "second way" at ' . l('drupal.org', 'https://www.drupal.org/docs/7/setting-up-cron/overview') . '. Comments are imported from email replies on every cron run, so a frequency of at least every 5 minutes is recommended. There is no need to disable automatic cron.')
   ];
+
+  $form['gmaps_api_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Google Maps API Key (optional)'),
+    '#description' => t('For the map to show on events, obtain a Google Maps Javascript API key at <a href="@link">@link</a> and paste it here.', array(
+      '@link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key',
+    )),
+    '#default_value' => variable_get('geofield_map_google_apikey', ''),
+    '#states' => [
+      'visible' =>[
+        ':input[name="collab_tools_enabled"]' => array('checked' => TRUE),
+      ],
+    ],
+  );
+
   $form['submit_button'] = [
     '#type' => 'submit',
     '#value' => t('Save Settings'),
@@ -173,6 +188,8 @@ function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
     variable_set('collab_tools_email_domain', $form_state['values']['domain']);
     variable_set('collab_tools_email_username', $form_state['values']['name']);
     variable_set('collab_tools_email_password', $form_state['values']['pass']);
+    variable_set('geofield_map_google_apikey', $form_state['values']['gmaps_api_key']);
+
     $mailbox = [
       'mail' => 'collaboration_tools',
       'admin_title' => 'collaboration_tools',
