@@ -101,10 +101,8 @@ function nodeadd (settings, submit) {
       break;
 
     default:
-    // Mukurtu patch -- pass the calendar NID to the add event form, then redirect to the current page (the CP, or if not on the CP, the calendar).
-      var viewDomKey = Object.keys(Drupal.settings.views.ajaxViews)[0];
-      var calendarNid = Drupal.settings.views.ajaxViews[viewDomKey].view_args;
-      window.location.assign('//' + window.location.host + '/node/add/' + settings.node_type + '/' + calendarNid + query + '&destination=' + Drupal.settings.getQ);
+      // Mukurtu patch -- pass the calendar NID through the link to the add event form, then redirect to the current page (the CP, or if not on the CP, the calendar).
+      window.location.assign('//' + window.location.host + '/node/add/' + settings.node_type + '/' + Drupal.settings.calendarNid + query + '&destination=' + Drupal.settings.getQ);
   }
 }
 
