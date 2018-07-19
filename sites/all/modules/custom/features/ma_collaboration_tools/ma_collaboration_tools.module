@@ -176,7 +176,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
     }
   }
 
-
+  // Events
   if ($view_mode == 'full' && $node->type == 'event') {
 
     $date = &$node->content['field_oa_date'][0]['#markup'];
@@ -189,6 +189,22 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
       $date =$rrdiv  . '<div class="label-inline">Next:&nbsp;</div>' . $rest;
     }
 
+  }
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function ma_collaboration_tools_node_load ($nodes, $types)  {
+  foreach ($nodes as &$node) {
+    if ($node->type =='event') {
+
+      // If there is no gmaps key, then do not show the location map.
+      if (!variable_get('geofield_map_google_apikey')) {
+        unset($node->field_oa_geo_location);
+      }
+
+    }
   }
 }
 
