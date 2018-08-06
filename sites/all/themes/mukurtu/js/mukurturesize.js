@@ -12,6 +12,20 @@ jQuery(document).ready(function ($) {
 		}
 	}
 
+	// Hero Image: Two Columns Resize
+	// entity entity-bean bean-hero-image-two-columns view-mode-default 
+	function heroImageTwoColumnsResize() {
+		var width = $(window).width();
+		$(".bean-hero-image-two-columns").each(function () {
+			if (width > 768) {
+				var totalHeight = parseInt($(this).css("height"), 10);
+				$(this).find(".col-sm-6 img").css("min-height", totalHeight + "px");
+			} else {
+				$(this).find(".col-sm-6 img").css("min-height", "");
+			}
+		});
+	}
+
 	// Featured Content Video Resize
 	function featuredContentResize() {
 		$(".view-mode-featured_content .scald-atom .mejs-container").each(function () {
@@ -29,6 +43,7 @@ jQuery(document).ready(function ($) {
 	}
 
 	function mukurtuOnResize() {
+		heroImageTwoColumnsResize();
 		refereshPanelAccordion();
 		featuredContentResize();
 	}
