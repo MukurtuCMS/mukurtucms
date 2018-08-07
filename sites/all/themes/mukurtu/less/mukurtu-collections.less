@@ -57,6 +57,11 @@
         color: #111111;
         font-size: 16px;
 
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            padding-right: 10px;
+        }
+
         // Desktop
         @media (min-width: @screen-md-min) {
             font-size: 17px;
@@ -200,7 +205,7 @@
 
 .node-word-list.view-mode-full,
 .node-collection.view-mode-full {
-    padding-bottom: 40px;
+    padding-bottom: 60px;
 
     >div:first-of-type {
         .fullwidth;
@@ -367,7 +372,7 @@
         // Pager
         .text-center {
             position: absolute;
-            bottom: 0;
+            bottom: -80px;
             left: 0;
             right: 0;
             margin-left: auto;

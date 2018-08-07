@@ -1,5 +1,10 @@
 /// Start bean
 .bean-hero-image-one-column {
+    .content {
+        position: relative;
+        width: 100%;
+    }
+
     .field-name-field-hero-image-caption .field-item {
         position: absolute;
         top: 50%;
@@ -41,6 +46,8 @@
 
     .row > div.col-sm-6 {
         padding: 0px;
+        padding-bottom: 100%;
+        margin-bottom: -100%;
     }
 
     .field-name-field-hero-image {
@@ -56,8 +63,8 @@
 
         // Tablet
         @media (min-width: @screen-sm-min) {
-            padding-bottom: 99999px;
-            margin-bottom: -99999px;
+            //padding-bottom: 99999px;
+            //margin-bottom: -99999px;
         }
 
         .field-name-field-welcome-title .field-item {

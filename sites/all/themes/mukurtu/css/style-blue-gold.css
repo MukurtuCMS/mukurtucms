@@ -8001,6 +8001,10 @@ footer header {
 .page-node-edit #edit-oggroup-fieldset-body .form-item .input-group {
   display: none;
 }
+.bean-hero-image-one-column .content {
+  position: relative;
+  width: 100%;
+}
 .bean-hero-image-one-column .field-name-field-hero-image-caption .field-item {
   position: absolute;
   top: 50%;
@@ -8036,6 +8040,8 @@ footer header {
 }
 .bean-hero-image-two-columns .row > div.col-sm-6 {
   padding: 0px;
+  padding-bottom: 100%;
+  margin-bottom: -100%;
 }
 .bean-hero-image-two-columns .field-name-field-hero-image img {
   margin: auto;
@@ -8055,12 +8061,6 @@ footer header {
 .bean-hero-image-two-columns .row > div:nth-of-type(2) a:hover,
 .bean-hero-image-two-columns .row > div:nth-of-type(2) a:focus {
   text-decoration: none;
-}
-@media (min-width: 768px) {
-  .bean-hero-image-two-columns .row > div:nth-of-type(2) {
-    padding-bottom: 99999px;
-    margin-bottom: -99999px;
-  }
 }
 .bean-hero-image-two-columns .row > div:nth-of-type(2) .field-name-field-welcome-title .field-item {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -8324,6 +8324,9 @@ ul.pagination li.pager-last {
   ul.pagination li.pager-last {
     display: inline;
   }
+}
+ul.pagination li.pager-ellipsis span {
+  border: none;
 }
 .slick-carousel-single button.slick-arrow,
 .slick-carousel-slider-for button.slick-arrow {
@@ -8721,6 +8724,9 @@ ul.pagination li.pager-last {
 .scald-atom .field-name-download-atom a:focus {
   background-color: #138aab;
   text-decoration: none;
+}
+.scald-menu .view-filters .views-exposed-form .views-exposed-widgets .input-group .form-control {
+  z-index: 0;
 }
 #breadcrumb {
   width: 100vw;
@@ -9294,6 +9300,9 @@ body #admin-menu {
     font-size: 16px;
   }
 }
+.view-mode-full .field-name-dh-related-items-teasers {
+  text-align: center;
+}
 .view-mode-search_result .label-inline,
 .view-mode-teaser .label-inline {
   letter-spacing: 1.2px;
@@ -9492,6 +9501,9 @@ body #admin-menu {
 .image-grid .views-field-name .field-content a {
   font-size: 16px;
   font-weight: bold;
+}
+.view-mode-mukurtu_scald_related_items img {
+  margin: auto;
 }
 .view-mukurtu-frontpage-browse-by-community {
   padding-bottom: 30px;
@@ -9891,6 +9903,11 @@ body #admin-menu {
   color: #111111;
   font-size: 16px;
 }
+@media (min-width: 768px) {
+  .large-teaser-box .field-name-field-collection-summary {
+    padding-right: 10px;
+  }
+}
 @media (min-width: 992px) {
   .large-teaser-box .field-name-field-collection-summary {
     font-size: 17px;
@@ -10011,7 +10028,7 @@ body #admin-menu {
 }
 .node-word-list.view-mode-full,
 .node-collection.view-mode-full {
-  padding-bottom: 40px;
+  padding-bottom: 60px;
 }
 .node-word-list.view-mode-full > div:first-of-type,
 .node-collection.view-mode-full > div:first-of-type {
@@ -10293,7 +10310,7 @@ body #admin-menu {
 .node-word-list.view-mode-full .field-name-field-digital-heritage-items .text-center,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .text-center {
   position: absolute;
-  bottom: 0;
+  bottom: -80px;
   left: 0;
   right: 0;
   margin-left: auto;
