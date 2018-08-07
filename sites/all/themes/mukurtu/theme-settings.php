@@ -28,6 +28,7 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   );
 
   //// Default Images
+  /*
   $form['mukurtu']['images'] = array(
     '#type' => 'fieldset',
     '#title' => t('Default Images'),
@@ -43,7 +44,8 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
     '#default_value' => variable_get('mukurtu_theme_default_audio_image', ''),
     '#upload_location' => 'public://',
   );
-  
+  */
+
   //// Footer.
   $form['mukurtu']['footer'] = array(
     '#type' => 'fieldset',
@@ -115,6 +117,7 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   );
 
   // Hero Image
+  /*
   $form['mukurtu']['frontpage']['mukurtu_theme_frontpage_hero_image'] = array(
     '#title' => t('Hero Image'),
     '#type' => 'managed_file',
@@ -122,4 +125,5 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
     '#default_value' => theme_get_setting('mukurtu_theme_frontpage_hero_image'),
     '#upload_location' => 'public://theme/mukurtu/',
   );
+  */
 }

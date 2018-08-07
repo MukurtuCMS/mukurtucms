@@ -80,3 +80,25 @@ function mukurtu_preprocess_field(&$variables, $hook) {
         }
     }
 }
+
+function mukurtu_block_view_alter(&$data, $block) {
+    // Rather than mess with block display, we configure all pre-packaged frontpage
+    // blocks to display and hide the ones not selected in the theme settings.
+    $frontpage_hero_setting = theme_get_setting('mukurtu_theme_frontpage_layout', 'mukurtu');
+
+    if(isset($block->bid)) {
+        switch($block->bid) {
+            case 'bean-frontpage-hero-image-one-column':
+                if($frontpage_hero_setting != 'large-hero') {
+                    unset($data['content']);
+                }
+                break;
+            case 'bean-frontpage-hero-image-two-columns':
+                if($frontpage_hero_setting != 'side-by-side') {
+                    unset($data['content']);
+                }
+                break;
+            default:
+        }
+    }
+}
