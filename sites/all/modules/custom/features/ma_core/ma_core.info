@@ -7,6 +7,7 @@ project = ma_core
 dependencies[] = advanced_help
 dependencies[] = atom_reference
 dependencies[] = backup_migrate
+dependencies[] = bean
 dependencies[] = better_exposed_filters
 dependencies[] = block
 dependencies[] = boxes

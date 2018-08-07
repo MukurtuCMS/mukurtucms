@@ -168,23 +168,29 @@ function ma_core_context_default_contexts() {
   $context->reactions = array(
     'block' => array(
       'blocks' => array(
-        'mukurtu_theme_blocks-mukurtu_theme_frontpage_hero' => array(
-          'module' => 'mukurtu_theme_blocks',
-          'delta' => 'mukurtu_theme_frontpage_hero',
+        'bean-frontpage-hero-image-one-column' => array(
+          'module' => 'bean',
+          'delta' => 'frontpage-hero-image-one-column',
           'region' => 'header',
-          'weight' => '-10',
+          'weight' => '-9',
+        ),
+        'bean-frontpage-hero-image-two-columns' => array(
+          'module' => 'bean',
+          'delta' => 'frontpage-hero-image-two-columns',
+          'region' => 'header',
+          'weight' => '-8',
         ),
         'views-c3e75cf63f3ce664337f20e351ba7938' => array(
           'module' => 'views',
           'delta' => 'c3e75cf63f3ce664337f20e351ba7938',
           'region' => 'content',
-          'weight' => '-10',
+          'weight' => '-9',
         ),
         'views-450f9588d7199dab32cfdceb4015cb67' => array(
           'module' => 'views',
           'delta' => '450f9588d7199dab32cfdceb4015cb67',
           'region' => 'content',
-          'weight' => '-9',
+          'weight' => '-8',
         ),
       ),
     ),
