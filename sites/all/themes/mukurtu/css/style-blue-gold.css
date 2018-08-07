@@ -7599,6 +7599,9 @@ header,
     font-size: 44px;
   }
 }
+.popup-element .popup-element-title {
+  background: none;
+}
 .section-shadow {
   background: linear-gradient(#e6e6e6, #ffffff);
   background-repeat: no-repeat;
