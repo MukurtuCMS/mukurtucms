@@ -79,7 +79,6 @@ function ma_dictionary_form_views_exposed_form_alter(&$form, &$form_state) {
  */
 function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state) {
   // "Item Sharing Settings" field customizations versus how it works by default (as used in the DH node form) //
-
   // Not required for Dictionary Words
   $form['field_item_privacy_setting'][LANGUAGE_NONE]['#required'] = FALSE;
 
@@ -120,15 +119,20 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
     $form['field_dictionary_word_language'][LANGUAGE_NONE]['#default_value'] = $default_language;
 
     // Set default language community to anything valid. It'll be changed to the correct value on save
-    $first_language_tid = array_keys($form['field_dictionary_word_language']['und']['#options'])[0];
-    $first_language_community = _ma_dictionary_get_language_community_from_tid($first_language_tid);
-    if($first_language_community) {
-        $form['field_language_community'][LANGUAGE_NONE][0]['default']['#default_value'] = $first_language_community;
+    if(!empty($form['field_dictionary_word_language']['und']['#options'])) {
+        $first_language_tid = array_keys($form['field_dictionary_word_language']['und']['#options'])[0];
+        $first_language_community = _ma_dictionary_get_language_community_from_tid($first_language_tid);
+        if($first_language_community) {
+            $form['field_language_community'][LANGUAGE_NONE][0]['default']['#default_value'] = $first_language_community;
+        }
     }
   }
 
   // Change paragraphs button text to be dictionary specific
   $form['field_word_entry'][LANGUAGE_NONE]['add_more']['add_more']['#value'] = t('Add new word entry');
+
+  //   kpr($form);
+   //    kpr(debug_backtrace(TRUE));
 }
 
 /**
@@ -302,6 +306,15 @@ function ma_dictionary_node_view($node, $view_mode = 'full', $langcode = NULL) {
             }
         }
     }
+
+    // Add link in browse page
+    if($node->type == 'dictionary_word' && $view_mode == 'dictionary_word_summary') {
+        if(!empty($node->content['field_word_entry'][0]['entity']['paragraphs_item'])) {
+            foreach($node->content['field_word_entry'][0]['entity']['paragraphs_item'] as $k => $word_entry) {
+                $node->content['field_word_entry'][0]['entity']['paragraphs_item'][$k]['field_alternate_spelling'][0]['#markup'] = l($node->content['field_word_entry'][0]['entity']['paragraphs_item'][$k]['field_alternate_spelling'][0]['#markup'], drupal_get_path_alias("node/{$node->nid}"));
+            }
+        }
+    }
 }
 
 /**
@@ -444,7 +457,7 @@ function ma_dictionary_node_delete($node) {
 function ma_dictionary_node_access($node, $op, $account) {
     global $user;
     $type = is_string($node) ? $node : $node->type;
-
+    
     // Don't delete any language communities that are still being referenced by dictionary words
     if($type == 'language_community') {
         if($op == 'delete') {
@@ -457,27 +470,27 @@ function ma_dictionary_node_access($node, $op, $account) {
     // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
     // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
     if($type == 'dictionary_word') {
-      $groups = og_get_groups_by_user(NULL, 'node');
-      if (count($groups)) {
-        foreach ($groups as $group) {
-          $og_node = node_load($group);
-          if ($og_node->type == 'language_community') {
-            if ($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
-              if (!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
-                return NODE_ACCESS_ALLOW;
-              }
-            }
+        $groups = og_get_groups_by_user(NULL, 'node');
+        if(!empty($groups)) {
+            foreach($groups as $group) {
+                $og_node = node_load($group);
+                if($og_node->type == 'language_community') {
+                    if($op == 'create' && og_user_access('node', $group, 'create dictionary_word content')) {
+                        if(!isset($node->nid) && isset($node->uid) && $node->uid == $user->uid) {
+                            return NODE_ACCESS_ALLOW;
+                        }
+                    }
 
-            if ($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
-              return NODE_ACCESS_ALLOW;
-            }
+                    if($op == 'update' && og_user_access('node', $group, 'update own dictionary_word content') && $node->uid == $user->uid) {
+                        return NODE_ACCESS_ALLOW;
+                    }
 
-            if ($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
-              return NODE_ACCESS_ALLOW;
+                    if($op == 'update' && og_user_access('node', $group, 'update any dictionary_word content')) {
+                        return NODE_ACCESS_ALLOW;
+                    }
+                }
             }
-          }
         }
-      }
     }
 
     return NODE_ACCESS_IGNORE;

@@ -1,17 +1,17 @@
 ### TODO
 
-#### Features to be implemented
+#### Features to be implemented related to renderers and player
 
-* deeper WebVTT support (alignment, color, etc.) - include captionator
-* Full support for Ender.js, including mediaelement-and-player-standalone which includes ender.
-* thin line when controls are off
-* system-wide events
-* Ogg/Theora playback
-* Better alignment with native MediaElement (using shimichanga.com techniques)
+*All items listed in https://github.com/mediaelement/mediaelement/labels/Feature*
 
-*More items listed in https://github.com/johndyer/mediaelement/labels/Feature*
+**NOTE** Please make sure any features are labeled with `Feature` to make them available with the link above.
 
+#### Known issues related to renderers and player
 
-#### Known issues
+*Known issues to be resolved listed in https://github.com/mediaelement/mediaelement/labels/Bug*
 
-*Known issues to be resolved listed in https://github.com/johndyer/mediaelement/labels/Bug*
+**NOTE** Please make sure any bugs are labeled with `Bug` to make them available with the link above.
+
+### Any features/issues related to elements in controlbar or additional
+
+*All items listed in https://github.com/mediaelement/mediaelement-plugins/issues*

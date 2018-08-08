@@ -76,7 +76,8 @@ var Drupal = Drupal || {};
    */
   Drupal.behaviors.bootstrapPopovers = {
     attach: function (context, settings) {
-      if (!settings.bootstrap || !settings.bootstrap.popoverEnabled) {
+      // Immediately return if popovers are not available.
+      if (!settings.bootstrap || !settings.bootstrap.popoverEnabled || !$.fn.popover) {
         return;
       }
 
@@ -145,7 +146,12 @@ var Drupal = Drupal || {};
         }
       }
     },
-    detach: function (context) {
+    detach: function (context, settings) {
+      // Immediately return if popovers are not available.
+      if (!settings.bootstrap || !settings.bootstrap.popoverEnabled || !$.fn.popover) {
+        return;
+      }
+
       // Destroy all popovers.
       $(context).find('[data-toggle="popover"]')
         .off('click.drupal.bootstrap.popover')

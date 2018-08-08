@@ -32,12 +32,13 @@ function ma_person_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Biographic Information',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-biographic field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-biographic field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_biographic|node|person|form'] = $field_group;
@@ -77,7 +78,7 @@ function ma_person_field_group_info() {
   $field_groups['group_metadata_div|node|person|taxonomy_record_teaser'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_metadata|node|person|default';
   $field_group->group_name = 'group_metadata';
@@ -110,7 +111,7 @@ function ma_person_field_group_info() {
   $field_groups['group_metadata|node|person|default'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_person_media|node|person|default';
   $field_group->group_name = 'group_person_media';
@@ -158,12 +159,13 @@ function ma_person_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Record Management',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-record-connections field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-record-connections field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_record_connections|node|person|form'] = $field_group;
@@ -185,12 +187,13 @@ function ma_person_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Relations',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-relations field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-relations field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_relations|node|person|form'] = $field_group;

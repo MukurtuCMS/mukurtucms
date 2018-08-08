@@ -90,3 +90,23 @@ function ma_base_theme_modify_default_image_style($image_style_name){
 
     image_default_style_save($image_style);
 }
+
+/**
+ * Implements hook_node_view_alter().
+ */
+function ma_base_theme_node_view_alter(&$build) {
+    // Only display the first media item for certain view modes
+    $view_modes = array('featured_content');
+    if($build['#entity_type'] == 'node' && in_array($build['#view_mode'], $view_modes)){
+        if(isset($build['field_media_asset'])) {
+            $count = 0;
+            foreach($build['field_media_asset']['#items'] as $index => $media_item) {
+                if($count++ > 0) {
+                    if(isset($build['field_media_asset'][$index])) {
+                        unset($build['field_media_asset'][$index]);
+                    }
+                }
+            }
+        }
+    }
+}

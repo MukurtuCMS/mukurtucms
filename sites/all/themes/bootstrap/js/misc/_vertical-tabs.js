@@ -118,6 +118,7 @@ Drupal.verticalTab.prototype = {
         })
         .end()
         .addClass('active')
+        .attr('style', '')
         .siblings(':hidden.vertical-tabs-active-tab')
         .val(this.fieldset.attr('id'));
     this.fieldset.find('> div').addClass('in');

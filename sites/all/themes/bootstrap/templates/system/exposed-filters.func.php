@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_exposed_filters().
@@ -18,7 +19,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_exposed_filters($variables) {
+function bootstrap_exposed_filters(array $variables) {
   $form = $variables['form'];
   $output = '';
 
@@ -34,15 +35,12 @@ function bootstrap_exposed_filters($variables) {
     foreach (element_children($form['current']) as $key) {
       $items[] = drupal_render($form['current'][$key]);
     }
-    $output .= theme('item_list', array(
-      'items' => $items,
-      'attributes' => array(
-        'class' => array(
-          'clearfix',
-          'current-filters',
-        ),
-      ),
-    ));
+    $build = array(
+      '#theme' => 'item_list',
+      '#items' => $items,
+      '#attributes' => array('class' => array('clearfix', 'current-filters')),
+    );
+    $output .= drupal_render($build);
   }
   $output .= drupal_render_children($form);
   return '<div class="form-horizontal">' . $output . '</div>';

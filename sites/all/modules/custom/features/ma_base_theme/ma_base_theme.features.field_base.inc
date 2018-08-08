@@ -26,7 +26,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 1,
     'type' => 'text_with_summary',
   );
@@ -47,7 +49,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -73,6 +77,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'category',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 1,
     'type' => 'taxonomy_term_reference',
@@ -99,6 +104,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'contributor',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -149,6 +155,7 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'backend' => 'default',
       'srid' => 4326,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'geofield',
@@ -168,7 +175,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -194,6 +203,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'creator',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -215,6 +225,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -234,7 +245,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_with_summary',
   );
@@ -255,6 +268,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -276,6 +290,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -302,9 +317,53 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'format',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_hero_image'.
+  $field_bases['field_hero_image'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_hero_image',
+    'indexes' => array(
+      'sid' => array(
+        0 => 'sid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'atom_reference',
+    'settings' => array(
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'atom_reference',
+  );
+
+  // Exported field_base: 'field_hero_image_caption'.
+  $field_bases['field_hero_image_caption'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_hero_image_caption',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'field_identifier'.
@@ -323,6 +382,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -344,6 +404,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'image',
     'settings' => array(
       'default_image' => 0,
+      'treeable' => FALSE,
       'uri_scheme' => 'public',
     ),
     'translatable' => 0,
@@ -370,6 +431,7 @@ function ma_base_theme_field_default_field_bases() {
         'all' => 'This item may only be shared with members belonging to ALL the protocols listed.',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -396,6 +458,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'language',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -425,6 +488,7 @@ function ma_base_theme_field_default_field_bases() {
         'http://creativecommons.org/licenses/by-nc-nd/4.0' => 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -463,6 +527,7 @@ function ma_base_theme_field_default_field_bases() {
         'http://localcontexts.org/tk/v/1.0' => 'TK Verified Label (TK V)',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -482,7 +547,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'atom_reference',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'atom_reference',
   );
@@ -507,6 +574,7 @@ function ma_base_theme_field_default_field_bases() {
         1 => '',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -533,6 +601,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'publisher',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -552,7 +621,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -573,6 +644,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -599,6 +671,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'subject',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -625,6 +698,7 @@ function ma_base_theme_field_default_field_bases() {
           'vocabulary' => 'tags',
         ),
       ),
+      'treeable' => FALSE,
     ),
     'translatable' => 1,
     'type' => 'taxonomy_term_reference',
@@ -644,7 +718,9 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -663,9 +739,54 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_welcome_message'.
+  $field_bases['field_welcome_message'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_welcome_message',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_welcome_title'.
+  $field_bases['field_welcome_title'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_welcome_title',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
   );
 
   // Exported field_base: 'group_access'.
@@ -689,6 +810,7 @@ function ma_base_theme_field_default_field_bases() {
         2 => 'Strict',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_integer',
@@ -715,6 +837,7 @@ function ma_base_theme_field_default_field_bases() {
         1 => 'Group type',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -741,6 +864,7 @@ function ma_base_theme_field_default_field_bases() {
         1 => 'Show on registration page',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -782,6 +906,7 @@ function ma_base_theme_field_default_field_bases() {
       ),
       'handler_submit' => 'Change handler',
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'target_type' => NULL,
     'translatable' => 0,
@@ -809,6 +934,7 @@ function ma_base_theme_field_default_field_bases() {
         1 => 'Override default roles and permissions',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',

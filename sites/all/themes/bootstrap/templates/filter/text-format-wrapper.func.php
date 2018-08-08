@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_text_format_wrapper().
@@ -18,7 +19,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_text_format_wrapper($variables) {
+function bootstrap_text_format_wrapper(array $variables) {
   $element = $variables['element'];
   $output = '<div class="text-format-wrapper">';
   $output .= $element['#children'];

@@ -57,6 +57,37 @@ function ma_community_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|community|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'community';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|community|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|community|full';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'community';
@@ -64,6 +95,11 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->settings = array(
     'create_content_block_ds_field' => array(
       'weight' => '10',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'community_membership_status' => array(
+      'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -92,18 +128,13 @@ function ma_community_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'group_management_links' => array(
-      'weight' => '2',
+    'featured_collections' => array(
+      'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'group_members' => array(
       'weight' => '4',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'title' => array(
-      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -123,6 +154,36 @@ function ma_community_ds_field_settings_info() {
     ),
   );
   $export['node|community|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|community|teaser';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'community';
+  $ds_fieldsetting->view_mode = 'teaser';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'body' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|community|teaser'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -186,6 +247,24 @@ function ma_community_ds_custom_fields_info() {
     'block_render' => '3',
   );
   $export['community_dh_items'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'community_membership_status';
+  $ds_field->label = 'Community Membership Status';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'community|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php print drupal_render(_render_subscribe_link($entity)); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['community_membership_status'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -300,8 +379,8 @@ function ma_community_ds_layout_settings_info() {
       'right' => array(
         2 => 'links',
         3 => 'admin_actions',
-        4 => 'group_register',
-        5 => 'group_group',
+        4 => 'group_group',
+        5 => 'group_register',
       ),
     ),
     'fields' => array(
@@ -309,10 +388,14 @@ function ma_community_ds_layout_settings_info() {
       'comments' => 'left',
       'links' => 'right',
       'admin_actions' => 'right',
-      'group_register' => 'right',
       'group_group' => 'right',
+      'group_register' => 'right',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'header' => 'div',
       'left' => 'div',
@@ -324,8 +407,50 @@ function ma_community_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => 0,
   );
   $export['node|community|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|community|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'community';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'field_community_image_thumbnail',
+        2 => 'featured_content_type',
+        3 => 'title',
+        4 => 'body',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'field_community_image_thumbnail' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+      'body' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|community|featured_content'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -408,31 +533,30 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'community';
   $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_2col_stacked';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'header' => array(
-        0 => 'field_community_image',
-        1 => 'title',
+      'right' => array(
+        0 => 'community_membership_status',
+        4 => 'group_members',
+        5 => 'community_protocol_items',
+        6 => 'field_parent_community',
+        7 => 'field_child_communities',
+        8 => 'community_browse_all_dh_link',
+        9 => 'featured_collections',
+        10 => 'create_content_block_ds_field',
+      ),
+      'top' => array(
+        1 => 'field_community_image',
       ),
       'left' => array(
         2 => 'body',
-        3 => 'group_management_links',
-        4 => 'community_dh_items',
-      ),
-      'right' => array(
-        5 => 'group_members',
-        6 => 'community_protocol_items',
-        7 => 'field_parent_community',
-        8 => 'field_child_communities',
-        9 => 'community_browse_all_dh_link',
-        10 => 'featured_collections',
-        11 => 'create_content_block_ds_field',
+        3 => 'community_dh_items',
       ),
     ),
     'fields' => array(
-      'field_community_image' => 'header',
-      'title' => 'header',
+      'community_membership_status' => 'right',
+      'field_community_image' => 'top',
       'body' => 'left',
       'group_management_links' => 'left',
       'community_dh_items' => 'left',
@@ -450,19 +574,61 @@ function ma_community_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'header' => 'div',
+      'top' => 'div',
       'left' => 'div',
       'right' => 'div',
-      'footer' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
   );
   $export['node|community|full'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|community|teaser';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'community';
+  $ds_layout->view_mode = 'teaser';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'right' => array(
+        0 => 'title',
+        1 => 'featured_content_type',
+        2 => 'body',
+      ),
+      'left' => array(
+        3 => 'field_community_image_thumbnail',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'body' => 'right',
+      'field_community_image_thumbnail' => 'left',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|community|teaser'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -495,6 +661,7 @@ function ma_community_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|community|thumbed'] = $ds_layout;
 

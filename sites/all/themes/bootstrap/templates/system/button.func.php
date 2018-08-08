@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_button().
@@ -19,7 +20,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_button($variables) {
+function bootstrap_button(array $variables) {
   $element = $variables['element'];
   $text = $element['#value'];
 

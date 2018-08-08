@@ -1,8 +1,11 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_pager().
  */
+
+/* @noinspection PhpDocMissingThrowsInspection */
 
 /**
  * Returns HTML for a query pager.
@@ -27,7 +30,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_pager($variables) {
+function bootstrap_pager(array $variables) {
   $output = "";
   $items = array();
   $tags = $variables['tags'];
@@ -63,23 +66,27 @@ function bootstrap_pager($variables) {
   }
 
   // End of generation loop preparation.
+  /* @noinspection PhpUnhandledExceptionInspection */
   $li_first = theme('pager_first', array(
     'text' => (isset($tags[0]) ? $tags[0] : t('first')),
     'element' => $element,
     'parameters' => $parameters,
   ));
+  /* @noinspection PhpUnhandledExceptionInspection */
   $li_previous = theme('pager_previous', array(
     'text' => (isset($tags[1]) ? $tags[1] : t('previous')),
     'element' => $element,
     'interval' => 1,
     'parameters' => $parameters,
   ));
+  /* @noinspection PhpUnhandledExceptionInspection */
   $li_next = theme('pager_next', array(
     'text' => (isset($tags[3]) ? $tags[3] : t('next')),
     'element' => $element,
     'interval' => 1,
     'parameters' => $parameters,
   ));
+  /* @noinspection PhpUnhandledExceptionInspection */
   $li_last = theme('pager_last', array(
     'text' => (isset($tags[4]) ? $tags[4] : t('last')),
     'element' => $element,
@@ -87,7 +94,7 @@ function bootstrap_pager($variables) {
   ));
   if ($pager_total[$element] > 1) {
 
-    // Only show "first" link if set on components' theme setting
+    // Only show "first" link if set on components' theme setting.
     if ($li_first && bootstrap_setting('pager_first_and_last')) {
       $items[] = array(
         'class' => array('pager-first'),
@@ -111,8 +118,9 @@ function bootstrap_pager($variables) {
       // Now generate the actual pager piece.
       for (; $i <= $pager_last && $i <= $pager_max; $i++) {
         if ($i < $pager_current) {
+          /* @noinspection PhpUnhandledExceptionInspection */
           $items[] = array(
-            // 'class' => array('pager-item'),
+            // 'class' => array('pager-item'),.
             'data' => theme('pager_previous', array(
               'text' => $i,
               'element' => $element,
@@ -129,6 +137,7 @@ function bootstrap_pager($variables) {
           );
         }
         if ($i > $pager_current) {
+          /* @noinspection PhpUnhandledExceptionInspection */
           $items[] = array(
             'data' => theme('pager_next', array(
               'text' => $i,
@@ -153,11 +162,11 @@ function bootstrap_pager($variables) {
         'data' => $li_next,
       );
     }
-    // // Only show "last" link if set on components' theme setting
+    // // Only show "last" link if set on components' theme setting.
     if ($li_last && bootstrap_setting('pager_first_and_last')) {
       $items[] = array(
-       'class' => array('pager-last'),
-       'data' => $li_last,
+        'class' => array('pager-last'),
+        'data' => $li_last,
       );
     }
 

@@ -79,7 +79,10 @@ function mukurtu_display_formatters_paged_node_field_formatter_view($entity_type
     $nodes = array();
     foreach ($items as $delta => $item) {
         if(isset($item['target_id'])) {
-            $nodes[] = $item['target_id'];
+            $node = node_load($item['target_id']);
+            if(node_access('view', $node)) {                
+                $nodes[] = $node;
+            }
         }
     }
 
@@ -88,11 +91,8 @@ function mukurtu_display_formatters_paged_node_field_formatter_view($entity_type
     $chunks = array_chunk($nodes, $items_per_page, TRUE);
 
     // Load the nodes for only that page
-    foreach($chunks[$current_page] as $nid) {
-        $node = node_load($nid);
-        if($node) {
-            $element[] = node_view($node, $item_view_mode);
-        }
+    foreach($chunks[$current_page] as $node) {
+        $element[] = node_view($node, $item_view_mode);
     }
 
     // Show the pager controls

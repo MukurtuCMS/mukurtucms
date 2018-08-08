@@ -1,4 +1,4 @@
-<!-- @file Instructions on how to sub-theme the Drupal Bootstrap base theme using the CDN Starterkit. -->
+<!-- @file Instructions for subtheming using the CDN Starterkit. -->
 <!-- @defgroup subtheme_cdn -->
 <!-- @ingroup subtheme -->
 # CDN Starterkit
@@ -25,5 +25,5 @@ Please refer to the @link subtheme_settings Sub-theme Settings @endlink topic.
 Please refer to the @link registry Theme Registry @endlink topic.
 
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: http://getbootstrap.com
-[jsDelivr CDN]: http://www.jsdelivr.com
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[jsDelivr CDN]: https://www.jsdelivr.com

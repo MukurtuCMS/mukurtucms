@@ -319,7 +319,7 @@ function ma_digitalheritage_node_view($node, $view_mode) {
       // If no media items at all on the DH item and in grid view, put a placeholder image
       if (!$node->field_media_asset) {
         $node->content['field_media_asset'][0]['#markup'] = '
-      <div class="col-md-4 col-md-push-8 field field-name-field-media-asset field-type-atom-reference field-label-hidden">
+      <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
         <div class="field-items">
             <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
         </div>
@@ -333,7 +333,9 @@ function ma_digitalheritage_node_view($node, $view_mode) {
         // Users (especially new admins) are sometimes viewing community records independently of the parent record and getting confused
         // because they think it is a standalone record.  Add a link back to the parent record to avoid confusion.
         // Only show to users with edit rights, only concerned about unintentional edits.
-        if(!empty($node->field_community_record_parent)) {
+        $current_page_node = menu_get_object();
+        $current_page_nid = isset($current_page_node) ? $current_page_node->nid : 0;
+        if(!empty($node->field_community_record_parent) && ($current_page_nid != $node->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
             $parent_record = node_load($node->field_community_record_parent[$node->language][0]['target_id']);
             if($parent_record && node_access('update', $node)) {
 
@@ -934,8 +936,15 @@ function ma_digitalheritage_page_alter(&$data) {
 
       // Book pages
       if ($node->field_book_children OR $node->field_book_parent) {
-          drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
-          $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
+          // Future use of ma_digital_heritage_book_page_build_carousel is deprecated. Still use it in the case where
+          // the old mukurtu_starter theme is still in use, or a sub-theme of mukurtu_starter.
+          // Themes going forward should implement this in the template layer.
+          global $theme;
+          $theme_list = list_themes();
+          if($theme == 'mukurtu_starter' || (isset($theme_list[$theme]->base_themes) && isset($theme_list[$theme]->base_themes['mukurtu_starter']))) {
+              drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_multipage_carousel.js');
+              $dh_page_content = ma_digital_heritage_book_page_build_carousel($node);
+          }
       }
 
       // Community Records
@@ -983,7 +992,7 @@ function ma_digitalheritage_page_alter(&$data) {
             $dh_tabs[] = array(
               'type' => 'node',
               'nid' => $community_record->nid,
-              'view_mode' => 'community_record',
+              'view_mode' => 'full',
               'title' => $community_record_tab_title,
               'hide_title' => 0,
               #'weight' => 0,

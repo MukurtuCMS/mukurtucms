@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "html" theme hook [pre]process functions.
@@ -9,11 +10,14 @@
  *
  * See template for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see html.tpl.php
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_html(&$variables) {
+function bootstrap_preprocess_html(array &$variables) {
   // Backport from Drupal 8 RDFa/HTML5 implementation.
   // @see https://www.drupal.org/node/1077566
   // @see https://www.drupal.org/node/1164926
@@ -82,11 +86,14 @@ function bootstrap_preprocess_html(&$variables) {
  * add this base theme's logic and risk introducing breakage and performance
  * issues.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see html.tpl.php
  *
  * @ingroup theme_process
  */
-function bootstrap_process_html(&$variables) {
+function bootstrap_process_html(array &$variables) {
   // Merge in (not reference!) core's ambiguous and separate "attribute" and
   // "class" arrays. These arrays are meant for the BODY element, but it must
   // be done at the process level in case sub-themes wish to add classes to

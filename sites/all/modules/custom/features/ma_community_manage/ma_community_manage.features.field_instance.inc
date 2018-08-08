@@ -28,6 +28,12 @@ function ma_community_manage_field_default_field_instances() {
         'type' => 'list_default',
         'weight' => 22,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
@@ -38,7 +44,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 28,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -96,6 +102,12 @@ function ma_community_manage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 17,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
@@ -106,7 +118,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 27,
       ),
       'thumbed' => array(
         'label' => 'above',

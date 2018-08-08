@@ -31,13 +31,13 @@
    * and closes the suggestions popup when doing so.
    */
   Drupal.autocompleteSubmit = function () {
-    $('.form-autocomplete > .dropdown').each(function () {
+    // NOTE: Do not return true as this is non-standard. Keep it similar to
+    // core. If another contrib project alters this functionality, then it is
+    // the responsibility of a sub-theme to override this method and combine
+    // this project with the other project.
+    return $('.form-autocomplete > .dropdown').each(function () {
       this.owner.hidePopup();
-    });
-
-    // Always return true to make it possible to submit even when there was an
-    // autocomplete suggestion list open.
-    return true;
+    }).length == 0;
   };
 
   /**

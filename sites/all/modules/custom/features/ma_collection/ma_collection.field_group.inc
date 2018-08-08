@@ -144,8 +144,8 @@ function ma_collection_field_group_info() {
     'weight' => '2',
     'children' => array(
       0 => 'field_digital_heritage_items',
-      1 => 'og_group_ref',
-      2 => 'field_item_privacy_setting',
+      1 => 'field_item_privacy_setting',
+      2 => 'og_group_ref',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -155,7 +155,7 @@ function ma_collection_field_group_info() {
         'classes' => 'group-items field-group-htab',
         'description' => '',
       ),
-      'formatter' => 'closed',
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_items|node|collection|form'] = $field_group;

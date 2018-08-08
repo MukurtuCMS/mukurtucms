@@ -174,6 +174,18 @@ function ma_collection_strongarm() {
       'person_teaser' => array(
         'custom_settings' => FALSE,
       ),
+      'collections_browse' => array(
+        'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

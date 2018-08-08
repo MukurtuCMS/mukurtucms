@@ -5,7 +5,8 @@
 - [Do you support X module?](#support)
 - [Do you support Internet Explorer?](#ie)
 - [Is Drupal Bootstrap a module or theme?](#module-or-theme)
-- [What does the JavaScript error `TypeError: $(...).on is not a function` mean?](#jquery)
+- [What does the JavaScript error `TypeError: $(...).on is not a function`
+  mean?](#jquery)
 - [Where can I discuss an issue in real time?](#irc)
 - [Where should I make changes?](#changes)
 - [Why are my sub-theme's `.info` settings ignored?](#theme-settings-ignored)
@@ -53,7 +54,7 @@ you are attempting to integrate the base theme with.
 - [Bootstrap Library](https://www.drupal.org/project/bootstrap_library)
 - [Display Suite](https://www.drupal.org/project/ds)
 - [Display Suite Bootstrap Layouts](https://www.drupal.org/project/ds_bootstrap_layouts)
-- [LESS module](https://drupal.org/project/less)
+- [LESS module](https://www.drupal.org/project/less)
 - [Panels](https://www.drupal.org/project/panels)
 - [Panels Bootstrap Layouts](https://www.drupal.org/project/panels_bootstrap_layouts)
 
@@ -63,9 +64,9 @@ you are attempting to integrate the base theme with.
 **A: No, not "officially"**
 
 The [Bootstrap Framework] itself does not officially support older Internet
-Explorer [compatibility modes](http://getbootstrap.com/getting-started/#support-ie-compatibility-modes).
+Explorer [compatibility modes](https://getbootstrap.com/docs/3.3/getting-started/#support-ie-compatibility-modes).
 To ensure you are using the latest rendering mode for IE, consider installing
-the [HTML5 Tools](https://drupal.org/project/html5_tools) module.
+the [HTML5 Tools](https://www.drupal.org/project/html5_tools) module.
 
 Internet Explorer 8 requires the use of [Respond.js] to enable media queries
 (Responsive Web Design). However, [Respond.js] does not work with CSS that is
@@ -124,7 +125,7 @@ theme is updated. This makes keeping track of changes next to impossible.
 Instead, you should create a custom sub-theme that isn't hosted on Drupal.org.
 
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: http://getbootstrap.com
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
 [Respond.js]: https://github.com/scottjehl/Respond
 
 ---
@@ -161,5 +162,5 @@ function hook_update_N() {
 
 [Drush]: http://www.drush.org
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: http://getbootstrap.com
-[jQuery Update]: https://drupal.org/project/jquery_update
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[jQuery Update]: https://www.drupal.org/project/jquery_update

@@ -78,9 +78,9 @@ For more details, see: https://www.drupal.org/node/2329453
 
 ### `grunt compile`
 This task ensures that all the necessary variations of versions and themes of
-Bootstrap and Bootswatch are compile from `starterkits/less/less/overrides.less`.
-Typically, this task generates hundreds of files and can take upwards of \~10
-seconds to fully complete.
+Bootstrap and Bootswatch are compile from
+`starterkits/less/less/overrides.less`. Typically, this task generates hundreds
+of files and can take upwards of \~10 seconds to fully complete.
 
 Optionally, if the `--dev` parameter is specified, this task will only compile
 the starterkit's `overrides.less` file for the latest version of Bootstrap:
@@ -104,7 +104,8 @@ and where to go for additional information. This documentation is intended for
 the project maintainers to help provide consistent results between releases.
 
 ### Release notes template
-The following is just a template to show a typical structured format used as release notes for this project:
+The following is just a template to show a typical structured format used as
+release notes for this project:
 
 ```html
 <h3 id="change-records">Change Records</h3>
@@ -117,7 +118,7 @@ However, if it is long, it should really be a change record.
 <h3 id="notes">Notes</h3>
 
 <p>&nbsp;</p>
-<p>Changes since <!-- Last major release version (no dev/beta/rc) --> (<!-- Total commit count -->):</p>
+<p>Changes since <!-- tag --> (<!-- commit count -->):</p>
 
 <h3 id="features">New Features</h3>
 <ul>
@@ -157,14 +158,14 @@ download and install this tool and follow the remaining steps.
 5. Generate a list of issues/commits by executing the following from the root
    of the project:
 
-   `drush release-notes <last official version> <new version> --commit-count`
+   `drush release-notes <old> <new> --commit-count`
    (e.g. `drush release-notes 7.x-3.0 7.x-3.1 --commit-count`)
 
    If this is a follow-up "alpha/beta/RC" release, always use the last
    "alpha/beta/RC" release version instead. This will allow for a quicker
    parsing of the list to merge into the previously copied release notes:
 
-   `drush release-notes <last alpha/beta/RC version> <new alpha/beta/RC version> --commit-count`
+   `drush release-notes <old> <new> --commit-count`
    (e.g. `drush release-notes 7.x-3.1-beta2 7.x-3.1-beta3 --commit-count`)
 
 6. Copy the entire generated output into the template, just under where the
@@ -173,5 +174,6 @@ download and install this tool and follow the remaining steps.
 7. Go though each item (`<li>`) that contains an issue link, ignoring duplicates
    and standalone verbiage (direct commits). Move (cut and paste) these items
    into the appropriate "New Features" or "Bug Fixes" sections.
-8. Once complete the generated list should be empty (e.g. `<ul></ul>`), remove it.
+8. Once complete the generated list should be empty (e.g. `<ul></ul>`), remove
+   it.
 9. Save the release node.

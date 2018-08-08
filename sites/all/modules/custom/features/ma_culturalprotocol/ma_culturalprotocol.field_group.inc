@@ -37,7 +37,7 @@ function ma_culturalprotocol_field_group_info() {
         'classes' => '',
         'description' => '',
       ),
-      'formatter' => 'closed',
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_advanced|node|cultural_protocol_group|form'] = $field_group;
@@ -65,12 +65,13 @@ function ma_culturalprotocol_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Basic',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => '',
         'required_fields' => 1,
+        'classes' => '',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_basic|node|cultural_protocol_group|form'] = $field_group;

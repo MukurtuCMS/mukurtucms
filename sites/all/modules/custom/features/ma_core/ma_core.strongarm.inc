@@ -457,7 +457,9 @@ col-md-4 col-md-push-8';
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'menu_expanded';
-  $strongarm->value = array();
+  $strongarm->value = array(
+    0 => 'main-menu',
+  );
   $export['menu_expanded'] = $strongarm;
 
   $strongarm = new stdClass();

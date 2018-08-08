@@ -3,7 +3,7 @@
   "description": "Built to use Bootstrap, a sleek, intuitive, and powerful front-end framework for faster and easier web development.",
   "type": "drupal-theme",
   "license": "GPL-2.0",
-  "homepage": "http://drupal.org/project/bootstrap",
+  "homepage": "https://www.drupal.org/project/bootstrap",
   "authors": [
     {
       "name": "Mark Carver (markcarver)",
@@ -22,7 +22,7 @@
     }
   ],
   "support": {
-    "docs": "http://drupal-bootstrap.org",
+    "docs": "https://drupal-bootstrap.org",
     "issues": "https://www.drupal.org/project/issues/bootstrap",
     "irc": "irc://irc.freenode.org/drupal-bootstrap",
     "source": "http://cgit.drupalcode.org/bootstrap"
