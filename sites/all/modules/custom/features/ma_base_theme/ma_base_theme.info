@@ -30,6 +30,7 @@ dependencies[] = ma_core
 dependencies[] = ma_digitalheritage
 dependencies[] = ma_media
 dependencies[] = ma_scald
+dependencies[] = ma_views_pages
 dependencies[] = media
 dependencies[] = mediafield
 dependencies[] = menu
