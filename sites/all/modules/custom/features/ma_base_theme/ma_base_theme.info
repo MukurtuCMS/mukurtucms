@@ -326,3 +326,4 @@ features_exclude[field_instance][node-digital_heritage-field_source] = node-digi
 features_exclude[field_instance][node-digital_heritage-field_subject] = node-digital_heritage-field_subject
 features_exclude[field_instance][node-digital_heritage-field_tags] = node-digital_heritage-field_tags
 features_exclude[field_instance][node-digital_heritage-field_tk_body] = node-digital_heritage-field_tk_body
+features_exclude[dependencies][fe_block] = fe_block

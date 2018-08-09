@@ -11,6 +11,15 @@ function ma_base_theme_update_7001() {
     $mukurtu_starter_settings['bootstrap_tooltip_placement'] = 'auto bottom';
     variable_set('theme_mukurtu_starter_settings', $mukurtu_starter_settings);
 }
+
+
+/**
+ * Create default front page blocks for new Mukurtu theme
+ */
+function ma_base_theme_update_7002(&$sandbox) {
+    _ma_base_theme_create_default_beans();
+}
+
 //function ma_base_theme_install () {
 //  $themes_to_enable = array (
 //    'bootstrap',

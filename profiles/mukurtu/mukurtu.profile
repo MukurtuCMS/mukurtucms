@@ -22,7 +22,8 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
     'mukurtu_cycle_search_api' => array(),
-    'mukurtu_revert_features' => array()
+    'mukurtu_revert_features' => array(),
+    'mukurtu_create_default_content' => array()
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -265,6 +266,10 @@ function mukurtu_cycle_search_api() {
             }
         }
     }
+}
+
+function mukurtu_create_default_content() {
+  _ma_base_theme_create_default_beans();
 }
 
 //function mukurtu_client_form() {
