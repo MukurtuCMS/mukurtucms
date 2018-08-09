@@ -26,6 +26,7 @@ dependencies[] = license
 dependencies[] = list
 dependencies[] = ma_base_theme
 dependencies[] = ma_core
+dependencies[] = ma_importexport_dc
 dependencies[] = media
 dependencies[] = mediafield
 dependencies[] = menu

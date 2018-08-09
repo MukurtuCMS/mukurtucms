@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<items>
+  <item>
+    <title attr="attribute0">I am a title0</title>
+    <description><text>I am a description0</text></description>
+  </item>
+  <item>
+    <title attr="attribute1">I am a title1</title>
+    <description><text>I am a description1</text></description>
+  </item>
+  <item>
+    <title attr="attribute2">I am a title2</title>
+    <description><text>I am a description2</text></description>
+  </item>
+
+  <thing>
+    <img src="http://drupal.org" />
+    <img src="http://drupal.org/project/feeds_ex" />
+  </thing>
+</items>

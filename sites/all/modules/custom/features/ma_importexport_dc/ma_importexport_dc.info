@@ -1,0 +1,11 @@
+name = Mukurtu Import/Export Dublin Core
+description = Import and Export DH Items in Dublin Core
+core = 7.x
+package = Features
+dependencies[] = ctools
+dependencies[] = feeds
+dependencies[] = feeds_ex
+features[ctools][] = feeds:feeds_importer_default:1
+features[features_api][] = api:2
+features[feeds_importer][] = dublin_core_digital_heritage_importer
+project path = sites/all/modules/custom/features
