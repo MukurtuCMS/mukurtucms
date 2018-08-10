@@ -307,7 +307,9 @@ return substr($path, strripos($path, \'/\') + 1);';
   $handler->display->display_options['empty']['area']['id'] = 'area';
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
-  $handler->display->display_options['empty']['area']['content'] = 'There is no content in this group.';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'There are no communities to display. Only communities with thumbnail images will be displayed here.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Relationship: OG membership: OG membership from Node */
   $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
   $handler->display->display_options['relationships']['og_membership_rel']['table'] = 'node';
@@ -365,7 +367,7 @@ return substr($path, strripos($path, \'/\') + 1);';
     t('Sort by'),
     t('Asc'),
     t('Desc'),
-    t('There is no content in this group.'),
+    t('There are no communities to display. Only communities with thumbnail images will be displayed here.'),
     t('OG membership from node'),
     t('Block'),
     t('Browse by Community'),
@@ -397,6 +399,13 @@ return substr($path, strripos($path, \'/\') + 1);';
   $handler->display->display_options['row_plugin'] = 'node';
   $handler->display->display_options['row_options']['view_mode'] = 'featured_content';
   $handler->display->display_options['row_options']['links'] = FALSE;
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'No content has been featured. To mark content as featured, edit the content, go to the "Publishing options" tab, select "Promoted to front page" and save the content.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -433,6 +442,7 @@ return substr($path, strripos($path, \'/\') + 1);';
     t('Sort by'),
     t('Asc'),
     t('Desc'),
+    t('No content has been featured. To mark content as featured, edit the content, go to the "Publishing options" tab, select "Promoted to front page" and save the content.'),
     t('Block'),
   );
   $export['mukurtu_frontpage_featured_content'] = $view;
