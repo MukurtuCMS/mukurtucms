@@ -9571,6 +9571,9 @@ body #admin-menu {
 .view-mukurtu-frontpage-browse-by-community .field-name-field-community-image-thumbnail img {
   height: 100%;
 }
+.view-mukurtu-frontpage-browse-by-community .view-empty {
+  background: none;
+}
 .top-bottom-image-title {
   padding-bottom: 30px;
 }
