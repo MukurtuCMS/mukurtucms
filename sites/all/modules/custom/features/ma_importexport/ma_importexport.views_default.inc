@@ -202,7 +202,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_creator']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -309,13 +309,13 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_licence_trad_1']['table'] = 'field_data_field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['field'] = 'field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['element_label_colon'] = FALSE;
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc_1']['id'] = 'field_licence_std_cc_1';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['field'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['label'] = 'Standard and Creative Commons Licensing URL';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['type'] = 'license_formatter_export';
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
@@ -329,11 +329,10 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['status']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['status']['type'] = 'boolean';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Field: Content: Collection */
+  /* Field: Content: Collections */
   $handler->display->display_options['fields']['field_collection']['id'] = 'field_collection';
   $handler->display->display_options['fields']['field_collection']['table'] = 'field_data_field_collection';
   $handler->display->display_options['fields']['field_collection']['field'] = 'field_collection';
-  $handler->display->display_options['fields']['field_collection']['label'] = 'Collections';
   $handler->display->display_options['fields']['field_collection']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_collection']['type'] = 'entityreference_entity_id';
   $handler->display->display_options['fields']['field_collection']['settings'] = array(
@@ -596,7 +595,7 @@ print $output;
   $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_creator']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -716,7 +715,7 @@ print $output;
   $handler->display->display_options['fields']['field_licence_trad_1']['table'] = 'field_data_field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['field'] = 'field_licence_trad';
   $handler->display->display_options['fields']['field_licence_trad_1']['element_label_colon'] = FALSE;
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc_1']['id'] = 'field_licence_std_cc_1';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc_1']['field'] = 'field_licence_std_cc';
@@ -724,7 +723,7 @@ print $output;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['alter']['strip_tags'] = TRUE;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_licence_std_cc_1']['type'] = 'license_formatter_export';
-  /* Field: Field: Licensing Options */
+  /* Field: Field: Standard and Creative Commons Licensing */
   $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
   $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
@@ -793,7 +792,7 @@ print $output;
     t('[field_licence_trad-value]'),
     t('Traditional Knowledge Labels'),
     t('Standard and Creative Commons Licensing URL'),
-    t('Licensing Options'),
+    t('Standard and Creative Commons Licensing'),
     t('Published'),
     t('Collections'),
     t('Sharing Protocol'),
@@ -805,7 +804,7 @@ print $output;
     t('Broken handler field_data_field_communities.field_communities'),
     t('Broken handler field_data_field_culturalprotocol.field_culturalprotocol'),
     t('Broken handler field_data_field_relation.field_relation'),
-    t('Original Date'),
+    t('Original Date Description'),
     t('Sharing Protocols'),
   );
   $export['export'] = $view;
