@@ -482,3 +482,87 @@ function array_diff_assoc_recursive($array1, $array2) {
   }
   return $difference;
 }
+
+/**
+ * Custom breadcrumbs for Mukurtu
+ */
+function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
+  // Return immediately if Mukurtu breadcrumbs are disabled
+  if(variable_get('mukurtu_breadcrumbs_opt_out', FALSE)) {
+    return;
+  }
+
+  $i = end(array_keys($active_trail));
+  
+  // Keep track of where we are. For container type pages (browse pages, collections, dictionary, word lists)
+  // we want to try and include breadcrumbs back to the origin
+  // Grab the previous item. Currently we are only tracking one previous item
+  $past_item = NULL;
+  if(isset($_SESSION['mukurtu_breadcrumb_item'])) {
+    $past_item = $_SESSION['mukurtu_breadcrumb_item'];
+  }
+
+  // If we are on a possible container, store the item
+  if(isset($item['page_arguments'][0]->type)) {
+    switch($item['page_arguments'][0]->type) {
+      case "community":
+      case "collection":
+      case "word_list":
+        $_SESSION['mukurtu_breadcrumb_item']['item'] = $item;
+        $_SESSION['mukurtu_breadcrumb_item']['trail'] = $active_trail[$i];
+        $_SESSION['mukurtu_breadcrumb_item']['query_parameters'] = drupal_get_query_parameters();
+        $past_item = NULL;
+        break;
+    }
+  }
+  // Capture browse pages
+  if(is_string($item['page_arguments'][0])) {
+    $_SESSION['mukurtu_breadcrumb_item']['item'] = $item;
+    $_SESSION['mukurtu_breadcrumb_item']['trail'] = $active_trail[$i];
+    $_SESSION['mukurtu_breadcrumb_item']['query_parameters'] = drupal_get_query_parameters();
+    $past_item = NULL;
+  }
+
+  if(isset($item['page_arguments'][0]->type)) {
+    // Some pages we don't want to mess with the breadcrumb
+    // In that case, clear the past item
+    if($item['page_arguments'][0]->type == 'page') {
+      $past_item = NULL;
+    }
+
+    // At this point, we have information about the previous page that 
+    // we would like to include in the breadcrumbs
+    if($past_item) {
+      // Start by inserting the past item in the next to last breadcrumb slot
+      $active_trail[$i + 1] = $active_trail[$i];
+      $active_trail[$i] = $past_item['trail'];
+
+      // The search pages are more complicated, we want to retain both 
+      // the exact page arguments and query parameters
+      if(is_string($past_item['item']['page_arguments'][0]) &&
+        stripos($past_item['item']['page_arguments'][0], '_browse') !== FALSE) {
+        $href = $past_item['item']['path'];
+
+        // Handle the page arguments
+        if(count($past_item['item']['page_arguments']) > 1) {
+          foreach(range(1, count($past_item['item']['page_arguments'])) as $delta) {
+            $href .= "/{$past_item['item']['page_arguments'][$delta]}";
+          }
+        }
+
+        // Update the breadcrumb, include the query parameters
+        $breadcrumb_title = $past_item['item']['title'] != "" ? $past_item['item']['title'] . ' Results' : $past_item['trail']['link_title'] . ' Results';
+        $active_trail[$i] = array(  
+          'title' => t($breadcrumb_title),
+          'href' => $href, 'localized_options' => array('query' => $past_item['query_parameters'])
+        );
+      }
+    } else {
+      // If viewing a collection, add in a "Collections" breadcrumb
+      if($item['page_arguments'][0]->type == 'collection') {
+        $active_trail[$i + 1] = $active_trail[$i];
+        $active_trail[$i] = array('title' => t('Collections'), 'href' => 'collections', 'localized_options' => array());
+      }
+    }
+  }
+}
