@@ -77,7 +77,7 @@ jQuery(document).ready(function($){
 
 	// Skip to page
 	$(".mukurtu-page-select-wrapper select").change(function () {
-	    var slide = $(this).find("option:selected")[0].index;
+		var slide = $(this).find("option:selected")[0].index - 1;
 	    $("#mukurtu-multipage-carousel").slick('slickGoTo', slide, false);
 	    $("#mukurtu-multipage-carousel .slick-slide[data-slick-index='" + slide +"'] a")[0].click();
 	});
