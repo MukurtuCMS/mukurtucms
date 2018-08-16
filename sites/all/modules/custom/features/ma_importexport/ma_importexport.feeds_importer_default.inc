@@ -56,7 +56,7 @@ function ma_importexport_feeds_importer_default() {
             'language' => 'und',
           ),
           2 => array(
-            'source' => 'title',
+            'source' => 'Title',
             'target' => 'title',
             'unique' => 0,
             'language' => 'und',
