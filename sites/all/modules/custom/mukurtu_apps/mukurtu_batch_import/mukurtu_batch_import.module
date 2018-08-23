@@ -278,7 +278,8 @@ function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
             }
         }
     }
-
+    
+    ksort($matches);
     $bestmatch = end($matches);
     return $bestmatch;
 }
