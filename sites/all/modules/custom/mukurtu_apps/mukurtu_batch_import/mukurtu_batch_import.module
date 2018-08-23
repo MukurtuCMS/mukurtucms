@@ -263,19 +263,24 @@ function mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) {
 // Try to figure out which importer a file should use based on its filename
 function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
     $entities = _mukurtu_export_get_entity_bundle_array();
-
+    $matches = array(0 => NULL);
     foreach($entities as $entity_type => $bundle) {
         foreach($bundle as $bundle_name) {
-            foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {
+            foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {                
                 if(stripos($filename, $variant) !== FALSE) {
                     $file_type['entity_type'] = $entity_type;
                     $file_type['bundle_name'] = $bundle_name;
-                    return $file_type;
+                    
+                    // Keep track of how many characters matched. We are assuming that
+                    // the longer the match, the better.
+                    $matches[strlen($variant)] = $file_type;
                 }
             }
         }
     }
-    return NULL;
+
+    $bestmatch = end($matches);
+    return $bestmatch;
 }
 
 function mukurtu_batch_import_generate_import_steps($files) {
