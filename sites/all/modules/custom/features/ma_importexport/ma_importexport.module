@@ -38,137 +38,144 @@ function ma_importexport_menu() {
  * Implements hook_feeds_processor_targets_alter().
  */
 function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
-    if($entity_type == 'node' && $bundle_name == 'digital_heritage') {
-        $targets['og_group_ref:guid_or_nid'] = array(
-            'name' => t('Protocol (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Protocol of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-            'callback' => 'ma_importexport_set_target',
-            'real_target' => 'og_group_ref',
-        );
-        $targets['field_collection:guid_or_nid'] = array(
-            'name' => t('Collection (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Collections of field_collection matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-            'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_collection',
-        );
-        $targets['field_related_dh_items:guid_or_nid'] = array(
-            'name' => t('Related Items (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Related Items of field_related_dh_items matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-            'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_related_dh_items',
-        );
-        $targets['field_book_children:guid_or_nid'] = array(
-            'name' => t('Book Pages (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Book Pages of field_book_children matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-            'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_book_children',
-        );
-        $targets['field_community_record_children:guid_or_nid'] = array(
-            'name' => t('Community Records (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Community Records of field_community_record_children matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-            'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_community_record_children',
-        );
-        $targets['field_community_record_parent:guid_or_nid'] = array(
-            'name' => t('Community Record Parent (Entity reference by Feeds GUID, failover to NID)'),
-            'description' => t('The field instance Community Record Parent of field_community_record_parent matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-            'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_community_record_parent',
-        );
+    // Loop through all entity types. Add a guid_or_nid option for any node/entity reference
+    foreach(array_keys(entity_get_info()) as $entity_type) {
+        if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom', 'taxonomy_term'))) {
+            continue;
+        }
+
+        $entity_info = entity_get_info($entity_type);
+
+        foreach($entity_info['bundles'] as $bundle_name => $ids) {
+            $fields_info = field_info_instances($entity_type, $bundle_name);
+            foreach($fields_info as $field_name => $field_value) {
+                $field = field_info_field($field_name);
+
+                $ref_type = '';
+                switch($field['type']) {
+                case 'node_reference':
+                    $ref_type = 'Node Reference';
+                    break;
+                case 'entityreference':
+                    $ref_type = 'Entity Reference';
+                    break;
+                case 'atom_reference':
+                    $ref_type = 'Scald Atom Reference';
+                    break;
+                    /*                case 'taxonomy_term_reference':
+                    $ref_type = 'Taxonomy Term Reference';
+                    break;*/
+                }
+
+                if($ref_type != '') {
+                    $target_id = array_keys($field['columns'])[0];
+                    $target_key = "{$field_name}:guid_or_{$target_id}";
+                    $target_name = t('@field_label (@ref_type by Feeds GUID, failover to @target_id)', array('@field_label' => $field_value['label'], '@ref_type' => $ref_type, '@target_id' => $target_id));
+                    $target_description = t('The field instance @field_label of @field_name matched by Feeds GUID.  If the GUID is not found, it will be used as a @target_id', array('@field_label' => $field_value['label'], '@field_name' => $field_name, '@target_id' => $target_id));
+
+                    $targets[$target_key] = array(
+                        'name' => $target_name,
+                        'description' => $target_description,
+                        'callback' => 'ma_importexport_set_target',
+                        'real_target' => $field_name
+                    );
+                }
+            }
+        }
     }
 
-   if($entity_type == 'node' && $bundle_name == 'cultural_protocol_group') {
-       $targets['og_group_ref:guid_or_nid'] = array(
-           'name' => t('Parent Community (Entity reference by Feeds GUID, failover to NID)'),
-           'description' => t('The field instance Parent Community of og_group_ref matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-           'callback' => 'ma_importexport_set_target',
-           'real_target' => 'og_group_ref',
-       );
-   }
-
-   if($entity_type == 'node' && $bundle_name == 'collection') {
-       $targets['field_digital_heritage_items:guid_or_nid'] = array(
-           'name' => t('Digital Heritage Items (Entity reference by Feeds GUID, failover to NID)'),
-           'description' => t('The field instance Digital Heritage Items of field_digital_heritage_items matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-           'callback' => 'ma_importexport_set_target',
-           'real_target' => 'field_digital_heritage_items',
-       );
-   }
-   
-   if($entity_type == 'node' && $bundle_name == 'community') {
-       $targets['field_parent_community:guid_or_nid'] = array(
-           'name' => t('Parent Community (Entity reference by Feeds GUID, failover to NID)'),
-           'description' => t('The field instance Parent Community of field_parent_community matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-           'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_parent_community',
-       );
-   }
-
-   if($entity_type == 'scald_atom') {
-       $targets['field_scald_protocol:guid_or_nid'] = array(
-           'name' => t('Protocol (Entity reference by Feeds GUID, failover to NID)'),
-           'description' => t('The field instance Protocol of field_scald_protocol matched by Feeds GUID.  If the GUID is not found, it will be used as a NID'),
-           'callback' => 'ma_importexport_set_target',
-            'real_target' => 'field_scald_protocol',
-       );
-   }
+    // Scald Media Source
+    $targets['file_source'] = array(
+        'name' => t('Media Source'),
+        'description' => t('The media source for a Scald Atom'),
+        'callback' => 'ma_importexport_set_media_source_target',
+        'real_target' => 'file_source',
+    );
 }
-
 
 /**
  * Callback for ma_importexport_feeds_processor_targets_alter
  */
-function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
-{
-    $new_target = str_replace(':guid_or_nid', '', $target);                             
-                
+function ma_importexport_set_media_source_target($source, $entity, $target, $value, $mapping) {
+    if(isset($value[0]) && !empty($value[0])) {
+        $entity->{$target} = $value[0];
+        ma_scald_save_atom_source($value[0], $entity);
+    }
+}
+
+/**
+ * Callback for ma_importexport_feeds_processor_targets_alter
+ */
+function ma_importexport_set_target($source, $entity, $target, $value, $mapping) {
+    preg_match('/:guid_or_(.+)/', $target, $matches);
+    $new_target = str_replace($matches[0], '', $target);
+    $target_id_index = $matches[1];
+
+    $field_info = field_info_field($new_target);
+    $target_id_name = array_keys($field_info['indexes'])[0];
+
+    switch($field_info['type']) {
+    case 'entityreference':
+        $entity_type = $field_info['settings']['target_type'];
+        break;
+    case 'node_reference':
+        $entity_type = 'node';
+        break;
+    case 'atom_reference':
+        $entity_type = 'scald_atom';
+        break;
+    }
+
+    // SCT: TODO Remove after testing
+    if(!$entity_type) {
+        dpm("missing entity_type for $target");
+    }
+
     foreach($value as $id) {
         if($id) {
             // Check if ID is a valid GUID.  If so, we use that.
-            $nid = ma_importexport_feeds_lookup_node_by_guid($id);
-            if(!$nid) {
+            $guid = ma_importexport_feeds_lookup_entity_by_guid($entity_type, $id);
+            if(!$guid) {
                 // Otherwise we assume ID is a NID
-                $nid = $id;
+                $guid = $id;
             }
-            $entity->{$new_target}[$entity->language][]['target_id'] = $nid;
+            $entity->{$new_target}[$entity->language][][$target_id_name] = $guid;
         }
     }    
+}
+
+
+/**
+ *  Lookup nid from guid
+ */
+function ma_importexport_feeds_lookup_entity_by_guid($entity_type, $guid) {
+  return db_select('feeds_item')
+    ->fields('feeds_item', array('entity_id'))
+    ->condition('entity_type', $entity_type)
+    ->condition('guid', $guid)
+    ->execute()
+    ->fetchField();
 }
 
 /**
  *  Lookup nid from guid
  */
 function ma_importexport_feeds_lookup_node_by_guid($guid) {
-  return db_select('feeds_item')
-    ->fields('feeds_item', array('entity_id'))
-    ->condition('entity_type', 'node')
-    ->condition('guid', $guid)
-    ->execute()
-    ->fetchField();
+  return ma_importexport_feeds_lookup_entity_by_guid('node', $guid);
 }
 
 /**
- *  Lookup nid from guid
+ *  Lookup tid from guid
  */
 function ma_importexport_feeds_lookup_term_by_guid($guid) {
-  return db_select('feeds_item')
-    ->fields('feeds_item', array('entity_id'))
-    ->condition('entity_type', 'taxonomy_term')
-    ->condition('guid', $guid)
-    ->execute()
-    ->fetchField();
+  return ma_importexport_feeds_lookup_entity_by_guid('taxonomy_term', $guid);
 }
 
 /**
  *  Lookup sid from guid
  */
 function ma_importexport_feeds_lookup_atom_by_guid($guid) {
-  return db_select('feeds_item')
-    ->fields('feeds_item', array('entity_id'))
-    ->condition('entity_type', 'scald_atom')
-    ->condition('guid', $guid)
-    ->execute()
-    ->fetchField();
+  return ma_importexport_feeds_lookup_entity_by_guid('scald_atom', $guid);
 }
 
 /**

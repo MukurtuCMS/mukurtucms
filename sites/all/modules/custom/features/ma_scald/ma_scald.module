@@ -496,3 +496,161 @@ function ma_scald_get_first_image_atom_content($atom_content_field) {
     }
     return $atom_content_field;
 }
+
+// This is the handler function for the scald atom "Media Source" field
+// during import. Typically this will either be the path to a file, an
+// external content ID (e.g., YouTube), or a URL to the external content.
+// See ma_importexport_set_media_source_target
+// We pair this with the scald provider to call all of the scald form
+// functions to recreate the base atom from scratch.
+function ma_scald_save_atom_source($source, &$entity) {
+    $type = isset($entity->type) ? $entity->type : NULL;
+
+    if($source) {
+        ma_scald_create_basic_atom($source, $entity, $type);
+    }
+    return;
+}
+
+/**
+ * Helper function that takes a media source ($filepath) and a scald provider and
+ * runs through all the scald form functions (source, add, options) for creating the atom.
+ * 
+ * This is ideal because it offloads all the details to the scald provider and scald
+ * will still call the relevant hooks.
+ */
+function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
+    // We are going to be making calls to the native Scald form functions, load those pages
+    module_load_include('inc', 'scald', 'includes/scald.pages');
+    $form_state = array();
+    $form_state['values']['atom0'][] = $atom;
+
+    // Copy initialization from scald_atom_add_page
+    // Start by getting the list of all the modules that said they can provide
+    // this atom type.
+    $scald_types = scald_types();
+    $providers = scald_atom_providers_opt();
+    $sources = $providers[$type];
+    $source = key($sources);
+
+    // Grab provider from the atom. If not set, use the from the provider list
+    // and hope for the best.
+    $provider = isset($atom->provider) ? $atom->provider : current($sources);
+
+    if (isset($form_state['scald']['atoms'][0])) {
+        $form_state['atom'] = $form_state['scald']['atoms'][0];
+    }
+
+    if (empty($form_state['scald'])) {
+        $form_state['scald'] = array(
+            'type' => $scald_types[$type],
+            'source' => isset($source) ? $source : NULL,
+            'provider' => $provider,
+        );
+    }
+    $form_state['scald']['step'] = 'source';
+
+    // Source
+    $source_form = array();
+    $source_form = scald_atom_add_form_source($source_form, $form_state);
+
+    // Add
+    $form_state['scald']['step'] = 'add';
+    $add_form = array();
+    $add_form = scald_atom_add_form_add($add_form, $form_state);
+
+    // Simulate uploading file
+    $location = $add_form['file']['#upload_location'];
+    $file_object = file_uri_to_object($filepath);
+    $file = file_move($file_object, $location);
+    $form_state['values']['file'] = $file->fid;
+
+    // Options
+    $form_state['scald']['step'] = 'options';
+    $options_form = array();
+    $options_form = scald_atom_add_form_options($options_form, $form_state);
+
+    if (isset($form_state['scald']['atoms'][0])) {
+        $form_state['atom'] = $form_state['scald']['atoms'][0];
+        $form_state['values']['atom0'][] = $form_state['atom'];
+    }
+
+    $provider_atom = _ma_scald_atom_add_form_options_submit($options_form, $form_state);
+    $atom = _ma_scald_merge_provider_atom($atom, $provider_atom);
+}
+
+/**
+ * Nearly wholesale copy of scald_atom_add_form_options_submit, except
+ * we don't want to:
+ * 1. Save the scald atom
+ * 2. Display the atom creation notice
+ * 
+ * Instead we return the atom, so that our import functions can integrate
+ * the atom fields that scald/scald provider created.
+ */
+function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
+    if (!$atoms = $form_state['scald']['atoms']) {
+      return;
+    }
+  
+    $atom_keys = array();
+    foreach(array_keys($atoms) as $delta) {
+      $atom_keys[] = 'atom' . $delta;
+    }
+    $values_excluding_atoms = array_diff_key($form_state['values'], array_flip($atom_keys));
+  
+    foreach ($atoms as $delta => $atom) {
+      $index = 'atom' . $delta;
+      $values = &$form_state['values'][$index];
+  
+      if (is_array($values['scald_actions'])) {
+        $bitstream = 0;
+        $actions = scald_actions();
+        foreach ($actions as $name => $action) {
+          if (!empty($values['scald_actions'][$name])) {
+            $bitstream |= $action['bitmask'];
+          }
+        }
+        $values['actions'] = $bitstream;
+      }
+  
+      $op = empty($atom->sid) ? t('created') : t('updated');
+  
+      // Prepare a form state that is suitable for modules that provide extra fields.
+      $atom_form_state = array('values' => $values + $values_excluding_atoms) + $form_state;
+      // Add back the structure required for fields and maintain a reference to
+      // the original form state values.
+      $atom_form_state['values'][$index] = &$values;
+  
+      // Let entity add its properties to the atom.
+      entity_form_submit_build_entity('scald_atom', $atom, $form[$index], $atom_form_state);
+  
+      // Then return it...
+      return $atom;
+    }
+    return NULL;
+}
+
+/**
+ * Copy the non-empty fields from the provider atom to the feeds atom. 
+ * Only copying the first level, this isn't a recursive deep dive.
+ */
+function _ma_scald_merge_provider_atom($feeds_atom, $provider_atom) {
+    $provider_fields = array_keys(get_object_vars($provider_atom));
+    $skip_fields = array('0', '1', 'atom0');
+    
+    foreach($provider_fields as $field) {
+        if(in_array($field, $skip_fields)) {
+            continue;
+        }
+
+        if(!empty($provider_atom->{$field})) {
+            if(!is_array($provider_atom->{$field}) 
+               || (is_array($provider_atom->{$field}) && !empty($provider_atom->{$field}))) {
+                $feeds_atom->{$field} = $provider_atom->{$field};
+            }
+        }
+    }
+
+    return $feeds_atom;
+}

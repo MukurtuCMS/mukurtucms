@@ -5,6 +5,8 @@
  * The Mukurtu export csv format handler.
  *
  * Adds configurable csv format to Mukurtu export.
+ * This module is based on the 'dsv' format module from Node Export.
+ *
  */
 
 /**
@@ -39,6 +41,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
 
   $settings['csv']['mukurtu_export_csv_enclosure'] = array(
     '#type' => 'textfield',
+      //    '#type' => 'hidden',
     '#title' => t('Escape enclosure'),
     '#size' => 5,
     '#maxlength' => 255,
@@ -302,9 +305,36 @@ function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $del
   return $csv_output;
 }
 
+
+/**
+ * Return the header label for a field name in a particular entity/bundle
+ */
 function _mukurtu_export_csv_get_header_label($entity_type, $bundle_name, $field_name) {
+    // Check for a feeds importer for this type/bundle
+    $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
+    $mapping = array();
+
+    if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => $importer))) {
+        $config = array_shift($config);
+        foreach($config->config['processor']['config']['mappings'] as $map) {
+            $mapping[$map['target']] = $map['source'];
+        }
+    }
+
+    // If we have a feeds importer setup, try to use the expected import headers as the export headers
+    if(!empty($mapping)) {
+        foreach($mapping as $import_field_name => $import_field_label) {
+            if(strpos($import_field_name, $field_name) !== FALSE) {
+                return $import_field_label;
+            }
+        }
+    }
+
+    // Otherwise, default to using the label of the field
     if($field_name == 'title') {
-        return 'Title';
+        $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
+        $title_label = $extra_fields['title']['label'];
+        return $title_label;
     }
 
     $info = field_info_instance($entity_type, $field_name, $bundle_name);
@@ -348,7 +378,12 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
       // Create a safe text version of this value and store it against the header using a safe key.
       $options = array('id_format' => $id_format);
 
-      list($value, $referenced_entities_to_encode, $files) = mukurtu_export_extract_value($entity_type, $parent, $v, $options);
+      // Get exportable value from field
+      //      if(is_null($parent)) {
+      //          list($value, $referenced_entities_to_encode, $files) = mukurtu_export_extract_value($entity_type, $header_value, $v, $options);
+      //      } else {      
+          list($value, $referenced_entities_to_encode, $files) = mukurtu_export_extract_value($entity_type, $parent, $v, $options);
+          //      }
 
       // Add any raw files we want to include
       if($export_files && !empty($files)) {
@@ -364,7 +399,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
             // Check permission?
 
             // Load entity
-            $referenced_entity_object = entity_load($referenced_entity_type, array($r_id));
+            $referenced_entity_object = mukurtu_export_entity_load_wrapper($referenced_entity_type, array($r_id));
             if(empty($referenced_entity_object)) {
               continue;
             }
@@ -479,21 +514,6 @@ function mukurtu_export_csv_array_to_csv($array, $delimiter, $enclosure, $separa
     foreach ($line as $line_key => $item) {
       if(!is_array($item)) {
         $item = array($item);
-      }
-
-      foreach($item as $item_key => $item_value) {
-
-        if (stripos($item_value, $enclosure) !== FALSE) {
-          $item[$item_key] = str_replace($enclosure, $enclosure . $enclosure, $item_value);
-        }
-        if (
-          (stripos($item_value, $delimiter) !== FALSE)
-          || (stripos($item_value, $enclosure) !== FALSE)
-          || (stripos($item_value, $separator) !== FALSE)
-          || ($escape_eol && stripos($item_value, "\n") !== FALSE)
-        ) {
-          $item[$item_key] = $enclosure . $item_value . $enclosure;
-        }
       }
       $out_item[] = implode($multivalue_delimiter, $item);
     }

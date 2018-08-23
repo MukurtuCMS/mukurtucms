@@ -12,8 +12,21 @@ function mukurtu_export_form($form, &$form_state) {
   //$is_batch = (isset($form_state['input']['op']) && $form_state['input']['op'] == 'Execute') ? TRUE : FALSE;
 
   if(!$is_batch && is_null($export_ids)){
-    $current_node = menu_get_object();
-    $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
+      $current_node = menu_get_object();
+      if($current_node) {
+          $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
+      } else {     
+          $args = arg();
+          if($args[0] == 'taxonomy') {
+              $item = menu_get_object('taxonomy_term', 2);
+              $export_ids = array('taxonomy_term' => array($item->vocabulary_machine_name => array($item->tid => $item)));
+          }
+
+          if($args[0] == 'atom') {
+              $item = menu_get_object('scald_atom', 1);
+              $export_ids = array('scald_atom' => array($item->type => array($item->sid => $item)));
+          }
+      }
   }
 
   // No format selected
@@ -183,7 +196,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
   foreach(array_keys(entity_get_info()) as $entity_type) {
 
     // Currently only show node/scald_atom fields
-    if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom'))) {
+    if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom', 'taxonomy_term'))) {
       continue;
     }
 
@@ -212,17 +225,40 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
         '#weight' => -2
       );
 
-      // Title
+      // Extra Fields (title, etc)
       $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
-      if(isset($extra_fields['title']['label'])) {
-          $title_label = $extra_fields['title']['label'];
-          $form['export_fields'][$entity_type][$bundle_name]['title'] = array(
+      if(!empty($extra_fields)) {
+          foreach($extra_fields as $extra_field_name => $extra_field) {
+              // Skip path/redirect fields
+              if(in_array($extra_field_name, array('path', 'redirect'))) {
+                  continue;
+              }
+
+              $form['export_fields'][$entity_type][$bundle_name][$extra_field_name] = array(
+                  '#type' => 'checkbox',
+                  '#title' => $extra_field['label'],
+                  '#default_value' => isset($defaults[$entity_type][$bundle_name][$extra_field_name]) ? $defaults[$entity_type][$bundle_name][$extra_field_name] : TRUE,
+                  '#weight' => -1
+              );
+          }
+      }
+
+      // TEST
+      if($entity_type == 'scald_atom') {
+          $form['export_fields'][$entity_type][$bundle_name]['provider'] = array(
               '#type' => 'checkbox',
-              '#title' => $title_label,
-              '#default_value' => isset($defaults[$entity_type][$bundle_name]['title']) ? $defaults[$entity_type][$bundle_name]['title'] : TRUE,
+              '#title' => 'Scald Provider',
+              '#default_value' => isset($defaults[$entity_type][$bundle_name]['data']) ? $defaults[$entity_type][$bundle_name]['data'] : TRUE,
+              '#weight' => -1
+          );
+          $form['export_fields'][$entity_type][$bundle_name]['file_source'] = array(
+              '#type' => 'checkbox',
+              '#title' => 'Media Source',
+              '#default_value' => isset($defaults[$entity_type][$bundle_name]['data']) ? $defaults[$entity_type][$bundle_name]['data'] : TRUE,
               '#weight' => -1
           );
       }
+      
 
       foreach($fields_info as $field_name => $field) {
         // Check global blacklist

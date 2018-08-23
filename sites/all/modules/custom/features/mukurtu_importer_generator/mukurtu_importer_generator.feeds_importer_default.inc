@@ -44,8 +44,23 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   'language' => 'und',
               ),
           );
-
+          
           $mapping_i = 2;
+
+          if($entity_type == 'scald_atom') {
+            $mappings[$mapping_i++] = array(
+                'source' => 'Provider',
+                'target' => 'provider',
+                'unique' => 0,
+                'language' => 'und',
+            );
+            $mappings[$mapping_i++] = array(
+                'source' => 'Media Source',
+                'target' => 'file_source',
+                'unique' => 0,
+                'language' => 'und',
+            );
+          }
 
           // Extra fields (title, etc)
           $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
@@ -58,7 +73,7 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   $mappings[$mapping_i++] = array(
                       'source' => $extra_field['label'],
                       'target' => $extra_field_name,
-                      'unique' => 1,
+                      'unique' => 0,
                       'language' => 'und',
                   );
               }
@@ -71,7 +86,7 @@ function mukurtu_importer_generator_feeds_importer_default() {
               $mappings[$mapping_i] = array(
                   'source' => $field_value['label'],
                   'target' => $field_name,
-                  'unique' => 1,
+                  'unique' => 0,
                   'language' => 'und',
               );
 

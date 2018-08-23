@@ -30,6 +30,11 @@ function mukurtu_export_mukurtu_export_field_handlers() {
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
             '#callback' => 'mukurtu_export_field_handler_entity_reference'
         ),
+        'geofield' => array(
+            '#module' => 'mukurtu_export',
+            '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
+            '#callback' => 'mukurtu_export_field_handler_geofield'
+        ),        
         'paragraphs' => array(
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
@@ -76,13 +81,27 @@ function mukurtu_export_field_handler_taxonomy_term_reference($value, $field_inf
  */
 function mukurtu_export_field_handler_image($value, $field_info, $options = array()) {
     $referenced_entities = array();
-    $binary_files = array();
 
     $saved_file = _mukurtu_export_save_file($value);
     $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
 
     return array($return_value, $referenced_entities, $saved_file);
 }
+
+// /**
+//  * Handle Scald data fields
+//  */
+// function mukurtu_export_field_handler_scald_data($value, $field_info, $options = array()) {
+//     $referenced_entities = array();
+//     $binary_files = array();
+
+//     if(isset($value['audio_file'])) {
+//         $binary_files =  _mukurtu_export_save_file($value);
+//         $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $binary_files[$value['fid']]['filename'];
+//     }
+
+//     return array($return_value, $referenced_entities, $binary_files);
+// }
 
 /**
  * Handle entityreference fields
@@ -167,6 +186,19 @@ function mukurtu_export_field_handler_partial_date_range($value, $field_info, $o
 
     if(isset($value['timestamp'])) {
         return array($value['timestamp'], $referenced_entities, $files);
+    }
+    return array(NULL, $referenced_entities, $files);
+}
+
+/**
+ * Handle geofields
+ */
+function mukurtu_export_field_handler_geofield($value, $field_info, $options = array()) {
+    $referenced_entities = array();
+    $files = array();
+
+    if(isset($value['geom'])) {
+        return array($value['geom'], $referenced_entities, $files);
     }
     return array(NULL, $referenced_entities, $files);
 }
