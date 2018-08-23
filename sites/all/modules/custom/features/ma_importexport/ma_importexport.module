@@ -139,7 +139,8 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
                 // Otherwise we assume ID is a NID
                 $guid = $id;
             }
-            $entity->{$new_target}[$entity->language][][$target_id_name] = $guid;
+            $language = isset($entity->language) ? $entity->language : LANGUAGE_NONE;
+            $entity->{$new_target}[$language][][$target_id_name] = $guid;
         }
     }    
 }
@@ -246,8 +247,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
     $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
 
     // Enforce access control on feeds
-    // TODO: get accurate entity type
-    $entity_type = 'node';
+    $entity_type = isset($entity->feeds_item->entity_type) ? $entity->feeds_item->entity_type : 'node';
 
     // All Mukurtu supplied importers should have titles/guids
     $item_id = isset($item['guid']) ? "(GUID: " . $item['guid'] . ")" : "";
