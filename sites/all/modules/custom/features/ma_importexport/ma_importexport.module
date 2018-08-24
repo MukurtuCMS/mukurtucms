@@ -62,6 +62,9 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
                 case 'atom_reference':
                     $ref_type = 'Scald Atom Reference';
                     break;
+                case 'paragraphs':
+                    $ref_type = 'Paragraphs Reference';
+                    break;
                     /*                case 'taxonomy_term_reference':
                     $ref_type = 'Taxonomy Term Reference';
                     break;*/
@@ -124,11 +127,9 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
     case 'atom_reference':
         $entity_type = 'scald_atom';
         break;
-    }
-
-    // SCT: TODO Remove after testing
-    if(!$entity_type) {
-        dpm("missing entity_type for $target");
+    case 'paragraphs':
+        $entity_type = 'paragraphs_item';
+        break;
     }
 
     foreach($value as $id) {

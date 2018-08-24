@@ -101,6 +101,10 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   $mappings[$mapping_i]['term_search'] = 0;
                   $mappings[$mapping_i]['autocreate'] = 1;
                   break;
+              case 'paragraphs':
+                  $target_id = array_keys($field['columns'])[0];
+                  $mappings[$mapping_i]['target'] = "{$field_name}:guid_or_{$target_id}";
+                  break;
               case 'geofield':
                   $mappings[$mapping_i]['target'] = "{$field_name}:wkt";
                   break;
@@ -146,7 +150,7 @@ function mukurtu_importer_generator_feeds_importer_default() {
                       'update_existing' => '2',
                       'expire' => '-1',
                       'mappings' => $mappings,
-                      'input_format' => 'filtered_html',
+                      'input_format' => 'full_html',
                       'author' => '1',
                       'authorize' => 1,
                       'skip_hash_check' => 0,
