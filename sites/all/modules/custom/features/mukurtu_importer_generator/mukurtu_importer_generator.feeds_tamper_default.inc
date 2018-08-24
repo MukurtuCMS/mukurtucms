@@ -66,8 +66,11 @@ function _mukurtu_importer_generator_add_required_tamper(&$tampers, $importer_id
 }
 
 function _mukurtu_importer_generator_add_require_valid_node_tamper(&$tampers, $importer_id, $field_name, $source, $node_type, $weight = 0) {
+    if(!is_array($node_type)) {
+        $node_type = array($node_type);
+    }
     $tamper_field_name = str_replace('field_', '', $field_name);
-    $tamper_id = "{$importer_id}-{$tamper_field_name}-required_valid_{$node_type}";
+    $tamper_id = "{$importer_id}-{$tamper_field_name}-required_valid_node";
 
     $feeds_tamper = new stdClass();
     $feeds_tamper->disabled = FALSE;
@@ -81,7 +84,8 @@ function _mukurtu_importer_generator_add_require_valid_node_tamper(&$tampers, $i
         'node_type' => $node_type,
     );
     $feeds_tamper->weight = $weight;
-    $feeds_tamper->description = "Require valid {$node_type}";
+    $node_type_string = implode("|", $node_type);
+    $feeds_tamper->description = "Require valid $node_type_string";
     $tampers[$tamper_id] = $feeds_tamper;
 }
 
@@ -127,14 +131,13 @@ function mukurtu_importer_generator_feeds_tamper_default() {
               if($field['type'] == 'entityreference') {
                   if($field['settings']['target_type'] == 'node') {
                       // Requires specific type of node
-                      if($field['settings']['handler'] == 'base') {
-                          $node_type = array_keys($field['settings']['handler_settings']['target_bundles'])[0];
+                      if($field['settings']['handler'] == 'base') {                                                   
+                          $node_type = array_keys($field['settings']['handler_settings']['target_bundles']);
                           _mukurtu_importer_generator_add_require_valid_node_tamper($export, $importer_id, $field_name, $source, $node_type);
                       }
 
                       // Can be any node
                       if($field['settings']['handler'] == 'views') {
-                          //                          $node_type = array_keys($field['settings']['handler_settings']['target_bundles'])[0];
                           _mukurtu_importer_generator_add_require_valid_node_tamper($export, $importer_id, $field_name, $source, 'any');
                       }
                   }
