@@ -223,7 +223,8 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
       $temp = file_save_data($encoded_export[$entity_type][$bundle_name]);
       $csv_files[] = $temp;
-      $zip->addFile(drupal_realpath($temp->uri), "{$entity_type}_{$bundle_name}.csv");
+      $filename_variants = mukurtu_batch_import_get_name_variants($entity_type, $bundle_name);
+      $zip->addFile(drupal_realpath($temp->uri), "{$filename_variants[0]}.csv");
     }
   }
   $zip->close();

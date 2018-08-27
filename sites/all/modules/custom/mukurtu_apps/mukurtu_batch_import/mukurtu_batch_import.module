@@ -235,8 +235,12 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 
 // For a given entity type/bundle name, return various forms the filename might take
 function mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) {
-    $filters = array('_', ' ', '_bundle');
+    $entity_info = entity_get_info($entity_type);
+    $bundle_info = $entity_info['bundles'][$bundle_name];
 
+    $filters = array('-', '_', ' ', '_bundle');
+
+    $variants[] = "{$entity_info['label']} - {$bundle_info['label']}";
     $variants[] = "{$entity_type}_{$bundle_name}";
     $variants[] = $bundle_name;
 
@@ -246,6 +250,10 @@ function mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) {
         }
         if(stripos("{$entity_type}_{$bundle_name}", $filter) !== FALSE) {
             $variants[] = str_replace($filter, '', "{$entity_type}_{$bundle_name}");
+       }
+
+       if(stripos("{$entity_info['label']} - {$bundle_info['label']}", $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', "{$entity_info['label']} - {$bundle_info['label']}");
        }
     }
 
@@ -262,12 +270,13 @@ function mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) {
 
 // Try to figure out which importer a file should use based on its filename
 function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
+    $filename = strtolower($filename);
     $entities = _mukurtu_export_get_entity_bundle_array();
     $matches = array(0 => NULL);
     foreach($entities as $entity_type => $bundle) {
         foreach($bundle as $bundle_name) {
             foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {                
-                if(stripos($filename, $variant) !== FALSE) {
+                if(stripos($filename, strtolower($variant)) !== FALSE) {
                     $file_type['entity_type'] = $entity_type;
                     $file_type['bundle_name'] = $bundle_name;
                     
