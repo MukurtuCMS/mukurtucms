@@ -562,7 +562,7 @@ function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
     // Simulate uploading file
     $location = $add_form['file']['#upload_location'];
     $file_object = file_uri_to_object($filepath);
-    $file = file_move($file_object, $location);
+    $file = file_copy($file_object, $location);
     $form_state['values']['file'] = $file->fid;
 
     // Options
@@ -603,7 +603,7 @@ function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
       $index = 'atom' . $delta;
       $values = &$form_state['values'][$index];
   
-      if (is_array($values['scald_actions'])) {
+      if (isset($values['scald_actions']) && is_array($values['scald_actions'])) {
         $bitstream = 0;
         $actions = scald_actions();
         foreach ($actions as $name => $action) {

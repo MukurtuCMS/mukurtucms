@@ -128,37 +128,28 @@ function mukurtu_batch_import_import($form, &$form_state) {
 }
 
 function mukurtu_batch_import_parse_zip($file) {
- 
   $file_path = drupal_realpath($file->uri);
 
   // Create a unique temporary folder to extract the zip file in
-  /* $temp_extract_path = file_directory_temp();
-  $temp_extract_path .= '/' . uniqid('mukurtu_upload_');
-  mkdir($temp_extract_path); */
-
   $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
-  //  mkdir($temp_extract_path);
   
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
     $zip->extractTo($temp_extract_path);
     $zip->close();
-    dsm('Zip file extracted');      
+    dsm('Zip file extracted');
   } else {
     dsm('Zip file not extracted.');
   }
-  
-  //  $media_path = $folder_path . '/media';
-  //  $metadata_path = $folder_path . '/metadata';
 
   $feedback = array();
   mukurtu_batch_import_import_metadata($temp_extract_path);
 
   // Record/store feedback
-  //  mukurtu_batch_import_feedback($messages);
   $messages = drupal_get_messages('status');
+
   // Delete extracted files from temporary directory
-  //  file_unmanaged_delete_recursive($temp_extract_path);
+  // file_unmanaged_delete_recursive($temp_extract_path);
 }
 
 /**
@@ -361,7 +352,7 @@ function mukurtu_batch_import_import_metadata($path) {
   }
 
   // Take the files we've found and figure out which importers to use and in what order
-  $import_steps =  mukurtu_batch_import_generate_import_steps($files);
+  $import_steps = mukurtu_batch_import_generate_import_steps($files);
 
   if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
       unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
@@ -410,7 +401,13 @@ function mukurtu_batch_import_import_metadata($path) {
           $source->save();
 
           // Do the import
-          $source->startImport();
+          if($hide_warnings) {
+            // For double run imports (community/protocol) we do the import *right now* rather than
+            // scheduling.
+            while (FEEDS_BATCH_COMPLETE != $source->import());
+          } else {
+            $source->startImport();
+          }
       }
   }
 
