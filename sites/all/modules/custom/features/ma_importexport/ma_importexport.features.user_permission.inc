@@ -387,6 +387,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['unlock digital_heritage_metadata feeds'] = array(
     'name' => 'unlock digital_heritage_metadata feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
