@@ -13,10 +13,10 @@ function ma_importexport_dc_feeds_importer_default() {
   $feeds_importer = new stdClass();
   $feeds_importer->disabled = FALSE; /* Edit this to true to make a default feeds_importer disabled initially */
   $feeds_importer->api_version = 1;
-  $feeds_importer->id = 'dublin_core_digital_heritage_importer';
+  $feeds_importer->id = 'digital_heritage_dc';
   $feeds_importer->config = array(
     'name' => 'Import Digital Heritage Dublin Core XML',
-    'description' => 'Import Digital Heritage items from a Dublin Core XML',
+    'description' => '',
     'fetcher' => array(
       'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
@@ -282,7 +282,7 @@ function ma_importexport_dc_feeds_importer_default() {
     'import_on_create' => 1,
     'process_in_background' => 0,
   );
-  $export['dublin_core_digital_heritage_importer'] = $feeds_importer;
+  $export['digital_heritage_dc'] = $feeds_importer;
 
   return $export;
 }
