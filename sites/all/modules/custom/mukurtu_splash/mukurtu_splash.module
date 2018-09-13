@@ -849,6 +849,15 @@ function mukurtu_splash_block_batch_import() {
     );
   }
 
+  if (feeds_access('import','digital_heritage_dc')) {
+    $items[] = array(
+      'title' => 'Import Digital Heritage Dublin Core Metadata',
+      'href' => 'import/digital_heritage_dc',
+      'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
+      'description' => t('Batch import many digital heritage items from a Dublin Core XML file.'),
+    );
+  }
+
   if (feeds_access('import','import_digital_heritage_community_records')) {
     $items[] = array(
       'title' => 'Import Digital Heritage Community Records',
@@ -924,10 +933,10 @@ function mukurtu_splash_block_batch_import() {
   
       if (feeds_access('import','digital_heritage_metadata')) {
           $items[] = array(
-              'title' => 'Import Digital Heritage Metadata from Zip Archive',
+              'title' => 'Import content from Zip Archive',
               'href' => 'manage/zip_import',
               'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
-              'description' => t('Batch import many digital heritage items from a Zip Archive.'),
+              'description' => t('Batch import content from a Zip Archive.'),
           );
       }
   }
