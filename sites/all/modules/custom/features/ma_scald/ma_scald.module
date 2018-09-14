@@ -520,9 +520,45 @@ function ma_scald_save_atom_source($source, &$entity) {
  * will still call the relevant hooks.
  */
 function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
+    ctools_include('object-cache');
+    ctools_include('wizard');
     // We are going to be making calls to the native Scald form functions, load those pages
     module_load_include('inc', 'scald', 'includes/scald.pages');
-    $form_state = array();
+
+    $form_info = array(
+        'id' => 'scald-atom-add',
+        'path' => 'atom/add/' . $type . '/' . 'nojs' . '/%step',
+        'show trail' => TRUE,
+        'show back' => FALSE,
+        'show cancel' => TRUE,
+        'show return' => FALSE,
+        'next callback' => 'scald_atom_add_wizard_next',
+        'finish callback' => 'scald_atom_add_wizard_finish',
+        'cancel callback' => 'scald_atom_add_wizard_cancel',
+        'order' => array(
+          'source' => t('Source'),
+          'add' => t('Add'),
+          'options' => t('Options'),
+        ),
+        'forms' => array(
+          'source' => array(
+            'form id' => 'scald_atom_add_form_source',
+          ),
+          'add' => array(
+            'form id' => 'scald_atom_add_form_add',
+          ),
+          'options' => array(
+            'form id' => 'scald_atom_add_form_options',
+          ),
+        ),
+      );
+
+    // Clear the cache or else we might get stuff from the previous item
+    ctools_object_cache_clear('scald_atom', 'add');
+    $form_state = array(
+        'ajax' => FALSE,
+        'scald' => ctools_object_cache_get('scald_atom', 'add'),
+    );
     $form_state['values']['atom0'][] = $atom;
 
     // Copy initialization from scald_atom_add_page
@@ -544,30 +580,43 @@ function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
     if (empty($form_state['scald'])) {
         $form_state['scald'] = array(
             'type' => $scald_types[$type],
-            'source' => isset($source) ? $source : NULL,
+            'source' => $provider, //isset($source) ? $source : NULL,
             'provider' => $provider,
         );
     }
-    $form_state['scald']['step'] = 'source';
 
     // Source
-    $source_form = array();
+    $form_state['scald']['step'] = 'source';
+    $source_form = ctools_wizard_multistep_form($form_info, 'source', $form_state);
+    //$source_form = array();
     $source_form = scald_atom_add_form_source($source_form, $form_state);
 
     // Add
     $form_state['scald']['step'] = 'add';
-    $add_form = array();
+    $add_form = ctools_wizard_multistep_form($form_info, 'add', $form_state);
+    //$add_form = array();
     $add_form = scald_atom_add_form_add($add_form, $form_state);
 
-    // Simulate uploading file
-    $location = $add_form['file']['#upload_location'];
-    $file_object = file_uri_to_object($filepath);
-    $file = file_copy($file_object, $location);
-    $form_state['values']['file'] = $file->fid;
+    switch($provider) {
+        case 'scald_dailymotion':
+        case 'scald_soundcloud':
+        case 'scald_youtube':
+        case 'scald_vimeo':
+            $form_state['values']['identifier'] = $filepath;
+            break;
+        default:
+            // Simulate uploading file
+            $location = $add_form['file']['#upload_location'];
+            $file_object = file_uri_to_object($filepath);
+            $file = file_copy($file_object, $location);
+            $form_state['values']['file'] = $file->fid;
+    }
 
     // Options
     $form_state['scald']['step'] = 'options';
+    //$options_form = ctools_wizard_multistep_form($form_info, 'options', $form_state);
     $options_form = array();
+    //field_attach_form('scald_atom', $atom, $options_form, $form_state);
     $options_form = scald_atom_add_form_options($options_form, $form_state);
 
     if (isset($form_state['scald']['atoms'][0])) {
@@ -622,6 +671,24 @@ function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
       // the original form state values.
       $atom_form_state['values'][$index] = &$values;
   
+    // HACK
+    $fields_info = field_info_instances('scald_atom', $atom->type);
+    foreach($fields_info as $field_name => $value) {
+        $field_info = field_info_field($field_name);
+        if($field_info['type'] == 'taxonomy_term_reference' && !empty($atom->{$field_name}[LANGUAGE_NONE])) {
+            foreach($atom->{$field_name}[LANGUAGE_NONE] as $delta => $field_value) {
+                $atom->{$field_name}[LANGUAGE_NONE][$delta]['vocabulary_machine_name'] = $field_info['settings']['allowed_values'][0]['vocabulary'];
+            }
+        }
+    }
+
+    if($atom->type == 'file') {
+        $atom->scald_file[LANGUAGE_NONE][0]['display'] = 1;
+        $atom->atom0['scald_thumbnail'][LANGUAGE_NONE][0]['display'] = 1;
+        $atom->atom0['scald_file'][LANGUAGE_NONE][0]['display'] = 1;
+        $atom->scald_thumbnail_default = 1;
+        $atom->data['scald_thumbnail_default'] = 1;
+    }
       // Let entity add its properties to the atom.
       entity_form_submit_build_entity('scald_atom', $atom, $form[$index], $atom_form_state);
   

@@ -407,7 +407,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
   if($entity->feeds_item->entity_type == 'scald_atom') {
 
       // If a scald atom comes in with just a GUID and no SID, check if that atom already exists and re-use that sid
-      if(!empty($entity->feeds_item->guid) && empty($entity->feeds_item->sid) && $entity->sid == "") {
+      if(!empty($entity->feeds_item->guid) && empty($entity->feeds_item->sid) && (!isset($entity->sid) || $entity->sid == "")) {
           $existing_sid = ma_importexport_feeds_lookup_atom_by_guid($entity->feeds_item->guid);
           if($existing_sid) {
               $entity->sid = $existing_sid;
@@ -512,7 +512,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
   }
 
   // If an entity is a revision but is missing the nid, look it up.  Otherwise feeds will fail to save that entity
-  if($entity->revision && (!isset($entity->nid) || !$entity->nid)) {
+  if(isset($entity->revision) && $entity->revision && (!isset($entity->nid) || !$entity->nid)) {
       list($id, $vid, $bundle) = entity_extract_ids($entity->feeds_item->entity_type, $entity);
 
       if($vid) {

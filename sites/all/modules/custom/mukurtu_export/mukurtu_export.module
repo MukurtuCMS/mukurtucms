@@ -176,7 +176,7 @@ function mukurtu_export_format_handlers() {
  */
 function mukurtu_export_extract_value($entity_type, $field_name, $value, $options = array()) {
   // Make hook to allow custom changes?
-    
+
   $referenced_entities = array();
   $files = array();
   $field_handlers = mukurtu_export_field_handlers();

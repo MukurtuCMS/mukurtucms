@@ -259,12 +259,35 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
       continue;
     }
     mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $entities[$entity_key], $entity_type, $bundle_name, $field_list, $id_format, $export_referenced, $export_files);
+
+    // Handle special cases after initial encode
+    mukurtu_export_csv_post_encode_entity($encoded_content, $new_entity_key, $entities[$entity_key], $entity_type, $bundle_name, $field_list);
   }
 
   if($is_batch == TRUE) {
     return $encoded_content;
   }
   return _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter);
+}
+
+/**
+ * Post entity encode step to handle special case scenarios
+ */
+function mukurtu_export_csv_post_encode_entity(&$encoded_content, $entity_key, $entity, $entity_type, $bundle_name, $field_list) {
+  if($entity_type == 'scald_atom') {
+    // Youtube/Vimeo fix
+    switch($entity->provider) {
+      case 'scald_dailymotion':
+      case 'scald_youtube':
+      case 'scald_vimeo':
+        // If exporting the media source
+        if($field_list[$entity_type][$bundle_name]['file_source']) {
+          // Media source is kept in the base_id for scald_youtube/scald_vimeo
+          $encoded_content[$entity_type][$bundle_name]['file_source'][$entity_key][0] = $entity->base_id;
+        }
+        break;
+    }
+  }
 }
 
 /**
