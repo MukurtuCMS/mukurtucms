@@ -11,7 +11,7 @@ include_once('ma_importexport.features.inc');
  */
 function ma_importexport_menu() {
   $items = array();
-  
+  /*
   // "Export Item" button for DH node
   $items['node/%node/export-item'] = array(
     'title' => 'Export Item',
@@ -28,7 +28,8 @@ function ma_importexport_menu() {
 					    'page callback' => 'drupal_get_form',
 					    'page arguments' => array('ma_importexport_export_form'),
 					    'access callback' => TRUE,
-					    );
+                        );
+   */
 
   return $items;
 }
