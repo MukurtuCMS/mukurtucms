@@ -128,37 +128,28 @@ function mukurtu_batch_import_import($form, &$form_state) {
 }
 
 function mukurtu_batch_import_parse_zip($file) {
- 
   $file_path = drupal_realpath($file->uri);
 
   // Create a unique temporary folder to extract the zip file in
-  /* $temp_extract_path = file_directory_temp();
-  $temp_extract_path .= '/' . uniqid('mukurtu_upload_');
-  mkdir($temp_extract_path); */
-
   $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
-  //  mkdir($temp_extract_path);
   
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
     $zip->extractTo($temp_extract_path);
     $zip->close();
-    dsm('Zip file extracted');      
+    dsm('Zip file extracted');
   } else {
     dsm('Zip file not extracted.');
   }
-  
-  //  $media_path = $folder_path . '/media';
-  //  $metadata_path = $folder_path . '/metadata';
 
   $feedback = array();
   mukurtu_batch_import_import_metadata($temp_extract_path);
 
   // Record/store feedback
-  //  mukurtu_batch_import_feedback($messages);
   $messages = drupal_get_messages('status');
+
   // Delete extracted files from temporary directory
-  //  file_unmanaged_delete_recursive($temp_extract_path);
+  // file_unmanaged_delete_recursive($temp_extract_path);
 }
 
 /**
@@ -233,49 +224,112 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 }
 */
 
+// For a given entity type/bundle name, return various forms the filename might take
+function mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) {
+    $entity_info = entity_get_info($entity_type);
+    $bundle_info = $entity_info['bundles'][$bundle_name];
+
+    $filters = array('-', '_', ' ', '_bundle');
+
+    $variants[] = "{$entity_info['label']} - {$bundle_info['label']}";
+    $variants[] = "{$entity_type}_{$bundle_name}";
+    $variants[] = $bundle_name;
+
+    foreach($filters as $filter) {
+        if(stripos($bundle_name, $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', $bundle_name);
+        }
+        if(stripos("{$entity_type}_{$bundle_name}", $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', "{$entity_type}_{$bundle_name}");
+       }
+
+       if(stripos("{$entity_info['label']} - {$bundle_info['label']}", $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', "{$entity_info['label']} - {$bundle_info['label']}");
+       }
+    }
+
+    // Legacy filename support for older version of Mukurtu
+    if($entity_type == 'node') {
+        switch($bundle_name) {
+        case 'cultural_protocol_group':
+            $variants[] = 'protocol';
+        }
+    }
+
+    return $variants;
+}
+
+// Try to figure out which importer a file should use based on its filename
+function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
+    $filename = strtolower($filename);
+    $entities = _mukurtu_export_get_entity_bundle_array();
+    $matches = array(0 => NULL);
+    foreach($entities as $entity_type => $bundle) {
+        foreach($bundle as $bundle_name) {
+            foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {                
+                if(stripos($filename, strtolower($variant)) !== FALSE) {
+                    $file_type['entity_type'] = $entity_type;
+                    $file_type['bundle_name'] = $bundle_name;
+                    
+                    // Keep track of how many characters matched. We are assuming that
+                    // the longer the match, the better.
+                    $matches[strlen($variant)] = $file_type;
+                }
+            }
+        }
+    }
+    
+    ksort($matches);
+    $bestmatch = end($matches);
+    return $bestmatch;
+}
+
+function mukurtu_batch_import_generate_import_steps($files) {
+    $content_import_steps = array();
+    $scald_import_steps = array();
+    $pre_import_community = array();
+    $pre_import_protocol = array();
+    foreach($files as $file) {
+        if(preg_match('/(.+)\.csv/', $file, $matches)) {
+            if($file_type = mukurtu_batch_import_filename_to_entity_bundle_name($matches[1])) {
+                $entity_type = $file_type['entity_type'];
+                $bundle_name = $file_type['bundle_name'];
+                $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
+
+                if($entity_type == 'scald_atom') {
+                    $scald_import_steps[] = array('filename' => $matches[0],
+                                                  'importer' => $importer,
+                                                  'hide_warnings' => FALSE);
+                } else {
+                    $content_import_steps[] = array('filename' => $matches[0],
+                                                    'importer' => $importer,
+                                                    'hide_warnings' => FALSE);
+                }
+
+                // Communities and protocols need to exist before most other content can be imported.
+                // We'll import them once right away, then again later after media has been imported.
+                if($entity_type == 'node' && $bundle_name == 'community') {
+                    $pre_import_community[] = array('filename' => $matches[0],
+                                                  'importer' => $importer,
+                                                  'hide_warnings' => TRUE);
+                }
+
+                if($entity_type == 'node' && $bundle_name == 'cultural_protocol_group') {
+                    $pre_import_protocol[] = array('filename' => $matches[0],
+                                                  'importer' => $importer,
+                                                  'hide_warnings' => TRUE);
+                }
+            }
+        }
+    }
+
+    $all_steps = array_merge($pre_import_community, $pre_import_protocol, $scald_import_steps,$content_import_steps);
+
+    return $all_steps;
+}
 
 function mukurtu_batch_import_import_metadata($path) {
   module_load_include('inc', 'feeds', 'feeds.pages');
-
-  $import_steps = array();
-  // Preload Communities and Protocols, don't show warnings, they might reference non-existant media yet to be imported
-  $import_steps[] = array('filename' => 'communities.csv',
-                          'importer' => 'import_communities',
-                          'hide_warnings' => TRUE);
-  $import_steps[] = array('filename' => 'protocols.csv',
-                          'importer' => 'import_cultural_protocols',
-                          'hide_warnings' => TRUE);
-
-  // Import Media
-  $import_steps[] = array('filename' => 'media_audio.csv',
-                          'importer' => 'import_media_audio',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_files.csv',
-                          'importer' => 'import_media_files',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_images.csv',
-                          'importer' => 'import_media_images',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_video.csv',
-                          'importer' => 'import_media_video',
-                          'hide_warnings' => FALSE);
-
-  // Re-import Communities and Protocols, parent objects and media should exist now
-  $import_steps[] = array('filename' => 'communities.csv',
-                          'importer' => 'import_communities',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'protocols.csv',
-                          'importer' => 'import_cultural_protocols',
-                          'hide_warnings' => FALSE);
-
-  // Import collections and digital heritage items
-  $import_steps[] = array('filename' => 'collections.csv',
-                          'importer' => 'import_collection',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'digitalheritage.csv',
-                          'importer' => 'digital_heritage_metadata',
-                          'hide_warnings' => FALSE);
-
 
   // Some zip archive programs place files inside a single folder. Rather than failing, if there is one directory in the root,
   // check if the files are there first.
@@ -287,18 +341,25 @@ function mukurtu_batch_import_import_metadata($path) {
       }
   }
 
+  // Single folder in the extracted Zip archive
   if(count($files) == 1) {
       foreach($files as $file) {
           if(is_dir($path . DIRECTORY_SEPARATOR . $file)) {
               $path = $path . DIRECTORY_SEPARATOR . $file;
+              $files = scandir($path);
           }
       }
   }
+
+  // Take the files we've found and figure out which importers to use and in what order
+  $import_steps = mukurtu_batch_import_generate_import_steps($files);
 
   if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
       unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
   }
   $success = FALSE;
+
+  // Run each import step
   foreach($import_steps as $import_step) {
       $filename = $import_step['filename'];
       $importer_id = $import_step['importer'];
@@ -313,9 +374,8 @@ function mukurtu_batch_import_import_metadata($path) {
           $csv = file_get_contents($csv_path);
 
           // Crude method to support relative file paths
-          $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
+          $csv = str_replace(MUKURTU_EXPORT_IMPORT_DIR, $path, $csv);
 
-          //      $destination = 'private://feeds/';
           $destination = $path;
           file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
 
@@ -341,10 +401,17 @@ function mukurtu_batch_import_import_metadata($path) {
           $source->save();
 
           // Do the import
-          $source->startImport();
+          if($hide_warnings) {
+            // For double run imports (community/protocol) we do the import *right now* rather than
+            // scheduling.
+            while (FEEDS_BATCH_COMPLETE != $source->import());
+          } else {
+            $source->startImport();
+          }
       }
   }
 
+  // If we didn't find any valid files, warn the user.
   if(!$success) {
       dpm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
   }
@@ -377,7 +444,7 @@ function mukurtu_batch_import_feeds_after_import($source) {
         if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
             foreach($_SESSION['mukurtu_zip_import']['hide_warnings'] as $key => $hide_id) {
                 if($hide_id == $id) {
-                    // Hide warnings is should probably be named hide errors
+                    // Hide warnings should probably be named hide errors
                     // We clear errors for the initial imports that might not have imported their dependencies yet
                     unset($_SESSION['mukurtu_zip_import']['hide_warnings'][$key]);
                     drupal_get_messages('error', TRUE);

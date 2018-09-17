@@ -723,6 +723,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
         $target_name = $mapping['target'];
       }
 
+      if(!isset($result->input_fields) || in_array(strtolower($mapping['source']), $result->input_fields)) {
       // If the target is a field empty the value for the targeted language
       // only.
       // In all other cases, just empty the target completely.
@@ -735,15 +736,18 @@ abstract class FeedsProcessor extends FeedsPlugin {
         $target_item->{$target_name} = NULL;
       }
     }
+    }
 
     // This is where the actual mapping happens: For every mapping we invoke
     // the parser's getSourceElement() method to retrieve the value of the
     // source element and pass it to the processor's setTargetElement() to stick
     // it on the right place of the target item.
     foreach ($this->getMappings() as $mapping) {
+      if(in_array(strtolower($mapping['source']), $result->input_fields)) {
       $value = $this->getSourceValue($source, $result, $mapping['source']);
 
       $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
+      }
     }
 
     return $target_item;
