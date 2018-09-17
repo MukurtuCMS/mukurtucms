@@ -325,16 +325,6 @@ function _mukurtu_export_entity_id($entity_type = NULL, $entity = NULL) {
   }
   $entity_info = entity_get_info($entity_type);
   return $entity_info['entity keys']['id'];
-  /*
-  switch($entity_type) {
-    case 'paragraphs_item':
-      return 'item_id';
-    case 'scald_atom':
-      return 'sid';
-    case 'node':
-    default:
-      return 'nid';
-      }*/
 }
 
 /**
