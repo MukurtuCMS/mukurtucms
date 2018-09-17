@@ -69,9 +69,23 @@ projects[dummyimage][patch][] = https://www.drupal.org/files/issues/dummyimage_m
 ; Forbid to use duplicate entities in entityreference field
 projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid-duplicate-entities-in-entityreference-field_0.patch
 
+;;; Feeds
+; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
+; Keep track of which fields were given by the feeds source
+projects[feeds][patch][] = contrib/0001-Add-new-input-fields-property-to-FeedsParser-class.patch
+; Do not clear fields that were not provided in the source
+projects[feeds][patch][] = contrib/0001-Add-support-for-partial-content-updates.patch
+; For Feeds CSV, keep track of the field headers, these are our input fields
+projects[feeds][patch][] = contrib/0001-Change-the-FeedsCSVParser-class-to-use-the-new-input.patch
+; Fix feeds processor to work with partial updating of scald atoms as well
+projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scald-atoms.patch
+
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value
 projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
+; Mukurtu Export change to support feed imports using a subset of fields. Treat single element arrays containing
+; a single empty string as empty
+projects[feeds_tamper][patch][] = contrib/0001-Count-an-empty-string-as-the-only-element-in-array-a.patch
 
 ;;; Fullcalendar Create
 ; Contributed patch:
