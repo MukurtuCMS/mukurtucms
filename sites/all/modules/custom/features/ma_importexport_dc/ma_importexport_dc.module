@@ -74,7 +74,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     drupal_goto('import/digital-heritage-dc-standalone');
   }
 
-  // Get the attributes (the fields) from the xml file.
+  // Get the attributes (the fields) from the XML file to use for the GUID and Media options below.
   $file = file_load ($fid);
   $path_to_file = drupal_realpath($file->uri);
   $file_contents = file_get_contents($path_to_file);
@@ -87,6 +87,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $attributes = array_map('strtolower', (array_keys($index)));
   $attributes = array_combine($attributes, $attributes);
 
+  // GUID source checkboxes.
   $form['guid'] = array(
     '#type' => 'checkboxes',
     '#title' => 'GUID',
@@ -98,6 +99,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     $form['guid']['#default_value'] = ['dc:identifier'];
   }
 
+  // Media source radio.
   $form['media'] = array(
     '#type' => 'radios',
     '#title' => 'Media',
@@ -111,6 +113,9 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   elseif (isset($attributes['dc:relation'])) {
     $form['media']['#default_value'] = 'dc:relation';
   }
+
+  // Custom protocol field.
+  list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, NULL, TRUE);
 
   $form['submit'] = [
     '#type' => 'submit',
