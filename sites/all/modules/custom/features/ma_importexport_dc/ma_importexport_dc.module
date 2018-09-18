@@ -117,20 +117,49 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   // Custom protocol field.
   list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, NULL, TRUE);
 
+  // Sharing settings radio.
+  $sharing_options = [
+    'any' => 'The imported Digital Heritage items will be viewable by members of ANY Protocols selected above (or all users if any of the Protocols are set to Open).',
+    'all' => 'The imported Digital Heritage items will be viewable only by members of ALL Protocols selected above (or all users if all of the Protocols are set to Open).'
+  ];
+  $form['sharing'] = array(
+    '#type' => 'radios',
+    '#title' => 'Items Sharing Setting',
+    '#options' =>   $sharing_options,
+    '#default_value' => 'all',
+    '#required' => TRUE,
+  );
+
+  // Import button
   $form['submit'] = [
     '#type' => 'submit',
     '#value' => t('Import'),
   ];
 
+  // Add a validation handler.
+  $form['#validate'][] = 'ma_importexport_dc_import_form_options_validate';
+
+  // Return form.
   return $form;
 }
 
 /**
- * On submission, save the options to vars (to be picked up by the importer),
- * and run the import.
+ * Submit handler for the options form.
+ */
+function ma_importexport_dc_import_form_options_validate($form, $form_state) {
+  if ($form_state['triggering_element']['#type'] == 'submit') { // This validation function will fire after a community is added but before a protocol is added, which will fail validation. So check to make sure this is fired from the submit button first.
+    if (!$form_state['values']['oggroup_fieldset'][0]['dropdown_second']) {
+      form_set_error('', "At least one Community and Protocol needs to be selected.");
+    }
+  }
+}
+
+/**
+ * Submit handler for the options form.
  */
 function ma_importexport_dc_import_form_options_submit($form, $form_state) {
 
+  // Set the options to be picked up by the importer.
   variable_set ('dc_import_options', $form_state['values']);
 
   // Load the Feeds Source object.
