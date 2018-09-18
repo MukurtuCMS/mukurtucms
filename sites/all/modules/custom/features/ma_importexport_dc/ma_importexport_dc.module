@@ -130,7 +130,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#required' => TRUE,
   );
 
-  // Category checkboxes.
+  // Category chosen select.
   $vocabulary = taxonomy_vocabulary_machine_name_load('Category');
   $categories = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
   $options = [];
@@ -138,10 +138,34 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     $options[$tid] = $term->name;
   }
   $form['category'] = array(
-    '#type' => 'checkboxes',
+    '#type' => 'select',
+    '#chosen' => TRUE,
+    '#multiple' => TRUE,
     '#title' => 'Category',
     '#options' => $options,
     // '#required' => TRUE, // Should this be required?
+  );
+
+  // Traditional Knowledge Labels chosen select.
+  $field = field_info_field('field_licence_trad');
+  $options = list_allowed_values($field);
+  $form['tk_label'] = array(
+    '#type' => 'select',
+    '#chosen' => TRUE,
+    '#multiple' => TRUE,
+    '#title' => 'Traditional Knowledge Labels',
+    '#options' => $options,
+  );
+
+  // Licensing Options chosen select.
+  $field = field_info_field('field_licence_std_cc');
+  $options = list_allowed_values($field);
+  $form['licensing'] = array(
+    '#type' => 'select',
+    '#chosen' => TRUE,
+    '#multiple' => TRUE,
+    '#title' => 'Licensing Options',
+    '#options' => $options,
   );
 
   // Import button
