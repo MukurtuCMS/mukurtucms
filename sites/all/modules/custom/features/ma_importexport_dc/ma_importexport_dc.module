@@ -130,6 +130,20 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#required' => TRUE,
   );
 
+  // Category checkboxes.
+  $vocabulary = taxonomy_vocabulary_machine_name_load('Category');
+  $categories = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
+  $options = [];
+  foreach ($categories as $tid => $term) {
+    $options[$tid] = $term->name;
+  }
+  $form['category'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'Category',
+    '#options' => $options,
+    // '#required' => TRUE, // Should this be required?
+  );
+
   // Import button
   $form['submit'] = [
     '#type' => 'submit',
