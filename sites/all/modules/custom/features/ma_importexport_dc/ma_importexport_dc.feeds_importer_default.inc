@@ -37,13 +37,21 @@ function ma_importexport_dc_feeds_importer_default() {
           'value' => '/metadata',
         ),
         'sources' => array(
+          'guid' => array(
+            'name' => 'guid',
+            'value' => 'guid',
+            'raw' => 0,
+            'inner' => 0,
+            'debug' => 0,
+            'weight' => '0',
+          ),
           'dc_title' => array(
             'name' => 'dc:title',
             'value' => 'dc:title',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '0',
+            'weight' => '1',
           ),
           'dc_creator' => array(
             'name' => 'dc:creator',
@@ -51,7 +59,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '1',
+            'weight' => '2',
           ),
           'dc_contributor' => array(
             'name' => 'dc:contributor',
@@ -59,7 +67,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '2',
+            'weight' => '3',
           ),
           'dc_date' => array(
             'name' => 'dc:date',
@@ -67,7 +75,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '3',
+            'weight' => '4',
           ),
           'dc_description' => array(
             'name' => 'dc:description',
@@ -75,7 +83,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '4',
+            'weight' => '5',
           ),
           'dc_publisher' => array(
             'name' => 'dc:publisher',
@@ -83,7 +91,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '5',
+            'weight' => '6',
           ),
           'dc_rights' => array(
             'name' => 'dc:rights',
@@ -91,7 +99,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '6',
+            'weight' => '7',
           ),
           'dc_format' => array(
             'name' => 'dc:format',
@@ -99,7 +107,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '7',
+            'weight' => '8',
           ),
           'dc_type' => array(
             'name' => 'dc:type',
@@ -107,7 +115,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '8',
+            'weight' => '9',
           ),
           'dc_identifier' => array(
             'name' => 'dc:identifier',
@@ -115,7 +123,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '9',
+            'weight' => '10',
           ),
           'dc_language' => array(
             'name' => 'dc:language',
@@ -123,7 +131,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '10',
+            'weight' => '11',
           ),
           'dc_source' => array(
             'name' => 'dc:source',
@@ -131,7 +139,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '11',
+            'weight' => '12',
           ),
           'dc_subject' => array(
             'name' => 'dc:subject',
@@ -139,7 +147,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '12',
+            'weight' => '13',
           ),
           'dc_coverage' => array(
             'name' => 'dc:coverage',
@@ -147,7 +155,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '13',
+            'weight' => '14',
           ),
           'dc_hasformat' => array(
             'name' => 'dc:hasformat',
@@ -155,7 +163,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '14',
+            'weight' => '15',
           ),
           'dc_relation' => array(
             'name' => 'dc:relation',
@@ -163,7 +171,7 @@ function ma_importexport_dc_feeds_importer_default() {
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
-            'weight' => '15',
+            'weight' => '16',
           ),
         ),
         'display_errors' => 0,
@@ -182,86 +190,98 @@ function ma_importexport_dc_feeds_importer_default() {
         'authorize' => 1,
         'mappings' => array(
           0 => array(
-            'source' => 'dc_title',
-            'target' => 'title',
+            'source' => 'guid',
+            'target' => 'guid',
             'unique' => 1,
             'language' => 'und',
           ),
           1 => array(
+            'source' => 'dc_title',
+            'target' => 'title',
+            'unique' => 0,
+            'language' => 'und',
+          ),
+          2 => array(
             'source' => 'dc_creator',
             'target' => 'field_creator',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          2 => array(
+          3 => array(
             'source' => 'dc_contributor',
             'target' => 'field_contributor',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          3 => array(
+          4 => array(
             'source' => 'dc_date',
             'target' => 'field_date',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          4 => array(
+          5 => array(
             'source' => 'dc_description',
             'target' => 'field_description',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          5 => array(
+          6 => array(
             'source' => 'dc_publisher',
             'target' => 'field_publisher',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          6 => array(
+          7 => array(
             'source' => 'dc_rights',
             'target' => 'field_rights',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          7 => array(
+          8 => array(
             'source' => 'dc_format',
             'target' => 'field_format',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          8 => array(
+          9 => array(
             'source' => 'dc_type',
             'target' => 'field_dh_type',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          9 => array(
+          10 => array(
             'source' => 'dc_identifier',
             'target' => 'field_identifier',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          10 => array(
+          11 => array(
             'source' => 'dc_language',
             'target' => 'field_language',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          11 => array(
+          12 => array(
             'source' => 'dc_source',
             'target' => 'field_source',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          12 => array(
+          13 => array(
             'source' => 'dc_subject',
             'target' => 'field_subject',
             'unique' => FALSE,
             'language' => 'und',
           ),
-          13 => array(
+          14 => array(
             'source' => 'dc_coverage',
             'target' => 'field_coverage_description',
+            'unique' => FALSE,
+            'language' => 'und',
+          ),
+          15 => array(
+            'source' => 'dc_hasformat',
+            'target' => 'field_media_asset',
             'unique' => FALSE,
             'language' => 'und',
           ),

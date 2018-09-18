@@ -852,7 +852,7 @@ function mukurtu_splash_block_batch_import() {
   if (feeds_access('import','digital_heritage_dc')) {
     $items[] = array(
       'title' => 'Import Digital Heritage Dublin Core Metadata',
-      'href' => 'import/digital_heritage_dc',
+      'href' => 'import/digital-heritage-dc-file',
       'localized_options' => array('attributes' => array('class' => array('opic-dashboard-content'))),
       'description' => t('Batch import many digital heritage items from a Dublin Core XML file.'),
     );
