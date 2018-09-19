@@ -68,10 +68,10 @@ function bean_list() {
 
   // Build the sortable table header.
   $header = array(
-    'title' => array(
-      'data' => 'Title',
+    'label' => array(
+      'data' => 'Label',
       'type' => 'property',
-      'specifier' => 'title',
+      'specifier' => 'label',
       'sort' => 'asc'
     ),
     'type' => array(
@@ -104,7 +104,7 @@ function bean_list() {
 
   foreach ($beans as $bean) {
     $rows[$bean->bid] = array(
-      'title' => array(
+      'label' => array(
         'data' => array(
           '#type' => 'link',
           '#title' => $bean->label,

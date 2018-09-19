@@ -101,6 +101,11 @@ abstract class BeanPlugin implements BeanTypePluginInterface {
    *   Return a renderable content array.
    */
   public function view($bean, $content, $view_mode = 'default', $langcode = NULL) {
+    if (!empty($content) && module_exists('contextual')) {
+      $content['bean'][$bean->Identifier()]['#contextual_links']['bean'] = array(
+        'block', array($bean->Identifier(), 'edit')
+      );
+    }
     return $content;
   }
 }

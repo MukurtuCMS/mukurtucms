@@ -75,14 +75,14 @@ function bean_usage_filters() {
     '#title' => t('Title'),
     '#prefix' => '<div style="margin-right:10px; position:relative; float:left;">',
     '#suffix' => '</div>',
-    '#default_value' => $filters['title'],
+    '#default_value' => !empty($filters['title']) ? $filters['title'] : '',
   );
   $form['bean_usage_filter']['bean_usage_filter_label'] = array(
     '#type' => 'textfield',
     '#title' => t('Label'),
     '#prefix' => '<div style="margin-right:10px; position:relative; float:left;">',
     '#suffix' => '</div>',
-    '#default_value' => $filters['label'],
+    '#default_value' => !empty($filters['label']) ? $filters['label'] : '',
   );
 
   $form['bean_usage_filter']['actions'] = array(

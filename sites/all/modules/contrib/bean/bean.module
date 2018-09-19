@@ -429,6 +429,7 @@ function bean_bean_cache_clear() {
   drupal_static_reset('bean_fetch_plugin_info');
   drupal_static_reset('bean_load_plugin_class');
   drupal_static_reset('bean_block_info');
+  drupal_static_reset('bean_load_delta');
 
   // Flush caches.
   cache_clear_all('bean_plugins', 'cache');
@@ -569,7 +570,7 @@ function bean_load_revision($bid, $vid, $reset = FALSE) {
  *   A fully-loaded $bean object or FALSE if it cannot be loaded.
  */
 function bean_load_delta($delta, $reset = FALSE, $revision = NULL) {
-  static $deltas = array();
+  $deltas = &drupal_static(__FUNCTION__, array());
   if (!$reset && !$revision && isset($deltas[$delta])) {
     return $deltas[$delta];
   }
@@ -897,12 +898,6 @@ function bean_block_view($delta = '') {
     $return = array(
       'content' => $content,
       'subject' => isset($bean->title) ? filter_xss($bean->title, $allowed_tags = array('em', 'strong', 'i', 'b')) : '',
-    );
-  }
-
-  if (!empty($return['content']) && module_exists('contextual')) {
-    $return['content']['#contextual_links']['bean'] = array(
-      'block', array($bean->Identifier(), 'edit')
     );
   }
 
