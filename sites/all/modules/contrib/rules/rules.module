@@ -4,6 +4,11 @@
  * @file Rules engine module
  */
 
+// The class autoloader may fail for classes added in 7.x-2.4 (Issue 2090511).
+if (!drupal_autoload_class('RulesEventHandlerEntityBundle')) {
+  require_once dirname(__FILE__) . '/includes/rules.event.inc';
+}
+
 // Include our hook implementations early, as they can be called even before
 // hook_init().
 require_once dirname(__FILE__) . '/modules/events.inc';
@@ -1020,10 +1025,10 @@ function rules_invoke_event() {
   $event_name = $args[0];
   unset($args[0]);
   // We maintain a whitelist of configured events to reduces the number of cache
-  // reads. If the whitelist is empty we proceed and it is rebuilt.
+  // reads. If the whitelist is not in the cache we proceed and it is rebuilt.
   if (rules_event_invocation_enabled()) {
     $whitelist = rules_get_cache('rules_event_whitelist');
-    if ((empty($whitelist) || isset($whitelist[$event_name])) && $event = rules_get_cache('event_' . $event_name)) {
+    if ((($whitelist === FALSE) || isset($whitelist[$event_name])) && $event = rules_get_cache('event_' . $event_name)) {
       $event->executeByArgs($args);
     }
   }
