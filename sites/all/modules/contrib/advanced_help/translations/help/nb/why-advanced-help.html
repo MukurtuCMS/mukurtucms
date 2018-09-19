@@ -1,4 +1,4 @@
-The <strong>Advanced help</strong> framework was designed to replace the original Drupal help system, which has several flaws that make it hard to create new help, hard to maintain existing help, and particularly hard to access help.
+Rammeverket <strong>Advanced help</strong> ble konstruert for å erstatte det opprinnelige hjelpesystemet for Drupal, som har flere mangler som gjør det vanskelig å lage ny hjelp, vanskelig å vedlikeholde eksisterende hjelp, og særlig vanskelig å bruke hjelp.
 
 The primary goal, then, is to increase the accessibility of help, meaning the ability of both the user and the help text author to access the needed tools to use, create, maintain and translate the help.
 
@@ -18,7 +18,7 @@ This separation makes it easy to find and modify. Currently, everything is lumpe
 
 In fact, requiring a documentation author to understand PHP at all is a detriment. The idea that documentation writers need to have PHP development as a skill seriously reduces the number of available contributors. HTML, on the other hand, is a much more common skill, is relatively easy to learn, and the amount of HTML needed to write documentation is only a little bit more than the HTML used in forum posts.
 
-Another benefit to not using PHP is that the files themselves are safe. They are filtered to escape malicious script code that could take over the server or do worse things. This means that these files can be used relatively easily on Drupal.org itself. It also means that descriptions of the project pulled from the project's help pages or README.txt or README.md can be made on the project's Drupal.org without the need to download the module or theme to look at the contents of these files.  This also simplifies maintenance, as the files can be corrected easily by patches, which are updated by tyhe maintainer and pushed to git.
+Another benefit to not using PHP is that the files themselves are safe. They are filtered to escape malicious script code that could take over the server or do worse things. This means that these files can be used relatively easily on Drupal.org itself. It also means that descriptions of the project pulled from the project's help pages or README.txt or README.md can be made on the project's Drupal.org without the need to download the module or theme to look at the contents of these files.  This also simplifies maintenance, as the files can be corrected easily by patches, which are updated by the maintainer and pushed to git.
 
 By moving all docymentation into help files, we could, if we wanted, package the Drupal.org handbooks, or a subset of them, directly into a Drupal distribution, or a Drupal add-on, so that Drupal administrators can have Drupal help without needing to visit Drupal.org. This can be valuable in locked down corporate environments and on planes. But more importantly, the handbooks can be made version aware much more easily than the current method on Drupal.org.
 

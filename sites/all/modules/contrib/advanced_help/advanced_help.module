@@ -593,6 +593,16 @@ function advanced_help_get_topic_filename($module, $topic) {
     return "./$info[path]/$info[file]";
   }
 }
+
+/**
+ * Get the module type (theme or module).
+ */
+function _advanced_help_get_module_type($module) {
+  $theme_list = array_keys(list_themes());
+  $is_theme = in_array($module, $theme_list);
+  return $is_theme ? 'theme' : 'module';
+}
+
 /**
  * Load and render a help topic.
  */
@@ -605,11 +615,12 @@ function advanced_help_get_topic_file_info($module, $topic) {
   }
 
   // Search paths:
+  $module_type = _advanced_help_get_module_type($module);
   $paths = array(
     // Allow theme override.
     path_to_theme() . '/help',
     // Translations.
-    drupal_get_path('module', $module) . "/translations/help/$language->language",
+    drupal_get_path($module_type, $module) . "/translations/help/$language->language",
     // In same directory as .inc file.
     $info['path'],
   );
@@ -640,13 +651,16 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
     $info = advanced_help_get_topic($module, $topic);
     $file = "./$file_info[path]/$file_info[file]";
 
+    // Fix invalid byte sequences (Issue #1330056).
     $output = file_get_contents($file);
+    mb_substitute_character(0xfffd);
+    $output = mb_convert_encoding($output, 'UTF-8', 'UTF-8');
+
     if (isset($info['readme file']) && $info['readme file']) {
       $ext = pathinfo($file, PATHINFO_EXTENSION);
       if ('md' == $ext && module_exists('markdown')) {
         $filters = module_invoke('markdown', 'filter_info');
         $md_info = $filters['filter_markdown'];
-	
         if (function_exists($md_info['process callback'])) {
           $function = $md_info['process callback'];
           $output = '<div class="advanced-help-topic">' . filter_xss_admin($function($output, NULL)) . '</div>';
@@ -660,14 +674,16 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
         if ('md' == $ext) {
           $readme .=
             '<p>' .
-	    t('If you install the !module module, the text below will be filtered by the module, producing rich text.',
-	    array('!module' => l(t('Markdown filter'),
-	    'https://www.drupal.org/project/markdown',
-	    array('attributes' => array('title' => t('Link to project.')))))) . '</p>';
-	}
+            t('If you install the !module module, the text below will be filtered by the module, producing rich text.',
+              array(
+                '!module' => l(t('Markdown filter'),
+                  'https://www.drupal.org/project/markdown',
+                  array('attributes' => array('title' => t('Link to project.'))))
+              )) . '</p>';
+        }
         $readme .=
           '<div class="advanced-help-topic"><pre class="readme">' . check_plain($output) . '</pre></div>';
-	$output = $readme;
+        $output = $readme;
       }
       return $output;
     }
@@ -803,7 +819,7 @@ function advanced_help_get_settings() {
 }
 
 /**
- * Funtion to parse ini / txt files.
+ * Function to parse ini / txt files.
  */
 function _advanced_help_parse_ini() {
   global $language;
