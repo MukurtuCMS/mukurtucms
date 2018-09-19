@@ -157,9 +157,9 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#options' => $options,
   );
 
-  // Licensing Options chosen select.
+  // Licensing Option chosen select (single val).
   $field = field_info_field('field_licence_std_cc');
-  $options = list_allowed_values($field);
+  $options = array_merge(['_none' => '- None -'], list_allowed_values($field));
   $form['licensing'] = array(
     '#type' => 'select',
     '#chosen' => TRUE,
@@ -215,6 +215,7 @@ function ma_importexport_dc_import_form_options_submit($form, $form_state) {
 
 /**
  * Implements hook_feeds_after_parse().
+ *
  * Set the GUID and dc:hasformat field values according to their source as selected in the options form.
  * Note: this could also be done by altering the mapping, as in https://drupal.stackexchange.com/questions/254661/feeds-how-to-set-a-blank-source-value-programmatically,
  * but that method still requires updating the values individually in the targets_alter, so it's no
@@ -247,6 +248,42 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
  */
 function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
   if ($source->id == 'digital_heritage_dc') {
+    $options = variable_get('dc_import_options');
+
+    // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).
+    $protocols = [];
+    foreach ($options['oggroup_fieldset'] as $ogg_fieldset) {
+      foreach ($ogg_fieldset['dropdown_second'] as $protocols_per_comm) {
+        $protocols[]['target_id'] = $protocols_per_comm;
+      }
+    }
+    $entity->og_group_ref[LANGUAGE_NONE] = $protocols;
+
+    // Set the category
+    $categories = [];
+    foreach ($options['category'] as $category) {
+      $categories[]['tid'] = $category;
+    }
+    if (count($categories)) {
+      $entity->field_category[LANGUAGE_NONE] = $categories;
+    }
+
+    // Set the TK Label(s)
+    $tk_labels = [];
+    foreach ($options['tk_label'] as $tk_label) {
+      $tk_labels[]['value'] = $tk_label;
+    }
+    if (count($tk_labels)) {
+      $entity->field_licence_trad[LANGUAGE_NONE] = $tk_labels;
+    }
+
+    // Set the Licensing Option
+    if (isset($options['licensing']) && $options['licensing'] <> '_none') {
+      $entity->field_licence_std_cc[LANGUAGE_NONE][0]['value'] = $options['licensing'];
+    }
+
+    // Set the author to admin user 1.
+    $entity->uid = 1;
 
   }
 }
