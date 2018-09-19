@@ -6,7 +6,7 @@
  */
 function mukurtu_preprocess_html(&$variables) {
     $color_scheme = theme_get_setting('mukurtu_theme_color_scheme');
-    $css = join(DIRECTORY_SEPARATOR, array(path_to_theme(), 'css', "style-{$color_scheme}.css"));
+    $css = join('/', array(path_to_theme(), 'css', "style-{$color_scheme}.css"));
     if (file_exists($css)) {
         drupal_add_css($css, array('group' => CSS_THEME, 'every_page' => TRUE));
     }
@@ -17,13 +17,13 @@ function mukurtu_preprocess_html(&$variables) {
  */
 function _mukurtu_include_slick_carousel() {
     $slick = libraries_get_path('slick');
-    $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick.css'));
+    $css = join('/', array($slick, 'slick.css'));
     drupal_add_css($css);
-    $css = join(DIRECTORY_SEPARATOR, array($slick, 'slick-theme.css'));
+    $css = join('/', array($slick, 'slick-theme.css'));
     drupal_add_css($css);
-    $js = join(DIRECTORY_SEPARATOR, array($slick, 'slick.min.js'));
+    $js = join('/', array($slick, 'slick.min.js'));
     drupal_add_js($js);
-    $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-slick-carousel.js'));
+    $js = join('/', array(drupal_get_path('theme', 'mukurtu'), 'js', 'mukurtu-slick-carousel.js'));
     drupal_add_js($js);
 }
 
