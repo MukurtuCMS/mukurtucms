@@ -239,6 +239,7 @@ function file_entity_uninstall() {
   // Remove variables.
   variable_del('file_entity_max_filesize');
   variable_del('file_entity_default_allowed_extensions');
+  variable_del('file_entity_default_file_directory');
   variable_del('file_entity_alt');
   variable_del('file_entity_title');
   variable_del('file_entity_allow_insecure_download');
@@ -248,6 +249,9 @@ function file_entity_uninstall() {
 
   // Remove any items from the file type queue if still there.
   DrupalQueue::get('file_entity_type_determine')->deleteQueue();
+
+  cache_clear_all('entity_info', 'cache', TRUE);
+  cache_clear_all('schema', 'cache', TRUE);
 }
 
 /**
