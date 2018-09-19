@@ -87,11 +87,32 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $attributes = array_map('strtolower', (array_keys($index)));
   $attributes = array_combine($attributes, $attributes);
 
+  // Context checkboxes.
+  $form['context'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'Context',
+    '#description' => "Select which attributes to use as the XML file's context. This will normally be all the attribute(s) before the ones starting with \"dc:\"",
+    '#options' => $attributes,
+    '#required' => TRUE,
+  );
+  $typical_context_values = ['metadata', 'rdf:rdf', 'rdf:description'];
+  $available_typical_context_values = [];
+  foreach ($typical_context_values as $typical_context_value) {
+    if (isset($attributes[$typical_context_value])) {
+      $available_typical_context_values[] = $typical_context_value;
+    }
+  }
+  if (count($available_typical_context_values)) {
+    $form['context']['#default_value'] = $available_typical_context_values;
+
+  }
+
+
   // GUID source checkboxes.
   $form['guid'] = array(
     '#type' => 'checkboxes',
     '#title' => 'GUID',
-    '#description' => 'Select which field(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another field which is. If there is no such field, you can select multiple fields which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose field(s) that will not be edited if the XML is re-imported later, because an edited GUID field will create a new, separate Digital Heritage item.',
+    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result GUID in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.',
     '#options' => $attributes,
     '#required' => TRUE,
   );
@@ -103,7 +124,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $form['media'] = array(
     '#type' => 'radios',
     '#title' => 'Media',
-    '#description' => 'Select which field contains the reference to media for the Digital Heritage item. This is typically "dc:hasformat", or "dc:relation".',
+    '#description' => 'Select which attribute contains the reference to media for the Digital Heritage item. This is typically "dc:hasformat", or "dc:relation".',
     '#options' => $attributes,
     '#required' => TRUE,
   );
@@ -176,6 +197,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   // Add a validation handler.
   $form['#validate'][] = 'ma_importexport_dc_import_form_options_validate';
 
+
   // Return form.
   return $form;
 }
@@ -186,7 +208,8 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
 function ma_importexport_dc_import_form_options_validate($form, $form_state) {
   if ($form_state['triggering_element']['#type'] == 'submit') { // This validation function will fire after a community is added but before a protocol is added, which will fail validation. So check to make sure this is fired from the submit button first.
     if (!$form_state['values']['oggroup_fieldset'][0]['dropdown_second']) {
-      form_set_error('', "At least one Community and Protocol needs to be selected.");
+   //   form_set_error('', "At least one Community and Protocol needs to be selected.");
+      // TODO set this back
     }
   }
 }
@@ -199,16 +222,28 @@ function ma_importexport_dc_import_form_options_submit($form, $form_state) {
   // Set the options to be picked up by the importer.
   variable_set ('dc_import_options', $form_state['values']);
 
-  // Load the Feeds Source object.
+  // Set the fetcher source and file.
   $source = feeds_source('digital_heritage_dc');
   $fetcher_config = $source->getConfigFor($source->importer->fetcher);
   $file = file_load (variable_get('dc_import_xml_fid'));
   $fetcher_config['source'] = $file->uri;
   $fetcher_config['file'] = $file;
-  // Set the source fetcher config.
   $source->setConfigFor($source->importer->fetcher, $fetcher_config);
-  // Save the source.
   $source->save();
+
+  // Set the context, as provided in the options form.
+  $context = '';
+  foreach ($form_state['values']['context'] as $context_part) {
+    if ($context_part) {
+      $context .= '/' . $context_part;
+    }
+  }
+  $importer = feeds_importer('digital_heritage_dc');
+  $config = $importer->parser->getConfig();
+  $config['context']['value'] = $context;
+  $importer->parser->setConfig($config);
+  $importer->save();
+  
   // Do the import
   $source->startImport();
 }
@@ -258,6 +293,9 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
       }
     }
     $entity->og_group_ref[LANGUAGE_NONE] = $protocols;
+
+    // Set the item privacy setting.
+    $entity->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] = $options['sharing'];
 
     // Set the category
     $categories = [];
