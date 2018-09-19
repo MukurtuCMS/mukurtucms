@@ -163,7 +163,6 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $form['licensing'] = array(
     '#type' => 'select',
     '#chosen' => TRUE,
-    '#multiple' => TRUE,
     '#title' => 'Licensing Options',
     '#options' => $options,
   );
