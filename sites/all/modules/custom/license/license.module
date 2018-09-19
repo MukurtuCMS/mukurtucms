@@ -172,7 +172,7 @@ function mukurtu_build_tk_label_text($entity, $license) {
 function license_build_default_tk_label_text ($license_uri) {
     $pattern = '/http:\/\/localcontexts.org\/tk\/([a-z]+)\/.*/';
     $letter = preg_match($pattern, $license_uri, $matches);
-    $github_url = "https://raw.githubusercontent.com/kimberlycw/Local-Contexts/1.1/{$matches[1]}/description.txt";
+    $github_url = "https://raw.githubusercontent.com/kimberlycw/Local-Contexts/master/{$matches[1]}/description.txt";
     $desc = file_get_contents($github_url);
     $tk_user_text = '<p>' . $desc . '</p>';
     return $tk_user_text;
