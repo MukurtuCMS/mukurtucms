@@ -89,6 +89,8 @@ function media_wysiwyg_update_dependencies() {
   $dependencies['media_wysiwyg'][7201] = array(
     'media' => 7226,
   );
+
+  return $dependencies;
 }
 
 /**
@@ -180,9 +182,9 @@ function media_wysiwyg_update_7205() {
   // Migrate the configuration from the old variables into the new DB tables.
   $types = file_type_load_all(TRUE);
   foreach ($types as $type) {
-    $enabled = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_restricted_view_modes_status", FALSE);
+    $enabled = variable_get("media_wysiwyg_view_mode_" . $type->type . "_wysiwyg_restricted_view_modes_status", FALSE);
     if ($enabled) {
-      $wysiwyg_restricted_view_modes = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_restricted_view_modes", array());
+      $wysiwyg_restricted_view_modes = variable_get("media_wysiwyg_view_mode_" . $type->type . "_wysiwyg_restricted_view_modes", array());
       foreach ($wysiwyg_restricted_view_modes as $wysiwyg_restricted_view_mode) {
         db_insert('media_restrict_wysiwyg')
           ->fields(array(
@@ -193,7 +195,7 @@ function media_wysiwyg_update_7205() {
       }
     }
 
-    $enabled = variable_get("media_wysiwyg_view_mode_" . $type->type . "_wysiwyg_view_mode_status", FALSE);
+    $enabled = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_view_mode_status", FALSE);
     if ($enabled) {
       $file_wysiwyg_view_mode = variable_get("media_wysiwyg_view_mode_" . $type->type . "_file_wysiwyg_view_mode", 'wysiwyg');
       db_insert('media_view_mode_wysiwyg')
