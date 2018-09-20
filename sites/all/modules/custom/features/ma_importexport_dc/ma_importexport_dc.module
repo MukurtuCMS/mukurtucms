@@ -201,9 +201,6 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#value' => t('Import'),
   ];
 
-  // Add a validation handler.
-  $form['#validate'][] = 'ma_importexport_dc_import_form_options_validate';
-
   // Return form.
   return $form;
 }
@@ -214,8 +211,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
 function ma_importexport_dc_import_form_options_validate($form, $form_state) {
   if ($form_state['triggering_element']['#type'] == 'submit') { // This validation function will fire after a community is added but before a protocol is added, which will fail validation. So check to make sure this is fired from the submit button first.
     if (!$form_state['values']['oggroup_fieldset'][0]['dropdown_second']) {
-   //   form_set_error('', "At least one Community and Protocol needs to be selected.");
-      // TODO set this back
+      form_set_error('', "At least one Community and Protocol needs to be selected.");
     }
   }
 }
