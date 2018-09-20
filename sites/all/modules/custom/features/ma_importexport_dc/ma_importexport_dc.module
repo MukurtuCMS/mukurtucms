@@ -121,7 +121,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $form['guid'] = array(
     '#type' => 'checkboxes',
     '#title' => 'GUID',
-    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result GUID in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.',
+    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.',
     '#options' => $attributes,
     '#required' => TRUE,
   );
