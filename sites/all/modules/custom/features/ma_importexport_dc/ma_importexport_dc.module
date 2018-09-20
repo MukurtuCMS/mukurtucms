@@ -26,6 +26,13 @@ function ma_importexport_dc_menu() {
     'access arguments' => array('import digital_heritage_metadata feeds'),
   );
 
+  $items['import/digital-heritage-dc-complete'] = array(
+    'title' => 'Import Digital Heritage Dublin Core XML - Complete',
+    'page callback' => 'ma_importexport_dc_import_complete',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
   return $items;
 }
 
@@ -197,7 +204,6 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   // Add a validation handler.
   $form['#validate'][] = 'ma_importexport_dc_import_form_options_validate';
 
-
   // Return form.
   return $form;
 }
@@ -217,7 +223,7 @@ function ma_importexport_dc_import_form_options_validate($form, $form_state) {
 /**
  * Submit handler for the options form.
  */
-function ma_importexport_dc_import_form_options_submit($form, $form_state) {
+function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
 
   // Set the options to be picked up by the importer.
   variable_set ('dc_import_options', $form_state['values']);
@@ -243,9 +249,13 @@ function ma_importexport_dc_import_form_options_submit($form, $form_state) {
   $config['context']['value'] = $context;
   $importer->parser->setConfig($config);
   $importer->save();
-  
+
+  // Go to the status page after it's done.
+  $form_state['redirect'] = 'import/digital-heritage-dc-complete';
+
   // Do the import
   $source->startImport();
+
 }
 
 /**
@@ -332,4 +342,36 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
     $entity->uid = 1;
 
   }
+}
+
+/**
+ * Page callback to show at the end of the DC import.
+ */
+function ma_importexport_dc_import_complete() {
+  $output = '';
+  $source = feeds_source('digital_heritage_dc');
+
+  // Taken from feeds_source_status();
+  $progress_importing = $source->progressImporting();
+  $v = array();
+  if ($progress_importing != FEEDS_BATCH_COMPLETE) {
+    $v['progress_importing'] = $progress_importing;
+  }
+  $progress_clearing = $source->progressClearing();
+  if ($progress_clearing != FEEDS_BATCH_COMPLETE) {
+    $v['progress_clearing'] = $progress_clearing;
+  }
+  $v['imported'] = $source->imported;
+  $v['count'] = $source->itemCount();
+  if (!empty($v)) {
+    $output = theme('feeds_source_status', $v);
+  }
+
+  // Add some buttons
+  $output .= '<br />';
+  $output .=  l('<span>' .t('Import More') .'</span>', 'import/digital-heritage-dc-file', array('attributes' => array('title' => t('Create a new user account.'), 'class' => 'button'), 'html' => 'TRUE'));
+  $output .=  l('<span>' .t('Return to Dashboard') .'</span>', 'dashboard', array('attributes' => array('title' => t('Create a new user account.'), 'class' => 'button'), 'html' => 'TRUE'));
+
+  // Return the page.
+  return $output;
 }
