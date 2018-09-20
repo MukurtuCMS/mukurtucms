@@ -327,24 +327,29 @@ class FeedsMapperMultilingualFieldsTestCase extends FeedsMapperTestCase {
       $this->drupalPost('admin/structure/types/manage/' . $this->contentType . '/fields/' . $field . '/widget-type', $edit, 'Continue');
     }
 
-    // Create a node with Dutch values.
+    // Create a node with Dutch values (except for the title, which is used as
+    // unique target).
     $edit = array(
       'title' => 'Teste Feeds Multilingue 1',
-      'body[und][0][value]' => 'Dit is de berichttekst',
-      'field_date[und][0][value][date]' => '07/29/1985',
-      'field_datestamp[und][0][value][date]' => '07/29/1985 - 04:48:12',
-      'field_datetime[und][0][value][date]' => '07/29/1985 - 04:48:12',
-      'field_link[und][0][url]' => 'http://google.nl',
-      'field_list_boolean[und]' => '1',
-      'field_number_decimal[und][0][value]' => '30.3',
-      'field_number_float[und][0][value]' => '30.2795',
-      'field_number_integer[und][0][value]' => '30',
-      'field_text[und][0][value]' => 'Wortelen',
-      'files[field_image_und_0]' => drupal_realpath('public://images/attersee.jpeg'),
-      'field_category[und]' => 'Nieuws',
       'language' => 'nl',
     );
     $this->drupalPost('node/add/' . $this->contentType, $edit, t('Save'));
+    // Add values for Dutch fields.
+    $edit = array(
+      'body[nl][0][value]' => 'Dit is de berichttekst',
+      'field_date[nl][0][value][date]' => '07/29/1985',
+      'field_datestamp[nl][0][value][date]' => '07/29/1985 - 04:48:12',
+      'field_datetime[nl][0][value][date]' => '07/29/1985 - 04:48:12',
+      'field_link[nl][0][url]' => 'http://google.nl',
+      'field_list_boolean[nl]' => '1',
+      'field_number_decimal[nl][0][value]' => '30.3',
+      'field_number_float[nl][0][value]' => '30.2795',
+      'field_number_integer[nl][0][value]' => '30',
+      'field_text[nl][0][value]' => 'Wortelen',
+      'files[field_image_nl_0]' => drupal_realpath('public://images/attersee.jpeg'),
+      'field_category[nl]' => 'Nieuws',
+    );
+    $this->drupalPost('node/1/edit/nl', $edit, t('Save'));
     // Add alt/title to the image.
     $edit = array(
       'field_image[nl][0][alt]' => 'Bij het zien',

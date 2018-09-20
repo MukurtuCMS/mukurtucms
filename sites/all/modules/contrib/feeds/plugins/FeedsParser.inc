@@ -438,13 +438,14 @@ class FeedsEnclosure extends FeedsElement {
    *
    * @return string
    *   The content of the referenced resource.
+   *
+   * @throws FeedsHTTPRequestException
+   *   In case the result code of the HTTP request is not in the 2xx series.
    */
   public function getContent() {
     feeds_include_library('http_request.inc', 'http_request');
-    $result = http_request_get($this->getUrlEncodedValue());
-    if ($result->code != 200) {
-      throw new Exception(t('Download of @url failed with code !code.', array('@url' => $this->getUrlEncodedValue(), '!code' => $result->code)));
-    }
+    $result = feeds_http_request($this->getUrlEncodedValue());
+    http_request_check_result($this->getUrlEncodedValue(), $result);
     return $result->data;
   }
 

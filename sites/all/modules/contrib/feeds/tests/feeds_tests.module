@@ -34,6 +34,11 @@ function feeds_tests_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['testing/feeds/nodes.csv'] = array(
+    'page callback' => 'feeds_tests_nodes',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
@@ -78,11 +83,88 @@ function feeds_tests_node_load($nodes) {
  * Changes runtime limit for feeds_source_import queue.
  *
  * @see FeedsFileFetcherTestCase::testRemoveFileAfterImportInBackground()
+ * @see FeedsFileHTTPTestCase::testImportSourceWithMultipleCronRuns()
  */
 function feeds_tests_cron_queue_info_alter(&$queues) {
   $feeds_source_import_queue_time = variable_get('feeds_tests_feeds_source_import_queue_time', FALSE);
   if ($feeds_source_import_queue_time && isset($queues['feeds_source_import'])) {
     $queues['feeds_source_import']['time'] = $feeds_source_import_queue_time;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedsimporter_feeds_form().
+ *
+ * Adds an extra checkbox setting.
+ *
+ * @see feeds_tests_config_defaults()
+ */
+function feeds_tests_form_feedsimporter_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_extra_setting'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_extra_setting'],
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedshttpfetcher_feeds_form().
+ *
+ * Adds an extra checkbox setting.
+ *
+ * @see feeds_tests_fetcher_config_defaults()
+ */
+function feeds_tests_form_feedshttpfetcher_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_fetcher_extra_setting'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_fetcher_extra_setting'],
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedscsvparser_feeds_form().
+ *
+ * Adds an extra checkbox setting.
+ *
+ * @see feeds_tests_parser_config_defaults()
+ */
+function feeds_tests_form_feedscsvparser_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_parser_extra_setting'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_parser_extra_setting'],
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for form feedsnodeprocessor_feeds_form().
+ *
+ * Adds an extra custom setting.
+ *
+ * @see feeds_tests_processor_config_defaults()
+ */
+function feeds_tests_form_feedsnodeprocessor_feeds_form_alter(&$form, &$form_state) {
+  if (variable_get('feeds_tests_hook_config_defaults', FALSE)) {
+    $config = $form['#configurable']->getConfig();
+
+    $form['feeds_tests_processor_extra_setting'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Extra setting'),
+      '#default_value' => $config['feeds_tests_processor_extra_setting'],
+    );
   }
 }
 
@@ -178,6 +260,53 @@ function feeds_tests_files_empty() {
   );
   drupal_add_http_header('Content-Type', 'text/plain; charset=utf-8');
   print theme('feeds_tests_files_empty', array('files' => $images));
+}
+
+/**
+ * Page callback. Generates a test feed and simulates last-modified.
+ *
+ * This is used to test the following:
+ * - Ensure that the source is not refetched on a second import when the
+ *   source did not change.
+ * - Ensure that the source *is* refetched on a second import when the
+ *   source *did* change.
+ *
+ * @see FeedsFileHTTPTestCase::testHttpRequestUsingFileCache()
+ * @see FeedsFileHTTPTestCase::testSourceCaching()
+ * @see FeedsFileHTTPTestCase::testChangedSource()
+ * @see FeedsFileHTTPTestCase::testImportSourceWithMultipleCronRuns()
+ */
+function feeds_tests_nodes() {
+  if (variable_get('feeds_tests_nodes_changed', FALSE)) {
+    $file = 'nodes_changes2.csv';
+    $last_modified = strtotime('Sun, 30 Mar 2016 10:19:55 GMT');
+  }
+  else {
+    $file = 'nodes.csv';
+    $last_modified = strtotime('Sun, 19 Nov 1978 05:00:00 GMT');
+  }
+
+  $if_modified_since = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : FALSE;
+  $if_none_match = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? stripslashes($_SERVER['HTTP_IF_NONE_MATCH']) : FALSE;
+
+  // Set header with last modified date.
+  drupal_add_http_header('Last-Modified', gmdate(DATE_RFC7231, $last_modified));
+
+  // Return 304 not modified if last modified.
+  if ($last_modified == $if_modified_since) {
+    drupal_add_http_header('Status', '304 Not Modified');
+    return;
+  }
+
+  // The following headers force validation of cache:
+  drupal_add_http_header('Expires', $last_modified);
+  drupal_add_http_header('Cache-Control', 'must-revalidate');
+  drupal_add_http_header('Content-Type', 'text/plain; charset=utf-8');
+
+  // Read actual feed from file.
+  $csv = file_get_contents(drupal_get_path('module', 'feeds') . '/tests/feeds/' . $file);
+
+  print $csv;
 }
 
 /**
@@ -407,12 +536,22 @@ function feeds_tests_feeds_after_parse(FeedsSource $source, FeedsParserResult $r
       }
     }
   }
+
+  // Casts the 'uid' value to a float to ensure float values don't result into
+  // array_flip() warnings when using the value to load an user.
+  // @see FeedsRSStoNodesTest::testUidTargetWithFloat()
+  if (variable_get('feeds_tests_feeds_after_parse_uid_float_value', FALSE)) {
+    foreach ($result->items as &$item) {
+      $item['uid'] = (float) $item['uid'];
+    }
+  }
 }
 
 /**
  * Implements hook_feeds_after_save().
  *
  * @see FeedsFileFetcherTestCase::testRemoveFileAfterImportInBackground()
+ * @see FeedsFileHTTPTestCase::testImportSourceWithMultipleCronRuns()
  */
 function feeds_tests_feeds_after_save() {
   $sleep = variable_get('feeds_tests_feeds_after_save_sleep', FALSE);
