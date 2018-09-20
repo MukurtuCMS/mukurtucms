@@ -1,5 +1,5 @@
 diff --git a/scald_feeds.module b/scald_feeds.module
-index 13f1780..67609bb 100644
+index 13f1780..c90ce7d 100644
 --- a/scald_feeds.module
 +++ b/scald_feeds.module
 @@ -21,7 +21,6 @@ function scald_feeds_feeds_processor_targets_alter(&$targets, $entity_type, $bun
@@ -14,7 +14,7 @@ index 13f1780..67609bb 100644
    if (!is_array($value)) {
      $value = array($value);
    }
-+  
++
    foreach ($value as $k => $v) {
 -    if (!($v instanceof FeedsEnclosure)) {
 -      if (is_string($v)) {
@@ -39,7 +39,7 @@ index 13f1780..67609bb 100644
    if (empty($value)) {
      return;
    }
-@@ -65,90 +70,259 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
+@@ -65,90 +70,276 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
      $data[$entity_type] = $entity;
    }
  
@@ -59,25 +59,25 @@ index 13f1780..67609bb 100644
 +        if($atom) {
 +            $existing_sid = $atom->sid;
 +        }
-+    }
-+      
-+    // Check if using a GUID for an existing scald atom previously imported by feeds
-+    if($existing_sid == FALSE) {
-+        $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
      }
 -    catch (Exception $e) {
 -      watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
 +
-+    // Search for a previously imported matching scald atom and use that if found.
++    // Check if using a GUID for an existing scald atom previously imported by feeds
 +    if($existing_sid == FALSE) {
-+      $type = _scald_feeds_get_provider_by_mime_type($v->getMimeType());
-+      $existing_sid = scald_feeds_fetch_matching_atom($v->getValue(), $type);
++        $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
      }
 -    if ($file) {
 -      $file = (array) $file;
 -      $sid = _scald_feeds_save_atom($file, $file['filename']);
 -      $field['und'][$i] = array(
 -        'sid' => $sid,
++
++    // Search for a previously imported matching scald atom and use that if found.
++    if($existing_sid == FALSE) {
++      $type = _scald_feeds_get_provider_by_mime_type($v->getMimeType());
++      $existing_sid = scald_feeds_fetch_matching_atom($v->getValue(), $type);
++    }
 +
 +    if($existing_sid) {
 +      $field[LANGUAGE_NONE][$i] = array(
@@ -88,7 +88,6 @@ index 13f1780..67609bb 100644
        }
        $i++;
      }
--  }
 +    else {
 +      $sid = _scald_feeds_save_atom($v->getValue(), $type, urldecode(basename($v->getValue())));
 +
@@ -100,7 +99,7 @@ index 13f1780..67609bb 100644
 +        }
 +        $i++;
 +    }
-+  }  
+   }
 +
    $entity->{$target} = $field;
  }
@@ -124,10 +123,10 @@ index 13f1780..67609bb 100644
 +  if(isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat']) && isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'])) {
 +    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['input_format'] = 'lat/lon';
 +    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lat'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat'];
-+    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lon'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon']; 
++    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lon'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'];
 +  }
 +
-+  if (isset($form['field_scald_created'][LANGUAGE_NONE][0]['#default_value'])) {	
++  if (isset($form['field_scald_created'][LANGUAGE_NONE][0]['#default_value'])) {
 +    $value1 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value']);
 +    $value2 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value2']);
 +    $atom->field_scald_created[LANGUAGE_NONE] = array(array('value' => $value1, 'value2' => $value2));
@@ -172,15 +171,15 @@ index 13f1780..67609bb 100644
 +  // Skip atom type the user isn't allowed to create.
 +  if (!scald_action_permitted($atoms[0], 'create')) {
 +    return FALSE;
-   }
--  elseif (!is_object($file) && !is_array($file)) {
++  }
 +
 +  if(valid_url($file, TRUE)) {
 +    $data = drupal_http_request($file);
 +    $temp_file = file_unmanaged_save_data($data->data);
 +  } else {
 +    $temp_file = file_unmanaged_copy($file);
-+  }
+   }
+-  elseif (!is_object($file) && !is_array($file)) {
 +
 +  if($temp_file === FALSE) {
      return FALSE;
@@ -314,7 +313,7 @@ index 13f1780..67609bb 100644
 +			'type' => $type,
 +			'publisher' => $user->uid);
 +  $sids = scald_search($scald_query, FALSE);
-+      
++
 +  if(!$sids) {
 +    return FALSE;
 +  }
@@ -337,13 +336,29 @@ index 13f1780..67609bb 100644
 +      break;
 +    }
 +
-+    if (filesize($atom->file_source) == filesize($filename) && 
-+	md5_file($atom->file_source) == md5_file($filename) && 
++    // For external files, save file to a temporary directory to compare on.
++    $external_file = 0;
++    if (strtolower(substr($filename, 0, 4) == 'http')) {
++      $external_file = 1;
++      $file_contents = file_get_contents($filename);
++      $filename = drupal_tempnam('temporary://', 'file');
++      file_put_contents($filename, $file_contents);
++    }
++
++    $new_file_filesize = filesize($filename);
++    $new_file_md5 = md5_file($filename);
++
++    if ($external_file) {
++      unlink($filename);
++    }
++
++    if (filesize($atom->file_source) == $new_file_filesize &&
++	md5_file($atom->file_source) == $new_file_md5 &&
 +	$atom->changed == $atom->created) {
++
 +      return $sid;
 +    }
 +  }
 +
 +  return FALSE;
 +}
-\ No newline at end of file
