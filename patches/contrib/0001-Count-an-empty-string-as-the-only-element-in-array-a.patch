@@ -10,8 +10,8 @@ Subject: [PATCH] Count an empty string as the only element in array as being
 
 diff --git a/sites/all/modules/contrib/feeds_tamper/plugins/required.inc b/sites/all/modules/contrib/feeds_tamper/plugins/required.inc
 index aa37d21..82bb370 100644
---- a/sites/all/modules/contrib/feeds_tamper/plugins/required.inc
-+++ b/sites/all/modules/contrib/feeds_tamper/plugins/required.inc
+--- a/plugins/required.inc
++++ b/plugins/required.inc
 @@ -47,7 +47,13 @@ function feeds_tamper_required_callback($result, $item_key, $element_key, &$fiel
    }
  
