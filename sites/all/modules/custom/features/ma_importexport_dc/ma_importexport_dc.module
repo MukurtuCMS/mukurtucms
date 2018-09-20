@@ -82,9 +82,10 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   // (it's excessively sensitive to character formatting and xmlns specs).
   // Also tried using the DOM but it was overkill.
   $parser = xml_parser_create();
+  xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
   xml_parse_into_struct($parser, $file_contents, $values, $index);
   xml_parser_free($parser);
-  $attributes = array_map('strtolower', (array_keys($index)));
+  $attributes = array_keys($index);
   $attributes = array_combine($attributes, $attributes);
 
   // Context checkboxes.
@@ -95,7 +96,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#options' => $attributes,
     '#required' => TRUE,
   );
-  $typical_context_values = ['metadata', 'rdf:rdf', 'rdf:description'];
+  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description'];
   $available_typical_context_values = [];
   foreach ($typical_context_values as $typical_context_value) {
     if (isset($attributes[$typical_context_value])) {
