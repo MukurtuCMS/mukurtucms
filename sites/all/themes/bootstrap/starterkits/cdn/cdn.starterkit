@@ -2,6 +2,7 @@ name = Bootstrap Sub-Theme (CDN)
 description = Uses the jsDelivr CDN for all CSS and JavaScript. No source files or compiling is necessary and is recommended for simple sites or beginners.
 core = 7.x
 base theme = bootstrap
+php = 5.3.0
 
 
 ;;;;;;;;;;;;;;;;;;;;;

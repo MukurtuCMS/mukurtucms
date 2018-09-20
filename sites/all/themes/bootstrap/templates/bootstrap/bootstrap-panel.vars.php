@@ -18,6 +18,12 @@
  * @ingroup theme_preprocess
  */
 function bootstrap_preprocess_bootstrap_panel(array &$variables) {
+  // Temporarily provide field_group "support" until properly "fixed" upstream.
+  // @see https://www.drupal.org/project/bootstrap/issues/2910624
+  if (!empty($variables['element']['#group']->format_type) && $variables['element']['#group']->format_type == 'htab') {
+    $variables['element']['#collapsed'] = FALSE;
+  }
+
   $element = &$variables['element'];
 
   // Set the element's attributes.

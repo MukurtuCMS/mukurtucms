@@ -24,9 +24,12 @@ function bootstrap_file_managed_file(array $variables) {
   $element = $variables['element'];
 
   $attributes = array();
-  if (isset($element['#id'])) {
+
+  // For Webform use, do not add the id to the wrapper.
+  if (isset($element['#id']) && empty($element['#webform_component'])) {
     $attributes['id'] = $element['#id'];
   }
+
   if (!empty($element['#attributes']['class'])) {
     $attributes['class'] = (array) $element['#attributes']['class'];
   }
