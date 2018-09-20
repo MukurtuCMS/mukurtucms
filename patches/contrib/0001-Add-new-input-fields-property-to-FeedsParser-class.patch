@@ -11,8 +11,8 @@ input. This will enable us to partial updates for existing content.
 
 diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsParser.inc b/sites/all/modules/contrib/feeds/plugins/FeedsParser.inc
 index e4fb66c..c3a9490 100644
---- a/sites/all/modules/contrib/feeds/plugins/FeedsParser.inc
-+++ b/sites/all/modules/contrib/feeds/plugins/FeedsParser.inc
+--- a/plugins/FeedsParser.inc
++++ b/plugins/FeedsParser.inc
 @@ -15,14 +15,22 @@ class FeedsParserResult extends FeedsResult {
    public $items;
    public $current_item;
