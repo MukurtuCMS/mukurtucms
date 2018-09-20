@@ -95,6 +95,18 @@ function search_api_drush_command() {
     'aliases' => array('sapi-r'),
   );
 
+  $items['search-api-reindex-items'] = array(
+    'description' => 'Force re-indexing of one or more specific items.',
+    'examples' => array(
+      'drush search-api-reindex-items node 12,34,56' => dt('Schedule the nodes with ID 12, 34 and 56 for re-indexing.'),
+    ),
+    'arguments' => array(
+      'entity_type' => dt('The entity type whose items should be re-indexed.'),
+      'entities' => dt('The entities of the given entity type to be re-indexed.'),
+    ),
+    'aliases' => array('sapi-ri'),
+  );
+
   $items['search-api-clear'] = array(
     'description' => 'Clear one or all search indexes and mark them for re-indexing.',
     'examples' => array(
@@ -107,6 +119,19 @@ function search_api_drush_command() {
       'index_id' => dt('The numeric ID or machine name of an index.'),
     ),
     'aliases' => array('sapi-c'),
+  );
+
+  $items['search-api-execute-tasks'] = array(
+    'description' => 'Execute all pending tasks or all for a given server.',
+    'examples' => array(
+      'drush search-api-execute-tasks my_solr_server' => dt('Execute all pending tasks on !server', array('!server' => 'my_solr_server')),
+      'drush sapi-et my_solr_server' => dt('Execute all pending tasks on !server', array('!server' => 'my_solr_server')),
+      'drush sapi-et' => dt('Execute all pending tasks on all servers.')
+    ),
+    'arguments' => array(
+      'server_id' => dt('The numeric ID or machine name of a server to execute tasks on.'),
+    ),
+    'aliases' => array('sapi-et')
   );
 
   $items['search-api-set-index-server'] = array(
@@ -449,6 +474,33 @@ function drush_search_api_reindex($index_id = NULL) {
 }
 
 /**
+ * Marks the given entities as needing to be re-indexed.
+ */
+function drush_search_api_reindex_items($entity_type, $entities) {
+  if (search_api_drush_static(__FUNCTION__)) {
+    return;
+  }
+
+  // Validate list of entity ids.
+  if (!empty($entities) && !preg_match('#^[0-9]*(,[0-9]*)*$#', $entities)) {
+    drush_log(dt('Entities should be a single numeric entity ID or a list with the numeric entity IDs separated by comma.'), 'error');
+    return;
+  }
+
+  $ids = explode(',', $entities);
+
+  if (!empty($ids)) {
+    search_api_track_item_change($entity_type, $ids);
+
+    $combined_ids = array();
+    foreach ($ids as $id) {
+      $combined_ids[] = $entity_type . '/' . $id;
+    }
+    search_api_track_item_change('multiple', $combined_ids);
+  }
+}
+
+/**
  * Clear an index.
  */
 function drush_search_api_clear($index_id = NULL) {
@@ -463,6 +515,34 @@ function drush_search_api_clear($index_id = NULL) {
   foreach ($indexes as $index) {
     $index->clear();
     drush_log(dt('!index was successfully cleared.', array('!index' => $index->machine_name)), 'ok');
+  }
+}
+
+/**
+ * Execute all pending tasks or all for a given server.
+ */
+function drush_search_api_execute_tasks($server_id = NULL) {
+  if (search_api_drush_static(__FUNCTION__)) {
+    return;
+  }
+
+  // Attempt to load the associated server.
+  $server = NULL;
+  if ($server_id) {
+    $servers = search_api_drush_get_server($server_id);
+    if (!$servers) {
+      return;
+    }
+    $server = reset($servers);
+  }
+
+  // Process batch op with drush.
+  try {
+    search_api_execute_pending_tasks($server);
+    drush_log(dt('!server tasks have been successfully executed.', array('!server' => $server->machine_name ? $server->machine_name : 'All')), 'ok');
+  }
+  catch (SearchApiException $e) {
+    drush_log($e->getMessage(), 'error');
   }
 }
 

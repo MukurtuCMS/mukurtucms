@@ -6,9 +6,9 @@
  */
 
 /**
- * Views filter handler base class for handling all "normal" cases.
+ * Views filter handler base class for handling date fields.
  */
-class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilter {
+class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilterNumeric {
 
   /**
    * Add a "widget type" option.
@@ -88,9 +88,22 @@ class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilter {
   public function value_form(&$form, &$form_state) {
     parent::value_form($form, $form_state);
 
+    $is_date_popup = ($this->options['widget_type'] == 'date_popup' && module_exists('date_popup'));
+
+    // If the operator is between
+    if ($this->operator == 'between') {
+      if ($is_date_popup) {
+        $form['value']['min']['#type'] = 'date_popup';
+        $form['value']['min']['#date_format'] =  $this->options['date_popup_format'];
+        $form['value']['min']['#date_year_range'] = $this->options['year_range'];
+        $form['value']['max']['#type'] = 'date_popup';
+        $form['value']['max']['#date_format'] =  $this->options['date_popup_format'];
+        $form['value']['max']['#date_year_range'] = $this->options['year_range'];
+      }
+    }
     // If we are using the date popup widget, overwrite the settings of the form
     // according to what date_popup expects.
-    if ($this->options['widget_type'] == 'date_popup' && module_exists('date_popup')) {
+    elseif ($is_date_popup) {
       $form['value']['#type'] = 'date_popup';
       $form['value']['#date_format'] =  $this->options['date_popup_format'];
       $form['value']['#date_year_range'] = $this->options['year_range'];
@@ -115,11 +128,31 @@ class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilter {
     elseif ($this->operator === 'not empty') {
       $this->query->condition($this->real_field, NULL, '<>', $this->options['group']);
     }
-    else {
-      while (is_array($this->value)) {
-        $this->value = $this->value ? reset($this->value) : NULL;
+    elseif (in_array($this->operator, array('between', 'not between'), TRUE)) {
+      $min = isset($this->value[0]['min']) ? $this->value[0]['min'] : '';
+      if ($min !== '') {
+        $min = is_numeric($min) ? $min : strtotime($min, REQUEST_TIME);
       }
-      $v = is_numeric($this->value) ? $this->value : strtotime($this->value, REQUEST_TIME);
+      $max = isset($this->value[0]['max']) ? $this->value[0]['max'] : '';
+      if ($max !== '') {
+        $max = is_numeric($max) ? $max : strtotime($max, REQUEST_TIME);
+      }
+
+      if (is_numeric($min) && is_numeric($max)) {
+        $this->query->condition($this->real_field, array($min, $max), strtoupper($this->operator), $this->options['group']);
+      }
+      elseif (is_numeric($min)) {
+        $operator = $this->operator === 'between' ? '>=' : '<';
+        $this->query->condition($this->real_field, $min, $operator, $this->options['group']);
+      }
+      elseif (is_numeric($max)) {
+        $operator = $this->operator === 'between' ? '<=' : '>';
+        $this->query->condition($this->real_field, $min, $operator, $this->options['group']);
+      }
+    }
+    else {
+      $value = isset($this->value[0]) ? $this->value[0]['value'] : $this->value['value'];
+      $v = is_numeric($value) ? $value : strtotime($value, REQUEST_TIME);
       if ($v !== FALSE) {
         $this->query->condition($this->real_field, $v, $this->operator, $this->options['group']);
       }

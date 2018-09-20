@@ -351,7 +351,8 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
           }
         }
         else {
-          $p = stripos($text, $key, $included[$key]);
+          $function = function_exists('mb_stripos') ? 'mb_stripos' : 'stripos';
+          $p = $function($text, $key, $included[$key]);
         }
         // Now locate a space in front (position $q) and behind it (position $s),
         // leaving about 60 characters extra before and after for context.

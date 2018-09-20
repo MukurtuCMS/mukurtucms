@@ -1,12 +1,11 @@
-
-name = Search API test
-description = "Some dummy implementations for testing the Search API."
+name = Search API test service 2
+description = "A module providing a second test search service."
 core = 7.x
 package = Search
 
 dependencies[] = search_api
 
-files[] = search_api_test.module
+files[] = search_api_test_service_2.module
 
 hidden = TRUE
 

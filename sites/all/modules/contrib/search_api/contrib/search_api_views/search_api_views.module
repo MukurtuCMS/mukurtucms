@@ -27,8 +27,11 @@ function search_api_views_search_api_index_insert() {
  */
 function search_api_views_search_api_index_update(SearchApiIndex $index) {
   // Check whether index was disabled.
-  if (!$index->enabled && $index->original->enabled) {
+  $is_enabled = $index->enabled;
+  $was_enabled = $index->original->enabled;
+  if (!$is_enabled && $was_enabled) {
     _search_api_views_index_unavailable($index);
+    return;
   }
 
   // Check whether the indexed fields changed.
@@ -36,7 +39,9 @@ function search_api_views_search_api_index_update(SearchApiIndex $index) {
   $old_fields = $old_fields['fields'];
   $new_fields = $index->options + array('fields' => array());
   $new_fields = $new_fields['fields'];
-  if ($old_fields != $new_fields) {
+
+  // If the index was enabled or its fields changed, invalidate the Views cache.
+  if ($is_enabled != $was_enabled || $old_fields != $new_fields) {
     views_invalidate_cache();
   }
 }

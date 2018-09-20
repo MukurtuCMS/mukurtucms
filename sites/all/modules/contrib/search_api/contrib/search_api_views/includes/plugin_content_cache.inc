@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains the SearchApiViewsCache class.
+ * Contains the SearchApiViewsContentCache class.
  */
 
 /**
- * Plugin class for caching Search API views.
+ * Plugin class for caching Search API views, with additional invalidation.
  */
-class SearchApiViewsCache extends views_plugin_cache_time {
+class SearchApiViewsContentCache extends views_content_cache_plugin_cache {
 
   /**
    * Static cache for get_results_key().

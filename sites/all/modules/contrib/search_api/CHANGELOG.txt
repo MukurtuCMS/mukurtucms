@@ -1,3 +1,51 @@
+Search API 1.25 (2018-09-17):
+-----------------------------
+- #2408727 by swim, drunken monkey: Added a batch operation for executing
+  pending tasks.
+- #2325917 by guillaumev, drunken monkey: Added a Views cache plugin based on
+  Views Content Cache.
+- #2989578 by KarlShea, drunken monkey: Fixed Views exposed form fields for
+  "not between" operator.
+- #2982167 by osopolar, drunken monkey: Added a Drush command for re-indexing
+  specific entities.
+- #1783746 by das-peter, sammys, SpadXIII, drunken monkey, ruloweb, KarlShea,
+  heshanlk, Anas_maw, pinkonomy, Damien Tournoud, rudiedirkx: Added support
+  for the "(not) between" operator.
+- #2408727 by drunken monkey, OliverColeman: Fixed out-of-memory errors when
+  executing pending tasks.
+-  Issue #2948820 by capysara, drunken monkey: Added a link to the "need to
+  reindex" message on the Filters tab.
+- #2828883 by JorgenSandstrom, drunken monkey: Fixed property type for
+  string-typed aggregated fields.
+- #2949899 by drunken monkey, DamienMcKenna: Added a warning against using
+  particular processors with Solr servers to the "Workflow" tab.
+
+Search API 1.24 (2018-04-05):
+-----------------------------
+- #2958201 by jcnventura, drunken monkey: Reverted issue #2566529: Added
+  support for the "Content access" processor for "Multiple types" indexes.
+
+Search API 1.23 (2018-03-31):
+-----------------------------
+- #2949562 by DamienMcKenna, drunken monkey: Fixed stemming of multi-word
+  tokens.
+- #1903004 by AndyF, joseph.olstad, drunken monkey: Fixed errors at feature
+  module installation in certain edge cases.
+- #2889989 by kevineinarsson, drunken monkey, kristofferwiklund: Fixed
+  highlighting for text with multi-byte characters.
+- #1393064 by xlyz, drunken monkey, jannis: Fixed handling of empty facet
+  filters.
+- #2927692 by drunken monkey, Kristi Wachter: Fixed exposed grouped Views
+  options filters.
+- #2928769 by jannis, drunken monkey: Fixed Views cache not being cleared when
+  enabling indexes.
+- #2566529 by Dylan Donkersgoed, drunken monkey, joachim, swirt: Added support
+  for the "Content access" processor for "Multiple types" indexes.
+- #2905445 by ciss, drunken monkey: Fixed error handling in Views term filter
+  handler.
+- #2904268 by pobster, drunken monkey: Added support for language hierarchy in
+  Views.
+
 Search API 1.22 (2017-07-18):
 -----------------------------
 - #1710212 by drunken monkey: Added a data alteration for indexing a user's

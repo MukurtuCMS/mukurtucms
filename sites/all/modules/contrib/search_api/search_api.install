@@ -265,6 +265,51 @@ function search_api_schema() {
 }
 
 /**
+ * Implements hook_requirements().
+ */
+function search_api_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    // Check whether at least one server has pending tasks.
+    if (search_api_server_tasks_count()) {
+      $items = array();
+
+      $conditions = array('enabled' => TRUE);
+      foreach (search_api_server_load_multiple(FALSE, $conditions) as $server) {
+        $count = search_api_server_tasks_count($server);
+        if ($count) {
+          $args = array(
+            '@name' => $server->name,
+          );
+          $text = format_plural($count, '@name has @count pending task.', '@name has @count pending tasks.', $args);
+          $items[] = l($text, "admin/config/search/search_api/server/{$server->machine_name}/execute-tasks");
+        }
+      }
+
+      if ($items) {
+        $text = t('There are pending tasks for the following servers:');
+        $text .= theme('item_list', array(
+          'type' => 'ul',
+          'items' => $items,
+        ));
+        if (count($items) > 1) {
+          $label = t('Execute pending tasks on all servers');
+          $text .= l($label, 'admin/config/search/search_api/execute-tasks');
+        }
+        $requirements['search_api_pending_tasks'] = array(
+          'title' => t('Search API'),
+          'value' => $text,
+          'severity' => REQUIREMENT_WARNING,
+        );
+      }
+    }
+  }
+
+  return $requirements;
+}
+
+/**
  * Implements hook_install().
  *
  * Creates a default node index if the module is installed manually.
