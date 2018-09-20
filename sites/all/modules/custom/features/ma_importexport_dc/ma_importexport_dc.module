@@ -68,6 +68,7 @@ function ma_importexport_dc_import_form_standalone($form, $form_state) {
  */
 function ma_importexport_dc_import_form_standalone_submit($form, $form_state) {
   variable_set('dc_import_xml_fid', $form_state['values']['xml_file']);
+  variable_set ('dublin_core_import_is_batch', 0);
   drupal_goto('import/digital-heritage-dc-options');
 }
 
@@ -365,8 +366,12 @@ function ma_importexport_dc_import_complete() {
 
   // Add some buttons
   $output .= '<br />';
-  $output .=  l('<span>' .t('Import More') .'</span>', 'import/digital-heritage-dc-file', array('attributes' => array('title' => t('Create a new user account.'), 'class' => 'button'), 'html' => 'TRUE'));
-  $output .=  l('<span>' .t('Return to Dashboard') .'</span>', 'dashboard', array('attributes' => array('title' => t('Create a new user account.'), 'class' => 'button'), 'html' => 'TRUE'));
+  $import_more_path = 'import/digital-heritage-dc-file';
+  if (variable_get('dublin_core_import_is_batch')) {
+    $import_more_path = 'manage/zip_import';
+  }
+  $output .=  l('Import More', $import_more_path, ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);
+  $output .=  l('Return to Dashboard', 'dashboard', ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);
 
   // Return the page.
   return $output;

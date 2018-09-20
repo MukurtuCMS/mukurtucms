@@ -44,7 +44,7 @@ function mukurtu_batch_import_form() {
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>' . l('Download a sample zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('This zip file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the <a href="@management_link">digital heritage management page</a>.', array('@management_link' => '/manage/digital-heritage')) . '</p>',
+    '#description' => '<p>For CSV imports, ' . l('download a sample ZIP file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This ZIP file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core imports, export an XML file from your system and create a ZIP archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
@@ -109,7 +109,7 @@ function mukurtu_batch_import_form() {
 */
   
   
-  $form['actions']['submit']['#value'] = t("Import");
+  $form['actions']['submit']['#value'] = t("Continue");
 /*   array_push($form['actions']['import']['#submit'], 'mukurtu_batch_import_import'); */
   array_push($form['#submit'], 'mukurtu_batch_import_import');
 
@@ -237,83 +237,125 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 function mukurtu_batch_import_import_metadata($path) {
   module_load_include('inc', 'feeds', 'feeds.pages');
 
-  $import_steps = array();
-  // Preload Communities and Protocols, don't show warnings, they might reference non-existant media yet to be imported
-  $import_steps[] = array('filename' => 'communities.csv',
-                          'importer' => 'import_communities',
-                          'hide_warnings' => TRUE);
-  $import_steps[] = array('filename' => 'protocols.csv',
-                          'importer' => 'import_cultural_protocols',
-                          'hide_warnings' => TRUE);
-
-  // Import Media
-  $import_steps[] = array('filename' => 'media_audio.csv',
-                          'importer' => 'import_media_audio',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_files.csv',
-                          'importer' => 'import_media_files',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_images.csv',
-                          'importer' => 'import_media_images',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_video.csv',
-                          'importer' => 'import_media_video',
-                          'hide_warnings' => FALSE);
-
-  // Re-import Communities and Protocols, parent objects and media should exist now
-  $import_steps[] = array('filename' => 'communities.csv',
-                          'importer' => 'import_communities',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'protocols.csv',
-                          'importer' => 'import_cultural_protocols',
-                          'hide_warnings' => FALSE);
-
-  // Import collections and digital heritage items
-  $import_steps[] = array('filename' => 'collections.csv',
-                          'importer' => 'import_collection',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'digitalheritage.csv',
-                          'importer' => 'digital_heritage_metadata',
-                          'hide_warnings' => FALSE);
-
-
   // Some zip archive programs place files inside a single folder. Rather than failing, if there is one directory in the root,
   // check if the files are there first.
   $files = scandir($path);
 
   foreach($files as $key => $file) {
-      if($file == '.' || $file == '..') {
-          unset($files[$key]);
-      }
+    if($file == '.' || $file == '..') {
+      unset($files[$key]);
+    }
   }
 
   if(count($files) == 1) {
-      foreach($files as $file) {
-          if(is_dir($path . DIRECTORY_SEPARATOR . $file)) {
-              $path = $path . DIRECTORY_SEPARATOR . $file;
-          }
+    foreach($files as $file) {
+      if(is_dir($path . DIRECTORY_SEPARATOR . $file)) {
+        $path = $path . DIRECTORY_SEPARATOR . $file;
       }
+    }
   }
 
-  if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
-      unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
+  foreach($files as $key => $file) {
+    if($file == '.' || $file == '..') {
+      unset($files[$key]);
+    }
   }
+
+  foreach ($files as $file) {
+    if (strpos($file, '.xml')) {
+
+      // Is Dublin Core import
+      $dc_import = 1;
+      $import_steps = [['filename' => $file,
+        'importer' => 'digital_heritage_dc',
+        'hide_warnings' => FALSE]];
+      break;
+    }
+  }
+
+  if (!$dc_import) {
+    // Not Dublin Core import
+
+    $import_steps = [];
+    // Preload Communities and Protocols, don't show warnings, they might reference non-existant media yet to be imported
+    $import_steps[] = [
+      'filename' => 'communities.csv',
+      'importer' => 'import_communities',
+      'hide_warnings' => TRUE
+    ];
+    $import_steps[] = [
+      'filename' => 'protocols.csv',
+      'importer' => 'import_cultural_protocols',
+      'hide_warnings' => TRUE
+    ];
+
+    // Import Media
+    $import_steps[] = [
+      'filename' => 'media_audio.csv',
+      'importer' => 'import_media_audio',
+      'hide_warnings' => FALSE
+    ];
+    $import_steps[] = [
+      'filename' => 'media_files.csv',
+      'importer' => 'import_media_files',
+      'hide_warnings' => FALSE
+    ];
+    $import_steps[] = [
+      'filename' => 'media_images.csv',
+      'importer' => 'import_media_images',
+      'hide_warnings' => FALSE
+    ];
+    $import_steps[] = [
+      'filename' => 'media_video.csv',
+      'importer' => 'import_media_video',
+      'hide_warnings' => FALSE
+    ];
+
+    // Re-import Communities and Protocols, parent objects and media should exist now
+    $import_steps[] = [
+      'filename' => 'communities.csv',
+      'importer' => 'import_communities',
+      'hide_warnings' => FALSE
+    ];
+    $import_steps[] = [
+      'filename' => 'protocols.csv',
+      'importer' => 'import_cultural_protocols',
+      'hide_warnings' => FALSE
+    ];
+
+    // Import collections and digital heritage items
+    $import_steps[] = [
+      'filename' => 'collections.csv',
+      'importer' => 'import_collection',
+      'hide_warnings' => FALSE
+    ];
+    $import_steps[] = [
+      'filename' => 'digitalheritage.csv',
+      'importer' => 'digital_heritage_metadata',
+      'hide_warnings' => FALSE
+    ];
+  }
+
+  if (isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
+    unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
+  }
+
   $success = FALSE;
   foreach($import_steps as $import_step) {
       $filename = $import_step['filename'];
       $importer_id = $import_step['importer'];
       $hide_warnings = $import_step['hide_warnings'];
 
-      $csv_path = $path . DIRECTORY_SEPARATOR . $filename;
-      if(file_exists($csv_path)) {
+      $import_file_path = $path . DIRECTORY_SEPARATOR . $filename;
+      if(file_exists($import_file_path)) {
           // Success in this case is finding at least one of the files we were looking for
           $success = TRUE;
 
           // Save as a managed file.
-          $csv = file_get_contents($csv_path);
+          $import_file = file_get_contents($import_file_path);
 
           // Crude method to support relative file paths
-          $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
+          $import_file = str_replace('[mukurtu:batch_import_temp_directory]', $path, $import_file);
 
           //      $destination = 'private://feeds/';
           $destination = $path;
@@ -322,10 +364,16 @@ function mukurtu_batch_import_import_metadata($path) {
           // Prefix will create a different file for imports that get run twice
           // Without this, feeds could try and run twice using the same file, which usually results in conflict
           $prefix = $hide_warnings ? 'hidden_' : '';
-          $file = file_save_data($csv, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
+          $file = file_save_data($import_file, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
 
           if($hide_warnings) {
               $_SESSION['mukurtu_zip_import']['hide_warnings'][] = $importer_id;
+          }
+
+          if ($dc_import) {
+            variable_set('dc_import_xml_fid', $file->fid);
+            variable_set ('dublin_core_import_is_batch', 1);
+            drupal_goto('import/digital-heritage-dc-options');
           }
 
           // Load the Feeds Source object.
@@ -346,7 +394,7 @@ function mukurtu_batch_import_import_metadata($path) {
   }
 
   if(!$success) {
-      dpm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
+      dsm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
   }
 }
 
