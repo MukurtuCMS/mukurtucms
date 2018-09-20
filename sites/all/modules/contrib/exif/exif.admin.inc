@@ -6,8 +6,8 @@ include_once drupal_get_path('module', 'exif') .'/ExifFactory.php';
  */
 function exif_admin_settings() {
   $filepath = drupal_get_path('module', 'exif') .'/sample.jpg';  
-  $url = url($filepath);
-	
+  //$url = url($filepath);
+  $url = $filepath;
   $output = '';
   $output .= '<h3>' . t('About') . '</h3>';
   $output .= '<p>' . t('The Exif module allows you :');
@@ -85,7 +85,7 @@ function exif_admin_settings() {
           }
         }
       } else {
-        watchdog(WATCHDOG_NOTICE, "section ".$section." does not contains an array. can not extract metadata for this section.");
+        watchdog('exif', 'Section !section does not contains an array. Can not extract metadata for this section.', array('!section' => $section), WATCHDOG_NOTICE);
       }
     }
   }

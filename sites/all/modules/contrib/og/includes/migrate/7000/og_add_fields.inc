@@ -7,8 +7,8 @@
 
 class OgMigrateAddFields extends MigrationBase {
 
-  public function __construct() {
-    parent::__construct();
+  public function __construct($arguments = array()) {
+    parent::__construct($arguments);
     $this->description = t('Add OG related fields to group and group-content node-types.');
     $this->enabled = !$this->isComplete();
   }

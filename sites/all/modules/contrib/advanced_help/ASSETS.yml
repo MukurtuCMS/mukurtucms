@@ -1,0 +1,32 @@
+---
+# Define an alias for screendumps.
+aliases:
+  hide: TRUE
+  title: ALIASES
+  block:
+  - &screendumps
+    type: asset
+    approved: allowed license
+    license: CC0
+    rights: https://creativecommons.org/publicdomain/zero/1.0/
+    source: Gisle Hannemyr
+
+help.png:
+  title: help.png
+  type: asset
+  approved: allowed license
+  license: CC0
+  rights: https://creativecommons.org/publicdomain/zero/1.0/
+  source: unknown origin
+  hide: TRUE
+
+help/ahelp_tab.png:
+  title: ahelp_tab.png
+  hide: TRUE
+  a: *screendumps
+
+help/click_icon.png:
+  title: click_icon.png
+  hide: TRUE
+  a: *screendumps
+

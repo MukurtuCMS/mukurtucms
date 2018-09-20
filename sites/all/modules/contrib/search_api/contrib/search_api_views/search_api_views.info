@@ -19,17 +19,18 @@ files[] = includes/handler_filter_date.inc
 files[] = includes/handler_filter_entity.inc
 files[] = includes/handler_filter_fulltext.inc
 files[] = includes/handler_filter_language.inc
+files[] = includes/handler_filter_numeric.inc
 files[] = includes/handler_filter_options.inc
 files[] = includes/handler_filter_taxonomy_term.inc
 files[] = includes/handler_filter_text.inc
 files[] = includes/handler_filter_user.inc
 files[] = includes/handler_sort.inc
 files[] = includes/plugin_cache.inc
+files[] = includes/plugin_content_cache.inc
 files[] = includes/query.inc
 
-; Information added by Drupal.org packaging script on 2017-07-18
-version = "7.x-1.22"
+; Information added by Drupal.org packaging script on 2018-09-17
+version = "7.x-1.25"
 core = "7.x"
 project = "search_api"
-datestamp = "1500368049"
-
+datestamp = "1537171099"

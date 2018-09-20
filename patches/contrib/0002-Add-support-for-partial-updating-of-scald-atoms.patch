@@ -10,8 +10,8 @@ Subject: [PATCH 2/2] Add support for partial updating of scald atoms during
 
 diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc b/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
 index 0c116c15..7736e5cb 100644
---- a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
-+++ b/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
+--- a/plugins/FeedsProcessor.inc
++++ b/plugins/FeedsProcessor.inc
 @@ -743,9 +743,11 @@ abstract class FeedsProcessor extends FeedsPlugin {
      // source element and pass it to the processor's setTargetElement() to stick
      // it on the right place of the target item.

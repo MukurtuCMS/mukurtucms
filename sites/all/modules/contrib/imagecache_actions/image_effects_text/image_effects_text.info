@@ -6,9 +6,9 @@ core = 7.x
 dependencies[] = image
 dependencies[] = imagecache_actions
 
-; Information added by Drupal.org packaging script on 2017-07-02
-version = "7.x-1.7+9-dev"
+; Information added by Drupal.org packaging script on 2018-03-20
+version = "7.x-1.9"
 core = "7.x"
 project = "imagecache_actions"
-datestamp = "1498983253"
+datestamp = "1521550387"
 

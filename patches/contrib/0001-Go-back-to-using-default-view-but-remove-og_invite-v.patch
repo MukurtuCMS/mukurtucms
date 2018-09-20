@@ -10,8 +10,8 @@ Subject: [PATCH] Go back to using default view, but remove og_invite view
 
 diff --git a/sites/all/modules/contrib/og_invite/og_invite.module b/sites/all/modules/contrib/og_invite/og_invite.module
 index e2d8281..b5c516a 100644
---- a/sites/all/modules/contrib/og_invite/og_invite.module
-+++ b/sites/all/modules/contrib/og_invite/og_invite.module
+--- a/og_invite.module
++++ b/og_invite.module
 @@ -176,6 +176,7 @@ The @sitename team.', $body_params);
   *
   * Remove invitations from the group members admin view.

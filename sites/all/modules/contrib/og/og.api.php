@@ -12,7 +12,28 @@
  */
 
 /**
- * Add group permissions.
+ * Define permissions specific to organic groups.
+ *
+ * This hook can supply permissions that the module defines, so that they can be
+ * selected on the group permissions page and used to grant or restrict access
+ * to actions pertaining to groups.
+ *
+ * Permissions are checked using og_user_access().
+ *
+ * @return array
+ *   An array whose keys are permission names and whose corresponding values are
+ *   arrays containg the following key-value pairs:
+ *   - title: The human-readable name of the permission, to be shown on group
+ *     permissions pages. This should be wrapped in the t() function so it can
+ *     be translated.
+ *   - description: (optional) A description of what the permission does. This
+ *     should be wrapped in the t() function so it can be translated.
+ *   - roles: (optional) An array of OG roles to which it is possible to assign
+ *     this permission. The default value is an array containg OG_ANONYMOUS_ROLE
+ *     and OG_AUTHENTICATED_ROLE.
+ *   - default role: (optional) An array of OG roles that should be assigned
+ *     this permission by default. If omitted then no role will receive the
+ *     permission by default.
  */
 function hook_og_permission() {
   return array(

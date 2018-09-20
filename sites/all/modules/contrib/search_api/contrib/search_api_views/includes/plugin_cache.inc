@@ -35,11 +35,16 @@ class SearchApiViewsCache extends views_plugin_cache_time {
     }
 
     $cid = $this->get_results_key();
+    $results = NULL;
+    $query_plugin = $this->view->query;
+    if ($query_plugin instanceof SearchApiViewsQuery) {
+      $results = $query_plugin->getSearchApiResults();
+    }
     $data = array(
       'result' => $this->view->result,
       'total_rows' => isset($this->view->total_rows) ? $this->view->total_rows : 0,
       'current_page' => $this->view->get_current_page(),
-      'search_api results' => $this->view->query->getSearchApiResults(),
+      'search_api results' => $results,
     );
     cache_set($cid, $data, $this->table, $this->cache_set_expire($type));
   }
@@ -80,7 +85,7 @@ class SearchApiViewsCache extends views_plugin_cache_time {
    * Overrides views_plugin_cache::get_cache_key().
    *
    * Use the Search API query as the main source for the key. Note that in
-   * Views < 3.8, this function does not exist.
+   * Views < 3.8, this method does not exist.
    */
   public function get_cache_key($key_data = array()) {
     global $user;
@@ -121,7 +126,7 @@ class SearchApiViewsCache extends views_plugin_cache_time {
   }
 
   /**
-   * Get the Search API query object associated with the current view.
+   * Retrieves the Search API query object associated with the current view.
    *
    * @return SearchApiQueryInterface|null
    *   The Search API query object associated with the current view; or NULL if

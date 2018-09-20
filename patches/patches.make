@@ -176,7 +176,5 @@ projects[services][patch][] = contrib/fix_services_multivals-2224803-comment-884
 projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
 
 ;;; Views
-; Taxonomy term "Representative node" views with filters and sorts don't work
-projects[views][patch][] = https://www.drupal.org/files/issues/views-representative_view-1417090-82.patch
 ; Change delimiter from coma to semi-colon
 projects[views][patch][] = contrib/109315810-Views-Change-delimiter-from-comma-to-semi-colon.patch

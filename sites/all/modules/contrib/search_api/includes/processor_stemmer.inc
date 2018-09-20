@@ -65,7 +65,7 @@ class SearchApiPorterStemmer extends SearchApiAbstractProcessor {
         $stemmed[] = $word;
       }
     }
-    $value = implode('', $stemmed);
+    $value = implode(' ', $stemmed);
   }
 
   /**

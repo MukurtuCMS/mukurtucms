@@ -1,0 +1,37 @@
+# wikipedia_adaption.
+help/:
+  type: asset
+  approved: https://www.drupal.org/node/2460769
+  title: About PHP, History of PHP, Usage of PHP, PHP Syntax, Security of PHP
+  rights: http://creativecommons.org/licenses/by-sa/3.0/
+  originalTitle: PHP (Wikipedia)
+  originalAttributionText: multiple Wikipedia contributors
+  originalAttributionUrl: http://en.wikipedia.org/w/index.php?title=PHP&action=history
+  source: http://en.wikipedia.org/wiki/PHP
+  orgiginalLicense: CC BY-SA 3.0
+  orgiginalRights: http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
+  weight: -1
+  path: help_example
+
+# lerdorf image
+help/180px-Lerdorf.jpg:
+  type: asset
+  approved: https://www.drupal.org/node/2460769
+  attributionText: Jud Dagnall
+  source: http://en.wikipedia.org/wiki/File:Lerdorf.jpg
+  title: Rasmus Lerdorf
+  license: CC BY-SA 3.0
+  rights: http://creativecommons.org/licenses/by-sa/3.0/deed.en
+  path: 'help_example\/history'
+
+# gutmans image
+help/180px-Andi_Gutmans_1.jpg:
+  type: asset
+  approved: https://www.drupal.org/node/2460769
+  attributionText: Jim Winstead
+  attributionUrl: "https://www.flickr.com/people/81342178@N00"
+  source: http://en.wikipedia.org/wiki/File:Andi_Gutmans_1.jpg
+  title: Andi Gutmans
+  license: CC BY 2.0
+  rights: http://creativecommons.org/licenses/by/2.0/deed.en
+  path: 'help_example\/history'

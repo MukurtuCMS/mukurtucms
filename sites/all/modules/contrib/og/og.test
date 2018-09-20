@@ -649,6 +649,41 @@ class OgGroupAndUngroup extends DrupalWebTestCase {
     $user_roles = og_get_user_roles('entity_test', $entity1->pid, $user1->uid, FALSE);
     $this->assertEqual($og_roles, $user_roles, t('Group manager was granted default role.'));
   }
+
+  /**
+   * Test group behaviour when the group owner is not active.
+   */
+  public function testGroupManagerNotActive() {
+    // Create the user.
+    $user1 = $this->drupalCreateUser();
+
+    // Create the group; the group owner is the previously created user.
+    $entity1 = entity_create('entity_test', array('name' => 'main', 'uid' => $user1->uid));
+    $wrapper = entity_metadata_wrapper('entity_test', $entity1);
+    $wrapper->{OG_GROUP_FIELD}->set(1);
+    $wrapper->save();
+
+    // Ensure that the user owner membership for the group has active status.
+    $og_membership = og_get_membership('entity_test', $entity1->pid, 'user', $user1->uid);
+    $this->assertEqual($og_membership->state, OG_STATE_ACTIVE, 'Owner Membership status is Active');
+
+    // Move the user owner membership to blocked.
+    $og_membership->state = OG_STATE_BLOCKED;
+    $og_membership->save();
+
+    $og_membership = og_membership_load($og_membership->identifier());
+    $this->assertEqual($og_membership->state, OG_STATE_BLOCKED, 'Owner Membership status is Blocked');
+
+    // Save the group entity.
+    $wrapper = entity_metadata_wrapper('entity_test', $entity1);
+    $wrapper->save();
+
+    // Ensure that the user owner membership for the group still has blocked
+    // status.
+    $og_membership = og_membership_load($og_membership->identifier());
+    $this->assertEqual($og_membership->state, OG_STATE_BLOCKED, 'Owner Membership status is Blocked');
+  }
+
 }
 
 class OgPermissionsTestCase extends DrupalWebTestCase {
@@ -767,6 +802,29 @@ class OgPermissionsTestCase extends DrupalWebTestCase {
     $roles = og_get_user_roles('entity_test', $entity->pid, $user2->uid);
     $this->assertEqual($roles,  array(), 'Blocked member has no roles.');
     $this->assertFalse(og_user_access('entity_test', $entity->pid, 'update group', $user2), 'Blocked member has no access.');
+  }
+
+  function testGrantRolesTwiceForPendingUsers() {
+    // Create user.
+    $user1 = $this->drupalCreateUser();
+
+    // Create an entity.
+    $entity = entity_create('entity_test', array('name' => 'main', 'uid' => $user1->uid));
+    $wrapper = entity_metadata_wrapper('entity_test', $entity);
+    $wrapper->{OG_GROUP_FIELD}->set(1);
+    $wrapper->save();
+
+    $og_roles = og_roles('entity_test', 'main');
+
+    //Add the user to the group.
+    $values = array('entity_type' => 'user', 'entity' => $user1, 'state' => OG_STATE_PENDING);
+    $rid = array_search(OG_ADMINISTRATOR_ROLE, $og_roles);
+    og_group('entity_test', $entity->pid, $values);
+
+    // Try granting the admin role to a pending user twice.
+    og_role_grant('entity_test', $entity->pid, $user1->uid, $rid);
+    og_role_grant('entity_test', $entity->pid, $user1->uid, $rid);
+    $this->pass('Granting a role twice should not throw an exception.');
   }
 }
 
@@ -1097,7 +1155,7 @@ class OgFieldWidgetTestCase extends DrupalWebTestCase {
    * Test "field widget settings" of the OG reference widget.
    */
   function testFieldSettings() {
-    $user = $this->drupalCreateUser(array('administer content types', 'administer group', 'access content', ));
+    $user = $this->drupalCreateUser(array('administer content types', 'administer group', 'access content', 'administer fields'));
     $this->drupalLogin($user);
 
     $widgets = field_info_widget_types();

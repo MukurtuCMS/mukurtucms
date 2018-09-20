@@ -74,7 +74,7 @@ function date_feeds_set_target(FeedsSource $source, $entity, $target, array $val
     $value = _date_feeds_get_date_object($value, $default_tz);
 
     if (!$value || !empty($value->errors)) {
-      $field[$language][$delta][$value_key] = '';
+      $field[$language][$delta][$value_key] = NULL;
     }
     else {
       if (!isset($field[$language][$delta]['timezone'])) {
@@ -85,6 +85,15 @@ function date_feeds_set_target(FeedsSource $source, $entity, $target, array $val
 
       $field[$language][$delta][$value_key] = $value->format($format, TRUE);
       $field[$language][$delta][$offset_key] = $value->getOffset();
+
+      // Ensure that both value keys always exist to prevent php notices in
+      // date_field_validate().
+      if (!array_key_exists('value', $field[$language][$delta])) {
+        $field[$language][$delta]['value'] = NULL;
+      }
+      if (!array_key_exists('value2', $field[$language][$delta])) {
+        $field[$language][$delta]['value2'] = NULL;
+      }
     }
 
     $delta++;

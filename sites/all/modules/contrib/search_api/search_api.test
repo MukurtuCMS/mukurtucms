@@ -86,6 +86,7 @@ class SearchApiWebTest extends DrupalWebTestCase {
    * and then run tests on it.
    */
   public function testFramework() {
+    module_enable(array('search_api_test_2'));
     $this->drupalLogin($this->drupalCreateUser(array('administer search_api')));
     $this->insertItems();
     $this->createIndex();
@@ -730,13 +731,17 @@ class SearchApiWebTest extends DrupalWebTestCase {
    * deleteServer()) and that all associated tables and variables are removed.
    */
   protected function disableModules() {
+    module_disable(array('search_api_test_2'), FALSE);
+    $this->assertFalse(module_exists('search_api_test_2'), 'Second test module was successfully disabled.');
     module_disable(array('search_api_test'), FALSE);
-    $this->assertFalse(module_exists('search_api_test'), 'Test module was successfully disabled.');
+    $this->assertFalse(module_exists('search_api_test'), 'First test module was successfully disabled.');
     module_disable(array('search_api'), FALSE);
     $this->assertFalse(module_exists('search_api'), 'Search API module was successfully disabled.');
 
+    drupal_uninstall_modules(array('search_api_test_2'), FALSE);
+    $this->assertEqual(drupal_get_installed_schema_version('search_api_test_2', TRUE), SCHEMA_UNINSTALLED, 'Second test module was successfully uninstalled.');
     drupal_uninstall_modules(array('search_api_test'), FALSE);
-    $this->assertEqual(drupal_get_installed_schema_version('search_api_test', TRUE), SCHEMA_UNINSTALLED, 'Test module was successfully uninstalled.');
+    $this->assertEqual(drupal_get_installed_schema_version('search_api_test', TRUE), SCHEMA_UNINSTALLED, 'First test module was successfully uninstalled.');
     $this->assertFalse(db_table_exists('search_api_test'), 'Test module table was successfully removed.');
     drupal_uninstall_modules(array('search_api'), FALSE);
     $this->assertEqual(drupal_get_installed_schema_version('search_api', TRUE), SCHEMA_UNINSTALLED, 'Search API module was successfully uninstalled.');

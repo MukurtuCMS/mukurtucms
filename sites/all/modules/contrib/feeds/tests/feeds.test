@@ -359,14 +359,48 @@ class FeedsWebTestCase extends DrupalWebTestCase {
 
   /**
    * Import a file through the import form. Assumes FeedsFileFetcher in place.
+   *
+   * @param string $id
+   *   The ID of the importer.
+   * @param string $file
+   *   The absolute path to the file.
+   * @param string $submit
+   *   (optional) The button to press.
+   *   Defaults to the button "Import".
    */
-  public function importFile($id, $file) {
-
+  public function importFile($id, $file, $submit = NULL) {
     $this->assertTrue(file_exists($file), 'Source file exists');
     $edit = array(
       'files[feeds]' => $file,
     );
-    $this->drupalPost('import/' . $id, $edit, 'Import');
+    if (empty($submit)) {
+      $submit = 'Import';
+    }
+    $this->drupalPost('import/' . $id, $edit, $submit);
+  }
+
+  /**
+   * Asserts that the given number of nodes exist.
+   *
+   * @param int $expected_node_count
+   *   The expected number of nodes in the node table.
+   * @param string $message
+   *   (optional) The message to assert.
+   */
+  protected function assertNodeCount($expected_node_count, $message = '') {
+    if (!$message) {
+      $message = '@expected nodes have been created (actual: @count).';
+    }
+
+    $node_count = db_select('node')
+      ->fields('node', array())
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertEqual($expected_node_count, $node_count, format_string($message, array(
+      '@expected' => $expected_node_count,
+      '@count' => $node_count,
+    )));
   }
 
   /**
@@ -430,17 +464,49 @@ class FeedsWebTestCase extends DrupalWebTestCase {
     return $this->assertTrue($fields && $found, $message, $group);
   }
 
-   /**
-    * Adds mappings to a given configuration.
-    *
-    * @param string $id
-    *   ID of the importer.
-    * @param array $mappings
-    *   An array of mapping arrays. Each mapping array must have a source and
-    *   an target key and can have a unique key.
-    * @param bool $test_mappings
-    *   (optional) TRUE to automatically test mapping configs. Defaults to TRUE.
-    */
+  /**
+   * Asserts that a field in the current page is enabled.
+   *
+   * @param string $name
+   *   Name of field to assert.
+   * @param string $message
+   *   (optional) A message to display with the assertion.
+   *
+   * @return bool
+   *   TRUE on pass, FALSE on fail.
+   */
+  protected function assertFieldEnabled($name, $message = '') {
+    $elements = $this->xpath($this->constructFieldXpath('name', $name));
+    return $this->assertTrue(isset($elements[0]) && empty($elements[0]['disabled']), $message ? $message : t('Field %name is enabled.', array('%name' => $name)), t('Browser'));
+  }
+
+  /**
+   * Asserts that a field in the current page is disabled.
+   *
+   * @param string $name
+   *   Name of field to assert.
+   * @param string $message
+   *   (optional) A message to display with the assertion.
+   *
+   * @return bool
+   *   TRUE on pass, FALSE on fail.
+   */
+  protected function assertFieldDisabled($name, $message = '') {
+    $elements = $this->xpath($this->constructFieldXpath('name', $name));
+    return $this->assertTrue(isset($elements[0]) && !empty($elements[0]['disabled']), $message ? $message : t('Field %name is disabled.', array('%name' => $name)), t('Browser'));
+  }
+
+  /**
+   * Adds mappings to a given configuration.
+   *
+   * @param string $id
+   *   ID of the importer.
+   * @param array $mappings
+   *   An array of mapping arrays. Each mapping array must have a source and
+   *   an target key and can have a unique key.
+   * @param bool $test_mappings
+   *   (optional) TRUE to automatically test mapping configs. Defaults to TRUE.
+   */
   public function addMappings($id, array $mappings, $test_mappings = TRUE) {
 
     $path = "admin/structure/feeds/$id/mapping";

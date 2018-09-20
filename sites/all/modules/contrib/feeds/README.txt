@@ -138,6 +138,43 @@ API Overview
 See "The developer's guide to Feeds":
 http://drupal.org/node/622700
 
+Running the Drush integration tests
+===================================
+
+In order the run Drush integration tests, Drush itself needs to be installed
+with its *dev dependencies*. Furthermore, the phpunit version that comes with
+Drush should be used for running the tests (instead of a globally installed
+phpunit), as that one has proven to be compatible with the Drush tests.
+
+  1. Git clone of Drush 8.
+
+       git clone --branch 8.x https://github.com/drush-ops/drush.git
+       cd drush
+
+  2. Install Drush with dev dependencies using Composer.
+
+       composer install
+
+     And ensure that the following text is displayed:
+
+       "Loading composer repositories with package information
+       Installing dependencies (including require-dev) from lock file"
+
+     Especially note that Composer says 'including require-dev'. This means that
+     the Drush dev dependencies are installed (including phpunit).
+
+  3. Execute a command like the following:
+
+       UNISH_NO_TIMEOUTS=1 UNISH_DRUPAL_MAJOR_VERSION=7 /path/to/drush/vendor/bin/phpunit --configuration /path/to/drush/tests /path/to/feeds/tests/drush
+
+     Replace '/path/to' with the appropriate path to the directory in question.
+     Also be sure to point to the phpunit version that comes with Drush.
+
+     So if Drush is installed in /users/megachriz/drush and the Feeds module is
+     located at /users/megachriz/Sites/drupal7/sites/all/modules/feeds:
+
+       UNISH_NO_TIMEOUTS=1 UNISH_DRUPAL_MAJOR_VERSION=7 /users/megachriz/drush/vendor/bin/phpunit --configuration /users/megachriz/drush/tests /users/megachriz/Sites/drupal7/sites/all/modules/feeds/tests/drush
+
 Debugging
 =========
 
@@ -193,6 +230,21 @@ Name:        feeds_never_use_curl
 Default:     FALSE
 Description: Flag to stop feeds from using its cURL for http requests. See
              http_request_use_curl().
+
+Name:        feeds_http_file_cache_dir
+Default:     private://feeds/cache
+Description: The location on the file system where results of HTTP requests are
+             cached.
+
+Name:        feeds_in_progress_dir
+Default:     private://feeds/in_progress
+Description: The location on the file system where temporary files are stored
+             that are in progress of being imported.
+
+Name:        feeds_sync_cache_feeds_http_interval
+Default:     21600
+Description: How often the feeds cache directory should be checked for orphaned
+             cache files.
 
 Name:        feeds_use_mbstring
 Default:     TRUE

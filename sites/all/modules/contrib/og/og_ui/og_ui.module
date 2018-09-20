@@ -328,12 +328,7 @@ function og_ui_user_access_group($perm, $group_type, $gid) {
     return FALSE;
   }
 
-  $entity_info = entity_get_info($group_type);
-  if (!$group_type || !$entity_info) {
-    // Not a valid entity type.
-    return FALSE;
-  }
-  return og_is_group($group_type, $gid) && og_user_access($group_type, $gid, $perm);
+  return og_user_access($group_type, $gid, $perm);
 }
 
 /**
@@ -1117,13 +1112,17 @@ function og_ui_get_group_admin($entity_type, $etid) {
   }
   // ensure we are invoking this on something worth doing it on
   $entity = entity_load_single($entity_type, $etid);
+  if (!$entity) {
+    // It is a non-existing group Id, giving up.
+    return FALSE;
+  }
   $entity_info = entity_get_info($entity_type);
   // if this isn't a group type, skip invoking admin modules
   if (empty($entity_info['entity keys']['bundle']) || !og_is_group_type($entity_type, $entity->{$entity_info['entity keys']['bundle']})) {
     $cache["$entity_type:$etid"] = FALSE;
     return FALSE;
   }
-  
+
 
   $data = module_invoke_all('og_ui_get_group_admin', $entity_type, $etid);
 

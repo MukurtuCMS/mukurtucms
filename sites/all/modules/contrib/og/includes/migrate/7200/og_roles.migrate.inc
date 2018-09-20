@@ -22,7 +22,7 @@ class OgMigrateRoles extends OgEntityMigration {
    */
   protected $systemOfRecord = Migration::DESTINATION;
 
-  public function __construct() {
+  public function __construct($arguments = array()) {
     $this->description = t('Add per-bundle OG roles.');
 
     $query = db_select('og_role', 'ogr');
@@ -39,7 +39,7 @@ class OgMigrateRoles extends OgEntityMigration {
 
     $this->query = $query;
 
-    parent::__construct();
+    parent::__construct($arguments);
 
     $this->addFieldMapping('rid', 'rid');
     $this->addFieldMapping('gid');

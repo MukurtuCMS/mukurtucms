@@ -192,27 +192,33 @@ function imagecache_actions_get_image_context($image, $data) {
       + file_get_file_references($managed_file, NULL, FIELD_LOAD_CURRENT, 'file');
 
     if ($references) {
-      // Load referring entities.
+      // Load referring entities., keep track of 1st reference separately.
+      $entity_type_first = '';
+      $field_name_first = '';
       foreach ($references as $field_name => $field_references) {
         foreach ($field_references as $entity_type => $entity_stubs) {
-          $image_context['referring_entities'][$field_name][$entity_type] = entity_load($entity_type, array_keys($entity_stubs));
+          $entities = entity_load($entity_type, array_keys($entity_stubs));
+          if (!empty($entities)) {
+            $image_context['referring_entities'][$field_name][$entity_type] = $entities;
+            // Make it easy to access the '1st' entity and its referring image
+            // field, part 1: entity.
+            if (empty($entity_type_first)) {
+              $entity_type_first = $entity_type;
+              $field_name_first = $field_name;
+              $image_context['entity'] = reset($entities);
+            }
+          }
         }
       }
 
-      // Make it easy to access the '1st' entity and its referring image field.
-      reset($image_context['referring_entities']);
-      list($field_name, $field_references) = each($image_context['referring_entities']);
-      reset($field_references);
-      list($entity_type, $entities) = each($field_references);
-      reset($entities);
-      list(, $image_context['entity']) = each($entities);
+      // Make it easy to access the '1st' entity and its referring image field,
+      // part 2: image field.
       /** @var array|false $image_field */
-      $image_field = field_get_items($entity_type, $image_context['entity'], $field_name);
+      $image_field = field_get_items($entity_type_first, $image_context['entity'], $field_name_first);
       if ($image_field) {
         // Get referring item.
         foreach ($image_field as $image_field_value) {
           if ($image_field_value['fid'] === $managed_file->fid) {
-            // @todo: file_field as well or just ignore the type of field?
             $image_context['image_field'] = $image_field_value;
             break;
           }
@@ -416,11 +422,14 @@ function imagecache_actions_calculate_offset($keyword, $value, $base_size, $laye
   }
 
   // Handle % values.
-  if (substr($value, strlen($value) - 1, 1) == '%') {
-    $value = intval($value / 100 * $base_size);
+  if (substr($value, -1) === '%') {
+    // Explicitly convert $value to prevent warnings in PHP 7.1.
+    $value = intval((int) $value / 100 * $base_size);
     $offset = -1 * ($layer_size / 2);
   }
-  $value = $base + ($direction * $value);
+  // $value may contain 'px' at the end: explicitly convert to prevent warnings
+  // in PHP 7.1.
+  $value = $base + ($direction * (int) $value);
 
   // Add any extra offset to position the item.
   return $value + $offset;

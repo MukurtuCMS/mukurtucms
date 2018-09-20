@@ -62,50 +62,57 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
   }
 
   /**
-   * Get the form for the settings for this destination.
+   * Get the default settings for this object.
    *
-   * Return the default tables whose data can be ignored. These tables mostly contain
-   *  info which can be easily reproducted (such as cache or search index)
-   *  but also tables which can become quite bloated but are not necessarily extremely
-   *  important to back up or migrate during development (such ass access log and watchdog)
+   * @return array
+   *   The default tables whose data can be ignored. These tables mostly
+   *   contain info which can be easily reproducted (such as cache or search
+   *   index) but also tables which can become quite bloated but are not
+   *   necessarily extremely important to back up or migrate during development
+   *   (such as access log and watchdog).
    */
   function backup_settings_default() {
-    $core = array(
-        'cache',
-        'cache_admin_menu',
-        'cache_browscap',
-        'cache_content',
-        'cache_filter',
-        'cache_calendar_ical',
-        'cache_location',
-        'cache_menu',
-        'cache_page',
-        'cache_reptag',
-        'cache_views',
-        'cache_views_data',
-        'cache_block',
-        'cache_update',
-        'cache_form',
-        'cache_bootstrap',
-        'cache_field',
-        'cache_image',
-        'cache_path',
-        'sessions',
-        'search_dataset',
-        'search_index',
-        'search_keywords_log',
-        'search_total',
-        'watchdog',
-        'accesslog',
-        'devel_queries',
-        'devel_times',
-      );
-    $nodata_tables = array_merge($core, module_invoke_all('devel_caches'));
-     return array(
-      'nodata_tables' => $nodata_tables,
-      'exclude_tables' => array(),
+    $all_tables = $this->_get_table_names();
+
+    // Basic modules that should be excluded.
+    $basic = array(
+      // Default core tables.
+      'accesslog',
+      'sessions',
+      'watchdog',
+      // Search module.
+      'search_dataset',
+      'search_index',
+      'search_keywords_log',
+      'search_total',
+      // Devel module.
+      'devel_queries',
+      'devel_times',
+    );
+
+    // Identify all cache tables.
+    $cache = array('cache');
+    foreach ($all_tables as $table_name) {
+      if (strpos($table_name, 'cache_') === 0) {
+        $cache[] = $table_name;
+      }
+    }
+
+    // Simpletest can create a lot of tables that do not need to be backed up,
+    // but all of them start with the string 'simpletest' so they can be easily
+    // excluded.
+    $simpletest = array();
+    foreach ($all_tables as $table_name) {
+      if (strpos($table_name, 'simpletest') === 0) {
+        $simpletest[] = $table_name;
+      }
+    }
+
+    return array(
+      'nodata_tables' => array_merge($basic, $cache, module_invoke_all('devel_caches')),
+      'exclude_tables' => $simpletest,
       'utils_lock_tables' => FALSE,
-   );
+    );
   }
 
   /**

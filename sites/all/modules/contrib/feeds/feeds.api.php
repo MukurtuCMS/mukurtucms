@@ -523,5 +523,47 @@ function my_module_preprocess_callback(array $target, array &$mapping) {
 }
 
 /**
+ * This hooks allows you add additional configuration keys to a
+ * FeedsConfigurable.
+ *
+ * @param FeedsConfigurable $configurable
+ *   The configurable item to add default configuration to.
+ *
+ * @return array
+ *   Return an array of default configuration.
+ */
+function hook_feeds_config_defaults(FeedsConfigurable $configurable) {
+  if ($configurable instanceof FeedsImporter) {
+    return array(
+      'my_module_extra_setting_1' => 0,
+      'my_module_extra_setting_2' => NULL,
+    );
+  }
+}
+
+/**
+ * A plugin-specific hook to add additional configuration keys instead of the
+ * global hook_feeds_config_defaults().
+ *
+ * The plugin type can be:
+ * - fetcher
+ * - parser
+ * - processor
+ *
+ * @param FeedsPlugin $plugin
+ *   The plugin to add default configuration to.
+ *
+ * @return array
+ *   Return an array of default configuration.
+ */
+function hook_feeds_PLUGIN_TYPE_config_defaults(FeedsPlugin $plugin) {
+  if ($plugin instanceof FeedsCSVParser) {
+    return array(
+      'extra_csv_parser_setting' => NULL,
+    );
+  }
+}
+
+/**
  * @}
  */

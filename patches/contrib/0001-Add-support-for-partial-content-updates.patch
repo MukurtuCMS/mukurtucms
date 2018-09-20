@@ -13,8 +13,8 @@ the time.
 
 diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc b/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
 index ead72acb..0c116c15 100644
---- a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
-+++ b/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
+--- a/plugins/FeedsProcessor.inc
++++ b/plugins/FeedsProcessor.inc
 @@ -723,6 +723,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
          $target_name = $mapping['target'];
        }

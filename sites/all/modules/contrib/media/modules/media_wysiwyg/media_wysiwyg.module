@@ -597,6 +597,15 @@ function media_wysiwyg_file_displays_alter(&$displays, $file, $view_mode) {
       }
     }
   }
+  // For integration/support of the picture module https://www.drupal.org/project/picture.
+  // Disable Picture display in WYSIWYG mode. Normal <img> will be rendered
+  // instead. CKEditor and Media WYSIWYG modules with render with common <img>
+  // while frontend will render full <picture> output as usual.
+  if (module_exists('picture')) {
+    if (!empty($file->override['wysiwyg']) && !empty($displays['file_field_picture']['status'])) {
+      $displays['file_field_picture']['status'] = 0;
+    }
+  }
 }
 
 /**

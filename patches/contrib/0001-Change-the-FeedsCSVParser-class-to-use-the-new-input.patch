@@ -11,8 +11,8 @@ In this case, the headers from the CSV file represent the input fields.
 
 diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc b/sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc
 index 073a56d..9694fdc 100644
---- a/sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc
-+++ b/sites/all/modules/contrib/feeds/plugins/FeedsCSVParser.inc
+--- a/plugins/FeedsCSVParser.inc
++++ b/plugins/FeedsCSVParser.inc
 @@ -50,7 +50,7 @@ class FeedsCSVParser extends FeedsParser {
      $state->progress($state->total, $progress);
  

@@ -135,3 +135,18 @@ function hook_media_browser_params_alter(&$stored_params) {
   $stored_params['types'][] = 'document';
   unset($stored_params['enabledPlugins'][0]);
 }
+
+/**
+ *
+ * Alter the media multiple elements widget
+ *
+ * @param $table
+ *   the table of elements that will be rendered via theme_table()
+ * @param $element
+ *   elements that are actually attached
+ *
+ * @see theme_media_widget_multiple()
+ */
+function hook_media_widget_multiple_alter(&$table, &$element) {
+  $table['attributes']['class'][] = 'myclass';
+}

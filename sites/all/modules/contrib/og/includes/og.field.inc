@@ -345,6 +345,10 @@ function og_complex_widget_after_build($form, &$form_state) {
     unset($form[$field_name][LANGUAGE_NONE]['add_more']);
     unset($form[$field_name][LANGUAGE_NONE][0]['_weight']);
 
+    if ($form[$field_name][LANGUAGE_NONE]['#required']) {
+      $form[$field_name][LANGUAGE_NONE]['#title'] .= ' ' . theme('form_required_marker', array());
+    }
+
     if (!empty($form[$field_name][LANGUAGE_NONE][0]['admin'])) {
       // Wrap both elements with a fieldset.
       $form[$field_name][LANGUAGE_NONE]['#theme_wrappers'] = array('fieldset');

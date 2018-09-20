@@ -124,6 +124,15 @@ function imagecache_coloractions_image_effect_info() {
     'summary theme' => 'coloractions_desaturatealpha_summary',
   );
 
+  $effects['imagecache_removeanimation'] = array(
+    'label' => t('Remove animation'),
+    'help' => t('Freezes an animated image, keeping only the first frame.'),
+    'effect callback' => 'coloractions_removeanimation_effect',
+    'dimensions passthrough' => TRUE,
+    'form callback' => 'coloractions_removeanimation_form',
+    'summary theme' => 'coloractions_removeanimation_summary',
+  );
+
   return $effects;
 }
 
@@ -160,6 +169,9 @@ function imagecache_coloractions_theme() {
       'variables' => array('data' => NULL),
     ),
     'coloractions_desaturatealpha_summary' => array(
+      'variables' => array('data' => NULL),
+    ),
+    'coloractions_removeanimation_summary' => array(
       'variables' => array('data' => NULL),
     ),
   );
@@ -1231,4 +1243,90 @@ function image_gd_desaturatealpha(stdClass $image/*, array $data*/) {
   $result = imagefilter($image->resource, IMG_FILTER_GRAYSCALE);
   imagealphablending($image->resource, TRUE);
   return $result;
+}
+
+/**
+ * Image effect form callback for the remove animation effect.
+ *
+ * This effect has no parameters.
+ *
+ * param array $data
+ *   The current configuration for this image effect.
+ *
+ * @return array
+ *   The form definition for this effect.
+ */
+function coloractions_removeanimation_form(/*array $data*/) {
+  $form = array();
+  $form['help'] = array(
+    '#markup' => "<p><strong>There are no user-configurable options for this effect.</strong></p>
+      <p>This image effect will remove all animation from a gif image, keeping only the first frame. Some notes:</p>
+      <ul>
+      <li>GD cannot handle animation at all and will always silently remove animation, whether this effect has been added to an image style or not.</li>
+      <li>Thus, this effect will only do something with ImageMagick as image toolkit.</li>
+      <li>Non gif images and non-animated gif images are silently ignored.</li>
+      <li>You can place this effect anywhere in the list of effects for an image style. There may be some performance gains when you add it as first though.</li>
+      </ul>
+      ",
+  );
+  return $form;
+}
+
+/**
+ * Implements theme_hook() for the remove animation effect summary.
+ *
+ * param array $variables
+ *   An associative array containing:
+ *   - data: The current configuration for this image effect.
+ *
+ * @return string
+ *   The HTML for the summary of this image effect.
+ * @ingroup themeable
+ */
+function theme_coloractions_removeanimation_summary(/*array $variables*/) {
+  return t('Remove animation, keeping only the first frame.');
+}
+
+/**
+ * Image effect callback for the remove animation effect.
+ *
+ * @param stdClass $image
+ * @param array $data
+ *
+ * @return bool
+ *   True on success, false otherwise.
+ */
+function coloractions_removeanimation_effect(stdClass $image, array $data) {
+  return image_toolkit_invoke('removeanimation', $image, array($data));
+}
+
+/**
+ * GD toolkit specific implementation of the remove animation effect.
+ *
+ * param stdClass $image
+ * param array $data
+ *   The parameters for this effect.
+ *
+ * @return bool
+ *   Always true, GD removes animations anyway.
+ */
+function image_gd_removeanimation(/*stdClass $image, array $data*/) {
+  return TRUE;
+}
+
+/**
+ * Imagemagick toolkit specific implementation of the remove animation effect.
+ *
+ * @param stdClass $image
+ *  param array $data
+ *   The parameters for this effect.
+ *
+ * @return bool
+ *   True on success, false otherwise.
+ */
+function image_imagemagick_removeanimation(stdClass $image/*, array $data*/) {
+  if ($image->info['mime_type'] === 'image/gif') {
+    $image->ops[] = '-delete 1--1';
+  }
+  return TRUE;
 }

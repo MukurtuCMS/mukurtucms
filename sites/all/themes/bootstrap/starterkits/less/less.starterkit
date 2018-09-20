@@ -2,6 +2,7 @@ name = 'THEMETITLE'
 description = Uses the Bootstrap Framework Less source files and must be compiled (not for beginners).
 core = 7.x
 base theme = bootstrap
+php = 5.3.0
 
 
 ;;;;;;;;;;;;;;;;;;;;;

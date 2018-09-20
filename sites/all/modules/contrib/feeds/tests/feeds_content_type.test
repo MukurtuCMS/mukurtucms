@@ -107,4 +107,121 @@ class FeedsContentTypeTest extends FeedsWebTestCase {
     $this->assertEqual('', $node->title, 'The feed node has no title.');
   }
 
+  /**
+   * Tests behavior when switching from standalone to attach to content type.
+   *
+   * When switching to attach to content type, the source form should be empty
+   * when adding a new feed node. Furthermore, the source that was created using
+   * the standalone form should no longer get updated on cron runs.
+   *
+   * In the end, when switching back to standalone form, the original created
+   * source should be 'restored' and updated during cron runs.
+   */
+  public function testSwitchToAttachToContentType() {
+    // Use standalone form first.
+    // Set also to import as often as possible. This way we can test if the
+    // source gets updated on cron runs.
+    $this->setSettings('syndication', NULL, array(
+      'import_period' => 0,
+      'content_type' => '',
+    ));
+
+    // Perform an import.
+    $url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/developmentseed.rss2';
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => $url,
+    );
+    $this->drupalPost('import/syndication', $edit, 'Import');
+    $this->assertText('Created 10 nodes');
+
+    // Delete all nodes again.
+    $this->drupalPost('import/syndication/delete-items', array(), 'Delete');
+    $this->assertText('Deleted 10 nodes');
+
+    // Ensure that no more nodes exist in the database.
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {node}")->fetchField(), 'No nodes exist.');
+
+    // Now switch back to attach to content type.
+    $this->setSettings('syndication', NULL, array('content_type' => 'page'));
+
+    // Go to the 'import' page.
+    $this->drupalGet('node/add/page');
+    $this->assertFieldByName('feeds[FeedsHTTPFetcher][source]', '');
+    $this->assertNoFieldByName('feeds[FeedsHTTPFetcher][source]', $url);
+
+    // Ensure that a cron task does not import content that was set using the
+    // standalone form.
+    $this->cronRun();
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {node}")->fetchField(), 'No nodes exist.');
+
+    // Switch back to standalone. Source should get restored.
+    $this->setSettings('syndication', NULL, array('content_type' => ''));
+    $this->drupalGet('import/syndication');
+    $this->assertFieldByName('feeds[FeedsHTTPFetcher][source]', $url);
+
+    // Run cron, nodes should get imported again.
+    $this->cronRun();
+    $this->assertEqual(10, db_query("SELECT COUNT(*) FROM {node}")->fetchField(), 'Ten nodes exist.');
+  }
+
+  /**
+   * Tests behavior when switching from attach to content type to standalone.
+   *
+   * When switching to a standalone form, the source form should be empty on
+   * this form. Furthermore, the source from the feed node that was created
+   * should no longer get updated on cron runs.
+   *
+   * In the end, when switching back to attach to content type, the source from
+   * the feed node should be 'restored' and updated during cron runs.
+   */
+  public function testSwitchToStandaloneForm() {
+    // Set to import as often as possible. This way we can test if the source
+    // gets updated on cron runs.
+    $this->setSettings('syndication', NULL, array(
+      'import_period' => 0,
+    ));
+
+    // Perform an import.
+    $url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/developmentseed.rss2';
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => $url,
+    );
+    $this->drupalPost('node/add/page', $edit, 'Save');
+    $this->assertText('Created 10 nodes');
+
+    // Delete all nodes again.
+    $this->drupalPost('node/1/delete-items', array(), 'Delete');
+    $this->assertText('Deleted 10 nodes');
+
+    // Only the feed node exist.
+    $this->assertEqual(1, db_query("SELECT COUNT(*) FROM {node}")->fetchField(), 'Only the feed node exists.');
+
+    // Now switch back to standalone form.
+    $this->setSettings('syndication', NULL, array('content_type' => ''));
+
+    // Go to 'import' page.
+    $this->drupalGet('import/syndication');
+    $this->assertFieldByName('feeds[FeedsHTTPFetcher][source]', '');
+    $this->assertNoFieldByName('feeds[FeedsHTTPFetcher][source]', $url);
+
+    // Ensure that a cron task does not import content that was set using the
+    // standalone form.
+    $this->cronRun();
+    $this->assertEqual(1, db_query("SELECT COUNT(*) FROM {node}")->fetchField(), 'Only one node exists.');
+
+    // Go to the edit page of the feed node and ensure that the feeds source
+    // form no longer exists.
+    $this->drupalGet('node/1/edit');
+    $this->assertNoFieldByName('feeds[FeedsHTTPFetcher][source]');
+
+    // Switch back to attach to content type. Sources should get restored.
+    $this->setSettings('syndication', NULL, array('content_type' => 'page'));
+    $this->drupalGet('node/1/edit');
+    $this->assertFieldByName('feeds[FeedsHTTPFetcher][source]', $url);
+
+    // Run cron, nodes should get imported again.
+    $this->cronRun();
+    $this->assertEqual(11, db_query("SELECT COUNT(*) FROM {node}")->fetchField(), 'Eleven nodes exist.');
+  }
+
 }

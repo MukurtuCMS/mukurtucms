@@ -5,9 +5,8 @@ core = 7.x
 files[] = rules_scheduler_test.inc
 hidden = TRUE
 
-; Information added by Drupal.org packaging script on 2017-04-20
-version = "7.x-2.10"
+; Information added by Drupal.org packaging script on 2018-05-18
+version = "7.x-2.11"
 core = "7.x"
 project = "rules"
-datestamp = "1492697958"
-
+datestamp = "1526653388"

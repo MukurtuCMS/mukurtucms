@@ -1,6 +1,7 @@
 name = Bootstrap
 description = Built to use Bootstrap, a sleek, intuitive, and powerful front-end framework for faster and easier web development.
 core = 7.x
+php = 5.3.0
 
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -208,9 +209,8 @@ multipliers[screen-md-max][] = 2x
 multipliers[screen-lg-min][] = 1.5x
 multipliers[screen-lg-min][] = 2x
 
-; Information added by Drupal.org packaging script on 2018-01-26
-version = "7.x-3.19"
+; Information added by Drupal.org packaging script on 2018-07-20
+version = "7.x-3.21"
 core = "7.x"
 project = "bootstrap"
-datestamp = "1516989514"
-
+datestamp = "1532095127"

@@ -219,6 +219,9 @@ function _search_api_views_add_handlers($id, array $field, EntityMetadataWrapper
       $table[$id]['filter']['vocabulary'] = $vocabulary;
     }
   }
+  elseif (in_array($inner_type, array('integer', 'decimal', 'duration', 'string'))) {
+    $table[$id]['filter']['handler'] = 'SearchApiViewsHandlerFilterNumeric';
+  }
   else {
     $table[$id]['filter']['handler'] = 'SearchApiViewsHandlerFilter';
   }
@@ -282,6 +285,16 @@ function search_api_views_views_plugins() {
       'use more' => TRUE,
       'accept attachments' => TRUE,
       'admin' => t('Facets block'),
+    );
+  }
+
+  if (module_exists('views_content_cache')) {
+    $ret['cache']['search_api_views_content_cache'] = array(
+      'title' => t('Search-specific content-based'),
+      'help' => t("Cache Search API views based on content updates. (Requires Views Content Cache)"),
+      'base' => $bases,
+      'handler' => 'SearchApiViewsContentCache',
+      'uses options' => TRUE,
     );
   }
 

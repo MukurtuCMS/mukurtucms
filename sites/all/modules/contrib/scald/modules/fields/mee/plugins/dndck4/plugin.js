@@ -32,7 +32,6 @@ CKEDITOR.plugins.add('dndck4', {
         caption: {
           selector: '.dnd-caption-wrapper',
           pathName: 'caption',
-          allowedContent: 'a[href]; strong; em'
         }
       },
       requiredContent: 'div span figure[data-scald-sid](dnd-atom-wrapper)',

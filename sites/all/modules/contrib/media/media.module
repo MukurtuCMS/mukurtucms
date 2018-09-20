@@ -168,6 +168,9 @@ function media_menu_local_tasks_alter(&$data, $router_item, $root_path) {
 function media_admin_paths() {
   $paths['media/*/edit/*'] = TRUE;
   $paths['media/*/format-form'] = TRUE;
+  if (module_exists('admin_language')) {
+    $paths['media/ajax/*'] = TRUE; // For admin_language module compatibility.
+  }
 
   // If the media browser theme is set to the admin theme, ensure it gets set
   // as an admin path as well.
@@ -244,6 +247,9 @@ function media_theme() {
 function media_ajax_upload() {
   $form_parents = func_get_args();
   $form_build_id = (string) array_pop($form_parents);
+
+  // Sanitize form parents before using them.
+  $form_parents = array_filter($form_parents, 'element_child');
 
   if (empty($_POST['form_build_id']) || $form_build_id != $_POST['form_build_id']) {
     // Invalid request.
@@ -607,7 +613,7 @@ function media_parse_to_uri($url) {
  * @see media_parse_to_uri()
  * @see media_add_from_url_submit()
  */
-function media_parse_to_file($url) {
+function media_parse_to_file($url, $params = array()) {
   try {
     $uri = media_parse_to_uri($url);
   }
@@ -646,9 +652,15 @@ function media_parse_to_file($url) {
       return;
     }
     $source_file = file_uri_to_object($source_uri);
-    $scheme = variable_get('file_default_scheme', 'public') . '://';
+    if(isset($params['to_directory'])){
+      $scheme = variable_get('file_default_scheme', 'public') . '://' . $params['to_directory'] . '/';
+    }
+    else{
+      $scheme = variable_get('file_default_scheme', 'public') . '://';
+    }
     $uri = file_stream_wrapper_uri_normalize($scheme . $source_file->filename);
     // Now to its new home.
+    file_prepare_directory($scheme, FILE_CREATE_DIRECTORY || FILE_MODIFY_PERMISSIONS);
     $file = file_move($source_file, $uri, FILE_EXISTS_RENAME);
   }
 

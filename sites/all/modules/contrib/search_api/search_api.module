@@ -72,6 +72,15 @@ function search_api_menu() {
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE | MENU_CONTEXT_PAGE,
   );
+  $items[$pre . '/server/%search_api_server/execute-tasks'] = array(
+    'title' => 'Execute pending tasks',
+    'description' => 'Attempt to process pending tasks for a given server.',
+    'page callback' => 'search_api_execute_pending_tasks',
+    'page arguments' => array(5),
+    'access callback' => 'search_api_access_execute_tasks_batch',
+    'access arguments' => array(5),
+    'type' => MENU_CALLBACK,
+  );
   $items[$pre . '/server/%search_api_server/disable'] = array(
     'title' => 'Disable',
     'description' => 'Disable index.',
@@ -97,6 +106,13 @@ function search_api_menu() {
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 10,
+  );
+  $items[$pre . '/execute-tasks'] = array(
+    'title' => 'Execute pending tasks',
+    'description' => 'Attempt to process pending server tasks.',
+    'page callback' => 'search_api_execute_pending_tasks',
+    'access callback' => 'search_api_access_execute_tasks_batch',
+    'type' => MENU_LOCAL_ACTION,
   );
   $items[$pre . '/index/%search_api_index'] = array(
     'title' => 'View index',
@@ -1026,6 +1042,28 @@ function search_api_search_api_item_type_info() {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensures the item type and service class static caches are invalidated at the
+ * right time.
+ */
+function search_api_module_implements_alter(array &$implementations, $hook) {
+  switch ($hook) {
+    case 'modules_enabled':
+      $group = $implementations['search_api'];
+      unset($implementations['search_api']);
+      $implementations = array('search_api' => $group) + $implementations;
+      break;
+
+    case 'modules_disabled':
+      $group = $implementations['search_api'];
+      unset($implementations['search_api']);
+      $implementations['search_api'] = $group;
+      break;
+  }
+}
+
+/**
  * Implements hook_modules_enabled().
  */
 function search_api_modules_enabled() {
@@ -1387,6 +1425,10 @@ function search_api_server_tasks_check(SearchApiServer $server = NULL) {
   // Sometimes the order of tasks might be important, so make sure to order by
   // the task ID (which should be in order of insertion).
   $select->orderBy('t.id');
+  // Only retrieve and execute 100 tasks at once, to avoid running out of memory
+  // or time. We just can't do anything else until all tasks have been resolved,
+  // but at least we shouldn't crash sites, or keep piling up tasks, that way.
+  $select->range(0, 100);
   $tasks = $select->execute();
 
   $executed_tasks = array();
@@ -1443,9 +1485,114 @@ function search_api_server_tasks_check(SearchApiServer $server = NULL) {
   if (!$executed_tasks) {
     return TRUE;
   }
-  // Otherwise, delete the executed tasks and check if new tasks were created.
+  // Otherwise, delete the executed tasks and check if new tasks were created
+  // (or if we didn't even fetch all due to the 100 tasks limit).
   search_api_server_tasks_delete($executed_tasks);
   return $count_query->execute()->fetchField() === 0;
+}
+
+/**
+ * Provides a batch wrapper for search_api_server_tasks_check().
+ *
+ * @param SearchApiServer|null $server
+ *   (optional) The server whose tasks should be executed, or NULL to execute
+ *   tasks for all servers.
+ */
+function search_api_execute_pending_tasks(SearchApiServer $server = NULL) {
+  batch_set(array(
+    'title' => t('Processing pending tasks'),
+    'operations' => array(
+      array(
+        'search_api_execute_pending_tasks_batch',
+        array(
+          $server,
+        ),
+      ),
+    ),
+    'finished' => 'search_api_execute_pending_tasks_finished'
+  ));
+  if ($server) {
+    $path = 'admin/config/search/search_api/server/' . $server->machine_name;
+  }
+  else {
+    $path = 'admin/config/search/search_api';
+  }
+
+  if (function_exists('drush_backend_batch_process')) {
+    drush_backend_batch_process();
+  }
+  else {
+    batch_process($path);
+  }
+}
+
+/**
+ * Executes pending server tasks as part of a batch operation.
+ */
+function search_api_execute_pending_tasks_batch(SearchApiServer $server = NULL, &$context) {
+  if (!isset($context['results']['total'])) {
+    $context['results']['total'] = search_api_server_tasks_count($server);
+  }
+  $total = $context['results']['total'];
+
+  search_api_server_tasks_check($server);
+
+  $remaining = search_api_server_tasks_count($server);
+  $executed = max($total - $remaining, 0);
+
+  $args['@remaining'] = $remaining;
+  $context['message'] = format_plural($executed, 'Successfully executed @count task, @remaining remaining.', 'Successfully executed @count tasks, @remaining remaining.', $args);
+  $context['finished'] = $executed / $total;
+}
+
+/**
+ * Batch finish callback for pending server tasks.
+ */
+function search_api_execute_pending_tasks_finished($success, $results, $operations) {
+  if ($success) {
+    // Clear the previous warning.
+    drupal_get_messages('warning');
+
+    // Alert user to the number of tasks executed.
+    drupal_set_message(format_plural($results['total'], 'Successfully executed @count task.', 'Successfully executed @count tasks.'));
+  }
+}
+
+/**
+ * Return the number of pending tasks.
+ *
+ * @param SearchApiServer|null $server
+ *   (optional) The server for which tasks should be counted, or NULL to count
+ *   for all enabled servers.
+ *
+ * @return int
+ *   The number of pending tasks for the server, or in total.
+ */
+function search_api_server_tasks_count(SearchApiServer $server = NULL) {
+  $query = db_select('search_api_task', 't')
+    ->fields('t');
+
+  if ($server) {
+    $query->condition('server_id', $server->machine_name);
+  }
+  else {
+    $query->join('search_api_server', 's', 's.machine_name = t.server_id');
+    $query->condition('s.enabled', 1);
+  }
+
+  return $query->countQuery()->execute()->fetchField();
+}
+
+/**
+ * Access callback: Checks whether a user can execute pending tasks.
+ *
+ * @param SearchApiServer|null $server
+ *   (optional) The server for which tasks would be executed.
+ */
+function search_api_access_execute_tasks_batch(SearchApiServer $server = NULL) {
+  return user_access('administer search_api')
+      && search_api_server_tasks_count($server)
+      && (!$server || $server->enabled);
 }
 
 /**
