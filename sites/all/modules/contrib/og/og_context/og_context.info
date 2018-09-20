@@ -3,8 +3,6 @@ description = "Get a group from a viewed page."
 package = "Organic groups"
 dependencies[] = og
 core = 7.x
-files[] = og_context.module
-files[] = og_context.install
 
 ; Views default arguments
 files[] = includes/views/handlers/og_context_plugin_argument_default_group_context.inc
@@ -15,9 +13,8 @@ files[] = includes/views/handlers/og_context_plugin_access_og_perm.inc
 ; Tests
 files[] = og_context.test
 
-; Information added by Drupal.org packaging script on 2016-04-20
-version = "7.x-2.9"
+; Information added by Drupal.org packaging script on 2018-06-28
+version = "7.x-2.10"
 core = "7.x"
 project = "og"
-datestamp = "1461150274"
-
+datestamp = "1530174231"

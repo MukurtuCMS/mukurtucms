@@ -537,7 +537,7 @@ function og_context_handler_node($node = NULL) {
     return;
   }
 
-  if ($item['path'] == 'node/%/group') {
+  if (strpos($item['path'], 'node/%') === 0 && !empty($item['map'][1]) && !is_object($item['map'][1])) {
     $node = node_load($item['map'][1]);
   }
   elseif (strpos($item['path'], 'group/%/%/admin') === 0 && !empty($item['map'][1]) && $item['map'][1] == 'node') {
@@ -640,7 +640,7 @@ function _group_context_handler_entity($entity_type = 'node', $entity = NULL, $p
   }
 
   // Check if the entity is itself a group.
-  if ($group = og_is_group($entity_type, $id)) {
+  if (og_is_group($entity_type, $entity)) {
     $contexts[$entity_type][] = $id;
   }
   elseif ($gids = og_get_entity_groups($entity_type, $entity)) {

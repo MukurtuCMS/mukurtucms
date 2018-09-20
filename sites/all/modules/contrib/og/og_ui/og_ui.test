@@ -199,7 +199,7 @@ class OgUiSubscribeTestCase extends DrupalWebTestCase {
     $this->drupalGet('node/' . $node->nid);
     $this->assertText(t('Unsubscribe from group'), t('Member gets correct unsubscribe text.'));
     $this->clickLink(t('Unsubscribe from group'));
-    $this->drupalPost(NULL, array() , t('Remove'));
+    $this->drupalPost(NULL, array() , t('Unsubscribe'));
 
     $this->assertFalse(og_is_member('node', $node->nid, 'user', $user2, array(OG_STATE_ACTIVE, OG_STATE_PENDING)), t('User unsubscribed from group.'));
 
@@ -429,9 +429,18 @@ class OgUiManagePeopleTestCase extends DrupalWebTestCase {
   public function testOgUiPath() {
     $this->drupalGet('entity_test/' . $this->entity->pid . 'invalid/group');
     $this->assertResponse(403);
-    // Numeric values that are not integers are forbidden, too.
-    $this->drupalGet('entity_test/' . $this->entity->pid . '.333/group');
+    // Numeric values that are not consist of decimal characters are forbidden.
+    // 0x1 for instance is equivalent to 1
+    // http://php.net/manual/en/language.types.integer.php
+    $this->drupalGet('entity_test/0x' . $this->entity->pid . '/group');
     $this->assertResponse(403);
+    // Non-existing groups return 404 however.
+    $this->drupalGet('entity_test/666');
+    $this->assertResponse(404);
+    // For the same, admin area returns 403.
+    $this->drupalGet('entity_test/666/group');
+    $this->assertResponse(403);
+
   }
 }
 
