@@ -6,9 +6,9 @@ dependencies[] = feeds_ui
 files[] = tests/feeds_tamper_ui.test
 core = 7.x
 
-; Information added by Drupal.org packaging script on 2017-01-12
-version = "7.x-1.1+4-dev"
+; Information added by Drupal.org packaging script on 2017-12-10
+version = "7.x-1.2"
 core = "7.x"
 project = "feeds_tamper"
-datestamp = "1484242997"
+datestamp = "1512894788"
 
