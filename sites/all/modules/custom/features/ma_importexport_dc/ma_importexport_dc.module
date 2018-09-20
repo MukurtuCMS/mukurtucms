@@ -125,8 +125,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#type' => 'radios',
     '#title' => 'Media',
     '#description' => 'Select which attribute contains the reference to media for the Digital Heritage item. This is typically "dc:hasformat", or "dc:relation".',
-    '#options' => $attributes,
-    '#required' => TRUE,
+    '#options' => array_merge(['none' => 'None'], $attributes),
   );
   if (isset($attributes['dc:hasformat'])) {
     $form['media']['#default_value'] = 'dc:hasformat';
@@ -260,6 +259,8 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
   if ($source->id == 'digital_heritage_dc') {
 
     $options = variable_get('dc_import_options');
+
+    // Set the GUID
     $guid_parts = [];
     foreach ($options['guid'] as $attribute) {
       if ($attribute) {
@@ -272,7 +273,13 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
         $guid_values[] = $item[$guid_part];
       }
       $result->items[$i]['guid'] = implode(':', $guid_values);
-      $result->items[$i]['dc:hasformat'] = $item[str_replace(':', '_', $options['media'])];
+
+      // Set the media field.
+      $media_value = '';
+      if ($options['media'] <> 'none') {
+        $media_value = $item[str_replace(':', '_', $options['media'])];
+      }
+      $result->items[$i]['dc_hasformat'] = $media_value;
     }
 
   }
