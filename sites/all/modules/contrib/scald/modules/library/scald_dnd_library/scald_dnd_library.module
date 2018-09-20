@@ -213,9 +213,9 @@ function theme_sdl_library_item($variables) {
 
   // Action links
   $links = scald_atom_user_build_actions_links($atom, NULL);
-  // Force all links to open in a new window
-  foreach ($links as $action => $link) {
-    $links[$action]['attributes']['target'] = '_blank';
+  // Force view link in the dnd library to open in a new window
+  if(current_path() == dnd_get_library()) {
+    $links['view']['attributes']['target'] = '_blank';
   }
   // The Insert link. Use the "_" prefix to avoid collision with possible
   // "insert" action.

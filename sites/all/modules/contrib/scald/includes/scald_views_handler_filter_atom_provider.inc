@@ -16,7 +16,7 @@ class scald_views_handler_filter_atom_provider extends views_handler_filter_in_o
       foreach ($types as $type_name => $type_providers) {
         $providers = array_merge($providers, $type_providers);
       }
-
+      $providers = array_map('t', $providers);
       $this->value_options = $providers;
     }
   }

@@ -179,6 +179,13 @@ class ScaldAtomController extends DrupalDefaultEntityController {
         ->condition('type', $type)
         ->execute();
       scald_types(TRUE);
+
+      foreach (array('scald_thumbnail', 'scald_authors', 'scald_tags') as $field_name) {
+        $instance = field_info_instance('scald_atom', $field_name, $type);
+        if (!empty($instance)) {
+          field_delete_instance($instance, FALSE);
+        }
+      }
       return TRUE;
     }
 

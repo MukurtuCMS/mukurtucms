@@ -391,6 +391,7 @@
 }
 
 .scald-menu .add-buttons ul li {
+  display: block;
   height: 30px;
   margin: 3px 4px;
   width: 30px;
