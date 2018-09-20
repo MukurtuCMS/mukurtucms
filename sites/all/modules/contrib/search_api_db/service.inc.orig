@@ -1056,8 +1056,7 @@ class SearchApiDbService extends SearchApiAbstractService {
             $score = $v['score'];
             $v = $v['value'];
             if (drupal_strlen($v) > 50) {
-              $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
-              $words = preg_split('/' . $spaces_regex . '+/u', $v, -1, PREG_SPLIT_NO_EMPTY);
+              $words = preg_split('/[^\p{L}\p{N}]+/u', $v, -1, PREG_SPLIT_NO_EMPTY);
               if (count($words) > 1 && max(array_map('drupal_strlen', $words)) <= 50) {
                 // Overlong token is due to bad tokenizing.
                 // Check for "Tokenizer" preprocessor on index.
@@ -1405,8 +1404,7 @@ class SearchApiDbService extends SearchApiAbstractService {
         $this->ignored[$keys] = 1;
         return NULL;
       }
-      $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
-      $words = preg_split('/' . $spaces_regex . '+/u', $proc, -1, PREG_SPLIT_NO_EMPTY);
+      $words = preg_split('/[^\p{L}\p{N}]+/u', $proc, -1, PREG_SPLIT_NO_EMPTY);
       if (count($words) > 1) {
         $proc = $this->splitKeys($words);
         if ($proc) {
@@ -2144,8 +2142,7 @@ class SearchApiDbService extends SearchApiAbstractService {
 
     // Also collect all keywords already contained in the query so we don't
     // suggest them.
-    $spaces_regex = ma_search_api_get_whitespace_tokenizer_regex();
-    $keys = drupal_map_assoc(preg_split('/' . $spaces_regex . '+/u', $user_input, -1, PREG_SPLIT_NO_EMPTY));
+    $keys = drupal_map_assoc(preg_split('/[^\p{L}\p{N}]+/u', $user_input, -1, PREG_SPLIT_NO_EMPTY));
     if ($incomplete_key) {
       $keys[$incomplete_key] = $incomplete_key;
     }
