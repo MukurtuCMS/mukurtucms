@@ -39,7 +39,7 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
   if (!is_array($value)) {
     $value = array($value);
   }
-  
+
   foreach ($value as $k => $v) {
     if(!empty($value[$k])) {
       if (!($v instanceof FeedsEnclosure)) {
@@ -83,7 +83,7 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
             $existing_sid = $atom->sid;
         }
     }
-      
+
     // Check if using a GUID for an existing scald atom previously imported by feeds
     if($existing_sid == FALSE) {
         $existing_sid = scald_feeds_lookup_atom_by_guid($v->getValue());
@@ -115,7 +115,7 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
         }
         $i++;
     }
-  }  
+  }
 
   $entity->{$target} = $field;
 }
@@ -139,10 +139,10 @@ function _scald_feeds_copy_fields($form, &$atom) {
   if(isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat']) && isset($form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'])) {
     $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['input_format'] = 'lat/lon';
     $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lat'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lat'];
-    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lon'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon']; 
+    $atom->{'field_scald_geo_location'}[LANGUAGE_NONE][0]['geom']['lon'] = $form['field_scald_geo_location'][LANGUAGE_NONE][0]['geom']['#default_value']['lon'];
   }
 
-  if (isset($form['field_scald_created'][LANGUAGE_NONE][0]['#default_value'])) {	
+  if (isset($form['field_scald_created'][LANGUAGE_NONE][0]['#default_value'])) {
     $value1 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value']);
     $value2 = str_replace('T', ' ', $form['field_scald_created'][LANGUAGE_NONE][0]['#default_value']['value2']);
     $atom->field_scald_created[LANGUAGE_NONE] = array(array('value' => $value1, 'value2' => $value2));
@@ -294,7 +294,7 @@ function scald_feeds_fetch_matching_atom($filename, $type) {
 			'type' => $type,
 			'publisher' => $user->uid);
   $sids = scald_search($scald_query, FALSE);
-      
+
   if(!$sids) {
     return FALSE;
   }
@@ -317,9 +317,26 @@ function scald_feeds_fetch_matching_atom($filename, $type) {
       break;
     }
 
-    if (filesize($atom->file_source) == filesize($filename) && 
-	md5_file($atom->file_source) == md5_file($filename) && 
+    // For external files, save file to a temporary directory to compare on.
+    $external_file = 0;
+    if (strtolower(substr($filename, 0, 4) == 'http')) {
+      $external_file = 1;
+      $file_contents = file_get_contents($filename);
+      $filename = drupal_tempnam('temporary://', 'file');
+      file_put_contents($filename, $file_contents);
+    }
+
+    $new_file_filesize = filesize($filename);
+    $new_file_md5 = md5_file($filename);
+
+    if ($external_file) {
+      unlink($filename);
+    }
+
+    if (filesize($atom->file_source) == $new_file_filesize &&
+	md5_file($atom->file_source) == $new_file_md5 &&
 	$atom->changed == $atom->created) {
+
       return $sid;
     }
   }

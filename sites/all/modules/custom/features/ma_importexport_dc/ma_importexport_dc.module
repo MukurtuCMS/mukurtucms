@@ -1,0 +1,378 @@
+<?php
+/**
+ * @file
+ * Code for the Mukurtu Import/Export Dublin Core feature.
+ */
+
+include_once 'ma_importexport_dc.features.inc';
+
+
+/**
+ * Implementation of hook_menu()
+ */
+function ma_importexport_dc_menu() {
+
+  $items['import/digital-heritage-dc-file'] = array(
+    'title' => 'Import Digital Heritage Dublin Core XML - File',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_importexport_dc_import_form_standalone'),
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  $items['import/digital-heritage-dc-options'] = array(
+    'title' => 'Import Digital Heritage Dublin Core XML - Options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_importexport_dc_import_form_options'),
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  $items['import/digital-heritage-dc-complete'] = array(
+    'title' => 'Import Digital Heritage Dublin Core XML - Complete',
+    'page callback' => 'ma_importexport_dc_import_complete',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('import digital_heritage_metadata feeds'),
+  );
+
+  return $items;
+}
+
+/**
+ * Custom form for user to upload the XML.
+ */
+function ma_importexport_dc_import_form_standalone($form, $form_state) {
+
+  $form['xml_file'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('File'),
+    '#description' => 'Select a Dublin Core XML file from your local system.',
+    '#size' => 22,
+    '#upload_location' => 'private://mukurtu_dc_xml_import',
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('xml')
+    ),
+    '#default_value' => variable_get('dc_import_fid'),
+    '#required' => TRUE,
+  );
+
+  $form['after_upload']['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Continue'),
+  ];
+
+  return $form;
+}
+
+/**
+ * On submission, set the file FID to a var (to be used in the options form),
+ * and redirect to the options form.
+ */
+function ma_importexport_dc_import_form_standalone_submit($form, $form_state) {
+  variable_set('dc_import_xml_fid', $form_state['values']['xml_file']);
+  variable_set ('dublin_core_import_is_batch', 0);
+  drupal_goto('import/digital-heritage-dc-options');
+}
+
+/**
+ * Custom form for the XML options.
+ */
+function ma_importexport_dc_import_form_options($form, $form_state) {
+
+  $fid = variable_get('dc_import_xml_fid');
+  if (!$fid) { // This should never happen.
+    drupal_goto('import/digital-heritage-dc-standalone');
+  }
+
+  // Get the attributes (the fields) from the XML file to use for the GUID and Media options below.
+  $file = file_load ($fid);
+  $path_to_file = drupal_realpath($file->uri);
+  $file_contents = file_get_contents($path_to_file);
+  // Tried doing this with simplexml but it fails on test imports
+  // (it's excessively sensitive to character formatting and xmlns specs).
+  // Also tried using the DOM but it was overkill.
+  $parser = xml_parser_create();
+  xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+  xml_parse_into_struct($parser, $file_contents, $values, $index);
+  xml_parser_free($parser);
+  $attributes = array_keys($index);
+  $attributes = array_combine($attributes, $attributes);
+
+  // Context checkboxes.
+  $form['context'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'Context',
+    '#description' => "Select which attributes to use as the XML file's context. This will normally be all the attribute(s) before the ones starting with \"dc:\"",
+    '#options' => $attributes,
+    '#required' => TRUE,
+  );
+  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description'];
+  $available_typical_context_values = [];
+  foreach ($typical_context_values as $typical_context_value) {
+    if (isset($attributes[$typical_context_value])) {
+      $available_typical_context_values[] = $typical_context_value;
+    }
+  }
+  if (count($available_typical_context_values)) {
+    $form['context']['#default_value'] = $available_typical_context_values;
+
+  }
+
+
+  // GUID source checkboxes.
+  $form['guid'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'GUID',
+    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.',
+    '#options' => $attributes,
+    '#required' => TRUE,
+  );
+  if (isset($attributes['dc:identifier'])) {
+    $form['guid']['#default_value'] = ['dc:identifier'];
+  }
+
+  // Media source radio.
+  $form['media'] = array(
+    '#type' => 'radios',
+    '#title' => 'Media',
+    '#description' => 'Select which attribute contains the reference to media for the Digital Heritage item. This is typically "dc:hasformat", or "dc:relation".',
+    '#options' => array_merge(['none' => 'None'], $attributes),
+  );
+  if (isset($attributes['dc:hasformat'])) {
+    $form['media']['#default_value'] = 'dc:hasformat';
+  }
+  elseif (isset($attributes['dc:relation'])) {
+    $form['media']['#default_value'] = 'dc:relation';
+  }
+
+  // Custom protocol field.
+  list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, NULL, TRUE);
+
+  // Sharing settings radio.
+  $sharing_options = [
+    'any' => 'The imported Digital Heritage items will be viewable by members of ANY Protocols selected above (or all users if any of the Protocols are set to Open).',
+    'all' => 'The imported Digital Heritage items will be viewable only by members of ALL Protocols selected above (or all users if all of the Protocols are set to Open).'
+  ];
+  $form['sharing'] = array(
+    '#type' => 'radios',
+    '#title' => 'Items Sharing Setting',
+    '#options' =>   $sharing_options,
+    '#default_value' => 'all',
+    '#required' => TRUE,
+  );
+
+  // Category chosen select.
+  $vocabulary = taxonomy_vocabulary_machine_name_load('Category');
+  $categories = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
+  $options = [];
+  foreach ($categories as $tid => $term) {
+    $options[$tid] = $term->name;
+  }
+  $form['category'] = array(
+    '#type' => 'select',
+    '#chosen' => TRUE,
+    '#multiple' => TRUE,
+    '#title' => 'Category',
+    '#options' => $options,
+    // '#required' => TRUE, // Should this be required?
+  );
+
+  // Traditional Knowledge Labels chosen select.
+  $field = field_info_field('field_licence_trad');
+  $options = list_allowed_values($field);
+  $form['tk_label'] = array(
+    '#type' => 'select',
+    '#chosen' => TRUE,
+    '#multiple' => TRUE,
+    '#title' => 'Traditional Knowledge Labels',
+    '#options' => $options,
+  );
+
+  // Licensing Option chosen select (single val).
+  $field = field_info_field('field_licence_std_cc');
+  $options = array_merge(['_none' => '- None -'], list_allowed_values($field));
+  $form['licensing'] = array(
+    '#type' => 'select',
+    '#chosen' => TRUE,
+    '#title' => 'Licensing Options',
+    '#options' => $options,
+  );
+
+  // Import button
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Import'),
+  ];
+
+  // Return form.
+  return $form;
+}
+
+/**
+ * Submit handler for the options form.
+ */
+function ma_importexport_dc_import_form_options_validate($form, $form_state) {
+  if ($form_state['triggering_element']['#type'] == 'submit') { // This validation function will fire after a community is added but before a protocol is added, which will fail validation. So check to make sure this is fired from the submit button first.
+    if (!$form_state['values']['oggroup_fieldset'][0]['dropdown_second']) {
+      form_set_error('', "At least one Community and Protocol needs to be selected.");
+    }
+  }
+}
+
+/**
+ * Submit handler for the options form.
+ */
+function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
+
+  // Set the options to be picked up by the importer.
+  variable_set ('dc_import_options', $form_state['values']);
+
+  // Set the fetcher source and file.
+  $source = feeds_source('digital_heritage_dc');
+  $fetcher_config = $source->getConfigFor($source->importer->fetcher);
+  $file = file_load (variable_get('dc_import_xml_fid'));
+  $fetcher_config['source'] = $file->uri;
+  $fetcher_config['file'] = $file;
+  $source->setConfigFor($source->importer->fetcher, $fetcher_config);
+  $source->save();
+
+  // Set the context, as provided in the options form.
+  $context = '';
+  foreach ($form_state['values']['context'] as $context_part) {
+    if ($context_part) {
+      $context .= '/' . $context_part;
+    }
+  }
+  $importer = feeds_importer('digital_heritage_dc');
+  $config = $importer->parser->getConfig();
+  $config['context']['value'] = $context;
+  $importer->parser->setConfig($config);
+  $importer->save();
+
+  // Go to the status page after it's done.
+  $form_state['redirect'] = 'import/digital-heritage-dc-complete';
+
+  // Do the import
+  $source->startImport();
+
+}
+
+/**
+ * Implements hook_feeds_after_parse().
+ *
+ * Set the GUID and dc:hasformat field values according to their source as selected in the options form.
+ * Note: this could also be done by altering the mapping, as in https://drupal.stackexchange.com/questions/254661/feeds-how-to-set-a-blank-source-value-programmatically,
+ * but that method still requires updating the values individually in the targets_alter, so it's no
+ * more efficient (and coding-wise less efficient) than just altering each value individually here in the after_parse.
+ */
+function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  if ($source->id == 'digital_heritage_dc') {
+
+    $options = variable_get('dc_import_options');
+
+    // Set the GUID
+    $guid_parts = [];
+    foreach ($options['guid'] as $attribute) {
+      if ($attribute) {
+        $guid_parts[] = str_replace(':', '_', $attribute);
+      }
+    }
+    foreach ($result->items as $i => $item) {
+      $guid_values = [];
+      foreach ($guid_parts as $guid_part) {
+        $guid_values[] = $item[$guid_part];
+      }
+      $result->items[$i]['guid'] = implode(':', $guid_values);
+
+      // Set the media field.
+      $media_value = '';
+      if ($options['media'] <> 'none') {
+        $media_value = $item[str_replace(':', '_', $options['media'])];
+      }
+      $result->items[$i]['dc_hasformat'] = $media_value;
+    }
+
+  }
+}
+
+/**
+ * Implements hook_feeds_presave().
+ */
+function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
+  if ($source->id == 'digital_heritage_dc') {
+    $options = variable_get('dc_import_options');
+
+    // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).
+    $protocols = [];
+    foreach ($options['oggroup_fieldset'] as $ogg_fieldset) {
+      foreach ($ogg_fieldset['dropdown_second'] as $protocols_per_comm) {
+        $protocols[]['target_id'] = $protocols_per_comm;
+      }
+    }
+    $entity->og_group_ref[LANGUAGE_NONE] = $protocols;
+
+    // Set the item privacy setting.
+    $entity->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] = $options['sharing'];
+
+    // Set the category
+    $categories = [];
+    foreach ($options['category'] as $category) {
+      $categories[]['tid'] = $category;
+    }
+    if (count($categories)) {
+      $entity->field_category[LANGUAGE_NONE] = $categories;
+    }
+
+    // Set the TK Label(s)
+    $tk_labels = [];
+    foreach ($options['tk_label'] as $tk_label) {
+      $tk_labels[]['value'] = $tk_label;
+    }
+    if (count($tk_labels)) {
+      $entity->field_licence_trad[LANGUAGE_NONE] = $tk_labels;
+    }
+
+    // Set the Licensing Option
+    if (isset($options['licensing']) && $options['licensing'] <> '_none') {
+      $entity->field_licence_std_cc[LANGUAGE_NONE][0]['value'] = $options['licensing'];
+    }
+
+    // Set the author to admin user 1.
+    $entity->uid = 1;
+
+  }
+}
+
+/**
+ * Page callback to show at the end of the DC import.
+ */
+function ma_importexport_dc_import_complete() {
+  $output = '';
+  $source = feeds_source('digital_heritage_dc');
+
+  // Taken from feeds_source_status();
+  $progress_importing = $source->progressImporting();
+  $v = array();
+  if ($progress_importing != FEEDS_BATCH_COMPLETE) {
+    $v['progress_importing'] = $progress_importing;
+  }
+  $progress_clearing = $source->progressClearing();
+  if ($progress_clearing != FEEDS_BATCH_COMPLETE) {
+    $v['progress_clearing'] = $progress_clearing;
+  }
+  $v['imported'] = $source->imported;
+  $v['count'] = $source->itemCount();
+  if (!empty($v)) {
+    $output = theme('feeds_source_status', $v);
+  }
+
+  // Add some buttons
+  $output .= '<br />';
+  $import_more_path = 'import/digital-heritage-dc-file';
+  if (variable_get('dublin_core_import_is_batch')) {
+    $import_more_path = 'manage/zip_import';
+  }
+  $output .=  l('Import More', $import_more_path, ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);
+  $output .=  l('Return to Dashboard', 'dashboard', ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);
+
+  // Return the page.
+  return $output;
+}

@@ -34,7 +34,6 @@ dependencies[] = feeds
 dependencies[] = feeds_tamper
 dependencies[] = feeds_tamper_ui
 dependencies[] = feeds_ui
-dependencies[] = feeds_xpathparser
 dependencies[] = field_group
 dependencies[] = file_entity
 dependencies[] = file_entity_link

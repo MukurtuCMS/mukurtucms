@@ -44,7 +44,7 @@ function mukurtu_batch_import_form() {
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>' . l('Download a sample zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('This zip file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the <a href="@management_link">digital heritage management page</a>.', array('@management_link' => '/manage/digital-heritage')) . '</p>',
+    '#description' => '<p>For CSV imports, ' . l('download a sample ZIP file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This ZIP file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core imports, export an XML file from your system and create a ZIP archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
@@ -109,7 +109,7 @@ function mukurtu_batch_import_form() {
 */
   
   
-  $form['actions']['submit']['#value'] = t("Import");
+  $form['actions']['submit']['#value'] = t("Continue");
 /*   array_push($form['actions']['import']['#submit'], 'mukurtu_batch_import_import'); */
   array_push($form['#submit'], 'mukurtu_batch_import_import');
 
@@ -128,9 +128,14 @@ function mukurtu_batch_import_import($form, &$form_state) {
 }
 
 function mukurtu_batch_import_parse_zip($file) {
+ 
   $file_path = drupal_realpath($file->uri);
 
   // Create a unique temporary folder to extract the zip file in
+  /* $temp_extract_path = file_directory_temp();
+  $temp_extract_path .= '/' . uniqid('mukurtu_upload_');
+  mkdir($temp_extract_path); */
+
   $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
   
   $zip = new ZipArchive;
@@ -351,8 +356,29 @@ function mukurtu_batch_import_import_metadata($path) {
       }
   }
 
-  // Take the files we've found and figure out which importers to use and in what order
-  $import_steps = mukurtu_batch_import_generate_import_steps($files);
+  // Check if it's a DC importer
+  $dc_import = 0;
+  foreach ($files as $file) {
+    if (strpos($file, '.xml')) {
+
+      // If DC importer, define simple single import step.
+      $dc_import = 1;
+      $import_steps = [
+        [
+          'filename' => $file,
+          'importer' => 'digital_heritage_dc',
+          'hide_warnings' => FALSE,
+        ],
+      ];
+      break;
+    }
+  }
+
+  // If it's not a DC importer, build the import steps.
+  if (!$dc_import) {
+    // Take the files we've found and figure out which importers to use and in what order
+    $import_steps = mukurtu_batch_import_generate_import_steps($files);
+  }
 
   if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
       unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
@@ -365,16 +391,16 @@ function mukurtu_batch_import_import_metadata($path) {
       $importer_id = $import_step['importer'];
       $hide_warnings = $import_step['hide_warnings'];
 
-      $csv_path = $path . DIRECTORY_SEPARATOR . $filename;
-      if(file_exists($csv_path)) {
+      $import_file_path = $path . DIRECTORY_SEPARATOR . $filename;
+      if(file_exists($import_file_path)) {
           // Success in this case is finding at least one of the files we were looking for
           $success = TRUE;
 
           // Save as a managed file.
-          $csv = file_get_contents($csv_path);
+          $import_file = file_get_contents($import_file_path);
 
           // Crude method to support relative file paths
-          $csv = str_replace(MUKURTU_EXPORT_IMPORT_DIR, $path, $csv);
+          $import_file = str_replace(MUKURTU_EXPORT_IMPORT_DIR, $path, $import_file);
 
           $destination = $path;
           file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
@@ -382,13 +408,21 @@ function mukurtu_batch_import_import_metadata($path) {
           // Prefix will create a different file for imports that get run twice
           // Without this, feeds could try and run twice using the same file, which usually results in conflict
           $prefix = $hide_warnings ? 'hidden_' : '';
-          $file = file_save_data($csv, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
+          $file = file_save_data($import_file, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
 
           if($hide_warnings) {
               $_SESSION['mukurtu_zip_import']['hide_warnings'][] = $importer_id;
           }
 
-          // Load the Feeds Source object.
+        // If it's a DC import, then set the imported file and go to the import options form, leaving this code at this point.
+        if ($dc_import) {
+          variable_set('dc_import_xml_fid', $file->fid);
+          variable_set('dublin_core_import_is_batch', 1);
+          drupal_goto('import/digital-heritage-dc-options');
+        }
+
+        // Not a DC importer. Proceed as normal.
+        // Load the Feeds Source object.
           $source = feeds_source($importer_id);
           $fetcher_config = $source->getConfigFor($source->importer->fetcher);
           $fetcher_config['source'] = $file->uri;

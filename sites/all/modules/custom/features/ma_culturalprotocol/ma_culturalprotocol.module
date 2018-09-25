@@ -373,12 +373,12 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
 /*
  * Helper function used nodes-in-CP custom protocol field and scald protocol field (default OG) to reduce down the available groups the user is a member of to those the user has posting permissions on, because OG on its own is not handling this
  */
-function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
+function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL, $import_form = FALSE) {
   $roles = [
     'contributor',
     'protocol steward'
   ];
-  return ma_cultural_protocol_get_cps_for_user($roles, $community_nid);
+  return ma_cultural_protocol_get_cps_for_user($roles, $community_nid, $import_form);
 }
 
 /*
@@ -408,13 +408,13 @@ function ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node, $
 /*
  * Helper function for the CPs for user helper functions.
  */
-function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL) {
+function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL, $import_form = FALSE) {
   $groups_for_user = og_get_groups_by_user(null, 'node');
   if (count($groups_for_user)) {
     $allowed_groups_for_user[] = [];
     foreach ($groups_for_user as $group_for_user) {
       $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
-      if (array_intersect($roles, $roles_for_user_in_group)) {
+      if ($import_form OR array_intersect($roles, $roles_for_user_in_group)) {
         $allowed_groups_for_user[] = $group_for_user;
       }
     }
