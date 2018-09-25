@@ -492,11 +492,12 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
     return;
   }
 
-  $i = end(array_keys($active_trail));
-  
+  $trail_keys = array_keys($active_trail);
+  $i = end($trail_keys);
+
   // Keep track of where we are. For container type pages (browse pages, collections, dictionary, word lists)
   // we want to try and include breadcrumbs back to the origin
-  // Grab the previous item. Currently we are only tracking one previous item
+  // Grab the previous item. Currently we are only tracking one previous item.
   $past_item = NULL;
   if(isset($_SESSION['mukurtu_breadcrumb_item'])) {
     $past_item = $_SESSION['mukurtu_breadcrumb_item'];
@@ -530,14 +531,14 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
       $past_item = NULL;
     }
 
-    // At this point, we have information about the previous page that 
+    // At this point, we have information about the previous page that
     // we would like to include in the breadcrumbs
     if($past_item) {
       // Start by inserting the past item in the next to last breadcrumb slot
       $active_trail[$i + 1] = $active_trail[$i];
       $active_trail[$i] = $past_item['trail'];
 
-      // The search pages are more complicated, we want to retain both 
+      // The search pages are more complicated, we want to retain both
       // the exact page arguments and query parameters
       if(is_string($past_item['item']['page_arguments'][0]) &&
         stripos($past_item['item']['page_arguments'][0], '_browse') !== FALSE) {
@@ -552,7 +553,7 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
 
         // Update the breadcrumb, include the query parameters
         $breadcrumb_title = $past_item['item']['title'] != "" ? $past_item['item']['title'] . ' Results' : $past_item['trail']['link_title'] . ' Results';
-        $active_trail[$i] = array(  
+        $active_trail[$i] = array(
           'title' => t($breadcrumb_title),
           'href' => $href, 'localized_options' => array('query' => $past_item['query_parameters'])
         );
