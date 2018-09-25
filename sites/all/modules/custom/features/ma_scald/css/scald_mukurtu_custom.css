@@ -26,11 +26,12 @@
     margin-top: -18px;
 }
 .scald-menu .add-buttons a {
-     margin-top: 43px;
+     margin-top: 12px;
+     padding-top: 36px;
      font-size: 10px;
      text-align: center;
      width: 43px;
-     height: 68px;
+     height: 52px;
      color: white;
 }
 
