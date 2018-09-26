@@ -39,6 +39,7 @@ function ma_importexport_menu() {
  * Implements hook_feeds_processor_targets_alter().
  */
 function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+
     // Loop through all entity types. Add a guid_or_nid option for any node/entity reference
     foreach(array_keys(entity_get_info()) as $entity_type) {
         if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom', 'taxonomy_term'))) {
@@ -185,6 +186,12 @@ function ma_importexport_feeds_lookup_atom_by_guid($guid) {
  * Implements hook_feeds_after_save().
  */
 function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $entity_id) {
+
+    // Do not act on the Dublin Core importer.
+    if($source->id == 'digital_heritage_dc') {
+      return;
+    }
+    
     if (isset($entity->type) && $entity->type == 'digital_heritage') {
 
         // If community record children exist, we need to set the community record parent on them.
@@ -245,6 +252,12 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
+
+    // Do not act on the Dublin Core importer.
+    if($source->id == 'digital_heritage_dc') {
+      return;
+    }
+
     global $user;
     $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
 
