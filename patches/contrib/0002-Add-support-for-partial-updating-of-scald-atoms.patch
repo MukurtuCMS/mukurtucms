@@ -1,29 +1,18 @@
-From 39974a9ce931ccb9bb50e1a983a70005abff2826 Mon Sep 17 00:00:00 2001
-From: Steve Taylor <steve_taylor@wsu.edu>
-Date: Thu, 23 Aug 2018 14:03:33 -0700
-Subject: [PATCH 2/2] Add support for partial updating of scald atoms during
- import
-
----
- sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc b/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc
-index 0c116c15..7736e5cb 100644
+diff --git a/plugins/FeedsProcessor.inc b/plugins/FeedsProcessor.inc
+index 284439f..286ce66 100644
 --- a/plugins/FeedsProcessor.inc
 +++ b/plugins/FeedsProcessor.inc
-@@ -743,9 +743,11 @@ abstract class FeedsProcessor extends FeedsPlugin {
+@@ -821,9 +821,11 @@ abstract class FeedsProcessor extends FeedsPlugin {
      // source element and pass it to the processor's setTargetElement() to stick
      // it on the right place of the target item.
      foreach ($this->getMappings() as $mapping) {
-+      if(in_array(strtolower($mapping['source']), $result->input_fields)) {
-       $value = $this->getSourceValue($source, $result, $mapping['source']);
+-      $value = $this->getSourceValue($source, $result, $mapping['source']);
++      if ($source->id == 'digital_heritage_dc' OR in_array(strtolower($mapping['source']), $result->input_fields)) {
++        $value = $this->getSourceValue($source, $result, $mapping['source']);
  
-       $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
+-      $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
++        $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
 +      }
      }
  
      return $target_item;
--- 
-2.17.1
-
