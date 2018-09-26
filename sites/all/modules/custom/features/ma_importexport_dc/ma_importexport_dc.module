@@ -335,9 +335,6 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
       $entity->field_licence_std_cc[LANGUAGE_NONE][0]['value'] = $options['licensing'];
     }
 
-    // Set the author to admin user 1.
-    $entity->uid = 1;
-
   }
 }
 
