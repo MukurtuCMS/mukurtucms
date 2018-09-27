@@ -10,6 +10,13 @@ function mukurtu_preprocess_html(&$variables) {
     if (file_exists($css)) {
         drupal_add_css($css, array('group' => CSS_THEME, 'every_page' => TRUE));
     }
+
+    // Add Zoom Library
+    $zoom_path = libraries_get_path('zoom');
+    $js = $zoom_path . "/jquery.zoom.min.js";
+    if (file_exists($js)) {
+        drupal_add_js($js);
+    }
 }
 
 /**

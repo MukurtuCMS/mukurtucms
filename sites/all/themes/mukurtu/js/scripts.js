@@ -18,13 +18,18 @@ jQuery(document).ready(function($){
             window.mukurtuGridActive = true;
         }
     }
-    
+
     function mukurtuDestroyGrid() {
         if(window.mukurtuGridActive && window.mukurtuGrid) {
             window.mukurtuGrid.masonry('destroy');
             window.mukurtuGridActive = false;
         }
     }
+
+    // Zoom colorbox images
+    $(window).bind('cbox_complete', function () {
+        $('#cboxLoadedContent').zoom({on:'grab'});
+    });
 
     $(window).load(function() {
         mukurtuMakeGrid();
