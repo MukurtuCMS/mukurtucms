@@ -517,47 +517,6 @@ function ma_collaboration_tools_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
-  $ds_layout->id = 'field_collection_item|field_notification_email|full';
-  $ds_layout->entity_type = 'field_collection_item';
-  $ds_layout->bundle = 'field_notification_email';
-  $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_1col';
-  $ds_layout->settings = array(
-    'regions' => array(
-      'ds_content' => array(
-        0 => 'field_notification_date_gene',
-        1 => 'field_notification_author',
-        2 => 'field_notification_comment',
-        3 => 'field_notification_subject',
-        4 => 'field_notification_body',
-      ),
-    ),
-    'fields' => array(
-      'field_notification_date_gene' => 'ds_content',
-      'field_notification_author' => 'ds_content',
-      'field_notification_comment' => 'ds_content',
-      'field_notification_subject' => 'ds_content',
-      'field_notification_body' => 'ds_content',
-    ),
-    'classes' => array(
-      'layout_class' => array(
-        '' => '',
-      ),
-    ),
-    'wrappers' => array(
-      'ds_content' => 'div',
-    ),
-    'layout_wrapper' => 'div',
-    'layout_attributes' => '',
-    'layout_attributes_merge' => 1,
-    'layout_link_attribute' => '',
-    'layout_link_custom' => '',
-    'layout_disable_css' => FALSE,
-  );
-  $export['field_collection_item|field_notification_email|full'] = $ds_layout;
-
-  $ds_layout = new stdClass();
-  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|calendar|form';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'calendar';
