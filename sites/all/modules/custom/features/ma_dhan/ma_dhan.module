@@ -6,30 +6,20 @@
 
 include_once 'ma_dhan.features.inc';
 
-///**
-// * Implements hook_node_view().
-// */
-//function ma_dhan_node_view($node, $view_mode) {
-//
-//  // On child collab pages, hide the "Following Users" and "Unfollowing Users" fields except to users that are Protocols Stewards of any of the child's CPs.
-//  if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
-//    $hide_following_users = 1;
-//    $groups_on_node = og_get_entity_groups('node', $node);
-//    $groups_on_node = array_values($groups_on_node['node']);
-//    foreach ($groups_on_node as $group) {
-//      $user_roles = og_get_user_roles('node', $group);
-//      if (in_array('protocol steward', $user_roles)) {
-//        $hide_following_users = 0;
-//        break;
-//      }
-//    }
-//    if ($hide_following_users) {
-//      unset($node->content['field_following_users']);
-//      unset($node->content['field_un_following_users']);
-//    }
-//  }
-//
-//}
+/**
+ * Implements hook_node_view().
+ */
+function ma_dhan_node_view($node, $view_mode) {
+
+  // On Communities and Protocols, hide the "Notified (Community Manager / Protocol Steward)" field unless user is a CM or PM of the node.
+  if ($view_mode == 'full' && ma_dhan_is_cp_or_comm($node)) {
+    $user_roles = og_get_user_roles('node', $node->nid);
+    if (!in_array('protocol steward', $user_roles) && !in_array('community manager', $user_roles)) {
+      unset($node->content['field_dhan_notified_users']);
+    }
+  }
+}
+
 //
 //
 ///**
@@ -120,7 +110,7 @@ include_once 'ma_dhan.features.inc';
 //    $ignore_fields = array_merge ($ignore_fields, ma_dhan_get_all_child_ref_fields());
 //    $following_fields = [
 //      'field_following_protocols',
-//      'field_following_users',
+//      'field_dhan_notified_users',
 //      'field_un_following_users',
 //      'field_custom_notification_freq',
 //    ];
@@ -238,8 +228,8 @@ include_once 'ma_dhan.features.inc';
 //    }
 //  }
 //  // Individually following
-//  if (isset($child_node->field_following_users[LANGUAGE_NONE])) {
-//    $notify_list = array_merge($notify_list, array_column($child_node->field_following_users[LANGUAGE_NONE], 'target_id'));
+//  if (isset($child_node->field_dhan_notified_users[LANGUAGE_NONE])) {
+//    $notify_list = array_merge($notify_list, array_column($child_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
 //  }
 //  // Remove duplicates
 //  $notify_list = array_unique($notify_list);
@@ -600,7 +590,7 @@ include_once 'ma_dhan.features.inc';
 //    if (!ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node)) {
 //      drupal_set_message ('You cannot follow this item because you are not a member of any of its Cultural Protocols.'); // This will only happen if a user tries to hit the follow URL directly, ie. it won't.
 //    }
-//    $nw->field_following_users[] = $user->uid;
+//    $nw->field_dhan_notified_users[] = $user->uid;
 //    $new_unfollowing_users = [];
 //    $unfollowing_users = $nw->field_un_following_users->value();
 //    foreach ($unfollowing_users as $unfollowing_user) {
@@ -613,13 +603,13 @@ include_once 'ma_dhan.features.inc';
 //  else {
 //    $nw->field_un_following_users[] = $user->uid;
 //    $new_following_users = [];
-//    $following_users = $nw->field_following_users->value();
+//    $following_users = $nw->field_dhan_notified_users->value();
 //    foreach ($following_users as $following_user) {
 //      if ($following_user->uid <> $user->uid) {
 //        $new_following_users[] = $following_user->uid;
 //      }
 //    }
-//    $nw->field_following_users->set($new_following_users);
+//    $nw->field_dhan_notified_users->set($new_following_users);
 //  }
 //  $nw->save();
 //  drupal_goto('node/' . $node->nid);
@@ -962,3 +952,12 @@ include_once 'ma_dhan.features.inc';
 //    ->execute();
 //  return reset($result['node'])->nid;
 //}
+
+/**
+ * Helper function to return if node is a Community or a CP.
+ */
+function ma_dhan_is_cp_or_comm($node) {
+  if (in_array($node->type, ['community', 'cultural_protocol_group'])) {
+    return TRUE;
+  }
+}

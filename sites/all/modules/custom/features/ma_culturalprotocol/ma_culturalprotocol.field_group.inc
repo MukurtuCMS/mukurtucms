@@ -61,7 +61,8 @@ function ma_culturalprotocol_field_group_info() {
       3 => 'field_protocol_image_thumbnail',
       4 => 'group_access',
       5 => 'og_group_ref',
-      6 => 'title',
+      6 => 'field_dhan_notified_users',
+      7 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

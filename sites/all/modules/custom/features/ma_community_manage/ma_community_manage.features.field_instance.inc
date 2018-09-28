@@ -38,7 +38,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -112,7 +112,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 43,
       ),
       'teaser' => array(
         'label' => 'above',

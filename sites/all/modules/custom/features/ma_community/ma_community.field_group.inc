@@ -57,11 +57,12 @@ function ma_community_field_group_info() {
     'children' => array(
       0 => 'body',
       1 => 'field_child_communities',
-      2 => 'field_community_image',
-      3 => 'field_community_image_thumbnail',
-      4 => 'field_parent_community',
-      5 => 'field_community_featured_colls',
-      6 => 'title',
+      2 => 'field_community_featured_colls',
+      3 => 'field_community_image',
+      4 => 'field_community_image_thumbnail',
+      5 => 'field_parent_community',
+      6 => 'field_dhan_notified_users',
+      7 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
