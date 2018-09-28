@@ -93,6 +93,11 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'dhan_notify' => array(
+      'weight' => '10',
+      'label' => 'above',
+      'format' => 'default',
+    ),
     'community_browse_all_dh_link' => array(
       'weight' => '9',
       'label' => 'hidden',
@@ -119,7 +124,7 @@ function ma_community_ds_field_settings_info() {
       'format' => 'default',
     ),
     'featured_collections' => array(
-      'weight' => '12',
+      'weight' => '13',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -134,7 +139,7 @@ function ma_community_ds_field_settings_info() {
       'format' => 'default',
     ),
     'create_content_block_ds_field' => array(
-      'weight' => '11',
+      'weight' => '12',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -553,7 +558,7 @@ function ma_community_ds_layout_settings_info() {
         7 => 'field_parent_community',
         8 => 'field_child_communities',
         9 => 'community_browse_all_dh_link',
-        10 => 'field_dhan_notified_users',
+        10 => 'dhan_notify',
         11 => 'create_content_block_ds_field',
         12 => 'featured_collections',
       ),
@@ -569,7 +574,7 @@ function ma_community_ds_layout_settings_info() {
       'field_parent_community' => 'right',
       'field_child_communities' => 'right',
       'community_browse_all_dh_link' => 'right',
-      'field_dhan_notified_users' => 'right',
+      'dhan_notify' => 'right',
       'create_content_block_ds_field' => 'right',
       'featured_collections' => 'right',
     ),

@@ -5,6 +5,33 @@
  */
 
 /**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_dhan_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'dhan_notify';
+  $ds_field->label = 'Digital Heritage Notifications';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php return ma_dhan_notification_field($entity); ?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['dhan_notify'] = $ds_field;
+
+  return $export;
+}
+
+/**
  * Implements hook_ds_layout_settings_info().
  */
 function ma_dhan_ds_layout_settings_info() {
