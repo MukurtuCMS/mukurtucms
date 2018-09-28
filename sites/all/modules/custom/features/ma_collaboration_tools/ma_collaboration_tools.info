@@ -388,4 +388,6 @@ features[views_view][] = mukurtu_collab_subscriptions
 features[views_view][] = oa_fullcalendar
 features_exclude[dependencies][node_reference] = node_reference
 features_exclude[dependencies][textformatter] = textformatter
+features_exclude[og_features_role][node:cultural_protocol_group:contributor] = node:cultural_protocol_group:contributor
+features_exclude[og_features_role][node:cultural_protocol_group:protocol steward] = node:cultural_protocol_group:protocol steward
 project path = sites/all/modules/custom/features
