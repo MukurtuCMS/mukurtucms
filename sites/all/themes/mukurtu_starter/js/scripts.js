@@ -28,4 +28,9 @@ jQuery(document).ready(function($){
 	jQuery(this).parent().attr('title', jQuery(this).attr('data-original-title'));
     });
     $('[data-toggle="ckeditor-tooltip"]').tooltip(options);
+
+    // Zoom colorbox images
+    $(window).bind('cbox_complete', function () {
+        $('#cboxLoadedContent').zoom({on:'grab'});
+    });
 });
