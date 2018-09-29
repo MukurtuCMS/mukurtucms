@@ -23,42 +23,42 @@ include_once 'ma_dhan.features.inc';
 //    }
 //  }
 //}
-//
-///**
-// * Implements hook_node_insert().
-// */
-//function ma_dhan_node_insert($node) {
-//
-//  ////
-//  // Create a Following Notification when a child page is created.
-//  ////
-//
-//  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
-//
-//    // Create and save the Following Notification node.
-//    $values = array(
-//      'type' => 'following_notification',
-//      'uid' => 1,
-//      'status' => 1,
-//    );
-//    $notification = entity_create('node', $values);
-//    $notification_w = entity_metadata_wrapper('node', $notification);
-//    $notification_w->title->set($node->title . ' (notification)');
-//    $notification_w = ma_dhan_set_notification_lists_on_following_node_wrapper($node, $notification_w);
-//    $notification_w->field_following_content->set($node->nid);
-//    $notification_w->save();
-//
-//    // Attach the notification email field collection to the notification node.
-//    ma_dhan_set_notification_email_fc($notification_w, $node, 'created');
-//
-//    // Update field_all_users_notified
-//    $notification_w = entity_metadata_wrapper('node',  $notification_w->getIdentifier()); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_notification_email_fc)
-//    ma_dhan_update_field_all_users_notified($notification_w);
-//
-//  }
-//
-//}
-//
+
+/**
+ * Implements hook_node_insert().
+ */
+function ma_dhan_node_insert($node) {
+
+  ////
+  // Create a DHAN when a DH node is created.
+  ////
+
+  if ($node->type == 'digital_heritage') {
+
+    // Create and save the DHAN node.
+    $values = array(
+      'type' => 'dhan',
+      'uid' => 1,
+      'status' => 1,
+    );
+    $dhan_node = entity_create('node', $values);
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_node);
+    $dhan_node_w->title->set($node->title . ' (DHAN)');
+    $dhan_node_w = ma_dhan_set_dhan_node_lists_on_following_node_wrapper($node, $dhan_node_w);
+    $dhan_node_w->field_following_content->set($node->nid);
+    $dhan_node_w->save();
+
+    // Attach the dhan_node email field collection to the dhan_node node.
+    ma_dhan_set_dhan_node_email_fc($dhan_node_w, $node, 'created');
+
+    // Update field_all_users_notified
+    $dhan_node_w = entity_metadata_wrapper('node',  $dhan_node_w->getIdentifier()); // reload the dhan_node wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_node_email_fc)
+    ma_dhan_update_field_all_users_notified($dhan_node_w);
+
+  }
+
+}
+
 ///**
 // * Implements hook_node_update().
 // */
@@ -164,7 +164,7 @@ include_once 'ma_dhan.features.inc';
 //
 //    // First update the Following node, if there are changes to the following fields.
 //    if (count($following_diff_list)) {
-//      $notification_w = ma_dhan_set_notification_lists_on_following_node_wrapper($node, $notification_w);
+//      $notification_w = ma_dhan_set_dhan_node_lists_on_following_node_wrapper($node, $notification_w);
 //      $notification_w->save();
 //    }
 //
@@ -183,124 +183,108 @@ include_once 'ma_dhan.features.inc';
 //
 //  }
 //}
-//
-//// Update field_all_users_notified
-//function ma_dhan_update_field_all_users_notified($notification_w) {
-//  $all_users_to_notify = $notification_w->field_notify_all->raw();
-//  $already_notified = $notification_w->field_users_notified->raw();
-//  $all_users_notified = 1;
-//  if (count(array_diff($all_users_to_notify, $already_notified))) {
-//    $all_users_notified = 0;
-//  }
-//  if ($all_users_notified <>  $notification_w->field_all_users_notified->value()) {
-//    $notification_w->field_all_users_notified->set($all_users_notified);
-//    $notification_w->save();
-//  }
-//  // dpm ("all users notified set to: " . $all_users_notified);
-//
-//}
-//
-//// Set the notification lists on a Following node wrapper (to be saved by calling function).
-//function ma_dhan_set_notification_lists_on_following_node_wrapper($child_node, $notification_w) {
-//
-//  $cw = entity_metadata_wrapper('node', $child_node);
-//
-//  // Build the notify list.
-//  $notify_list = [];
-//  // Following due to protocol membership
-//  $following_protocols = $cw->field_following_protocols->value();
-//  if (count($following_protocols)) {
-//    foreach ($following_protocols as $following_protocol) {
-//      $notify_list = array_merge($notify_list, og_get_group_members_properties($following_protocol, [], 'members', 'node'));
-//    }
-//  }
-//  // Individually following
-//  if (isset($child_node->field_dhan_notified_users[LANGUAGE_NONE])) {
-//    $notify_list = array_merge($notify_list, array_column($child_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
-//  }
-//  // Remove duplicates
-//  $notify_list = array_unique($notify_list);
-//  // Remove individually unfollowing
-//  if (isset($child_node->field_un_following_users[LANGUAGE_NONE])) {
-//    $notify_list = array_diff($notify_list, array_column($child_node->field_un_following_users[LANGUAGE_NONE], 'target_id'));
-//  }
-//
-//  // Build notify_frequency lists.
-//  $notify_frequency = [
-//    'right away' => [],
-//    'daily digest' => [],
-//    'weekly digest' => [],
-//  ];
-//  $notify_freq_map = [];
-//  if (isset($child_node->field_custom_notification_freq[LANGUAGE_NONE])) {
-//    foreach ($child_node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
-//      $notify_freq_map[$custom_frequency['first']] = $custom_frequency['second'];
-//    }
-//  }
-//  foreach ($notify_list as $notify_uuid) {
-//    if (array_key_exists($notify_uuid, $notify_freq_map)) {
-//      $notify_frequency[$notify_freq_map[$notify_uuid]][] = $notify_uuid;
-//    }
-//    else {
-//      $account = user_load($notify_uuid);
-//      $def_user_frequency = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
-//      $notify_frequency[$def_user_frequency][] = $notify_uuid;
-//    }
-//  }
-//
-//  // Set the fields on the notification wrapper, and return the wrapper to be saved in calling function.
-//  $notification_w->field_notify_immediately->set($notify_frequency['right away']);
-//  $notification_w->field_notify_day->set($notify_frequency['daily digest']);
-//  $notification_w->field_notify_week->set($notify_frequency['weekly digest']);
-//  $notification_w->field_notify_all->set(array_merge($notify_frequency['right away'], $notify_frequency['daily digest'], $notify_frequency['weekly digest']));
-//
-//  return $notification_w;
-//}
-//
-//
-//// Attach the notification email field collection to a given notification node.
-//function ma_dhan_set_notification_email_fc($notification_w, $child_node, $op, $comment = NULL) {
-//  $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
-//  $fc_email->setHostEntity('node', node_load($notification_w->getIdentifier()));
-//  $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
-//
-//  // Set the time
-//  $fce_w->field_notification_date_gene->set(time());
-//
-//  // Set the subject
-//  $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
-//
-//  // Set the body
-//  $node_type_label = strtolower(node_type_get_name($child_node));
-//  switch ($op) {
-//    case 'updated':
-//      global $user;
-//      $author_id = $user->uid;
-//      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was updated by ' . $user->name . ' on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ".\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . $child_node->path["alias"];
-//      break;
-//    case 'created':
-//      $author_id = $child_node->uid;
-//      $body = "The " . $node_type_label . ' "' . $child_node->title . '", was created by ' . $child_node->name . ' on ' . date('l, F j', $child_node->timestamp) . ' at ' . date('g:ia', $child_node->timestamp) . ", and you were added as a follower.\n\nView the " . $node_type_label . ': ' . $GLOBALS["base_url"] . '/' . pathauto_create_alias('node', 'return', '/node/' . $child_node->nid, ['node' => $child_node], $child_node->type);
-//      break;
-//    case 'commented on':
-//      $author_id = $comment->uid;
-//      $comment_author = user_load($author_id);
-//      $body = "The " . $node_type_label . ' "' . $child_node->title . '", which you are following, was commented on by ' . $comment_author->name . ' on ' . date('l, F j', $comment->created) . ' at ' . date('g:ia', $comment->created) . ".\n\nView the comment: " . $GLOBALS["base_url"] . '/' . drupal_get_path_alias('node/' . $child_node->nid) . '#comment-' . $comment->cid;
-//      break;
-//  }
-//  $fce_w->field_notification_body->set($body);
-//
-//  // Set the notification "author".
-//  $fce_w->field_notification_author	->set($author_id);
-//
-//  // If this is a comment notification, set the comment ref.
-//  if ($comment) {
-//    $fce_w->field_notification_comment->set($comment->cid);
-//  }
-//
-//  // Save the field collection.
-//  $fce_w->save();
-//}
+
+// Update field_all_users_notified
+function ma_dhan_update_field_all_users_notified($dhan_node_w) {
+  $all_users_to_notify = $dhan_node_w->field_notify_all->raw();
+  $already_notified = $dhan_node_w->field_users_notified->raw();
+  $all_users_notified = 1;
+  if (count(array_diff($all_users_to_notify, $already_notified))) {
+    $all_users_notified = 0;
+  }
+  if ($all_users_notified <>  $dhan_node_w->field_all_users_notified->value()) {
+    $dhan_node_w->field_all_users_notified->set($all_users_notified);
+    $dhan_node_w->save();
+  }
+}
+
+
+
+
+// Set the notification lists on a DHAN node wrapper (to be saved by calling function).
+function ma_dhan_set_dhan_node_lists_on_following_node_wrapper($dh_node, $dhan_node_w) {
+
+  $dh_w = entity_metadata_wrapper('node', $dh_node);
+
+
+
+  // Build the list of parent comms and cps.
+  $comms_cps = [];
+  foreach ($dh_node->field_community_ref[LANGUAGE_NONE] as $comm) {
+    $comms_cps[] = $comm['nid'];
+  }
+  foreach ($dh_node->og_group_ref[LANGUAGE_NONE] as $cp) {
+    $comms_cps[] = $cp['target_id'];
+  }
+
+  // Build the notify list.
+  $notify_list = [];
+  foreach ($comms_cps as $comm_cp_nid) {
+    $comm_cp_node = node_load($comm_cp_nid);
+    if (isset($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE])) {
+      $notify_list = array_merge($notify_list, array_column($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
+    }
+  }
+  // Remove duplicates
+  $notify_list = array_unique($notify_list);
+
+  // Build notify_frequency lists.
+  $notify_frequency = [
+    'right away' => [],
+    'daily digest' => [],
+    'weekly digest' => [],
+  ];
+  foreach ($notify_list as $notify_uuid) {
+    $account = user_load($notify_uuid);
+    $user_frequency = isset($account->field_dhan_frequency[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] : 'right away';
+    $notify_frequency[$user_frequency][] = $notify_uuid;
+  }
+
+  // Set the fields on the notification wrapper, and return the wrapper to be saved in calling function.
+  $dhan_node_w->field_notify_immediately->set($notify_frequency['right away']);
+  $dhan_node_w->field_notify_day->set($notify_frequency['daily digest']);
+  $dhan_node_w->field_notify_week->set($notify_frequency['weekly digest']);
+  $dhan_node_w->field_notify_all->set(array_merge($notify_frequency['right away'], $notify_frequency['daily digest'], $notify_frequency['weekly digest']));
+
+  return $dhan_node_w;
+}
+
+
+// Attach the dhan email field collection to a given dhan node.
+function ma_dhan_set_dhan_node_email_fc($notification_w, $dh_node, $op, $comment = NULL) {
+  $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
+  $fc_email->setHostEntity('node', node_load($notification_w->getIdentifier()));
+  $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
+
+  // Set the time
+  $fce_w->field_notification_date_gene->set(time());
+
+  // Set the subject
+  $fce_w->field_notification_subject->set('"' . $dh_node->title . '" has been ' . $op . '.');
+
+  // Set the body
+  switch ($op) {
+    case 'updated':
+      global $user;
+      $author_id = $user->uid;
+      $dh_path = $dh_node->path["alias"];
+    case 'created':
+      $author_id = $dh_node->uid;
+      $dh_path =  pathauto_create_alias('node', 'return', '/node/' . $dh_node->nid, ['node' => $dh_node], $dh_node->type);
+      break;
+  }
+  $body = 'The Digital Heritage item "' . $dh_node->title . '", was ' . $op . ' by ' . $dh_node->name . ' on ' . date('l, F j', $dh_node->timestamp) . ' at ' . date('g:ia', $dh_node->timestamp) . '.';
+  $body .= '\n\nYou are being notified of this because you have chosen to receive notifications for either a Community or a Protocol that this item is in.';
+  $body .= '\n\nView the Digital Heritage item: ' . $GLOBALS["base_url"] . '/' . $dh_path;
+  $fce_w->field_notification_body->set($body);
+
+  // Set the notification "author".
+  $fce_w->field_notification_author->set($author_id);
+
+  // Save the field collection.
+  $fce_w->save();
+}
+
 //
 ///**
 // * Implements hook_field_collection_item_insert()
