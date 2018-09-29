@@ -47,6 +47,41 @@ function ma_profile_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'user-user-field_dhan_frequency'.
+  $field_instances['user-user-field_dhan_frequency'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'user',
+    'field_name' => 'field_dhan_frequency',
+    'label' => 'DHAN Frequency',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'user-user-field_notifications_freq_def'.
   $field_instances['user-user-field_notifications_freq_def'] = array(
     'bundle' => 'user',
@@ -155,6 +190,7 @@ function ma_profile_field_default_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Communities');
+  t('DHAN Frequency');
   t('Notifications Email Frequency Default');
   t('Request message');
   t('This can be overridden per content.');
