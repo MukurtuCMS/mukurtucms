@@ -8774,6 +8774,10 @@ ul.pagination li.pager-ellipsis span {
   background: none;
   line-height: 44px;
 }
+.quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li a.active,
+.quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li a.last {
+  background: none;
+}
 .quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li:hover {
   background-color: #9A1134;
 }
