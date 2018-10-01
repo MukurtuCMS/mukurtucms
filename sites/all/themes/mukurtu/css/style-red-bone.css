@@ -8798,7 +8798,7 @@ ul.pagination li.pager-ellipsis span {
     position: relative;
     left: 50%;
     margin-left: -9%;
-    top: -1px;
+    top: -2px;
     border-style: solid;
     border-width: 15px 15px 0 15px;
     border-color: #AC143A transparent transparent transparent;
