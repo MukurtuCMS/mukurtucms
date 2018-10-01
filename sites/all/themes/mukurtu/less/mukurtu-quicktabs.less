@@ -38,6 +38,11 @@
                 height: 100%;
                 background: none;
                 line-height: 44px;
+
+                &.active,
+                &.last {
+                    background: none;
+                }
             }
 
             &:hover {
@@ -52,6 +57,7 @@
             &.active {
                 background: none;
                 background-color: @brand-primary;
+                text-align: center;
                 a {
                     color: #fff;
                 }
@@ -63,9 +69,7 @@
                         content : "";
                         display: inline-block;
                         position: relative;
-                        left: 50%;
-                        margin-left: -9%;
-                        top: -1px;
+                        top: -2px;
                         border-style: solid;
                         border-width: 15px 15px 0 15px;
                         border-color: @brand-primary transparent transparent transparent;
