@@ -8787,6 +8787,7 @@ ul.pagination li.pager-ellipsis span {
 .quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li.active {
   background: none;
   background-color: #AC143A;
+  text-align: center;
 }
 .quicktabs-wrapper.quicktabs-style-excel ul.quicktabs-tabs li.active a {
   color: #fff;
@@ -8796,8 +8797,6 @@ ul.pagination li.pager-ellipsis span {
     content: "";
     display: inline-block;
     position: relative;
-    left: 50%;
-    margin-left: -9%;
     top: -2px;
     border-style: solid;
     border-width: 15px 15px 0 15px;
