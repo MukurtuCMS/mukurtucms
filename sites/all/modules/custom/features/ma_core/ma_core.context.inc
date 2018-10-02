@@ -75,7 +75,7 @@ function ma_core_context_default_contexts() {
   $export['dashboard'] = $context;
 
   $context = new stdClass();
-  $context->disabled = TRUE; /* Edit this to true to make a default context disabled initially */
+  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'front_page';
   $context->description = 'Mukurtu Starter Theme - Front Page';
@@ -84,6 +84,11 @@ function ma_core_context_default_contexts() {
     'path' => array(
       'values' => array(
         '<front>' => '<front>',
+      ),
+    ),
+    'theme' => array(
+      'values' => array(
+        'mukurtu_starter' => 'mukurtu_starter',
       ),
     ),
   );
@@ -105,7 +110,7 @@ function ma_core_context_default_contexts() {
       ),
     ),
   );
-  $context->condition_mode = 0;
+  $context->condition_mode = 1;
 
   // Translatables
   // Included for use with string extractors like potx.
@@ -123,6 +128,11 @@ function ma_core_context_default_contexts() {
     'sitewide' => array(
       'values' => array(
         1 => 1,
+      ),
+    ),
+    'theme' => array(
+      'values' => array(
+        'mukurtu' => 'mukurtu',
       ),
     ),
   );
@@ -144,7 +154,7 @@ function ma_core_context_default_contexts() {
       ),
     ),
   );
-  $context->condition_mode = 0;
+  $context->condition_mode = 1;
 
   // Translatables
   // Included for use with string extractors like potx.
@@ -162,6 +172,11 @@ function ma_core_context_default_contexts() {
     'path' => array(
       'values' => array(
         '<front>' => '<front>',
+      ),
+    ),
+    'theme' => array(
+      'values' => array(
+        'mukurtu' => 'mukurtu',
       ),
     ),
   );
@@ -195,7 +210,7 @@ function ma_core_context_default_contexts() {
       ),
     ),
   );
-  $context->condition_mode = 0;
+  $context->condition_mode = 1;
 
   // Translatables
   // Included for use with string extractors like potx.
@@ -204,7 +219,7 @@ function ma_core_context_default_contexts() {
   $export['mukurtu_theme-front_page'] = $context;
 
   $context = new stdClass();
-  $context->disabled = TRUE; /* Edit this to true to make a default context disabled initially */
+  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'sitewide';
   $context->description = 'Mukurtu Starter Theme - Site Wide';
@@ -213,6 +228,11 @@ function ma_core_context_default_contexts() {
     'sitewide' => array(
       'values' => array(
         1 => 1,
+      ),
+    ),
+    'theme' => array(
+      'values' => array(
+        'mukurtu_starter' => 'mukurtu_starter',
       ),
     ),
   );
@@ -228,7 +248,7 @@ function ma_core_context_default_contexts() {
       ),
     ),
   );
-  $context->condition_mode = 0;
+  $context->condition_mode = 1;
 
   // Translatables
   // Included for use with string extractors like potx.
