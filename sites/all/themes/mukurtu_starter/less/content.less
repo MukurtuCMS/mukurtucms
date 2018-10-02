@@ -197,7 +197,7 @@
   div.form-item table .form-type-textfield * {
 
   }
-  
+
   #edit-field-original-date .help-block {
     clear: both;
     margin: 0;
@@ -283,7 +283,7 @@
 
     .field-name-field-source {
     }
-    
+
     .group-left, .group-middle, .group-right {
 	width: 30%;
 	margin-left: 20px;
@@ -310,7 +310,7 @@
     .scald-atom {
 	margin-bottom: 0px;
     }
-    
+
     padding-bottom: 20px;
 }
 
@@ -338,7 +338,8 @@
 .view-collections-grid-list,
 .view-dictionary-words {
   .view-header {
-    float:right;
+    //float:right;
+    padding-bottom: 10px;
     margin-right: 20px;
 
     a {
@@ -371,58 +372,71 @@
       }
     }
   }
-
   &.grid-view {
+    padding-top: 60px;
 
-    // Show tooltips in grid view only
-    .tooltips span {
-      top: 0px;
-      left: 0px;
-      width: 220px;
-      z-index: 999;
+    .view-header {
+        position: absolute;
+        top: 0;
     }
 
     .view-content {
-      margin-left: -25px;
-      margin-right: -25px;
-
-      .placeholder-image, .field-name-field-collection, .field-name-field-description, .field-name-field-community-ref, .field-name-field-category {
-        display: none;
-      }
-      .views-row {
-        float: left;
-        width: 220px;
-        background: #F8F7F7;
-        margin: 0 25px 20px 25px;
-        padding-bottom: 20px;
-
-
-        .field-name-field-media-asset {
-          width: 100%;
-          padding: 0;
-          left:0;
-        }
-        .group_list_view_fields {
-          right: 0;
-          width: 100%;
-        }
-        .field-name-title h2,
-        .field-name-collections-title-with-count h2 {
-          font-size: 140%;
-        }
-        .label-inline {
-          float:none;
-          font-weight: bold;
-          display:none;
-        }
-        .col-md-8 {
-          position: static;
-          width: 100%;
-        }
-      }
+        height: 100%;
     }
+
+    // Pager
     .text-center {
-      clear: both;
+        width: 100%;
+        float: left;
+        margin-top: 10%;
+    }
+
+    .views-row {
+        width: 100% !important;
+        float: left;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            width: 45% !important;
+        }
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            width: 30% !important;
+        }
+
+        // Extra large Desktop
+        @media (min-width: 1600px) {
+            width: 20% !important;
+        }
+    }
+
+    .view-mode-search_result {
+      .field {
+          display: none;
+      }
+      .field-name-title,
+      .field-name-field-media-asset {
+          display: block;
+
+          h2 {
+              font-size: 16px;
+              font-weight: bold;
+          }
+      }
+
+      .field-name-field-media-asset img {
+          width: 100%;
+      }
+
+      .col-xs-4,
+      .col-xs-8,
+      .col-sm-4,
+      .col-sm-8 {
+        width: 100%;
+      }
     }
   }
 }
@@ -701,12 +715,18 @@ a.tooltips span {
   background:none;
   border:none;
   border-radius:0;
+
+  ul.dropdown-menu {
+    background-color: #474440;
+    padding: 5px 5px;
+  }
+
   ul.nav {
     width:100%;
     li {
       background: #585551;
       margin: 8px 2px;
-      &.last {
+      &.last.collapsed {
         float:right;
         border-radius: 4px;
         border: 1px solid #979797;
@@ -717,8 +737,7 @@ a.tooltips span {
         color: #F5F5F5;
         padding: 6px 10px;
       }
-      &:hover {
-        background: #F4EADE;
+      &.leaf:hover {
         a {
           color: #474440;
         }
