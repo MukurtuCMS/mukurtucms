@@ -158,6 +158,338 @@
   }
 }
 
+.node {
+    // Common
+    &.view-mode-full,
+    &.view-mode-search_result {
+       .field {
+            margin-bottom: 10px;
+            .label-inline {
+                width: 100px;
+            }
+        }
+        .col-sm-12 {
+            .field {
+                .label-inline {
+                    width: auto;
+                }
+            }
+        }
+        .col-sm-8 {
+            .label-above {
+                font-size: 22px;
+            }
+        }
+
+        .col-xs-4 {
+            .field-name-field-media-asset {
+                width: 100%;
+            }
+        }
+    }
+
+    // Search results specific
+    &.view-mode-search_result {
+        .col-xs-4,
+        .col-xs-8 {
+            width: 100%;
+        }
+        @media (min-width: @screen-sm-min) {
+            .col-xs-4 {
+                width: 33.33333333%;
+            }
+            .col-xs-8 {
+                width: 66.66666667%;
+            }
+        }
+    }
+}
+
+.pane-title {
+    .fa-caret-right {
+        display: none;
+    }
+    .fa-caret-down {
+        display: inline;
+    }
+}
+
+.collapsed {
+    .pane-title {
+        .fa-caret-right {
+            display: inline;
+        }
+        .fa-caret-down {
+            display: none;
+        }
+    }
+}
+
+// Dictionary Browse
+.page-dictionary {
+    .dictionary-facets {
+        background: #fff;
+    }
+
+    .dictionary-facets-region {
+        margin: auto;
+        float: none;
+
+        .panel-pane {
+            padding: 10px 15px 10px 15px;
+        }
+
+        .pane-block {
+            .pane-content {
+                padding: 0px;
+                #edit-search-api-views-fulltext-wrapper {
+                    padding: 10px 0px 10px 0px;
+                }
+            }
+        }
+
+        // Facet Dropdowns
+        .dropdown {
+            button {
+                height: 40px;
+                width: 100%;
+                text-align: left;
+            }
+        }
+
+        .dropdown-menu {
+            width: 100%;
+            ul {
+                padding-left: 10px;
+
+                li {
+                    list-style-type: none;
+
+                    a {
+                        &.facetapi-checkbox {
+                            padding-left: 5px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Exposed fiew form, text search
+    .pane-views-exp-dictionary-words-all {
+        // Hide title
+        .pane-title {
+            display: none;
+        }
+
+        // Hide label
+        #edit-search-api-views-fulltext-wrapper {
+            padding: 10px 15px 10px 15px;
+            clear: left;
+
+            label {
+                display: none;
+            }
+        }
+
+        .views-exposed-widget {
+            padding: 10px 5px 10px 5px;
+
+            // Submit/Reset buttons
+            input,
+            button,
+            .btn {
+                width: 100%;
+                margin-top: 0px;
+            }
+        }
+    }
+
+    // A-Z glossary facet
+    .facet-glossary {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        margin-left: 20px;
+        background: none;
+        >a {
+            display: none;
+        }
+
+        .facetapi-search-api-glossary {
+            width: 100%;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: table;
+            }
+
+            // Don't display glossary letters that aren't clickable, on small screens
+            .no-content {
+                display: none;
+
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    display: table-cell;
+                }
+            }
+
+            .active {
+                font-weight: bold;
+                color: @text-color;
+            }
+
+            li {
+                display: inline;
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    display: table-cell;
+                    width: 3%;
+                }
+
+                a {
+                    font-weight: bold;
+                    font-size: 17px;
+                }
+            }
+        }
+    }
+}
+
+.node-dictionary-word.view-mode-dictionary_word_summary {
+    .field-name-field-word-entry {
+        div.paragraphs-item-dictionary-word-bundle {
+            // Hide additional entries
+            display: none;
+            margin-bottom: @grid-gutter-width;
+            background-color: #F8F7F7;
+            padding-bottom: 30px;
+
+            // Desktop
+            @media (min-width: @screen-md-min) {
+                height: 290px;
+            }
+
+            .field {
+                width: 100%;
+                padding-left: 10px;
+                padding-top: 10px;
+
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    padding-left: 30px;
+                }
+            }
+
+            .field-name-field-alternate-spelling {
+                background-color: #E3E2E1;
+                background-size: 18px;
+                height: 68px;
+                padding: 0px 0px 0px 10px;
+
+                a {
+                    display: inherit;
+                    font-size: 26px;
+                    //color: @mukurtu-dictionary-term-title-color;
+                    padding-left: 20px;
+                    line-height: 68px;
+                }
+            }
+
+            .field-name-field-translation {
+                font-weight: bold;
+                font-size: 20px;
+            }
+
+            .field-name-field-dictionary-word-recording {
+                .field-label {
+                    font-size: 17px;
+                }
+
+                .field-item {
+                    padding-right: 30px;
+                    .group-left {
+                        width: 80%;
+                    }
+                }
+
+
+                .mejs__container {
+                    // Shrink controls on mobile
+                    max-width: 240px;
+
+                    // Tablet
+                    @media (min-width: @screen-sm-min) {
+                        max-width: 350px;
+                    }
+
+                    // Desktop
+                    @media (min-width: @screen-md-min) {
+                        max-width: 330px;
+                    }
+
+                    // Large Desktop
+                    @media (min-width: @screen-lg-min) {
+                        max-width: 100%;
+                    }
+                }
+            }
+        }
+
+        // Show first entry
+        div:first-of-type {
+            display: block;
+        }
+    }
+}
+
+.view-dictionary-words {
+    background: none;
+    .view-content {
+        .views-row {
+            border-bottom: none !important;
+            padding: 0px !important;
+        }
+    }
+}
+
+.mejs__container {
+    .mejs__controls {
+        // Hide volume controls when screen is small
+        .mejs__horizontal-volume-button,
+        .mejs__mute,
+        .mejs__horizontal-volume-slider {
+            display: none;
+
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: block;
+            }
+        }
+    }
+}
+
+// Log in/Log out menu
+  .mukurtu-login-menu {
+    float: right;
+    background: #474440;
+    margin-top: -20px;
+	border-radius: 0px 0px 0px 5px;
+	ul {
+		list-style-type: none;
+		text-align: center;
+		padding-left: 0px;
+		margin-bottom: 4px;
+
+        li {
+            a {
+                font-size: 16px;
+                color: #F5F5F5;
+                padding: 6px 10px;
+            }
+        }
+	}
+}
+
 // Custom Mukurtu Collapsed/Collapsible div -- looks just like the other fields but collapsible with a dynamic arrow
 .mukurtu-collapsed-fieldset-div {
   h3 {
@@ -244,7 +576,7 @@
   .group-left {
     width: 66%
   }
-  .group-right {
+  .group-right, .metadata-sidebar {
     width: 30%;
     background: #f8f7f7 none repeat scroll 0 0;
     border-radius: 4px;
@@ -468,17 +800,9 @@ a:hover {
   }
 
    &.list-view {
-      // float the audio/video atom of the recording to the top right
-      .field-name-field-dictionary-word-recording {
-        float: right;
-        margin-top: -40px;
-        margin-right: 20px;
-        margin-left: 20px;
-      }
       .views-row {
         margin-top: 0 !important;
         margin-bottom: 0 !important;
-        padding-bottom: 15px !important;
       }
   }
 
@@ -556,7 +880,8 @@ a:hover {
   }
 
   // Blocks in right column
-  .group-right .block-views, .group-right .field {
+  .group-right .block-views, .group-right .field,
+  .metadata-wrapper .block-views, .metadata-wrapper .field {
     background: #F8F7F7;
     border-radius: 5px;
     h2.block-title, .label-above {
@@ -584,7 +909,7 @@ a:hover {
 .node-calendar.view-mode-full, .node-event.view-mode-full {
 
   // Blocks in right column
-  .group-right {
+  .group-right, .metadata-sidebar {
     .panel, .right-col-block {
       background: #F8F7F7;
       border-radius: 5px;
@@ -816,7 +1141,7 @@ a.tooltips span {
       //  display: none;
     }
   }
-  .group-right {
+  .group-right, .metadata-sidebar {
     background: #f8f7f7 none repeat scroll 0 0;
     border-radius: 4px;
     padding: 30px;
@@ -824,6 +1149,7 @@ a.tooltips span {
 
   // TK Labels
   .field-name-field-licence-trad {
+    width: 299px;
     .popup-element {
       .popup-element-title img {
         width: 88px; // Make TK Label image the same width as Licensing Options image

@@ -104,6 +104,14 @@
           </nav>
         </div>
       </div>
+      <div class="mukurtu-menu mukurtu-login-menu">
+        <?php
+        $menu = menu_navigation_links('menu-log-in-log-out');
+        if ($menu) {
+          print theme('links__menu_log_in_log_out', array('links' => $menu));
+        }
+        ?>
+      </div>
     <?php endif; ?>
 
 
@@ -140,8 +148,7 @@
         <?php print render($page['sidebar_first']); ?>
       </aside>  <!-- /#sidebar-first -->
     <?php endif; ?>
-
-    <section<?php print $content_column_class; ?>>
+    <section <?php print $content_column_class; ?>>
       <?php if (!empty($page['highlighted'])): ?>
         <div class="highlighted jumbotron"><?php print render($page['highlighted']); ?></div>
       <?php endif; ?>

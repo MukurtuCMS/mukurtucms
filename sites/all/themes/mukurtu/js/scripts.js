@@ -13,9 +13,11 @@ jQuery(document).ready(function($){
             mukurtuDestroyGrid();
         }
 
-        if( ($.cookie('dh_browse_mode') == 'grid-view')) {
-            window.mukurtuGrid = jQuery('.grid-view').masonry($mukurtuGridViewMasonryOptions);
-            window.mukurtuGridActive = true;
+        if($.cookie) {
+            if( ($.cookie('dh_browse_mode') == 'grid-view')) {
+                window.mukurtuGrid = jQuery('.grid-view').masonry($mukurtuGridViewMasonryOptions);
+                window.mukurtuGridActive = true;
+            }
         }
     }
 
