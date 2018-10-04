@@ -493,10 +493,12 @@
 // Browse Collections
 .page-collections {
     .view-mode-collections_browse {
-        background: #F5F5F5;
+        .row {
+            background: #F5F5F5;
+        }
 
         .large-teaser-image {
-            padding-left: 0px;
+            padding: 0px;
         }
     }
      // Full text search widget
@@ -504,15 +506,20 @@
      // Sort Widget
      .pane-ma-search-api-ma-custom-sorts {
          margin: 0 auto;
-         width: 450px;
+         width: 350px;
 
          .pane-content {
              padding: 5px 10px;
          }
          .views-exposed-form {
+             .views-widget-filter-search_api_views_fulltext {
+                 .views-widget {
+                     width: 200px;
+                 }
+             }
             .views-exposed-widgets {
                 margin: 0 auto;
-                width: 400px;
+                width: 300px;
             }
             .views-exposed-widget {
                 padding: 5px;
