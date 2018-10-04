@@ -19,6 +19,10 @@
             .record-drop-shadow;
             padding-left: 0px;
 
+            &.first {
+                background: none;
+            }
+
             // Stack CR tabs left->right on non-mobile
             // Tablet
             @media (min-width: @screen-sm-min) {
@@ -39,6 +43,7 @@
                 background: none;
                 line-height: 44px;
 
+                &.first,
                 &.active,
                 &.last {
                     background: none;
