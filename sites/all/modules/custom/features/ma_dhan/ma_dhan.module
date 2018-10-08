@@ -59,7 +59,7 @@ function ma_dhan_node_insert($node) {
     $dhan_node = entity_create('node', $values);
     $dhan_node_w = entity_metadata_wrapper('node', $dhan_node);
     $dhan_node_w->title->set($node->title . ' (DHAN)');
-    $dhan_node_w = ma_dhan_set_dhan_node_lists_on_dhan_wrapper($node, $dhan_node_w);
+    $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($node, $dhan_node_w);
     $dhan_node_w->field_following_content->set($node->nid);
     $dhan_node_w->save();
 
@@ -95,7 +95,7 @@ function ma_dhan_node_update($node) {
       'path',
       'redirect',
       // TODO: should these fields be ignored? Go over with Alex.
-      // 'og_group_ref',
+      // 'og_group_ref', // if this or community ref gets added, need a separate array for them because we do need to update dhan (without notification) to update its notify users
       // 'field_community_ref',
       // 'field_item_privacy_setting',
       // 'field_related_dh_items',
@@ -154,21 +154,22 @@ function ma_dhan_node_update($node) {
       }
     }
 
-    $dhan_nid = ma_dhan_get_dhan_nid($node->nid);
-    if (!$dhan_nid) { // this should never happen but log an error in case it does.
-      watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
-      return;
-    }
-    $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
-
-//    // First update the Following node, if there are changes to the following fields.
-//    if (count($following_diff_list)) {
-//      $dhan_node_w = ma_dhan_set_dhan_node_lists_on_dhan_wrapper($node, $dhan_node_w);
-//      $dhan_node_w->save();
-//    }
-
     // There are changes to the fields.
     if (count($diff_list)) {
+
+      $dhan_nid = ma_dhan_get_dhan_nid($node->nid);
+      if (!$dhan_nid) { // this should never happen but log an error in case it does.
+        watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+        return;
+      }
+      $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+
+      // First update the DHAN, if there are changes to its community or protocol fields.
+      // We probably don't need to check against field_community_ref, as at this point only the og_group_ref fields is changed (even if a protocol is changed) due to custom protocol field. But leaving in for good measure.
+      if (array_key_exists('og_group_ref', $diff_list) OR array_key_exists ('field_community_ref', $diff_list)) {
+        $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($node, $dhan_node_w);
+        $dhan_node_w->save();
+      }
 
       // Unset the users_notified on the DHAN, then add a new DHAN email FC.
       $dhan_node_w->field_users_notified->set([]);
@@ -198,7 +199,7 @@ function ma_dhan_update_field_all_users_notified($dhan_node_w) {
 }
 
 // Set the notification lists on a DHAN node wrapper (to be saved by calling function).
-function ma_dhan_set_dhan_node_lists_on_dhan_wrapper($dh_node, $dhan_node_w) {
+function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w) {
 
   // Build the list of parent comms and cps.
   $comms_cps = [];
