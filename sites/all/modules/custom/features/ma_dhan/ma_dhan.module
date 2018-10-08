@@ -15,14 +15,12 @@ include_once 'ma_dhan.features.inc';
 function ma_dhan_node_delete($node) {
 
   ////
-  // Update a DHAN when a DH node is updated.
+  // Update a DHAN when a DH node is deleted.
   // This differs from the ma_collaboration_tools, where deleting a child page will delete its following node, and no notification occurs.
   // Here we want to inform admins of DH deletions.
   ////
   if ($node->type == 'digital_heritage') {
-    $dhan_nid = ma_dhan_get_dhan_nid($node->nid);
-    if (!$dhan_nid) { // this should never happen but log an error in case it does.
-      watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+    if (!$dhan_nid = ma_dhan_get_dhan_nid($node->nid)) {
       return;
     }
     $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
@@ -37,6 +35,38 @@ function ma_dhan_node_delete($node) {
     ma_dhan_update_field_all_users_notified($dhan_node_w);
 
   }
+
+  ////
+  // Update a CP or Community's DH's DHANs when the CP/Community is deleted, since their notify lists need to be updated.
+  ////
+  if ($node->type == 'cultural_protocol_group' or $node->type == 'community') {
+    // Get all DH items within this comm/cp.
+    $fieldcondition = [
+      'community' => ['field' => 'field_community_ref', 'col' => 'nid'],
+      'cultural_protocol_group' => ['field' => 'og_group_ref', 'col' => 'target_id'],
+    ];
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->addMetaData('account', user_load(1))
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'digital_heritage')
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->fieldCondition($fieldcondition[$node->type]['field'], $fieldcondition[$node->type]['col'], $node->nid)
+      ->execute();
+    if (count($result['node'])) {
+      // Update the DHANs for all the DH nodes in this comm/cp.
+      foreach ($result['node'] as $dh_nid => $v) {
+        $dh_node = node_load($dh_nid);
+        if (!$dhan_nid = ma_dhan_get_dhan_nid($dh_nid)) {
+          continue;
+        }
+        $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+        $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $node->nid);
+        $dhan_node_w->save();
+      }
+    }
+  }
+
 }
 
 /**
@@ -157,9 +187,7 @@ function ma_dhan_node_update($node) {
     // There are changes to the fields.
     if (count($diff_list)) {
 
-      $dhan_nid = ma_dhan_get_dhan_nid($node->nid);
-      if (!$dhan_nid) { // this should never happen but log an error in case it does.
-        watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+      if (!$dhan_nid = ma_dhan_get_dhan_nid($node->nid)) {
         return;
       }
       $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
@@ -199,7 +227,7 @@ function ma_dhan_update_field_all_users_notified($dhan_node_w) {
 }
 
 // Set the notification lists on a DHAN node wrapper (to be saved by calling function).
-function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w) {
+function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_being_deleted_nid = NULL) {
 
   // Build the list of parent comms and cps.
   $comms_cps = [];
@@ -213,9 +241,11 @@ function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_nod
   // Build the notify list.
   $notify_list = [];
   foreach ($comms_cps as $comm_cp_nid) {
-    $comm_cp_node = node_load($comm_cp_nid);
-    if (isset($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE])) {
-      $notify_list = array_merge($notify_list, array_column($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
+    if ($comm_cp_nid <> $comm_cp_being_deleted_nid) { // if this function was called from hook_node_delete of a comm/cp, it's not actually yet deleted so we have to force skipping it here.
+      $comm_cp_node = node_load($comm_cp_nid);
+      if (isset($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE])) {
+        $notify_list = array_merge($notify_list, array_column($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
+      }
     }
   }
   // Remove duplicates
@@ -910,6 +940,10 @@ function ma_dhan_get_dhan_nid($dh_nid) {
     ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
     ->fieldCondition('field_following_content', 'target_id', $dh_nid)
     ->execute();
+  if (!count($result['node'])) {
+    watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $dh_nid), WATCHDOG_ERROR);
+    return;
+  }
   return reset($result['node'])->nid;
 }
 
