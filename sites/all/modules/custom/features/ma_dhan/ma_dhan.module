@@ -18,8 +18,8 @@ include_once 'ma_dhan.features.inc';
 //
 //  // If a child node is deleted, also delete its Following node.
 //  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
-//    if ($following_nid = ma_dhan_get_following_nid($node->nid)) { // This condition should always be met.
-//      node_delete($following_nid);
+//    if ($dhan_nid = ma_dhan_get_dhan_nid($node->nid)) { // This condition should always be met.
+//      node_delete($dhan_nid);
 //    }
 //  }
 //}
@@ -44,145 +44,129 @@ function ma_dhan_node_insert($node) {
     $dhan_node = entity_create('node', $values);
     $dhan_node_w = entity_metadata_wrapper('node', $dhan_node);
     $dhan_node_w->title->set($node->title . ' (DHAN)');
-    $dhan_node_w = ma_dhan_set_dhan_node_lists_on_following_node_wrapper($node, $dhan_node_w);
+    $dhan_node_w = ma_dhan_set_dhan_node_lists_on_dhan_wrapper($node, $dhan_node_w);
     $dhan_node_w->field_following_content->set($node->nid);
     $dhan_node_w->save();
 
     // Attach the dhan_node email field collection to the dhan_node node.
-    ma_dhan_set_dhan_node_email_fc($dhan_node_w, $node, 'created');
+    ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'created');
 
     // Update field_all_users_notified
-    $dhan_node_w = entity_metadata_wrapper('node',  $dhan_node_w->getIdentifier()); // reload the dhan_node wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_node_email_fc)
+    $dhan_node_w = entity_metadata_wrapper('node',  $dhan_node_w->getIdentifier()); // reload the dhan_node wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
     ma_dhan_update_field_all_users_notified($dhan_node_w);
 
   }
 
 }
 
-///**
-// * Implements hook_node_update().
-// */
-//function ma_dhan_node_update($node) {
-//
-//  ////
-//  // Create a Following Notification when a child page is updated.
-//  ////
-//
-//  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
-//    $entity_new = $cw = entity_metadata_wrapper('node', $node);
-//    $entity_old = entity_metadata_wrapper('node', $node->original);
-//
-//    // When updating a child page, only create a following email FC instance if certain fields are changed.
-//    // If only a Following field is changed, instead update the Following node instead.
-//    // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
-//    // Also using helper functions added to ma_core.
-//    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
-//    $ignore_fields = [
-//      'field_pre_actions',
-//      'path',
-//      'redirect',
-//      'og_group_ref',
-//      'field_community_ref',
-//      'field_item_privacy_setting',
-//    ];
-//    $properties_within_fields_to_ignore = [
-//      'safe_value',
-//      'safe_summary',
-//      'all_day',
-//      'show_repeat_settings',
-//      'show_todate',
-//      'offset',
-//      'offset2',
-//    ];
-//    $ignore_fields = array_merge ($ignore_fields, ma_dhan_get_all_child_ref_fields());
-//    $following_fields = [
-//      'field_following_protocols',
-//      'field_dhan_notified_users',
-//      'field_un_following_users',
-//      'field_custom_notification_freq',
-//    ];
-//
-//    $following_diff_list =  array();
-//    $data = array_merge(['title' => ['label' => 'Title']], field_info_instances('node' ,$entity_new->getBundle()));
-//    $fields_list = array_keys($data);
-//    $diff_list =  array();
-//    foreach ($fields_list as $key => $field_name ) {
-//      // Ignore if field name belong to ignore list
-//      if(in_array($field_name, $ignore_fields )) {
-//        continue;
-//      }
-//      $old_value = $entity_old->{$field_name}->raw();
-//      $new_value = $entity_new->{$field_name}->raw();
-//      // If both are empty - ignore
-//      if(empty($old_value) && empty($new_value)) {
-//        continue;
-//      }
-//      // If one of the value is not empty compared to the other
-//      if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
-//        // You can use field_get_items() to get the changed value.
-//        if (in_array($field_name, $following_fields)) {
-//          $following_diff_list[$field_name] = $data[$field_name]['label'];
-//        }
-//        else {
-//          $diff_list[$field_name] = $data[$field_name]['label'];
-//        }
-//        continue;
-//      }
-//      if(!is_array($new_value) && $new_value != $old_value) {
-//        if (in_array($field_name, $following_fields)) {
-//          $following_diff_list[$field_name] = $data[$field_name]['label'];
-//        }
-//        else {
-//          $diff_list[$field_name] = $data[$field_name]['label'];
-//        }
-//        continue;
-//      }
-//      if(is_array($new_value) && is_array($old_value)) {
-//        foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
-//          recursive_unset($new_value, $property_to_ignore);
-//          recursive_unset($old_value, $property_to_ignore);
-//        }
-//        $diff1 = array_diff_assoc_recursive($new_value, $old_value);
-//        $diff2 = array_diff_assoc_recursive($old_value, $new_value);
-//        if($diff1 or $diff2) {
-//          if (in_array($field_name, $following_fields)) {
-//            $following_diff_list[$field_name] = $data[$field_name]['label'];
-//          }
-//          else {
-//            $diff_list[$field_name] = $data[$field_name]['label'];
-//          }
-//        }
-//      }
-//    }
-//
-//    $following_nid = ma_dhan_get_following_nid($node->nid);
-//    if (!$following_nid) { // this should never happen but log an error in case it does.
-//      watchdog('ma_dhan', 'There is no Following node for node %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
-//      return;
-//    }
-//    $notification_w = entity_metadata_wrapper('node', $following_nid);
-//
+/**
+ * Implements hook_node_update().
+ */
+function ma_dhan_node_update($node) {
+
+  ////
+  // Update a DHAN when a DH node is updated.
+  ////
+  if ($node->type == 'digital_heritage') {
+    $dhan_new_w = $cw = entity_metadata_wrapper('node', $node);
+    $dhan_old_w = entity_metadata_wrapper('node', $node->original);
+
+    // When updating a DH node, only create a DHAN email FC instance if certain fields are changed.
+    // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
+    // Also using helper functions added to ma_core.
+    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
+    $ignore_fields = [
+      'field_pre_actions',
+      'path',
+      'redirect',
+      // TODO: should these fields be ignored? Go over with Alex.
+      // 'og_group_ref',
+      // 'field_community_ref',
+      // 'field_item_privacy_setting',
+      // 'field_related_dh_items',
+      // 'field_related_dictionary_words',
+      // 'field_community_record_children	',
+      // 'field_book_children',
+      // 'field_book_parent	',
+      // 'field_community_record_parent	',
+      'field_personal_collections	',
+    ];
+    
+    $properties_within_fields_to_ignore = [
+      'safe_value',
+      'safe_summary',
+      'all_day',
+      'show_repeat_settings',
+      'show_todate',
+      'offset',
+      'offset2',
+    ];
+
+    $data = array_merge(['title' => ['label' => 'Title']], field_info_instances('node' ,$dhan_new_w->getBundle()));
+    $fields_list = array_keys($data);
+    $diff_list =  array();
+    foreach ($fields_list as $key => $field_name ) {
+      // Ignore if field name belong to ignore list
+      if(in_array($field_name, $ignore_fields )) {
+        continue;
+      }
+      $old_value = $dhan_old_w->{$field_name}->raw();
+      $new_value = $dhan_new_w->{$field_name}->raw();
+      // If both are empty - ignore
+      if(empty($old_value) && empty($new_value)) {
+        continue;
+      }
+      // If one of the value is not empty compared to the other
+      if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
+        // You can use field_get_items() to get the changed value.
+        $diff_list[$field_name] = $data[$field_name]['label'];
+        continue;
+      }
+      if(!is_array($new_value) && $new_value != $old_value) {
+        $diff_list[$field_name] = $data[$field_name]['label'];
+        continue;
+      }
+      if(is_array($new_value) && is_array($old_value)) {
+        foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
+          recursive_unset($new_value, $property_to_ignore);
+          recursive_unset($old_value, $property_to_ignore);
+        }
+        $diff1 = array_diff_assoc_recursive($new_value, $old_value);
+        $diff2 = array_diff_assoc_recursive($old_value, $new_value);
+        if($diff1 or $diff2) {
+          $diff_list[$field_name] = $data[$field_name]['label'];
+        }
+      }
+    }
+
+    $dhan_nid = ma_dhan_get_dhan_nid($node->nid);
+    if (!$dhan_nid) { // this should never happen but log an error in case it does.
+      watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+      return;
+    }
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+
 //    // First update the Following node, if there are changes to the following fields.
 //    if (count($following_diff_list)) {
-//      $notification_w = ma_dhan_set_dhan_node_lists_on_following_node_wrapper($node, $notification_w);
-//      $notification_w->save();
+//      $dhan_node_w = ma_dhan_set_dhan_node_lists_on_dhan_wrapper($node, $dhan_node_w);
+//      $dhan_node_w->save();
 //    }
-//
-//    // Then, if there are changes to the other fields, first unset the users_notified on the Following node, then add a new Following email FC.
-//    if (count($diff_list)) {
-//      $notification_w->field_users_notified->set([]);
-//      $notification_w->save();
-//      ma_dhan_set_notification_email_fc($notification_w, $node, 'updated');
-//    }
-//
-//    // Update field_all_users_notified
-//    if (count($following_diff_list) OR count ($diff_list)) {
-//      $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_notification_email_fc)
-//      ma_dhan_update_field_all_users_notified($notification_w);
-//    }
-//
-//  }
-//}
+
+    // There are changes to the fields.
+    if (count($diff_list)) {
+
+      // Unset the users_notified on the DHAN, then add a new DHAN email FC.
+      $dhan_node_w->field_users_notified->set([]);
+      $dhan_node_w->save();
+      ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'updated');
+
+      // Update field_all_users_notified
+      $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
+      ma_dhan_update_field_all_users_notified($dhan_node_w);
+    }
+
+  }
+}
 
 // Update field_all_users_notified
 function ma_dhan_update_field_all_users_notified($dhan_node_w) {
@@ -202,11 +186,7 @@ function ma_dhan_update_field_all_users_notified($dhan_node_w) {
 
 
 // Set the notification lists on a DHAN node wrapper (to be saved by calling function).
-function ma_dhan_set_dhan_node_lists_on_following_node_wrapper($dh_node, $dhan_node_w) {
-
-  $dh_w = entity_metadata_wrapper('node', $dh_node);
-
-
+function ma_dhan_set_dhan_node_lists_on_dhan_wrapper($dh_node, $dhan_node_w) {
 
   // Build the list of parent comms and cps.
   $comms_cps = [];
@@ -251,9 +231,9 @@ function ma_dhan_set_dhan_node_lists_on_following_node_wrapper($dh_node, $dhan_n
 
 
 // Attach the dhan email field collection to a given dhan node.
-function ma_dhan_set_dhan_node_email_fc($notification_w, $dh_node, $op, $comment = NULL) {
+function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op, $comment = NULL) {
   $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
-  $fc_email->setHostEntity('node', node_load($notification_w->getIdentifier()));
+  $fc_email->setHostEntity('node', node_load($dhan_node_w->getIdentifier()));
   $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
 
   // Set the time
@@ -268,6 +248,7 @@ function ma_dhan_set_dhan_node_email_fc($notification_w, $dh_node, $op, $comment
       global $user;
       $author_id = $user->uid;
       $dh_path = $dh_node->path["alias"];
+      break;
     case 'created':
       $author_id = $dh_node->uid;
       $dh_path =  pathauto_create_alias('node', 'return', '/node/' . $dh_node->nid, ['node' => $dh_node], $dh_node->type);
@@ -293,8 +274,8 @@ function ma_dhan_set_dhan_node_email_fc($notification_w, $dh_node, $op, $comment
 // */
 //function ma_dhan_field_collection_item_insert($fc_item){
 //  if ($fc_item->field_name == 'field_notification_email') {
-//    $notification_w = entity_metadata_wrapper('node', $fc_item->hostEntity());
-//    $notify_users = array_diff($notification_w->field_notify_immediately->raw(), $notification_w->field_users_notified->raw());
+//    $dhan_node_w = entity_metadata_wrapper('node', $fc_item->hostEntity());
+//    $notify_users = array_diff($dhan_node_w->field_notify_immediately->raw(), $dhan_node_w->field_users_notified->raw());
 //
 //    // Send notifications.
 //    $notification_author = $fc_item->field_notification_author[LANGUAGE_NONE][0]['target_id'];;
@@ -323,7 +304,7 @@ function ma_dhan_set_dhan_node_email_fc($notification_w, $dh_node, $op, $comment
 //
 //      // Update the notified users field.
 //      if (count($successful_sends)) {
-//        $notification_w->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
+//        $dhan_node_w->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
 //      }
 //
 //    }
@@ -681,8 +662,8 @@ function ma_dhan_notify_process($node, $op) {
 //    if (isset($result['node']) && count($result['node'])) {
 //      // Loop through these, and check the child page if this user is using their default notification frequency for that node, and if so, update the Following node.
 //      foreach (array_keys($result['node']) as $nid) {
-//        $notification_w = entity_metadata_wrapper('node', $nid);
-//        $custom_notification_freqs = $notification_w->field_following_content->field_custom_notification_freq->value();
+//        $dhan_node_w = entity_metadata_wrapper('node', $nid);
+//        $custom_notification_freqs = $dhan_node_w->field_following_content->field_custom_notification_freq->value();
 //        if (count($custom_notification_freqs)) {
 //          foreach ($custom_notification_freqs as $custom_notification_freq) {
 //            if ($custom_notification_freq['first'] = $account->uid) {
@@ -692,9 +673,9 @@ function ma_dhan_notify_process($node, $op) {
 //          }
 //        }
 //        if (!$user_custom_freq_for_this_node) {
-//          $notification_w->{$frequency_field_map[$existing_freq]}->set(array_diff($notification_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
-//          $notification_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
-//          $notification_w->save();
+//          $dhan_node_w->{$frequency_field_map[$existing_freq]}->set(array_diff($dhan_node_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
+//          $dhan_node_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
+//          $dhan_node_w->save();
 //        }
 //      }
 //    }
@@ -841,19 +822,19 @@ function ma_dhan_notify_process($node, $op) {
 //    $successful_sends = [];
 //    $aggregated_fcs_all_users = [];
 //    foreach (array_keys($result['node']) as $nid) {
-//      $notification_w = entity_metadata_wrapper('node', $nid);
+//      $dhan_node_w = entity_metadata_wrapper('node', $nid);
 //
 //      // Get users to send to.
-//      $users_to_send_to = $notification_w->field_notify_immediately->raw() ? $notification_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was following a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate (either on the node or by switching to default wherein their default is immediate). This ensures those notifications still get sent, during the next scheduled send (ie. no later than daily).
-//      $users_to_send_to = array_merge($users_to_send_to, $notification_w->{$notification_field}->raw() ? $notification_w->{$notification_field}->raw() : []);
-//      $users_to_send_to = array_diff($users_to_send_to, $notification_w->field_users_notified->raw() ? $notification_w->field_users_notified->raw() : []); // Do not send to users already notified.
+//      $users_to_send_to = $dhan_node_w->field_notify_immediately->raw() ? $dhan_node_w->field_notify_immediately->raw() : [];  // We start with all immediate notifications that have not yet gone out. This happens if a user was following a node on a schedule, the node was then updated before the schedule was fired, and then user changed their schedule to immediate (either on the node or by switching to default wherein their default is immediate). This ensures those notifications still get sent, during the next scheduled send (ie. no later than daily).
+//      $users_to_send_to = array_merge($users_to_send_to, $dhan_node_w->{$notification_field}->raw() ? $dhan_node_w->{$notification_field}->raw() : []);
+//      $users_to_send_to = array_diff($users_to_send_to, $dhan_node_w->field_users_notified->raw() ? $dhan_node_w->field_users_notified->raw() : []); // Do not send to users already notified.
 //      $users_to_send_to = array_unique($users_to_send_to); // There never should be duplicates, but just in case.
 //
 //      if (count($users_to_send_to)) {
 //        // Get the FC
-//        $latest_fc = $notification_w->field_notification_email->count();
+//        $latest_fc = $dhan_node_w->field_notification_email->count();
 //        if ($latest_fc) { // This can be 0 from development debugging. Ultimately this should be able to be removed.
-//          $fc = $notification_w->field_notification_email[$latest_fc - 1]->value();
+//          $fc = $dhan_node_w->field_notification_email[$latest_fc - 1]->value();
 //          // Add the FC for each user to send to.
 //          foreach ($users_to_send_to as $user_to_send_to) {
 //            $aggregated_fcs_all_users[$user_to_send_to][$nid] = $fc;
@@ -866,9 +847,9 @@ function ma_dhan_notify_process($node, $op) {
 //    // Send the aggregate email(s), one per user.
 //    foreach ($aggregated_fcs_all_users as $uid => $fc_items) {
 //      $bodies = ["This is your " . $schedule . " digest of notifications for " . variable_get('site_name') . ". You may manage these notifications at: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following"];
-//      $following_nids = [];
-//      foreach ($fc_items as $following_nid => $fc_item) {
-//        $following_nids[] = $following_nid;
+//      $dhan_nids = [];
+//      foreach ($fc_items as $dhan_nid => $fc_item) {
+//        $dhan_nids[] = $dhan_nid;
 //        $bodies[] = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
 //      }
 //      $body = implode("\n_____________________________________________________________________________\n\n", $bodies); // 77 chars wide
@@ -879,42 +860,42 @@ function ma_dhan_notify_process($node, $op) {
 //      $user = user_load($uid);
 //      $result = drupal_mail('ma_dhan', 'collab_notification', $user->mail, language_default(), $params);
 //      if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
-//        $successful_sends[$uid] = $following_nids;
+//        $successful_sends[$uid] = $dhan_nids;
 //      }
 //    }
 //
 //    // Update the Following nodes field_users_notified and then field_all_users_notified
 //    $nids_to_update = [];
-//    foreach ($successful_sends as $uid => $following_nids) {
-//      foreach ($following_nids as $following_nid) {
-//        $nids_to_update[$following_nid][] = $uid;
+//    foreach ($successful_sends as $uid => $dhan_nids) {
+//      foreach ($dhan_nids as $dhan_nid) {
+//        $nids_to_update[$dhan_nid][] = $uid;
 //      }
 //    }
 //    foreach ($nids_to_update as $nid_to_update => $users_emailed) {
-//      $notification_w = entity_metadata_wrapper('node', $nid_to_update);
-//      $users_notified = array_unique(array_merge($notification_w->field_users_notified->raw(), $users_emailed));
-//      $notification_w->field_users_notified->set($users_notified);
-//      $notification_w->save();
-//      ma_dhan_update_field_all_users_notified($notification_w);
+//      $dhan_node_w = entity_metadata_wrapper('node', $nid_to_update);
+//      $users_notified = array_unique(array_merge($dhan_node_w->field_users_notified->raw(), $users_emailed));
+//      $dhan_node_w->field_users_notified->set($users_notified);
+//      $dhan_node_w->save();
+//      ma_dhan_update_field_all_users_notified($dhan_node_w);
 //    }
 //
 //  }
 //}
 //
-///**
-// * Helper function to get the following NID given child NID
-// */
-//function ma_dhan_get_following_nid($child_nid) {
-//  $query = new EntityFieldQuery();
-//  $result = $query
-//    ->addMetaData('account', user_load(1))
-//    ->entityCondition('entity_type', 'node')
-//    ->entityCondition('bundle', 'following_notification')
-//    ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
-//    ->fieldCondition('field_following_content', 'target_id', $child_nid)
-//    ->execute();
-//  return reset($result['node'])->nid;
-//}
+/**
+ * Helper function to get the DHAN NID given DH NID
+ */
+function ma_dhan_get_dhan_nid($dh_nid) {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dhan')
+    ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
+    ->fieldCondition('field_following_content', 'target_id', $dh_nid)
+    ->execute();
+  return reset($result['node'])->nid;
+}
 
 /**
  * Helper function to return if node is a Community or a CP.
