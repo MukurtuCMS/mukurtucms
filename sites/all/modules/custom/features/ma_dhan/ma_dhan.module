@@ -7,22 +7,37 @@
 include_once 'ma_dhan.features.inc';
 
 
-//
-//
-///**
-// * Implements hook_node_delete().
-// */
-//function ma_dhan_node_delete($node) {
-//
-//  // TODO change this
-//
-//  // If a child node is deleted, also delete its Following node.
-//  if (in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
-//    if ($dhan_nid = ma_dhan_get_dhan_nid($node->nid)) { // This condition should always be met.
-//      node_delete($dhan_nid);
-//    }
-//  }
-//}
+
+
+/**
+ * Implements hook_node_delete().
+ */
+function ma_dhan_node_delete($node) {
+
+  ////
+  // Update a DHAN when a DH node is updated.
+  // This differs from the ma_collaboration_tools, where deleting a child page will delete its following node, and no notification occurs.
+  // Here we want to inform admins of DH deletions.
+  ////
+  if ($node->type == 'digital_heritage') {
+    $dhan_nid = ma_dhan_get_dhan_nid($node->nid);
+    if (!$dhan_nid) { // this should never happen but log an error in case it does.
+      watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $node->nid), WATCHDOG_ERROR);
+      return;
+    }
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+
+    // Unset the users_notified on the DHAN, then add a new DHAN email FC.
+    $dhan_node_w->field_users_notified->set([]);
+    $dhan_node_w->save();
+    ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'deleted');
+
+    // Update field_all_users_notified
+    $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
+    ma_dhan_update_field_all_users_notified($dhan_node_w);
+
+  }
+}
 
 /**
  * Implements hook_node_insert().
@@ -91,7 +106,7 @@ function ma_dhan_node_update($node) {
       // 'field_community_record_parent	',
       'field_personal_collections	',
     ];
-    
+
     $properties_within_fields_to_ignore = [
       'safe_value',
       'safe_summary',
@@ -182,9 +197,6 @@ function ma_dhan_update_field_all_users_notified($dhan_node_w) {
   }
 }
 
-
-
-
 // Set the notification lists on a DHAN node wrapper (to be saved by calling function).
 function ma_dhan_set_dhan_node_lists_on_dhan_wrapper($dh_node, $dhan_node_w) {
 
@@ -231,7 +243,7 @@ function ma_dhan_set_dhan_node_lists_on_dhan_wrapper($dh_node, $dhan_node_w) {
 
 
 // Attach the dhan email field collection to a given dhan node.
-function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op, $comment = NULL) {
+function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op) {
   $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
   $fc_email->setHostEntity('node', node_load($dhan_node_w->getIdentifier()));
   $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
@@ -245,6 +257,7 @@ function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op, $comment = NULL)
   // Set the body
   switch ($op) {
     case 'updated':
+    case 'deleted':
       global $user;
       $author_id = $user->uid;
       $dh_path = $dh_node->path["alias"];
@@ -256,7 +269,9 @@ function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op, $comment = NULL)
   }
   $body = 'The Digital Heritage item "' . $dh_node->title . '", was ' . $op . ' by ' . $dh_node->name . ' on ' . date('l, F j', $dh_node->timestamp) . ' at ' . date('g:ia', $dh_node->timestamp) . '.';
   $body .= '\n\nYou are being notified of this because you have chosen to receive notifications for either a Community or a Protocol that this item is in.';
-  $body .= '\n\nView the Digital Heritage item: ' . $GLOBALS["base_url"] . '/' . $dh_path;
+  if ($op <> 'deleted') {
+    $body .= '\n\nView the Digital Heritage item: ' . $GLOBALS["base_url"] . '/' . $dh_path;
+  }
   $fce_w->field_notification_body->set($body);
 
   // Set the notification "author".
