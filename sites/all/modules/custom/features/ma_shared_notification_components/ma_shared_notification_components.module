@@ -27,7 +27,7 @@ function ma_shared_notification_components_field_collection_item_insert($fc_item
         }
         $body = $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'];
         // Digital Heritage Admin Notifiations
-        if ($notification_w->bundle == 'dhan') {
+        if ($notification_w->getBundle() == 'dhan') {
           $body .= "\n\nView your Digital Heritage notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/digital-heritage-notifications";
         }
         // Collab pages notifications
