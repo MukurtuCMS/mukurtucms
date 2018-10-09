@@ -4,9 +4,9 @@
  * Bootstrap 6-6 stacked template for Display Suite.
  */
 ?>
-<?php if (isset($cr_tabs[$nid])): ?>
+<?php if (isset($mukurtu_tabbed_local_tasks[$nid])): ?>
 <ul class="tabs--primary nav nav-tabs">
-<?php print render($cr_tabs[$nid]);?>
+<?php print render($mukurtu_tabbed_local_tasks[$nid]);?>
 </ul>
 <?php endif; ?>
 
