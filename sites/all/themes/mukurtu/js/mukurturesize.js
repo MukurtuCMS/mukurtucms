@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
 	}
 
 	// Hero Image: Two Columns Resize
-	// entity entity-bean bean-hero-image-two-columns view-mode-default 
+	// entity entity-bean bean-hero-image-two-columns view-mode-default
 	function heroImageTwoColumnsResize() {
 		var width = $(window).width();
 		$(".bean-hero-image-two-columns").each(function () {
@@ -95,10 +95,19 @@ jQuery(document).ready(function ($) {
 				var tabID = ($(this)[0].id).replace("-tab-", "-tabpage-");
 				$('#' + tabID + " .slick-carousel-slider-nav .slick-active").click();
 			});
-		} 
-		
+		}
+
+		// When quicktabs are clicked, do a resize event. This redraws
+		// some elements like the OA caledar that don't render if
+		// not on the active tab.
+		if ($(".quicktabs-tabs li").length > 0) {
+			$(".quicktabs-tabs li a").on('click', function () {
+				window.dispatchEvent(new Event('resize'));
+			});
+		}
+
 		// Community Record MediaElement JS element resizing
-		// When a mejs element is rendered hidden/off screen it's width is 100%, we need to 
+		// When a mejs element is rendered hidden/off screen it's width is 100%, we need to
 		// handle that for community record tabs
 		$("a.quicktabs-tab-node").on('click', function () {
 			mukurtuMediaelementResize();
@@ -108,7 +117,7 @@ jQuery(document).ready(function ($) {
 		for (var pKey in mejs.players) {
 			/*
 			mejs.players[pKey].media.addEventListener('mejsEnterFullScreen', function (e) {
-	
+
 			}, false);
 			*/
 			// Add a listener for our custom exit fullscreen event. This fixes the carousel display after
