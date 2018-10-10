@@ -614,6 +614,9 @@ function ma_collaboration_tools_set_notification_email_fc($notification_w, $chil
   // Set the time
   $fce_w->field_notification_date_gene->set(time());
 
+  // Set the action
+  $fce_w->field_notification_action->set($op);
+
   // Set the subject
   $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
 
