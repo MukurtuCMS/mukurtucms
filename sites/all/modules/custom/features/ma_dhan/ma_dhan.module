@@ -498,14 +498,8 @@ function ma_dhan_dhan_report_access() {
  */
 function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
 
+  // The exposed filters on the DHAN view.
   if ($form['#id'] == 'views-exposed-form-dhan-page-1') {
-
-    // Make the date field smaller.
-    $form['date']['value']['#size'] = 10;
-
-    // Add the Protocol and Community exposed filters,
-    // showing only the Protocols that the user is a steward and Communities user is a Manager of,
-    // Views on its own can't do this. Especially apply the filter which is handled in ma_dhan_views_post_execute.
 
     $uid = arg(1);
     $user = user_load($uid);
@@ -513,6 +507,15 @@ function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
       return; // Should never happen.
     }
 
+    // Make the date field smaller.
+    $form['date']['value']['#size'] = 10;
+
+    // Do not show "commented on" as an action option, as it only applies to Following notifications.
+    unset ($form['action']['#options']['commented on']);
+
+    // Add the Protocol and Community exposed filters,
+    // showing only the Protocols that the user is a steward and Communities user is a Manager of,
+    // Views on its own can't do this. Especially apply the filter which is handled in ma_dhan_views_post_execute.
     $community_options = $protocol_options = ['All' => '- Any -'];
     $groups = og_get_groups_by_user($user);
     foreach ($groups['node'] as $gid) {
@@ -533,16 +536,13 @@ function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
           $protocol_options[$gid] .= ' (not receiving notifications)';
         }
       }
-
     }
-
     $form['community'] = [
       '#type' => 'select',
       '#options' => $community_options,
       '#default_value' => 'All',
       '#prefix' => '<label>' . t('Community') . '</label>',
     ];
-
     $form['protocol'] = [
       '#type' => 'select',
       '#options' => $protocol_options,
