@@ -21,25 +21,33 @@ function ma_shared_notification_components_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_notification_date_gene',
-        1 => 'field_notification_subject',
-        2 => 'field_notification_body',
-        3 => 'field_notification_comment',
-        4 => 'field_notification_author',
+        1 => 'field_notification_author',
+        2 => 'field_notification_action',
+        3 => 'field_notification_subject',
+        4 => 'field_notification_body',
+        5 => 'field_notification_comment',
       ),
     ),
     'fields' => array(
       'field_notification_date_gene' => 'ds_content',
+      'field_notification_author' => 'ds_content',
+      'field_notification_action' => 'ds_content',
       'field_notification_subject' => 'ds_content',
       'field_notification_body' => 'ds_content',
       'field_notification_comment' => 'ds_content',
-      'field_notification_author' => 'ds_content',
     ),
-    'classes' => array(),
-    'wrappers' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
-    'layout_attributes_merge' => TRUE,
-    'layout_link_attribute' => FALSE,
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
     'layout_link_custom' => '',
     'layout_disable_css' => FALSE,
   );
