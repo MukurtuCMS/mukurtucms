@@ -37,31 +37,7 @@ function ma_dhan_node_delete($node) {
   // Update a CP or Community's DH's DHANs when the CP/Community is deleted, since their notify lists need to be updated.
   ////
   if ($node->type == 'cultural_protocol_group' or $node->type == 'community') {
-    // Get all DH items within this comm/cp.
-    $fieldcondition = [
-      'community' => ['field' => 'field_community_ref', 'col' => 'nid'],
-      'cultural_protocol_group' => ['field' => 'og_group_ref', 'col' => 'target_id'],
-    ];
-    $query = new EntityFieldQuery();
-    $result = $query
-      ->addMetaData('account', user_load(1))
-      ->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'digital_heritage')
-      ->propertyCondition('status', NODE_PUBLISHED)
-      ->fieldCondition($fieldcondition[$node->type]['field'], $fieldcondition[$node->type]['col'], $node->nid)
-      ->execute();
-    if (count($result['node'])) {
-      // Update the DHANs for all the DH nodes in this comm/cp.
-      foreach ($result['node'] as $dh_nid => $v) {
-        $dh_node = node_load($dh_nid);
-        if (!$dhan_nid = ma_dhan_get_dhan_nid($dh_nid)) {
-          continue;
-        }
-        $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
-        $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $node->nid);
-        $dhan_node_w->save();
-      }
-    }
+    ma_dhan_update_dh_dhan_notify_lists($node, TRUE);
   }
 
 }
@@ -106,12 +82,25 @@ function ma_dhan_node_insert($node) {
  */
 function ma_dhan_node_update($node) {
 
+//  ////
+//  // Update a Community or Protocol's DH's DHANs if the comm/protocol has its field_dhan_notified_user value changed.
+//  ////
+//  if ($node->type == 'community' OR $node->type == 'cultural_protocol_group') {
+//    $comm_cp_new_w = $cw = entity_metadata_wrapper('node', $node);
+//    $comm_cp_old_w = entity_metadata_wrapper('node', $node->original);
+//    $old_value = $comm_cp_old_w->field_dhan_notified_users->raw();
+//    $new_value = $comm_cp_new_w->field_dhan_notified_users->raw();
+//    if (ma_dhan_check_for_field_value_change($old_value, $new_value)) {
+//      ma_dhan_update_dh_dhan_notify_lists($node);
+//    }
+//  }
+
   ////
   // Update a DHAN when a DH node is updated.
   ////
   if ($node->type == 'digital_heritage') {
-    $dhan_new_w = $cw = entity_metadata_wrapper('node', $node);
-    $dhan_old_w = entity_metadata_wrapper('node', $node->original);
+    $dh_new_w = $cw = entity_metadata_wrapper('node', $node);
+    $dh_old_w = entity_metadata_wrapper('node', $node->original);
 
     // When updating a DH node, only create a DHAN email FC instance if certain fields are changed.
     // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
@@ -144,38 +133,38 @@ function ma_dhan_node_update($node) {
       'offset2',
     ];
 
-    $data = array_merge(['title' => ['label' => 'Title']], field_info_instances('node' ,$dhan_new_w->getBundle()));
+    $data = array_merge(['title' => ['label' => 'Title']], field_info_instances('node', $dh_new_w->getBundle()));
     $fields_list = array_keys($data);
-    $diff_list =  array();
-    foreach ($fields_list as $key => $field_name ) {
+    $diff_list = [];
+    foreach ($fields_list as $key => $field_name) {
       // Ignore if field name belong to ignore list
-      if(in_array($field_name, $ignore_fields )) {
+      if (in_array($field_name, $ignore_fields)) {
         continue;
       }
-      $old_value = $dhan_old_w->{$field_name}->raw();
-      $new_value = $dhan_new_w->{$field_name}->raw();
+      $old_value = $dh_old_w->{$field_name}->raw();
+      $new_value = $dh_new_w->{$field_name}->raw();
       // If both are empty - ignore
-      if(empty($old_value) && empty($new_value)) {
+      if (empty($old_value) && empty($new_value)) {
         continue;
       }
       // If one of the value is not empty compared to the other
-      if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
+      if ((empty($old_value) && !empty($new_value)) || (empty($new_value) && !empty($old_value))) {
         // You can use field_get_items() to get the changed value.
         $diff_list[$field_name] = $data[$field_name]['label'];
         continue;
       }
-      if(!is_array($new_value) && $new_value != $old_value) {
+      if (!is_array($new_value) && $new_value != $old_value) {
         $diff_list[$field_name] = $data[$field_name]['label'];
         continue;
       }
-      if(is_array($new_value) && is_array($old_value)) {
+      if (is_array($new_value) && is_array($old_value)) {
         foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
           recursive_unset($new_value, $property_to_ignore);
           recursive_unset($old_value, $property_to_ignore);
         }
         $diff1 = array_diff_assoc_recursive($new_value, $old_value);
         $diff2 = array_diff_assoc_recursive($old_value, $new_value);
-        if($diff1 or $diff2) {
+        if ($diff1 or $diff2) {
           $diff_list[$field_name] = $data[$field_name]['label'];
         }
       }
@@ -191,7 +180,7 @@ function ma_dhan_node_update($node) {
 
       // First update the DHAN, if there are changes to its community or protocol fields.
       // We probably don't need to check against field_community_ref, as at this point only the og_group_ref fields is changed (even if a protocol is changed) due to custom protocol field. But leaving in for good measure.
-      if (array_key_exists('og_group_ref', $diff_list) OR array_key_exists ('field_community_ref', $diff_list)) {
+      if (array_key_exists('og_group_ref', $diff_list) OR array_key_exists('field_community_ref', $diff_list)) {
         $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($node, $dhan_node_w);
         $dhan_node_w->save();
       }
@@ -205,7 +194,71 @@ function ma_dhan_node_update($node) {
       $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
       ma_dhan_update_field_all_users_notified($dhan_node_w);
     }
+  }
 
+}
+
+/**
+ * Helper function to update a CP or Community's DH's DHAN's notify lists.
+ */
+function ma_dhan_update_dh_dhan_notify_lists($node, $deletion = FALSE) {
+  // Get all DH items within this comm/cp.
+  $fieldcondition = [
+    'community' => ['field' => 'field_community_ref', 'col' => 'nid'],
+    'cultural_protocol_group' => ['field' => 'og_group_ref', 'col' => 'target_id'],
+  ];
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'digital_heritage')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition($fieldcondition[$node->type]['field'], $fieldcondition[$node->type]['col'], $node->nid)
+    ->execute();
+  if (count($result['node'])) {
+    // Update the DHANs for all the DH nodes in this comm/cp.
+    foreach ($result['node'] as $dh_nid => $v) {
+      $dh_node = node_load($dh_nid);
+      if (!$dhan_nid = ma_dhan_get_dhan_nid($dh_nid)) {
+        continue;
+      }
+      $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid);
+      $comm_cp_nid_being_deleted = FALSE;
+      if ($deletion) {
+        $comm_cp_nid_being_deleted = $node->nid;
+      }
+      $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_nid_being_deleted);
+      $dhan_node_w->save();
+    }
+  }
+}
+
+/**
+ * Helper function to compare two fields and return if there is a difference.
+ */
+function ma_dhan_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore = []) {
+  // If both are empty - ignore
+  if(empty($old_value) && empty($new_value)) {
+    return FALSE;
+  }
+  // If one of the value is not empty compared to the other
+  if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
+    return TRUE;
+  }
+  if(!is_array($new_value) && $new_value != $old_value) {
+    return TRUE;
+  }
+  // Both values exist. Check for a difference.
+  if(is_array($new_value) && is_array($old_value)) {
+    foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
+      recursive_unset($new_value, $property_to_ignore);
+      recursive_unset($old_value, $property_to_ignore);
+    }
+    $diff1 = array_diff_assoc_recursive($new_value, $old_value);
+    $diff2 = array_diff_assoc_recursive($old_value, $new_value);
+    if ($diff1 or $diff2) {
+      return TRUE;
+    }
   }
 }
 
@@ -224,7 +277,7 @@ function ma_dhan_update_field_all_users_notified($dhan_node_w) {
 }
 
 // Set the notification lists on a DHAN node wrapper (to be saved by calling function).
-function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_being_deleted_nid = NULL) {
+function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_being_deleted_nid = FALSE) {
 
   // Build the list of parent comms and cps.
   $comms_cps = [];
@@ -238,7 +291,7 @@ function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_nod
   // Build the notify list.
   $notify_list = [];
   foreach ($comms_cps as $comm_cp_nid) {
-    if ($comm_cp_nid <> $comm_cp_being_deleted_nid) { // if this function was called from hook_node_delete of a comm/cp, it's not actually yet deleted so we have to force skipping it here.
+    if ($comm_cp_nid <> $comm_cp_being_deleted_nid) { // if this function was called from hook_node_delete of a comm/cp, it's not actually yet deleted so we have to force skip it here.
       $comm_cp_node = node_load($comm_cp_nid);
       if (isset($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE])) {
         $notify_list = array_merge($notify_list, array_column($comm_cp_node->field_dhan_notified_users[LANGUAGE_NONE], 'target_id'));
@@ -419,6 +472,11 @@ function ma_dhan_notify_process($node, $op) {
     $nw->field_dhan_notified_users->set($new_notified_users);
   }
   $nw->save();
+
+  // Update this comm/community's notify lists.
+  ma_dhan_update_dh_dhan_notify_lists($node);
+
+  // Return to the node.
   drupal_goto('node/' . $node->nid);
 }
 
