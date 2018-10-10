@@ -329,34 +329,16 @@ function ma_dhan_notification_field($entity) {
     if ($notified) {
       $output = 'You are receiving notifications {schedule}.';
       $output .= '<br />' . l('Stop receiving notifications.', 'node/' . $entity->nid . '/no-dhan');
+      $filter = $entity->type;
+      if ($filter == 'cultural_protocol_group') {
+        $filter = 'protocol';
+      }
+      $output .= '<br />' . l ('View your notifications', '/user/' . $user->uid . '/digital-heritage-notifications', ['query' => [$filter => $entity->nid]]);
     }
     else {
       $output = 'You are not receiving notifications.';
       $output .= '<br />' . l('Receive notifications.', 'node/' . $entity->nid . '/dhan');
     }
-
-    //  if ($notified) {
-    //    // Popup text node notification frequency form.
-    //    $def_freq = isset($user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $user->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] : 'right away';
-    //    $node_freq = ma_dhan_get_user_node_notification_frequency($entity, $user);
-    //    $form = drupal_get_form('ma_dhan_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
-    //    $popup_text .= drupal_render($form);
-    //  }
-    //
-    //  // Add link to Following view.
-    //  $popup_text .= '<span class="link-to-following-view">' . l('See all content you are following.', '/user/' . $user->uid . '/following') . '</span>';
-    //
-    //  // Generate the popup
-    //  require_once drupal_get_path('module', 'popup') . '/includes/popup.api.inc';
-    //  $popup_attributes = array (
-    //    'style' => 'White',
-    //    'origin' => 'top-left',
-    //    'expand' => 'top-left',
-    //    'width' => '400',
-    //    'class' => 'follow-unfollow-popup',
-    //    // 'activate' => 'click', 'close' => 1, // uncomment this to tweak CSS in the inspector
-    //  );
-    //  $output .= popup_element('Details.', $popup_text, $popup_attributes);
 
     return $output;
 
