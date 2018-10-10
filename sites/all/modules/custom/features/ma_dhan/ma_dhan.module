@@ -99,8 +99,8 @@ function ma_dhan_node_update($node) {
   // Update a DHAN when a DH node is updated.
   ////
   if ($node->type == 'digital_heritage') {
-    $dh_new_w = $cw = entity_metadata_wrapper('node', $node);
     $dh_old_w = entity_metadata_wrapper('node', $node->original);
+    $dh_new_w = $cw = entity_metadata_wrapper('node', $node);
 
     // When updating a DH node, only create a DHAN email FC instance if certain fields are changed.
     // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
@@ -137,37 +137,18 @@ function ma_dhan_node_update($node) {
     $fields_list = array_keys($data);
     $diff_list = [];
     foreach ($fields_list as $key => $field_name) {
+
       // Ignore if field name belong to ignore list
       if (in_array($field_name, $ignore_fields)) {
         continue;
       }
       $old_value = $dh_old_w->{$field_name}->raw();
       $new_value = $dh_new_w->{$field_name}->raw();
-      // If both are empty - ignore
-      if (empty($old_value) && empty($new_value)) {
-        continue;
-      }
-      // If one of the value is not empty compared to the other
-      if ((empty($old_value) && !empty($new_value)) || (empty($new_value) && !empty($old_value))) {
-        // You can use field_get_items() to get the changed value.
+
+      if (ma_dhan_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore)) {
         $diff_list[$field_name] = $data[$field_name]['label'];
-        continue;
       }
-      if (!is_array($new_value) && $new_value != $old_value) {
-        $diff_list[$field_name] = $data[$field_name]['label'];
-        continue;
-      }
-      if (is_array($new_value) && is_array($old_value)) {
-        foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
-          recursive_unset($new_value, $property_to_ignore);
-          recursive_unset($old_value, $property_to_ignore);
-        }
-        $diff1 = array_diff_assoc_recursive($new_value, $old_value);
-        $diff2 = array_diff_assoc_recursive($old_value, $new_value);
-        if ($diff1 or $diff2) {
-          $diff_list[$field_name] = $data[$field_name]['label'];
-        }
-      }
+
     }
 
     // There are changes to the fields.
