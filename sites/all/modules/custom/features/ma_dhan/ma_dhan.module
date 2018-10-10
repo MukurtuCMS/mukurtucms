@@ -493,7 +493,10 @@ function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
     $form['date']['value']['#size'] = 10;
 
     // Do not show "commented on" as an action option, as it only applies to Following notifications.
-    unset ($form['action']['#options']['commented on']);
+    unset($form['action']['#options']['commented on']);
+
+    // Do not show "Anonymous" as a user option
+    unset ($form['user']['#options'][0]);
 
     // Add the Protocol and Community exposed filters,
     // showing only the Protocols that the user is a steward and Communities user is a Manager of,
@@ -531,6 +534,21 @@ function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
       '#default_value' => 'All',
       '#prefix' => '<label>' . t('Protocol') . '</label>',
     ];
+    // Added form elements need to go into their own widgets (as described at https://www.drupal.org/project/views/issues/893392#comment-5700698),
+    // or else they end up within the submit div.
+    $new_form_info = array(
+      'filter-community' => array('value' => 'community'),
+      'filter-protocol' => array('value' => 'protocol'),
+    );
+    $form['#info'] = array_merge($form['#info'], $new_form_info); // The order of filters in $form['#info'] is the order they will appear. In this case, we want the community and protocol at the end, so we can just append them.
+
+
+    // Use chosen for all the select filters (all filters except Date)
+    // Only User really needs this (because all users are displayed), but using for all for consistency.
+    $form['user']['#chosen'] = TRUE;
+    $form['action']['#chosen'] = TRUE;
+    $form['community']['#chosen'] = TRUE;
+    $form['protocol']['#chosen'] = TRUE;
 
   }
 }
