@@ -11012,3 +11012,10 @@ a:hover {
 .view-dhan .form-item-date-value .form-control {
   height: 25px;
 }
+.view-dhan #ma-dhan-dhan-frequency label {
+  float: left;
+  margin-right: 0.5em;
+}
+.view-dhan #ma-dhan-dhan-frequency #edit-dhan-frequency {
+  width: auto;
+}

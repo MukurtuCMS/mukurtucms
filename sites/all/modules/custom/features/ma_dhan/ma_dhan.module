@@ -256,7 +256,7 @@ function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_nod
   ];
   foreach ($notify_list as $notify_uuid) {
     $account = user_load($notify_uuid);
-    $user_frequency = isset($account->field_dhan_frequency[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] : 'right away';
+    $user_frequency = isset($account->field_dhan_frequency[LANGUAGE_NONE][0]['value']) ? $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] : 'right away';
     $notify_frequency[$user_frequency][] = $notify_uuid;
   }
 
@@ -321,13 +321,22 @@ function ma_dhan_notification_field($entity) {
   if (in_array('protocol steward', $user_roles) OR in_array('community manager', $user_roles)) { // The Notify / Do not notify button should only show up is user is a CM or PS of the node.
 
     global $user;
-    $user = user_load($user->uid); // Must reload user object to get the hidden field_notifications_freq_def field.
+    $user = user_load($user->uid); // Must reload user object to get the hidden field_dhan_frequency field.
 
     $notified = ma_dhan_is_notified($entity, $user->uid);
 
     // Create output.
+    $frequency = 'right away';
+    if (isset($user->field_dhan_frequency[LANGUAGE_NONE][0]['value'])) {
+      $frequency = $user->field_dhan_frequency[LANGUAGE_NONE][0]['value'];
+    }
+    $freq_map = [
+      'right away' => 'as they occur',
+      'daily digest' => 'daily',
+      'weekly digest' => 'weekly',
+    ];
     if ($notified) {
-      $output = 'You are receiving notifications {schedule}.';
+      $output = 'You are receiving notifications ' . $freq_map[$frequency] . '.';
       $output .= '<br />' . l('Stop receiving notifications.', 'node/' . $entity->nid . '/no-dhan');
       $filter = $entity->type;
       if ($filter == 'cultural_protocol_group') {
@@ -346,59 +355,16 @@ function ma_dhan_notification_field($entity) {
 
 }
 
-
-///**
-// * Helper function for Following view to show the default notification frequency form in the header.
-// */
-//function ma_dhan_show_default_notification_frequency_form($view) {
-//  global $user;
-//  if ($view->args[0] == $user->uid) {
-//    $form = drupal_get_form('ma_dhan_notification_frequency_default');
-//    return drupal_render($form);
-//  }
-//}
-//
-///**
-// * Helper function for Following view to show Unfollow button.
-// */
-//function ma_dhan_show_unfollow_button_in_view($view, $data) {
-//  global $user;
-//  if ($view->args[0] == $user->uid) {
-//    return l('<button class="btn btn-default">UnFollow</button>', 'node/' . $data->nid . '/unfollow', [
-//      'html' => TRUE,
-//      'query' => drupal_get_destination()
-//    ]);
-//  }
-//}
-//
-//
-///**
-// * Helper function for Following view to show the per-node notification frequency form.
-// */
-//function ma_dhan_generate_notication_frequency_form($view, $data) {
-//  global $user;
-//  if ($view->args[0] == $user->uid) {
-//    $viewed_user = user_load($view->args[0]);
-//    $entity = node_load($data->nid);
-//    $def_freq = isset($viewed_user->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $viewed_user->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] : 'right away';
-//    $node_freq = ma_dhan_get_user_node_notification_frequency($entity, $viewed_user);
-//    $form = drupal_get_form('ma_dhan_notification_frequency_node_' . $entity->nid, $entity->nid, $def_freq, $node_freq);
-//    return drupal_render($form);
-//  }
-//}
-//
-///**
-// * Helper function for the Following view Parent field.
-// */
-//function ma_dhan_show_parent($nid) {
-//  $child = node_load($nid);
-//  $child_page_w = entity_metadata_wrapper('node', $child);
-//  $parent =  ($child_page_w->{ma_dhan_get_child_ref_field_to_parent($child->type)}->value());
-//  print l($parent->title, $parent->nid);
-//}
-//
-//
-
+/**
+ * Helper function for DHAN view to show the DHAN frequency form in the header.
+ */
+function ma_dhan_show_default_dhan_frequency_form($view) {
+  global $user;
+  if ($view->args[0] == $user->uid) { // Only shows to user when viewing their own notifications.
+    $form = drupal_get_form('ma_dhan_dhan_frequency');
+    return drupal_render($form);
+  }
+}
 
 /**
  * Returns if a given user is set to be notified on a given Protocol / Community.
@@ -503,22 +469,24 @@ function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
     // Views on its own can't do this. Especially apply the filter which is handled in ma_dhan_views_post_execute.
     $community_options = $protocol_options = ['All' => '- Any -'];
     $groups = og_get_groups_by_user($user);
-    foreach ($groups['node'] as $gid) {
-      $user_roles_in_group = og_get_user_roles('node', $gid, $uid);
-      if (in_array('community manager', $user_roles_in_group)) {
-        $comm_cp_w = entity_metadata_wrapper('node', $gid);
-        $community_options[$gid] = $comm_cp_w->label();
-        $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
-        if (!in_array($uid, $users_to_notify)) {
-          $community_options[$gid] .= ' (not receiving notifications)';
+    if (count($groups)) {
+      foreach ($groups['node'] as $gid) {
+        $user_roles_in_group = og_get_user_roles('node', $gid, $uid);
+        if (in_array('community manager', $user_roles_in_group)) {
+          $comm_cp_w = entity_metadata_wrapper('node', $gid);
+          $community_options[$gid] = $comm_cp_w->label();
+          $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+          if (!in_array($uid, $users_to_notify)) {
+            $community_options[$gid] .= ' (not receiving notifications)';
+          }
         }
-      }
-      if (in_array('protocol steward', $user_roles_in_group)) {
-        $comm_cp_w = entity_metadata_wrapper('node', $gid);
-        $protocol_options[$gid] = $comm_cp_w->label();
-        $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
-        if (!in_array($uid, $users_to_notify)) {
-          $protocol_options[$gid] .= ' (not receiving notifications)';
+        if (in_array('protocol steward', $user_roles_in_group)) {
+          $comm_cp_w = entity_metadata_wrapper('node', $gid);
+          $protocol_options[$gid] = $comm_cp_w->label();
+          $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+          if (!in_array($uid, $users_to_notify)) {
+            $protocol_options[$gid] .= ' (not receiving notifications)';
+          }
         }
       }
     }
@@ -638,172 +606,46 @@ function ma_dhan_views_post_execute(&$view) {
   }
 }
 
-//
-///**
-// * Notification default frequency form (header of the Following view).
-// */
-//function ma_dhan_notification_frequency_default($form, &$form_state) {
-//  $account = user_load(arg(1));
-//  $def_val = isset($account->field_notifications_freq_def[LANGUAGE_NONE][0]['value']) ? $account->field_notifications_freq_def['und'][0]['value'] : 'right away';
-//  global $user;
-//  $form = [
-//    'notification_frequency_default' => [
-//      '#type' => 'select',
-//      '#title' => t('Notification Frequency Default: '),
-//      '#options' => field_info_field('field_notifications_freq_def')['settings']['allowed_values'],
-//      '#default_value' => $def_val,
-//      '#disabled' => $user->uid <> $account->uid ? TRUE : FALSE,
-//      '#attributes' => [
-//        'onChange' => 'this.form.submit();',
-//      ],
-//    ],
-//    'submit' => [
-//      '#type' => 'submit',
-//    ],
-//  ];
-//  return $form;
-//}
-//
-///**
-// * Submit handler for the notification default frequency form.
-// */
-//function ma_dhan_notification_frequency_default_submit ($form, &$form_state) {
-//
-//  $account = user_load(arg(1));
-//  $existing_freq = $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'];
-//  $new_freq = $form_state['values']['notification_frequency_default'];
-//  if ($existing_freq <> $new_freq) {
-//
-//    // Update the notification default frequency on the user object.
-//    $account->field_notifications_freq_def[LANGUAGE_NONE][0]['value'] = $new_freq;
-//    user_save($account);
-//
-//    // Update the Following nodes for all child pages the user is following that are set to default frequency.
-//    $frequency_field_map = [
-//      'right away' => 'field_notify_immediately',
-//      'daily digest' => 'field_notify_day',
-//      'weekly digest' => 'field_notify_week',
-//    ];
-//    // Get all Following nodes the user is marked as a follower of.
-//    $query = new EntityFieldQuery();
-//    $result = $query
-//      ->addMetaData('account', user_load(1))
-//      ->entityCondition('entity_type', 'node')
-//      ->entityCondition('bundle', 'following_notification')
-//      ->propertyCondition('status', NODE_PUBLISHED)
-//      ->fieldCondition('field_notify_all', 'target_id', $account->uid)
-//      ->execute();
-//    if (isset($result['node']) && count($result['node'])) {
-//      // Loop through these, and check the child page if this user is using their default notification frequency for that node, and if so, update the Following node.
-//      foreach (array_keys($result['node']) as $nid) {
-//        $dhan_node_w = entity_metadata_wrapper('node', $nid);
-//        $custom_notification_freqs = $dhan_node_w->field_following_content->field_custom_notification_freq->value();
-//        if (count($custom_notification_freqs)) {
-//          foreach ($custom_notification_freqs as $custom_notification_freq) {
-//            if ($custom_notification_freq['first'] = $account->uid) {
-//              $user_custom_freq_for_this_node = 1;
-//              break;
-//            }
-//          }
-//        }
-//        if (!$user_custom_freq_for_this_node) {
-//          $dhan_node_w->{$frequency_field_map[$existing_freq]}->set(array_diff($dhan_node_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
-//          $dhan_node_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
-//          $dhan_node_w->save();
-//        }
-//      }
-//    }
-//
-//  }
-//
-//}
-//
-///**
-// * Get the notification frequency for a given node and user.
-// */
-//function ma_dhan_get_user_node_notification_frequency($node, $user) {
-//  if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
-//    foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $custom_frequency) {
-//      if ($custom_frequency['first'] == $user->uid) {
-//        return $custom_frequency['second'];
-//      }
-//    }
-//  }
-//}
-//
-///**
-// * Notification node frequency form (in the node frequency popup as well as a column in the Following view).
-// */
-//function ma_dhan_notification_frequency_node($form, &$form_state, $nid, $def_freq, $node_freq) {
-//
-//  $options = ['use default' => 'Use Default (' . ucwords($def_freq) . ')'] + field_info_field('field_notifications_freq_def')['settings']['allowed_values'];
-//  $form = [
-//    'notification_frequency_node' => [
-//      '#type' => 'select',
-//      '#title' => t('Notification frequency: '),
-//      '#options' => $options,
-//      '#default_value' => isset($node_freq) ? $node_freq : 'use default',
-//      '#attributes' => [
-//        'onChange' => 'this.form.submit();',
-//      ],
-//    ],
-//    'nid' => [
-//      '#type' => 'value',
-//      '#value' => $nid,
-//    ],
-//    'submit' => [
-//      '#type' => 'submit',
-//    ],
-//  ];
-//  return $form;
-//}
-//
-///**
-// * Submit handler for the notification frequency sets the value on the node for the user, or unsets it if using default.
-// */
-//function ma_dhan_notification_frequency_node_submit ($form, &$form_state) {
-//  global $user;
-//  $val = $form_state['values']['notification_frequency_node'];
-//  $node = node_load ($form_state['values']['nid']);
-//  if ($val == 'use default') {
-//    foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $i => $custom_frequency) {
-//      if ($custom_frequency['first'] == $user->uid) {
-//        unset ($node->field_custom_notification_freq[LANGUAGE_NONE][$i]);
-//        node_save($node);
-//        return;
-//      }
-//    }
-//  }
-//  else {
-//    if (isset($node->field_custom_notification_freq[LANGUAGE_NONE])) {
-//      foreach ($node->field_custom_notification_freq[LANGUAGE_NONE] as $i => $custom_frequency) {
-//        if ($custom_frequency['first'] == $user->uid) {
-//          unset ($node->field_custom_notification_freq[LANGUAGE_NONE][$i]);
-//        }
-//      }
-//    }
-//    $node->field_custom_notification_freq[LANGUAGE_NONE][] = [
-//      'first' => $user->uid,
-//      'second' => $val,
-//    ];
-//    node_save($node);
-//  }
-//}
-//
-///**
-// * Implementation of hook_forms()
-// *
-// * This is required because we are using the same form multiple times on the (Following) page. This allows for multiple form IDs calling the same form definition.
-// */
-//function ma_dhan_forms($form_id, $args) {
-//  $forms = [];
-//  if (strpos($form_id, 'ma_dhan_notification_frequency_node_') === 0) {
-//    $forms[$form_id] = array(
-//      'callback' => 'ma_dhan_notification_frequency_node',
-//    );
-//  }
-//  return $forms;
-//}
+/**
+ * Notification frequency form (header of the DHAN view).
+ */
+function ma_dhan_dhan_frequency($form, &$form_state) {
+  $account = user_load(arg(1));
+  $def_val = isset($account->field_dhan_frequency[LANGUAGE_NONE][0]['value']) ? $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] : 'right away';
+  global $user;
+  $form = [
+    'dhan_frequency' => [
+      '#type' => 'select',
+      '#title' => t('Digital Heritage Notification Frequency: '),
+      '#options' => field_info_field('field_dhan_frequency')['settings']['allowed_values'],
+      '#default_value' => $def_val,
+      '#disabled' => $user->uid <> $account->uid ? TRUE : FALSE,
+      '#attributes' => [
+        'onChange' => 'this.form.submit();',
+      ],
+    ],
+    'submit' => [
+      '#type' => 'submit',
+    ],
+  ];
+  return $form;
+}
+
+/**
+ * Submit handler for the DHAN frequency form.
+ */
+function ma_dhan_dhan_frequency_submit ($form, &$form_state) {
+
+  $account = user_load(arg(1));
+  $existing_freq = $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'];
+  $new_freq = $form_state['values']['dhan_frequency'];
+  if ($existing_freq <> $new_freq) {
+    // Update the DHAN frequency on the user object.
+    $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] = $new_freq;
+    user_save($account);
+  }
+
+}
 
 /**
  * Helper function to get the DHAN NID given DH NID
