@@ -279,6 +279,9 @@ function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op) {
   // Set the time
   $fce_w->field_notification_date_gene->set(time());
 
+  // Set the action
+  $fce_w->field_notification_action->set($op);
+
   // Set the subject
   $fce_w->field_notification_subject->set('"' . $dh_node->title . '" has been ' . $op . '.');
 
@@ -309,37 +312,6 @@ function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op) {
   $fce_w->save();
 }
 
-///**
-// *  Implements hook_form_alter().
-// */
-//function ma_dhan_form_alter(&$form, &$form_state, $form_id) {
-//
-//  // On Collab child pages
-//  $node_type = str_replace('_node_form', '', $form_id, $count);
-//  if ($count && in_array($node_type, ma_culturalprotocol_collab_child_node_types())) {
-//
-//
-//    // Unfollowing Users should be viewable to anyone that can edit this node, but not editable. Only the users themselves should be able to do that through the Unfollow button.
-//    $form['field_un_following_users']['#disabled'] = TRUE;
-//
-//    // Restrict the Protocols the user can set to those they are a Steward of (or it is already set on the node).
-//    $existing_protocols = $form['field_following_protocols'][LANGUAGE_NONE]['#default_value']; // Existing protocols need to be added separately for cases where the editing user is not a protocol steward of a referenced protocol. It still needs to be an option if it was already set on the node.
-//    $existing_protocols_with_titles = []; //
-//    foreach ($existing_protocols as $existing_protocol) {
-//      $existing_protocol_node = node_load ($existing_protocol);
-//      $existing_protocols_with_titles[$existing_protocol] = $existing_protocol_node->title;
-//    }
-//    $valid_protocols_with_titles = ma_cultural_protocol_get_cps_user_is_steward();
-//    $referenceable_cps = $existing_protocols_with_titles + $valid_protocols_with_titles;
-//    //    dpm ($existing_protocols_with_titles, 'existing');
-//    //    dpm ($valid_protocols_with_titles, 'valid');
-//    //    dpm ($referenceable_cps, 'referenceable');
-//    $form['field_following_protocols'][LANGUAGE_NONE]['#options'] = $referenceable_cps;
-//
-//  }
-//}
-//
-//
 /**
  * Custom notification field.
  */
@@ -476,15 +448,6 @@ function ma_dhan_menu() {
     'access callback' => TRUE,
   );
 
-//  $items['user/%user/following'] = array(
-//    'title' => 'Following',
-//    'page callback' => 'ma_dhan_following_view',
-//    'page arguments' => array(1),
-//    'access callback' => 'ma_dhan_following_view_access',
-//    'access arguments' => array(1),
-//    'type' => MENU_LOCAL_TASK,
-//  );
-
   return $items;
 }
 
@@ -511,52 +474,170 @@ function ma_dhan_notify_process($node, $op) {
   drupal_goto('node/' . $node->nid);
 }
 
-//
-///**
-// * Access callback; Determine if user can view the Following tab on a given profile page.
-// */
-//function ma_dhan_following_view_access($account) {
-//  global $user;
-//  // Can view if own profile page
-//  if ($user->uid == $account->uid) {
-//    return TRUE;
-//  }
-//  // Can view if admin or Mukurtu admin
-//  $admin = user_role_load_by_name('administrator');
-//  $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
-//  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
-//    return TRUE;
-//  }
-//}
-//
-///**
-// * Page callback; Call a view to show what the the user's Followings.
-// */
-//function ma_dhan_following_view($account) {
-//  $view = views_get_view('mukurtu_collab_subscriptions');
-//  $view->set_arguments(array($account->uid));
-//  return $view->preview();
-//}
-//
-///**
-// * Implements hook_views_post_execute.
-// */
-//function ma_dhan_views_post_execute(&$view) {
-//
-//  // Filter down the Following view. Views UI could not handle this, so we are doing it here.
-//  // It would be better to do this in a views query alter so that pagers could work (as now there is no paging),
-//  // plus more efficient, but I do not think it is possible. If this becomes slow then will need to set a hidden field
-//  // on the child collab nodes which contains following lists of users which can be queried.
-//  if ($view->name == "mukurtu_collab_subscriptions") {
-//    $uid = $view->args[0];
-//    foreach ($view->result as $i => $row) {
-//      list ($following, $reasons) = ma_dhan_get_following_status_and_reasons(node_load ($row->nid), $uid);
-//      if (!$following) {
-//        unset ($view->result[$i]);
-//      }
-//    }
-//  }
-//}
+
+/**
+ * Access callback called by the DHAN view.
+ */
+function ma_dhan_dhan_report_access() {
+  $viewing_user = arg(1);
+  global $user;
+  // Can view if own profile page
+  if ($user->uid == $viewing_user) {
+    return TRUE;
+  }
+  // Can view if admin or Mukurtu admin
+  $admin = user_role_load_by_name('administrator');
+  $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
+  if (user_has_role($admin->rid) || user_has_role($mukurtuadmin->rid)) {
+    return TRUE;
+  }
+}
+
+/**
+ *  Implements hook_form_FORM_ID_alter().
+ */
+function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+
+  if ($form['#id'] == 'views-exposed-form-dhan-page-1') {
+
+    // Make the date field smaller.
+    $form['date']['value']['#size'] = 10;
+
+    // Add the Protocol and Community exposed filters,
+    // showing only the Protocols that the user is a steward and Communities user is a Manager of,
+    // Views on its own can't do this. Especially apply the filter which is handled in ma_dhan_views_post_execute.
+
+    $uid = arg(1);
+    $user = user_load($uid);
+    if (!$user) {
+      return; // Should never happen.
+    }
+
+    $community_options = $protocol_options = ['All' => '- Any -'];
+    $groups = og_get_groups_by_user($user);
+    foreach ($groups['node'] as $gid) {
+      $user_roles_in_group = og_get_user_roles('node', $gid, $uid);
+      if (in_array('community manager', $user_roles_in_group)) {
+        $comm_cp_w = entity_metadata_wrapper('node', $gid);
+        $community_options[$gid] = $comm_cp_w->label();
+        $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+        if (!in_array($uid, $users_to_notify)) {
+          $community_options[$gid] .= ' (not receiving notifications)';
+        }
+      }
+      if (in_array('protocol steward', $user_roles_in_group)) {
+        $comm_cp_w = entity_metadata_wrapper('node', $gid);
+        $protocol_options[$gid] = $comm_cp_w->label();
+        $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+        if (!in_array($uid, $users_to_notify)) {
+          $protocol_options[$gid] .= ' (not receiving notifications)';
+        }
+      }
+
+    }
+
+    $form['community'] = [
+      '#type' => 'select',
+      '#options' => $community_options,
+      '#default_value' => 'All',
+      '#prefix' => '<label>' . t('Community') . '</label>',
+    ];
+
+    $form['protocol'] = [
+      '#type' => 'select',
+      '#options' => $protocol_options,
+      '#default_value' => 'All',
+      '#prefix' => '<label>' . t('Protocol') . '</label>',
+    ];
+
+  }
+}
+
+
+/**
+ * Implements hook_views_post_execute.
+ */
+function ma_dhan_views_post_execute(&$view) {
+
+  // DH notifications view
+  if ($view->name == "dhan") {
+
+    $uid = $view->args[0];
+    $user = user_load($uid);
+    if (!$user) {
+      return; // Should never happen.
+    }
+
+    // Set a custom page title
+    drupal_set_title('Digital Heritage Notifications for ' . $user->name);
+
+    ////////
+    // Filter down the DH notifications view. Views UI could not handle this, so we are doing it here.
+    // It would be better to do this in a views query alter so that pagers could work (as now there is no paging),
+    // plus more efficient, but I do not think it is possible. If this becomes slow then will need to set a hidden field
+    // on the DHAN with a list of all the comms and communities is referenced DH is in. That could get ugly with node updates, so avoid.
+    ////////
+
+    if (isset($_GET['community'])) {
+      if (is_numeric($_GET['community'])) {
+        $community_filter = $_GET['community'];
+      }
+    }
+
+    if (isset($_GET['protocol'])) {
+      if (is_numeric($_GET['protocol'])) {
+        $protocol_filter = $_GET['protocol'];
+      }
+    }
+
+    $show_node = []; // Use this as a cache so that we don't have to repeat the test on every node (as there are multiple actions / field collections per node)
+
+    foreach ($view->result as $i => $row) { // This is why it's inefficient. We are looping through the view results individually instead of applying a filter at the query level.
+      $dh_nid = $row->node_field_data_field_following_content_nid;
+      // First check against the cache.
+      if ($show_node[$dh_nid] == 'show') {
+        continue;
+      }
+      if ($show_node[$dh_nid] == 'do not show') {
+        unset ($view->result[$i]);
+        continue;
+      }
+
+      $dh_node = node_load($dh_nid);
+
+      // Build the list of $comm_cps (communities and protocols) that this DH node is in,
+      // applying the community or protocol filters (if set)
+      $comms_cps= [];
+      foreach ($dh_node->field_community_ref[LANGUAGE_NONE] as $comm) {
+        if (!isset($community_filter) OR $comm['nid'] == $community_filter) {
+          $comms_cps[] = $comm['nid'];
+        }
+      }
+      foreach ($dh_node->og_group_ref[LANGUAGE_NONE] as $cp) {
+        $protocols[] = $cp['target_id'];
+        if (!isset($protocol_filter) OR $cp['target_id'] == $protocol_filter) {
+          $comms_cps[] = $cp['target_id'];
+        }
+      }
+
+      // We now have our list of $comm_cps. Now filter out those that the user is not set to receive notifications on.
+      foreach ($comms_cps as $comm_cp_nid) {
+        $comm_cp_w = entity_metadata_wrapper('node', $comm_cp_nid);
+        if ($comm_cp_w->__isset('field_dhan_notified_users')) { // Need to do this check first in case a comm or cp was deleted (the entity reference remains)
+          $users_to_notify = $comm_cp_w->field_dhan_notified_users->raw();
+          if (in_array($uid, $users_to_notify)) {
+            $show_node[$dh_nid] = 'show'; // User is receiving notifications on at least one of the DH's communities or protocols.
+            continue 2;
+          }
+        }
+      }
+      $show_node[$dh_nid] = 'do not show'; // User is not receiving notification on any of the DH's communities or protocols.
+      unset ($view->result[$i]);
+      continue;
+    }
+  }
+}
+
 //
 ///**
 // * Notification default frequency form (header of the Following view).
