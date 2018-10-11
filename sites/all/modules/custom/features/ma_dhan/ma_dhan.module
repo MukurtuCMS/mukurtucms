@@ -274,9 +274,9 @@ function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op) {
       break;
   }
   $body = 'The Digital Heritage item "' . $dh_node->title . '", was ' . $op . ' by ' . $dh_node->name . ' on ' . date('l, F j', $dh_node->timestamp) . ' at ' . date('g:ia', $dh_node->timestamp) . '.';
-  $body .= '\n\nYou are being notified of this because you have chosen to receive notifications for either a Community or a Protocol that this item is in.';
+  $body .= "\n\nYou are being notified of this because you have chosen to receive notifications for either a Community or a Protocol that this item is in.";
   if ($op <> 'deleted') {
-    $body .= '\n\nView the Digital Heritage item: ' . $GLOBALS["base_url"] . '/' . $dh_path;
+    $body .= "\n\nView the Digital Heritage item: " . $GLOBALS["base_url"] . '/' . $dh_path;
   }
   $fce_w->field_notification_body->set($body);
 
