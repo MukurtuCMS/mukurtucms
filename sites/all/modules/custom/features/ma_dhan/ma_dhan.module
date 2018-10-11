@@ -81,20 +81,7 @@ function ma_dhan_node_insert($node) {
  * Implements hook_node_update().
  */
 function ma_dhan_node_update($node) {
-
-//  ////
-//  // Update a Community or Protocol's DH's DHANs if the comm/protocol has its field_dhan_notified_user value changed.
-//  ////
-//  if ($node->type == 'community' OR $node->type == 'cultural_protocol_group') {
-//    $comm_cp_new_w = $cw = entity_metadata_wrapper('node', $node);
-//    $comm_cp_old_w = entity_metadata_wrapper('node', $node->original);
-//    $old_value = $comm_cp_old_w->field_dhan_notified_users->raw();
-//    $new_value = $comm_cp_new_w->field_dhan_notified_users->raw();
-//    if (ma_dhan_check_for_field_value_change($old_value, $new_value)) {
-//      ma_dhan_update_dh_dhan_notify_lists($node);
-//    }
-//  }
-
+  
   ////
   // Update a DHAN when a DH node is updated.
   ////
