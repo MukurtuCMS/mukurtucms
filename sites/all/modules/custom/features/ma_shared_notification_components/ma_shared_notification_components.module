@@ -226,3 +226,34 @@ function ma_shared_notification_components_send_scheduled_notifications($schedul
     }
   }
 }
+
+/**
+ * Helper function to compare two fields and return if there is a difference.
+ *
+ * This diff'ing code is based on https://drupal.stackexchange.com/a/175186/83739.
+ */
+function ma_shared_notification_components_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore = []) {
+  // If both are empty - ignore
+  if(empty($old_value) && empty($new_value)) {
+    return FALSE;
+  }
+  // If one of the value is not empty compared to the other
+  if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
+    return TRUE;
+  }
+  if(!is_array($new_value) && $new_value != $old_value) {
+    return TRUE;
+  }
+  // Both values exist. Check for a difference.
+  if(is_array($new_value) && is_array($old_value)) {
+    foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
+      recursive_unset($new_value, $property_to_ignore);
+      recursive_unset($old_value, $property_to_ignore);
+    }
+    $diff1 = array_diff_assoc_recursive($new_value, $old_value);
+    $diff2 = array_diff_assoc_recursive($old_value, $new_value);
+    if ($diff1 or $diff2) {
+      return TRUE;
+    }
+  }
+}

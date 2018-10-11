@@ -103,9 +103,8 @@ function ma_dhan_node_update($node) {
     $dh_new_w = $cw = entity_metadata_wrapper('node', $node);
 
     // When updating a DH node, only create a DHAN email FC instance if certain fields are changed.
-    // This diff'ing code is somewhat modified from https://drupal.stackexchange.com/a/175186/83739.
-    // Also using helper functions added to ma_core.
-    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
+
+    // Fields to ignore.
     $ignore_fields = [
       'field_pre_actions',
       'path',
@@ -123,6 +122,7 @@ function ma_dhan_node_update($node) {
       'field_personal_collections',
     ];
 
+    // $properties_within_fields_to_ignore does what it says, wherein those properties can be nested anywhere within the field that is being compared.
     $properties_within_fields_to_ignore = [
       'safe_value',
       'safe_summary',
@@ -137,18 +137,15 @@ function ma_dhan_node_update($node) {
     $fields_list = array_keys($data);
     $diff_list = [];
     foreach ($fields_list as $key => $field_name) {
-
       // Ignore if field name belong to ignore list
       if (in_array($field_name, $ignore_fields)) {
         continue;
       }
       $old_value = $dh_old_w->{$field_name}->raw();
       $new_value = $dh_new_w->{$field_name}->raw();
-
-      if (ma_dhan_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore)) {
+      if (ma_shared_notification_components_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore)) {
         $diff_list[$field_name] = $data[$field_name]['label'];
       }
-
     }
 
     // There are changes to the fields.
@@ -210,35 +207,6 @@ function ma_dhan_update_dh_dhan_notify_lists($node, $deletion = FALSE) {
       }
       $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_nid_being_deleted);
       $dhan_node_w->save();
-    }
-  }
-}
-
-/**
- * Helper function to compare two fields and return if there is a difference.
- */
-function ma_dhan_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore = []) {
-  // If both are empty - ignore
-  if(empty($old_value) && empty($new_value)) {
-    return FALSE;
-  }
-  // If one of the value is not empty compared to the other
-  if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
-    return TRUE;
-  }
-  if(!is_array($new_value) && $new_value != $old_value) {
-    return TRUE;
-  }
-  // Both values exist. Check for a difference.
-  if(is_array($new_value) && is_array($old_value)) {
-    foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
-      recursive_unset($new_value, $property_to_ignore);
-      recursive_unset($old_value, $property_to_ignore);
-    }
-    $diff1 = array_diff_assoc_recursive($new_value, $old_value);
-    $diff2 = array_diff_assoc_recursive($old_value, $new_value);
-    if ($diff1 or $diff2) {
-      return TRUE;
     }
   }
 }
