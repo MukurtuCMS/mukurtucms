@@ -29,7 +29,7 @@ function ma_dhan_node_delete($node) {
 
     // Update field_all_users_notified
     $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
-    ma_dhan_update_field_all_users_notified($dhan_node_w);
+    ma_shared_notification_components_update_field_all_users_notified($dhan_node_w);
 
   }
 
@@ -71,7 +71,7 @@ function ma_dhan_node_insert($node) {
 
     // Update field_all_users_notified
     $dhan_node_w = entity_metadata_wrapper('node',  $dhan_node_w->getIdentifier()); // reload the dhan_node wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
-    ma_dhan_update_field_all_users_notified($dhan_node_w);
+    ma_shared_notification_components_update_field_all_users_notified($dhan_node_w);
 
   }
 
@@ -170,7 +170,7 @@ function ma_dhan_node_update($node) {
 
       // Update field_all_users_notified
       $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
-      ma_dhan_update_field_all_users_notified($dhan_node_w);
+      ma_shared_notification_components_update_field_all_users_notified($dhan_node_w);
     }
   }
 
@@ -208,20 +208,6 @@ function ma_dhan_update_dh_dhan_notify_lists($node, $deletion = FALSE) {
       $dhan_node_w = ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_node_w, $comm_cp_nid_being_deleted);
       $dhan_node_w->save();
     }
-  }
-}
-
-// Update field_all_users_notified
-function ma_dhan_update_field_all_users_notified($dhan_node_w) {
-  $all_users_to_notify = $dhan_node_w->field_notify_all->raw();
-  $already_notified = $dhan_node_w->field_users_notified->raw();
-  $all_users_notified = 1;
-  if (count(array_diff($all_users_to_notify, $already_notified))) {
-    $all_users_notified = 0;
-  }
-  if ($all_users_notified <>  $dhan_node_w->field_all_users_notified->value()) {
-    $dhan_node_w->field_all_users_notified->set($all_users_notified);
-    $dhan_node_w->save();
   }
 }
 
@@ -650,6 +636,31 @@ function ma_dhan_dhan_frequency_submit ($form, &$form_state) {
     // Update the DHAN frequency on the user object.
     $account->field_dhan_frequency[LANGUAGE_NONE][0]['value'] = $new_freq;
     user_save($account);
+  }
+
+  // Update the DHANs for all the CPs and Comms the user is following.
+  $frequency_field_map = [
+    'right away' => 'field_notify_immediately',
+    'daily digest' => 'field_notify_day',
+    'weekly digest' => 'field_notify_week',
+  ];
+  // Get all DHANs the user is marked as a follower of.
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->addMetaData('account', user_load(1))
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dhan')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('field_notify_all', 'target_id', $account->uid)
+    ->execute();
+  if (isset($result['node']) && count($result['node'])) {
+    // Loop through these, and check the child page if this user is using their default notification frequency for that node, and if so, update the Following node.
+    foreach (array_keys($result['node']) as $nid) {
+      $dhan_w = entity_metadata_wrapper('node', $nid);
+      $dhan_w->{$frequency_field_map[$existing_freq]}->set(array_diff($dhan_w->{$frequency_field_map[$existing_freq]}->raw(), [$account->uid])); // Remove the user from the old frequency
+      $dhan_w->{$frequency_field_map[$new_freq]}[] = $account->uid; // Add the user to the new frequency
+      $dhan_w->save();
+    }
   }
 
 }

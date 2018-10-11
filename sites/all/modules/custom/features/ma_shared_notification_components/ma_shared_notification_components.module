@@ -228,6 +228,22 @@ function ma_shared_notification_components_send_scheduled_notifications($schedul
 }
 
 /**
+ * Update field_all_users_notified.
+ */
+function ma_shared_notification_components_update_field_all_users_notified($notification_w) {
+  $all_users_to_notify = $notification_w->field_notify_all->raw();
+  $already_notified = $notification_w->field_users_notified->raw();
+  $all_users_notified = 1;
+  if (count(array_diff($all_users_to_notify, $already_notified))) {
+    $all_users_notified = 0;
+  }
+  if ($all_users_notified <>  $notification_w->field_all_users_notified->value()) {
+    $notification_w->field_all_users_notified->set($all_users_notified);
+    $notification_w->save();
+  }
+}
+
+/**
  * Helper function to compare two fields and return if there is a difference.
  *
  * This diff'ing code is based on https://drupal.stackexchange.com/a/175186/83739.

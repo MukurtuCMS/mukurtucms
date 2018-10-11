@@ -373,7 +373,7 @@ function ma_collaboration_tools_node_insert($node) {
 
     // Update field_all_users_notified
     $notification_w = entity_metadata_wrapper('node',  $notification_w->getIdentifier()); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
-    ma_collaboration_tools_update_field_all_users_notified($notification_w);
+    ma_shared_notification_components_update_field_all_users_notified($notification_w);
 
   }
 
@@ -466,7 +466,7 @@ function ma_collaboration_tools_node_update($node) {
     // Update field_all_users_notified
     if (count($following_diff_list) OR count ($diff_list)) {
       $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
-      ma_collaboration_tools_update_field_all_users_notified($notification_w);
+      ma_shared_notification_components_update_field_all_users_notified($notification_w);
     }
 
   }
@@ -495,24 +495,8 @@ function ma_collaboration_tools_comment_insert($comment) {
     $notification_w->save();
     ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'commented on', $comment);
     $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper
-    ma_collaboration_tools_update_field_all_users_notified($notification_w);
+    ma_shared_notification_components_update_field_all_users_notified($notification_w);
   }
-}
-
-// Update field_all_users_notified
-function ma_collaboration_tools_update_field_all_users_notified($notification_w) {
-  $all_users_to_notify = $notification_w->field_notify_all->raw();
-  $already_notified = $notification_w->field_users_notified->raw();
-  $all_users_notified = 1;
-  if (count(array_diff($all_users_to_notify, $already_notified))) {
-    $all_users_notified = 0;
-  }
-  if ($all_users_notified <>  $notification_w->field_all_users_notified->value()) {
-    $notification_w->field_all_users_notified->set($all_users_notified);
-    $notification_w->save();
-  }
-  // dpm ("all users notified set to: " . $all_users_notified);
-
 }
 
 // Set the notification lists on a Following node wrapper (to be saved by calling function).
@@ -1376,7 +1360,7 @@ function ma_collaboration_tools_send_scheduled_notifications($schedule) {
       $users_notified = array_unique(array_merge($notification_w->field_users_notified->raw(), $users_emailed));
       $notification_w->field_users_notified->set($users_notified);
       $notification_w->save();
-      ma_collaboration_tools_update_field_all_users_notified($notification_w);
+      ma_shared_notification_components_update_field_all_users_notified($notification_w);
     }
 
   }
