@@ -102,6 +102,11 @@ function ma_culturalprotocol_ds_field_settings_info() {
       'weight' => '6',
       'label' => 'above',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
     'group_management_links' => array(
       'weight' => '2',

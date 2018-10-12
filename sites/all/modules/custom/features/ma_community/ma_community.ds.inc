@@ -97,6 +97,11 @@ function ma_community_ds_field_settings_info() {
       'weight' => '10',
       'label' => 'above',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
     'community_browse_all_dh_link' => array(
       'weight' => '9',
