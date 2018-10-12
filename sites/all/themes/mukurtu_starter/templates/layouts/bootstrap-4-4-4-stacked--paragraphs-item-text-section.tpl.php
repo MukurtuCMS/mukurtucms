@@ -1,19 +1,30 @@
 <?php
 /**
  * @file
- * Bootstrap 6-6 stacked template for Display Suite.
+ * Bootstrap 4-4-4 Stacked template for Display Suite.
  */
 ?>
+<?php
+if(empty($left) && empty($right)) {
+    $central_classes .= ' col-sm-12';
+}
 
-<?php if (isset($mukurtu_tabbed_local_tasks[$nid])): ?>
-<div class="btn-group">
-<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Item Menu <span class="caret"></span></button>
-<h2 class="element-invisible">Primary tabs</h2>
-<ul class="dropdown-menu tabs--primary nav nav-tabs">
-<?php print render($mukurtu_tabbed_local_tasks[$nid]);?>
-</ul>
-</div>
-<?php endif; ?>
+if(empty($left) && !empty($right)) {
+    $central_classes .= ' col-sm-8';
+    $right_classes .= ' col-sm-4';
+}
+
+if(!empty($left) && empty($right)) {
+    $central_classes .= ' col-sm-8';
+    $left_classes .= ' col-sm-4';
+}
+
+if(!empty($left) && !empty($right)) {
+    $central_classes .= ' col-sm-6';
+    $left_classes .= ' col-sm-3';
+    $right_classes .= ' col-sm-3';
+}
+?>
 
 
 <<?php print $layout_wrapper; print $layout_attributes; ?> class="<?php print $classes; ?>">
@@ -27,18 +38,21 @@
       </<?php print $top_wrapper; ?>>
     </div>
   <?php endif; ?>
-  <?php if ($left || $right): ?>
+
+  <?php if ($left || $central || $right): ?>
     <div class="row">
-      <<?php print $left_wrapper; ?> class="col-sm-8 <?php print $left_classes; ?>">
+      <<?php print $left_wrapper; ?> class="col-xs-12 <?php print $left_classes; ?>">
         <?php print $left; ?>
       </<?php print $left_wrapper; ?>>
-      <<?php print $right_wrapper; ?> class="col-sm-4 <?php print $right_classes; ?>">
-       <div class="metadata-wrapper">
+      <<?php print $central_wrapper; ?> class="col-xs-12 <?php print $central_classes; ?>">
+        <?php print $central; ?>
+      </<?php print $central_wrapper; ?>>
+      <<?php print $right_wrapper; ?> class="col-xs-12 <?php print $right_classes; ?>">
         <?php print $right; ?>
-       </div>
       </<?php print $right_wrapper; ?>>
     </div>
   <?php endif; ?>
+
   <?php if ($bottom): ?>
     <div class="row">
       <<?php print $bottom_wrapper; ?> class="col-sm-12 <?php print $bottom_classes; ?>">

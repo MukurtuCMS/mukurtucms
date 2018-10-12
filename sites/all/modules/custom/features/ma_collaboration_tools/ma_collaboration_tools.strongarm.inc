@@ -1288,7 +1288,6 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->name = 'node_options_calendar';
   $strongarm->value = array(
     0 => 'status',
-    1 => 'promote',
   );
   $export['node_options_calendar'] = $strongarm;
 
@@ -1334,7 +1333,6 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->name = 'node_options_event';
   $strongarm->value = array(
     0 => 'status',
-    1 => 'promote',
   );
   $export['node_options_event'] = $strongarm;
 
@@ -1362,7 +1360,6 @@ function ma_collaboration_tools_strongarm() {
   $strongarm->name = 'node_options_oa_section';
   $strongarm->value = array(
     0 => 'status',
-    1 => 'promote',
   );
   $export['node_options_oa_section'] = $strongarm;
 

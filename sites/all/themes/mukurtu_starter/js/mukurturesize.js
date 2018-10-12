@@ -97,15 +97,6 @@ jQuery(document).ready(function ($) {
 			});
 		}
 
-		// When quicktabs are clicked, do a resize event. This redraws
-		// some elements like the OA caledar that don't render if
-		// not on the active tab.
-		if ($(".quicktabs-tabs li").length > 0) {
-			$(".quicktabs-tabs li a").on('click', function () {
-				window.dispatchEvent(new Event('resize'));
-			});
-		}
-
 		// Community Record MediaElement JS element resizing
 		// When a mejs element is rendered hidden/off screen it's width is 100%, we need to
 		// handle that for community record tabs

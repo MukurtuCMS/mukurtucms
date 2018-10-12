@@ -17,6 +17,7 @@ dependencies[] = ckeditor
 dependencies[] = comment
 dependencies[] = contact
 dependencies[] = context
+dependencies[] = context_condition_theme
 dependencies[] = contextual
 dependencies[] = ctools
 dependencies[] = defaultcontent

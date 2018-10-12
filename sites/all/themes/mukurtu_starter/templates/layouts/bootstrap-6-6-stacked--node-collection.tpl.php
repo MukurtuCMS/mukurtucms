@@ -5,16 +5,6 @@
  */
 ?>
 
-<?php if (isset($mukurtu_tabbed_local_tasks[$nid])): ?>
-<div class="btn-group">
-<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Item Menu <span class="caret"></span></button>
-<h2 class="element-invisible">Primary tabs</h2>
-<ul class="dropdown-menu tabs--primary nav nav-tabs">
-<?php print render($mukurtu_tabbed_local_tasks[$nid]);?>
-</ul>
-</div>
-<?php endif; ?>
-
 
 <<?php print $layout_wrapper; print $layout_attributes; ?> class="<?php print $classes; ?>">
   <?php if (isset($title_suffix['contextual_links'])): ?>
@@ -29,14 +19,12 @@
   <?php endif; ?>
   <?php if ($left || $right): ?>
     <div class="row">
-      <<?php print $left_wrapper; ?> class="col-sm-8 <?php print $left_classes; ?>">
+      <<?php print $right_wrapper; ?> class="col-sm-3 col-sm-push-9 <?php print $right_classes; ?>">
+        <?php print $right; ?>
+      </<?php print $right_wrapper; ?>>
+      <<?php print $left_wrapper; ?> class="col-sm-9 col-sm-pull-3 <?php print $left_classes; ?>">
         <?php print $left; ?>
       </<?php print $left_wrapper; ?>>
-      <<?php print $right_wrapper; ?> class="col-sm-4 <?php print $right_classes; ?>">
-       <div class="metadata-wrapper">
-        <?php print $right; ?>
-       </div>
-      </<?php print $right_wrapper; ?>>
     </div>
   <?php endif; ?>
   <?php if ($bottom): ?>

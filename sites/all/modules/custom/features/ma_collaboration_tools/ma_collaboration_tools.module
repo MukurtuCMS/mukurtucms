@@ -56,22 +56,11 @@ function ma_collaboration_tools_page_alter(&$data) {
           // Main CP tab
           $contents = '';
 
-          // Add the CP local tasks within the tab content.
-          // This is like what is being done in ma_digitalheritage_preprocess_node & ma_digitalheritage_community_record_local_tasks but with a lot less code.
-          $local_tasks = menu_local_tasks()['tabs']['output'];
-          if (count($local_tasks) > 1) {
-            $local_tasks['#prefix'] = '<ul class="tabs--primary nav nav-tabs">';
-            $local_tasks['#suffix'] = '</ul>';
-            $contents .= drupal_render($local_tasks);
-            // Set a flag to remove the CP local tasks from above the tabs, processed in ma_collaboration_tools_preprocess_page.
-            $data['hide_node_local_tasks'] = 1;
-          }
-
           // Add the CP node content to the first tab contents, and then build the first tab.
-          $node_view = node_view($cp_node, 'full');
-          $contents .= drupal_render($node_view);
           $tabs[] = [
-            'contents' => $contents,
+            'type' => 'node',
+            'nid' => $cp_node->nid,
+            'view_mode' => 'full',
             'title' => 'Protocol',
             'hide_title' => 1,
             'weight' => -1,
@@ -126,14 +115,22 @@ function ma_collaboration_tools_get_all_child_ref_fields() {
 
 
 /**
- * Implements hook_preprocess_page.
+ * Implements hook_preprocess_page().
  */
 function ma_collaboration_tools_preprocess_page(&$variables) {
-  if(isset($variables['node']) && $variables['node']->type == 'cultural_protocol_group') {
-    // If the local tasks are being displayed separately within the CP tab, then hide the default local tasks which appear above the tabs.
-    if (isset($variables['page']['hide_node_local_tasks'])) {
-      unset($variables['tabs']);
-    }
+  $types = array(
+    'calendar',
+    'cultural_protocol_group',
+    'discussion_space',
+    'discussion_topic',
+    'document_library',
+    'document_page',
+    'event',
+  );
+  if (isset($variables['node']) && in_array($variables['node']->type, $types)) {
+    // If the local tasks are being displayed separately within the CP tab,
+    // then hide the default local tasks which appear above the tabs.
+    unset($variables['tabs']);
   }
 }
 

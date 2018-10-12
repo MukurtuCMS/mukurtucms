@@ -11,7 +11,7 @@ include_once('ma_digitalheritage.features.inc');
  */
 function ma_digitalheritage_node_presave($node) {
   if ($node->type == 'digital_heritage') {
-    
+
     // Set the community record parent if the session var for such was set in ma_digitalheritage_form_digital_heritage_node_form_alter
     if (isset ($_SESSION['community_record_parent']) && isset($_SESSION['community_record_parent_requesting_path'])) {
         // Check and see if the previous page we were on matches the requesting page.  We don't want to set the parent on the wrong
@@ -23,7 +23,7 @@ function ma_digitalheritage_node_presave($node) {
             unset ($_SESSION['community_record_parent_requesting_path']);
         }
     }
-    
+
   }
 }
 
@@ -119,80 +119,10 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
  * Implements moduleName_preprocess_hook.
  */
 function ma_digitalheritage_preprocess_page(&$variables) {
-    if(isset($variables['node']) && $variables['node']->type == 'digital_heritage') {
-        $node = $variables['node'];
-        // For digital heritage items that have community records or are a community record, remove the standard local
-        // tasks tab. We will build multiple sets tabs with ma_digitalheritage_community_record_local_tasks
-        if(!empty($node->field_community_record_children) || !empty($node->field_community_record_parent)) {
-            unset($variables['tabs']);
-        }
-    }
-}
-
-function ma_digitalheritage_preprocess_node(&$variables) {
-    if($variables['type'] == 'digital_heritage') {
-        // For digital heritage items that have community records we will build multiple sets of local task tabs
-        // with ma_digitalheritage_community_record_local_tasks. The variable 'cr_tabs' will need to be used
-        // in templates.
-        if($variables['view_mode'] == 'full' || $variables['view_mode'] == 'community_record') {
-            if(!empty($variables['field_community_record_children']) || !empty($variables['field_community_record_parent'])) {
-                $variables['cr_tabs'] = ma_digitalheritage_community_record_local_tasks();
-            }
-        }
-    }
-}
-
-/*
- * Builds the local tasks tabs for a digital heritage item with community records.
- *
- * Default Drupal behavior would be to have a single set of tabs for the parent. This
- * builds tabs for the parent and each child.
- */
-function ma_digitalheritage_community_record_local_tasks() {
-    $cr_local_tasks = array();
-
-    // Get the current node
-    $node = menu_get_object();
-    if(!$node || $node->type != 'digital_heritage') {
-        return $cr_local_tasks;
-    }
-
-    // Get the local task tabs for that node
-    $local_tasks = menu_local_tasks();
-
-    // Store the tabs for the parent node, don't display if only one tab
-    if($local_tasks['tabs']['count'] > 1) {
-        $cr_local_tasks[$node->nid] = $local_tasks['tabs']['output'];
-    }
-
-    // Go through each community record
-    if(isset($node->field_community_record_children[LANGUAGE_NONE])) {
-        foreach($node->field_community_record_children[LANGUAGE_NONE] as $cr) {
-            $child_local_tasks = $local_tasks;
-            if(isset($cr['target_id'])) {
-                $cr_nid = $cr['target_id'];
-
-                // Go through each tab
-                foreach($child_local_tasks['tabs']['output'] as $key => $tab) {
-                    if(isset($tab['#link']['href'])) {
-                        // Replace the parent NID with the CR NID
-                        $child_local_tasks['tabs']['output'][$key]['#link']['href'] = str_replace($node->nid, $cr_nid, $tab['#link']['href']);
-                        // If the resulting path is inaccessible by the current user, remove it
-                        if(!drupal_valid_path($child_local_tasks['tabs']['output'][$key]['#link']['href'])) {
-                            unset($child_local_tasks['tabs']['output'][$key]);
-                        }
-                    }
-                }
-
-                // Store the tabs for the community record, don't display if only one tab
-                if(count($child_local_tasks['tabs']['output']) > 1) {
-                    $cr_local_tasks[$cr_nid] = $child_local_tasks['tabs']['output'];
-                }
-            }
-        }
-    }
-
-    return $cr_local_tasks;
+  if (isset($variables['node']) && $variables['node']->type == 'digital_heritage') {
+    // For digital heritage items, remove the standard local tasks tab.
+    unset($variables['tabs']);
+  }
 }
 
 /**
@@ -321,7 +251,7 @@ function ma_digitalheritage_node_view($node, $view_mode) {
         $node->content['field_media_asset'][0]['#markup'] = '
       <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
         <div class="field-items">
-            <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
+            <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img class="img-responsive" src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
         </div>
       </div>';
       }
@@ -815,7 +745,7 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
         form_set_error('field_book_children', t('Do not remove Book Pages here. Instead, edit the Book Page, then press "Delete".'));
       }
     }
-    
+
   }
 }
 

@@ -9752,6 +9752,282 @@ table .checkbox input[type="checkbox"] {
 .ds-2col-stacked .group-left .label-above {
   font-size: 22px;
 }
+.node.view-mode-full .field,
+.node.view-mode-search_result .field {
+  margin-bottom: 10px;
+}
+.node.view-mode-full .field .label-inline,
+.node.view-mode-search_result .field .label-inline {
+  width: 100px;
+}
+.node.view-mode-full .col-sm-12 .field .label-inline,
+.node.view-mode-search_result .col-sm-12 .field .label-inline {
+  width: auto;
+}
+.node.view-mode-full .col-sm-8 .label-above,
+.node.view-mode-search_result .col-sm-8 .label-above {
+  font-size: 22px;
+}
+.node.view-mode-full .col-xs-4 .field-name-field-media-asset,
+.node.view-mode-search_result .col-xs-4 .field-name-field-media-asset {
+  width: 100%;
+}
+.node.view-mode-search_result .col-xs-4,
+.node.view-mode-search_result .col-xs-8 {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .node.view-mode-search_result .col-xs-4 {
+    width: 33.33333333%;
+  }
+  .node.view-mode-search_result .col-xs-8 {
+    width: 66.66666667%;
+  }
+}
+.pane-title .fa-caret-right {
+  display: none;
+}
+.pane-title .fa-caret-down {
+  display: inline;
+}
+.collapsed .pane-title .fa-caret-right {
+  display: inline;
+}
+.collapsed .pane-title .fa-caret-down {
+  display: none;
+}
+.page-dictionary .dictionary-facets {
+  background: #fff;
+}
+.page-dictionary .dictionary-facets-region {
+  margin: auto;
+  float: none;
+}
+.page-dictionary .dictionary-facets-region .panel-pane {
+  padding: 10px 15px 10px 15px;
+}
+.page-dictionary .dictionary-facets-region .pane-block .pane-content {
+  padding: 0px;
+}
+.page-dictionary .dictionary-facets-region .pane-block .pane-content #edit-search-api-views-fulltext-wrapper {
+  padding: 10px 0px 10px 0px;
+}
+.page-dictionary .dictionary-facets-region .dropdown button {
+  height: 40px;
+  width: 100%;
+  text-align: left;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu {
+  width: 100%;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul {
+  padding-left: 10px;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li {
+  list-style-type: none;
+}
+.page-dictionary .dictionary-facets-region .dropdown-menu ul li a.facetapi-checkbox {
+  padding-left: 5px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .pane-title {
+  display: none;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all #edit-search-api-views-fulltext-wrapper {
+  padding: 10px 15px 10px 15px;
+  clear: left;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all #edit-search-api-views-fulltext-wrapper label {
+  display: none;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget {
+  padding: 10px 5px 10px 5px;
+}
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget input,
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget button,
+.page-dictionary .pane-views-exp-dictionary-words-all .views-exposed-widget .btn {
+  width: 100%;
+  margin-top: 0px;
+}
+.page-dictionary .facet-glossary {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-left: 20px;
+  background: none;
+}
+.page-dictionary .facet-glossary > a {
+  display: none;
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .page-dictionary .facet-glossary .facetapi-search-api-glossary {
+    display: table;
+  }
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary .no-content {
+  display: none;
+}
+@media (min-width: 768px) {
+  .page-dictionary .facet-glossary .facetapi-search-api-glossary .no-content {
+    display: table-cell;
+  }
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary .active {
+  font-weight: bold;
+  color: #333333;
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary li {
+  display: inline;
+}
+@media (min-width: 768px) {
+  .page-dictionary .facet-glossary .facetapi-search-api-glossary li {
+    display: table-cell;
+    width: 3%;
+  }
+}
+.page-dictionary .facet-glossary .facetapi-search-api-glossary li a {
+  font-weight: bold;
+  font-size: 17px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle {
+  display: none;
+  margin-bottom: 30px;
+  background-color: #F8F7F7;
+  padding-bottom: 30px;
+}
+@media (min-width: 992px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle {
+    height: 290px;
+  }
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field {
+  width: 100%;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+@media (min-width: 768px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field {
+    padding-left: 30px;
+  }
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling {
+  background-color: #E3E2E1;
+  background-size: 18px;
+  height: 68px;
+  padding: 0px 0px 0px 10px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-alternate-spelling a {
+  display: inherit;
+  font-size: 26px;
+  padding-left: 20px;
+  line-height: 68px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-translation {
+  font-weight: bold;
+  font-size: 20px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .field-label {
+  font-size: 17px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .field-item {
+  padding-right: 30px;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .field-item .group-left {
+  width: 80%;
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .mejs__container {
+  max-width: 240px;
+}
+@media (min-width: 768px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .mejs__container {
+    max-width: 350px;
+  }
+}
+@media (min-width: 992px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .mejs__container {
+    max-width: 330px;
+  }
+}
+@media (min-width: 1200px) {
+  .node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div.paragraphs-item-dictionary-word-bundle .field-name-field-dictionary-word-recording .mejs__container {
+    max-width: 100%;
+  }
+}
+.node-dictionary-word.view-mode-dictionary_word_summary .field-name-field-word-entry div:first-of-type {
+  display: block;
+}
+.view-dictionary-words {
+  background: none;
+}
+.view-dictionary-words .view-content .views-row {
+  border-bottom: none !important;
+  padding: 0px !important;
+}
+.mejs__container .mejs__controls .mejs__horizontal-volume-button,
+.mejs__container .mejs__controls .mejs__mute,
+.mejs__container .mejs__controls .mejs__horizontal-volume-slider {
+  display: none;
+}
+@media (min-width: 768px) {
+  .mejs__container .mejs__controls .mejs__horizontal-volume-button,
+  .mejs__container .mejs__controls .mejs__mute,
+  .mejs__container .mejs__controls .mejs__horizontal-volume-slider {
+    display: block;
+  }
+}
+.mukurtu-login-menu {
+  float: right;
+  background: #474440;
+  margin-top: -20px;
+  border-radius: 0px 0px 0px 5px;
+}
+.mukurtu-login-menu ul {
+  list-style-type: none;
+  text-align: center;
+  padding-left: 0px;
+  margin-bottom: 4px;
+}
+.mukurtu-login-menu ul li a {
+  font-size: 16px;
+  color: #F5F5F5;
+  padding: 6px 10px;
+}
+.page-collections .view-mode-collections_browse .row {
+  background: #F5F5F5;
+}
+.page-collections .view-mode-collections_browse .large-teaser-image {
+  padding: 0px;
+}
+.page-collections .pane-views-exp-collections-all,
+.page-collections .pane-ma-search-api-ma-custom-sorts {
+  margin: 0 auto;
+  width: 350px;
+}
+.page-collections .pane-views-exp-collections-all .pane-content,
+.page-collections .pane-ma-search-api-ma-custom-sorts .pane-content {
+  padding: 5px 10px;
+}
+.page-collections .pane-views-exp-collections-all .views-exposed-form .views-widget-filter-search_api_views_fulltext .views-widget,
+.page-collections .pane-ma-search-api-ma-custom-sorts .views-exposed-form .views-widget-filter-search_api_views_fulltext .views-widget {
+  width: 200px;
+}
+.page-collections .pane-views-exp-collections-all .views-exposed-form .views-exposed-widgets,
+.page-collections .pane-ma-search-api-ma-custom-sorts .views-exposed-form .views-exposed-widgets {
+  margin: 0 auto;
+  width: 300px;
+}
+.page-collections .pane-views-exp-collections-all .views-exposed-form .views-exposed-widget,
+.page-collections .pane-ma-search-api-ma-custom-sorts .views-exposed-form .views-exposed-widget {
+  padding: 5px;
+}
+.page-collections .pane-views-exp-collections-all .views-exposed-form .views-exposed-widget .form-submit,
+.page-collections .pane-ma-search-api-ma-custom-sorts .views-exposed-form .views-exposed-widget .form-submit {
+  margin-top: 0px;
+}
+.page-collections .view-content .views-row {
+  padding: 10px 0px;
+}
 .mukurtu-collapsed-fieldset-div h3 {
   font-weight: bold;
   text-transform: uppercase;
@@ -9815,7 +10091,9 @@ table .checkbox input[type="checkbox"] {
   width: 66%;
 }
 .node-dictionary-word.view-mode-full .group-right,
-.node-word-list.view-mode-full .group-right {
+.node-word-list.view-mode-full .group-right,
+.node-dictionary-word.view-mode-full .metadata-sidebar,
+.node-word-list.view-mode-full .metadata-sidebar {
   width: 30%;
   background: #f8f7f7 none repeat scroll 0 0;
   border-radius: 4px;
@@ -9883,7 +10161,7 @@ table .checkbox input[type="checkbox"] {
 .view-digital-heritage-grid-list .view-header,
 .view-collections-grid-list .view-header,
 .view-dictionary-words .view-header {
-  float: right;
+  padding-bottom: 10px;
   margin-right: 20px;
 }
 .view-digital-heritage-grid-list .view-header a,
@@ -9921,84 +10199,98 @@ table .checkbox input[type="checkbox"] {
 .view-dictionary-words.list-view .view-content .views-row .field-name-field-media-asset {
   right: 0;
 }
-.view-digital-heritage-grid-list.grid-view .tooltips span,
-.view-collections-grid-list.grid-view .tooltips span,
-.view-dictionary-words.grid-view .tooltips span {
-  top: 0px;
-  left: 0px;
-  width: 220px;
-  z-index: 999;
+.view-digital-heritage-grid-list.grid-view,
+.view-collections-grid-list.grid-view,
+.view-dictionary-words.grid-view {
+  padding-top: 60px;
+}
+.view-digital-heritage-grid-list.grid-view .view-header,
+.view-collections-grid-list.grid-view .view-header,
+.view-dictionary-words.grid-view .view-header {
+  position: absolute;
+  top: 0;
 }
 .view-digital-heritage-grid-list.grid-view .view-content,
 .view-collections-grid-list.grid-view .view-content,
 .view-dictionary-words.grid-view .view-content {
-  margin-left: -25px;
-  margin-right: -25px;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .placeholder-image,
-.view-collections-grid-list.grid-view .view-content .placeholder-image,
-.view-dictionary-words.grid-view .view-content .placeholder-image,
-.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-collection,
-.view-collections-grid-list.grid-view .view-content .field-name-field-collection,
-.view-dictionary-words.grid-view .view-content .field-name-field-collection,
-.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-description,
-.view-collections-grid-list.grid-view .view-content .field-name-field-description,
-.view-dictionary-words.grid-view .view-content .field-name-field-description,
-.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-community-ref,
-.view-collections-grid-list.grid-view .view-content .field-name-field-community-ref,
-.view-dictionary-words.grid-view .view-content .field-name-field-community-ref,
-.view-digital-heritage-grid-list.grid-view .view-content .field-name-field-category,
-.view-collections-grid-list.grid-view .view-content .field-name-field-category,
-.view-dictionary-words.grid-view .view-content .field-name-field-category {
-  display: none;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .views-row,
-.view-collections-grid-list.grid-view .view-content .views-row,
-.view-dictionary-words.grid-view .view-content .views-row {
-  float: left;
-  width: 220px;
-  background: #F8F7F7;
-  margin: 0 25px 20px 25px;
-  padding-bottom: 20px;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-field-media-asset,
-.view-collections-grid-list.grid-view .view-content .views-row .field-name-field-media-asset,
-.view-dictionary-words.grid-view .view-content .views-row .field-name-field-media-asset {
-  width: 100%;
-  padding: 0;
-  left: 0;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .group_list_view_fields,
-.view-collections-grid-list.grid-view .view-content .views-row .group_list_view_fields,
-.view-dictionary-words.grid-view .view-content .views-row .group_list_view_fields {
-  right: 0;
-  width: 100%;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-title h2,
-.view-collections-grid-list.grid-view .view-content .views-row .field-name-title h2,
-.view-dictionary-words.grid-view .view-content .views-row .field-name-title h2,
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .field-name-collections-title-with-count h2,
-.view-collections-grid-list.grid-view .view-content .views-row .field-name-collections-title-with-count h2,
-.view-dictionary-words.grid-view .view-content .views-row .field-name-collections-title-with-count h2 {
-  font-size: 140%;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .label-inline,
-.view-collections-grid-list.grid-view .view-content .views-row .label-inline,
-.view-dictionary-words.grid-view .view-content .views-row .label-inline {
-  float: none;
-  font-weight: bold;
-  display: none;
-}
-.view-digital-heritage-grid-list.grid-view .view-content .views-row .col-md-8,
-.view-collections-grid-list.grid-view .view-content .views-row .col-md-8,
-.view-dictionary-words.grid-view .view-content .views-row .col-md-8 {
-  position: static;
-  width: 100%;
+  height: 100%;
 }
 .view-digital-heritage-grid-list.grid-view .text-center,
 .view-collections-grid-list.grid-view .text-center,
 .view-dictionary-words.grid-view .text-center {
-  clear: both;
+  width: 100%;
+  float: left;
+  margin-top: 10%;
+}
+.view-digital-heritage-grid-list.grid-view .views-row,
+.view-collections-grid-list.grid-view .views-row,
+.view-dictionary-words.grid-view .views-row {
+  width: 100% !important;
+  float: left;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+@media (min-width: 768px) {
+  .view-digital-heritage-grid-list.grid-view .views-row,
+  .view-collections-grid-list.grid-view .views-row,
+  .view-dictionary-words.grid-view .views-row {
+    width: 45% !important;
+  }
+}
+@media (min-width: 992px) {
+  .view-digital-heritage-grid-list.grid-view .views-row,
+  .view-collections-grid-list.grid-view .views-row,
+  .view-dictionary-words.grid-view .views-row {
+    width: 30% !important;
+  }
+}
+@media (min-width: 1600px) {
+  .view-digital-heritage-grid-list.grid-view .views-row,
+  .view-collections-grid-list.grid-view .views-row,
+  .view-dictionary-words.grid-view .views-row {
+    width: 20% !important;
+  }
+}
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .field,
+.view-collections-grid-list.grid-view .view-mode-search_result .field,
+.view-dictionary-words.grid-view .view-mode-search_result .field {
+  display: none;
+}
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .field-name-title,
+.view-collections-grid-list.grid-view .view-mode-search_result .field-name-title,
+.view-dictionary-words.grid-view .view-mode-search_result .field-name-title,
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .field-name-field-media-asset,
+.view-collections-grid-list.grid-view .view-mode-search_result .field-name-field-media-asset,
+.view-dictionary-words.grid-view .view-mode-search_result .field-name-field-media-asset {
+  display: block;
+}
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .field-name-title h2,
+.view-collections-grid-list.grid-view .view-mode-search_result .field-name-title h2,
+.view-dictionary-words.grid-view .view-mode-search_result .field-name-title h2,
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .field-name-field-media-asset h2,
+.view-collections-grid-list.grid-view .view-mode-search_result .field-name-field-media-asset h2,
+.view-dictionary-words.grid-view .view-mode-search_result .field-name-field-media-asset h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .field-name-field-media-asset img,
+.view-collections-grid-list.grid-view .view-mode-search_result .field-name-field-media-asset img,
+.view-dictionary-words.grid-view .view-mode-search_result .field-name-field-media-asset img {
+  width: 100%;
+}
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .col-xs-4,
+.view-collections-grid-list.grid-view .view-mode-search_result .col-xs-4,
+.view-dictionary-words.grid-view .view-mode-search_result .col-xs-4,
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .col-xs-8,
+.view-collections-grid-list.grid-view .view-mode-search_result .col-xs-8,
+.view-dictionary-words.grid-view .view-mode-search_result .col-xs-8,
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .col-sm-4,
+.view-collections-grid-list.grid-view .view-mode-search_result .col-sm-4,
+.view-dictionary-words.grid-view .view-mode-search_result .col-sm-4,
+.view-digital-heritage-grid-list.grid-view .view-mode-search_result .col-sm-8,
+.view-collections-grid-list.grid-view .view-mode-search_result .col-sm-8,
+.view-dictionary-words.grid-view .view-mode-search_result .col-sm-8 {
+  width: 100%;
 }
 a:hover {
   text-decoration: none;
@@ -10018,16 +10310,9 @@ a:hover {
 .view-dictionary-words .field-name-field-dictionary-word-recording {
   width: 190px;
 }
-.view-dictionary-words.list-view .field-name-field-dictionary-word-recording {
-  float: right;
-  margin-top: -40px;
-  margin-right: 20px;
-  margin-left: 20px;
-}
 .view-dictionary-words.list-view .views-row {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  padding-bottom: 15px !important;
 }
 .view-dictionary-words.grid-view .dictionary-list-fields {
   padding-left: 15px;
@@ -10077,7 +10362,11 @@ a:hover {
 .node-community .group-right .block-views,
 .node-cultural-protocol-group .group-right .block-views,
 .node-community .group-right .field,
-.node-cultural-protocol-group .group-right .field {
+.node-cultural-protocol-group .group-right .field,
+.node-community .metadata-wrapper .block-views,
+.node-cultural-protocol-group .metadata-wrapper .block-views,
+.node-community .metadata-wrapper .field,
+.node-cultural-protocol-group .metadata-wrapper .field {
   background: #F8F7F7;
   border-radius: 5px;
   margin-bottom: 2em;
@@ -10086,10 +10375,18 @@ a:hover {
 .node-cultural-protocol-group .group-right .block-views h2.block-title,
 .node-community .group-right .field h2.block-title,
 .node-cultural-protocol-group .group-right .field h2.block-title,
+.node-community .metadata-wrapper .block-views h2.block-title,
+.node-cultural-protocol-group .metadata-wrapper .block-views h2.block-title,
+.node-community .metadata-wrapper .field h2.block-title,
+.node-cultural-protocol-group .metadata-wrapper .field h2.block-title,
 .node-community .group-right .block-views .label-above,
 .node-cultural-protocol-group .group-right .block-views .label-above,
 .node-community .group-right .field .label-above,
-.node-cultural-protocol-group .group-right .field .label-above {
+.node-cultural-protocol-group .group-right .field .label-above,
+.node-community .metadata-wrapper .block-views .label-above,
+.node-cultural-protocol-group .metadata-wrapper .block-views .label-above,
+.node-community .metadata-wrapper .field .label-above,
+.node-cultural-protocol-group .metadata-wrapper .field .label-above {
   background: #E3E2E1;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
@@ -10103,27 +10400,47 @@ a:hover {
 .node-cultural-protocol-group .group-right .block-views .view-content,
 .node-community .group-right .field .view-content,
 .node-cultural-protocol-group .group-right .field .view-content,
+.node-community .metadata-wrapper .block-views .view-content,
+.node-cultural-protocol-group .metadata-wrapper .block-views .view-content,
+.node-community .metadata-wrapper .field .view-content,
+.node-cultural-protocol-group .metadata-wrapper .field .view-content,
 .node-community .group-right .block-views .view-footer,
 .node-cultural-protocol-group .group-right .block-views .view-footer,
 .node-community .group-right .field .view-footer,
 .node-cultural-protocol-group .group-right .field .view-footer,
+.node-community .metadata-wrapper .block-views .view-footer,
+.node-cultural-protocol-group .metadata-wrapper .block-views .view-footer,
+.node-community .metadata-wrapper .field .view-footer,
+.node-cultural-protocol-group .metadata-wrapper .field .view-footer,
 .node-community .group-right .block-views ul,
 .node-cultural-protocol-group .group-right .block-views ul,
 .node-community .group-right .field ul,
-.node-cultural-protocol-group .group-right .field ul {
+.node-cultural-protocol-group .group-right .field ul,
+.node-community .metadata-wrapper .block-views ul,
+.node-cultural-protocol-group .metadata-wrapper .block-views ul,
+.node-community .metadata-wrapper .field ul,
+.node-cultural-protocol-group .metadata-wrapper .field ul {
   padding-left: 20px;
   padding-bottom: 10px;
 }
 .node-community .group-right .block-views ul,
 .node-cultural-protocol-group .group-right .block-views ul,
 .node-community .group-right .field ul,
-.node-cultural-protocol-group .group-right .field ul {
+.node-cultural-protocol-group .group-right .field ul,
+.node-community .metadata-wrapper .block-views ul,
+.node-cultural-protocol-group .metadata-wrapper .block-views ul,
+.node-community .metadata-wrapper .field ul,
+.node-cultural-protocol-group .metadata-wrapper .field ul {
   padding-top: 10px;
 }
 .node-calendar.view-mode-full .group-right .panel,
 .node-event.view-mode-full .group-right .panel,
+.node-calendar.view-mode-full .metadata-sidebar .panel,
+.node-event.view-mode-full .metadata-sidebar .panel,
 .node-calendar.view-mode-full .group-right .right-col-block,
-.node-event.view-mode-full .group-right .right-col-block {
+.node-event.view-mode-full .group-right .right-col-block,
+.node-calendar.view-mode-full .metadata-sidebar .right-col-block,
+.node-event.view-mode-full .metadata-sidebar .right-col-block {
   background: #F8F7F7;
   border-radius: 5px;
   border-color: #ddd !important;
@@ -10132,26 +10449,40 @@ a:hover {
 }
 .node-calendar.view-mode-full .group-right .panel .view,
 .node-event.view-mode-full .group-right .panel .view,
+.node-calendar.view-mode-full .metadata-sidebar .panel .view,
+.node-event.view-mode-full .metadata-sidebar .panel .view,
 .node-calendar.view-mode-full .group-right .right-col-block .view,
-.node-event.view-mode-full .group-right .right-col-block .view {
+.node-event.view-mode-full .group-right .right-col-block .view,
+.node-calendar.view-mode-full .metadata-sidebar .right-col-block .view,
+.node-event.view-mode-full .metadata-sidebar .right-col-block .view {
   padding: 15px;
 }
 .node-calendar.view-mode-full .group-right .right-col-block .label-above,
 .node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .metadata-sidebar .right-col-block .label-above,
+.node-event.view-mode-full .metadata-sidebar .right-col-block .label-above,
 .node-calendar.view-mode-full .group-right .panel-title,
-.node-event.view-mode-full .group-right .panel-title {
+.node-event.view-mode-full .group-right .panel-title,
+.node-calendar.view-mode-full .metadata-sidebar .panel-title,
+.node-event.view-mode-full .metadata-sidebar .panel-title {
   font-size: 20px;
   font-weight: 400;
   text-transform: none;
 }
 .node-calendar.view-mode-full .group-right .right-col-block .label-above,
 .node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .metadata-sidebar .right-col-block .label-above,
+.node-event.view-mode-full .metadata-sidebar .right-col-block .label-above,
 .node-calendar.view-mode-full .group-right .panel-heading,
-.node-event.view-mode-full .group-right .panel-heading {
+.node-event.view-mode-full .group-right .panel-heading,
+.node-calendar.view-mode-full .metadata-sidebar .panel-heading,
+.node-event.view-mode-full .metadata-sidebar .panel-heading {
   background: #E3E2E1;
 }
 .node-calendar.view-mode-full .group-right .right-col-block .label-above,
-.node-event.view-mode-full .group-right .right-col-block .label-above {
+.node-event.view-mode-full .group-right .right-col-block .label-above,
+.node-calendar.view-mode-full .metadata-sidebar .right-col-block .label-above,
+.node-event.view-mode-full .metadata-sidebar .right-col-block .label-above {
   padding: 10px 15px;
 }
 .field-name-protocol-dh-items,
@@ -10241,6 +10572,10 @@ a:hover {
 .navbar-top.navbar.container {
   margin-top: 0;
 }
+.navbar-top ul.dropdown-menu {
+  background-color: #474440;
+  padding: 5px 5px;
+}
 .navbar-top ul.nav {
   width: 100%;
 }
@@ -10248,7 +10583,7 @@ a:hover {
   background: #585551;
   margin: 8px 2px;
 }
-.navbar-top ul.nav li.last {
+.navbar-top ul.nav li.last.collapsed {
   float: right;
   border-radius: 4px;
   border: 1px solid #979797;
@@ -10258,10 +10593,7 @@ a:hover {
   color: #F5F5F5;
   padding: 6px 10px;
 }
-.navbar-top ul.nav li:hover {
-  background: #F4EADE;
-}
-.navbar-top ul.nav li:hover a {
+.navbar-top ul.nav li.leaf:hover a {
   color: #474440;
 }
 .navbar-bottom {
@@ -10317,10 +10649,16 @@ a:hover {
   margin-bottom: 2.5em;
 }
 .node-digital-heritage.view-mode-full .group-right,
-.node-digital-heritage.view-mode-community_record .group-right {
+.node-digital-heritage.view-mode-community_record .group-right,
+.node-digital-heritage.view-mode-full .metadata-sidebar,
+.node-digital-heritage.view-mode-community_record .metadata-sidebar {
   background: #f8f7f7 none repeat scroll 0 0;
   border-radius: 4px;
   padding: 30px;
+}
+.node-digital-heritage.view-mode-full .field-name-field-licence-trad,
+.node-digital-heritage.view-mode-community_record .field-name-field-licence-trad {
+  width: 299px;
 }
 .node-digital-heritage.view-mode-full .field-name-field-licence-trad .popup-element,
 .node-digital-heritage.view-mode-community_record .field-name-field-licence-trad .popup-element {

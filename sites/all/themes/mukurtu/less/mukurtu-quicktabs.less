@@ -19,6 +19,10 @@
             .record-drop-shadow;
             padding-left: 0px;
 
+            &.first {
+                background: none;
+            }
+
             // Stack CR tabs left->right on non-mobile
             // Tablet
             @media (min-width: @screen-sm-min) {
@@ -38,6 +42,12 @@
                 height: 100%;
                 background: none;
                 line-height: 44px;
+
+                &.first,
+                &.active,
+                &.last {
+                    background: none;
+                }
             }
 
             &:hover {
@@ -52,6 +62,7 @@
             &.active {
                 background: none;
                 background-color: @brand-primary;
+                text-align: center;
                 a {
                     color: #fff;
                 }
@@ -63,9 +74,7 @@
                         content : "";
                         display: inline-block;
                         position: relative;
-                        left: 50%;
-                        margin-left: -9%;
-                        top: -1px;
+                        top: -2px;
                         border-style: solid;
                         border-width: 15px 15px 0 15px;
                         border-color: @brand-primary transparent transparent transparent;

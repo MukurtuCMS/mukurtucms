@@ -4,17 +4,15 @@
  * Bootstrap 6-6 stacked template for Display Suite.
  */
 ?>
-
-<?php if (isset($mukurtu_tabbed_local_tasks[$nid])): ?>
+<?php if (isset($cr_tabs[$nid])): ?>
 <div class="btn-group">
 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Item Menu <span class="caret"></span></button>
 <h2 class="element-invisible">Primary tabs</h2>
 <ul class="dropdown-menu tabs--primary nav nav-tabs">
-<?php print render($mukurtu_tabbed_local_tasks[$nid]);?>
+<?php print render($cr_tabs[$nid]);?>
 </ul>
 </div>
 <?php endif; ?>
-
 
 <<?php print $layout_wrapper; print $layout_attributes; ?> class="<?php print $classes; ?>">
   <?php if (isset($title_suffix['contextual_links'])): ?>
