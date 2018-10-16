@@ -150,7 +150,7 @@ function ma_dhan_node_update($node) {
       // Unset the users_notified on the DHAN, then add a new DHAN email FC.
       $dhan_node_w->field_users_notified->set([]);
       $dhan_node_w->save();
-      ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'updated');
+      ma_dhan_set_dhan_email_fc($dhan_node_w, $node, 'updated', $diff_list);
 
       // Update field_all_users_notified
       $dhan_node_w = entity_metadata_wrapper('node', $dhan_nid); // reload the notification wrapper, since it may have been updated in ma_dhan_field_collection_item_insert (as fired from ma_dhan_set_dhan_email_fc)
@@ -243,7 +243,7 @@ function ma_dhan_set_dhan_notification_lists_on_dhan_wrapper($dh_node, $dhan_nod
 
 
 // Attach the dhan email field collection to a given dhan node.
-function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op) {
+function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op, $diff_list = []) {
   $fc_email = entity_create('field_collection_item', array('field_name' => 'field_notification_email'));
   $fc_email->setHostEntity('node', node_load($dhan_node_w->getIdentifier()));
   $fce_w = entity_metadata_wrapper('field_collection_item', $fc_email);
@@ -272,6 +272,9 @@ function ma_dhan_set_dhan_email_fc($dhan_node_w, $dh_node, $op) {
   }
   $body = 'The Digital Heritage item "' . $dh_node->title . '", was ' . $op . ' by ' . $dh_node->name . ' on ' . date('l, F j', $dh_node->timestamp) . ' at ' . date('g:ia', $dh_node->timestamp) . '.';
   $body .= "\n\nYou are being notified of this because you have chosen to receive notifications for either a Community or a Protocol that this item is in.";
+  if ($op == 'updated') {
+    $body .= "\n\nThe following field(s) were updated: " . implode ($diff_list, ', ')  . '.';
+  }
   if ($op <> 'deleted') {
     $body .= "\n\nView the Digital Heritage item: " . $GLOBALS["base_url"] . '/' . $dh_path;
   }
