@@ -427,7 +427,7 @@ function ma_dhan_dhan_report_access() {
 function ma_dhan_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
 
   // The exposed filters on the DHAN view.
-  if ($form['#id'] == 'views-exposed-form-dhan-page-1') {
+  if ($form['#id'] == 'views-exposed-form-dhan-page') {
 
     $uid = arg(1);
     $user = user_load($uid);
