@@ -177,4 +177,8 @@ projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
 
 ;;; Views
 ; Change delimiter from coma to semi-colon
-projects[views][patch][] = contrib/109315810-Views-Change-delimiter-from-comma-to-semi-colon.patch
+;projects[views][patch][] = contrib/109315810-Views-Change-delimiter-from-comma-to-semi-colon.patch
+
+;;; Views Data Export
+; Fixes issue where the first row in a data export is empty
+projects[views_data_export][patch][] =  https://www.drupal.org/files/issues/2018-10-16/views_data_export-empty-row-after-export-2902923-2.patch
