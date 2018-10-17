@@ -186,8 +186,38 @@ function ma_culturalprotocol_node_access($node, $op, $account) {
             // OG node_access doesn't know what to do for users with no community memberships yet.
             // This causes users like Language Stewards to be presented with the option to create protocols, which we don't want.
             // Here we explicitly check for the ability to create protocols
-            if(!user_access('create cultural_protocol_group content')) {
-                return NODE_ACCESS_DENY;
+            $access = FALSE;
+            $groups_for_user = og_get_groups_by_user($account, 'node');
+            foreach($groups_for_user as $group) {
+              $roles = og_get_user_roles('node', $group);
+              if(in_array('community manager', $roles)) {
+                // Check if user has global permission to create protocols.
+                if(user_access('create cultural_protocol_group content', $account)) {
+                  $access = TRUE;
+                  break;
+                }
+
+                // Check if user has OG permission to create protocols.
+                if(og_user_access("node", $group, 'create cultural_protocol_group content', $account)) {
+                  $access = TRUE;
+                  break;
+                }
+
+                $cps = ma_cultural_protocol_get_cps_for_user($roles, $group);
+                if(!empty($cps)) {
+                  foreach(array_keys($cps) as $cp) {
+                    // Check each protocol for OG permission to create protocols.
+                    if(og_user_access("node", $cp, 'create cultural_protocol_group content', $account)) {
+                      $access = TRUE;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+
+            if(!$access) {
+              return NODE_ACCESS_DENY;
             }
             break;
         case 'delete':
