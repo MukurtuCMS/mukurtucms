@@ -113,27 +113,6 @@ function ma_collaboration_tools_get_all_child_ref_fields() {
   return $ref_fields;
 }
 
-
-/**
- * Implements hook_preprocess_page().
- */
-function ma_collaboration_tools_preprocess_page(&$variables) {
-  $types = array(
-    'calendar',
-    'cultural_protocol_group',
-    'discussion_space',
-    'discussion_topic',
-    'document_library',
-    'document_page',
-    'event',
-  );
-  if (isset($variables['node']) && in_array($variables['node']->type, $types)) {
-    // If the local tasks are being displayed separately within the CP tab,
-    // then hide the default local tasks which appear above the tabs.
-    unset($variables['tabs']);
-  }
-}
-
 /**
  * Implements hook_node_view().
  */
