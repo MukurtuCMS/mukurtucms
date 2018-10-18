@@ -108,7 +108,7 @@ function mukurtu_rebuild_permissions () {
 function mukurtu_default_tax_terms () {
   $taxonomy = array(
     'category' => array(
-      'General',
+      'Default',
     ),
   );
   foreach ($taxonomy as $vocabulary_name => $terms) {
