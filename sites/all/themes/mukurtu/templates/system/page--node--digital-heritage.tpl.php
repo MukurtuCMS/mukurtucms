@@ -74,7 +74,7 @@
  * @ingroup templates
  */
 ?>
- 
+
 <header id="navbar" role="banner" class="<?php print $navbar_classes; ?>">
 <div class="mukurtu-menu <?php print $container_class; ?>">
         <nav role="navigation">
@@ -93,7 +93,7 @@
         ?>
         </nav>
   </div>
-  <div id="mukurtu-collapse-menu-container" class="<?php print $container_class; ?>"> 
+  <div id="mukurtu-collapse-menu-container" class="<?php print $container_class; ?>">
     <div class="navbar-header">
       <?php if ($logo): ?>
         <a class="logo navbar-btn pull-left" href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>">
@@ -174,12 +174,13 @@ if(!empty($node->field_community_record_parent[LANGUAGE_NONE])) {
 ?>
 <?php
 // Is this a multi-page item?
-if ($multipage_node->field_book_children OR $multipage_node->field_book_parent):
+$edit = (basename(current_path()) == 'edit') ? TRUE : FALSE;
+if (!$edit && ($multipage_node->field_book_children || $multipage_node->field_book_parent)):
 ?>
 <?php
 // Find the first page
 if(isset($multipage_node->field_book_children) && count($multipage_node->field_book_children) > 0) {
-    $first_page = $multipage_node; 
+    $first_page = $multipage_node;
 } else {
     $first_page = node_load($multipage_node->field_book_parent[LANGUAGE_NONE][0]['target_id']);
 }
