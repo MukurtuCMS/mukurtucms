@@ -329,7 +329,6 @@ function ma_collection_strongarm() {
   $strongarm->name = 'node_options_personal_collection';
   $strongarm->value = array(
     0 => 'status',
-    1 => 'promote',
   );
   $export['node_options_personal_collection'] = $strongarm;
 

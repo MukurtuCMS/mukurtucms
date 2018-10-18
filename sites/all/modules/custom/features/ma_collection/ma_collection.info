@@ -109,6 +109,7 @@ features[field_instance][] = node-personal_collection-field_digital_heritage_ite
 features[field_instance][] = node-personal_collection-field_personal_coll_privacy
 features[field_instance][] = node-personal_collection-field_pre_actions
 features[menu_links][] = main-menu_-collection:node/add/collection
+features[menu_links][] = main-menu_-personal-collection:node/add/personal-collection
 features[node][] = collection
 features[node][] = personal_collection
 features[page_manager_pages][] = collections
