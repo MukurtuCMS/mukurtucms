@@ -310,20 +310,21 @@ function ma_dhan_notification_field($entity) {
       'daily digest' => 'daily',
       'weekly digest' => 'weekly',
     ];
+    $output = '<div class="dh-notifications">';
     if ($notified) {
-      $output = 'You are receiving notifications ' . $freq_map[$frequency] . '.';
-      $output .= '<br />' . l('Stop receiving notifications.', 'node/' . $entity->nid . '/no-dhan');
+      $output .= '<p>You are receiving notifications ' . $freq_map[$frequency] . '.</p>';
+      $output .= '<p>' . l('Stop receiving notifications.', 'node/' . $entity->nid . '/no-dhan') . '</p>';
       $filter = $entity->type;
       if ($filter == 'cultural_protocol_group') {
         $filter = 'protocol';
       }
-      $output .= '<br />' . l ('View your notifications', '/user/' . $user->uid . '/digital-heritage-notifications', ['query' => [$filter => $entity->nid]]);
+      $output .= '<p>' . l ('View your notifications', '/user/' . $user->uid . '/digital-heritage-notifications', ['query' => [$filter => $entity->nid]]) . '</p>';
     }
     else {
-      $output = 'You are not receiving notifications.';
-      $output .= '<br />' . l('Receive notifications.', 'node/' . $entity->nid . '/dhan');
+      $output .= '<p>You are not receiving notifications.' . '</p>';
+      $output .= '<p>' . l('Receive notifications.', 'node/' . $entity->nid . '/dhan') . '</p>';
     }
-
+    $output .= '</div>';
     return $output;
 
   }

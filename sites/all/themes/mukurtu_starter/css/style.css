@@ -10423,6 +10423,16 @@ a:hover {
   padding-left: 20px;
   padding-bottom: 10px;
 }
+.node-community .group-right .block-views .dh-notifications,
+.node-cultural-protocol-group .group-right .block-views .dh-notifications,
+.node-community .group-right .field .dh-notifications,
+.node-cultural-protocol-group .group-right .field .dh-notifications,
+.node-community .metadata-wrapper .block-views .dh-notifications,
+.node-cultural-protocol-group .metadata-wrapper .block-views .dh-notifications,
+.node-community .metadata-wrapper .field .dh-notifications,
+.node-cultural-protocol-group .metadata-wrapper .field .dh-notifications {
+  padding: 10px 20px 10px 20px;
+}
 .node-community .group-right .block-views ul,
 .node-cultural-protocol-group .group-right .block-views ul,
 .node-community .group-right .field ul,
