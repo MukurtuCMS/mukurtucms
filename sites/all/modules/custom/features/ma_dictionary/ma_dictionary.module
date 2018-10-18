@@ -139,7 +139,7 @@ function ma_dictionary_form_dictionary_word_node_form_alter(&$form, &$form_state
  * Implements hook_form_FORM_ID_alter().
  */
 function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_state) {
-  
+
   // Remove any languages that already have language communities
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
@@ -457,7 +457,7 @@ function ma_dictionary_node_delete($node) {
 function ma_dictionary_node_access($node, $op, $account) {
     global $user;
     $type = is_string($node) ? $node : $node->type;
-    
+
     // Don't delete any language communities that are still being referenced by dictionary words
     if($type == 'language_community') {
         if($op == 'delete') {
@@ -470,6 +470,21 @@ function ma_dictionary_node_access($node, $op, $account) {
     // The following dictionary_word permissions seem redundant, but are there for when the paragraphs module checks
     // host entity access. Without these, new paragraphs (word entries) will be disallowed for new, unsaved dictionary words.
     if($type == 'dictionary_word') {
+        if($op == 'create') {
+            // First, check if there are any language communities.
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node')
+                ->entityCondition('bundle', 'language_community')
+                ->propertyCondition('status', NODE_PUBLISHED)
+                ->addMetaData('account', user_load(1));
+            $result = $query->execute();
+
+            // If there are no language communities, don't allow creation of new words.
+            if (empty($result['node'])) {
+                return NODE_ACCESS_DENY;
+            }
+        }
+
         $groups = og_get_groups_by_user(NULL, 'node');
         if(!empty($groups)) {
             foreach($groups as $group) {
@@ -725,7 +740,7 @@ function ma_dictionary_set_target($source, $entity, $target, $value, $mapping)
     // Load the first word entry.
     $first_word_entry = NULL;
     $save_paragraph = FALSE;
-    
+
     // If this is an existing item, it will already have a word entry, so reuse that
     if(isset($entity->field_word_entry[LANGUAGE_NONE][0]['value'])) {
         $first_word_entry = entity_load_single('paragraphs_item', $entity->field_word_entry[LANGUAGE_NONE][0]['value']);
@@ -844,7 +859,7 @@ function _ma_dictionary_get_user_language_communities($account = NULL) {
         global $user;
         $account = $user;
     }
-    
+
     $groups = og_get_groups_by_user($account, 'node');
     foreach($groups as $group) {
         $group_node = node_load($group);

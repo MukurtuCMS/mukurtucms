@@ -63,12 +63,13 @@ function ma_collection_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Basic',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-basic field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-basic field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_basic|node|personal_collection|form'] = $field_group;
@@ -177,12 +178,13 @@ function ma_collection_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Items',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-items field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-items field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_items|node|personal_collection|form'] = $field_group;
