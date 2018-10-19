@@ -204,14 +204,14 @@ function ma_importexport_dc_feeds_importer_default() {
           2 => array(
             'source' => 'dc_creator',
             'target' => 'field_creator',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           3 => array(
             'source' => 'dc_contributor',
             'target' => 'field_contributor',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           4 => array(
             'source' => 'dc_date',
@@ -228,8 +228,8 @@ function ma_importexport_dc_feeds_importer_default() {
           6 => array(
             'source' => 'dc_publisher',
             'target' => 'field_publisher',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           7 => array(
             'source' => 'dc_rights',
@@ -240,14 +240,14 @@ function ma_importexport_dc_feeds_importer_default() {
           8 => array(
             'source' => 'dc_format',
             'target' => 'field_format',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           9 => array(
             'source' => 'dc_type',
             'target' => 'field_dh_type',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           10 => array(
             'source' => 'dc_identifier',
@@ -258,8 +258,8 @@ function ma_importexport_dc_feeds_importer_default() {
           11 => array(
             'source' => 'dc_language',
             'target' => 'field_language',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           12 => array(
             'source' => 'dc_source',
@@ -270,8 +270,8 @@ function ma_importexport_dc_feeds_importer_default() {
           13 => array(
             'source' => 'dc_subject',
             'target' => 'field_subject',
-            'unique' => FALSE,
-            'language' => 'und',
+            'term_search' => '0',
+            'autocreate' => 1,
           ),
           14 => array(
             'source' => 'dc_coverage',
