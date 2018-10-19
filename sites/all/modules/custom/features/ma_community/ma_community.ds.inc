@@ -93,16 +93,6 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'dhan_notify' => array(
-      'weight' => '10',
-      'label' => 'above',
-      'format' => 'default',
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb-col' => TRUE,
-        ),
-      ),
-    ),
     'community_browse_all_dh_link' => array(
       'weight' => '9',
       'label' => 'hidden',
@@ -489,12 +479,12 @@ function ma_community_ds_layout_settings_info() {
         15 => 'field_child_communities',
         17 => 'field_community_featured_colls',
         18 => 'field_membership_list_options',
-        19 => 'field_dhan_notified_users',
         20 => 'group_custom_tk_label_text',
       ),
       'hidden' => array(
         13 => 'group_group',
         16 => 'og_group_ref',
+        19 => 'field_dhan_notified_users',
         21 => '_add_existing_field',
       ),
     ),
@@ -518,7 +508,7 @@ function ma_community_ds_layout_settings_info() {
       'og_group_ref' => 'hidden',
       'field_community_featured_colls' => 'ds_content',
       'field_membership_list_options' => 'ds_content',
-      'field_dhan_notified_users' => 'ds_content',
+      'field_dhan_notified_users' => 'hidden',
       'group_custom_tk_label_text' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
@@ -563,9 +553,8 @@ function ma_community_ds_layout_settings_info() {
         7 => 'field_parent_community',
         8 => 'field_child_communities',
         9 => 'community_browse_all_dh_link',
-        10 => 'dhan_notify',
-        11 => 'create_content_block_ds_field',
-        12 => 'featured_collections',
+        10 => 'create_content_block_ds_field',
+        11 => 'featured_collections',
       ),
     ),
     'fields' => array(
@@ -579,7 +568,6 @@ function ma_community_ds_layout_settings_info() {
       'field_parent_community' => 'right',
       'field_child_communities' => 'right',
       'community_browse_all_dh_link' => 'right',
-      'dhan_notify' => 'right',
       'create_content_block_ds_field' => 'right',
       'featured_collections' => 'right',
     ),

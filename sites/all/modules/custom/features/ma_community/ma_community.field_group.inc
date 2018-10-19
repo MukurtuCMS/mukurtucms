@@ -61,8 +61,7 @@ function ma_community_field_group_info() {
       3 => 'field_community_image',
       4 => 'field_community_image_thumbnail',
       5 => 'field_parent_community',
-      6 => 'field_dhan_notified_users',
-      7 => 'title',
+      6 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
