@@ -207,7 +207,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
 }
 
 /**
- * Submit handler for the options form.
+ * Validation handler for the options form.
  */
 function ma_importexport_dc_import_form_options_validate($form, $form_state) {
   if ($form_state['triggering_element']['#type'] == 'submit') { // This validation function will fire after a community is added but before a protocol is added, which will fail validation. So check to make sure this is fired from the submit button first.
