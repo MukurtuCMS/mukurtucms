@@ -44,7 +44,7 @@ function mukurtu_batch_import_form() {
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>For CSV imports, ' . l('download a sample ZIP file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This ZIP file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core imports, export an XML file from your system and create a ZIP archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p>',
+    '#description' => '<p>For CSV imports, ' . l('download a sample ZIP file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This ZIP file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core and MODS XML imports, export an XML file from your system and create a ZIP archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
@@ -356,13 +356,13 @@ function mukurtu_batch_import_import_metadata($path) {
       }
   }
 
-  // Check if it's a DC importer
-  $dc_import = 0;
+  // Check if it's an XML importer
+  $xml_import = 0;
   foreach ($files as $file) {
     if (strpos($file, '.xml')) {
 
-      // If DC importer, define simple single import step.
-      $dc_import = 1;
+      // If XML importer, define simple single import step.
+      $xml_import = 1;
       $import_steps = [
         [
           'filename' => $file,
@@ -374,8 +374,8 @@ function mukurtu_batch_import_import_metadata($path) {
     }
   }
 
-  // If it's not a DC importer, build the import steps.
-  if (!$dc_import) {
+  // If it's not an XML importer, build the import steps.
+  if (!$xml_import) {
     // Take the files we've found and figure out which importers to use and in what order
     $import_steps = mukurtu_batch_import_generate_import_steps($files);
   }
@@ -414,14 +414,14 @@ function mukurtu_batch_import_import_metadata($path) {
               $_SESSION['mukurtu_zip_import']['hide_warnings'][] = $importer_id;
           }
 
-        // If it's a DC import, then set the imported file and go to the import options form, leaving this code at this point.
-        if ($dc_import) {
-          variable_set('dc_import_xml_fid', $file->fid);
-          variable_set('dublin_core_import_is_batch', 1);
-          drupal_goto('import/digital-heritage-dc-options');
+        // If it's an XML import, then set the imported file and go to the import options form, leaving this code at this point.
+        if ($xml_import) {
+          variable_set('dh_xml_import_fid', $file->fid);
+          variable_set('xml_import_is_batch', 1);
+          drupal_goto('import/digital-heritage-xml-options');
         }
 
-        // Not a DC importer. Proceed as normal.
+        // Not an XML importer. Proceed as normal.
         // Load the Feeds Source object.
           $source = feeds_source($importer_id);
           $fetcher_config = $source->getConfigFor($source->importer->fetcher);

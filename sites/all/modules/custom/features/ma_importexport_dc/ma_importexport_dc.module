@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Code for the Mukurtu Import/Export Dublin Core feature.
+ * Code for the Mukurtu Import/Export Dublin Core and MODS feature.
  */
 
 include_once 'ma_importexport_dc.features.inc';
@@ -12,22 +12,22 @@ include_once 'ma_importexport_dc.features.inc';
  */
 function ma_importexport_dc_menu() {
 
-  $items['import/digital-heritage-dc-file'] = array(
-    'title' => 'Import Digital Heritage Dublin Core XML - File',
+  $items['import/digital-heritage-xml-file'] = array(
+    'title' => 'Import Digital Heritage XML - File',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ma_importexport_dc_import_form_standalone'),
     'access arguments' => array('import digital_heritage_metadata feeds'),
   );
 
-  $items['import/digital-heritage-dc-options'] = array(
-    'title' => 'Import Digital Heritage Dublin Core XML - Options',
+  $items['import/digital-heritage-xml-options'] = array(
+    'title' => 'Import Digital Heritage XML - Options',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ma_importexport_dc_import_form_options'),
     'access arguments' => array('import digital_heritage_metadata feeds'),
   );
 
-  $items['import/digital-heritage-dc-complete'] = array(
-    'title' => 'Import Digital Heritage Dublin Core XML - Complete',
+  $items['import/digital-heritage-xml-complete'] = array(
+    'title' => 'Import Digital Heritage XML - Complete',
     'page callback' => 'ma_importexport_dc_import_complete',
     'type' => MENU_CALLBACK,
     'access arguments' => array('import digital_heritage_metadata feeds'),
@@ -44,13 +44,13 @@ function ma_importexport_dc_import_form_standalone($form, $form_state) {
   $form['xml_file'] = array(
     '#type' => 'managed_file',
     '#title' => t('File'),
-    '#description' => 'Select a Dublin Core XML file from your local system.',
+    '#description' => 'Select a Dublin Core or MODS XML file from your local system.',
     '#size' => 22,
-    '#upload_location' => 'private://mukurtu_dc_xml_import',
+    '#upload_location' => 'private://mukurtu_xml_xml_import',
     '#upload_validators' => array(
       'file_validate_extensions' => array('xml')
     ),
-    '#default_value' => variable_get('dc_import_fid'),
+    '#default_value' => variable_get('dh_xml_import_fid'),
     '#required' => TRUE,
   );
 
@@ -67,9 +67,9 @@ function ma_importexport_dc_import_form_standalone($form, $form_state) {
  * and redirect to the options form.
  */
 function ma_importexport_dc_import_form_standalone_submit($form, $form_state) {
-  variable_set('dc_import_xml_fid', $form_state['values']['xml_file']);
-  variable_set ('dublin_core_import_is_batch', 0);
-  drupal_goto('import/digital-heritage-dc-options');
+  variable_set('dh_xml_import_fid', $form_state['values']['xml_file']);
+  variable_set ('xml_import_is_batch', 0);
+  drupal_goto('import/digital-heritage-xml-options');
 }
 
 /**
@@ -77,9 +77,9 @@ function ma_importexport_dc_import_form_standalone_submit($form, $form_state) {
  */
 function ma_importexport_dc_import_form_options($form, $form_state) {
 
-  $fid = variable_get('dc_import_xml_fid');
+  $fid = variable_get('dh_xml_import_fid');
   if (!$fid) { // This should never happen.
-    drupal_goto('import/digital-heritage-dc-standalone');
+    drupal_goto('import/digital-heritage-xml-standalone');
   }
 
   // Get the attributes (the fields) from the XML file to use for the GUID and Media options below.
@@ -96,15 +96,27 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $attributes = array_keys($index);
   $attributes = array_combine($attributes, $attributes);
 
+  // Determine if is a MODS file
+  $mods_attributes = ['mods']; // TODO: add any other MODS identifiers here
+  foreach ($mods_attributes as $mods_attribute) {
+    if (in_array($mods_attribute, $attributes)) {
+      $mods_file = 1;
+      break;
+    }
+  }
+
   // Context checkboxes.
   $form['context'] = array(
     '#type' => 'checkboxes',
     '#title' => 'Context',
-    '#description' => "Select which attributes to use as the XML file's context. This will normally be all the attribute(s) before the ones starting with \"dc:\"",
+    '#description' => "Select which attributes to use as the XML file's context.",
     '#options' => $attributes,
     '#required' => TRUE,
   );
-  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description'];
+  if (!$mods_file) {
+    $form['context']['#description'] .= " For Dublin Core files, this will normally be all the attribute(s) before the ones starting with \"dc:\"";
+  }
+  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description', 'mods'];
   $available_typical_context_values = [];
   foreach ($typical_context_values as $typical_context_value) {
     if (isset($attributes[$typical_context_value])) {
@@ -248,7 +260,7 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
   $importer->save();
 
   // Go to the status page after it's done.
-  $form_state['redirect'] = 'import/digital-heritage-dc-complete';
+  $form_state['redirect'] = 'import/digital-heritage-xml-complete';
 
   // Do the import
   $source->startImport();
@@ -363,8 +375,8 @@ function ma_importexport_dc_import_complete() {
 
   // Add some buttons
   $output .= '<br />';
-  $import_more_path = 'import/digital-heritage-dc-file';
-  if (variable_get('dublin_core_import_is_batch')) {
+  $import_more_path = 'import/digital-heritage-xml-file';
+  if (variable_get('xml_import_is_batch')) {
     $import_more_path = 'manage/zip_import';
   }
   $output .=  l('Import More', $import_more_path, ['attributes' => ['class' => 'button'], 'html' => 'TRUE']);

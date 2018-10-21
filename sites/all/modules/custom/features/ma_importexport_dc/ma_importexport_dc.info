@@ -1,5 +1,5 @@
-name = Mukurtu Import/Export Dublin Core
-description = Import and Export DH Items in Dublin Core
+name = Mukurtu Import/Export Dublin Core and MODS XML
+description = Import and Export DH Items in Dublin Core and MODS XML
 core = 7.x
 package = Features
 dependencies[] = ctools
