@@ -131,7 +131,7 @@ function ma_digitalheritage_preprocess_page(&$variables) {
 function ma_digitalheritage_preprocess_field(&$variables, $hook) {
     // Display the first image or thumbnail when viewing the media asset field rather than a default icon for any display where we are
     // showing a single image to represent the entire field (e.g., search results). This was previously implemented as a patch to Scald.
-    if($variables['element']['#field_name'] == 'field_media_asset' ) {//&& count($variables['items']) == 1) {
+    if($variables['element']['#field_name'] == 'field_media_asset' && $variables['element']['#view_mode'] == 'search_result') {//&& count($variables['items']) == 1) {
         // Only process if there are more than 1 scald atoms
         if(isset($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) && count($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) > 1 ) {
             // Search through the scald atoms and find the first image or thumbnail
