@@ -83,11 +83,24 @@
             letter-spacing: @mukurtu-expanded-letter-spacing;
             padding-bottom: 20px;
             text-transform: uppercase;
-    
+
             // Desktop
             @media (min-width: @screen-md-min) {
                 font-size: 15px;
             }
+        }
+    }
+}
+
+// List View
+.list-view {
+    .mejs__audio,
+    .mejs__video .mejs__controls {
+        display: none;
+
+        // Tablet
+        @media (min-width: @screen-sm-min) {
+            display: flex;
         }
     }
 }
