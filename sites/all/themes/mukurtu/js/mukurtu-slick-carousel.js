@@ -11,10 +11,10 @@ jQuery(document).ready(function($){
 
 	// Digital Heritage Multi-page
 	try {
-	    var initialDHPage = Drupal.settings.mukurtu.dh_multipage_initial_slide;
+		var initialDHPage = Drupal.settings.mukurtu.dh_multipage_initial_slide;
 	}
 	catch(err) {
-	    var initialDHPage = 0;
+		var initialDHPage = 0;
 	}
 	$('.slick-carousel-multipage').slick({
 	    dots: false,
@@ -68,7 +68,7 @@ jQuery(document).ready(function($){
 	});
 
 	// Loader animation when clicking a page in the multi-page carousel
-	$(".slick-carousel-multipage .slick-slide").click(function () { 
+	$(".slick-carousel-multipage .slick-slide").click(function () {
 	    if(!$(this).find(".mukurtu-loader").hasClass("mukurtu-loader-loading")) {
 		$(this).find("img").addClass("mukurtu-loader-background");
 		$(this).find(".mukurtu-loader").addClass("mukurtu-loader-loading");
@@ -81,19 +81,21 @@ jQuery(document).ready(function($){
 	    $("#mukurtu-multipage-carousel").slick('slickGoTo', slide, false);
 	    $("#mukurtu-multipage-carousel .slick-slide[data-slick-index='" + slide +"'] a")[0].click();
 	});
-	
+
 	// Digital Heritage Multiple Media Items
 	$('.slick-carousel-slider-for').slick({
+		centerMode: false,
 	    slidesToShow: 1,
 	    slidesToScroll: 1,
 	    swipeToSlide: true,
-	    arrows: false,
+		arrows: false,
 	    fade: true,
 	    adaptiveHeight: true,
 	    mobileFirst: true,
 	    asNavFor: '.slick-carousel-slider-nav'
 	});
 	$('.slick-carousel-slider-nav').slick({
+		arrows: true,
 	    slidesToShow: 3,
 	    slidesToScroll: 1,
 	    swipeToSlide: true,
