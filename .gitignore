@@ -1,6 +1,48 @@
-# Ignore configuration files that may contain sensitive information.
-sites/*/settings*.php
-
 # Ignore paths that contain user-generated content.
-# sites/*/files # Mukurtu patch -- we *want* sites/default/files in the rep so the end-user does not need to create it. Instead, we add the files dir into the rep, and add a .gitignore within there so that files within it are ignored but the directory is included.
-sites/*/private
+/sites/*/files
+/sites/*/private
+/files/*
+/cache
+
+# ** Only works in OSs that support newer versions of fnmatch (Bash 4+)
+/sites/default/**/files
+/sites/default/**/private
+
+# Avoid accidental modification of pantheon.upstream.yml in sites
+# created from this upstream
+pantheon.upstream.yml
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# Logs and databases #
+######################
+*.log
+*.sql
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon
+
+Thumbs.db
+._*
+
+# Vim generated files #
+######################
+*.un~
+
+# SASS #
+##########
+.sass-cache
