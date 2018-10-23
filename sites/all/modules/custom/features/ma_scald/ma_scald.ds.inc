@@ -213,13 +213,19 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
+        0 => 'scald_thumbnail',
+        1 => 'atom',
       ),
     ),
     'fields' => array(
+      'scald_thumbnail' => 'ds_content',
       'atom' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -228,6 +234,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|audio|ma_scald_search_results'] = $ds_layout;
 
@@ -745,14 +752,16 @@ function ma_scald_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'atom',
-        1 => 'scald_thumbnail',
       ),
     ),
     'fields' => array(
       'atom' => 'ds_content',
-      'scald_thumbnail' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -761,6 +770,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|video|ma_scald_search_results'] = $ds_layout;
 
