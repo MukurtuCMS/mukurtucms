@@ -644,3 +644,8 @@ if (defined('PANTHEON_ENVIRONMENT')) {
   // Extract Pantheon environmental configuration for Domain Access
   extract(json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE));
 }
+
+if (file_exists(DRUPAL_ROOT . '/' . conf_path() . '/settings.local.php')) {
+  include DRUPAL_ROOT . '/' . conf_path() . '/settings.local.php';
+}
+
