@@ -2311,7 +2311,10 @@ function url($path = NULL, array $options = array()) {
     $language = isset($options['language']) && isset($options['language']->language) ? $options['language']->language : '';
     $alias = drupal_get_path_alias($original_path, $language);
     if ($alias != $original_path) {
-      $path = $alias;
+      // Strip leading slashes from internal path aliases to prevent them
+      // becoming external URLs without protocol. /example.com should not be
+      // turned into //example.com.
+      $path = ltrim($alias, '/');
     }
   }
 
@@ -7642,7 +7645,7 @@ function drupal_implode_tags($tags) {
 
     $encoded_tags[] = $tag;
   }
-  return implode('; ', $encoded_tags);
+  return implode(', ', $encoded_tags);
 }
 
 /**
