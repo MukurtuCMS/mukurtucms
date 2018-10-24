@@ -8,6 +8,13 @@ jQuery(document).ready(function($){
     window.mukurtuGridActive = false;
     window.mukurtuGrid = null;
 
+    function mukurtuGridListMejsResize() {
+        for (var pKey in mejs.players) {
+            mejs.players[pKey].setPlayerSize();
+            mejs.players[pKey].setControlsSize();
+        };
+    }
+
     function mukurtuMakeGrid() {
         if(window.mukurtuGridActive) {
             mukurtuDestroyGrid();
@@ -15,7 +22,10 @@ jQuery(document).ready(function($){
 
         if($.cookie) {
             if( ($.cookie('dh_browse_mode') == 'grid-view')) {
+                mukurtuGridListMejsResize();
                 window.mukurtuGrid = jQuery('.grid-view').masonry($mukurtuGridViewMasonryOptions);
+                window.mukurtuGrid.on('layoutComplete', mukurtuGridListMejsResize);
+                window.mukurtuGrid.on('removeComplete', mukurtuGridListMejsResize);
                 window.mukurtuGridActive = true;
             }
         }
@@ -25,6 +35,7 @@ jQuery(document).ready(function($){
         if(window.mukurtuGridActive && window.mukurtuGrid) {
             window.mukurtuGrid.masonry('destroy');
             window.mukurtuGridActive = false;
+            mukurtuGridListMejsResize();
         }
     }
 

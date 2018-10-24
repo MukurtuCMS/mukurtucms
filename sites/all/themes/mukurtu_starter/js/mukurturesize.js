@@ -46,6 +46,7 @@ jQuery(document).ready(function ($) {
 		heroImageTwoColumnsResize();
 		refereshPanelAccordion();
 		featuredContentResize();
+		mukurtuMediaelementResize();
 	}
 
 	window.onresize = mukurtuOnResize;
