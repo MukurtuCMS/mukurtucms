@@ -17,9 +17,23 @@ function ma_importexport_dc_user_default_permissions() {
     'module' => 'feeds',
   );
 
+  // Exported permission: 'clear digital_heritage_mods feeds'.
+  $permissions['clear digital_heritage_mods feeds'] = array(
+    'name' => 'clear digital_heritage_mods feeds',
+    'roles' => array(),
+    'module' => 'feeds',
+  );
+
   // Exported permission: 'import digital_heritage_dc feeds'.
   $permissions['import digital_heritage_dc feeds'] = array(
     'name' => 'import digital_heritage_dc feeds',
+    'roles' => array(),
+    'module' => 'feeds',
+  );
+
+  // Exported permission: 'import digital_heritage_mods feeds'.
+  $permissions['import digital_heritage_mods feeds'] = array(
+    'name' => 'import digital_heritage_mods feeds',
     'roles' => array(),
     'module' => 'feeds',
   );
@@ -31,9 +45,23 @@ function ma_importexport_dc_user_default_permissions() {
     'module' => 'feeds_tamper',
   );
 
+  // Exported permission: 'tamper digital_heritage_mods'.
+  $permissions['tamper digital_heritage_mods'] = array(
+    'name' => 'tamper digital_heritage_mods',
+    'roles' => array(),
+    'module' => 'feeds_tamper',
+  );
+
   // Exported permission: 'unlock digital_heritage_dc feeds'.
   $permissions['unlock digital_heritage_dc feeds'] = array(
     'name' => 'unlock digital_heritage_dc feeds',
+    'roles' => array(),
+    'module' => 'feeds',
+  );
+
+  // Exported permission: 'unlock digital_heritage_mods feeds'.
+  $permissions['unlock digital_heritage_mods feeds'] = array(
+    'name' => 'unlock digital_heritage_mods feeds',
     'roles' => array(),
     'module' => 'feeds',
   );

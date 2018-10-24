@@ -97,6 +97,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $attributes = array_combine($attributes, $attributes);
 
   // Determine if is a MODS file
+  $mods_file = 0;
   $mods_attributes = ['mods']; // TODO: add any other MODS identifiers here
   foreach ($mods_attributes as $mods_attribute) {
     if (in_array($mods_attribute, $attributes)) {
@@ -104,8 +105,9 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
       break;
     }
   }
+  $form['#mods_file'] = $mods_file;
 
-  // Context checkboxes.
+    // Context checkboxes.
   $form['context'] = array(
     '#type' => 'checkboxes',
     '#title' => 'Context',
@@ -234,13 +236,21 @@ function ma_importexport_dc_import_form_options_validate($form, $form_state) {
  */
 function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
 
+  // Set the importer.
+  if ($form['#mods_file']) {
+    $importer = 'digital_heritage_mods';
+  }
+  else {
+    $importer = 'digital_heritage_dc';
+  }
+
   // Set the options to be picked up by the importer.
-  variable_set ('dc_import_options', $form_state['values']);
+  variable_set ('xml_import_options', array_merge(['importer' => $importer], $form_state['values']));
 
   // Set the fetcher source and file.
-  $source = feeds_source('digital_heritage_dc');
+  $source = feeds_source($importer);
   $fetcher_config = $source->getConfigFor($source->importer->fetcher);
-  $file = file_load (variable_get('dc_import_xml_fid'));
+  $file = file_load (variable_get('dh_xml_import_fid'));
   $fetcher_config['source'] = $file->uri;
   $fetcher_config['file'] = $file;
   $source->setConfigFor($source->importer->fetcher, $fetcher_config);
@@ -253,7 +263,7 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
       $context .= '/' . $context_part;
     }
   }
-  $importer = feeds_importer('digital_heritage_dc');
+  $importer = feeds_importer($importer);
   $config = $importer->parser->getConfig();
   $config['context']['value'] = $context;
   $importer->parser->setConfig($config);
@@ -276,9 +286,9 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
  * more efficient (and coding-wise less efficient) than just altering each value individually here in the after_parse.
  */
 function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
-  if ($source->id == 'digital_heritage_dc') {
+  if ($source->id == 'digital_heritage_dc' OR $source->id == 'digital_heritage_mods') {
 
-    $options = variable_get('dc_import_options');
+    $options = variable_get('xml_import_options');
 
     // Set the GUID
     $guid_parts = [];
@@ -309,8 +319,8 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
  * Implements hook_feeds_presave().
  */
 function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
-  if ($source->id == 'digital_heritage_dc') {
-    $options = variable_get('dc_import_options');
+  if ($source->id == 'digital_heritage_dc' or $source->id == 'digital_heritage_mods') {
+    $options = variable_get('xml_import_options');
 
     // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).
     $protocols = [];
@@ -351,11 +361,13 @@ function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
 }
 
 /**
- * Page callback to show at the end of the DC import.
+ * Page callback to show at the end of the XML import.
  */
 function ma_importexport_dc_import_complete() {
   $output = '';
-  $source = feeds_source('digital_heritage_dc');
+
+  $options = variable_get('xml_import_options');
+  $source = feeds_source($options['importer']);
 
   // Taken from feeds_source_status();
   $progress_importing = $source->progressImporting();
