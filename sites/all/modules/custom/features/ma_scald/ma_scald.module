@@ -235,7 +235,7 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
 function ma_scald_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'scald_atom_add_form_options') {
     $atom_index = 0;
-    
+
     // Add a custom validation handler so that the user cannot unset a CP if they are not allowed to post to it
     $form['#validate'][] = 'ma_scald_prevent_unsetting_cp_when_no_permission';
     $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
@@ -264,7 +264,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       if(isset($entity->base_id)) {
 	$file = file_load($entity->base_id);
       }
-      
+
       $language = $entity->language;
 
       if (!isset($entity->created)) {
@@ -292,7 +292,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
             //'field_gps_latitude' => '',
             //'field_gps_longitude' => '',
           );
-	  
+
           foreach ($field_assocs as $exif_field => $scald_field) {
             if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] == NULL) {
               $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
@@ -428,7 +428,7 @@ function ma_scald_scald_player() {
  * Implements hook_scald_prerender().
  */
 function ma_scald_scald_prerender($atom, $context, $options, $mode) {
-    $default_thumbnail_contexts = array('ma_scald_search_results', 'mukurtu_scald_related_items');
+    $default_thumbnail_contexts = array('mukurtu_scald_related_items', 'mukurtu_carousel_thumbnail');
 
     if($atom->type == 'audio' && !in_array($context, $default_thumbnail_contexts)) {
         // Soundcloud already integrates the thumbnail with the display, remove it for rendering so it isn't duplicated
@@ -452,31 +452,10 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
 
     if($mode == 'player') {
         if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {
-            // Use the atom thumbnail if there is one
-            if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
-                if($atom->type == 'file' || $atom->type == 'video') {
-                    $atom->rendered->player = array('#markup' => '');
-                    return;
-                }
-                $image_styles = array (
-                    'ma_scald_search_results' => 'medium',
-                    'mukurtu_scald_related_items' => 'related_items_teaser'
-                );
-                $thumbnail_image = theme_image_style (array (
-                    'style_name' => $image_styles[$context],
-                    'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
-                ));
+            // Fetch our default thumbnail if the atom doesn't have one.
+            if (empty($atom->scald_thumbnail[LANGUAGE_NONE])) {
+                $atom->scald_thumbnail[LANGUAGE_NONE][] = _ma_scald_default_thumbnail($atom->type);
             }
-            // If no atom thumbnail, use our default thumbnails
-            else {
-                $image_widths = array (
-                    'ma_scald_search_results' => '220',
-                    'mukurtu_scald_related_items' => '280'
-                );
-                $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$context] . '.jpg">';
-            }
-
-            $atom->rendered->player = array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
         }
     }
 }
@@ -516,7 +495,7 @@ function ma_scald_save_atom_source($source, &$entity) {
 /**
  * Helper function that takes a media source ($filepath) and a scald provider and
  * runs through all the scald form functions (source, add, options) for creating the atom.
- * 
+ *
  * This is ideal because it offloads all the details to the scald provider and scald
  * will still call the relevant hooks.
  */
@@ -634,7 +613,7 @@ function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
  * we don't want to:
  * 1. Save the scald atom
  * 2. Display the atom creation notice
- * 
+ *
  * Instead we return the atom, so that our import functions can integrate
  * the atom fields that scald/scald provider created.
  */
@@ -642,17 +621,17 @@ function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
     if (!$atoms = $form_state['scald']['atoms']) {
       return;
     }
-  
+
     $atom_keys = array();
     foreach(array_keys($atoms) as $delta) {
       $atom_keys[] = 'atom' . $delta;
     }
     $values_excluding_atoms = array_diff_key($form_state['values'], array_flip($atom_keys));
-  
+
     foreach ($atoms as $delta => $atom) {
       $index = 'atom' . $delta;
       $values = &$form_state['values'][$index];
-  
+
       if (isset($values['scald_actions']) && is_array($values['scald_actions'])) {
         $bitstream = 0;
         $actions = scald_actions();
@@ -663,15 +642,15 @@ function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
         }
         $values['actions'] = $bitstream;
       }
-  
+
       $op = empty($atom->sid) ? t('created') : t('updated');
-  
+
       // Prepare a form state that is suitable for modules that provide extra fields.
       $atom_form_state = array('values' => $values + $values_excluding_atoms) + $form_state;
       // Add back the structure required for fields and maintain a reference to
       // the original form state values.
       $atom_form_state['values'][$index] = &$values;
-  
+
     // This fixes that strange scald taxonomy term issue, that seems to mostly be a soundcloud issue.
     // Definitely a bit of a hack.
     $fields_info = field_info_instances('scald_atom', $atom->type);
@@ -693,7 +672,7 @@ function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
     }
       // Let entity add its properties to the atom.
       entity_form_submit_build_entity('scald_atom', $atom, $form[$index], $atom_form_state);
-  
+
       // Then return it...
       return $atom;
     }
@@ -701,20 +680,20 @@ function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
 }
 
 /**
- * Copy the non-empty fields from the provider atom to the feeds atom. 
+ * Copy the non-empty fields from the provider atom to the feeds atom.
  * Only copying the first level, this isn't a recursive deep dive.
  */
 function _ma_scald_merge_provider_atom($feeds_atom, $provider_atom) {
     $provider_fields = array_keys(get_object_vars($provider_atom));
     $skip_fields = array('0', '1', 'atom0');
-    
+
     foreach($provider_fields as $field) {
         if(in_array($field, $skip_fields)) {
             continue;
         }
 
         if(!empty($provider_atom->{$field})) {
-            if(!is_array($provider_atom->{$field}) 
+            if(!is_array($provider_atom->{$field})
                || (is_array($provider_atom->{$field}) && !empty($provider_atom->{$field}))) {
                 $feeds_atom->{$field} = $provider_atom->{$field};
             }
@@ -722,4 +701,30 @@ function _ma_scald_merge_provider_atom($feeds_atom, $provider_atom) {
     }
 
     return $feeds_atom;
+}
+
+/**
+ * Generate default scald thumbnail for Mukurtu.
+ */
+function _ma_scald_default_thumbnail($type) {
+    $fid = variable_get("mukurtu_scald_default_thumbnail_$type", NULL);
+    $file = file_load($fid);
+    if (!$file) {
+        $filename = drupal_get_path('module', 'ma_digitalheritage') . "/images/default_{$type}_thumbnail_280.jpg";
+        $handle = fopen(drupal_realpath($filename), 'r');
+
+        // Given a type we don't have a stock image for, use generic "no media" image.
+        if(!$handle) {
+            $filename = drupal_get_path('module', 'ma_digitalheritage') . "/images/no_media_available.jpg";
+            $handle = fopen(drupal_realpath($filename), 'r');
+        }
+        $file = file_save_data($handle, "public://atoms/default_thumbnail_{$type}.jpg", FILE_EXISTS_REPLACE);
+        fclose($handle);
+
+        if($file) {
+            variable_set("mukurtu_scald_default_thumbnail_$type", $file->fid);
+        }
+    }
+
+    return (array) $file;
 }

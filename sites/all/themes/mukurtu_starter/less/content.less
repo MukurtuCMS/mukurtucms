@@ -189,17 +189,17 @@
     }
 
     // Search results specific
-    &.view-mode-search_result {
+     &.view-mode-search_result {
         .col-xs-4,
         .col-xs-8 {
             width: 100%;
         }
         @media (min-width: @screen-sm-min) {
             .col-xs-4 {
-                width: 33.33333333%;
+                width: 50%;
             }
             .col-xs-8 {
-                width: 66.66666667%;
+                width: 50%;
             }
         }
     }
@@ -411,27 +411,6 @@
                         width: 80%;
                     }
                 }
-
-
-                .mejs__container {
-                    // Shrink controls on mobile
-                    max-width: 240px;
-
-                    // Tablet
-                    @media (min-width: @screen-sm-min) {
-                        max-width: 350px;
-                    }
-
-                    // Desktop
-                    @media (min-width: @screen-md-min) {
-                        max-width: 330px;
-                    }
-
-                    // Large Desktop
-                    @media (min-width: @screen-lg-min) {
-                        max-width: 100%;
-                    }
-                }
             }
         }
 
@@ -453,6 +432,26 @@
 }
 
 .mejs__container {
+  // Shrink controls on mobile
+  //max-width: 240px;
+  max-width: 100%;
+
+  // Tablet
+  @media (min-width: @screen-sm-min) {
+      //max-width: 300px;
+      //max-width: 100%;
+  }
+
+  // Desktop
+  @media (min-width: @screen-md-min) {
+      //max-width: 330px;
+  }
+
+  // Large Desktop
+  @media (min-width: @screen-lg-min) {
+      //max-width: 100%;
+  }
+
     .mejs__controls {
         // Hide volume controls when screen is small
         .mejs__horizontal-volume-button,
@@ -701,12 +700,6 @@
 }
 
 //// Digital Heritage grid/list view
-
-// Hide the embedded videos (the thumbnail will display instead)
-.view-id-digital_heritage_grid_list iframe {
-  display: none;
-}
-
 
 //// Grid/List Views (DH, Collections, Dictionary)
 

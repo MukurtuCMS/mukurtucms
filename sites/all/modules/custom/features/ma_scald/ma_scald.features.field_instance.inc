@@ -65,7 +65,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 4,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -156,7 +156,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 2,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -247,7 +247,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 3,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -345,7 +345,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 5,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -460,7 +460,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 6,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -549,7 +549,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 7,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -646,10 +646,14 @@ function ma_scald_field_default_field_instances() {
         'weight' => 0,
       ),
       'ma_scald_search_results' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 1,
+        'label' => 'hidden',
+        'module' => 'image',
+        'settings' => array(
+          'image_link' => '',
+          'image_style' => 'medium',
+        ),
+        'type' => 'image',
+        'weight' => 0,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'hidden',
@@ -3724,7 +3728,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 2,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -3799,7 +3803,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 3,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -3874,7 +3878,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 4,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -3969,7 +3973,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 5,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -4038,7 +4042,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 6,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -4103,12 +4107,8 @@ function ma_scald_field_default_field_instances() {
       ),
       'ma_scald_search_results' => array(
         'label' => 'hidden',
-        'module' => 'image',
-        'settings' => array(
-          'image_link' => '',
-          'image_style' => 'medium',
-        ),
-        'type' => 'image',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 1,
       ),
       'mukurtu_carousel_thumbnail' => array(
