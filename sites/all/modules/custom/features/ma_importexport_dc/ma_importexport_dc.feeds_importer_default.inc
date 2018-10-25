@@ -340,8 +340,8 @@ function ma_importexport_dc_feeds_importer_default() {
             'weight' => '0',
           ),
           'dc_title' => array(
-            'name' => '/titleInfo/title',
-            'value' => 'dc:title',
+            'name' => 'dc:title',
+            'value' => 'titleInfo/title',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -349,7 +349,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_creator' => array(
             'name' => 'dc:creator',
-            'value' => 'dc:creator',
+            'value' => 'name/namePart/role/roleTerm',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -357,7 +357,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_contributor' => array(
             'name' => 'dc:contributor',
-            'value' => 'dc:contributor',
+            'value' => 'name/namePart/role/roleTerm',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -365,7 +365,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_date' => array(
             'name' => 'dc:date',
-            'value' => 'dc:date',
+            'value' => 'dateIssued',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -373,7 +373,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_description' => array(
             'name' => 'dc:description',
-            'value' => 'dc:description',
+            'value' => 'note',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -381,7 +381,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_publisher' => array(
             'name' => 'dc:publisher',
-            'value' => 'dc:publisher',
+            'value' => 'publisher',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -389,7 +389,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_rights' => array(
             'name' => 'dc:rights',
-            'value' => 'dc:rights',
+            'value' => 'accessCondition',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -397,7 +397,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_format' => array(
             'name' => 'dc:format',
-            'value' => 'dc:format',
+            'value' => 'physicalDescription/extent',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -405,7 +405,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_type' => array(
             'name' => 'dc:type',
-            'value' => 'dc:type',
+            'value' => 'typeOfResource',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -413,7 +413,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_identifier' => array(
             'name' => 'dc:identifier',
-            'value' => 'dc:identifier',
+            'value' => 'identifier',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -421,7 +421,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_language' => array(
             'name' => 'dc:language',
-            'value' => 'dc:language',
+            'value' => 'language/languageTerm',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -429,7 +429,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_source' => array(
             'name' => 'dc:source',
-            'value' => 'dc:source',
+            'value' => 'relatedItem',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -437,7 +437,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_subject' => array(
             'name' => 'dc:subject',
-            'value' => 'dc:subject',
+            'value' => 'subject/geographic',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -445,7 +445,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_coverage' => array(
             'name' => 'dc:coverage',
-            'value' => 'dc:coverage',
+            'value' => 'subject/geographic',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -453,7 +453,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_hasformat' => array(
             'name' => 'dc:hasformat',
-            'value' => 'dc:hasformat',
+            'value' => 'relatedItems',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -461,15 +461,15 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_relation' => array(
             'name' => 'dc:relation',
-            'value' => 'dc:relation',
+            'value' => 'relatedItems',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
             'weight' => '16',
           ),
         ),
-        'display_errors' => 0,
-        'debug_mode' => 0,
+        'display_errors' => 1,
+        'debug_mode' => 1,
         'source_encoding' => array(
           0 => 'auto',
         ),
