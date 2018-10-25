@@ -187,8 +187,8 @@ function ma_importexport_feeds_lookup_atom_by_guid($guid) {
  */
 function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $entity_id) {
 
-    // Do not act on the Dublin Core importer.
-    if($source->id == 'digital_heritage_dc') {
+    // Do not act on the XML importers.
+    if(ma_importexport_dc_is_xml_importer($source->id)) {
       return;
     }
     
@@ -254,7 +254,7 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
 
     // Do not act on the Dublin Core importer.
-    if($source->id == 'digital_heritage_dc') {
+    if(ma_importexport_dc_is_xml_importer($source->id)) {
       return;
     }
 

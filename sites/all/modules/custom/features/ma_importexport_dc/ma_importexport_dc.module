@@ -6,6 +6,14 @@
 
 include_once 'ma_importexport_dc.features.inc';
 
+/**
+ * Helper function to return if a given feeds importer is an XML importer.
+ */
+function ma_importexport_dc_is_xml_importer($importer_name) {
+  if (in_array($importer_name, ['digital_heritage_dc', 'digital_heritage_mods'])) {
+    return TRUE;
+  }
+}
 
 /**
  * Implementation of hook_menu()
@@ -286,7 +294,7 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
  * more efficient (and coding-wise less efficient) than just altering each value individually here in the after_parse.
  */
 function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
-  if ($source->id == 'digital_heritage_dc' OR $source->id == 'digital_heritage_mods') {
+  if (ma_importexport_dc_is_xml_importer($source->id)) {
 
     $options = variable_get('xml_import_options');
 
@@ -319,7 +327,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
  * Implements hook_feeds_presave().
  */
 function ma_importexport_dc_feeds_presave(FeedsSource $source, $entity, $item) {
-  if ($source->id == 'digital_heritage_dc' or $source->id == 'digital_heritage_mods') {
+  if (ma_importexport_dc_is_xml_importer($source->id)) {
     $options = variable_get('xml_import_options');
 
     // Set the protocol(s) (the community(s) gets added in mukurtu_protocol_field_node_presave()).

@@ -366,7 +366,7 @@ function mukurtu_batch_import_import_metadata($path) {
       $import_steps = [
         [
           'filename' => $file,
-          'importer' => 'digital_heritage_dc',
+          'importer' => 'digital_heritage_dc', // TODO: make work with MODS
           'hide_warnings' => FALSE,
         ],
       ];
