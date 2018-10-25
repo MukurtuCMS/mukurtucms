@@ -94,48 +94,56 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $file = file_load ($fid);
   $path_to_file = drupal_realpath($file->uri);
   $file_contents = file_get_contents($path_to_file);
+
+  ////////
   // Tried doing this with simplexml but it fails on test imports
   // (it's excessively sensitive to character formatting and xmlns specs).
   // Also tried using the DOM but it was overkill.
+
+  // Get nested attributes
+  require_once('XmlElement.php');
+  $structure = xml_to_object($file_contents);
+  $nested_attributes = ma_importexport_nested_xml_from_structure($structure);
+
+  // Get individual attributes
   $parser = xml_parser_create();
   xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
   xml_parse_into_struct($parser, $file_contents, $values, $index);
   xml_parser_free($parser);
-  $attributes = array_keys($index);
-  $attributes = array_combine($attributes, $attributes);
+  $individual_attributes = array_keys($index);
+  $individual_attributes = array_combine($individual_attributes, $individual_attributes);
 
   // Determine if is a MODS file
   $mods_file = 0;
   $mods_attributes = ['mods']; // TODO: add any other MODS identifiers here
   foreach ($mods_attributes as $mods_attribute) {
-    if (in_array($mods_attribute, $attributes)) {
+    if (in_array($mods_attribute, $individual_attributes)) {
       $mods_file = 1;
       break;
     }
   }
   $form['#mods_file'] = $mods_file;
 
-    // Context checkboxes.
+  // Context checkboxes.
   $form['context'] = array(
     '#type' => 'checkboxes',
     '#title' => 'Context',
-    '#description' => "Select which attributes to use as the XML file's context.",
-    '#options' => $attributes,
+    '#description' => "Select which attribute(s) to use as the XML file's context.",
+    '#options' => $individual_attributes,
     '#required' => TRUE,
   );
   if (!$mods_file) {
-    $form['context']['#description'] .= " For Dublin Core files, this will normally be all the attribute(s) before the ones starting with \"dc:\"";
+    $form['context']['#description'] .= " For Dublin Core files, this will normally be all the attribute(s) before the ones starting with \"dc:\""; // TODO: add helper text for MODS if there end up being more typical contexts than just "MODS"
   }
   $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description', 'mods'];
   $available_typical_context_values = [];
   foreach ($typical_context_values as $typical_context_value) {
-    if (isset($attributes[$typical_context_value])) {
+    if (isset($individual_attributes[$typical_context_value])) {
       $available_typical_context_values[] = $typical_context_value;
     }
   }
   if (count($available_typical_context_values)) {
     $form['context']['#default_value'] = $available_typical_context_values;
-
   }
 
 
@@ -143,12 +151,16 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   $form['guid'] = array(
     '#type' => 'checkboxes',
     '#title' => 'GUID',
-    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.',
-    '#options' => $attributes,
+    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.', // TODO: update help text to account for MODS
+    '#options' => $nested_attributes,
     '#required' => TRUE,
   );
-  if (isset($attributes['dc:identifier'])) {
-    $form['guid']['#default_value'] = ['dc:identifier'];
+  $typical_guid_values = ['dc:identifier', 'identifier'];
+  foreach ($typical_guid_values as $typical_guid_value) {
+    if (isset($nested_attributes[$typical_guid_value])) {
+      $form['guid']['#default_value'] = [$typical_guid_value];
+      break;
+    }
   }
 
   // Media source radio.
@@ -156,12 +168,12 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#type' => 'radios',
     '#title' => 'Media',
     '#description' => 'Select which attribute contains the reference to media for the Digital Heritage item. This is typically "dc:hasformat", or "dc:relation".',
-    '#options' => array_merge(['none' => 'None'], $attributes),
+    '#options' => array_merge(['none' => 'None'], $nested_attributes),
   );
-  if (isset($attributes['dc:hasformat'])) {
+  if (isset($nested_attributes['dc:hasformat'])) {
     $form['media']['#default_value'] = 'dc:hasformat';
   }
-  elseif (isset($attributes['dc:relation'])) {
+  elseif (isset($nested_attributes['dc:relation'])) {
     $form['media']['#default_value'] = 'dc:relation';
   }
 
@@ -404,4 +416,26 @@ function ma_importexport_dc_import_complete() {
 
   // Return the page.
   return $output;
+}
+
+/**
+ * Recursive function that turns xml_to_object()'s structure into an array of nested XML attributes
+ */
+function ma_importexport_nested_xml_from_structure($element) {
+  static $nest_level = 0;
+  static $attributes;
+  static $attributes_parts;
+  foreach ($element->children as $child) {
+    $attributes_parts[$nest_level] = $child->name;
+    if (count($child->children)) {
+      $nest_level++;
+      ma_importexport_nested_xml_from_structure($child);
+      $nest_level--;
+    }
+    else {
+      $attributes[] = implode('/', $attributes_parts);
+      unset ($attributes_parts[$nest_level]);
+    }
+  }
+  return array_unique(array_combine($attributes, $attributes));
 }
