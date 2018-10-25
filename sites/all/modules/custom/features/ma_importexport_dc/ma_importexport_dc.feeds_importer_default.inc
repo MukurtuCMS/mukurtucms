@@ -20,13 +20,13 @@ function ma_importexport_dc_feeds_importer_default() {
     'fetcher' => array(
       'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
-        'allowed_extensions' => 'txt csv tsv xml opml',
-        'delete_uploaded_file' => FALSE,
-        'direct' => FALSE,
+        'allowed_extensions' => 'xml',
+        'delete_uploaded_file' => 1,
+        'direct' => 0,
         'directory' => 'private://feeds',
         'allowed_schemes' => array(
-          0 => 'public',
-          1 => 'private',
+          'public' => 'public',
+          'private' => 'private',
         ),
       ),
     ),
@@ -314,13 +314,13 @@ function ma_importexport_dc_feeds_importer_default() {
     'fetcher' => array(
       'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
-        'allowed_extensions' => 'txt csv tsv xml opml',
-        'delete_uploaded_file' => FALSE,
-        'direct' => FALSE,
+        'allowed_extensions' => 'xml',
+        'delete_uploaded_file' => 1,
+        'direct' => 0,
         'directory' => 'private://feeds',
         'allowed_schemes' => array(
-          0 => 'public',
-          1 => 'private',
+          'public' => 'public',
+          'private' => 'private',
         ),
       ),
     ),
