@@ -341,7 +341,7 @@ function mukurtu_batch_import_import_metadata($path) {
   $files = scandir($path);
 
   foreach($files as $key => $file) {
-      if($file == '.' || $file == '..') {
+      if($file == '.' || $file == '..' || $file == '__MACOSX') {
           unset($files[$key]);
       }
   }
@@ -366,7 +366,7 @@ function mukurtu_batch_import_import_metadata($path) {
       $import_steps = [
         [
           'filename' => $file,
-          'importer' => 'digital_heritage_dc', // TODO: make work with MODS
+          'importer' => 'digital_heritage_xml_dc_or_mods', // we don't know yet whether it's DC or MODS so we just use a generic name, which is fine because this doesn't get used within the batch importer, but does need to be defined.
           'hide_warnings' => FALSE,
         ],
       ];
@@ -417,8 +417,8 @@ function mukurtu_batch_import_import_metadata($path) {
         // If it's an XML import, then set the imported file and go to the import options form, leaving this code at this point.
         if ($xml_import) {
           variable_set('dh_xml_import_fid', $file->fid);
-          variable_set('xml_import_is_batch', 1);
-          drupal_goto('import/digital-heritage-xml-options');
+          variable_set('dh_xml_import_is_batch', 1);
+          drupal_goto('import/digital-heritage-xml-context');
         }
 
         // Not an XML importer. Proceed as normal.
@@ -430,7 +430,7 @@ function mukurtu_batch_import_import_metadata($path) {
 
           // Set the source fetcher config.
           $source->setConfigFor($source->importer->fetcher, $fetcher_config);
-      
+
           // Save the source.
           $source->save();
 
@@ -447,7 +447,7 @@ function mukurtu_batch_import_import_metadata($path) {
 
   // If we didn't find any valid files, warn the user.
   if(!$success) {
-      dpm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
+      drupal_set_message("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
   }
 }
 
