@@ -178,3 +178,7 @@ projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
 ;;; Views
 ; Change delimiter from coma to semi-colon
 projects[views][patch][] = contrib/109315810-Views-Change-delimiter-from-comma-to-semi-colon.patch
+
+;;; Views Data Export
+; Allow showing just a text link and not an image for the views data export attached button
+projects[views_data_export][patch][] = https://www.drupal.org/files/issues/option-non-image-link-2261167-39.patch
