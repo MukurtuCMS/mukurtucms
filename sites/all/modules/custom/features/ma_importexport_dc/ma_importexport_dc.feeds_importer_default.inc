@@ -34,7 +34,7 @@ function ma_importexport_dc_feeds_importer_default() {
       'plugin_key' => 'FeedsExXml',
       'config' => array(
         'context' => array(
-          'value' => '/rdf:RDF/rdf:Description',
+          'value' => 'rdf:RDF/rdf:Description',
         ),
         'sources' => array(
           'guid' => array(
@@ -328,7 +328,7 @@ function ma_importexport_dc_feeds_importer_default() {
       'plugin_key' => 'FeedsExXml',
       'config' => array(
         'context' => array(
-          'value' => '/mods',
+          'value' => 'mods',
         ),
         'sources' => array(
           'guid' => array(
