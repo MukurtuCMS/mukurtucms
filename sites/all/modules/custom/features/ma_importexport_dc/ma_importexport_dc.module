@@ -119,7 +119,7 @@ function ma_importexport_dc_import_form_context($form, $form_state) {
 
   // Determine if is a MODS file
   $mods_file = 0;
-  $mods_attributes = ['mods']; // TODO: add any other MODS identifiers here
+  $mods_attributes = ['mods', 'modsCollection'];
   foreach ($mods_attributes as $mods_attribute) {
     if (in_array($mods_attribute, $individual_attributes)) {
       $mods_file = 1;
@@ -137,9 +137,9 @@ function ma_importexport_dc_import_form_context($form, $form_state) {
     '#required' => TRUE,
   );
   if (!$mods_file) {
-    $form['context']['#description'] .= " For Dublin Core files, this will normally be all the attribute(s) before the ones starting with \"dc:\""; // TODO: add helper text for MODS if there end up being more typical contexts than just "MODS"
+    $form['context']['#description'] .= " For Dublin Core files, this will normally be all the attribute(s) before the ones starting with \"dc:\"";
   }
-  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description', 'mods'];
+  $typical_context_values = ['metadata', 'rdf:RDF', 'rdf:Description', 'mods', 'modsCollection'];
   $available_typical_context_values = [];
   foreach ($typical_context_values as $typical_context_value) {
     if (isset($individual_attributes[$typical_context_value])) {
@@ -217,10 +217,14 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
 
 
   // GUID source checkboxes.
+  $description = 'Select which attributes(s) to use for the GUID (globally unique identifier). This is used to match records to already-imported Digital Heritage items when re-importing from updated source data. Typically, you would use "dc:identifier", but if this is not available, not unique per record, or not populated for all records, then you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited in the source XML prior to a re-import, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.';
+  if ($mods_file) {
+    $description = str_replace('dc:', '', $description);
+  }
   $form['guid'] = array(
     '#type' => 'checkboxes',
     '#title' => 'GUID',
-    '#description' => 'Select which attributes(s) to use for the GUID (globally unique identifier). Typically you would use "dc:identifier". But if this not unique in your XML, you need to use another attribute which is. If there is no such attribute, you can select multiple attributes which will combine to create the GUID. Only choose as many as is required to create a unique value. Choose attributes(s) that will not be edited if the XML is re-imported later, as that will result in a new, separate Digital Heritage item. Also be sure not to choose any attributes which you chose for context.', // TODO: update help text to account for MODS
+    '#description' => $description,
     '#options' => $nested_attributes,
     '#required' => TRUE,
   );
@@ -233,17 +237,25 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   }
 
   // Media source radio.
+  $description = 'Select which attribute contains the reference to media for the Digital Heritage item.';
+  if (!$mods_file) {
+    $description .= ' This is typically "dc:hasformat" or "dc:relation".';
+  }
+  else {
+    $description .= ' This is typically "location/url" or "relateditem".';
+  }
   $form['media'] = array(
     '#type' => 'radios',
     '#title' => 'Media',
-    '#description' => 'Select which attribute contains the reference to media for the Digital Heritage item. This is typically "dc:hasformat", or "dc:relation".', // TODO: update help text to account for MODS
+    '#description' => $description,
     '#options' => array_merge(['none' => 'None'], $nested_attributes),
   );
-  if (isset($nested_attributes['dc:hasformat'])) {
-    $form['media']['#default_value'] = 'dc:hasformat';
-  }
-  elseif (isset($nested_attributes['dc:relation'])) {
-    $form['media']['#default_value'] = 'dc:relation';
+  $typical_media_values = ['dc:hasformat', 'dc:relation', 'location/url', 'relatedItem'];
+  foreach ($typical_media_values as $typical_media_value) {
+    if (isset($nested_attributes[$typical_media_value])) {
+      $form['media']['#default_value'] = $typical_media_value;
+      break;
+    }
   }
 
   // Custom protocol field.
@@ -375,11 +387,19 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
 
     $import_options = variable_get('dh_xml_import_options');
 
+    // Get the mapping from the attribute name to its xpath field machine name
+    $importer = feeds_importer($import_options['importer']);
+    $config = $importer->parser->getConfig();
+    $mapping = [];
+    foreach ($config['sources'] as $field_machine_name => $field_properties) {
+      $mapping[$field_properties['value']] = $field_machine_name;
+    }
+
     // Set the GUID
     $guid_parts = [];
     foreach ($import_options['guid'] as $attribute) {
       if ($attribute) {
-        $guid_parts[] = str_replace(':', '_', $attribute);
+        $guid_parts[] = $mapping[$attribute];
       }
     }
     foreach ($result->items as $i => $item) {
@@ -392,7 +412,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
       // Set the media field.
       $media_value = '';
       if ($import_options['media'] <> 'none') {
-        $media_value = $item[str_replace(':', '_', $import_options['media'])];
+        $media_value = trim($item[$mapping[$import_options['media']]]);
       }
       $result->items[$i]['dc_hasformat'] = $media_value;
     }
