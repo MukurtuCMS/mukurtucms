@@ -1,3 +1,15 @@
+## Mukurtu 2.0.13
+- Use Honeypot for spam prevention (bot user registration) on user registration form.
+
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
+## Mukurtu 2.0.12
+- Critical security update for Drupal core from 7.59 to 7.60.
+
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
 ## Mukurtu 2.0.11
 - Critical security update for Drupal core from 7.58 to 7.59.
 - Critical security update for Media module from 2.10 to 2.19.

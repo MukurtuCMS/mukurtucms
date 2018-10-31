@@ -88,16 +88,6 @@ function ma_core_user_default_permissions() {
     'module' => 'contextual',
   );
 
-  // Exported permission: 'access mollom statistics'.
-  $permissions['access mollom statistics'] = array(
-    'name' => 'access mollom statistics',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'access site in maintenance mode'.
   $permissions['access site in maintenance mode'] = array(
     'name' => 'access site in maintenance mode',
@@ -361,6 +351,16 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'homebox',
+  );
+
+  // Exported permission: 'administer honeypot'.
+  $permissions['administer honeypot'] = array(
+    'name' => 'administer honeypot',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'honeypot',
   );
 
   // Exported permission: 'administer image styles'.
@@ -659,14 +659,14 @@ function ma_core_user_default_permissions() {
     'module' => 'system',
   );
 
-  // Exported permission: 'bypass mollom protection'.
-  $permissions['bypass mollom protection'] = array(
-    'name' => 'bypass mollom protection',
+  // Exported permission: 'bypass honeypot protection'.
+  $permissions['bypass honeypot protection'] = array(
+    'name' => 'bypass honeypot protection',
     'roles' => array(
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
-    'module' => 'mollom',
+    'module' => 'honeypot',
   );
 
   // Exported permission: 'bypass node access'.
