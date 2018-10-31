@@ -377,10 +377,7 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
 /**
  * Implements hook_feeds_after_parse().
  *
- * Set the GUID and dc:hasformat field values according to their source as selected in the options form.
- * Note: this could also be done by altering the mapping, as in https://drupal.stackexchange.com/questions/254661/feeds-how-to-set-a-blank-source-value-programmatically,
- * but that method still requires updating the values individually in the targets_alter, so it's no
- * more efficient (and coding-wise less efficient) than just altering each value individually here in the after_parse.
+ *
  */
 function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
   if (ma_importexport_dc_is_xml_importer($source->id)) {
@@ -391,11 +388,18 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
     $importer = feeds_importer($import_options['importer']);
     $config = $importer->parser->getConfig();
     $mapping = [];
-    foreach ($config['sources'] as $field_machine_name => $field_properties) {
-      $mapping[$field_properties['value']] = $field_machine_name;
+    foreach ($config['sources'] as $xpath_field_machine_name => $field_properties) {
+      $mapping[$field_properties['value']] = $xpath_field_machine_name;
     }
 
-    // Set the GUID
+    // Trim all the elements of all items. This removes whitespace as well as newlines.
+    $result->items = trim_multi_assoc_array($result->items);
+
+    // Set the GUID and dc:hasformat field values according to their source as selected in the options form.
+    // Note: this could also be done by altering the mapping, as in
+    // https://drupal.stackexchange.com/questions/254661/feeds-how-to-set-a-blank-source-value-programmatically ,
+    // but that method still requires updating the values individually in the targets_alter, so it's no
+    // more efficient (and coding-wise less efficient) than just altering each value individually here.
     $guid_parts = [];
     foreach ($import_options['guid'] as $attribute) {
       if ($attribute) {
@@ -408,16 +412,27 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
         $guid_values[] = $item[$guid_part];
       }
       $result->items[$i]['guid'] = implode(':', $guid_values);
-
       // Set the media field.
       $media_value = '';
       if ($import_options['media'] <> 'none') {
-        $media_value = trim($item[$mapping[$import_options['media']]]);
+        $media_value = $item[$mapping[$import_options['media']]];
       }
       $result->items[$i]['dc_hasformat'] = $media_value;
     }
 
   }
+}
+
+// Trim values in an array or multidimensional mrray, including associative arrays
+// http://www.beliefmedia.com/code/php-snippets/trim-array-values
+function trim_multi_assoc_array($data) {
+  if ($data == null) {
+    return null;
+  }
+  if (is_array($data)) {
+    return array_map('trim_multi_assoc_array', $data);
+  }
+  else return trim($data);
 }
 
 /**
