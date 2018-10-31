@@ -376,8 +376,6 @@ function ma_importexport_dc_import_form_options_submit(&$form, &$form_state) {
 
 /**
  * Implements hook_feeds_after_parse().
- *
- *
  */
 function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
   if (ma_importexport_dc_is_xml_importer($source->id)) {
@@ -394,6 +392,23 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
 
     // Trim all the elements of all items. This removes whitespace as well as newlines.
     $result->items = trim_multi_assoc_array($result->items);
+
+    // Combine multival attributes that map to singleval fields.
+    $processor_config = $importer->processor->getConfig();
+    $singleval_fields = [];
+    foreach ($processor_config['mappings'] as $mapping) {
+      $field_info = field_info_field($mapping['target']);
+      if ($field_info['cardinality'] == 1) {
+        $singleval_fields[] = $mapping['source'];
+      }
+    }
+    foreach ($result->items as $i => $item) {
+      foreach ($singleval_fields as $singleval_field) {
+        if (count($item[$singleval_field]) > 1) {
+          $result->items[$i][$singleval_field] = implode("\n\n", $item[$singleval_field]); // Results in a paragraph break for long text fields and a single space for short text fields, which is what we want.
+        }
+      }
+    }
 
     // Set the GUID and dc:hasformat field values according to their source as selected in the options form.
     // Note: this could also be done by altering the mapping, as in
