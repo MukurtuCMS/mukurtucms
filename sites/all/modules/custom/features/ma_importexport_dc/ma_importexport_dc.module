@@ -382,12 +382,12 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
 
     $import_options = variable_get('dh_xml_import_options');
 
-    // Get the mapping from the attribute name to its xpath field machine name
+    // Get the xpath mapping from the attribute name to its xpath field machine name
     $importer = feeds_importer($import_options['importer']);
     $config = $importer->parser->getConfig();
-    $mapping = [];
+    $xpath_mapping = [];
     foreach ($config['sources'] as $xpath_field_machine_name => $field_properties) {
-      $mapping[$field_properties['value']] = $xpath_field_machine_name;
+      $xpath_mapping[$field_properties['value']] = $xpath_field_machine_name;
     }
 
     // Trim all the elements of all items. This removes whitespace as well as newlines.
@@ -396,10 +396,10 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
     // Combine multival attributes that map to singleval fields.
     $processor_config = $importer->processor->getConfig();
     $singleval_fields = [];
-    foreach ($processor_config['mappings'] as $mapping) {
-      $field_info = field_info_field($mapping['target']);
+    foreach ($processor_config['mappings'] as $feeds_mapping) {
+      $field_info = field_info_field($feeds_mapping['target']);
       if ($field_info['cardinality'] == 1) {
-        $singleval_fields[] = $mapping['source'];
+        $singleval_fields[] = $feeds_mapping['source'];
       }
     }
     foreach ($result->items as $i => $item) {
@@ -411,14 +411,10 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
     }
 
     // Set the GUID and dc:hasformat field values according to their source as selected in the options form.
-    // Note: this could also be done by altering the mapping, as in
-    // https://drupal.stackexchange.com/questions/254661/feeds-how-to-set-a-blank-source-value-programmatically ,
-    // but that method still requires updating the values individually in the targets_alter, so it's no
-    // more efficient (and coding-wise less efficient) than just altering each value individually here.
     $guid_parts = [];
     foreach ($import_options['guid'] as $attribute) {
       if ($attribute) {
-        $guid_parts[] = $mapping[$attribute];
+        $guid_parts[] = $xpath_mapping[$attribute];
       }
     }
     foreach ($result->items as $i => $item) {
@@ -430,7 +426,7 @@ function ma_importexport_dc_feeds_after_parse(FeedsSource $source, FeedsParserRe
       // Set the media field.
       $media_value = '';
       if ($import_options['media'] <> 'none') {
-        $media_value = $item[$mapping[$import_options['media']]];
+        $media_value = $item[$xpath_mapping[$import_options['media']]];
       }
       $result->items[$i]['dc_hasformat'] = $media_value;
     }
