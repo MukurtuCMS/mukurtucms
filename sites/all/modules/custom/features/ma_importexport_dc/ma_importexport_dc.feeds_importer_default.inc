@@ -328,7 +328,7 @@ function ma_importexport_dc_feeds_importer_default() {
       'plugin_key' => 'FeedsExXml',
       'config' => array(
         'context' => array(
-          'value' => 'mods',
+          'value' => 'modsCollection/mods',
         ),
         'sources' => array(
           'guid' => array(
@@ -349,7 +349,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_creator' => array(
             'name' => 'dc:creator',
-            'value' => 'name/namePart/role/roleTerm',
+            'value' => 'name/namePart',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -357,7 +357,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_contributor' => array(
             'name' => 'dc:contributor',
-            'value' => 'name/namePart/role/roleTerm',
+            'value' => 'name/namePart',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -365,7 +365,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_date' => array(
             'name' => 'dc:date',
-            'value' => 'dateIssued',
+            'value' => 'originInfo/dateCreated',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -381,7 +381,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_publisher' => array(
             'name' => 'dc:publisher',
-            'value' => 'publisher',
+            'value' => 'originInfo/publisher',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -437,7 +437,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_subject' => array(
             'name' => 'dc:subject',
-            'value' => 'subject/geographic',
+            'value' => 'classification',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -445,7 +445,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_coverage' => array(
             'name' => 'dc:coverage',
-            'value' => 'subject/geographic',
+            'value' => 'originInfo/place/placeTerm',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -453,7 +453,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_hasformat' => array(
             'name' => 'dc:hasformat',
-            'value' => 'relatedItems',
+            'value' => 'location/url',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
@@ -461,7 +461,7 @@ function ma_importexport_dc_feeds_importer_default() {
           ),
           'dc_relation' => array(
             'name' => 'dc:relation',
-            'value' => 'relatedItems',
+            'value' => 'relatedItem',
             'raw' => 0,
             'inner' => 0,
             'debug' => 0,
