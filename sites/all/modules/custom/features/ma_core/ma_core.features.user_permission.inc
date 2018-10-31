@@ -439,16 +439,6 @@ function ma_core_user_default_permissions() {
     'module' => 'system',
   );
 
-  // Exported permission: 'administer mollom'.
-  $permissions['administer mollom'] = array(
-    'name' => 'administer mollom',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'mollom',
-  );
-
   // Exported permission: 'administer nodes'.
   $permissions['administer nodes'] = array(
     'name' => 'administer nodes',
@@ -1278,16 +1268,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'backup_migrate',
-  );
-
-  // Exported permission: 'report to mollom'.
-  $permissions['report to mollom'] = array(
-    'name' => 'report to mollom',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'mollom',
   );
 
   // Exported permission: 'restore from backup'.
