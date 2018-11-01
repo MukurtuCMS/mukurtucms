@@ -34,7 +34,7 @@ function mukurtu_export_mukurtu_export_field_handlers() {
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
             '#callback' => 'mukurtu_export_field_handler_geofield'
-        ),        
+        ),
         'paragraphs' => array(
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
@@ -173,7 +173,7 @@ function mukurtu_export_field_handler_paragraphs($value, $field_info, $options =
         $referenced_entities['paragraphs_item'][$value['value']] = $value['value'];
         return array($value['value'], $referenced_entities, $files);
     }
-    
+
     return array(NULL, $referenced_entities, $files);
 }
 

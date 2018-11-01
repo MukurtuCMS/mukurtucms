@@ -96,6 +96,63 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
         'callback' => 'ma_importexport_set_media_source_target',
         'real_target' => 'file_source',
     );
+
+    // Paragraphs host entity.
+    $targets['host_entity'] = array(
+        'name' => t('Host Entity'),
+        'description' => t('The host entity field for a paragraph.'),
+        'callback' => 'ma_importexport_set_paragraph_host_entity',
+        'real_target' => 'host_entity',
+    );
+}
+
+/**
+ * Callback for ma_importexport_feeds_processor_targets_alter.
+ */
+function ma_importexport_set_paragraph_host_entity($source, $entity, $target, $value, $mapping) {
+  $pid = (isset($entity->feeds_item->guid)) ? 'guid: ' . $entity->feeds_item->guid : 'id: ' . $entity->item_id;
+  foreach ($value as $id) {
+    // Check if this is a real paragraph entity.
+    if (!method_exists($entity, 'hostEntity')) {
+      drupal_set_message(t('Paragraph @id failed to load during import', array('@id' => $pid)));
+      $entity->feeds_item->skip = TRUE;
+      continue;
+    }
+
+    // Try submitted value as a GUID first. Otherwise assume it's a NID.
+    $host_entity_nid = ma_importexport_feeds_lookup_node_by_guid($id);
+    if (!$host_entity_nid) {
+      $host_entity_nid = $id;
+    }
+    $host_entity = node_load($host_entity_nid);
+
+    // Provided host entity must be a valid entity.
+    if (!$host_entity) {
+      $entity->feeds_item->skip = TRUE;
+      drupal_set_message(t('Provided host entity (@host_id) for paragraph @id is invalid, paragraph not updated.', array('@id' => $pid, '@host_id' => $id)));
+      continue;
+    }
+
+    // New paragraph, just set the host entity.
+    if ($entity->feeds_item->is_new) {
+      $entity->field_name = ma_importexport_get_paragraph_fieldname($host_entity);
+      $entity->setHostEntity('node', $host_entity);
+      continue;
+    }
+
+    // Updating the paragraph.
+    $original_host_entity = $entity->hostEntity();
+
+    // Updating, but user is trying to switch the host entity, which we don't want to allow.
+    if ($original_host_entity && ($original_host_entity->nid != $host_entity_nid)) {
+      $entity->feeds_item->skip = TRUE;
+      drupal_set_message(t('Paragraph @id is already being used by node @node_id. Create a new paragraph or change the host entity ID.', array('@id' => $pid, '@node_id' => $original_host_entity->nid)));
+      continue;
+    }
+
+    // If we get to this point, the user is updating the paragraph without
+    // trying to change the host entity, so we don't need to do anything.
+  }
 }
 
 /**
@@ -145,7 +202,7 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
             $language = isset($entity->language) ? $entity->language : LANGUAGE_NONE;
             $entity->{$new_target}[$language][][$target_id_name] = $guid;
         }
-    }    
+    }
 }
 
 
@@ -191,7 +248,7 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
     if($source->id == 'digital_heritage_dc') {
       return;
     }
-    
+
     if (isset($entity->type) && $entity->type == 'digital_heritage') {
 
         // If community record children exist, we need to set the community record parent on them.
@@ -548,7 +605,7 @@ function ma_importexport_export_form_submit($form, &$form_state)
   if(!$items && isset($_SESSION['digital_heritage_grid_list_nids'])) {
     $items = $_SESSION['digital_heritage_grid_list_nids'];
   }
-  
+
   $format = $form['dh_export']['format']['#value'];
   $options = array();
   if($format = 'csv') {
@@ -560,7 +617,7 @@ function ma_importexport_export_form_submit($form, &$form_state)
   $options['export_related_items'] = $form['dh_export']['options']['export_related_items']['#checked'];
   $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
   $options['export_package'] = $form['dh_export']['package']['#value'];
-  
+
   $download_link = ma_importexport_digital_heritage_node_export($items, $format, $options);
   $message = t('Download your exported items: <div class="btn btn-primary export-download"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
   drupal_set_message($message);
@@ -594,7 +651,7 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
   }
 
   $form['dh_export']['items'] = array( '#type' => 'hidden', '#value' => $items);
-  
+
   $export_url = current_path();
   $form['dh_export']['original_path'] = array('#type' => 'hidden', '#value' => $export_url);
 
@@ -604,7 +661,7 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
       '#title' => t('Export local item IDs (nids) for reimport'),
       '#default_value' => 1
   );
-  
+
   // Export Options
   $fields_to_export = array( 'export_community_records' => t('Community Records'),
                              'export_all_pages' => t('All Pages'),
@@ -625,7 +682,7 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
   					'#default_value' => 'package_dh_only',
   					'#options' => $options,
   					);
-  
+
   // Export Format
   $options = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
 
@@ -642,12 +699,12 @@ function ma_importexport_export_form($form, &$form_state, $items = NULL, $format
 					     '#title' => t('CSV column multi-value delimiter'),
 					     '#default_value' => ';',
 					     '#size' => 4,
-					     '#maxlength' => 10);					     
-  
+					     '#maxlength' => 10);
+
   $form['dh_export']['export'] = array( '#type' => 'submit',
 					'#value' => t('Export'),
 					);
-					
+
 
   return $form;
 }
@@ -661,7 +718,7 @@ function ma_importexport_form_feeds_delete_tab_form_alter(&$form, &$form_state, 
 }
 
 /**
- * Grabs the form for exporting from the browse DH page or DH node 
+ * Grabs the form for exporting from the browse DH page or DH node
  */
 function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = NULL) {
   if (is_int($items)) {
@@ -669,7 +726,7 @@ function ma_importexport_export_gui($items = NULL, $format = 'csv', $delivery = 
   }
   elseif (is_object($items)) {
     $items = array($items->nid);
-  }					
+  }
 
   return drupal_get_form('ma_importexport_export_form', $items, $format);
 }
@@ -688,7 +745,7 @@ function ma_importexport_dh_export_form($settings, &$form_state) {
       '#title' => t('Export local item IDs (nids) for reimport'),
       '#default_value' => 1
   );
-  
+
   /* Checkboxes to select what related nodes are exported */
   $fields_to_export = array( 'export_community_records' => t('Community Records'),
                              'export_all_pages' => t('All Pages'),
@@ -710,7 +767,7 @@ function ma_importexport_dh_export_form($settings, &$form_state) {
   					'#default_value' => 'package_dh_only',
   					'#options' => $options,
   					);
-  
+
   $export_formats = array('csv' => t('CSV'), 'xml' => t('XML'), 'json' => t('JSON'));
 
   $form['dh_export']['format'] = array( '#type' => 'radios',
@@ -745,7 +802,7 @@ function ma_importexport_dh_export_submit($form, $form_state) {
   $options['export_all_pages'] = $form['dh_export']['options']['export_all_pages']['#checked'];
   $options['multivalue_delimiter'] = $form_state['values']['csvdelimiter'];
   $options['export_package'] = $form['dh_export']['package']['#value'];
- 
+
   $return['format'] = $form_state['values']['format'];
   $return['export_options'] = $options;
   return $return;
@@ -766,7 +823,7 @@ function ma_importexport_dh_export(&$node, $context) {
         $download_link = ma_importexport_digital_heritage_node_export($_SESSION['digital_heritage_export_list'], $context['format'], $context['export_options']);
         $message = t('Download your exported items: <div class="btn btn-primary export-download"><a href="@downloadlink">Download</a></div>', array('@downloadlink' => $download_link));
         drupal_set_message($message);
-        
+
     }
 }
 
@@ -789,7 +846,7 @@ function ma_importexport_action_info() {
 
 function ma_importexport_dh_export_views_bulk_operations_form($options) {
   $form = array();
- 
+
   return $form;
 }
 
@@ -823,7 +880,7 @@ function ma_importexport_access_export($node) {
     $access = $access && (in_array('administrator', $user->roles)
                           || in_array('Mukurtu Administrator', $user->roles)
                           || in_array('Community Administrator', $user->roles));
-    
+
     // Make sure the user can view the original node content.
     $access = $access && node_access('view', $node);
   }
@@ -844,13 +901,13 @@ function ma_importexport_make_node_guid($nid) {
   if($node) {
       // Check for an existing feeds guid
       $node_feeds_info = feeds_item_info_load('node', $node->nid);
-      
+
       if($node_feeds_info && isset($node_feeds_info->guid)) {
           return $node_feeds_info->guid;
       }
-      
+
       // Otherwise generate a new one
-      $guid = $node->type . '_' . $node->nid . '_' . $node->created;      
+      $guid = $node->type . '_' . $node->nid . '_' . $node->created;
       return $guid;
   }
   return "";
@@ -862,7 +919,7 @@ function ma_importexport_make_node_guid($nid) {
  */
 function ma_importexport_make_atom_guid($sid) {
   $atom = scald_atom_load($sid);
-  
+
   if($atom) {
       // Check for an existing feeds guid
       $atom_feeds_info = feeds_item_info_load('scald_atom', $sid);
@@ -870,7 +927,7 @@ function ma_importexport_make_atom_guid($sid) {
       if($atom_feeds_info && isset($atom_feeds_info->guid)) {
           return $atom_feeds_info->guid;
       }
-      
+
       // Otherwise generate a new one
       $guid = $atom->type . '_' . $atom->sid . '_' . $atom->created;
       return $guid;
@@ -883,19 +940,19 @@ function ma_importexport_make_atom_guid($sid) {
  *  Take a list of digital heritage nids and sort them topologically so that they can be imported without dependency issues.
  *  Crude implementation of Kahn's algorithm.
  *
- *  TODO: Long-term it would be better (for the user) to try and handle dependencies on import.  Users could alter this 
+ *  TODO: Long-term it would be better (for the user) to try and handle dependencies on import.  Users could alter this
  *        ordering of the exported items prior to import.
  */
 function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
     $nodes = node_load_multiple($nids);
 
-    // Create a simple graph of the nodes, merging the different relations into a single "dependency" relationship    
+    // Create a simple graph of the nodes, merging the different relations into a single "dependency" relationship
     $node_graph = array();
     foreach($nodes as $node) {
         if($node->type != 'digital_heritage') {
             continue;
         }
-        
+
         $related_items = array();
         $community_records = array();
         $book_pages = array();
@@ -907,7 +964,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
                 }
             }
         }
-        
+
         if($options['export_related_items']) {
             if(!empty($node->field_related_dh_items)) {
                 foreach($node->field_related_dh_items[LANGUAGE_NONE] as $ri) {
@@ -936,7 +993,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
 
     $sorted_nodes = array();
     $edgeless_nodes = array();
-    
+
     // Find nodes with no incoming edges
     foreach($node_graph as $nid => $edges) {
         if(empty($edges)) {
@@ -959,7 +1016,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
                     $edgeless_nodes[] = $m;
                 }
             }
-        }        
+        }
     }
 
     // Check for unprocessed edges, indicating that graph is not acyclic
@@ -981,7 +1038,7 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   if(empty($item)) {
     return $result;
   }
-  
+
   // Strip off any suffix on the field name to make things easier
   $field_name = str_replace(':etid', '', $field_name);
   $field_name = str_replace(':guid_or_nid', '', $field_name);
@@ -992,7 +1049,7 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
   if(!in_array($base_field_name, $excluded_fields) && empty($item->{$base_field_name})) {
       return $result;
   }
- 
+
   switch($field_name) {
   case 'title':
     $result[] = $item->title;
@@ -1002,10 +1059,10 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
     break;
   case 'guid':
     $result[] = ma_importexport_make_node_guid($item->nid);
-    break;    
+    break;
   case 'body':
     foreach($item->{$field_name}[$item->language] as $field_value) {
-      $result[] = $field_value['value']; 
+      $result[] = $field_value['value'];
     }
     break;
   case 'field_media_asset':
@@ -1052,11 +1109,11 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
     break;
   case 'field_community_ref':
     foreach($item->{$field_name}[LANGUAGE_NONE] as $ref) {
-      if($use_guid) {	
+      if($use_guid) {
           $result[] = ma_importexport_make_node_guid($ref['nid']);
       } else {
           $result[] = $ref['nid'];
-      }     
+      }
     }
     break;
   case 'field_coverage':
@@ -1073,17 +1130,17 @@ function ma_importexport_digital_heritage_field_export($item, $field_name, $use_
     foreach($item->field_coverage[LANGUAGE_NONE] as $ref) {
       $result[] = $ref['lon'];
     }
-    break;    
+    break;
   default:
     foreach($item->{$field_name}[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['value']; 
+      $result[] = $field_value['value'];
     }
   }
 
   if($use_guid) {
       $result = ma_importexport_scald_dnd_encode($result);
   }
-  
+
   return $result;
 }
 
@@ -1100,7 +1157,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
       $multivalue_delimiter = ';';
     }
   }
-  
+
   if (is_int($items)) {
     $items = array($items);
   }
@@ -1109,9 +1166,9 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   }
 
   // Add any related items we need to export as well
-  // TODO: restructure this to avoid looping over and loading all nodes twice  
+  // TODO: restructure this to avoid looping over and loading all nodes twice
   $related_items = array();
-  foreach($items as $item) {    
+  foreach($items as $item) {
     $original_node = node_load($item);
 
     if($options['export_related_items'] && !empty($original_node->field_related_dh_items)) {
@@ -1135,16 +1192,16 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $dh_items = array_merge($items, $related_items);
   $dh_items = array_unique($dh_items);
   $dh_items = ma_importexport_sort_digital_heritage_nodes($dh_items, $options);
-  
+
   // Get list of DH field names
   $dhfields = field_info_instances('node', 'digital_heritage');
-  
+
   $mapping = ma_importexport_get_importer_mapping('digital_heritage', $options['export_nids']);
-  
+
   $export_items = array();
-  
+
   // Add headers
-  // TODO: Purge this once generalized 
+  // TODO: Purge this once generalized
   //  foreach($mapping as $f => $h) {
   //  $export_items['headers'][$f] = $h;
   //}
@@ -1154,7 +1211,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
   $collection_list = array();
   $protocol_list = array();
   $media_sids = array();
-  
+
   // Process Items
   foreach ($dh_items as $item) {
     $original_node = node_load($item);
@@ -1164,7 +1221,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
     $collection_list = array_merge($collection_list, ma_importexport_digital_heritage_field_export($original_node, 'field_collection'));
     $protocol_list = array_merge($protocol_list, ma_importexport_digital_heritage_field_export($original_node, 'og_group_ref'));
     //  $community_list = array_merge($community_list, ma_importexport_digital_heritage_field_export($original_node, 'field_community_ref'));
-    
+
     // Check export permission for item
     if (!ma_importexport_access_export($original_node)) {
       $error = $msg_t("You do not have permission to export one or more of these items.  No items exported.");
@@ -1200,7 +1257,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
           }
       }
   }
-  
+
   // Load collection nodes
   $collection_list = array_unique($collection_list);
   foreach($collection_list as $key => $nid) {
@@ -1212,18 +1269,18 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
       if(!in_array($collection_image_sid[0], $media_sids)) {
           $media_sids[] = $collection_image_sid[0];
       }
-    }    
+    }
   }
 
   // Load cultural protocol nodes
   $protocol_list = array_unique($protocol_list);
-  foreach($protocol_list as $key => $nid) {     
+  foreach($protocol_list as $key => $nid) {
     $protocol_list[$key] = node_load($nid);
 
     // Find all the communities that the protocols reference
     $community_list = array_merge($community_list, ma_importexport_node_field_export($protocol_list[$key], 'og_group_ref'));
 
-     // Protocols have scald media atoms too, add them to export list   
+     // Protocols have scald media atoms too, add them to export list
     $protocol_image_sid = ma_importexport_node_field_export($protocol_list[$key], 'field_protocol_image');
     if(count($protocol_image_sid) > 0) {
       if(!in_array($protocol_image_sid[0], $media_sids)) {
@@ -1238,15 +1295,15 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
       }
     }
   }
-    
+
   // Load community nodes
-  // TODO: Get parent/child communities and add them to the list  
+  // TODO: Get parent/child communities and add them to the list
   $community_list = array_unique($community_list);
-  
+
   foreach($community_list as $key => $nid) {
     $community_list[$key] = node_load($nid);
 
-    // Communities have scald media atoms too, add them to export list                 
+    // Communities have scald media atoms too, add them to export list
     $community_image_sid = ma_importexport_node_field_export($community_list[$key], 'field_community_image');
     if(count($community_image_sid) > 0) {
       if(!in_array($community_image_sid[0], $media_sids)) {
@@ -1261,7 +1318,7 @@ function ma_importexport_digital_heritage_node_export($items, $format = 'csv', $
       }
     }
   }
-    
+
   $exported_media = ma_importexport_load_scald_atoms($media_sids);
 
   //  $export = array('digitalheritage' => $export_items,
@@ -1356,7 +1413,7 @@ function ma_importexport_get_importer_mapping($nodetype, $export_nids = TRUE) {
   if($nodetype == 'digital_heritage' && isset($mapping['field_community_record_parent:guid_or_nid'])) {
       unset($mapping['field_community_record_parent:guid_or_nid']);
   }
-  
+
   return $mapping;
 }
 
@@ -1383,9 +1440,9 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
     default:
       $importer_id = '';
     }
-  
+
   $mapping = array();
-  
+
   if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => $importer_id))) {
     $config = array_shift($config);
     foreach($config->config['processor']['config']['mappings'] as $map) {
@@ -1406,7 +1463,7 @@ function ma_importexport_get_atom_field_mapping($type, $export_sids = TRUE) {
           $mapping['sid'] = 'sid';
       }
   }
-  
+
   return $mapping;
 }
 
@@ -1428,11 +1485,11 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
   if(!in_array($base_field_name, $excluded_fields) && empty($node->{$base_field_name})) {
       return $result;
   }
-  
+
   switch($field_name) {
   case 'body':
     foreach($node->{$field_name}[$node->language] as $field_value) {
-        $result[] = ($use_guid) ? ma_importexport_scald_dnd_encode($field_value['value']) : $field_value['value']; 
+        $result[] = ($use_guid) ? ma_importexport_scald_dnd_encode($field_value['value']) : $field_value['value'];
     }
     break;
   case 'field_collection_image':
@@ -1444,7 +1501,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       if($use_guid) {
           $result[] = ma_importexport_make_atom_guid($field_value['sid']);
       } else {
-          $result[] = $field_value['sid'];	
+          $result[] = $field_value['sid'];
       }
     }
     break;
@@ -1459,16 +1516,16 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       foreach($node->{$field_name}[LANGUAGE_NONE] as $term) {
           $result[] = taxonomy_term_load($term['tid'])->name;
       }
-      break;    
+      break;
   case 'field_category':
   case 'field_tags':
       foreach($node->{$field_name}[$node->language] as $term) {
           $result[] = taxonomy_term_load($term['tid'])->name;
       }
-      break;    
+      break;
   case 'field_parent_community:etid':
   case 'field_parent_community':
-    foreach($node->field_parent_community[LANGUAGE_NONE] as $field_value) {           
+    foreach($node->field_parent_community[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
           $result[] = ma_importexport_make_node_guid($field_value['target_id']);
       } else {
@@ -1497,7 +1554,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
     break;
   case 'field_description:summary':
     foreach($node->field_collection_summary[LANGUAGE_NONE] as $field_value) {
-        $result[] = ($use_guid) ? ma_importexport_scald_dnd_encode($field_value['value']) : $field_value['value']; 
+        $result[] = ($use_guid) ? ma_importexport_scald_dnd_encode($field_value['value']) : $field_value['value'];
     }
     break;
   case 'og_group_ref':
@@ -1523,14 +1580,14 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
               $result[] = $ref['target_id'];
           }
       }
-      break;    
+      break;
   case 'field_community_ref':
     foreach($node->{$field_name}[LANGUAGE_NONE] as $ref) {
-      if($use_guid) {	
+      if($use_guid) {
           $result[] = ma_importexport_make_node_guid($ref['nid']);
       } else {
           $result[] = $ref['nid'];
-      }     
+      }
     }
     break;
   case 'field_coverage':
@@ -1547,7 +1604,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
     foreach($node->field_coverage[LANGUAGE_NONE] as $ref) {
       $result[] = $ref['lon'];
     }
-    break;    
+    break;
   case 'nid':
     $result[] = $node->nid;
     break;
@@ -1567,7 +1624,7 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       break;
   default:
     foreach($node->{$field_name}[LANGUAGE_NONE] as $field_value) {
-        $result[] = ($use_guid) ? ma_importexport_scald_dnd_encode($field_value['value']) : $field_value['value']; 
+        $result[] = ($use_guid) ? ma_importexport_scald_dnd_encode($field_value['value']) : $field_value['value'];
     }
   }
 
@@ -1586,7 +1643,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
 
   $result = array();
 
-  
+
   // Strip off any suffix on the field name to make things easier
   $field_name = str_replace(':etid', '', $field_name);
   $field_name = str_replace(':guid_or_nid', '', $field_name);
@@ -1597,14 +1654,14 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
   if(!in_array($base_field_name, $excluded_fields) && empty($atom->{$base_field_name})) {
       return $result;
   }
-  
+
   switch($field_name) {
   case 'sid':
     $result[] = $atom->sid;
     break;
   case 'guid':
       $result[] = ma_importexport_make_atom_guid($atom->sid);
-    break;    
+    break;
   case 'title':
     $result[] = $atom->{$field_name};
     break;
@@ -1632,7 +1689,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     foreach($atom->field_scald_geo_location[LANGUAGE_NONE] as $field_value) {
       $result[] = $field_value['lon'];
     }
-    break;    
+    break;
   case 'field_scald_protocol':
   case 'og_group_ref':
     foreach($atom->{$field_name}[LANGUAGE_NONE] as $ref) {
@@ -1641,7 +1698,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
       } else {
 	$result[] = $ref['target_id'];
       }
-    }    
+    }
     break;
   case 'og_group_ref:etid':
     foreach($atom->field_scald_protocol[LANGUAGE_NONE] as $ref) {
@@ -1650,7 +1707,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
       } else {
 	$result[] = $ref['target_id'];
       }
-    }    
+    }
     break;
   case 'field_category':
     foreach($atom->{$field_name}[$atom->language] as $term) {
@@ -1690,7 +1747,7 @@ function ma_importexport_atom_field_export($atom, $field_name, $mapping = array(
     break;
   default:
     foreach($atom->{$field_name}[LANGUAGE_NONE] as $field_value) {
-      $result[] = $field_value['value']; 
+      $result[] = $field_value['value'];
     }
   }
   return $result;
@@ -1712,7 +1769,7 @@ function ma_importexport_write_node_csv($csv_file, $nodetype, $node = NULL, $del
   foreach($mapping as $field_name => $field) {
       $row[] = implode($delimiter, ma_importexport_node_field_export($node, $field_name, $mapping, !$export_nids));
   }
-    
+
   fputcsv($csv_file, $row);
 }
 
@@ -1775,10 +1832,10 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
                            'audio' => 'media_audio.csv',
                            'video' => 'media_video.csv',
                            'file' => 'media_files.csv');
-  
+
   $node_type = array();
   $atom_output = array();
-  
+
   foreach($node_types as $type) {
       $node_output[$type]['file'] = tempnam(sys_get_temp_dir(),'MUKURTUEXPORT');
       $node_output[$type]['handle'] = fopen($node_output[$type]['file'], 'w');
@@ -1812,22 +1869,22 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
       }
   }
 
-  // Export atoms to CSV files and copy media to temp location 
+  // Export atoms to CSV files and copy media to temp location
   foreach($export['atoms'] as $atom) {
       if(!in_array($atom->type, $atom_types)) {
           continue;
       }
-      
+
       ma_importexport_write_atom_csv($atom_output[$atom->type]['handle'], $atom->type, $atom, $delimiter, $export_ids);
       $atom_output[$atom->type]['count']++;
-  
+
       // Copy Thumbnails
       foreach($atom->scald_thumbnail[LANGUAGE_NONE] as $thumbnail) {
           $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
           $tempmedia = file_unmanaged_copy($thumbnail['uri'], $tempmedia, FILE_EXISTS_REPLACE);
           if($tempmedia) {
               $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
-              $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $thumbnail['filename']); 
+              $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $thumbnail['filename']);
           }
       }
 
@@ -1840,7 +1897,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
               $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. $atom->base_entity->filename);
           }
       }
-      
+
       // Copy video
       if(isset($atom->data['video_file'])) {
           $tempmedia = tempnam(sys_get_temp_dir(), 'MUKURTUEXPORT');
@@ -1849,7 +1906,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
               $media_dir = 'media/' . $atom->type . '/' . $atom->sid . '/';
               $export_files[] = array('filename' => $tempmedia, 'localname' => $media_dir. basename($atom->data['video_file']));
           }
-      }   
+      }
   }
 
   // Close all node temp files
@@ -1858,7 +1915,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
 
       // Add files with content to export list to be packaged for download
       if($type['count'] > 0) {
-          $export_files[] = array('filename' => $type['file'], 'localname' => $type['localname']); 
+          $export_files[] = array('filename' => $type['file'], 'localname' => $type['localname']);
       }
   }
 
@@ -1867,7 +1924,7 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
       fclose($type['handle']);
 
       if($type['count'] > 0) {
-          $export_files[] = array('filename' => $type['file'], 'localname' => $type['localname']); 
+          $export_files[] = array('filename' => $type['file'], 'localname' => $type['localname']);
       }
   }
 
@@ -1878,13 +1935,13 @@ function ma_importexport_export_csv($export, $delimiter=';', $export_ids = FALSE
   return ma_importexport_zip_download_url($export_files);
 }
 
-function ma_importexport_file_download_url($file) {   
+function ma_importexport_file_download_url($file) {
     // Copy to a managed location that we can present for download
     $destination = 'private://batch_export/';
     file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
     $filename = $file['localname'];
     $download_file = file_save_data(file_get_contents($file['filename']), $destination . $filename, FILE_EXISTS_RENAME);
-    
+
     return file_create_url($download_file->uri);
 }
 
@@ -1908,7 +1965,7 @@ function ma_importexport_zip_download_url($files) {
     $download_file = file_save_data($zip_handle, $destination . $filename, FILE_EXISTS_RENAME);
 
     unlink(drupal_realpath($tempfile));
-    
+
     return file_create_url($download_file->uri);
 }
 
@@ -1982,7 +2039,7 @@ function ma_importexport_scald_dnd_decode($fields) {
     $single_value = FALSE;
     if(!is_array($fields)) {
         $fields = array($fields);
-        $single_value = TRUE;        
+        $single_value = TRUE;
     }
 
     // Users wanted an easier way to embed SCALD atoms in their import files
@@ -2050,6 +2107,21 @@ function ma_importexport_get_scald_dnd_enabled_fields()
     return $scald_dnd_enabled_fields;
 }
 
+/**
+ * Return the fieldname of the paragraphs field for a
+ * given entity. Currently only returns the first
+ * paragraphs field.
+ */
+function ma_importexport_get_paragraph_fieldname($entity, $entity_type = 'node') {
+  $fields = field_info_instances($entity_type, $entity->type);
+
+  foreach($fields as $field_name => $field) {
+    $field_info = field_info_field($field_name);
+    if ($field_info['type'] == 'paragraphs') {
+      return $field_info['field_name'];
+    }
+  }
+}
 
 /**
  * Take a node or nid and return an array of scald atom sids that are
@@ -2058,7 +2130,7 @@ function ma_importexport_get_scald_dnd_enabled_fields()
 function ma_importexport_get_embedded_dnd_scald_atoms($node)
 {
     $sids = array();
-    
+
     if(is_numeric($node)) {
         $node = node_load($node);
         if(!$node) {
