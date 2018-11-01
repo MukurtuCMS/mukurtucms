@@ -3,6 +3,8 @@
 
 #### Manual Upgrade Steps
 - clear all caches: `drush cc all`
+- revert the Mukurtu Core feature: `drush fr ma_core -y`
+- re-clear all caches: `drush cc all`
 
 ## Mukurtu 2.0.12
 - Critical security update for Drupal core from 7.59 to 7.60.
