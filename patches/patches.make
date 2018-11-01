@@ -184,3 +184,5 @@ projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
 projects[views_data_export][patch][] = https://www.drupal.org/files/issues/2018-10-16/views_data_export-empty-row-after-export-2902923-2.patch
 ; Allow showing just a text link and not an image for the views data export attached button
 projects[views_data_export][patch][] = https://www.drupal.org/files/issues/option-non-image-link-2261167-39.patch
+; Add XML multival handling
+projects[views_data_export][patch][] = https://www.drupal.org/files/issues/2018-11-01/1102298-multiple-values-support-16.patch
