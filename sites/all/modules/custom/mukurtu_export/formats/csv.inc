@@ -273,7 +273,7 @@ function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delim
 /**
  * Post entity encode step to handle special case scenarios
  */
-function mukurtu_export_csv_post_encode_entity(&$encoded_content, $entity_key, $entity, $entity_type, $bundle_name, $field_list) {
+function mukurtu_export_csv_post_encode_entity(&$encoded_content, $entity_key, $entity, $entity_type, $bundle_name, $field_list, $id_format = 'internal') {
   if($entity_type == 'scald_atom') {
     // Youtube/Vimeo fix
     switch($entity->provider) {
@@ -286,6 +286,16 @@ function mukurtu_export_csv_post_encode_entity(&$encoded_content, $entity_key, $
           $encoded_content[$entity_type][$bundle_name]['file_source'][$entity_key][0] = $entity->base_id;
         }
         break;
+    }
+  }
+
+  // Need to keep track of paragraph's host entity so we can keep references
+  // intact on import.
+  if ($entity_type == 'paragraphs_item') {
+    if ($field_list[$entity_type][$bundle_name]['host_entity']) {
+      $host_entity = $entity->hostEntity();
+      $host_entity_id = ($id_format == 'guid') ? _mukurtu_export_entity_get_guid('node', $host_entity->nid) : $host_entity->nid;
+      $encoded_content[$entity_type][$bundle_name]['host_entity'][$entity_key][0] = $host_entity_id;
     }
   }
 }
@@ -405,7 +415,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
       // Get exportable value from field
       //      if(is_null($parent)) {
       //          list($value, $referenced_entities_to_encode, $files) = mukurtu_export_extract_value($entity_type, $header_value, $v, $options);
-      //      } else {      
+      //      } else {
           list($value, $referenced_entities_to_encode, $files) = mukurtu_export_extract_value($entity_type, $parent, $v, $options);
           //      }
 
@@ -440,6 +450,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
 
             // Encode referenced content
             mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format, $export_referenced, $export_files);
+            mukurtu_export_csv_post_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format);
           }
         }
       }

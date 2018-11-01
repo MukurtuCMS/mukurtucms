@@ -44,7 +44,7 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   'language' => 'und',
               ),
           );
-          
+
           $mapping_i = 2;
 
           if($entity_type == 'scald_atom') {
@@ -57,6 +57,22 @@ function mukurtu_importer_generator_feeds_importer_default() {
             $mappings[$mapping_i++] = array(
                 'source' => 'Media Source',
                 'target' => 'file_source',
+                'unique' => 0,
+                'language' => 'und',
+            );
+          }
+
+          if ($entity_type == 'paragraphs_item') {
+            switch($bundle_name) {
+            case 'dictionary_word_bundle':
+                $source = 'Dictionary Word';
+                break;
+            default:
+                $source = "Host Entity";
+            }
+            $mappings[$mapping_i++] = array(
+                'source' => $source,
+                'target' => 'host_entity',
                 'unique' => 0,
                 'language' => 'und',
             );

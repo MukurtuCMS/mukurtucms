@@ -15,7 +15,7 @@ function mukurtu_export_form($form, &$form_state) {
       $current_node = menu_get_object();
       if($current_node) {
           $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
-      } else {     
+      } else {
           $args = arg();
           if($args[0] == 'taxonomy') {
               $item = menu_get_object('taxonomy_term', 2);
@@ -129,7 +129,7 @@ function mukurtu_export_form_submit($form, &$form_state) {
     $form_state['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
     $_SESSION['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
   }
-  
+
 }
 
 /**
@@ -264,7 +264,23 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
               '#weight' => -1
           );
       }
-      
+
+      if ($entity_type == 'paragraphs_item') {
+        switch ($bundle_name) {
+          case 'dictionary_word_bundle':
+            $title = "Dictionary Word";
+            break;
+
+          default:
+            $title = "Host Entity";
+        }
+        $form['export_fields'][$entity_type][$bundle_name]['host_entity'] = array(
+            '#type' => 'checkbox',
+            '#title' => $title,
+            '#default_value' => isset($defaults[$entity_type][$bundle_name]['host_entity']) ? $defaults[$entity_type][$bundle_name]['host_entity'] : TRUE,
+            '#weight' => -1
+        );
+      }
 
       foreach($fields_info as $field_name => $field) {
         // Check global blacklist

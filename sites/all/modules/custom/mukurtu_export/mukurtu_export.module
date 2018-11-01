@@ -6,7 +6,7 @@
  */
 
 
-define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]"); 
+define("MUKURTU_EXPORT_IMPORT_DIR", "[mukurtu:batch_import_temp_directory]");
 
 /**
  * @file
@@ -130,7 +130,7 @@ function mukurtu_export_config_form() {
 
 /**
  * Returns an array of available field handlers
- * 
+ *
  * Field handlers can further process the raw field values.
  * For example, during export we might want to load the title of a taxonomy term, rather than
  * simply exporting the tid.
@@ -199,7 +199,7 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
 
     // No default handler.
     // If using GUID, convert DnD Scald embed code to use GUID rather than SID
-    if(in_array($field_info['type'], mee_field_types()) 
+    if(in_array($field_info['type'], mee_field_types())
     && (isset($options['id_format']) && ($options['id_format'] == 'guid')
     && isset($value['value']))) {
       return _mukurtu_export_encode_scald_dnd($value['value']);
@@ -329,13 +329,13 @@ function _mukurtu_export_entity_id($entity_type = NULL, $entity = NULL) {
 
 /**
  * Gets the GUID for an entity
- * 
+ *
  * Fetches the existing feeds GUID if available, creates a new GUID if not
  */
 function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
   $entity = entity_load($entity_type, array($entity_id));
   $entity_wrapper = entity_metadata_wrapper($entity_type, $entity[$entity_id]);
-  
+
   $feeds_info = feeds_item_info_load($entity_type, $entity_id);
   // Check for an existing feeds guid
   if($feeds_info && isset($feeds_info->guid)) {
@@ -360,7 +360,7 @@ function _mukurtu_export_encode_scald_dnd($value) {
 
   $sid_pattern = "/scald=(\d+):/";
   preg_match_all($sid_pattern, $value, $matches);
-  
+
   foreach($matches[1] as $sid) {
       $atom_guid = _mukurtu_export_entity_get_guid('scald_atom', $sid);
       $referenced_entities['scald_atom'][$sid] = $sid;
@@ -378,14 +378,14 @@ function _mukurtu_export_encode_scald_dnd($value) {
 function _mukurtu_export_get_entity_bundle_array() {
     $entities = array();
     foreach(array_keys(entity_get_info()) as $entity_type) {
-        
+
         // Currently only support node/scald_atom/taxonomy fields
         if(!in_array($entity_type, array('paragraphs_item', 'node', 'scald_atom', 'taxonomy_term'))) {
             continue;
         }
-        
+
         $entity_info = entity_get_info($entity_type);
-        
+
         foreach($entity_info['bundles'] as $bundle_name => $ids) {
             $entities[$entity_type][] = $bundle_name;
         }
