@@ -96,8 +96,8 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['style_options']['filename'] = 'digital-heritage-export-mods.xml';
   $handler->display->display_options['style_options']['parent_sort'] = 0;
   $handler->display->display_options['style_options']['transform'] = 1;
-  $handler->display->display_options['style_options']['root_node'] = 'rdf:RDF';
-  $handler->display->display_options['style_options']['item_node'] = 'rdf:Description';
+  $handler->display->display_options['style_options']['root_node'] = 'modsCollection';
+  $handler->display->display_options['style_options']['item_node'] = 'mods';
   $handler->display->display_options['path'] = 'export/digital-heritage-mods-xml';
   $handler->display->display_options['displays'] = array(
     'page' => 'page',
