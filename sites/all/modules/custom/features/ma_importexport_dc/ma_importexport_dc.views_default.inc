@@ -222,6 +222,128 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
   $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = 'titleInfo/title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['title']['link_to_node'] = FALSE;
+  /* Field: Content: Creator */
+  $handler->display->display_options['fields']['field_creator']['id'] = 'field_creator';
+  $handler->display->display_options['fields']['field_creator']['table'] = 'field_data_field_creator';
+  $handler->display->display_options['fields']['field_creator']['field'] = 'field_creator';
+  $handler->display->display_options['fields']['field_creator']['label'] = 'name/namePart';
+  $handler->display->display_options['fields']['field_creator']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_creator']['separator'] = ';;;';
+  /* Field: Content: Subject */
+  $handler->display->display_options['fields']['field_subject']['id'] = 'field_subject';
+  $handler->display->display_options['fields']['field_subject']['table'] = 'field_data_field_subject';
+  $handler->display->display_options['fields']['field_subject']['field'] = 'field_subject';
+  $handler->display->display_options['fields']['field_subject']['label'] = 'classification';
+  $handler->display->display_options['fields']['field_subject']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_subject']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_subject']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_subject']['separator'] = ';;;';
+  /* Field: Content: Body */
+  $handler->display->display_options['fields']['body']['id'] = 'body';
+  $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
+  $handler->display->display_options['fields']['body']['field'] = 'body';
+  $handler->display->display_options['fields']['body']['label'] = 'note';
+  $handler->display->display_options['fields']['body']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['body']['type'] = 'text_plain';
+  /* Field: Content: Publisher */
+  $handler->display->display_options['fields']['field_publisher']['id'] = 'field_publisher';
+  $handler->display->display_options['fields']['field_publisher']['table'] = 'field_data_field_publisher';
+  $handler->display->display_options['fields']['field_publisher']['field'] = 'field_publisher';
+  $handler->display->display_options['fields']['field_publisher']['label'] = 'originInfo/publisher';
+  $handler->display->display_options['fields']['field_publisher']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_publisher']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_publisher']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_publisher']['separator'] = ';;;';
+  /* Field: Field: Contributor */
+  $handler->display->display_options['fields']['field_contributor']['id'] = 'field_contributor';
+  $handler->display->display_options['fields']['field_contributor']['table'] = 'field_data_field_contributor';
+  $handler->display->display_options['fields']['field_contributor']['field'] = 'field_contributor';
+  $handler->display->display_options['fields']['field_contributor']['label'] = 'name/namePart';
+  $handler->display->display_options['fields']['field_contributor']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_contributor']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_contributor']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_contributor']['separator'] = ';;;';
+  /* Field: Content: Original Date Description */
+  $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
+  $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
+  $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
+  $handler->display->display_options['fields']['field_date']['label'] = 'originInfo/dateCreated';
+  $handler->display->display_options['fields']['field_date']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_date']['type'] = 'text_plain';
+  /* Field: Content: Type */
+  $handler->display->display_options['fields']['field_dh_type']['id'] = 'field_dh_type';
+  $handler->display->display_options['fields']['field_dh_type']['table'] = 'field_data_field_dh_type';
+  $handler->display->display_options['fields']['field_dh_type']['field'] = 'field_dh_type';
+  $handler->display->display_options['fields']['field_dh_type']['label'] = 'typeOfResource';
+  $handler->display->display_options['fields']['field_dh_type']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_dh_type']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_dh_type']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_dh_type']['separator'] = ';;;';
+  /* Field: Content: Format */
+  $handler->display->display_options['fields']['field_format']['id'] = 'field_format';
+  $handler->display->display_options['fields']['field_format']['table'] = 'field_data_field_format';
+  $handler->display->display_options['fields']['field_format']['field'] = 'field_format';
+  $handler->display->display_options['fields']['field_format']['label'] = 'physicalDescription/extent';
+  $handler->display->display_options['fields']['field_format']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_format']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_format']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_format']['separator'] = ';;;';
+  /* Field: Content: Identifier */
+  $handler->display->display_options['fields']['field_identifier']['id'] = 'field_identifier';
+  $handler->display->display_options['fields']['field_identifier']['table'] = 'field_data_field_identifier';
+  $handler->display->display_options['fields']['field_identifier']['field'] = 'field_identifier';
+  $handler->display->display_options['fields']['field_identifier']['label'] = 'identifier';
+  $handler->display->display_options['fields']['field_identifier']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_identifier']['type'] = 'text_plain';
+  /* Field: Field: Source */
+  $handler->display->display_options['fields']['field_source']['id'] = 'field_source';
+  $handler->display->display_options['fields']['field_source']['table'] = 'field_data_field_source';
+  $handler->display->display_options['fields']['field_source']['field'] = 'field_source';
+  $handler->display->display_options['fields']['field_source']['label'] = 'relatedItem';
+  $handler->display->display_options['fields']['field_source']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_source']['type'] = 'text_plain';
+  /* Field: Content: Language */
+  $handler->display->display_options['fields']['field_language']['id'] = 'field_language';
+  $handler->display->display_options['fields']['field_language']['table'] = 'field_data_field_language';
+  $handler->display->display_options['fields']['field_language']['field'] = 'field_language';
+  $handler->display->display_options['fields']['field_language']['label'] = 'language/languageTerm';
+  $handler->display->display_options['fields']['field_language']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_language']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_language']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_language']['separator'] = ';;;';
+  /* Field: Content: Location Description */
+  $handler->display->display_options['fields']['field_coverage_description']['id'] = 'field_coverage_description';
+  $handler->display->display_options['fields']['field_coverage_description']['table'] = 'field_data_field_coverage_description';
+  $handler->display->display_options['fields']['field_coverage_description']['field'] = 'field_coverage_description';
+  $handler->display->display_options['fields']['field_coverage_description']['label'] = 'originInfo/place/placeTerm';
+  $handler->display->display_options['fields']['field_coverage_description']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_coverage_description']['type'] = 'text_plain';
+  /* Field: Field: Rights */
+  $handler->display->display_options['fields']['field_rights']['id'] = 'field_rights';
+  $handler->display->display_options['fields']['field_rights']['table'] = 'field_data_field_rights';
+  $handler->display->display_options['fields']['field_rights']['field'] = 'field_rights';
+  $handler->display->display_options['fields']['field_rights']['label'] = 'accessCondition';
+  $handler->display->display_options['fields']['field_rights']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_rights']['type'] = 'text_plain';
+  /* Field: Content: Media Assets */
+  $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
+  $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
+  $handler->display->display_options['fields']['field_media_asset']['field'] = 'field_media_asset';
+  $handler->display->display_options['fields']['field_media_asset']['label'] = 'location/url';
+  $handler->display->display_options['fields']['field_media_asset']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_media_asset']['click_sort_column'] = 'sid';
+  $handler->display->display_options['fields']['field_media_asset']['settings'] = array(
+    'link' => '0',
+  );
+  $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';
+  $handler->display->display_options['fields']['field_media_asset']['separator'] = ';;;';
   $handler->display->display_options['path'] = 'export/digital-heritage-mods-xml';
   $handler->display->display_options['displays'] = array(
     'page' => 'page',
@@ -261,7 +383,20 @@ function ma_importexport_dc_views_default_views() {
     t('Page'),
     t('Dublin Core XML'),
     t('MODS XML'),
-    t('Title'),
+    t('titleInfo/title'),
+    t('name/namePart'),
+    t('classification'),
+    t('note'),
+    t('originInfo/publisher'),
+    t('originInfo/dateCreated'),
+    t('typeOfResource'),
+    t('physicalDescription/extent'),
+    t('identifier'),
+    t('relatedItem'),
+    t('language/languageTerm'),
+    t('originInfo/place/placeTerm'),
+    t('accessCondition'),
+    t('location/url'),
   );
   $export['dh_xml_export'] = $view;
 
