@@ -597,6 +597,13 @@ return FALSE;';
       'override_label' => 0,
       'label' => '',
     ),
+    'action::ma_importexport_dc_action_xml_export' => array(
+      'selected' => 1,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
+      'override_label' => 0,
+      'label' => '',
+    ),
   );
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';

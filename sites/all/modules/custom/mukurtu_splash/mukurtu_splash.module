@@ -929,17 +929,10 @@ function mukurtu_splash_block_batch_import() {
     }
 
     $items[] = [
-      'title' => 'Export Digital Heritage Metadata as CSV',
+      'title' => 'Export Digital Heritage Metadata',
       'href' => 'manage/digital-heritage',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Select digital heritage items for exporting to a CSV file.'),
-    ];
-
-    $items[] = [
-      'title' => 'Export Digital Heritage Metadata as XML',
-      'href' => 'export/digital-heritage-xml',
-      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Select digital heritage items for exporting to a Dublin Core or MODS XML file.'),
+      'description' => t('Select digital heritage items for exporting to a CSV or XML file.'),
     ];
 
     if (feeds_access('import', 'digital_heritage_metadata')) {

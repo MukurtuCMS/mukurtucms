@@ -555,3 +555,94 @@ function ma_importexport_nested_xml_from_structure($element, $contexts) {
   }
   return array_unique(array_combine($attributes, $attributes));
 }
+
+
+////////////////////////
+// Custom VBO action to export to XML, added as a VBO action to the existing DH bulk export view
+// There is no in-built functionality to combine VBO with views_data_export,
+// so this is (heavily) adapted from https://www.drupal.org/project/views_data_export/issues/1436726#comment-9924326
+//
+
+/**
+ * Implements hook_action_info().
+ */
+function ma_importexport_dc_action_info() {
+  return [
+    'ma_importexport_dc_action_xml_export' => [
+      'type' => 'entity',
+      'label' => t('Mukurtu XML Export'),
+      'configurable' => TRUE,
+      'aggregate' => TRUE,
+      'behavior' => ['ma_importexport_dc_export_xml'],
+    ],
+  ];
+}
+
+/**
+ * XML export action form to select XML type.
+ */
+function ma_importexport_dc_action_xml_export_form($options, $entity_type, $settings_dom_id) {
+  $form = array();
+  $form['xml_type'] = array(
+    '#type' => 'radios',
+    '#title' => t('Select XML Type'),
+    '#options' => array(
+      'dc_xml' => t('Dublin Core'),
+      'mods_xml' => t('MODS'),
+    ),
+    '#required' => TRUE,
+  );
+  return $form;
+}
+
+/**
+ * XML export action set the view dispay ID according to the XML type form selection.
+ */
+function ma_importexport_dc_action_xml_export_submit($form, &$form_state) {
+  return array(
+    'display_id' => $form_state['values']['xml_type'],
+  );
+}
+
+/**
+ * XML export action callback.
+ */
+function ma_importexport_dc_action_xml_export($entity, &$context) {
+
+  $view = views_get_view($context['view_info']['name']);
+  if (isset($context['view_info']['total_rows'])) {
+    $total_rows = $context['view_info']['total_rows'];
+  }
+  else {
+    $countView = clone $view;
+    $countView->execute($context['view_info']['display']);
+    $total_rows = $countView->total_rows;
+  }
+  $entity_ids = array_keys($entity);
+  if (count($entity_ids) < $total_rows) {
+    $args['entity_ids'] = $entity_ids;
+  }
+  $view = views_get_view('dh_xml_export');
+  $view->execute_display($context['display_id'], $args);
+  drupal_exit();
+
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function ma_importexport_dc_views_query_alter(&$view, &$query) {
+  if ($view->display_handler->plugin_name == 'views_data_export') {
+    // If an explicit list of entity IDs was provided, use that to refine the
+    // query.
+    if (isset($view->args['entity_ids'])) {
+      $query->add_where(0, $view->base_table . '.' . $view->base_field, $view->args['entity_ids'], 'IN');
+      // Now remove this fake argument to avoid confusion.
+      unset($view->args['entity_ids']);
+    }
+  }
+}
+
+//
+// end custom VBO action
+////////////////////////

@@ -28,9 +28,88 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['pager']['options']['items_per_page'] = '20';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['pager']['options']['expose']['items_per_page'] = TRUE;
+  $handler->display->display_options['pager']['options']['expose']['items_per_page_options_all'] = TRUE;
   $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'title' => 'title',
+    'field_media_asset' => 'field_media_asset',
+    'changed' => 'changed',
+    'field_summary' => 'field_summary',
+    'field_community_ref' => 'field_community_ref',
+    'field_category' => 'field_category',
+    'field_creator' => 'field_creator',
+    'field_contributor' => 'field_contributor',
+    'field_date' => 'field_date',
+    'field_collection' => 'field_collection',
+  );
+  $handler->display->display_options['style_options']['default'] = 'changed';
+  $handler->display->display_options['style_options']['info'] = array(
+    'title' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_media_asset' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'changed' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_summary' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_community_ref' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_category' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_creator' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_contributor' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_date' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_collection' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+  );
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -176,10 +255,140 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'digital_heritage' => 'digital_heritage',
   );
-
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['path'] = 'export/digital-heritage-xml';
+  $handler->display->display_options['filters']['type']['group'] = 1;
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title']['id'] = 'title';
+  $handler->display->display_options['filters']['title']['table'] = 'node';
+  $handler->display->display_options['filters']['title']['field'] = 'title';
+  $handler->display->display_options['filters']['title']['operator'] = 'contains';
+  $handler->display->display_options['filters']['title']['group'] = 1;
+  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['label'] = 'Title';
+  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
+  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: Content: Community (field_community_ref) */
+  $handler->display->display_options['filters']['field_community_ref_nid']['id'] = 'field_community_ref_nid';
+  $handler->display->display_options['filters']['field_community_ref_nid']['table'] = 'field_data_field_community_ref';
+  $handler->display->display_options['filters']['field_community_ref_nid']['field'] = 'field_community_ref_nid';
+  $handler->display->display_options['filters']['field_community_ref_nid']['group'] = 1;
+  $handler->display->display_options['filters']['field_community_ref_nid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_community_ref_nid']['expose']['operator_id'] = 'field_community_ref_nid_op';
+  $handler->display->display_options['filters']['field_community_ref_nid']['expose']['label'] = 'Community';
+  $handler->display->display_options['filters']['field_community_ref_nid']['expose']['operator'] = 'field_community_ref_nid_op';
+  $handler->display->display_options['filters']['field_community_ref_nid']['expose']['identifier'] = 'field_community_ref_nid';
+  $handler->display->display_options['filters']['field_community_ref_nid']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['field_community_ref_nid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: Field: Category (field_category) */
+  $handler->display->display_options['filters']['field_category_tid']['id'] = 'field_category_tid';
+  $handler->display->display_options['filters']['field_category_tid']['table'] = 'field_data_field_category';
+  $handler->display->display_options['filters']['field_category_tid']['field'] = 'field_category_tid';
+  $handler->display->display_options['filters']['field_category_tid']['value'] = '';
+  $handler->display->display_options['filters']['field_category_tid']['group'] = 1;
+  $handler->display->display_options['filters']['field_category_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_category_tid']['expose']['operator_id'] = 'field_category_tid_op';
+  $handler->display->display_options['filters']['field_category_tid']['expose']['label'] = 'Category';
+  $handler->display->display_options['filters']['field_category_tid']['expose']['operator'] = 'field_category_tid_op';
+  $handler->display->display_options['filters']['field_category_tid']['expose']['identifier'] = 'field_category_tid';
+  $handler->display->display_options['filters']['field_category_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['field_category_tid']['vocabulary'] = 'category';
+  /* Filter criterion: Content: Creator (field_creator) */
+  $handler->display->display_options['filters']['field_creator_tid']['id'] = 'field_creator_tid';
+  $handler->display->display_options['filters']['field_creator_tid']['table'] = 'field_data_field_creator';
+  $handler->display->display_options['filters']['field_creator_tid']['field'] = 'field_creator_tid';
+  $handler->display->display_options['filters']['field_creator_tid']['value'] = '';
+  $handler->display->display_options['filters']['field_creator_tid']['group'] = 1;
+  $handler->display->display_options['filters']['field_creator_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_creator_tid']['expose']['operator_id'] = 'field_creator_tid_op';
+  $handler->display->display_options['filters']['field_creator_tid']['expose']['label'] = 'Creator';
+  $handler->display->display_options['filters']['field_creator_tid']['expose']['operator'] = 'field_creator_tid_op';
+  $handler->display->display_options['filters']['field_creator_tid']['expose']['identifier'] = 'field_creator_tid';
+  $handler->display->display_options['filters']['field_creator_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['field_creator_tid']['vocabulary'] = 'creator';
+  /* Filter criterion: Content: Community Record Parent (field_community_record_parent) */
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['id'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['table'] = 'field_data_field_community_record_parent';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['field'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['group'] = 1;
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['expose']['operator_id'] = 'field_community_record_parent_target_id_op';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['expose']['label'] = 'Community Record Parent (field_community_record_parent)';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['expose']['operator'] = 'field_community_record_parent_target_id_op';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['expose']['identifier'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['is_grouped'] = TRUE;
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['label'] = 'Is Community Record';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['identifier'] = 'field_community_record_parent_target_id';
+  /* Filter criterion: Content: Book Parent (field_book_parent) */
+  $handler->display->display_options['filters']['field_book_parent_target_id']['id'] = 'field_book_parent_target_id';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['table'] = 'field_data_field_book_parent';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['field'] = 'field_book_parent_target_id';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['group'] = 1;
+  $handler->display->display_options['filters']['field_book_parent_target_id']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_book_parent_target_id']['expose']['operator_id'] = 'field_book_parent_target_id_op';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['expose']['label'] = 'Book Parent (field_book_parent)';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['expose']['operator'] = 'field_book_parent_target_id_op';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['expose']['identifier'] = 'field_book_parent_target_id';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['is_grouped'] = TRUE;
+  $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['label'] = 'Is Community Record';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['identifier'] = 'field_book_parent_target_id';
+  $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['group_items'] = array(
+    1 => array(
+      'title' => '',
+      'operator' => '=',
+      'value' => array(
+        'value' => '',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+    2 => array(
+      'title' => '',
+      'operator' => '=',
+      'value' => array(
+        'value' => '',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+    3 => array(
+      'title' => '',
+      'operator' => '=',
+      'value' => array(
+        'value' => '',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+  );
 
   /* Display: Dublin Core XML */
   $handler = $view->new_display('views_data_export', 'Dublin Core XML', 'dc_xml');
@@ -189,7 +398,7 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'views_data_export_xml';
   $handler->display->display_options['style_options']['attach_text'] = 'Export as Dublin Core';
   $handler->display->display_options['style_options']['provide_file'] = 1;
-  $handler->display->display_options['style_options']['text_link'] = 1;
+  $handler->display->display_options['style_options']['text_link'] = 0;
   $handler->display->display_options['style_options']['text_link_class'] = 'btn btn-default ';
   $handler->display->display_options['style_options']['filename'] = 'digital-heritage-export-dc.xml';
   $handler->display->display_options['style_options']['parent_sort'] = 0;
@@ -201,6 +410,9 @@ function ma_importexport_dc_views_default_views() {
     'page' => 'page',
     'default' => 0,
   );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['return_path'] = 'manage/digital-heritage';
+  $handler->display->display_options['segment_size'] = '100';
 
   /* Display: MODS XML */
   $handler = $view->new_display('views_data_export', 'MODS XML', 'mods_xml');
@@ -210,7 +422,7 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'views_data_export_xml';
   $handler->display->display_options['style_options']['attach_text'] = 'Export as MODS';
   $handler->display->display_options['style_options']['provide_file'] = 1;
-  $handler->display->display_options['style_options']['text_link'] = 1;
+  $handler->display->display_options['style_options']['text_link'] = 0;
   $handler->display->display_options['style_options']['text_link_class'] = 'btn btn-default ';
   $handler->display->display_options['style_options']['filename'] = 'digital-heritage-export-mods.xml';
   $handler->display->display_options['style_options']['parent_sort'] = 0;
@@ -349,6 +561,9 @@ function ma_importexport_dc_views_default_views() {
     'page' => 'page',
     'default' => 0,
   );
+  $handler->display->display_options['use_batch'] = 'batch';
+  $handler->display->display_options['return_path'] = 'manage/digital-heritage';
+  $handler->display->display_options['segment_size'] = '100';
   $translatables['dh_xml_export'] = array(
     t('Master'),
     t('Export Digital Heritage Metadata as XML'),
@@ -380,7 +595,13 @@ function ma_importexport_dc_views_default_views() {
     t('dc:coverage'),
     t('dc:rights'),
     t('dc:hasformat'),
-    t('Page'),
+    t('Title'),
+    t('Community'),
+    t('Category'),
+    t('Creator'),
+    t('Community Record Parent (field_community_record_parent)'),
+    t('Is Community Record'),
+    t('Book Parent (field_book_parent)'),
     t('Dublin Core XML'),
     t('MODS XML'),
     t('titleInfo/title'),
