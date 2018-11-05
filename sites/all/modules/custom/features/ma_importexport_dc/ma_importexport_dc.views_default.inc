@@ -398,8 +398,6 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'views_data_export_xml';
   $handler->display->display_options['style_options']['attach_text'] = 'Export as Dublin Core';
   $handler->display->display_options['style_options']['provide_file'] = 1;
-  $handler->display->display_options['style_options']['text_link'] = 0;
-  $handler->display->display_options['style_options']['text_link_class'] = 'btn btn-default ';
   $handler->display->display_options['style_options']['filename'] = 'digital-heritage-export-dc.xml';
   $handler->display->display_options['style_options']['parent_sort'] = 0;
   $handler->display->display_options['style_options']['transform'] = 1;
@@ -422,8 +420,6 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'views_data_export_xml';
   $handler->display->display_options['style_options']['attach_text'] = 'Export as MODS';
   $handler->display->display_options['style_options']['provide_file'] = 1;
-  $handler->display->display_options['style_options']['text_link'] = 0;
-  $handler->display->display_options['style_options']['text_link_class'] = 'btn btn-default ';
   $handler->display->display_options['style_options']['filename'] = 'digital-heritage-export-mods.xml';
   $handler->display->display_options['style_options']['parent_sort'] = 0;
   $handler->display->display_options['style_options']['transform'] = 1;

@@ -28,14 +28,6 @@ class views_data_export_plugin_style_export extends views_plugin_style {
       'default' => FALSE,
       'translatable' => FALSE,
     );
-    $options['text_link'] = array(
-      'default' => FALSE,
-      'translatable' => FALSE,
-    );
-    $options['text_link_class'] = array(
-      'default' => FALSE,
-      'translatable' => FALSE,
-    );
     $options['filename'] = array(
       'default' => $this->definition['export feed file'],
       'translatable' => FALSE,
@@ -69,22 +61,6 @@ class views_data_export_plugin_style_export extends views_plugin_style {
       '#title' => t('Provide as file'),
       '#default_value' => $this->options['provide_file'],
       '#description' => t('By deselecting this, the xml file will be provided as a feed instead of a file for download.'),
-    );
-   $form['text_link'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Use a text link'),
-      '#default_value' => $this->options['text_link'],
-      '#description' => t('Select this checkbox to use a text link instead of an icon.'),
-    );
-   $form['text_link_class'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Add a class'),
-      '#default_value' => $this->options['text_link_class'],
-      '#description' => t('Enter a class to apply to the text link.'),
-	  '#process' => array('ctools_dependent_process'),
-      '#dependency' => array(
-        'edit-style-options-text-link' => array(TRUE),
-      ),
     );
     $form['filename'] = array(
       '#type' => 'textfield',
@@ -192,23 +168,13 @@ class views_data_export_plugin_style_export extends views_plugin_style {
       if (!isset($this->view->feed_icon)) {
         $this->view->feed_icon = '';
       }
-      if (empty($this->options['text_link'])) {
-        $this->view->feed_icon .= theme($theme_pattern, array(
-	   'image_path' => $this->definition['export feed icon'],
-	   'url' => $this->view->get_url(NULL, $path),
-	   'query' => $query,
-	   'text' => $this->options['attach_text'],
-	 )
-       );
-       }
-      if (!empty($this->options['text_link'])) {
-	$text_link = t('<a href="@url" class="@class">@text</a>', array(
-	   '@url' => url($this->view->get_url(null,$path), array('query' => $query)),
-	   '@class' => $this->options['text_link_class'],
-	   '@text' => $this->options['attach_text'])
-	   );
-	$this->view->feed_icon .= $text_link;
-       }
+      $this->view->feed_icon .= theme($theme_pattern, array(
+          'image_path' => $this->definition['export feed icon'],
+          'url' => $this->view->get_url(NULL, $path),
+          'query' => $query,
+          'text' => $this->options['attach_text'],
+        )
+      );
     }
   }
 
