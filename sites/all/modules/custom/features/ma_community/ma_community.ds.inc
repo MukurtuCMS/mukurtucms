@@ -104,7 +104,7 @@ function ma_community_ds_field_settings_info() {
       'format' => 'default',
     ),
     'featured_collections' => array(
-      'weight' => '9',
+      'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -125,11 +125,6 @@ function ma_community_ds_field_settings_info() {
     ),
     'community_protocol_items' => array(
       'weight' => '5',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'featured_collections' => array(
-      'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -163,15 +158,18 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
     'featured_content_type' => array(
-      'weight' => '0',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
         'ft' => array(),
       ),
     ),
@@ -597,20 +595,20 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
-      'right' => array(
-        0 => 'title',
-        1 => 'featured_content_type',
-        2 => 'body',
-      ),
       'left' => array(
-        3 => 'field_community_image_thumbnail',
+        0 => 'field_community_image_thumbnail',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'featured_content_type',
+        3 => 'body',
       ),
     ),
     'fields' => array(
+      'field_community_image_thumbnail' => 'left',
       'title' => 'right',
       'featured_content_type' => 'right',
       'body' => 'right',
-      'field_community_image_thumbnail' => 'left',
     ),
     'classes' => array(
       'layout_class' => array(

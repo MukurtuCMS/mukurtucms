@@ -861,7 +861,7 @@ function ma_collection_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'ma_colorbox',
+        'type' => 'mukurtu_featured_content',
         'weight' => 0,
       ),
       'search_result' => array(
@@ -875,7 +875,7 @@ function ma_collection_field_default_field_instances() {
         'weight' => 0,
       ),
       'teaser' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
@@ -919,11 +919,11 @@ function ma_collection_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'search_result' => array(
         'label' => 'inline',
@@ -937,7 +937,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'node',
@@ -971,11 +971,11 @@ function ma_collection_field_default_field_instances() {
     'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -987,7 +987,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 23,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -1028,7 +1028,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 23,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1040,7 +1040,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 5,
       ),
     ),
     'entity_type' => 'node',
@@ -1073,13 +1073,13 @@ function ma_collection_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
           'items_per_page' => 10,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1091,7 +1091,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 21,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -1131,17 +1131,18 @@ function ma_collection_field_default_field_instances() {
     'description' => 'Personal Collections are listed on your <a href=\'/user\'>user profile page</a>. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.',
     'display' => array(
       'default' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'list',
         'settings' => array(),
         'type' => 'list_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
-        'label' => 'above',
+        'label' => 'inline',
+        'module' => 'list',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
+        'type' => 'list_default',
+        'weight' => 20,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -1178,7 +1179,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1190,7 +1191,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 19,
       ),
     ),
     'ds_extras_field_template' => '',

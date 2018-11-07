@@ -203,6 +203,7 @@
     }
 }
 
+.node-personal-collection.view-mode-full,
 .node-word-list.view-mode-full,
 .node-collection.view-mode-full {
     padding-bottom: 60px;
@@ -252,7 +253,8 @@
         .field-name-title,
         .field-name-field-description,
         .field-name-field-collection-summary,
-        .field-name-field-collection-credit {
+        .field-name-field-collection-credit,
+        .field-name-field-personal-coll-privacy {
             // Desktop
             @media (min-width: @screen-md-min) {
                 float: right;
@@ -272,7 +274,7 @@
                 position: relative;
                 top: -40px;
             }
-        
+
             // Desktop
             @media (min-width: @screen-md-min) {
                 padding-top: 50px;
@@ -319,6 +321,7 @@
             }
         }
 
+        .field-name-field-personal-coll-privacy,
         .field-name-field-collection-credit {
             font-size: 14px;
             .label-inline {
@@ -393,7 +396,7 @@
         .current {
             color: @mukurtu-navbar-default-link-active-color;
         }
-    
+
         .label-above {
             .mukurtu-pane-label;
             color: @mukurtu-collection-title-font-color;
@@ -407,6 +410,7 @@
 }
 
 // Collection node page
+.node-type-personal-collection,
 .node-type-word-list,
 .node-type-collection {
     // Hide normal title header

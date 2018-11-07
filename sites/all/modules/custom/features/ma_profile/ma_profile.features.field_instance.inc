@@ -60,10 +60,9 @@ function ma_profile_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 2,
+        'type' => 'hidden',
+        'weight' => 5,
       ),
     ),
     'display_label' => '',
@@ -96,24 +95,14 @@ function ma_profile_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'textformatter',
+        'module' => 'entityreference',
         'settings' => array(
-          'textformatter_class' => 'textformatter-list',
-          'textformatter_comma_and' => 0,
-          'textformatter_comma_full_stop' => 0,
-          'textformatter_comma_override' => 0,
-          'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(
-            'entityreference_link' => 1,
-          ),
-          'textformatter_separator_custom' => '',
-          'textformatter_separator_custom_class' => 'textformatter-separator',
-          'textformatter_separator_custom_tag' => 'span',
-          'textformatter_term_plain' => 0,
-          'textformatter_type' => 'ul',
+          'links' => 1,
+          'use_content_language' => 1,
+          'view_mode' => 'teaser',
         ),
-        'type' => 'textformatter_list',
-        'weight' => 1,
+        'type' => 'entityreference_entity_view',
+        'weight' => 0,
       ),
     ),
     'ds_extras_field_template' => '',

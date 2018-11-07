@@ -37,7 +37,7 @@ function ma_collection_node_view($node, $view_mode, $langcode) {
     }
   }
 
-  if ($node->type == 'collection') {
+  if ($node->type == 'collection' || $node->type == 'personal_collection') {
 
       // If there is no collection image, try to find an appropriate one
       if(empty($node->field_collection_image)) {
@@ -49,7 +49,7 @@ function ma_collection_node_view($node, $view_mode, $langcode) {
               node_build_content($node, $view_mode, $langcode);
           }
       }
-      
+
     if ($view_mode == 'search_result') {
 
       // Tooltip and links on DH grid/list views
@@ -791,7 +791,7 @@ function ma_collection_views_pre_view(&$view, &$display_id, &$args) {
       $view->set_item($display_id, 'footer', 'area', $item);
     }
   }
-  
+
 }
 
 /**
