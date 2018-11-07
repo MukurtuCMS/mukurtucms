@@ -110,16 +110,19 @@ function ma_profile_user_presave(&$edit, $account, $category) {
  */
 function ma_profile_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'full') {
-
+    $empty = TRUE;
     // Only show Community nodes (not CPs) when viewing a user profile page under the "Communities" field (which is actually a field that contains all the users groups)
-    foreach ($account->og_user_node[LANGUAGE_NONE] as $group) {
-      $group_node = node_load ($group['target_id']);
-      if ($group_node->type <> 'community') {
-        unset ($account->content['og_user_node'][0]['#items'][$group['target_id']]);
+    foreach ($account->og_user_node[LANGUAGE_NONE] as $delta => $group) {
+      if ($group['entity']->type <> 'community') {
+        unset($account->og_user_node[LANGUAGE_NONE][$delta]);
+        unset($account->content['og_user_node']['#items'][$delta]);
+      } else {
+        $empty = FALSE;
       }
     }
+
     // If no groups are left, then hide the whole field
-    if (count($account->content['og_user_node'][0]['#items']) == 0) {
+    if ($empty) {
       unset ($account->content['og_user_node']);
     }
   }

@@ -87,7 +87,7 @@ function ma_community_field_default_field_instances() {
           'trim_length' => 255,
         ),
         'type' => 'text_summary_or_trimmed',
-        'weight' => 1,
+        'weight' => 3,
       ),
       'thumbed' => array(
         'label' => 'hidden',
@@ -167,7 +167,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 25,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -230,7 +230,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 23,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -300,7 +300,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 24,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -372,7 +372,7 @@ function ma_community_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
-        'weight' => 19,
+        'weight' => 0,
       ),
       'thumbed' => array(
         'label' => 'hidden',
@@ -443,7 +443,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 22,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -516,7 +516,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 20,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -582,7 +582,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 21,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -650,7 +650,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 26,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -717,7 +717,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'thumbed' => array(
         'label' => 'above',
@@ -790,7 +790,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'thumbed' => array(
         'label' => 'above',

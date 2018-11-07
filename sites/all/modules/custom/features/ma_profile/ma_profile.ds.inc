@@ -18,14 +18,23 @@ function ma_profile_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'personal_collections' => array(
-      'weight' => '2',
+      'weight' => '1',
       'label' => 'above',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'My Personal Collections',
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
-    'ds_user_picture' => array(
-      'weight' => '0',
-      'label' => 'hidden',
-      'format' => 'ds_picture_large',
+    'og_user_node' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'My Communities',
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
   );
   $export['user|user|default'] = $ds_fieldsetting;
@@ -69,21 +78,17 @@ function ma_profile_ds_layout_settings_info() {
   $ds_layout->entity_type = 'user';
   $ds_layout->bundle = 'user';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
-        0 => 'ds_user_picture',
-        1 => 'og_user_node',
-        2 => 'personal_collections',
-        3 => 'summary',
+      'central' => array(
+        0 => 'og_user_node',
+        1 => 'personal_collections',
       ),
     ),
     'fields' => array(
-      'ds_user_picture' => 'ds_content',
-      'og_user_node' => 'ds_content',
-      'personal_collections' => 'ds_content',
-      'summary' => 'ds_content',
+      'og_user_node' => 'central',
+      'personal_collections' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -91,7 +96,7 @@ function ma_profile_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'central' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
