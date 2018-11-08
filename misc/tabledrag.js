@@ -580,30 +580,43 @@ Drupal.tableDrag.prototype.dropRow = function (event, self) {
  * Get the mouse coordinates from the event (allowing for browser differences).
  */
 Drupal.tableDrag.prototype.mouseCoords = function (event) {
+
+  // Match both null and undefined, but not zero, by using != null.
+  // See https://stackoverflow.com/questions/2647867/how-to-determine-if-variable-is-undefined-or-null
+  if (event.pageX != null && event.pageY != null) {
+    return {x: event.pageX, y: event.pageY};
+  }
+
   // Complete support for pointer events was only introduced to jQuery in
   // version 1.11.1; between versions 1.7 and 1.11.0 pointer events have the
-  // clientX and clientY properties undefined. In those cases, the properties
-  // must be retrieved from the event.originalEvent object instead.
-  var clientX;
-  var clientY;
-  if (event.type === 'pointermove') {
-    clientX = event.originalEvent.clientX;
-    clientY = event.originalEvent.clientY;
-  }
-  else {
-    clientX = event.clientX || event.originalEvent.clientX;
-    clientY = event.clientY || event.originalEvent.clientY;
+  // pageX and pageY properties undefined. In those cases, the properties must
+  // be retrieved from the event.originalEvent object instead.
+  if (event.originalEvent && event.originalEvent.pageX != null && event.originalEvent.pageY != null) {
+    return {x: event.originalEvent.pageX, y: event.originalEvent.pageY};
   }
 
-  if (event.pageX || event.pageY) {
-    return { x: event.pageX, y: event.pageY };
+  // Some old browsers do not support MouseEvent.pageX and *.pageY at all.
+  // See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/pageY
+  // For those, we look at event.clientX and event.clientY instead.
+  if (event.clientX == null || event.clientY == null) {
+    // In some jQuery versions, some events created by jQuery do not have
+    // clientX and clientY. But the original event might have.
+    if (!event.originalEvent) {
+      throw new Error("The event has no coordinates, and no event.originalEvent.");
+    }
+    event = event.originalEvent;
+    if (event.clientX == null || event.clientY == null) {
+      throw new Error("The original event has no coordinates.");
+    }
   }
 
-  var scrollNode = document.scrollingElement  || document.documentElement;
-  return {
-    x: clientX + scrollNode.scrollLeft - scrollNode.clientLeft,
-    y: clientY + scrollNode.scrollTop  - scrollNode.clientTop
-  };
+  // Copied from jQuery.event.fix() in jQuery 1.4.1.
+  // In newer jQuery versions, this code is in jQuery.event.mouseHooks.filter().
+  var doc = document.documentElement, body = document.body;
+  var pageX = event.clientX + ( doc && doc.scrollLeft || body && body.scrollLeft || 0 ) - ( doc && doc.clientLeft || body && body.clientLeft || 0 );
+  var pageY = event.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
+
+  return {x: pageX, y: pageY};
 };
 
 /**
@@ -611,14 +624,6 @@ Drupal.tableDrag.prototype.mouseCoords = function (event) {
  * element. To do this we need the element's position and the mouse position.
  */
 Drupal.tableDrag.prototype.getMouseOffset = function (target, event) {
-  // Complete support for pointer events was only introduced to jQuery in
-  // version 1.11.1; between versions 1.7 and 1.11.0 pointer events have the
-  // clientX and clientY properties undefined. In those cases, the properties
-  // must be retrieved from the event.originalEvent object instead.
-  if (event.type === 'pointerdown') {
-    event = event.originalEvent;
-  }
-
   var docPos   = $(target).offset();
   var mousePos = this.mouseCoords(event);
   return { x: mousePos.x - docPos.left, y: mousePos.y - docPos.top };
