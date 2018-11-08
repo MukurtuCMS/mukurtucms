@@ -6,9 +6,6 @@ core = 7.x
 ;; Core ;;
 ;;;;;;;;;;
 
-; Fix IE11 & Chrome scrolls to the top of the page after dragging the bottom item with jquery 1.5 <-> 1.11.
-projects[drupal][patch][] = https://www.drupal.org/files/issues/2843240-22.patch
-
 ; Custom logo and favicon stored in private filesystem if it is the default.
 projects[drupal][patch][] = https://www.drupal.org/files/issues/1087250.logo-public-filesystem.057.patch
 
