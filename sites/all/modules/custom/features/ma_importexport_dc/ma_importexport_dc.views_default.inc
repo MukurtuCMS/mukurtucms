@@ -231,6 +231,7 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_media_asset']['label'] = 'dc:hasformat';
   $handler->display->display_options['fields']['field_media_asset']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_media_asset']['click_sort_column'] = 'sid';
+  $handler->display->display_options['fields']['field_media_asset']['type'] = 'file_representation';
   $handler->display->display_options['fields']['field_media_asset']['settings'] = array(
     'link' => '0',
   );
@@ -547,6 +548,7 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_media_asset']['label'] = 'location/url';
   $handler->display->display_options['fields']['field_media_asset']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_media_asset']['click_sort_column'] = 'sid';
+  $handler->display->display_options['fields']['field_media_asset']['type'] = 'file_representation';
   $handler->display->display_options['fields']['field_media_asset']['settings'] = array(
     'link' => '0',
   );

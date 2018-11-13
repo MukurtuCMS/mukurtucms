@@ -646,3 +646,20 @@ function ma_importexport_dc_views_query_alter(&$view, &$query) {
 //
 // end custom VBO action
 ////////////////////////
+
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_importexport_dc_views_pre_render(&$view) {
+  // Rewrite the Media Assets field values on the XML exports (MODS and DC) to provide a link to the atom.
+  // This is too complex for views "rewrite results".
+  if ($view->name == 'dh_xml_export') {
+    foreach ($view->result as &$view_row) {
+      foreach ($view_row->field_field_media_asset as &$media_item) {
+        $atom = scald_atom_load($media_item['raw']['sid']);
+        $media_item['rendered'] = $atom->rendered->file_source_url;
+      }
+    }
+  }
+}
