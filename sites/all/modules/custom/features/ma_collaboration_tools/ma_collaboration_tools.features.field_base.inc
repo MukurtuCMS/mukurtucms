@@ -333,6 +333,34 @@ function ma_collaboration_tools_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_notification_action'.
+  $field_bases['field_notification_action'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_notification_action',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'created' => 'created',
+        'updated' => 'updated',
+        'deleted' => 'deleted',
+        'commented on' => 'commented on',
+      ),
+      'allowed_values_function' => '',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'field_notification_author'.
   $field_bases['field_notification_author'] = array(
     'active' => 1,
