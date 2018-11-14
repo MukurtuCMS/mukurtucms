@@ -11,6 +11,43 @@ function ma_collaboration_tools_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance:
+  // 'field_collection_item-field_notification_email-field_notification_action'.
+  $field_instances['field_collection_item-field_notification_email-field_notification_action'] = array(
+    'bundle' => 'field_notification_email',
+    'default_value' => array(),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 2,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_notification_action',
+    'label' => 'Action',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'field_collection_item-field_notification_email-field_notification_author'.
   $field_instances['field_collection_item-field_notification_email-field_notification_author'] = array(
     'bundle' => 'field_notification_email',
@@ -1522,6 +1559,8 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_oa_media',
     'label' => 'Attachments',
@@ -1538,35 +1577,23 @@ function ma_collaboration_tools_field_default_field_instances() {
       'module' => 'media',
       'settings' => array(
         'allowed_schemes' => array(
+          'oembed' => 0,
           'private' => 'private',
           'public' => 'public',
-          'vimeo' => 'vimeo',
-          'youtube' => 'youtube',
         ),
         'allowed_types' => array(
-          'audio' => 0,
+          'audio' => 'audio',
           'document' => 'document',
           'image' => 'image',
           'video' => 'video',
         ),
         'browser_plugins' => array(
-          'media_default--media_browser_1' => 'media_default--media_browser_1',
+          'media_default--media_browser_1' => 0,
           'media_default--media_browser_my_files' => 'media_default--media_browser_my_files',
           'media_internet' => 'media_internet',
           'upload' => 'upload',
         ),
-        'manualcrop_crop_info' => 1,
-        'manualcrop_default_crop_area' => 1,
-        'manualcrop_enable' => 0,
-        'manualcrop_inline_crop' => 0,
-        'manualcrop_instant_crop' => FALSE,
-        'manualcrop_instant_preview' => 1,
-        'manualcrop_keyboard' => 1,
-        'manualcrop_maximize_default_crop_area' => 0,
-        'manualcrop_require_cropping' => array(),
-        'manualcrop_styles_list' => array(),
-        'manualcrop_styles_mode' => 'include',
-        'manualcrop_thumblist' => 0,
+        'treeable' => 0,
       ),
       'type' => 'media_generic',
       'weight' => 3,
@@ -2622,13 +2649,13 @@ function ma_collaboration_tools_field_default_field_instances() {
           'public' => 'public',
         ),
         'allowed_types' => array(
-          'audio' => 0,
+          'audio' => 'audio',
           'document' => 'document',
           'image' => 'image',
           'video' => 'video',
         ),
         'browser_plugins' => array(
-          'media_default--media_browser_1' => 'media_default--media_browser_1',
+          'media_default--media_browser_1' => 0,
           'media_default--media_browser_my_files' => 'media_default--media_browser_my_files',
           'media_internet' => 'media_internet',
           'upload' => 'upload',
@@ -3668,6 +3695,8 @@ http://www.whitehouse.gov/',
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_oa_media',
     'label' => 'Attachments',
@@ -3684,37 +3713,23 @@ http://www.whitehouse.gov/',
       'module' => 'media',
       'settings' => array(
         'allowed_schemes' => array(
+          'oembed' => 0,
           'private' => 'private',
           'public' => 'public',
-          'vimeo' => 0,
-          'youtube' => 0,
         ),
         'allowed_types' => array(
-          'audio' => 0,
+          'audio' => 'audio',
           'document' => 'document',
           'image' => 'image',
-          'video' => 0,
+          'video' => 'video',
         ),
         'browser_plugins' => array(
           'media_default--media_browser_1' => 0,
-          'media_default--media_browser_my_files' => 0,
-          'media_internet' => 0,
-          'upload' => 0,
-          'youtube' => 0,
+          'media_default--media_browser_my_files' => 'media_default--media_browser_my_files',
+          'media_internet' => 'media_internet',
+          'upload' => 'upload',
         ),
-        'manualcrop_crop_info' => TRUE,
-        'manualcrop_default_crop_area' => TRUE,
-        'manualcrop_enable' => FALSE,
-        'manualcrop_inline_crop' => FALSE,
-        'manualcrop_instant_crop' => FALSE,
-        'manualcrop_instant_preview' => TRUE,
-        'manualcrop_keyboard' => TRUE,
-        'manualcrop_maximize_default_crop_area' => FALSE,
-        'manualcrop_require_cropping' => array(),
-        'manualcrop_styles_list' => array(),
-        'manualcrop_styles_mode' => 'include',
-        'manualcrop_thumblist' => FALSE,
-        'progress_indicator' => 'throbber',
+        'treeable' => 0,
       ),
       'type' => 'media_generic',
       'weight' => 5,
@@ -4800,6 +4815,7 @@ http://www.whitehouse.gov/',
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Action');
   t('All users notified (of created, or most recent update)');
   t('Attachment(s)');
   t('Attachments');
