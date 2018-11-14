@@ -821,7 +821,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     // source element and pass it to the processor's setTargetElement() to stick
     // it on the right place of the target item.
     foreach ($this->getMappings() as $mapping) {
-      if ($source->id == 'digital_heritage_dc' OR in_array(strtolower($mapping['source']), $result->input_fields)) {
+      if (ma_importexport_dc_is_xml_importer($source->id) OR in_array(strtolower($mapping['source']), $result->input_fields)) {
         $value = $this->getSourceValue($source, $result, $mapping['source']);
 
         $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);

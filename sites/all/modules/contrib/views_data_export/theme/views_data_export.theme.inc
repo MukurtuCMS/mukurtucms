@@ -435,6 +435,15 @@ function template_preprocess_views_data_export_xml_body(&$vars) {
         $content = '<![CDATA[' . str_replace(']]>', ']]]]><![CDATA[>', $content) . ']]>';
       }
 
+      $views_field = $vars['view']->field[$field];
+      if ($views_field->multiple && $views_field->options['multi_type'] == 'separator') {
+        $separator = $views_field->options['separator'];
+        $content = explode($separator, $content);
+      }
+      else {
+        $content = array($content);
+      }
+      
       $vars['themed_rows'][$num][$field] = $content;
     }
   }
