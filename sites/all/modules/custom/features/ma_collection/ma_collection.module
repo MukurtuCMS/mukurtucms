@@ -979,8 +979,8 @@ function ma_collection_get_default_atom($node) {
     foreach ($collection_emw->field_digital_heritage_items->value() as $collection_item) {
         $collection_item_emw = entity_metadata_wrapper('node', $collection_item);
 
-        // Find the first item that has a media asset set
-        if(isset($collection_item_emw->field_media_asset)) {
+        // Find the first item that has a media asset set.
+        if (node_access('view', $collection_item) && isset($collection_item_emw->field_media_asset)) {
 
             // Look through those media assets
             foreach ($collection_item_emw->field_media_asset->value() as $collection_item_media_index => $collection_item_media) {
