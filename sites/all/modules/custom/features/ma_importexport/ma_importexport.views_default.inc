@@ -339,7 +339,7 @@ function ma_importexport_views_default_views() {
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_collection']['delta_offset'] = '0';
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access']['id'] = 'group_access';
   $handler->display->display_options['fields']['group_access']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access']['field'] = 'group_access';
@@ -795,7 +795,7 @@ print $output;
     t('Standard and Creative Commons Licensing'),
     t('Published'),
     t('Collections'),
-    t('Sharing Protocol'),
+    t('Sharing protocol'),
     t('Export as zip'),
     t('Export as XML'),
     t('title'),
