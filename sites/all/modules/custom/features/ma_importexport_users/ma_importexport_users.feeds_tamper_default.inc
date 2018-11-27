@@ -217,7 +217,7 @@ function ma_importexport_users_feeds_tamper_default() {
   $export['import_cultural_protocols-sharing_protocol-required'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_users-community_affiliations-explode';
   $feeds_tamper->importer = 'import_users';
@@ -233,7 +233,7 @@ function ma_importexport_users_feeds_tamper_default() {
   $export['import_users-community_affiliations-explode'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'import_users-community_affiliations-trim';
   $feeds_tamper->importer = 'import_users';

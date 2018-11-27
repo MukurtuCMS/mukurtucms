@@ -27,6 +27,7 @@ function ma_importexport_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -75,7 +76,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           5 => array(
             'source' => 'Sharing Protocols',
-            'target' => 'og_group_ref:guid_or_nid',
+            'target' => 'field_scald_protocol:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -235,25 +236,25 @@ function ma_importexport_feeds_importer_default() {
           ),
           30 => array(
             'source' => 'Collections',
-            'target' => 'field_collection:guid_or_nid',
+            'target' => 'field_collection:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
           31 => array(
             'source' => 'Related Items',
-            'target' => 'field_related_dh_items:guid_or_nid',
+            'target' => 'field_dictionary_word_related_dh:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
           32 => array(
             'source' => 'Book Pages',
-            'target' => 'field_book_children:guid_or_nid',
+            'target' => 'field_book_children:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
           33 => array(
             'source' => 'Community Records',
-            'target' => 'field_community_record_children:guid_or_nid',
+            'target' => 'field_community_record_children:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -300,6 +301,7 @@ function ma_importexport_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -348,7 +350,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           5 => array(
             'source' => 'Sharing Protocols',
-            'target' => 'og_group_ref:guid_or_nid',
+            'target' => 'field_scald_protocol:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -508,25 +510,25 @@ function ma_importexport_feeds_importer_default() {
           ),
           30 => array(
             'source' => 'Collections',
-            'target' => 'field_collection:guid_or_nid',
+            'target' => 'field_collection:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
           31 => array(
             'source' => 'Related Items',
-            'target' => 'field_related_dh_items:guid_or_nid',
+            'target' => 'field_dictionary_word_related_dh:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
           32 => array(
             'source' => 'Book Pages',
-            'target' => 'field_book_children:guid_or_nid',
+            'target' => 'field_book_children:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
           33 => array(
             'source' => 'Community Record Parent',
-            'target' => 'field_community_record_parent:guid_or_nid',
+            'target' => 'field_community_record_parent:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -620,7 +622,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           5 => array(
             'source' => 'Protocol',
-            'target' => 'field_scald_protocol:guid_or_nid',
+            'target' => 'field_scald_protocol:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -643,6 +645,7 @@ function ma_importexport_feeds_importer_default() {
             'target' => 'field_people',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
           9 => array(
             'source' => 'Tags',
@@ -744,7 +747,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           5 => array(
             'source' => 'Protocol',
-            'target' => 'field_scald_protocol:guid_or_nid',
+            'target' => 'field_scald_protocol:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -849,7 +852,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           3 => array(
             'source' => 'Protocol',
-            'target' => 'field_scald_protocol:guid_or_nid',
+            'target' => 'field_scald_protocol:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -1051,7 +1054,7 @@ function ma_importexport_feeds_importer_default() {
           ),
           4 => array(
             'source' => 'Protocol',
-            'target' => 'field_scald_protocol:guid_or_nid',
+            'target' => 'field_scald_protocol:guid_or_target_id',
             'unique' => FALSE,
             'language' => 'und',
           ),
@@ -1080,6 +1083,7 @@ function ma_importexport_feeds_importer_default() {
             'target' => 'field_people',
             'term_search' => '0',
             'autocreate' => 1,
+            'language' => 'und',
           ),
         ),
         'update_existing' => '2',
