@@ -306,9 +306,6 @@ function ma_person_ds_layout_settings_info() {
       'layout_class' => array(
         '' => '',
       ),
-      'right' => array(
-        'metadata-sidebar' => 'metadata-sidebar',
-      ),
     ),
     'wrappers' => array(
       'top' => 'div',
