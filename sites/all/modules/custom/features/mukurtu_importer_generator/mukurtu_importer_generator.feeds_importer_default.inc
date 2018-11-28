@@ -166,7 +166,7 @@ function mukurtu_importer_generator_feeds_importer_default() {
                       'update_existing' => '2',
                       'expire' => '-1',
                       'mappings' => $mappings,
-                      'input_format' => 'full_html',
+                      'input_format' => 'filtered_html',
                       'author' => '1',
                       'authorize' => 1,
                       'skip_hash_check' => 0,
