@@ -320,6 +320,45 @@ function ma_digitalheritage_ds_custom_fields_info() {
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
+  $ds_field->field = 'digital_heritage_page_number';
+  $ds_field->label = 'Digital Heritage Page Number';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+  if (!empty($entity->field_book_children[LANGUAGE_NONE])) {
+    $pages = count($entity->field_book_children[LANGUAGE_NONE]) + 1;
+    print t("@pages pages", array(\'@pages\' => $pages));
+    return;
+  }
+
+  if (!empty($entity->field_book_parent[LANGUAGE_NONE])) {
+    $parent_nid = $entity->field_book_parent[LANGUAGE_NONE][0][\'target_id\'];
+    $parent = node_load($parent_nid);
+    $pages = count(array_keys($parent->field_book_children[LANGUAGE_NONE])) + 1;
+    $page = 1;
+    foreach ($parent->field_book_children[LANGUAGE_NONE] as $child_page) {
+      $page++;
+      if ($child_page[\'target_id\'] == $entity->nid) {
+        break;
+      }
+    }
+    print t("Page @page of @pages", array(\'@page\' => $page, \'@pages\' => $pages));
+    return;
+  }
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['digital_heritage_page_number'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
   $ds_field->field = 'featured_content_type';
   $ds_field->label = 'Featured Content Type';
   $ds_field->field_type = 5;

@@ -239,7 +239,8 @@ function ma_collection_ds_custom_fields_info() {
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = '';
+  $ds_field->ui_limit = 'collection|*
+personal_collection|*';
   $ds_field->properties = array(
     'code' => array(
       'value' => '<?php 
