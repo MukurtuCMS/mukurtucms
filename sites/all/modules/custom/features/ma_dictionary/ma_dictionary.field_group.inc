@@ -117,7 +117,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '18',
+    'weight' => '36',
     'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(

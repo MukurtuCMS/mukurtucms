@@ -82,6 +82,21 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word';
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
+    'dictionary_word_one_media_asset' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
+      ),
+    ),
+    'featured_content_type' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -525,17 +540,23 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'dictionary_word';
   $ds_layout->view_mode = 'search_result';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
+      'right' => array(
         0 => 'title',
-        1 => 'field_word_entry',
+        2 => 'featured_content_type',
+        3 => 'field_word_entry',
+      ),
+      'left' => array(
+        1 => 'dictionary_word_one_media_asset',
       ),
     ),
     'fields' => array(
-      'title' => 'ds_content',
-      'field_word_entry' => 'ds_content',
+      'title' => 'right',
+      'dictionary_word_one_media_asset' => 'left',
+      'featured_content_type' => 'right',
+      'field_word_entry' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -543,13 +564,15 @@ function ma_dictionary_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'left' => 'div',
+      'right' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|search_result'] = $ds_layout;
 
@@ -764,12 +787,6 @@ function ma_dictionary_ds_layout_settings_info() {
     'classes' => array(
       'layout_class' => array(
         '' => '',
-      ),
-      'topleft' => array(
-        'dictionary-word-entry-left-brick' => 'dictionary-word-entry-left-brick',
-      ),
-      'topright' => array(
-        'dictionary-word-entry-right-brick' => 'dictionary-word-entry-right-brick',
       ),
     ),
     'wrappers' => array(
