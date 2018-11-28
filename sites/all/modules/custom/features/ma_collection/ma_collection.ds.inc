@@ -119,10 +119,21 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'collection';
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
-    'collections_title_with_count' => array(
+    'featured_content_type' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
     ),
   );
   $export['node|collection|search_result'] = $ds_fieldsetting;
@@ -513,23 +524,27 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'collection';
   $ds_layout->view_mode = 'search_result';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
-        0 => 'collections_title_with_count',
-        1 => 'field_collection_image',
+      'left' => array(
+        0 => 'field_collection_image',
+      ),
+      'right' => array(
+        1 => 'title',
         2 => 'group_list_view_fields',
-        3 => 'field_collection_summary',
-        4 => 'field_collection_credit',
+        3 => 'featured_content_type',
+        4 => 'field_collection_summary',
+        5 => 'field_collection_credit',
       ),
     ),
     'fields' => array(
-      'collections_title_with_count' => 'ds_content',
-      'field_collection_image' => 'ds_content',
-      'group_list_view_fields' => 'ds_content',
-      'field_collection_summary' => 'ds_content',
-      'field_collection_credit' => 'ds_content',
+      'field_collection_image' => 'left',
+      'title' => 'right',
+      'group_list_view_fields' => 'right',
+      'featured_content_type' => 'right',
+      'field_collection_summary' => 'right',
+      'field_collection_credit' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -537,7 +552,8 @@ function ma_collection_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'left' => 'div',
+      'right' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
