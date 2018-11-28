@@ -195,6 +195,40 @@ function ma_dictionary_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|word_list|search_result';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'word_list';
+  $ds_fieldsetting->view_mode = 'search_result';
+  $ds_fieldsetting->settings = array(
+    'word_list_count' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'title' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|word_list|search_result'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|word_list|teaser';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'word_list';
@@ -300,6 +334,31 @@ function ma_dictionary_ds_field_settings_info() {
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'paragraphs_item|dictionary_word_bundle|word_entry_search_results';
+  $ds_fieldsetting->entity_type = 'paragraphs_item';
+  $ds_fieldsetting->bundle = 'dictionary_word_bundle';
+  $ds_fieldsetting->view_mode = 'word_entry_search_results';
+  $ds_fieldsetting->settings = array(
+    'field_alternate_spelling' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Term',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_translation' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['paragraphs_item|dictionary_word_bundle|word_entry_search_results'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -308,6 +367,40 @@ function ma_dictionary_ds_field_settings_info() {
  */
 function ma_dictionary_ds_custom_fields_info() {
   $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'dictionary_word_one_media_asset';
+  $ds_field->label = 'Dictionary Word First Media Asset';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'dictionary_word|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+if (!empty($entity->field_word_entry[LANGUAGE_NONE][0][\'value\'])) {
+  $id = $entity->field_word_entry[LANGUAGE_NONE][0][\'value\'];
+  $p = entity_load(\'paragraphs_item\', array($id));
+  if (isset($p[$id]->field_dictionary_word_recording[LANGUAGE_NONE][0][\'sid\'])) {
+    $sid = $p[$id]->field_dictionary_word_recording[LANGUAGE_NONE][0][\'sid\'];
+    $html = scald_render($sid, "ma_scald_search_results");
+    $host = $p[$id]->hostEntity();
+    if (isset($host->nid)) {
+      $path = drupal_get_path_alias(\'node/\' . $host->nid);
+      $html = str_replace(\'<a href="/">\', "<a href=\\"$path\\">", $html);
+      print $html;
+    }
+  }
+}
+
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['dictionary_word_one_media_asset'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -323,6 +416,32 @@ function ma_dictionary_ds_custom_fields_info() {
     'block_render' => '3',
   );
   $export['dictionary_word_related_dh_tease'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'word_list_count';
+  $ds_field->label = 'Word List Count';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'word_list|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php 
+$count = ma_dictionary_get_word_count($entity);
+if($count == 1) {
+   print t(\'@count word\', array( \'@count\' => $count)); 
+} else {
+   print t(\'@count words\', array( \'@count\' => $count)); 
+}
+
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['word_list_count'] = $ds_field;
 
   return $export;
 }
@@ -706,6 +825,50 @@ function ma_dictionary_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|word_list|search_result';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'word_list';
+  $ds_layout->view_mode = 'search_result';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_collection_image',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'featured_content_type',
+        3 => 'word_list_count',
+        4 => 'field_collection_summary',
+      ),
+    ),
+    'fields' => array(
+      'field_collection_image' => 'left',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'word_list_count' => 'right',
+      'field_collection_summary' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|word_list|search_result'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|word_list|teaser';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'word_list';
@@ -853,6 +1016,41 @@ function ma_dictionary_ds_layout_settings_info() {
   );
   $export['paragraphs_item|dictionary_word_bundle|featured_content'] = $ds_layout;
 
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|dictionary_word_bundle|word_entry_search_results';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'dictionary_word_bundle';
+  $ds_layout->view_mode = 'word_entry_search_results';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'field_alternate_spelling',
+        1 => 'field_translation',
+      ),
+    ),
+    'fields' => array(
+      'field_alternate_spelling' => 'central',
+      'field_translation' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['paragraphs_item|dictionary_word_bundle|word_entry_search_results'] = $ds_layout;
+
   return $export;
 }
 
@@ -880,6 +1078,15 @@ function ma_dictionary_ds_view_modes_info() {
     'paragraphs_item' => 'paragraphs_item',
   );
   $export['dictionary_word_summary'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'word_entry_search_results';
+  $ds_view_mode->label = 'Word Entry Search Results';
+  $ds_view_mode->entities = array(
+    'paragraphs_item' => 'paragraphs_item',
+  );
+  $export['word_entry_search_results'] = $ds_view_mode;
 
   return $export;
 }

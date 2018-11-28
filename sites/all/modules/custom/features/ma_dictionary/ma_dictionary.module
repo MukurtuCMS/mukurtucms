@@ -1342,3 +1342,23 @@ function compare_keys_by_alphabet($a, $b) {
   $result = compare_by_alphabet($alphabet, $a, $b);
   return $result;
 }
+
+// Return the number of accessible words in a word list.
+function ma_dictionary_get_word_count($word_list) {
+  $item_count = 0;
+  $word_list_wrapper = entity_metadata_wrapper('node', $word_list);
+  $words = $word_list_wrapper->field_words->value();
+  if (count($words)) {
+      if (user_access('bypass content access control')) {
+          $item_count += count($words);
+      }
+      else {
+          foreach ($words as $word) {
+              if (node_access('view', $word)) {
+                  $item_count++;
+              }
+          }
+      }
+  }
+  return $item_count;
+}
