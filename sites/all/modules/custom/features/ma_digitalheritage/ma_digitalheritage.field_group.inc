@@ -155,7 +155,9 @@ function ma_digitalheritage_field_group_info() {
       0 => 'field_community_ref',
       1 => 'field_summary',
       2 => 'field_category',
-      3 => 'title',
+      3 => 'digital_heritage_page_number',
+      4 => 'featured_content_type',
+      5 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(
