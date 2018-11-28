@@ -214,6 +214,9 @@ class Entity implements EntityInterface {
    * Set up the object instance on construction or unserializiation.
    */
   protected function setUp() {
+    if (!function_exists('entity_get_info')) {
+      return;
+    }
     $this->entityInfo = entity_get_info($this->entityType);
     $this->idKey = $this->entityInfo['entity keys']['id'];
     $this->nameKey = isset($this->entityInfo['entity keys']['name']) ? $this->entityInfo['entity keys']['name'] : $this->idKey;
@@ -403,6 +406,9 @@ class Entity implements EntityInterface {
     unset($vars['entityInfo'], $vars['idKey'], $vars['nameKey'], $vars['statusKey']);
     // Also key the returned array with the variable names so the method may
     // be easily overridden and customized.
+    if (!function_exists('drupal_map_assoc')) {
+      return;
+    }
     return drupal_map_assoc(array_keys($vars));
   }
 
