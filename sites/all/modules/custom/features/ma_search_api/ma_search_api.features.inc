@@ -33,10 +33,6 @@ function ma_search_api_default_search_api_index() {
           "weight" : "-10",
           "settings" : { "default" : "1", "bundles" : [] }
         },
-        "search_api_alter_node_access" : { "status" : 1, "weight" : "0", "settings" : [] },
-        "search_api_alter_node_status" : { "status" : 0, "weight" : "0", "settings" : [] },
-        "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
-        "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
         "search_api_alter_add_url" : { "status" : 0, "weight" : "0", "settings" : [] },
         "search_api_alter_add_aggregation" : {
           "status" : 1,
@@ -55,10 +51,24 @@ function ma_search_api_default_search_api_index() {
                 "separator" : "\\n\\n",
                 "fields" : [ "title" ],
                 "description" : "A First aggregation of the following fields: Title."
+              },
+              "search_api_aggregation_3" : {
+                "name" : "Person Record",
+                "type" : "fulltext",
+                "separator" : "\\n\\n",
+                "fields" : [
+                  "field_people",
+                  "field_mukurtu_terms:field_mukurtu_records:field_people"
+                ],
+                "description" : "A Fulltext aggregation of the following fields: People, Mukurtu Terms \\u00bb Records \\u00bb People."
               }
             }
           }
-        }
+        },
+        "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
+        "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
+        "search_api_alter_node_access" : { "status" : 1, "weight" : "0", "settings" : [] },
+        "search_api_alter_node_status" : { "status" : 0, "weight" : "0", "settings" : [] }
       },
       "processors" : {
         "search_api_case_ignore" : {
@@ -132,19 +142,6 @@ function ma_search_api_default_search_api_index() {
             "stopwords" : "but\\r\\ndid\\r\\nthe this that those\\r\\netc"
           }
         },
-        "search_api_highlighting" : {
-          "status" : 0,
-          "weight" : "35",
-          "settings" : {
-            "prefix" : "\\u003Cstrong\\u003E",
-            "suffix" : "\\u003C\\/strong\\u003E",
-            "excerpt" : 1,
-            "excerpt_length" : "256",
-            "exclude_fields" : [],
-            "highlight" : "always",
-            "highlight_partial" : 0
-          }
-        },
         "search_api_porter_stemmer" : {
           "status" : 0,
           "weight" : "35",
@@ -199,6 +196,19 @@ function ma_search_api_default_search_api_index() {
               "field_word_entry:field_pronunciation:value" : true
             },
             "exceptions" : "texan=texa"
+          }
+        },
+        "search_api_highlighting" : {
+          "status" : 0,
+          "weight" : "35",
+          "settings" : {
+            "prefix" : "\\u003Cstrong\\u003E",
+            "suffix" : "\\u003C\\/strong\\u003E",
+            "excerpt" : 1,
+            "excerpt_length" : "256",
+            "exclude_fields" : [],
+            "highlight" : "always",
+            "highlight_partial" : 0
           }
         }
       },
@@ -269,8 +279,28 @@ function ma_search_api_default_search_api_index() {
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
+        "field_mukurtu_terms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_mukurtu_terms:field_mukurtu_records" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "node"
+        },
+        "field_mukurtu_terms:field_mukurtu_records:field_people" : {
+          "type" : "list\\u003Clist\\u003Clist\\u003Cinteger\\u003E\\u003E\\u003E",
+          "entity_type" : "taxonomy_term"
+        },
+        "field_mukurtu_terms:field_mukurtu_records:field_people:name" : { "type" : "list\\u003Clist\\u003Clist\\u003Ctext\\u003E\\u003E\\u003E" },
+        "field_mukurtu_terms:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_original_date:timestamp" : { "type" : "integer" },
         "field_people" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
+        "field_people:field_mukurtu_records" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "node"
+        },
+        "field_people:field_mukurtu_records:field_people" : {
+          "type" : "list\\u003Clist\\u003Clist\\u003Cinteger\\u003E\\u003E\\u003E",
+          "entity_type" : "taxonomy_term"
+        },
+        "field_people:field_mukurtu_records:field_people:name" : { "type" : "list\\u003Clist\\u003Clist\\u003Ctext\\u003E\\u003E\\u003E" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_source" : { "type" : "text" },
@@ -798,6 +828,51 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "field_collections_parent_coll",
             "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_mukurtu_terms" : {
+            "table" : "search_api_db_default_node_index_field_mukurtu_terms",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_people:field_mukurtu_records" : {
+            "table" : "search_api_db_default_node_index_field_people_field_mukurtu_re",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_people:field_mukurtu_records:field_people:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Clist\\u003Ctext\\u003E\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_people:field_mukurtu_records:field_people" : {
+            "table" : "search_api_db_default_node_index_field_people_field_mukurtu__1",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Clist\\u003Cinteger\\u003E\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_mukurtu_terms:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_mukurtu_terms:field_mukurtu_records" : {
+            "table" : "search_api_db_default_node_index_field_mukurtu_terms_field_muk",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_mukurtu_terms:field_mukurtu_records:field_people" : {
+            "table" : "search_api_db_default_node_index_field_mukurtu_terms_field_m_1",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Clist\\u003Cinteger\\u003E\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_mukurtu_terms:field_mukurtu_records:field_people:name" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Clist\\u003Clist\\u003Ctext\\u003E\\u003E\\u003E",
             "boost" : "1.0"
           }
         }
