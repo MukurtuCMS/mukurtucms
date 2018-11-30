@@ -107,6 +107,7 @@ features[field_instance][] = node-person-field_node_aggregate
 features[field_instance][] = node-person-field_pre_actions
 features[field_instance][] = node-person-field_related_people
 features[field_instance][] = node-person-field_sections
+features[field_instance][] = node-person-field_tags
 features[field_instance][] = node-person-og_group_ref
 features[field_instance][] = paragraphs_item-person_relationship_bundle-field_related_person
 features[field_instance][] = paragraphs_item-person_relationship_bundle-field_relationship_type
