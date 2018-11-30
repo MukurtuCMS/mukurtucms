@@ -38,12 +38,7 @@ jQuery(document).ready(function($){
             mukurtuGridListMejsResize();
         }
     }
-
-    // Zoom colorbox images
-    $(window).bind('cbox_complete', function () {
-        $('#cboxLoadedContent').zoom({on:'grab'});
-    });
-
+  
     $(window).load(function() {
         mukurtuMakeGrid();
         $('.view-header .btn.list').on ('click', function() { mukurtuDestroyGrid(); });
