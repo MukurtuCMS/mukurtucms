@@ -10,6 +10,13 @@
 function mukurtu_importer_generator_feeds_importer_default() {
   $export = array();
 
+  // Fields to not generate import fields for.
+  $field_blacklist = array(
+    'all' => array('field_pre_actions', 'field_digital_heritage_count', 'field_media_aggregate'),
+    'node' => array(
+        'dictionary_word' => array('field_media_asset'),
+    ),
+  );
 
   foreach(array_keys(entity_get_info()) as $entity_type) {
       // Only generate importers for the following entity types
@@ -96,6 +103,16 @@ function mukurtu_importer_generator_feeds_importer_default() {
           }
 
           foreach($fields_info as $field_name => $field_value) {
+            // Check global blacklist.
+            if (in_array($field_name, $field_blacklist['all'])) {
+                continue;
+            }
+
+            // Check specific blacklist.
+            if (!empty($field_blacklist[$entity_type][$bundle_name]) && in_array($field_name, $field_blacklist[$entity_type][$bundle_name])) {
+                continue;
+            }
+
               $field = field_info_field($field_name);
               //              dpm("Add $entity_type - $bundle_name: $field_name/{$field['type']}");
 

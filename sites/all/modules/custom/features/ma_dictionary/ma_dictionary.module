@@ -555,14 +555,23 @@ function ma_dictionary_node_prepare($node) {
  * Implements hook_node_presave.
  */
 function ma_dictionary_node_presave($node) {
-    if($node->type == 'dictionary_word' && isset($node->field_dictionary_word_language[LANGUAGE_NONE])) {
-        // We always want the dictionary word's language community to be set to the language community that has the corresponding
-        // related language taxonomy term. Language community is a hidden field.
-        $lang_nid = _ma_dictionary_get_language_community_from_tid($node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid']);
-        if($lang_nid) {
-            $node->field_language_community['und'][0]['target_id'] = $lang_nid;
-        }
+  if ($node->type != 'dictionary_word') {
+    return;
+  }
+
+  // We always want the dictionary word's language community to be set to the
+  // language community that has the corresponding related language taxonomy term.
+  // Language community is a hidden field.
+  if (isset($node->field_dictionary_word_language[LANGUAGE_NONE])) {
+    $lang_nid = _ma_dictionary_get_language_community_from_tid($node->field_dictionary_word_language[LANGUAGE_NONE][0]['tid']);
+    if ($lang_nid) {
+      $node->field_language_community['und'][0]['target_id'] = $lang_nid;
     }
+  }
+
+  // Aggregate media from paragraphs into media assets field.
+  // This is for search facets/previews.
+  $node->field_media_asset[LANGUAGE_NONE] = _ma_dictionary_get_media_assets($node);
 }
 
 /**
@@ -1361,4 +1370,29 @@ function ma_dictionary_get_word_count($word_list) {
       }
   }
   return $item_count;
+}
+
+// Return all media assets from dictionary word paragraphs
+// that we want to consider for search facets and previews.
+function _ma_dictionary_get_media_assets($node) {
+  $media_assets = array();
+  if ($node->type != 'dictionary_word') {
+    return $media_assets;
+  }
+
+  // Check all word entries (paragraphs) for media assets.
+  if (!empty($node->field_word_entry[LANGUAGE_NONE])) {
+    foreach($node->field_word_entry[LANGUAGE_NONE] as $word_entry) {
+      $word = entity_load_single('paragraphs_item', $word_entry['value']);
+
+      // Check word entry recordings.
+      if (!empty($word->field_dictionary_word_recording[LANGUAGE_NONE])) {
+        foreach($word->field_dictionary_word_recording[LANGUAGE_NONE] as $recording) {
+          $media_assets[$recording['sid']] = $recording;
+        }
+      }
+    }
+  }
+
+  return array_values($media_assets);
 }
