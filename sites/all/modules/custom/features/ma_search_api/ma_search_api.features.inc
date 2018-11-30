@@ -61,6 +61,13 @@ function ma_search_api_default_search_api_index() {
                   "field_mukurtu_terms:field_mukurtu_records:field_people"
                 ],
                 "description" : "A Fulltext aggregation of the following fields: People, Mukurtu Terms \\u00bb Records \\u00bb People."
+              },
+              "search_api_aggregation_4" : {
+                "name" : "Child Node Score",
+                "type" : "count",
+                "separator" : "\\n\\n",
+                "fields" : [ "field_book_parent", "field_community_record_parent" ],
+                "description" : "A Count aggregation of the following fields: Book Parent, Community Record Parent."
               }
             }
           }
@@ -156,6 +163,11 @@ function ma_search_api_default_search_api_index() {
               "field_collection_credit" : true,
               "field_collection_summary" : true,
               "body:value" : true,
+              "field_people:name" : true,
+              "field_contributor:name" : true,
+              "field_category:name" : true,
+              "field_tags:name" : true,
+              "field_description:value" : true,
               "field_book_children:title" : true,
               "field_book_children:field_summary" : true,
               "field_book_children:field_transcription" : true,
@@ -165,16 +177,11 @@ function ma_search_api_default_search_api_index() {
               "field_book_children:field_collection_credit" : true,
               "field_book_children:field_collection_summary" : true,
               "field_dh_type:name" : true,
-              "field_people:name" : true,
-              "field_category:name" : true,
-              "field_contributor:name" : true,
               "field_coverage_description:value" : true,
               "field_creator:name" : true,
-              "field_description:value" : true,
               "field_format:name" : true,
               "field_language:name" : true,
               "field_subject:name" : true,
-              "field_tags:name" : true,
               "field_tk_body:value" : true,
               "field_word_entry:field_source" : true,
               "field_word_entry:field_alternate_spelling" : true,
@@ -182,16 +189,16 @@ function ma_search_api_default_search_api_index() {
               "field_word_entry:field_sample_sentence" : true,
               "field_word_entry:field_translation" : true,
               "field_book_children:body:value" : true,
-              "field_book_children:field_dh_type:name" : true,
-              "field_book_children:field_category:name" : true,
               "field_book_children:field_contributor:name" : true,
+              "field_book_children:field_category:name" : true,
+              "field_book_children:field_tags:name" : true,
+              "field_book_children:field_description:value" : true,
+              "field_book_children:field_dh_type:name" : true,
               "field_book_children:field_coverage_description:value" : true,
               "field_book_children:field_creator:name" : true,
-              "field_book_children:field_description:value" : true,
               "field_book_children:field_format:name" : true,
               "field_book_children:field_language:name" : true,
               "field_book_children:field_subject:name" : true,
-              "field_book_children:field_tags:name" : true,
               "field_book_children:field_tk_body:value" : true,
               "field_word_entry:field_pronunciation:value" : true
             },
@@ -328,6 +335,7 @@ function ma_search_api_default_search_api_index() {
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
         "search_api_aggregation_1" : { "type" : "string" },
         "search_api_aggregation_2" : { "type" : "string" },
+        "search_api_aggregation_4" : { "type" : "integer" },
         "search_api_language" : { "type" : "string" },
         "status" : { "type" : "boolean" },
         "sticky" : { "type" : "boolean" },
@@ -873,6 +881,12 @@ function ma_search_api_default_search_api_server() {
           "field_mukurtu_terms:field_mukurtu_records:field_people:name" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Clist\\u003Clist\\u003Ctext\\u003E\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "search_api_aggregation_4" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "search_api_aggregation_4",
+            "type" : "integer",
             "boost" : "1.0"
           }
         }

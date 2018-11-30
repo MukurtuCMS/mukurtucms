@@ -254,8 +254,7 @@ function ma_search_api_search_api_query_alter($sapi_query) {
           'reverse' => TRUE,
         ),
         'relevance' => array(
-          'sort' => 'search_api_relevance',
-          'reverse' => TRUE,
+          'sort' => 'search_api_aggregation_4',
         ),
       );
       $sort_direction = 'ASC';
