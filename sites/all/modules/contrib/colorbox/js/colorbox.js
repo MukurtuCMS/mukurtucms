@@ -21,6 +21,13 @@ Drupal.behaviors.initColorbox = {
 
     // Use "data-colorbox-gallery" if set otherwise use "rel".
     settings.colorbox.rel = function () {
+
+      // Zoom colorbox images
+      var zoomImage = $(this).data('zoom-image');
+      $(window).bind('cbox_complete', function () {
+        $('#cboxLoadedContent').zoom({on:'mouseover', url:zoomImage});
+      });
+
       if ($(this).data('colorbox-gallery')) {
         return $(this).data('colorbox-gallery');
       }

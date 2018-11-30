@@ -186,6 +186,14 @@ function theme_colorbox_imagefield($variables) {
     $image = theme('image', $variables['image']);
   }
 
+  // Add Zoom Library
+  $zoom_path = libraries_get_path('zoom');
+  $js = $zoom_path . "/jquery.zoom.min.js";
+  if (file_exists($js)) {
+    drupal_add_js($js);
+  }
+
+
   $options = drupal_parse_url($variables['path']);
   $options += array(
     'html' => TRUE,
@@ -194,6 +202,7 @@ function theme_colorbox_imagefield($variables) {
       'class' => $class,
       'data-colorbox-gallery' => $variables['gid'],
       'data-cbox-img-attrs' => '{"title": "' . $variables['image']['title'] . '", "alt": "' . $variables['image']['alt'] . '"}',
+      'data-zoom-image' => image_style_url('tiny_thumbnail', $variables['image']['path']),
     ),
   );
 
