@@ -100,15 +100,6 @@ function mukurtu_starter_file_link($variables) {
   return '<span class="file">' . $icon . ' ' . l($link_text, $url, $options) . '</span>';
 }
 
-function mukurtu_starter_preprocess_html(&$variables) {
-    // Add Zoom Library
-    $zoom_path = libraries_get_path('zoom');
-    $js = $zoom_path . "/jquery.zoom.min.js";
-    if (file_exists($js)) {
-        drupal_add_js($js);
-    }
-}
-
 function mukurtu_starter_preprocess_panels_pane(&$variables)
 {
     // Add custom theme suggestions for the dictionary browse page search facets
