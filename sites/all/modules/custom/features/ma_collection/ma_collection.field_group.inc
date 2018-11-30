@@ -27,7 +27,8 @@ function ma_collection_field_group_info() {
       1 => 'field_collection_image',
       2 => 'field_collection_summary',
       3 => 'field_description',
-      4 => 'title',
+      4 => 'field_tags',
+      5 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
