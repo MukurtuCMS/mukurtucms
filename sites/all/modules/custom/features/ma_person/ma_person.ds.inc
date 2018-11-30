@@ -42,6 +42,11 @@ function ma_person_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_tags' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|person|default'] = $ds_fieldsetting;
 
@@ -315,12 +320,13 @@ function ma_person_ds_layout_settings_info() {
         1 => 'table_of_contents',
         2 => 'field_date_born',
         3 => 'field_date_died',
-        4 => 'field_related_people',
+        4 => 'field_tags',
+        5 => 'field_related_people',
       ),
       'bottom' => array(
-        5 => 'field_sections',
-        6 => 'field_node_aggregate',
-        7 => 'field_media_aggregate',
+        6 => 'field_sections',
+        7 => 'field_node_aggregate',
+        8 => 'field_media_aggregate',
       ),
     ),
     'fields' => array(
@@ -328,6 +334,7 @@ function ma_person_ds_layout_settings_info() {
       'table_of_contents' => 'right',
       'field_date_born' => 'right',
       'field_date_died' => 'right',
+      'field_tags' => 'right',
       'field_related_people' => 'right',
       'field_sections' => 'bottom',
       'field_node_aggregate' => 'bottom',

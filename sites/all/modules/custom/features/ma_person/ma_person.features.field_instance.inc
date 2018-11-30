@@ -253,7 +253,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 34,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -334,7 +334,7 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'default',
         ),
         'type' => 'entityreference_entity_view',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -531,7 +531,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 36,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -616,7 +616,7 @@ function ma_person_field_default_field_instances() {
         'module' => 'mukurtu_display_formatters_referenced_content_view',
         'settings' => array(),
         'type' => 'mukurtu_referenced_content_formatter',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -705,7 +705,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 37,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -777,7 +777,7 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -866,7 +866,7 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'featured_content' => array(
         'label' => 'hidden',
@@ -954,10 +954,27 @@ function ma_person_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
-        'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
-        'weight' => 29,
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 4,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -1029,7 +1046,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 35,
       ),
       'featured_content' => array(
         'label' => 'above',
