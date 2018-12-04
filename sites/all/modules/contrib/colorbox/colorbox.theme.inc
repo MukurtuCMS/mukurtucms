@@ -186,6 +186,13 @@ function theme_colorbox_imagefield($variables) {
     $image = theme('image', $variables['image']);
   }
 
+  // Add Zoom Library
+  $zoom_path = libraries_get_path('zoom');
+  $js = $zoom_path . "/jquery.zoom.min.js";
+  if (file_exists($js)) {
+    drupal_add_js($js);
+  }
+
   $options = drupal_parse_url($variables['path']);
   $options += array(
     'html' => TRUE,

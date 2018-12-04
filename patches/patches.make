@@ -51,6 +51,10 @@ projects[bootstrap][patch][] = contrib/150281138-add-first-last-classes-to-lists
 ; Do not skip over text format fields
 projects[bootstrap][patch][] = contrib/150281089-Dont-skip-over-text_format-fields.patch
 
+;;; Colorbox
+; Enable Jack Moore's Zoom library to work on top of the Colorbox images
+projects[colorbox][patch][] = contrib/zoom_on_colorbox.patch
+
 ;;; Community Tags
 ; PHP Notice: Undefined variables: user and terms_to_add
 projects[community_tags][patch][] = https://www.drupal.org/files/issues/community_tags-undefined-variables-7.x-1.x-2420969-1_0.patch
