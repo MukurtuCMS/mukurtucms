@@ -202,7 +202,6 @@ function theme_colorbox_imagefield($variables) {
       'class' => $class,
       'data-colorbox-gallery' => $variables['gid'],
       'data-cbox-img-attrs' => '{"title": "' . $variables['image']['title'] . '", "alt": "' . $variables['image']['alt'] . '"}',
-      'data-zoom-image' => image_style_url('tiny_thumbnail', $variables['image']['path']),
     ),
   );
 

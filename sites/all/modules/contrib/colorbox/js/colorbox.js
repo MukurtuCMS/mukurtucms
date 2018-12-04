@@ -23,9 +23,8 @@ Drupal.behaviors.initColorbox = {
     settings.colorbox.rel = function () {
 
       // Zoom colorbox images
-      var zoomImage = $(this).data('zoom-image');
       $(window).bind('cbox_complete', function () {
-        $('#cboxLoadedContent').zoom({on:'mouseover', url:zoomImage});
+        $('#cboxLoadedContent').zoom({on:'mouseover', magnify: 2});
       });
 
       if ($(this).data('colorbox-gallery')) {
