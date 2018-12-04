@@ -22,11 +22,6 @@ Drupal.behaviors.initColorbox = {
     // Use "data-colorbox-gallery" if set otherwise use "rel".
     settings.colorbox.rel = function () {
 
-      // Zoom colorbox images
-      $(window).bind('cbox_complete', function () {
-        $('#cboxLoadedContent').zoom({on:'mouseover', magnify: 2});
-      });
-
       if ($(this).data('colorbox-gallery')) {
         return $(this).data('colorbox-gallery');
       }
@@ -42,6 +37,12 @@ Drupal.behaviors.initColorbox = {
     $(context).bind('cbox_complete', function () {
       Drupal.attachBehaviors('#cboxLoadedContent');
     });
+
+    // Zoom colorbox images
+    $(window).bind('cbox_complete', function () {
+      $('#cboxLoadedContent').zoom({on:'mouseover', magnify: 2});
+    });
+
   }
 };
 

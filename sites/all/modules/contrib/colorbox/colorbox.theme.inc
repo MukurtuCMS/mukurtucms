@@ -193,7 +193,6 @@ function theme_colorbox_imagefield($variables) {
     drupal_add_js($js);
   }
 
-
   $options = drupal_parse_url($variables['path']);
   $options += array(
     'html' => TRUE,
