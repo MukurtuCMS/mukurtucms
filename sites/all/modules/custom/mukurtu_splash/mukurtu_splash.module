@@ -555,6 +555,13 @@ function mukurtu_splash_block_site_start() {
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t($enable_disable_word . ' Related Items teasers at top of right of Digital Heritage items.'),
     ];
+
+    $items_layout[] = [
+      'title' => 'Configure Default Browse Page',
+      'href' => 'admin/config/mukurtu/select-default-browse-page',
+      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
+      'description' => t('Select the default content browse page.'),
+    ];
   }
 
 

@@ -179,7 +179,7 @@ function ma_dictionary_default_search_api_sort() {
     "enabled" : "1",
     "weight" : "-100",
     "identifier" : "default_node_index__search_api_aggregation_2",
-    "default_sort" : "1",
+    "default_sort" : "0",
     "default_sort_no_terms" : "1",
     "default_order" : "asc",
     "options" : { "field_name" : "Node Title" },

@@ -67,6 +67,10 @@ projects[ctools][patch][] = https://www.drupal.org/files/issues/ctools-fix_modal
 ; The 'For missing images' option will always fail
 projects[dummyimage][patch][] = https://www.drupal.org/files/issues/dummyimage_missing_1728026-5.patch
 
+;;; Entity
+; Prevent error from workflow (https://www.drupal.org/project/entity/issues/2289693)
+projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.patch
+
 ;;; Entity Reference
 ; Forbid to use duplicate entities in entityreference field
 projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid-duplicate-entities-in-entityreference-field_0.patch

@@ -27,7 +27,8 @@ function ma_dictionary_field_group_info() {
       1 => 'field_collection_image',
       2 => 'field_collection_summary',
       3 => 'field_description',
-      4 => 'title',
+      4 => 'field_tags',
+      5 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -117,7 +118,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '18',
+    'weight' => '36',
     'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
@@ -324,7 +325,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Words',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_words',
     ),

@@ -214,7 +214,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -291,7 +291,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 12,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -317,7 +317,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 6,
+      'weight' => 5,
     ),
   );
 
@@ -352,7 +352,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -411,7 +411,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -477,7 +477,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 14,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -533,7 +533,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -570,7 +570,77 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 5,
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-dictionary_word-field_media_asset'.
+  $field_instances['node-dictionary_word-field_media_asset'] = array(
+    'bundle' => 'dictionary_word',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'title',
+        'weight' => 26,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_media_asset',
+    'label' => 'Media Assets',
+    'required' => 0,
+    'settings' => array(
+      'allow_override' => 0,
+      'referencable_types' => array(
+        'audio' => 'audio',
+        'file' => 'file',
+        'image' => 'image',
+        'video' => 'video',
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'atom_reference',
+      'settings' => array(
+        'context' => 'sdl_editor_representation',
+        'treeable' => 0,
+      ),
+      'type' => 'atom_reference_textfield',
+      'weight' => 6,
     ),
   );
 
@@ -607,7 +677,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -681,7 +751,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -756,7 +826,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -823,10 +893,10 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'paragraphs',
         'settings' => array(
-          'view_mode' => 'dictionary_teaser',
+          'view_mode' => 'word_entry_search_results',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -911,7 +981,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -989,7 +1059,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1219,6 +1289,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 3,
       ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -1288,6 +1364,16 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'mukurtu_featured_content',
         'weight' => 0,
       ),
+      'search_result' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 1,
+          'override' => 0,
+        ),
+        'type' => 'ma_scald_search_results',
+        'weight' => 0,
+      ),
       'teaser' => array(
         'label' => 'above',
         'module' => 'atom_reference',
@@ -1352,6 +1438,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 2,
       ),
+      'search_result' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -1410,6 +1503,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 4,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1474,6 +1573,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 22,
       ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1497,6 +1602,67 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'type' => 'options_onoff',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'node-word_list-field_tags'.
+  $field_instances['node-word_list-field_tags'] = array(
+    'bundle' => 'word_list',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 6,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_tags',
+    'label' => 'Keywords',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 6,
     ),
   );
 
@@ -1534,6 +1700,12 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'mukurtu_paged_node_formatter',
         'weight' => 5,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1615,6 +1787,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 2,
       ),
+      'word_entry_search_results' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1686,6 +1865,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 18,
+      ),
+      'word_entry_search_results' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -1775,6 +1960,12 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'mukurtu_scald_dictionary_media',
         'weight' => 17,
+      ),
+      'word_entry_search_results' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -1877,6 +2068,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 16,
       ),
+      'word_entry_search_results' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -1943,6 +2140,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 15,
+      ),
+      'word_entry_search_results' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -2016,6 +2219,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 19,
       ),
+      'word_entry_search_results' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -2086,6 +2295,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 14,
+      ),
+      'word_entry_search_results' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -2161,6 +2376,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 13,
       ),
+      'word_entry_search_results' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
@@ -2211,9 +2433,11 @@ function ma_dictionary_field_default_field_instances() {
   t('Include any media or additional information that does not fit in the other fields here. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (e.g., audio, YouTube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Item Sharing Settings');
   t('Keywords');
+  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.');
   t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. Separate multiple keywords with semicolons.');
   t('Language');
   t('Language Community');
+  t('Media Assets');
   t('Normally, the glossary title letter filter will "pad" itself with all letters from A-Z for which there are no words in the site\'s glossary that start with that letter. Unlike the other letters, they are unlinked. Their purpose is to provide a complete-looking alphabet in the filter. However, if the language(s) of the glossary does not include all the letters from A-Z, it would be preferable to leave out the letters which do not exist in the language. Click this checkbox to disable padding of the glossary with all the letters from A-Z. Only the first letter of words in the glossary will remain in the filter.');
   t('One or more example sentences that demonstrate use of the word entry.');
   t('Part of Speech');

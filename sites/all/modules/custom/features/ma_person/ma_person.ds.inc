@@ -42,6 +42,11 @@ function ma_person_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_tags' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|person|default'] = $ds_fieldsetting;
 
@@ -117,6 +122,37 @@ function ma_person_ds_field_settings_info() {
     ),
   );
   $export['node|person|related_person_teaser'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|person|search_result';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'person';
+  $ds_fieldsetting->view_mode = 'search_result';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '15',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '13',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_media_asset' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|person|search_result'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -284,12 +320,13 @@ function ma_person_ds_layout_settings_info() {
         1 => 'table_of_contents',
         2 => 'field_date_born',
         3 => 'field_date_died',
-        4 => 'field_related_people',
+        4 => 'field_tags',
+        5 => 'field_related_people',
       ),
       'bottom' => array(
-        5 => 'field_sections',
-        6 => 'field_node_aggregate',
-        7 => 'field_media_aggregate',
+        6 => 'field_sections',
+        7 => 'field_node_aggregate',
+        8 => 'field_media_aggregate',
       ),
     ),
     'fields' => array(
@@ -297,6 +334,7 @@ function ma_person_ds_layout_settings_info() {
       'table_of_contents' => 'right',
       'field_date_born' => 'right',
       'field_date_died' => 'right',
+      'field_tags' => 'right',
       'field_related_people' => 'right',
       'field_sections' => 'bottom',
       'field_node_aggregate' => 'bottom',
@@ -305,9 +343,6 @@ function ma_person_ds_layout_settings_info() {
     'classes' => array(
       'layout_class' => array(
         '' => '',
-      ),
-      'right' => array(
-        'metadata-sidebar' => 'metadata-sidebar',
       ),
     ),
     'wrappers' => array(
@@ -375,47 +410,49 @@ function ma_person_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_pre_actions',
-        1 => 'title',
-        2 => 'group_tabs',
+        1 => 'group_tabs',
+        2 => 'title',
         3 => 'field_media_asset',
         4 => 'field_node_aggregate',
-        6 => 'field_sections',
-        9 => 'field_date_born',
-        11 => 'field_date_died',
-        12 => 'field_mukurtu_terms',
-        13 => 'field_deceased',
-        14 => 'field_related_people',
-        15 => 'group_biographic',
+        5 => 'field_date_born',
+        7 => 'field_date_died',
+        9 => 'field_deceased',
+        11 => 'field_tags',
+        13 => 'field_sections',
+        14 => 'field_mukurtu_terms',
+        15 => 'field_related_people',
+        16 => 'group_biographic',
         17 => 'group_relations',
-        18 => 'group_record_connections',
+        19 => 'group_record_connections',
       ),
       'hidden' => array(
-        5 => 'og_group_ref',
-        7 => 'redirect',
-        8 => 'path',
-        10 => 'field_media_aggregate',
-        16 => '_add_existing_field',
+        6 => 'og_group_ref',
+        8 => 'redirect',
+        10 => 'path',
+        12 => 'field_media_aggregate',
+        18 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'field_pre_actions' => 'ds_content',
-      'title' => 'ds_content',
       'group_tabs' => 'ds_content',
+      'title' => 'ds_content',
       'field_media_asset' => 'ds_content',
       'field_node_aggregate' => 'ds_content',
-      'og_group_ref' => 'hidden',
-      'field_sections' => 'ds_content',
-      'redirect' => 'hidden',
-      'path' => 'hidden',
       'field_date_born' => 'ds_content',
-      'field_media_aggregate' => 'hidden',
+      'og_group_ref' => 'hidden',
       'field_date_died' => 'ds_content',
-      'field_mukurtu_terms' => 'ds_content',
+      'redirect' => 'hidden',
       'field_deceased' => 'ds_content',
+      'path' => 'hidden',
+      'field_tags' => 'ds_content',
+      'field_media_aggregate' => 'hidden',
+      'field_sections' => 'ds_content',
+      'field_mukurtu_terms' => 'ds_content',
       'field_related_people' => 'ds_content',
       'group_biographic' => 'ds_content',
-      '_add_existing_field' => 'hidden',
       'group_relations' => 'ds_content',
+      '_add_existing_field' => 'hidden',
       'group_record_connections' => 'ds_content',
     ),
     'classes' => array(
@@ -507,6 +544,46 @@ function ma_person_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|person|related_person_teaser'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|person|search_result';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'person';
+  $ds_layout->view_mode = 'search_result';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_media_asset',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'featured_content_type',
+      ),
+    ),
+    'fields' => array(
+      'field_media_asset' => 'left',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|person|search_result'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

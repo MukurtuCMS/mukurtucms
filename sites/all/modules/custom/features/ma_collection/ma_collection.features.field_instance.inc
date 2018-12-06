@@ -771,6 +771,67 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-collection-field_tags'.
+  $field_instances['node-collection-field_tags'] = array(
+    'bundle' => 'collection',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
+    'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 29,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_tags',
+    'label' => 'Keywords',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 8,
+    ),
+  );
+
   // Exported field_instance: 'node-collection-og_group_ref'.
   $field_instances['node-collection-og_group_ref'] = array(
     'bundle' => 'collection',
@@ -1229,6 +1290,8 @@ function ma_collection_field_default_field_instances() {
   t('Digital Heritage Items');
   t('Image');
   t('Item Sharing Settings');
+  t('Keywords');
+  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.');
   t('Personal Collections are listed on your <a href=\'/user\'>user profile page</a>. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.');
   t('Pre-Actions');
   t('Privacy');

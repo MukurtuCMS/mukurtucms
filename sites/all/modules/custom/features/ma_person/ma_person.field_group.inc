@@ -28,7 +28,8 @@ function ma_person_field_group_info() {
       2 => 'field_deceased',
       3 => 'field_media_asset',
       4 => 'field_sections',
-      5 => 'title',
+      5 => 'field_tags',
+      6 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -181,7 +182,7 @@ function ma_person_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Relations',
-    'weight' => '15',
+    'weight' => '14',
     'children' => array(
       0 => 'field_related_people',
     ),

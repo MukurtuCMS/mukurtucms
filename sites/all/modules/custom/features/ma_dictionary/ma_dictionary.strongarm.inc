@@ -318,7 +318,7 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'search_result' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'diff_standard' => array(
         'custom_settings' => FALSE,
@@ -354,6 +354,9 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
         'custom_settings' => FALSE,
       ),
     ),
@@ -403,6 +406,12 @@ function ma_dictionary_strongarm() {
       ),
       'featured_content' => array(
         'custom_settings' => TRUE,
+      ),
+      'word_entry_search_results' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
       ),
     ),
     'extra_fields' => array(

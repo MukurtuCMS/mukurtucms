@@ -434,7 +434,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 3,
+        'weight' => 5,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
@@ -905,7 +905,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 2,
+        'weight' => 4,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
@@ -3808,7 +3808,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 6,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',

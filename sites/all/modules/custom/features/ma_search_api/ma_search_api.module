@@ -221,8 +221,8 @@ function ma_search_api_search_api_query_alter($sapi_query) {
 
 
   // Custom sorts
-
-  if ($current_page == 'digital-heritage' or $current_page == 'collections') { // Add Dictionary here later.
+  $sort_pages = array('browse', 'collections', 'digital-heritage');
+  if (in_array($current_page, $sort_pages)) { // Add Dictionary here later.
 
     // Sort according to the session var, otherwise fallback to default
     if (isset($_SESSION[$current_page . '_custom_sort_order'])) {
@@ -252,6 +252,9 @@ function ma_search_api_search_api_query_alter($sapi_query) {
         'newest' => array(
           'sort' => 'field_original_date:timestamp',
           'reverse' => TRUE,
+        ),
+        'relevance' => array(
+          'sort' => 'search_api_aggregation_4',
         ),
       );
       $sort_direction = 'ASC';
@@ -450,6 +453,7 @@ function ma_search_api_block_view($delta = '') {
 function ma_search_api_sort_form($form, &$form_state) {
   $current_page = arg(0);
   $sort_options = array(
+    'relevance' => t('Search Relevance'),
     'changed' => t('Date Changed'),
     'added' => t('Date Added'),
     'newest' => t('Newest'),

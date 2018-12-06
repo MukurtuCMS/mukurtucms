@@ -111,6 +111,11 @@ function ma_digitalheritage_form_views_exposed_form_alter(&$form, &$form_state) 
       $form['reset'] = array('#markup' => l(t('Reset'),'digital-heritage', array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
     }
   }
+  if (strpos($form['#id'], 'views-exposed-form-browse-all-content-all') !== FALSE) {
+    if (count(arg()) > 1 OR count(drupal_get_query_parameters())) {
+      $form['reset'] = array('#markup' => l(t('Reset'),'browse', array('attributes' => array('class' => array ('btn', 'btn-primary', 'form-submit')), 'html' => TRUE)));
+    }
+  }
 
 }
 
@@ -203,7 +208,7 @@ function ma_digitalheritage_views_pre_render(&$view) {
 function ma_digitalheritage_preprocess_views_view(&$vars) {
   $view = &$vars['view'];
 
-  if ($view->name == 'digital_heritage_grid_list') {
+  if ($view->name == 'digital_heritage_grid_list' || $view->name == 'browse_all_content') {
     // Add JS for browse mode switcher on DH view
     drupal_add_library('system', 'jquery.cookie');
     drupal_add_js(drupal_get_path('module', 'ma_digitalheritage') . '/js/dh_browse_mode_switcher.js');
@@ -814,7 +819,7 @@ function ma_digitalheritage_node_delete($node) {
  * Implements hook_search_api_index_items_alter().
  */
 function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchApiIndex $index) {
-  foreach($items as $id => $item){
+  /* foreach($items as $id => $item){
 
     // Exclude Community Record DH nodes from being indexed
     if (isset($item->field_community_record_parent[LANGUAGE_NONE])) {
@@ -826,7 +831,7 @@ function ma_digitalheritage_search_api_index_items_alter(array &$items, SearchAp
       unset($items[$id]);
     }
 
-  }
+  } */
 }
 
 

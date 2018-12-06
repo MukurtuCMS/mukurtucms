@@ -181,6 +181,16 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'digital_heritage';
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
+    'digital_heritage_page_number' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '1',
       'label' => 'hidden',
@@ -307,6 +317,45 @@ function ma_digitalheritage_ds_custom_fields_info() {
     'block_render' => '3',
   );
   $export['dh_related_items_teasers'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'digital_heritage_page_number';
+  $ds_field->label = 'Digital Heritage Page Number';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+  if (!empty($entity->field_book_children[LANGUAGE_NONE])) {
+    $pages = count($entity->field_book_children[LANGUAGE_NONE]) + 1;
+    print t("@pages pages", array(\'@pages\' => $pages));
+    return;
+  }
+
+  if (!empty($entity->field_book_parent[LANGUAGE_NONE])) {
+    $parent_nid = $entity->field_book_parent[LANGUAGE_NONE][0][\'target_id\'];
+    $parent = node_load($parent_nid);
+    $pages = count(array_keys($parent->field_book_children[LANGUAGE_NONE])) + 1;
+    $page = 1;
+    foreach ($parent->field_book_children[LANGUAGE_NONE] as $child_page) {
+      $page++;
+      if ($child_page[\'target_id\'] == $entity->nid) {
+        break;
+      }
+    }
+    print t("Page @page of @pages", array(\'@page\' => $page, \'@pages\' => $pages));
+    return;
+  }
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['digital_heritage_page_number'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -785,17 +834,21 @@ function ma_digitalheritage_ds_layout_settings_info() {
         0 => 'field_media_asset',
       ),
       'right' => array(
-        1 => 'title',
-        2 => 'group_list_view_fields',
-        3 => 'field_community_ref',
-        4 => 'field_category',
-        5 => 'field_summary',
+        1 => 'group_list_view_fields',
+        2 => 'title',
+        3 => 'featured_content_type',
+        4 => 'digital_heritage_page_number',
+        5 => 'field_community_ref',
+        6 => 'field_category',
+        7 => 'field_summary',
       ),
     ),
     'fields' => array(
       'field_media_asset' => 'left',
-      'title' => 'right',
       'group_list_view_fields' => 'right',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'digital_heritage_page_number' => 'right',
       'field_community_ref' => 'right',
       'field_category' => 'right',
       'field_summary' => 'right',

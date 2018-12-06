@@ -27,7 +27,8 @@ function ma_collection_field_group_info() {
       1 => 'field_collection_image',
       2 => 'field_collection_summary',
       3 => 'field_description',
-      4 => 'title',
+      4 => 'field_tags',
+      5 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -200,11 +201,12 @@ function ma_collection_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '2',
+    'weight' => '1',
     'children' => array(
       0 => 'field_collection_credit',
       1 => 'field_collection_summary',
-      2 => 'collections_title_with_count',
+      2 => 'featured_content_type',
+      3 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(

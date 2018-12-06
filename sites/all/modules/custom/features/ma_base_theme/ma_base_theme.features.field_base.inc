@@ -696,8 +696,8 @@ function ma_base_theme_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(
         0 => array(
-          'parent' => 0,
           'vocabulary' => 'tags',
+          'parent' => 0,
         ),
       ),
       'treeable' => FALSE,

@@ -142,7 +142,7 @@ function _ma_base_theme_create_default_beans() {
         if($bean == FALSE) {
             $bean = bean_create(array('type' => 'hero_image_one_column'));
         }
-        
+
         if(!$already_created) {
             $bean->label = 'Frontpage Hero Image: One Column';
             $bean->title = '';
@@ -189,4 +189,138 @@ function _ma_base_theme_create_default_beans() {
             $bean->save();
         }
     }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_base_theme_menu() {
+  $items = array();
+
+  // Select default browse page.
+  $items['admin/config/mukurtu/select-default-browse-page'] = array(
+    'title' => 'Mukurtu Default Browse Page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_base_theme_choose_browse_form', 1),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
+  );
+  return $items;
+}
+
+/**
+ * Form to pick default browse page.
+ */
+function ma_base_theme_choose_browse_form($form, &$form_state) {
+  $option = variable_get('mukurtu_default_browse_page');
+
+  $form['mukurtu_default_browse_page'] = array(
+    '#type' => 'radios',
+    '#title' => t('Default Browse Page'),
+    '#default_value' => $option,
+    '#options' => array(
+      'digital-heritage' => 'Browse Digital Heritage Only',
+      'browse' => 'Browse All Content',
+      'both' => 'Enable Both',
+    ),
+    '#description' => t('Select the default browse page.'),
+    '#required' => TRUE,
+  );
+
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'ma_base_theme_choose_browse_form_submit';
+  return $form;
+}
+
+/**
+ * Custom submit handler for ma_base_theme_choose_browse_form.
+ */
+function ma_base_theme_choose_browse_form_submit($form, &$form_state) {
+  _ma_base_theme_set_default_browse($form_state['values']['mukurtu_default_browse_page']);
+}
+
+/**
+ * Set default browse to either 'digital-heritage','browse' (all), or 'both'.
+ */
+function _ma_base_theme_set_default_browse($page = 'digital-heritage') {
+  // Clear any old redirects.
+  $dh_redirect = redirect_load_by_source('digital-heritage');
+  $browse_redirect = redirect_load_by_source('browse');
+  $delete_rids = array();
+  if (!empty($dh_redirect)) {
+    $delete_rids[] = $dh_redirect->rid;
+  }
+  if (!empty($browse_redirect)) {
+    $delete_rids[] = $browse_redirect->rid;
+  }
+  redirect_delete_multiple($delete_rids);
+
+  $option = $page;
+
+  switch ($page) {
+    case 'browse':
+      // Set redirect from digital-heritage -> browse.
+      $redirect = new stdClass();
+      redirect_object_prepare(
+        $redirect,
+        array(
+          'source' => 'digital-heritage',
+          'source_options' => array(),
+          'redirect' => 'browse',
+          'redirect_options' => array(),
+          'language' => LANGUAGE_NONE,
+        )
+      );
+      redirect_save($redirect);
+
+      // Hide digital-heritage menu link, show browse link.
+      $browse_menu_hidden = 0;
+      $dh_menu_hidden = 1;
+      break;
+
+    case 'both':
+      // Enable both menu options.
+      $browse_menu_hidden = 0;
+      $dh_menu_hidden = 0;
+      break;
+
+    case 'digital-heritage':
+    default:
+      $option = 'digital-heritage';
+      // Set redirect from browse -> digitial-heritage.
+      $redirect = new stdClass();
+      redirect_object_prepare(
+        $redirect,
+        array(
+          'source' => 'browse',
+          'source_options' => array(),
+          'redirect' => 'digital-heritage',
+          'redirect_options' => array(),
+          'language' => LANGUAGE_NONE,
+        )
+      );
+      redirect_save($redirect);
+
+      // Hide browse menu link, show digital-heritage menu link.
+      $browse_menu_hidden = 1;
+      $dh_menu_hidden = 0;
+  }
+
+  $browse_menu = menu_load_links('menu-browse-menu');
+  foreach ($browse_menu as &$menu_item) {
+    // Set 'browse' menu option.
+    if ($menu_item['link_path'] == 'browse') {
+      $menu_item['hidden'] = $browse_menu_hidden;
+      menu_link_save($menu_item);
+    }
+
+    // Set 'digital-heritage' menu option.
+    if ($menu_item['link_path'] == 'digital-heritage') {
+      $menu_item['hidden'] = $dh_menu_hidden;
+      menu_link_save($menu_item);
+    }
+  }
+
+  variable_set('mukurtu_default_browse_page', $option);
 }

@@ -21,3 +21,29 @@ function ma_dictionary_install () {
         menu_link_save($item);
     */
 }
+
+/**
+ * Index existing dictionary words for search facets.
+ */
+function ma_dictionary_update_7001(&$sandbox) {
+  // Find all dictionary words.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'dictionary_word')
+    ->addMetaData('account', user_load(1));
+  $results = $query->execute();
+
+  // Exit if no dictionary words exist.
+  if (empty($results['node'])) {
+    return;
+  }
+
+  // Load each dictionary word, aggregate the media,
+  // save the dictionary word.
+  $nids = array_keys($results['node']);
+  foreach ($nids as $nid) {
+    $node = node_load($nid);
+    $node->field_media_asset[LANGUAGE_NONE] = _ma_dictionary_get_media_assets($node);
+    node_save($node);
+  }
+}

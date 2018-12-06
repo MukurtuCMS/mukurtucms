@@ -100,6 +100,7 @@ features[field_instance][] = node-collection-field_digital_heritage_count
 features[field_instance][] = node-collection-field_digital_heritage_items
 features[field_instance][] = node-collection-field_item_privacy_setting
 features[field_instance][] = node-collection-field_pre_actions
+features[field_instance][] = node-collection-field_tags
 features[field_instance][] = node-collection-og_group_ref
 features[field_instance][] = node-personal_collection-field_collection_image
 features[field_instance][] = node-personal_collection-field_collection_summary

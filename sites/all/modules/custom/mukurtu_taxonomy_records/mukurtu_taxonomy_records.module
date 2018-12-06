@@ -317,7 +317,7 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
 
     $new_record_links = array();
     foreach($record_list as $type => $bundles) {
-        foreach($bundles as $bundle => $bundle_label) {           
+        foreach($bundles as $bundle => $bundle_label) {
             $add_path = "$type/add/$bundle/attach-record/{$term->tid}";
             if(drupal_valid_path($add_path)) {
                 $new_record_links[] = l($bundle_label, $add_path);
@@ -343,7 +343,7 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
         'status' => array('data' => t('Status'), 'field' => 'n.status'),
         'changed' => array('data' => t('Updated'), 'field' => 'n.changed', 'sort' => 'desc')
     );
-    
+
     $options = array();
 
     // Get all available records
@@ -363,13 +363,13 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
     foreach($emw_term->field_mukurtu_records->value() as $index => $record_ref) {
         $mukurtu_record_refs[] = $record_ref->nid;
     }
-    
+
     foreach($record_nids as $nid => $value) {
         // Don't present already attached terms
         if(in_array($nid, $mukurtu_record_refs)) {
             continue;
         }
-        
+
         $node = node_load($nid);
         $atom = scald_atom_load($node->field_media_asset[LANGUAGE_NONE][0]['sid']);
 
@@ -400,7 +400,7 @@ function mukurtu_taxonomy_records_add_record_form($form, $form_state, $term) {
         '#value' => t('Add Selected'),
     );
     */
-    
+
     return $form;
 }
 
@@ -409,7 +409,7 @@ function mukurtu_taxonomy_records_add_record_form_submit($form, &$form_state) {
     if(!isset($form_state['build_info']['args'][0])) {
         return;
     }
-    
+
     $term = $form_state['build_info']['args'][0];
 
     // Add selected records
@@ -455,7 +455,7 @@ function mukurtu_taxonomy_records_config_form($form, $form_state) {
         '#type' => 'submit',
         '#value' => t('Save configuration'),
     );
-    
+
     return $form;
 }
 
@@ -516,7 +516,7 @@ function mukurtu_taxonomy_records_enable_records_for_vocabulary($vocab) {
         );
         field_create_instance($field_instance);
     }
-        
+
     // Enable CER for vocabulary <-> All record types
     mukurtu_taxonomy_records_enable_all_cer($vocab);
 }
@@ -568,7 +568,7 @@ function mukurtu_taxonomy_records_disable_cer($left_type, $left_bundle, $right_t
     $left = "$left_type:$left_bundle:$left_field";
     $right = "$right_type:$right_bundle:$right_field";
     $identifier = "$left*$right";
-    
+
     // Find the CER
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'cer')
@@ -654,7 +654,7 @@ function mukurtu_taxonomy_records_add_record_form_access($term) {
  */
 function mukurtu_taxonomy_records_remove_record_form($form, $form_state, $term, $record) {
     $question = t("Remove the record \"@record\" from term \"@term\"?", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
-    
+
     $description = t("Are you sure you want to detach the record \"@record\" currently attached to the \"@term\" term in the \"@vocab\" taxonomy? This will not delete the record.", array('@record' => $record->title, '@term' => $term->name, '@vocab' => $term->vocabulary_machine_name));
     return confirm_form($form, $question, drupal_get_destination(), $description);
 }
@@ -781,7 +781,7 @@ function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $fo
                 if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all'])) {
                     $form['field_mukurtu_terms'][LANGUAGE_NONE]['mukurtu_record']['terms_all']['#default_value'][] = $tid;
                 }
-                
+
                 if(isset($form['field_mukurtu_terms'][LANGUAGE_NONE]['#default_value'])) {
                     // Make sure CER is enabled
                     mukurtu_taxonomy_records_enable_all_cer($vocab);
@@ -797,9 +797,9 @@ function mukurtu_taxonomy_records_form_node_form_alter(&$form, &$form_state, $fo
                         $form['field_mukurtu_terms'][LANGUAGE_NONE]['#default_value'][] = $tid;
                     }
                 }
-            }                    
+            }
         }
-        
+
         // Hide node/media aggregate fields when editing. Those are set programmatically.
         $form['field_node_aggregate']['#access'] = FALSE;
         $form['field_media_aggregate']['#access'] = FALSE;
@@ -948,7 +948,7 @@ function mukurtu_taxonomy_records_are_records_enabled_for_vocabulary($vocab) {
                 ->fieldCondition($cer_field, 'path', "taxonomy_term:{$vocab->machine_name}:field_mukurtu_records", '=')
                 ->fieldCondition('cer_enabled', 'value', TRUE)
                 ->addMetaData('account', user_load(1));
-            
+
             $result = $query->execute();
             if(isset($result['cer']) && count($result['cer']) > 0) {
                 return TRUE;
@@ -971,7 +971,7 @@ function mukurtu_taxonomy_records_are_records_enabled($term) {
 // Returns a list of entity types that have records enabled
 function mukurtu_taxonomy_records_entity_list() {
     $entity_records = array();
-    
+
     $entity_info = entity_get_info();
 
     // Currently only supporting scald_atom and node
@@ -998,9 +998,9 @@ function mukurtu_taxonomy_records_is_record($entity, $entity_type = 'node') {
     $supported_list = mukurtu_taxonomy_records_entity_list();
     if(isset($supported_list[$entity_type])) {
         foreach($supported_list[$entity_type] as $bundle => $bundle_label) {
-            if($entity->type == $bundle) {                
+            if($entity->type == $bundle) {
                 return TRUE;
-            }                
+            }
         }
     }
     if(isset($entity->field_mukurtu_terms)) {
