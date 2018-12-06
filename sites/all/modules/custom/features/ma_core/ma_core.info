@@ -61,7 +61,6 @@ dependencies[] = media_wysiwyg
 dependencies[] = mediaelement
 dependencies[] = menu
 dependencies[] = modernizr
-dependencies[] = mollom
 dependencies[] = mukurtu_splash
 dependencies[] = node
 dependencies[] = oembed
