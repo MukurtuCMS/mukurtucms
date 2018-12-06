@@ -513,6 +513,12 @@ function rules_update_7213() {
  * Switch out the rules_event_whitelist variable for a cache equivalent.
  */
 function rules_update_7214() {
+  // Enable Rules if currently disabled so that this update won't fail.
+  $disable_rules = FALSE;
+  if (!module_exists('rules')) {
+    module_enable(array('rules'));
+    $disable_rules = TRUE;
+  }
   // Set new event_whitelist cache cid.
   rules_set_cache('rules_event_whitelist', variable_get('rules_event_whitelist', array()));
   // Delete old conf variable.
@@ -525,6 +531,10 @@ function rules_update_7214() {
   rules_get_cache();
   _rules_rebuild_component_cache();
   RulesEventSet::rebuildEventCache();
+  // Disable Rules again if it was disabled before this update started.
+  if ($disable_rules) {
+    module_disable(array('rules'));
+  }
 }
 
 /**
