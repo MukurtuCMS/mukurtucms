@@ -296,6 +296,7 @@ features[image][] = mukurtu_theme_4_3_ratio
 features[image][] = mukurtu_theme_7_4_ratio
 features[image][] = related_items_teaser
 features[menu_custom][] = menu-log-in-log-out
+features[menu_links][] = menu-browse-menu_browse:browse
 features[menu_links][] = menu-log-in-log-out_log-in:user/login
 features[menu_links][] = menu-log-in-log-out_log-out:user/logout
 features[page_manager_pages][] = browse_all_content
