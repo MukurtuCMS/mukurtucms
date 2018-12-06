@@ -8,17 +8,31 @@
 
 backup_migrate_include('crud');
 
+
+/**
+ * Implementation of hook_backup_migrate_profile_subtypes().
+ *
+ * Get the built in Backup and Migrate profile types.
+ */
+function backup_migrate_backup_migrate_profile_subtypes() {
+  $out = array();
+  $out += array(
+    'backup' => array(
+      'include' => 'profiles',
+      'type_name' => t('Backup Settings Profile'),
+      'class' => 'backup_migrate_profile',
+    ),
+  );
+  return $out;
+}
+
+
 /**
  * Get all the available backup profiles.
  */
 function backup_migrate_get_profiles() {
   backup_migrate_include('filters');
-  static $profiles = NULL;
-
-  // Get the list of profiles and cache them locally.
-  if ($profiles === NULL) {
-    $profiles = backup_migrate_crud_get_items('profile');
-  }
+  $profiles = backup_migrate_crud_get_items('profile');
   return $profiles;
 }
 
@@ -49,7 +63,7 @@ function backup_migrate_backup_migrate_profiles() {
   $out = array();
 
   // Get the module default profile.
-  $out['default'] = backup_migrate_crud_create_item('profile', array('name' => t("Default Settings"), 'profile_id' => 'default'));
+  $out['default'] = backup_migrate_crud_create_item('profile', array('name' => t("Default Settings"), 'machine_name' => 'default'));
 
   return $out;
 }
@@ -92,8 +106,6 @@ function _backup_migrate_ui_backup_settings_form($profile) {
     "#default_value" => $profile->filename,
   );
   if (module_exists('token')) {
-    $form['file']['filename']['#description'] = t('You can use tokens in the file name.');
-
     $form['file']['token_help'] = array(
       '#title' => t('Replacement patterns'),
       '#type' => 'fieldset',
@@ -105,14 +117,26 @@ function _backup_migrate_ui_backup_settings_form($profile) {
       '#token_types' => array('current-date', 'site'),
       '#global_types' => FALSE,
     );
+    $form['file']['filename']['#description'] = t('You can use tokens in the file name.');
   }
 
   $form['file']['append_timestamp'] = array(
-    "#type" => "checkbox",
-    "#title" => t("Append a timestamp."),
+    "#type" => "radios",
+    '#options' => array(
+      0 => t('Create separate backups if `Backup file name` already exists'),
+      2 => t('Overwrite the existing backup file'),
+      1 => t('Append the timestamp'),
+    ),
+    "#title" => t("Save mode"),
     "#default_value" => $profile->append_timestamp,
   );
-  $form['file']['timestamp_format'] = array(
+  $form['file']['timestamp_format_wrapper'] = array(
+    '#type' => 'backup_migrate_dependent',
+    '#dependencies' => array(
+      'append_timestamp' => 1,
+    ),
+  );
+  $form['file']['timestamp_format_wrapper']['timestamp_format'] = array(
     "#type" => "textfield",
     "#title" => t("Timestamp format"),
     "#default_value" => $profile->timestamp_format,
@@ -185,18 +209,39 @@ function _backup_migrate_profile_saved_default_profile($profile_id = NULL) {
 class backup_migrate_profile extends backup_migrate_item {
   var $db_table = "backup_migrate_profiles";
   var $type_name = "profile";
-  var $singular = 'profile';
-  var $plural = 'profiles';
+  var $singular = 'settings profile';
+  var $plural = 'settings profiles';
+  var $title_plural = 'Settings Profiles';
+  var $title_singular = 'Settings Profile';
+
+  /**
+   * Perform a shallow merge of the defaults and the parameters.
+   *
+   * This is needed because otherwise it will *combine* the nested arrays and
+   * make it impossible to deselect database tables from the 'nodata' setting.
+   *
+   * @param array $params
+   */
+  public function __construct(array $params = array()) {
+    $params = (array)$params;
+    $defaults = (array)$this->get_default_values();
+    foreach ($defaults as $key => $val) {
+      if (!isset($params[$key])) {
+        $params[$key] = $val;
+      }
+    }
+    $this->from_array($params);
+  }
 
   /**
    * This function is not supposed to be called. It is just here to help the po extractor out.
    */
   function strings() {
     // Help the pot extractor find these strings.
-    t('Profile');
-    t('Profiles');
-    t('profile');
-    t('profiles');
+    t('Settings Profile');
+    t('Settings Profiles');
+    t('settings profile');
+    t('settings profiles');
   }
 
   /**
@@ -228,19 +273,6 @@ class backup_migrate_profile extends backup_migrate_item {
   }
 
   /**
-   * Get a row of data to be used in a list of items of this type.
-   */  
-  function get_list_row() {
-    $row = parent::get_list_row();
-    if (empty($this->enabled)) {
-      foreach ($row as $key => $field) {
-        $row[$key] = array('data' => $field, 'class' => 'profile-list-disabled');
-      }
-    }
-    return $row;
-  }
-
-  /**
    * Set the source of this setings profile. Takes either a source object or source id.
    */
   function set_source($source) {
@@ -258,9 +290,9 @@ class backup_migrate_profile extends backup_migrate_item {
    * Get the source of the profile.
    */
   function get_source() {
-    backup_migrate_include('destinations');
-    if (!empty($this->source_id) && (empty($this->source) || $this->source->destination_id !== $this->source_id)) {
-      $this->source = backup_migrate_get_destination($this->source_id);
+    backup_migrate_include('locations');
+    if (!empty($this->source_id) && (empty($this->source) || $this->source->get_id() !== $this->source_id)) {
+      $this->source = backup_migrate_get_source($this->source_id);
     }
     return empty($this->source) ? NULL : $this->source;
   }
@@ -279,21 +311,56 @@ class backup_migrate_profile extends backup_migrate_item {
    * Get the destination of the profile.
    */
   function get_destination() {
+    $destinations = (array)$this->get_destinations();
+    return reset($destinations);
+  }
+
+  /**
+   * Get the destination of the profile.
+   */
+  function get_destinations() {
     backup_migrate_include('destinations');
-    if (!empty($this->destination_id) && (empty($this->destination) || $this->destination->destination_id !== $this->destination_id)) {
-      $this->destination = backup_migrate_get_destination($this->destination_id);
+    if (empty($this->destinations)) {
+      $this->destinations = array();
+      $ids = $weights = array();
+      if (!empty($this->destination_id)) {
+        foreach ((array)$this->destination_id as $destination_id) {
+          if (!in_array($destination_id, $ids) && $destination = backup_migrate_get_destination($destination_id)) {            
+            $this->destinations[] = $destination;
+            $weights[] = $destination->get('weight');
+            $ids[] = $destination_id;
+          }
+        }
+      }
+      // Sort the destinations by weight.
+      array_multisort($weights, SORT_NUMERIC, $this->destinations);
     }
-    return empty($this->destination) ? NULL : $this->destination;
+
+    return $this->destinations;
   }
 
   /**
    * Get the name of the destination.
    */
   function get_destination_name() {
-    if ($destination = $this->get_destination()) {
-      return $destination->get_name();
+    $out = array();
+    foreach ($this->get_destinations() as $destination) {
+      $out[] = $destination->get_name();
+    }
+    if ($out) {
+      return implode(', ', $out);
     }
     return t("Missing");
+  }
+
+  /**
+   * Get the source and destinations specified in the given settings profile
+   */
+  function get_all_locations() {
+    $out = array();
+    $out += $this->get('destinations');
+    $out[] = $this->get('source');
+    return $out;
   }
 
   /**
@@ -318,4 +385,3 @@ class backup_migrate_profile extends backup_migrate_item {
     return t('Are you sure you want to delete the profile %name? Any schedules using this profile will be disabled.', array('%name' => $this->get('name')));
   }
 }
-
