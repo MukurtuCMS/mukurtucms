@@ -270,6 +270,7 @@ function mukurtu_cycle_search_api() {
 
 function mukurtu_create_default_content() {
   _ma_base_theme_create_default_beans();
+  _ma_base_theme_set_default_browse('digital-heritage');
 }
 
 //function mukurtu_client_form() {
