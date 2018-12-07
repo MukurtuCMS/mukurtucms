@@ -37,8 +37,6 @@ projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.p
 ;;; Seven (theme)
 ; Use Mukurtu logo during install.
 projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
-; Custom templates for the XML export views in the Seven theme, because the views use Batch API, thus the admin theme.
-projects[seven][patch][] = core/custom_templates_for_xml_export_views_in_seven_theme.patch
 
 
 ;;;;;;;;;;;;;

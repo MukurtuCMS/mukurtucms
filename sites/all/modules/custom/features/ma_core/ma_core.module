@@ -838,3 +838,14 @@ function ma_core_preprocess_page(&$variables) {
     unset($variables['tabs']);
   }
 }
+
+/**
+ * Implements hook_admin_paths_alter().
+ */
+function ma_core_admin_paths_alter(&$paths) {
+
+  // This tells the batch API *not* to use the admin theme but instead the user theme.
+  // This allows allows us to use custom template files for the XML export views (both DC and MODS, which use Batch API)
+  // without having to hack core (seven, the admin theme).
+  $paths['batch'] = false;
+}
