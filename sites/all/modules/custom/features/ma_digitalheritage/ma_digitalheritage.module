@@ -947,43 +947,52 @@ function ma_digitalheritage_page_alter(&$data) {
           }
         }
 
-        // Set default tab in the case that we are coming from a community record redirect
-        if($cr_redirect_parent == $parent_dh->getIdentifier() && $cr_tab_index > 0) {
+        // Only display quicktabs if there are multiple tabs the user can *view*.
+        if ($cr_tab_count > 1) {
+          // Set default tab in the case that we are coming from a community record redirect.
+          if ($cr_redirect_parent == $parent_dh->getIdentifier() && $cr_tab_index > 0) {
             $tab_settings['default_tab'] = $cr_tab_index;
 
-            // Clear the redirect info, if the page is refreshed, we want to default back to the parent being default
+            // Clear the redirect info, if the page is refreshed,
+            // we want to default back to the parent being default.
             unset($_SESSION['mukurtu']['redirect_source']);
             unset($_SESSION['mukurtu']['redirect_dest']);
-        }
+          }
 
-        // Add the rendered quicktabs to the built page content
-        $community_record_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs);
-        foreach($community_record_tabs['content']['content']['tabs']['tablinks'] as $key => $tab) {
+          // Add the rendered quicktabs to the built page content.
+          $community_record_tabs = quicktabs_build_quicktabs("community-record", $tab_settings, $dh_tabs);
+          foreach ($community_record_tabs['content']['content']['tabs']['tablinks'] as $key => $tab) {
             // Shorten title if necessary.  Long titles break the tabs.
-             if(strlen($tab['#title']) > 25) {
-                 $comma_break_pos = strpos($tab['#title'], ',', 18);
-                 $colon_break_pos = strpos($tab['#title'], ':', 18);
-                 $word_break_pos = strpos($tab['#title'], ' ', 18);
-                 $break_pos = 25;
+            if (strlen($tab['#title']) > 25) {
+              $comma_break_pos = strpos($tab['#title'], ',', 18);
+              $colon_break_pos = strpos($tab['#title'], ':', 18);
+              $word_break_pos = strpos($tab['#title'], ' ', 18);
+              $break_pos = 25;
 
-                 if($comma_break_pos > 0) {
-                     $break_pos = $comma_break_pos;
-                 }
+              if ($comma_break_pos > 0) {
+                $break_pos = $comma_break_pos;
+              }
 
-                 if($colon_break_pos > 0 && $colon_break_pos < $break_pos) {
-                     $break_pos = $colon_break_pos;
-                 }
+              if ($colon_break_pos > 0 && $colon_break_pos < $break_pos) {
+                $break_pos = $colon_break_pos;
+              }
 
-                 if($word_break_pos > 0 && $word_break_pos < $break_pos) {
-                     $break_pos = $word_break_pos;
-                 }
+              if ($word_break_pos > 0 && $word_break_pos < $break_pos) {
+                $break_pos = $word_break_pos;
+              }
 
-                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
-                 $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($tab['#title'], 0, $break_pos) . '...';
-             }
+              $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#options']['attributes']['title'] = $tab['#title'];
+              $community_record_tabs['content']['content']['tabs']['tablinks'][$key]['#title'] = substr($tab['#title'], 0, $break_pos) . '...';
+            }
+          }
+
+          $dh_page_content .= drupal_render($community_record_tabs);
+        } else {
+          // There is only one record the user has view access for.
+          // Render the single node normally, without quicktabs.
+          $node_array = node_view($node, 'full');
+          $dh_page_content .= drupal_render($node_array);
         }
-
-        $dh_page_content .= drupal_render($community_record_tabs);
       }
 
       // Node does not have community records. Render DH normally.
