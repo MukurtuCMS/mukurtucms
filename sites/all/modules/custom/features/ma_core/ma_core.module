@@ -75,6 +75,26 @@ function ma_core_views_pre_view(&$view, &$display_id, &$args) {
 }
 
 /**
+ * Implements hook_entity_prepare_view().
+ */
+function ma_core_entity_prepare_view($entities, $type, $langcode) {
+  if ($type == 'node') {
+    foreach ($entities as $uid => &$entity) {
+      $fields = field_info_instances($type, $entity->type);
+      // Check all scald atom reference fields, remove any atoms
+      // the user doesn't have accces to.
+      foreach ($fields as $field) {
+        $field_info = field_info_field($field['field_name']);
+        if ($field_info['type'] == 'atom_reference') {
+          // Strip out inaccessible media.
+          ma_scald_atom_reference_field_filter($entity, $field_info['field_name']);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_views_pre_render().
  */
 function ma_core_views_pre_render(&$view) {
