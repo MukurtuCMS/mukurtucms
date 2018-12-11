@@ -1006,7 +1006,7 @@ function scald_rendered_to_sas($string, $render_language = 'XHTML') {
  */
 function scald_invoke_atom_access($atom, $action, $account = NULL) {
   // @codingStandardsIgnoreEnd
-  if (user_access('administer scald atoms')) {
+  if (user_access('administer scald atoms', $account)) {
     return SCALD_ATOM_ACCESS_ALLOW;
   }
 

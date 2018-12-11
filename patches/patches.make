@@ -147,6 +147,8 @@ projects[scald][patch][] = contrib/Add-custom-hook-in-Scald-for-media-warnings.p
 projects[scald][patch][] = contrib/uploaded_video_dimension_fix.patch
 ; Upload video do no fill dimensions on upload. NOTE: this was not previously applied.
 projects[scald][patch][] = contrib/uploaded_video_do_not_fill_dimenions_on_upload.patch
+; In scald_invoke_atom_access, pass account variable to user_access call
+projects[scald][patch][] = contrib/scald_atom_access_account_parameter.patch
 
 ;;; Scald Feeds
 ; Add scald feeds metadata support
