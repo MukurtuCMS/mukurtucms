@@ -1,3 +1,9 @@
+## Mukurtu 2.0.13.1
+- Update Rules and Backup and Migrate modules to avoid installation errors on PHP 7.
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.0.13
 - Use Honeypot for spam prevention (bot user registration) on user registration form.
 
@@ -99,7 +105,7 @@
 - The dictionary introduces several new content types
 - A “Dictionary Word” is a the basic dictionary content type
 - Each dictionary word can contain multiple “Word Entries” to list different sources, spellings, uses, etc
-- A “Language Community” is a dictionary specific community that controls which users can contribute dictionary words to a language's dictionary. Access to individual dictionary words is controlled by cultural protocols. 
+- A “Language Community” is a dictionary specific community that controls which users can contribute dictionary words to a language's dictionary. Access to individual dictionary words is controlled by cultural protocols.
 - A “Word List” is a collection of dictionary words
 
 #### Dictionary Quick Start
