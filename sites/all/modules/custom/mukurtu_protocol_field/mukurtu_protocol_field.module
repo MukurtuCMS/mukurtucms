@@ -48,18 +48,17 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
   $node_type = str_replace('_node_form', '', $form_id, $count);
   if ($count && ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type)) {
+    // Hide the original Protocol field.
+    $form['og_group_ref']['#access'] = FALSE;
 
     // Do not create this custom field for Book Pages
     if(isset($form_state['mukurtu_book_parent'])) {
       return;
     }
 
-    // Hide the original Protocol field.
-    $form['og_group_ref']['#access'] = FALSE;
-
     // Do not create this custom field for Book Pages
     // Also hide the Item Sharing Settings field
-    if (isset ($form['field_book_parent'])) {
+    if (isset($form['field_book_parent'])) {
       if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'] OR arg(3) == 'book-page') {
         $form['field_item_privacy_setting']['#access'] = FALSE;
         return;
