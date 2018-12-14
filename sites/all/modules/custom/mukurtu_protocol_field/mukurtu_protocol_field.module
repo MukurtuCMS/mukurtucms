@@ -16,7 +16,7 @@
  */
 function mukurtu_protocol_field_node_insert($node) {
   if ($node->type == 'community' && !property_exists($node,'feeds_item')) {
-    
+
     // create protocol
     $newnode = new stdClass();
     $newnode->title = $node->title." Community Only";
@@ -54,6 +54,9 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
       return;
     }
 
+    // Hide the original Protocol field.
+    $form['og_group_ref']['#access'] = FALSE;
+
     // Do not create this custom field for Book Pages
     // Also hide the Item Sharing Settings field
     if (isset ($form['field_book_parent'])) {
@@ -62,9 +65,6 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
         return;
       }
     }
-
-    // Hide the original Protocol field.
-    $form['og_group_ref']['#access'] = FALSE;
 
     // Build the custom protocol field.
     list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, $node_type);
