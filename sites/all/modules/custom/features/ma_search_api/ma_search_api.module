@@ -361,9 +361,16 @@ function ma_search_api_list_of_indexed_fields() {
 
   // Build the output
   $output = '<p>The following fields will return results if their contents match searches made at ' . l("Browse Digital Heritage", 'digital-heritage') . ' or ' . l("Browse Collections", 'collections') . '.<p>';
+  if (drupal_valid_path('admin/config/search/search_api/index/default_node_index/fields')) {
+    $output .= '<p>' . t('Indexed fields can be altered at the') . ' ' . l(t("Search API node index page"), 'admin/config/search/search_api/index/default_node_index/fields') . '.';
+    $output .= '</p>';
+  }
   $content_types_to_show = array ( // Limit the list to just the content types that have search pages
     'digital_heritage',
     'collection',
+    'dictionary_word',
+    'word_list',
+    'person',
   );
   $types = node_type_get_types();
   foreach ($indexed_fields_per_content_type as $content_type => $indexed_fields) {
