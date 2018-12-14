@@ -233,3 +233,15 @@
         }
     }
 }
+
+// Remove volume controls in list/grid views.
+.list-view,
+.grid-view {
+  .mejs__container {
+    .mejs__horizontal-volume-button,
+    .mejs__mute,
+    .mejs__horizontal-volume-slider {
+      display: none;
+    }
+  }
+}
