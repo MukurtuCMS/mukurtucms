@@ -77,6 +77,7 @@ features[ds_fields][] = dh_related_items_teasers
 features[ds_fields][] = digital_heritage_page_number
 features[ds_fields][] = featured_content_type
 features[ds_fields][] = featured_content_view_link
+features[ds_fields][] = mukurtu_icon_actions
 features[ds_layout_settings][] = node|digital_heritage|community_record
 features[ds_layout_settings][] = node|digital_heritage|featured_content
 features[ds_layout_settings][] = node|digital_heritage|form
