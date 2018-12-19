@@ -1586,7 +1586,7 @@ a.tooltips span {
 
 // Add to Collection modal
 .modal-add-to-collection {
-
+  overflow: hidden;
   // The default position is too close to the top of the screen.
   // top: 200px !important; // This only works in the full node view.
   // TODO: get the modal to center vertically, or perhaps position where the mouse was clicked.
@@ -2036,4 +2036,13 @@ a.tooltips span {
 // Zoom icon for the zoom-on-colorbox.
 #cboxLoadedContent img {
   cursor: url(../zoom.png), auto;
+}
+
+.node {
+  &.view-mode-full {
+    .field-name-mukurtu-icon-actions {
+      float: right;
+      //margin-top: -25px;
+    }
+  }
 }
