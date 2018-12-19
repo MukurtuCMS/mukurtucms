@@ -409,6 +409,26 @@ if(isset($info[\'bundles\'][$type])) {
   );
   $export['featured_content_view_link'] = $ds_field;
 
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'mukurtu_icon_actions';
+  $ds_field->label = 'Mukurtu Icon Actions';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+  ma_collection_add_to_personal_collection_icon_ds_field($entity);
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['mukurtu_icon_actions'] = $ds_field;
+
   return $export;
 }
 
