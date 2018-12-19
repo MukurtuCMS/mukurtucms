@@ -157,7 +157,8 @@ function ma_digitalheritage_field_group_info() {
       2 => 'field_category',
       3 => 'digital_heritage_page_number',
       4 => 'featured_content_type',
-      5 => 'title',
+      5 => 'mukurtu_icon_actions',
+      6 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -414,7 +415,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Transcription:',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'field_transcription',
     ),

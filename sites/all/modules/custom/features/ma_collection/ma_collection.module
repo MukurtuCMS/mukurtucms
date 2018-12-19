@@ -29,6 +29,7 @@ function ma_collection_preprocess_views_view(&$vars) {
 }
 
 function ma_collection_node_view($node, $view_mode, $langcode) {
+  drupal_add_js(drupal_get_path('module', 'ma_collection') . '/js/mukurtu_collection.js');
 
   // On full node view of node types that can be added to a Collection, load the "Add to Collection" ctools modal JS.
   if ($view_mode == 'full') {
@@ -684,8 +685,9 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $pers
         if ($personal) {
           $collection_type = "Personal Collection";
         }
-        $output = '<p>' . node_type_get_name($node_to_add) . ' <i>' . $node_to_add->title . '</i> has been added to ' . $collection_type . ' <i>' . $coll_node->title . '</i>.</p>';
+        $output = '<p><i>' . $node_to_add->title . '</i> has been added to ' . $collection_type . ' <i>' . $coll_node->title . '</i>.</p>';
         $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
+        $ctools_output[] = ajax_command_invoke("#star-{$nid_to_add}", 'mukurtuToggleStarOn');
         $ctools_output[] = ctools_modal_command_display('Success', $output);
         print ajax_render($ctools_output);
         exit;
@@ -996,4 +998,53 @@ function ma_collection_get_default_atom($node) {
             }
         }
     }
+}
+
+/**
+ * Returns all personal collections a nid is in for a given account.
+ */
+function ma_collection_find_node_in_personal_collection($nid, $account = NULL) {
+  global $user;
+  if (!isset($account)) {
+    $account = $user;
+  }
+
+  $collections = array();
+  $collection_fields = ma_collection_get_valid_node_types_for_collection();
+  foreach ($collection_fields as $entity_reference_field => $node_type) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'personal_collection')
+      ->fieldCondition($entity_reference_field, 'target_id', $nid)
+      ->propertyCondition('uid', $account->uid);
+    $result = $query->execute();
+    if (isset($result['node'])) {
+      $collections = array_keys($result['node']);
+    }
+  }
+
+  return $collections;
+}
+
+/**
+ * Creates icon for add to personal collection, used in 'Mukurtu Icon Actions' DS code field.
+ */
+function ma_collection_add_to_personal_collection_icon_ds_field($entity) {
+  if (drupal_valid_path("node/{$entity->nid}/add-to-personal-collection")) {
+    $link = url("ma_collection/nojs/{$entity->nid}/personal_collection");
+    $classes = 'ctools-use-modal ctools-modal-add-to-collection';
+    $collections = ma_collection_find_node_in_personal_collection($entity->nid);
+    if (empty($collections)) {
+      $title = t('Add to personal collection');
+      print "<a href={$link} title=\"{$title}\" class=\"{$classes}\"><span id=\"star-{$entity->nid}\" class=\"glyphicon glyphicon-star-empty\" aria-hidden=\"true\"></span></a>";
+    } else {
+      $first_collection = node_load($collections[0]);
+      if ($first_collection && isset($first_collection->title)) {
+        $title = t('Add to personal collection. Already in personal collection \'@collection\'.', array('@collection' => $first_collection->title));
+      } else {
+        $title = t('Add to personal collection. Already in a personal collection.');
+      }
+      print "<a href={$link} title=\"{$title}\" class=\"{$classes}\"><span id=\"star-{$entity->nid}\" class=\"glyphicon glyphicon-star\" aria-hidden=\"true\"></span></a>";
+    }
+  }
 }
