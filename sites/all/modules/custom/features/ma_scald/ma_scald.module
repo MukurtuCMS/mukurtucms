@@ -491,7 +491,7 @@ function ma_scald_scald_player() {
  * Implements hook_scald_prerender().
  */
 function ma_scald_scald_prerender($atom, $context, $options, $mode) {
-    $default_thumbnail_contexts = array('mukurtu_scald_related_items', 'mukurtu_carousel_thumbnail');
+    $default_thumbnail_contexts = array('mukurtu_scald_related_items', 'mukurtu_carousel_thumbnail', 'mukurtu_multi_page_carousel');
 
     if($atom->type == 'audio' && !in_array($context, $default_thumbnail_contexts)) {
         // Soundcloud already integrates the thumbnail with the display, remove it for rendering so it isn't duplicated
