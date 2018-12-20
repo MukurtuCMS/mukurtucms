@@ -148,6 +148,16 @@ function mukurtu_importer_generator_feeds_importer_default() {
               $mapping_i++;
           }
 
+          // Add username for node imports.
+          if ($entity_type == 'node') {
+            $mappings[$mapping_i++] = array(
+                'source' => 'Username',
+                'target' => 'user_name',
+                'unique' => 0,
+                'language' => 'und',
+            );
+          }
+
           // Create feed importer
           $feeds_importer = new stdClass();
           $feeds_importer->disabled = FALSE;
