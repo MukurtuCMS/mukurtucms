@@ -211,6 +211,9 @@ function mukurtu_importer_generator_feeds_importer_default() {
               'process_in_background' => 0,
           );
           $export[$id] = $feeds_importer;
+
+          // Create/update documentation.
+          mukurtu_importer_generator_set_mapping_documentation($mappings, $entity_type, $bundle_name);
       }
   }
 

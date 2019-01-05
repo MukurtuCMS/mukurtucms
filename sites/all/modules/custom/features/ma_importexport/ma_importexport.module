@@ -2174,3 +2174,21 @@ function ma_importexport_convert_soundcloud_taxonomy_terms($field, $vocabulary) 
 
     return $result;
 }
+
+/**
+ * Return an array of scald provider machine names.
+ */
+function ma_importexport_get_valid_scald_providers($type = NULL) {
+  $providers = scald_atom_providers();
+  $valid_providers = array();
+
+  if ($type && !empty($providers[$type])) {
+    $valid_providers = array_keys($providers[$type]);
+  } else {
+    foreach ($providers as $type => $type_provider) {
+      $valid_providers = array_merge($valid_providers, array_keys($type_provider));
+    }
+  }
+
+  return $valid_providers;
+}

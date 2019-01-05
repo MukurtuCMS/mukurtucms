@@ -13,7 +13,7 @@ function mukurtu_batch_import_menu() {
     'access arguments' => array('administer site configuration'),
   );
 
-  return $items;	  
+  return $items;
 }
 
 
@@ -28,12 +28,12 @@ function mukurtu_batch_import_form() {
 
   $form['mukurtu_batch_import_form'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Import Batch Content'),  
+    '#title' => t('Import Batch Content'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
-  
+
   $form['mukurtu_batch_import_form']['header'] = array(
     '#type' => 'markup',
     '#markup' => '<p>' . t('Upload content into Mukurtu by uploading a zip archive.') . '</p>',
@@ -44,11 +44,11 @@ function mukurtu_batch_import_form() {
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>For CSV imports, ' . l('download a sample ZIP file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This ZIP file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core and MODS XML imports, export an XML file from your system and create a ZIP archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p>',
+    '#description' => '<p>For CSV imports, ' . l('download a sample ZIP file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This ZIP file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core and MODS XML imports, export an XML file from your system and create a ZIP archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p><p>Information about field formats can be found on the type specific ' . l("Mukurtu Import", 'import') . ' pages in the "Field Format Section" section.</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
-  
+
   $form['mukurtu_batch_import_form']['upload'] = array(
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('2. Upload your zip file') . '</h3>',
@@ -91,9 +91,9 @@ function mukurtu_batch_import_form() {
 /*   $form['actions']['import']['#type'] = 'submit'; */
 /*   $form['actions']['import']['#value'] = t('Import'); */
 /*   $form['actions']['import']['#submit'] = array('mukurtu_batch_import_import'); */
-  
-  
-  
+
+
+
 /*
     $list = _media_browser_plus_folder_list();
   return array(
@@ -105,10 +105,10 @@ function mukurtu_batch_import_form() {
     '#options' => $list,
     '#description' => t('Select a folder for the media to be put in'),
   );
-  
+
 */
-  
-  
+
+
   $form['actions']['submit']['#value'] = t("Continue");
 /*   array_push($form['actions']['import']['#submit'], 'mukurtu_batch_import_import'); */
   array_push($form['#submit'], 'mukurtu_batch_import_import');
@@ -119,16 +119,16 @@ function mukurtu_batch_import_form() {
 }
 
 function mukurtu_batch_import_import($form, &$form_state) {
-  $fid = $form_state['values']['mukurtu_batch_import_form']['upload']['folder'];  
+  $fid = $form_state['values']['mukurtu_batch_import_form']['upload']['folder'];
   $file = file_load($fid);
 
   if($file) {
-    mukurtu_batch_import_parse_zip($file); 
+    mukurtu_batch_import_parse_zip($file);
   }
 }
 
 function mukurtu_batch_import_parse_zip($file) {
- 
+
   $file_path = drupal_realpath($file->uri);
 
   // Create a unique temporary folder to extract the zip file in
@@ -137,7 +137,7 @@ function mukurtu_batch_import_parse_zip($file) {
   mkdir($temp_extract_path); */
 
   $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
-  
+
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
     $zip->extractTo($temp_extract_path);
@@ -271,11 +271,11 @@ function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
     $matches = array(0 => NULL);
     foreach($entities as $entity_type => $bundle) {
         foreach($bundle as $bundle_name) {
-            foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {                
+            foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {
                 if(stripos($filename, strtolower($variant)) !== FALSE) {
                     $file_type['entity_type'] = $entity_type;
                     $file_type['bundle_name'] = $bundle_name;
-                    
+
                     // Keep track of how many characters matched. We are assuming that
                     // the longer the match, the better.
                     $matches[strlen($variant)] = $file_type;
@@ -283,7 +283,7 @@ function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
             }
         }
     }
-    
+
     ksort($matches);
     $bestmatch = end($matches);
     return $bestmatch;
@@ -493,7 +493,7 @@ function mukurtu_batch_import_form_ajax($form, $form_state) {
 
   $commands = array();
   $commands[] = ajax_command_replace('.fieldset-description', $messages);
-  
+
   // Set message.
   $commands[] = ajax_command_remove('#messages-wrap');
   $commands[] = ajax_command_after('#breadcrumb-wrap', '<div id="messages-wrap">' . theme('status_messages') . '</div>');
