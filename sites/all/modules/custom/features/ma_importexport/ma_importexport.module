@@ -309,38 +309,37 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
  * Implements hook_feeds_presave().
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
+  // Do not act on the Dublin Core importer.
+  if (ma_importexport_dc_is_xml_importer($source->id)) {
+    return;
+  }
 
-    // Do not act on the Dublin Core importer.
-    if(ma_importexport_dc_is_xml_importer($source->id)) {
-      return;
-    }
+  global $user;
+  $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
 
-    global $user;
-    $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
+  // Enforce access control on feeds.
+  $entity_type = isset($entity->feeds_item->entity_type) ? $entity->feeds_item->entity_type : 'node';
 
-    // Enforce access control on feeds
-    $entity_type = isset($entity->feeds_item->entity_type) ? $entity->feeds_item->entity_type : 'node';
+  // All Mukurtu supplied importers should have titles/guids.
+  $item_id = isset($item['guid']) ? "(GUID: " . $item['guid'] . ")" : "";
+  $item_title = isset($item['title']) ? $item['title'] : "";
 
-    // All Mukurtu supplied importers should have titles/guids
-    $item_id = isset($item['guid']) ? "(GUID: " . $item['guid'] . ")" : "";
-    $item_title = isset($item['title']) ? $item['title'] : "";
+  // If there's an existing ID, check if the user can update that entity.
+  // If the ID is NULL, we are creating a new entity, check creation permission.
+  $action = $entity_id ? 'update' : 'create';
 
-    // If there's an existing ID, check if the user can update that entity.
-    // If the ID is NULL, we are creating a new entity, check creation permission.
-    $action = $entity_id ? 'update' : 'create';
+  // If this is existing node content, put the nid back in.
+  // Not doing this will cause the upcoming entity_access call to fail.
+  if (isset($entity_id) && $entity_type == 'node') {
+    $entity->nid = $entity_id;
+  }
 
-    // If this is existing node content, put the nid back in.
-    // Not doing this will cause the upcoming entity_access call to fail.
-    if(isset($entity_id) && $entity_type == 'node') {
-        $entity->nid = $entity_id;
-    }
-
-    // Check user's access to perform the action
-    if(!entity_access($action, $entity_type, $entity)) {
-        // User does not have sufficient permissions, show warning and skip that item
-        drupal_set_message(t('Access denied: importing item %title %guid', array('%title' => $item_title, '%guid' => $item_id)), 'error');
-        $entity->feeds_item->skip = TRUE;
-    }
+  // Check user's access to perform the action.
+  if (!entity_access($action, $entity_type, $entity)) {
+    // User does not have sufficient permissions, show warning and skip that item.
+    drupal_set_message(t('Access denied: importing item %title %guid', array('%title' => $item_title, '%guid' => $item_id)), 'error');
+    $entity->feeds_item->skip = TRUE;
+  }
 
   // Custom handling of Youtube and Vimeo URLs
   // This code is adapted from _ma_services_create_atom, which itself is adapted from scald provider code as commented there
@@ -477,13 +476,13 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
 
   if($entity->feeds_item->entity_type == 'scald_atom') {
 
-      // If a scald atom comes in with just a GUID and no SID, check if that atom already exists and re-use that sid
-      if(!empty($entity->feeds_item->guid) && empty($entity->feeds_item->sid) && (!isset($entity->sid) || $entity->sid == "")) {
-          $existing_sid = ma_importexport_feeds_lookup_atom_by_guid($entity->feeds_item->guid);
-          if($existing_sid) {
-              $entity->sid = $existing_sid;
-          }
-      }
+    // If a scald atom comes in with just a GUID and no SID, check if that atom already exists and re-use that sid
+    if(!empty($entity->feeds_item->guid) && empty($entity->feeds_item->sid) && (!isset($entity->sid) || $entity->sid == "")) {
+        $existing_sid = ma_importexport_feeds_lookup_atom_by_guid($entity->feeds_item->guid);
+        if($existing_sid) {
+            $entity->sid = $existing_sid;
+        }
+    }
 
     if($entity->feeds_item->id == 'import_media_audio') {
       $type = 'audio';
