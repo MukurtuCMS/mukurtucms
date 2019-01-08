@@ -265,7 +265,8 @@ function mukurtu_importer_generator_form_feeds_import_form_alter(&$form, &$form_
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     'field_documentation' => array(
-      '#type' => 'table',
+      '#type' => 'markup',
+      '#theme' => 'table',
       '#header' => $header,
       '#rows' => $fields,
     ),
