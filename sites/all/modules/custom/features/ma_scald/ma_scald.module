@@ -612,9 +612,28 @@ function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
     $sources = $providers[$type];
     $source = key($sources);
 
-    // Grab provider from the atom. If not set, use the from the provider list
-    // and hope for the best.
-    $provider = isset($atom->provider) ? $atom->provider : current($sources);
+    // Check the Scald provider. We are doing a few things here.
+    // - If no provider is given, try to infer something sane.
+    // - If a provider is given, make sure it's correct.
+    // - If not correct, try to infer something sane.
+    $scald_providers = scald_atom_providers_opt();
+    $type_providers = array();
+    if (isset($scald_providers[$type])) {
+      $type_providers = array_keys($scald_providers[$type]);
+    }
+    if (empty($atom->provider) || !in_array($atom->provider, $type_providers)) {
+      $atom->provider = _ma_scald_guess_provider_from_media_source($type, $atom->file_source);
+    }
+
+    // Grab provider from the atom.
+    if (isset($atom->provider)) {
+      $provider = $atom->provider;
+    } else {
+      // If at this point we have no provider, just exit.
+      // Scald is perfectly happy to write garbage atoms to the
+      // database which cannot be deleted via scald_atom_delete.
+      return;
+    }
 
     if (isset($form_state['scald']['atoms'][0])) {
         $form_state['atom'] = $form_state['scald']['atoms'][0];
@@ -790,4 +809,57 @@ function _ma_scald_default_thumbnail($type) {
     }
 
     return (array) $file;
+}
+
+/**
+ * Given a media source (file path, URL, etc...) and a
+ * scald atom type, return the most likely scald provider.
+ */
+function _ma_scald_guess_provider_from_media_source($type, $media_source) {
+  $scald_providers = scald_atom_providers_opt();
+  if (isset($scald_providers[$type])) {
+    $type_providers = array_keys($scald_providers[$type]);
+    // If there is only a single provider for the type, use that.
+    if (count($type_providers) == 1) {
+      return current($type_providers);
+    }
+
+    // Check media sources. These are very much Mukurtu specific
+    // and are not taking into account any user added providers.
+    switch ($type) {
+      case 'audio':
+        // Check Soundcloud (scald_soundcloud).
+        if (function_exists(scald_soundcloud_parse_id)) {
+          if (scald_soundcloud_parse_id($media_source, FALSE)) {
+            return 'scald_soundcloud';
+          }
+        }
+        // Default to standard audio provider.
+        return 'scald_audio';
+
+      case 'video':
+        // Check Dailymotion (scald_dailymotion).
+        if (function_exists(scald_dailymotion_parse_id)) {
+          if (scald_dailymotion_parse_id($media_source)) {
+            return 'scald_dailymotion';
+          }
+        }
+        // Check Vimeo (scald_vimeo).
+        if (function_exists(scald_vimeo_parse_id)) {
+          if (scald_vimeo_parse_id($media_source, FALSE)) {
+            return 'scald_vimeo';
+          }
+        }
+        // Check YouTube (scald_youtube).
+        if (function_exists(scald_youtube_parse_id)) {
+          if (scald_youtube_parse_id($media_source, FALSE)) {
+            return 'scald_youtube';
+          }
+        }
+        // Default to basic video provider.
+        return 'scald_video';
+    }
+    return current($type_providers);
+  }
+  return NULL;
 }
