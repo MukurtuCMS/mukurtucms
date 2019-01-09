@@ -257,7 +257,10 @@ function ma_community_ds_custom_fields_info() {
   $ds_field->ui_limit = 'community|*';
   $ds_field->properties = array(
     'code' => array(
-      'value' => '<?php print drupal_render(_render_subscribe_link($entity)); ?>',
+      'value' => '<?php
+$subscribe_link = _render_subscribe_link($entity);
+print drupal_render($subscribe_link);
+?>',
       'format' => 'ds_code',
     ),
     'use_token' => 0,

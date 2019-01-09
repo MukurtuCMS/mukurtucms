@@ -538,8 +538,8 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
         break;
     }
   }
-  // Capture browse pages
-  if(is_string($item['page_arguments'][0])) {
+  // Capture browse pages.
+  if (isset($item['page_arguments'][0]) && is_string($item['page_arguments'][0])) {
     $_SESSION['mukurtu_breadcrumb_item']['item'] = $item;
     $_SESSION['mukurtu_breadcrumb_item']['trail'] = $active_trail[$i];
     $_SESSION['mukurtu_breadcrumb_item']['query_parameters'] = drupal_get_query_parameters();

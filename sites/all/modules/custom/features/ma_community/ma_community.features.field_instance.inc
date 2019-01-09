@@ -410,6 +410,75 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-community-field_dhan_notified_users'.
+  $field_instances['node-community-field_dhan_notified_users'] = array(
+    'bundle' => 'community',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Community Managers that are notified of insertions, changes, and deletions of Digital Heritage nodes in this Protocol.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 26,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_dhan_notified_users',
+    'label' => 'Notified Community Managers',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
   // Exported field_instance: 'node-community-field_membership_list_options'.
   $field_instances['node-community-field_membership_list_options'] = array(
     'bundle' => 'community',
@@ -841,11 +910,13 @@ Strict - Your community page is invisible to all site users who are not members 
   t('Banner Image');
   t('Child Communities');
   t('Comment');
+  t('Community Managers that are notified of insertions, changes, and deletions of Digital Heritage nodes in this Protocol.');
   t('Community Parent');
   t('Description');
   t('Featured Collections');
   t('Group type');
   t('Membership List Options');
+  t('Notified Community Managers');
   t('Open - Your community page is visible to all visitors of your site. Any items under open protocols are also accessible.<br>
 Strict - Your community page is invisible to all site users who are not members or your community. All protocols created within this community are inaccessible to users outside of this community.');
   t('Parent Community');
