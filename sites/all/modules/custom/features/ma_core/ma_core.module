@@ -6,6 +6,8 @@
 
 include_once('ma_core.features.inc');
 
+define('MUKURTU_PRERELEASE_FUNCTIONALITY', 'mukurtu_prerelease_functionality');
+
 /**
  * Implementation of hook_init().
  */
@@ -868,4 +870,19 @@ function ma_core_admin_paths_alter(&$paths) {
   // This allows allows us to use custom template files for the XML export views (both DC and MODS, which use Batch API)
   // without having to hack core (seven, the admin theme).
   $paths['batch'] = false;
+}
+
+/**
+ * Internal book-keeping for pre-release functionality.
+ *
+ * This is for restricting public facing elements such as dashboard
+ * links to things we don't want to expose yet. It is not an actual
+ * access control system (e.g., doesn't not enable/disable features).
+ */
+function ma_core_prerelease_functionality_enabled($feature) {
+  $enabled = variable_get(MUKURTU_PRERELEASE_FUNCTIONALITY);
+  if (isset($enabled[$feature])) {
+    return $enabled[$feature];
+  }
+  return FALSE;
 }
