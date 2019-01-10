@@ -21,3 +21,14 @@ function YOURMOD_entity_property_info_alter(&$info) {
 function YOURMOD_user_full_address($entity, $options, $field, $entity_type, $property) {
   return $entity->field_address[LANGUAGE_NONE][0]['value'] . ', ' . variable_get('YOURMOD_global_country', 'Zimbabwe');
 }
+
+/**
+ * Implements hook_geocoder_geocode_values_alter().
+ *
+ * Alter the source values before geocode them.
+ */
+function YOURMOD_geocoder_geocode_values_alter(&$source_field_values, $field_info, $handler_settings, $field_instance) {
+  foreach($source_field_values as $key => $value) {
+    $source_field_values[$key]['administrative_area'] = 'Ciudad de Buenos Aires';
+  }
+}

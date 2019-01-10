@@ -13,7 +13,7 @@ $plugin = array(
   'title' => t("Yandex (Яндекс.Карт)"),
   'description' => t('Geocodes addresses via Yandex (Яндекс.Карт)'),
   'callback' => 'geocoder_yandex',
-  'field_types' => array('text','text_long','addressfield', 'location','text_with_summary','computed', 'taxonomy_term_reference'),
+  'field_types' => array('text','text_long','addressfield', 'location','text_with_summary','computed', 'taxonomy_term_reference', 'country'),
   'field_callback' => 'geocoder_yandex_field',
   'terms_of_service' => 'http://api.yandex.ru/maps/geocoder/doc/desc/concepts/About.xml',
 );
@@ -29,8 +29,7 @@ function geocoder_yandex($address, $options = array()) {
     $consumer_key = $geocoder_settings["geocoder_apikey_yandex"];
   }
   else {
-    drupal_set_message(t('You must set up your Yandex API key. Click !config', array('!config' => l(t('here'), $base_path .'admin/config/content/geocoder'))),'error');
-    return;
+    throw new Exception(t('You must set up your Yandex API key. Click !config', array('!config' => l(t('here'), $base_path .'admin/config/content/geocoder'))));
   }
 
   $params = array (
@@ -53,9 +52,13 @@ function geocoder_yandex_field($field, $field_item) {
     $address = geocoder_widget_parse_addressfield($field_item);
     return geocoder_yandex($address);
   }
+  if ($field['type'] == 'country') {
+    $address = geocoder_widget_parse_countryfield($field_item);
+    return geocoder_yandex($address);
+  }
   if ($field['type'] == 'location') {
     $address = geocoder_widget_parse_locationfield($field_item);
-    return geocoder_google($address);
+    return geocoder_yandex($address);
   }
   if ($field['type'] == 'taxonomy_term_reference') {
     $term = taxonomy_term_load($field_item['tid']);
@@ -64,25 +67,21 @@ function geocoder_yandex_field($field, $field_item) {
 }
 
 function _geocoder_yandex_geometry(&$data) {
-  try {
-    geophp_load();
+  geophp_load();
 
-    if (isset($data->error)) {
-      $args = array(
-        '@status' => $data->error->status,
-        '@error' => $data->error->message,
-      );
-      $msg = t('Yandex API has reported an error.\nStatus: @status\nError: @error', $args);
-      throw new Exception($msg, WATCHDOG_WARNING);
-    }
-
-    if($data->response->GeoObjectCollection->metaDataProperty->GeocoderResponseMetaData->found == 0) {
-      return NULL;
-    }
-
-    $loc = explode(' ', $data->response->GeoObjectCollection->featureMember[0]->GeoObject->Point->pos);
-    return new Point ($loc[0], $loc[1]);
-  } catch (Exception $e) {
-    watchdog_exception('geocoder', $e, $e->getMessage(), array(), $e->getCode());
+  if (isset($data->error)) {
+    $args = array(
+      '@status' => $data->error->status,
+      '@error' => $data->error->message,
+    );
+    $msg = t('Yandex API has reported an error.\nStatus: @status\nError: @error', $args);
+    throw new Exception($msg);
   }
+
+  if ($data->response->GeoObjectCollection->metaDataProperty->GeocoderResponseMetaData->found == 0) {
+    return NULL;
+  }
+
+  $loc = explode(' ', $data->response->GeoObjectCollection->featureMember[0]->GeoObject->Point->pos);
+  return new Point ($loc[0], $loc[1]);
 }

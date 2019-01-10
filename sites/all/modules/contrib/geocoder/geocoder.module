@@ -14,6 +14,35 @@ define('GEOCODER_GOOGLE_AUTH_WORK', 3);
 
 /**
  * The Geocoder API call.
+ * TODO
+ */
+function geocoder_reverse($handler, $lat, $long, $options = array(), $cache_type = 2, $cache_reset = FALSE) {
+  ctools_include('plugins');
+  static $static_cache_reverse = array();
+
+  if ($cache_reset) {
+    $static_cache_reverse = array();
+  }
+
+  if ($cache_type) {
+    $cache_id = $handler . '_' . md5(serialize(array($lat, $long, $options)));
+    if (!empty($static_cache_reverse[$cache_id])) {
+      return $static_cache_reverse[$cache_id];
+    }
+  }
+
+  $processor = ctools_get_plugins('geocoder', 'geocoder_reverse_handler', $handler);
+  $address = call_user_func($processor['callback'], $lat, $long, $options);
+
+  if ($cache_type) {
+    $static_cache_reverse[$cache_id] = $address;
+  }
+
+  return $address;
+}
+
+/**
+ * The Geocoder API call.
  *
  * Given a handler and data, geocode the data into a geometry object using the handler.
  *
@@ -67,6 +96,10 @@ function geocoder($handler, $data, $options = array(), $cache_type = 'DEPRECATED
     geocoder_cache_set($geometry, $handler, $data, $options);
   }
 
+  if (!$geometry && variable_get('geocoder_log_empty_results', FALSE)) {
+    watchdog('geocoder', t('No results for geocoding @data', array('@data' => $data)));
+  }
+
   return $geometry;
 }
 
@@ -74,17 +107,18 @@ function geocoder($handler, $data, $options = array(), $cache_type = 'DEPRECATED
 /**
  * Implements hook_menu().
  */
-function  geocoder_menu() {
+function geocoder_menu() {
   // Admin settings for the site.
   $items['admin/config/content/geocoder'] = array(
     'title' => 'Geocoder settings',
-    'description' => 'Configuration for API keys.',
+    'description' => 'Configuration for API keys and other global settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('geocoder_admin_settings'),
     'file' => 'geocoder.admin.inc',
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_NORMAL_ITEM, // optional
+    'type' => MENU_DEFAULT_LOCAL_TASK, // optional
   );
+
   $items['geocoder/service/%'] = array(
     'title' => 'AJAX / AJAJ geocoding service',
     'description' => 'Provides basic callback for geocoding using JavaScript',
@@ -183,6 +217,7 @@ function geocoder_ctools_plugin_type() {
     'geocoder_handler' => array(
       'cache' => TRUE,
     ),
+    'geocoder_reverse_handler' => array(),
   );
 }
 
@@ -353,4 +388,11 @@ function geocoder_cache_set($geometry, $handler, $data, $options) {
   // Cache result-relevant parameters together with the actual result, so cache records can be traced.
   $data['geometry'] = $geometry ? $geometry : FALSE;
   cache_set($cid, $data, 'cache_geocoder', variable_get('geocoder_cache_ttl', CACHE_PERMANENT));
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function geocoder_flush_caches() {
+  return array('cache_geocoder');
 }
