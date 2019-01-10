@@ -1,11 +1,10 @@
 <?php
 
-
 /**
  * @file
  * Drush commands for backup and migrate.
  */
- 
+
 /**
  * Implementation of hook_drush_command().
  */
@@ -41,7 +40,6 @@ function backup_migrate_drush_command() {
     'callback' => 'backup_migrate_drush_destinations',
     'description' => dt('Get a list of available destinations.'),
   );
-
   $items['bam-sources'] = array(
     'callback' => 'backup_migrate_drush_sources',
     'description' => dt('Get a list of available sources.'),
@@ -57,6 +55,17 @@ function backup_migrate_drush_command() {
       'destination'   => "Optional. The id of destination to list backups from. Use 'drush bam-destinations' to get a list of destinations.",
     ),
   );
+  $items['bam-schedule'] = array(
+    'callback' => 'backup_migrate_drush_schedule',
+    'description' => dt('Backup using a specific schedule.'),
+    'arguments' => array(
+      'schedule_id' => dt('The ID of the schedule to run.'),
+    ),
+  );
+  $items['bam-schedules'] = array(
+    'callback' => 'backup_migrate_drush_schedules',
+    'description' => dt('Get a list of available schedules.'),
+  );
   return $items;
 }
 
@@ -67,12 +76,16 @@ function backup_migrate_drush_help($section) {
   switch ($section) {
     case 'drush:bam-backup':
       return dt("Backup the site's database using default settings.");
+
     case 'drush:bam-restore':
       return dt('Restore the site\'s database with Backup and Migrate.');
+
     case 'drush:bam-destinations':
       return dt('Get a list of available destinations.');
+
     case 'drush:bam-profiles':
       return dt('Get a list of available settings profiles.');
+
     case 'drush:bam-backups':
       return dt('Get a list of previously created backup files.');
   }
@@ -96,7 +109,7 @@ function backup_migrate_drush_backup($source_id = 'db', $destination_id = 'manua
     return;
   }
   $settings = backup_migrate_get_profile($profile_id);
-  if(!$settings) {
+  if (!$settings) {
     _backup_migrate_message("Could not find the profile '@profile'. Try using 'drush bam-profiles' to get a list of available profiles.", array('@profile' => $profile_id), 'error');
     return;
   }
@@ -108,10 +121,48 @@ function backup_migrate_drush_backup($source_id = 'db', $destination_id = 'manua
 }
 
 /**
+ * Backup using schedule.
+ */
+function backup_migrate_drush_schedule($schedule_id = '') {
+  backup_migrate_include('schedules');
+
+  // Set the message mode to drush output.
+  _backup_migrate_message_callback('_backup_migrate_message_drush');
+
+  if (!($schedule = backup_migrate_get_schedule($schedule_id))) {
+    _backup_migrate_message("Could not find the schedule '@schedule'. Try using 'drush bam-schedules' to get a list of available schedules.", array('@schedule' => $schedule_id), 'error');
+    return;
+  }
+
+  if (!$schedule->enabled) {
+    _backup_migrate_message("Nothing to do, the schedule '@schedule' is disabled.", array('@schedule' => $schedule_id), 'warning');
+    return;
+  }
+
+  _backup_migrate_message("Starting schedule '$schedule_id'...");
+
+  backup_migrate_schedule_run($schedule_id);
+}
+
+/**
+ * Get a list of available destinations.
+ */
+function backup_migrate_drush_schedules() {
+  backup_migrate_include('schedules');
+  $rows = array(array(dt('ID'), dt('Name')));
+  foreach (backup_migrate_get_schedules() as $schedule) {
+    $rows[] = array(
+      $schedule->get_id(),
+      $schedule->get_name(),
+    );
+  }
+  drush_print_table($rows, TRUE, array(32, 32));
+}
+
+/**
  * Restore to the default database.
  */
 function backup_migrate_drush_restore($source_id = '', $destination_id = '', $file_id = '') {
-
   backup_migrate_include('profiles', 'destinations', 'sources');
 
   // Set the message mode to drush output.
@@ -125,7 +176,7 @@ function backup_migrate_drush_restore($source_id = '', $destination_id = '', $fi
     _backup_migrate_message("Could not find the destination '@destination'. Try using 'drush bam-destinations' to get a list of available destinations.", array('@destination' => $destination_id), 'error');
     return;
   }
-  else if (!$file_id || !$file = backup_migrate_destination_get_file($destination_id, $file_id)) {
+  elseif (!$file_id || !$file = backup_migrate_destination_get_file($destination_id, $file_id)) {
     _backup_migrate_message("Could not find the file '@file'. Try using 'drush bam-backups @destination' to get a list of available backup files in this destination destinations.", array('@destination' => $destination_id, '@file' => $file_id), 'error');
     return;
   }
@@ -164,7 +215,7 @@ function _backup_migrate_drush_destinations($op = NULL) {
     $rows[] = array(
       $destination->get_id(),
       $destination->get_name(),
-      implode (', ', $destination->ops()),
+      implode(', ', $destination->ops()),
     );
   }
   drush_print_table($rows, TRUE, array(32, 32));
@@ -181,7 +232,7 @@ function _backup_migrate_drush_sources($op = NULL) {
     $rows[] = array(
       $destination->get_id(),
       $destination->get_name(),
-      implode (', ', $destination->ops()),
+      implode(', ', $destination->ops()),
     );
   }
   drush_print_table($rows, TRUE, array(32, 32));
@@ -203,7 +254,7 @@ function backup_migrate_drush_profiles() {
 }
 
 /**
- * Get a list of files in a given destination
+ * Get a list of files in a given destination.
  */
 function backup_migrate_drush_destination_files($destination_id = NULL) {
   backup_migrate_include('destinations');
@@ -220,7 +271,7 @@ function backup_migrate_drush_destination_files($destination_id = NULL) {
   if ($destination) {
     $destinations = array($destination);
   }
-  // List all destinations
+  // List all destinations.
   else {
     $destinations = backup_migrate_get_destinations('list files');
   }
@@ -243,13 +294,15 @@ function backup_migrate_drush_destination_files($destination_id = NULL) {
     }
   }
 
-  $headers = array(array(
-    dt('Filename'),
-    dt('Destination'),
-    dt('Date'),
-    dt('Age'),
-    dt('Size'),
-  ));
+  $headers = array(
+    array(
+      dt('Filename'),
+      dt('Destination'),
+      dt('Date'),
+      dt('Age'),
+      dt('Size'),
+    ),
+  );
 
   if (count($rows)) {
     array_multisort($sort, SORT_DESC, $rows);
@@ -264,7 +317,8 @@ function backup_migrate_drush_destination_files($destination_id = NULL) {
  * Send a message to the drush log.
  */
 function _backup_migrate_message_drush($message, $replace, $type) {
-  // If this is an error use drush_set_error to notify the end user and set the exit status
+  // If this is an error use drush_set_error to notify the end user and set the
+  // exit status.
   if ($type == 'error') {
     drush_set_error(strip_tags(dt($message, $replace)));
   }

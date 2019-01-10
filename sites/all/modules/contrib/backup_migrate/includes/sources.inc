@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * All of the source handling code needed for Backup and Migrate.
@@ -39,7 +38,7 @@ function backup_migrate_create_source($subtype, $params = array()) {
 }
 
 /**
- * Implementation of hook_backup_migrate_source_subtypes().
+ * Implements hook_backup_migrate_source_subtypes().
  *
  * Get the built in Backup and Migrate source types.
  */
@@ -49,27 +48,27 @@ function backup_migrate_backup_migrate_source_subtypes() {
     'db' => array(
       'type_name' => t('Database'),
       'description' => t('Import the backup directly into another database. Database sources can also be used as a source to backup from.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/sources.db.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/sources.db.inc',
       'class' => 'backup_migrate_source_db',
       'can_create' => FALSE,
     ),
     'mysql' => array(
       'type_name' => t('MySQL Database'),
       'description' => t('Import the backup directly into another MySQL database. Database sources can also be used as a source to backup from.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/sources.db.mysql.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/sources.db.mysql.inc',
       'class' => 'backup_migrate_source_db_mysql',
       'can_create' => TRUE,
     ),
     'filesource' => array(
       'description' => t('A files directory which can be backed up from.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/sources.filesource.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/sources.filesource.inc',
       'class' => 'backup_migrate_destination_filesource',
       'type_name' => t('File Directory'),
       'can_create' => TRUE,
     ),
     'archive' => array(
       'description' => t('Create an archive of your entire site.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/sources.archivesource.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/sources.archivesource.inc',
       'class' => 'backup_migrate_files_destination_archivesource',
       'type_name' => t('Site Archive'),
       'can_create' => FALSE,
@@ -80,12 +79,12 @@ function backup_migrate_backup_migrate_source_subtypes() {
 }
 
 /**
- * Implementation of hook_backup_migrate_sources().
+ * Implements hook_backup_migrate_sources().
  *
  * Get the built in backup sources and those in the db.
  */
 function backup_migrate_backup_migrate_sources() {
-  $out              = array();
+  $out = array();
 
   // Expose the configured databases as sources.
   backup_migrate_include('filters');
@@ -153,17 +152,19 @@ function _backup_migrate_get_source_form_item_options() {
  * A base class for creating sources.
  */
 class backup_migrate_source extends backup_migrate_location {
-  var $db_table = "backup_migrate_sources";
-  var $type_name = 'source';
-  var $singular = 'source';
-  var $plural = 'sources';
-  var $title_plural = 'Sources';
-  var $title_singular = 'Source';
+  public $db_table = "backup_migrate_sources";
+  public $type_name = 'source';
+  public $singular = 'source';
+  public $plural = 'sources';
+  public $title_plural = 'Sources';
+  public $title_singular = 'Source';
 
   /**
-   * This function is not supposed to be called. It is just here to help the po extractor out.
+   * This function is not supposed to be called.
+   *
+   * It is just here to help out the po extractor.
    */
-  function strings() {
+  public function strings() {
     // Help the pot extractor find these strings.
     t('source');
     t('sources');
@@ -174,7 +175,7 @@ class backup_migrate_source extends backup_migrate_location {
   /**
    * Get the available location types.
    */
-  function location_types() {
+  public function location_types() {
     return backup_migrate_get_source_subtypes();
   }
 
@@ -184,32 +185,33 @@ class backup_migrate_source extends backup_migrate_location {
  * A base class for creating sources.
  */
 class backup_migrate_source_remote extends backup_migrate_source {
+
   /**
    * The location is a URI so parse it and store the parts.
    */
-  function get_location() {
+  public function get_location() {
     return $this->url(FALSE);
   }
 
   /**
    * The location to display is the url without the password.
    */
-  function get_display_location() {
+  public function get_display_location() {
     return $this->url(TRUE);
   }
 
   /**
-   * Return the location with the password.
+   * Returns the location with the password.
    */
-  function set_location($location) {
+  public function set_location($location) {
     $this->location = $location;
     $this->set_url($location);
   }
 
   /**
-   * source configuration callback.
+   * Source configuration callback.
    */
-  function edit_form() {
+  public function edit_form() {
     $form = parent::edit_form();
     $form['scheme'] = array(
       "#type" => "textfield",
@@ -251,18 +253,21 @@ class backup_migrate_source_remote extends backup_migrate_source {
         "#type" => "value",
         "#value" => @$this->dest_url['pass'],
       );
-      $form['pass']["#description"] .= t(' You do not need to enter a password unless you wish to change the currently saved password.');
+      $form['pass']["#description"] .= t('You do not need to enter a password unless you wish to change the currently saved password.');
     }
     return $form;
   }
 
   /**
-   * Submit the configuration form. Glue the url together and add the old password back if a new one was not specified.
+   * Submits the configuration form.
+   *
+   * Glue the url together and add the old password back if a new one was not
+   * specified.
    */
-  function edit_form_submit($form, &$form_state) {
+  public function edit_form_submit($form, &$form_state) {
     $form_state['values']['pass'] = $form_state['values']['pass'] ? $form_state['values']['pass'] : $form_state['values']['old_password'];
     $form_state['values']['location'] = $this->glue_url($form_state['values'], FALSE);
     parent::edit_form_submit($form, $form_state);
   }
-}
 
+}
