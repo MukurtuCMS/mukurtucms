@@ -3,8 +3,14 @@ description = A example help module to demonstrate the advanced help module.
 core = 7.x
 dependencies[] = advanced_help
 
-; Information added by Drupal.org packaging script on 2018-04-14
-version = "7.x-1.4"
+; Information added by Drupal.org packaging script on 2018-10-11
+version = "7.x-1.4+6-dev"
 core = "7.x"
 project = "advanced_help"
-datestamp = "1523697491"
+datestamp = "1539281584"
+
+; Information added by Drupal.org packaging script on 2018-10-25
+version = "7.x-1.5"
+core = "7.x"
+project = "advanced_help"
+datestamp = "1540469884"

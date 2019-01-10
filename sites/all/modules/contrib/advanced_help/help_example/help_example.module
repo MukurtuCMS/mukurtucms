@@ -5,6 +5,15 @@
  */
 
 /**
+ * Implements hook_admin_paths_alter().
+ *
+ * Force help pages for this module to be rendered in admin theme.
+ */
+function help_example_admin_paths_alter(&$paths) {
+  $paths['help/help_example/*'] = TRUE;
+}
+
+/**
  * Implements hook_menu().
  */
 function help_example_menu() {
@@ -22,10 +31,60 @@ function help_example_menu() {
  * Topic index callback.
  */
 function help_example_index_page() {
-  $output = theme('advanced_help_topic', array(
+  $output = '<p>' . t('Read the source code of the module <strong>Help example</strong> to learn how to create themed and plain links to help topics, and how to render help in the adminstrative theme.') . '</p>';
+  $output .= '<p>' . t('Two popup examples:') . '<br />';
+
+  // Create the question mark icon for the topic.
+  $toc_qm = theme('advanced_help_topic', array(
     'module' => 'help_example',
-    'topic' => 'about-php',
+    'topic' => 'toc',
+    'type' => 'icon',
   ));
-  $output .= '&nbsp;' . t('Click the help icon to view some example help about the PHP programming language (from wikipedia.org). Be sure to run cron to update the index if you want to try out the search features.');
+  // Append some explanatory text.
+  $output .= $toc_qm . '&nbsp;' . t('Click the help icon on the left to view a popup of the example module index page.');
+
+  $output .= '<br />';
+  $topic_qm = theme('advanced_help_topic', array(
+    'module' => 'help_example',
+    'topic' => 'about-example',
+    'type' => 'icon',
+  ));
+  $output .= $topic_qm . '&nbsp;' . t('Click the help icon on the left to view a popup of the first help topic.');
+
+  // Create the question mark icon for the topic.
+  $toc_qm = theme('advanced_help_topic', array(
+    'module' => 'help_example',
+    'topic' => 'toc',
+    'type' => 'icon',
+  ));
+  // Append some explanatory text.
+
+  $output .= '</p>';
+
+  $output .= '</p>';
+  $topic_title = theme('advanced_help_topic', array(
+    'module' => 'help_example',
+    'topic' => 'lorem',
+    'type' => 'title',
+  ));
+  $output .= t('Link to a popup of the topic with the title: ') . $topic_title . '.';
+  $output .= '</p>';
+  
+  $output .= '</p>';
+  $topic_title = theme('advanced_help_topic', array(
+    'module' => 'help_example',
+    'topic' => 'etiam',
+    'type' => 'anchor text',
+  ));
+  $output .= t('Link to a popup of the third topic with user defined ') . $topic_title . '.';
+  $output .= '</p>';
+
+
+  $output .= '<p>' . t('Examples of unthemed links to help pages:') . '<br />';
+  $output .= t('Link to <a href="@url">the example module index page</a>.<br />', array('@url' => '/admin/help/ah/help_example'));
+  $output .= t('Link to the <a href="@url">first help topic</a>.', array('@url' => '/help/help_example/about-example'));
+
+  $output .= '</p>';
+  
   return $output;
 }
