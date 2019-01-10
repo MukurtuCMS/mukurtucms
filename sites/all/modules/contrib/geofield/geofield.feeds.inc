@@ -142,18 +142,14 @@ function geofield_set_target_simple($source, $entity, $target, $values) {
     $delta++;
   }
 
+  // Compute all the geofield values for each field value.
   foreach ($field[LANGUAGE_NONE] as $delta => $value) {
     if (!empty($value['lat']) && !empty($value['lon'])) {
-      // Build up geom data.
-      $field[LANGUAGE_NONE][$delta] = geofield_compute_values($value, 'latlon');
+      $field[LANGUAGE_NONE][$delta] = geofield_compute_values($value, GEOFIELD_INPUT_LAT_LON);
     }
-    elseif (!empty($value['top']) &&
-            !empty($value['right']) &&
-            !empty($value['bottom']) &&
-            !empty($value['left'])) {
-      // Set format and geom data for geofield_bounds
-      $field[LANGUAGE_NONE][$delta]['geom'] = $field[LANGUAGE_NONE][$delta];
-      $field[LANGUAGE_NONE][$delta]['input_format'] = GEOFIELD_INPUT_BOUNDS;
+    elseif (!empty($value['top']) && !empty($value['right']) && !empty($value['bottom']) && !empty($value['left'])) {
+      $value = array('geom' => $value);
+      $field[LANGUAGE_NONE][$delta] = geofield_compute_values($value, GEOFIELD_INPUT_BOUNDS);
     }
   }
 
