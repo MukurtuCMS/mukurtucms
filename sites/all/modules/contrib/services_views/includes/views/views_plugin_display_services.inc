@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains the page display plugin.
@@ -11,9 +12,17 @@
  */
 class views_plugin_display_services extends views_plugin_display {
 
-  function has_path() {return TRUE; }
+  /**
+   * {@inheritdoc}
+   */
+  public function has_path() {
+    return TRUE;
+  }
 
-  function option_definition() {
+  /**
+   * {@inheritdoc}
+   */
+  public function option_definition() {
     $options = parent::option_definition();
 
     $options['path'] = array('default' => '');
@@ -22,9 +31,9 @@ class views_plugin_display_services extends views_plugin_display {
   }
 
   /**
-   * Execute implementation.
+   * {@inheritdoc}
    */
-  function execute() {
+  public function execute() {
 
     if (!$this->access()) {
       global $user;
@@ -55,7 +64,7 @@ class views_plugin_display_services extends views_plugin_display {
       foreach ($this->view->field as $field_name => $field) {
         // Skip this field?
         if (isset($field->options['exclude']) && $field->options['exclude'] == TRUE) {
-         continue;
+          continue;
         }
         // Make sure new keys are alphanumerical, underscore and dash.
         $custom_key = (!empty($field->options['label']) && preg_match('/^[0-9A-Za-z_-]*$/', $field->options['label']))
@@ -78,11 +87,17 @@ class views_plugin_display_services extends views_plugin_display {
     return $result;
   }
 
-  function render() {
+  /**
+   * {@inheritdoc}
+   */
+  public function render() {
     return $this->execute();
   }
 
-  function preview() {
+  /**
+   * {@inheritdoc}
+   */
+  public function preview() {
     module_load_include('resource.inc', 'services_views');
     return '<pre>' . var_export(services_views_execute_view(NULL, $this->view, $this->display->id), TRUE) . '</pre>';
   }
@@ -92,7 +107,7 @@ class views_plugin_display_services extends views_plugin_display {
    *
    * This output is returned as an array.
    */
-  function options_summary(&$categories, &$options) {
+  public function options_summary(&$categories, &$options) {
     // It is very important to call the parent function here:
     parent::options_summary($categories, $options);
 
@@ -119,7 +134,7 @@ class views_plugin_display_services extends views_plugin_display {
   /**
    * Provide the default form for setting options.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_form($form, $form_state);
 
@@ -135,7 +150,10 @@ class views_plugin_display_services extends views_plugin_display {
     }
   }
 
-  function options_validate(&$form, &$form_state) {
+  /**
+   * {@inheritdoc}
+   */
+  public function options_validate(&$form, &$form_state) {
     // It is very important to call the parent function here.
     parent::options_validate($form, $form_state);
     if ($form_state['section'] == 'path') {
@@ -158,7 +176,10 @@ class views_plugin_display_services extends views_plugin_display {
     }
   }
 
-  function options_submit(&$form, &$form_state) {
+  /**
+   * {@inheritdoc}
+   */
+  public function options_submit(&$form, &$form_state) {
     // It is very important to call the parent function here.
     parent::options_submit($form, $form_state);
     switch ($form_state['section']) {
@@ -167,4 +188,5 @@ class views_plugin_display_services extends views_plugin_display {
         break;
     }
   }
+
 }

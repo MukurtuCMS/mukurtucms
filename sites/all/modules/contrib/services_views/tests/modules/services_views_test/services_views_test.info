@@ -1,0 +1,13 @@
+name = Services Views Test
+description = Set up module for Services Views testing.
+package = Testing
+core = 7.x
+dependencies[] = services_views
+hidden = TRUE
+
+; Information added by Drupal.org packaging script on 2017-12-01
+version = "7.x-1.3"
+core = "7.x"
+project = "services_views"
+datestamp = "1512141196"
+

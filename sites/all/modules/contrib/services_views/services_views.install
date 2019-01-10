@@ -59,3 +59,11 @@ function services_views_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Limit view resource support to services type view displays for security.
+ */
+function services_views_update_7101() {
+  services_views_convert_white_list_to_clones();
+  return "Please be sure to export the newly cloned view displays and service views whitelist settings via features if you use that workflow. Failure to do so will cause backward compatibility to fail.";
+}
