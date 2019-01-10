@@ -21,7 +21,12 @@
  */
 function hook_entity_postsave($entity, $entity_type, $op) {
   list($id) = entity_extract_ids($entity_type, $entity);
-  watchdog('hook_post_action_test', "The {$op}d entity {$entity_type} id is {$id} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The @op entity $type id is @id from @function.', array(
+    '@op' => t($op . 'd'),
+    '@id' => $id,
+    '@type' => $entity_type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -39,7 +44,11 @@ function hook_entity_postsave($entity, $entity_type, $op) {
  */
 function hook_entity_postinsert($entity, $entity_type) {
   list($id) = entity_extract_ids($entity_type, $entity);
-  watchdog('hook_post_action_test', "The inserted entity {$entity_type} id is {$id} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The inserted entity @type id is @id from @function.', array(
+    '@id' => $id,
+    '@type' => $entity_type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -57,7 +66,11 @@ function hook_entity_postinsert($entity, $entity_type) {
  */
 function hook_entity_postupdate($entity, $entity_type) {
   list($id) = entity_extract_ids($entity_type, $entity);
-  watchdog('hook_post_action_test', "The updated entity {$entity_type} id is {$id} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The updated entity @type id is @id from @function.', array(
+    '@id' => $id,
+    '@type' => $entity_type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -75,7 +88,11 @@ function hook_entity_postupdate($entity, $entity_type) {
  */
 function hook_entity_postdelete($entity, $entity_type) {
   list($id) = entity_extract_ids($entity_type, $entity);
-  watchdog('hook_post_action_test', "The deleted entity {$entity_type} id is {$id} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The deleted entity @type id is @id from @function.', array(
+    '@id' => $id,
+    '@type' => $entity_type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -92,7 +109,12 @@ function hook_entity_postdelete($entity, $entity_type) {
  * @ingroup node_api_hooks
  */
 function hook_node_postsave($node, $op) {
-  watchdog('hook_post_action_test', "The {$op}d node {$node->type} id is {$node->nid} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The @op node @type id is @nid from @function.', array(
+    '@op' => t($op . 'd'),
+    '@nid' => $node->nid,
+    '@type' => $node->type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -107,7 +129,11 @@ function hook_node_postsave($node, $op) {
  * @ingroup node_api_hooks
  */
 function hook_node_postinsert($node) {
-  watchdog('hook_post_action_test', "The inserted node {$node->type} id is {$node->nid} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The inserted node @type id is @nid from @function.', array(
+    '@nid' => $node->nid,
+    '@type' => $node->type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -122,7 +148,11 @@ function hook_node_postinsert($node) {
  * @ingroup node_api_hooks
  */
 function hook_node_postupdate($node) {
-  watchdog('hook_post_action_test', "The updated node {$node->type} id is {$node->nid} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The updated node @type id is @nid from @function.', array(
+    '@nid' => $node->nid,
+    '@type' => $node->type,
+    '@function' => __FUNCTION__,
+  ));
 }
 
 /**
@@ -137,5 +167,9 @@ function hook_node_postupdate($node) {
  * @ingroup node_api_hooks
  */
 function hook_node_postdelete($node) {
-  watchdog('hook_post_action_test', "The deleted node {$node->type} id is {$node->nid} from " . __FUNCTION__);
+  watchdog('hook_post_action_test', 'The deleted node @type id is @nid from @function.', array(
+    '@nid' => $node->nid,
+    '@type' => $node->type,
+    '@function' => __FUNCTION__,
+  ));
 }

@@ -1,10 +1,16 @@
 <?php
+
 /**
  * @param $entity
  * @param $type
  */
 function hook_post_action_entity_insert($entity, $type) {
-  drupal_register_shutdown_function('_hook_post_action_post_save', $entity, $type, 'insert');
+  $entity_info = array(
+    'entity' => $entity,
+    'type' => $type,
+    'operation' => 'insert',
+  );
+  drupal_register_shutdown_function('_hook_post_action_post_save', $entity_info);
 }
 
 /**
@@ -12,7 +18,17 @@ function hook_post_action_entity_insert($entity, $type) {
  * @param $type
  */
 function hook_post_action_entity_update($entity, $type) {
-  drupal_register_shutdown_function('_hook_post_action_post_save', $entity, $type, 'update');
+  //hook_node_update unsets the original property after calling the hook functions.
+  //To work around this we save a reference to the original object here,
+  //and pass it in to _hook_post_action_post_save as an optional fourth argument.
+  $original = isset($entity->original) ? $entity->original : NULL;
+  $entity_info = array(
+    'entity' => $entity,
+    'type' => $type,
+    'operation' => 'update',
+    'original' => $original,
+  );
+  drupal_register_shutdown_function('_hook_post_action_post_save', $entity_info);
 }
 
 /**
@@ -20,7 +36,12 @@ function hook_post_action_entity_update($entity, $type) {
  * @param $type
  */
 function hook_post_action_entity_delete($entity, $type) {
-  drupal_register_shutdown_function('_hook_post_action_post_save', $entity, $type, 'delete');
+  $entity_info = array(
+    'entity' => $entity,
+    'type' => $type,
+    'operation' => 'delete',
+  );
+  drupal_register_shutdown_function('_hook_post_action_post_save', $entity_info);
 }
 
 /**
@@ -28,9 +49,18 @@ function hook_post_action_entity_delete($entity, $type) {
  * @param $type
  * @param $op
  */
-function _hook_post_action_post_save($entity, $type, $op) {
+function _hook_post_action_post_save($entity_info) {
+  $entity = $entity_info['entity'];
+  $type = $entity_info['type'];
+  $op = $entity_info['operation'];
+  $original = $entity_info['original'];
   $entity_is_saved = FALSE;
   $new_entity = NULL;
+
+  //If $original is not null then restore it to the original property in the entity.
+  if ($original != NULL) {
+    $entity->original = $original;
+  }
 
   if ($op == 'insert' || $op == 'update') {
     $entity_is_saved = TRUE;
