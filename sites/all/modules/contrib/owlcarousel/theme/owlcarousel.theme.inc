@@ -21,6 +21,7 @@ function template_preprocess_owlcarousel_wrapper(&$variables) {
   if (count($variables['output']['#items']) < 2) {
     $variables['output']['#settings']['attributes']['class'][] = 'disabled';
   }
+  $variables['output']['#settings']['attributes']['class'][] = drupal_clean_css_identifier($variables['output']['#settings']['instance']);
 }
 
 /**
