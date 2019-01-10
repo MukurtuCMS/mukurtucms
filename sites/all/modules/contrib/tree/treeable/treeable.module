@@ -548,6 +548,9 @@ function treeable_field_formatter_view($entity_type, $entity, $field, $instance,
  * Implements hook_preprocess_HOOK() where HOOK is "field".
  */
 function treeable_preprocess_field(&$variables) {
+  // Mukurtu patch. We are not using this formatter, and it returns PHP notices, so get out of here.
+  return;
+
   $element = $variables['element'];
 
   if ($element['#formatter'] == 'treeable_list') {
