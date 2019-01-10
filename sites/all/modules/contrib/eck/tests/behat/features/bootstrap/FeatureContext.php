@@ -5,11 +5,11 @@
  */
 
 use Behat\Behat\Context\ClosuredContextInterface,
-    Behat\Behat\Context\TranslatedContextInterface,
-    Behat\Behat\Context\BehatContext,
-    Behat\Behat\Exception\PendingException;
+  Behat\Behat\Context\TranslatedContextInterface,
+  Behat\Behat\Context\BehatContext,
+  Behat\Behat\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode,
-    Behat\Gherkin\Node\TableNode;
+  Behat\Gherkin\Node\TableNode;
 
 /**
  * Features context.
@@ -23,5 +23,6 @@ class FeatureContext extends Drupal\DrupalExtension\Context\DrupalContext {
    * @param array $parameters
    *   Context parameters (set them up through behat.yml)
    */
-  public function __construct(array $parameters) {}
+  public function __construct(array $parameters) {
+  }
 }

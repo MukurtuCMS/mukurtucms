@@ -57,7 +57,7 @@ function eck__default_properties__form_submit($form, &$state, $entity_type) {
 /**
  * All default properties information.
  * @todo combine this and get_default_property().
- * 
+ *
  * @return array
  *   All of the default properties info.
  */
@@ -70,10 +70,10 @@ function eck_get_default_properties() {
 
 /**
  * Get a default property by name.
- * 
+ *
  * @param string $name
  *   Default property's name.
- * 
+ *
  * @return array
  *   The default property info.
  */

@@ -138,6 +138,11 @@ function eck__entity__menu($entity_type, $bundle) {
 
 /**
  * Get admin bundle information from the entity info array.
+ *
+ * @param string $entity_type_name
+ *   Entity type.
+ * @param string $bundle_name
+ *   Bundle.
  */
 function get_bundle_admin_info($entity_type, $bundle) {
   $info = entity_get_info();
@@ -147,6 +152,11 @@ function get_bundle_admin_info($entity_type, $bundle) {
 
 /**
  * Get bundle crud information from the entity info array.
+ *
+ * @param string $entity_type_name
+ *   Entity type.
+ * @param string $bundle_name
+ *   Bundle.
  */
 function get_bundle_crud_info($entity_type_name, $bundle_name) {
   $info = entity_get_info();
@@ -155,6 +165,11 @@ function get_bundle_crud_info($entity_type_name, $bundle_name) {
 
 /**
  * Entity overview page callback.
+ *
+ * @param string $entity_type_name
+ *   Entity type.
+ * @param string $bundle_name
+ *   Bundle.
  */
 function eck__entity__list($entity_type_name, $bundle_name) {
   $entity_type = entity_type_load($entity_type_name);
@@ -168,9 +183,9 @@ function eck__entity__list($entity_type_name, $bundle_name) {
   // Get all entity instances of this type.
   $query = new EntityFieldQuery();
   $query
-  ->entityCondition('entity_type', $entity_type->name, '=')
-  ->entityCondition('bundle', $bundle->name, '=')
-  ->pager(20);
+    ->entityCondition('entity_type', $entity_type->name, '=')
+    ->entityCondition('bundle', $bundle->name, '=')
+    ->pager(20);
 
   drupal_alter('entity_overview_query', $query, $info);
   unset($info['entity_type']);
@@ -246,11 +261,15 @@ function eck__entity__add($entity_type_name, $bundle_name) {
  *
  * @param string $entity_type
  *   entity type
+ * @param string $bundle
+ *   Bundle.
  * @param mixed $id
  *   The entity id or the entity object itself
  *   Normally you wouldn't need to call this function if you already have the
  *   loaded entity but there are some workflows where an object is passed.
  *   So this function handles that case as well.
+ * @param string $view_mode
+ *   View mode
  */
 function eck__entity__build($entity_type, $bundle, $id, $view_mode = "full") {
 
@@ -289,6 +308,13 @@ function eck__entity__edit($entity_type_name, $bundle_name, $id) {
 
 /**
  * Callback function for the delete functionality.
+ *
+ * @param string $entity_type_name
+ *   Entity type.
+ * @param string $bundle_name
+ *   Bundle.
+ * @param object $entity
+ *   an object as returned by entity_load().
  */
 function eck__entity__delete($entity_type_name, $bundle_name, $entity) {
   $entity_type = entity_type_load($entity_type_name);
@@ -401,9 +427,10 @@ function eck__entity__form($form, &$form_state, $entity) {
   // Entity Translation module integration.
   $langcode = LANGUAGE_NONE;
   if (module_exists('entity_translation') &&
-    entity_translation_enabled($entity->entityType())) {
+    entity_translation_enabled($entity->entityType())
+  ) {
     $handler = entity_translation_get_handler($entity->entityType(), $entity);
-    $langcode = $handler->getFormLanguage();
+    $langcode = $handler->getActiveLanguage();
   }
 
   field_attach_form($entity->entityType(), $entity, $form, $form_state, $langcode);
@@ -424,8 +451,6 @@ function eck__entity__form_validate($form, &$state) {
  */
 function eck__entity__form_submit($form, &$state) {
   $entity = $state['values']['entity'];
-
-  field_attach_submit($entity->entityType(), $entity, $form, $state);
 
   $entity_type = $entity->entityType();
   $entity_type = EntityType::loadByName($entity_type);
@@ -469,6 +494,8 @@ function eck__entity__form_submit($form, &$state) {
     $wrapper->{$property}->set($value);
   }
 
+  field_attach_submit($entity->entityType(), $entity, $form, $state);
+
   // Let the behaviors modify the entity.
   // @todo Why do we need to pass form information to the save behavior.
   // This is related to eck_revisions. Is there a danger that the current
@@ -485,7 +512,11 @@ function eck__entity__form_submit($form, &$state) {
     '@entity_label' => entity_label($form['#entity_type'], $entity),
   );
 
-  $context = array('entity' => $entity, 'form' => $form, 'form_state' => $state);
+  $context = array(
+    'entity' => $entity,
+    'form' => $form,
+    'form_state' => $state
+  );
   drupal_alter('eck_entity_save_message', $msg, $args, $context);
 
   if ($msg) {

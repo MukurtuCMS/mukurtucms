@@ -2,7 +2,7 @@
 /**
  * @file
  * Changed behavior.
- * 
+ *
  * Store the current time in the property every time it is updated.
  */
 

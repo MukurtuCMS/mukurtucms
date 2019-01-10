@@ -21,10 +21,9 @@ module_load_include('inc', 'eck', 'includes/eck.references_dialog');
  * Load callback for %eckentity.
  */
 function eckentity_load($id, $type) {
-  try{
+  try {
     $entity = entity_load_single($type, $id);
-  }
-  catch (Exception $ex) {
+  } catch (Exception $ex) {
     drupal_not_found();
     exit();
   }
@@ -214,7 +213,10 @@ function entity_table($entities, $select = FALSE) {
   $crud_info = NULL;
 
   $rows = array();
-  $header = array(t('Name'), array('data' => t('Operations'), 'colspan' => '1'));
+  $header = array(
+    t('Name'),
+    array('data' => t('Operations'), 'colspan' => '1')
+  );
 
   $info = NULL;
   foreach ($entities as $entity) {
@@ -677,7 +679,8 @@ function entity_table_select($form, &$state, $entity_type, $bundle, $header, $ro
 /**
  * Base class for ECK entites.
  */
-class ECKEntity extends Entity {}
+class ECKEntity extends Entity {
+}
 
 /**
  * Implements hook_entity_presave().
@@ -880,7 +883,10 @@ function eck_entity_view_alter(&$build, $entity_type) {
       // could cause of contextual links not to work correctly.
 
       $build['#contextual_links']['eck']
-        = array("{$entity_type}/{$this_bundle}", array(entity_id($entity_type, $entity)));
+        = array(
+        "{$entity_type}/{$this_bundle}",
+        array(entity_id($entity_type, $entity))
+      );
     }
   }
 }

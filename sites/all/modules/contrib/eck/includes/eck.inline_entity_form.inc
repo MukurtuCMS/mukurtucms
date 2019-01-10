@@ -4,7 +4,6 @@
  * @file
  * Defines the inline entity form controller for ECK Entities.
  */
-
 class EckInlineEntityFormController extends EntityInlineEntityFormController {
 
   /**

@@ -2,8 +2,8 @@
 /**
  * @file
  * Author Behavior.
- * 
- * Save the user id of the user when the entity is created. 
+ *
+ * Save the user id of the user when the entity is created.
  */
 
 $plugin = array(

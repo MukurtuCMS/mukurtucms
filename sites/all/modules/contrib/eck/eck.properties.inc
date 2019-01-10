@@ -138,9 +138,10 @@ function eck__properties__form($form, &$state, $entity_type_name) {
 
   $form['info'] = array(
     '#markup' => "<p><strong>HELP:</strong> "
-    . "The add property button will temporarily add a property to the entity "
-    . "type, to finalize adding the property, click the checkbox on the left and "
-    . "click save </p>");
+      . "The add property button will temporarily add a property to the entity "
+      . "type, to finalize adding the property, click the checkbox on the left and "
+      . "click save </p>"
+  );
 
   // When the add button is clicked, the submit callback directs the form to
   // be rebuilt. Here we check to see if a new property was added, and keep it
@@ -166,7 +167,8 @@ function eck__properties__form($form, &$state, $entity_type_name) {
     // property_type or property_name of the already existing properties.
 
     if (!array_key_exists($property_name, $new_properties) ||
-      $new_properties[$property_name]['type'] == $property_type) {
+      $new_properties[$property_name]['type'] == $property_type
+    ) {
 
       $new_properties[$property_name] = array(
         'label' => $state['values']['property_label'],
@@ -182,7 +184,10 @@ function eck__properties__form($form, &$state, $entity_type_name) {
     }
   }
 
-  $form['new_properties'] = array('#type' => 'value', '#value' => $new_properties);
+  $form['new_properties'] = array(
+    '#type' => 'value',
+    '#value' => $new_properties
+  );
 
   // This is the select table where all the new properties are shown.
   $header = array(
@@ -302,7 +307,8 @@ function eck__properties__form($form, &$state, $entity_type_name) {
  */
 function eck_deactivate_on_save($element, &$state) {
   if (array_key_exists('input', $state) && array_key_exists('op', $state['input']) &&
-    $state['input']['op'] == t('Save')) {
+    $state['input']['op'] == t('Save')
+  ) {
     isset($element['#element_validate']) ? $element['#element_validate'] = NULL : NULL;
     isset($element['#needs_validation']) ? $element['#needs_validation'] = NULL : NULL;
   }
@@ -328,7 +334,11 @@ function eck__properties__form_validate($form, &$state) {
         }
       }
     }
-    if (!empty($state['values']['property_name']) && in_array($state['values']['property_name'], array('id', 'type'))) {
+    if (!empty($state['values']['property_name']) && in_array($state['values']['property_name'], array(
+        'id',
+        'type'
+      ))
+    ) {
       form_set_error('property_name', t('Property name "@name" is already used by the module. Please choose another name.', array(
         '@name' => $state['values']['property_name'],
       )));

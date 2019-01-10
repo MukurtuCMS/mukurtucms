@@ -81,7 +81,7 @@ function hook_eck_default_properties() {
  *   The label for the entity.
  */
 function hook_eck_entity_label($entity, $entity_id) {
-  return "Somethins that should be the label for this entity";
+  return "Something that should be the label for this entity";
 }
 
 /**

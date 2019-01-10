@@ -1,8 +1,8 @@
-<?php 
+<?php
 /**
  * @file
  * Created behavior.
- * 
+ *
  * Save the current time when an entity is created.
  */
 

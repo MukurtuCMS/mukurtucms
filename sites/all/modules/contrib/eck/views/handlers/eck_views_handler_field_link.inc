@@ -3,7 +3,6 @@
  * @file
  * Field handler to present a link to the entity content.
  */
-
 // @codingStandardsIgnoreStart
 class eck_views_handler_field_link extends views_handler_field_entity {
 

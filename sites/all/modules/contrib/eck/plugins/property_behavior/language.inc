@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Implementation of Language property behavior, which represents the language 
+ * Implementation of Language property behavior, which represents the language
  * of an entity.
  */
 
@@ -58,7 +58,7 @@ function eck_language_property_property_info($property, $vars) {
 
 /**
  * Language widget.
- * 
+ *
  * Select one of the enabled languages.
  */
 function eck_language_property_widget($property, $vars) {
@@ -126,7 +126,7 @@ function eck_language_property_views_data_alter($property, $vars) {
 
 /**
  * Setting multilingual options in bundle form.
- * 
+ *
  * @todo Why is the behavior setting things in the bundle form?
  */
 function eck_language_property_bundle_form($property, $vars) {
