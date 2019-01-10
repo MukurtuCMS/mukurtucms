@@ -1,0 +1,24 @@
+<?php
+/**
+ * @file
+ * Code for install of Open Atrium Messages feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function oa_messages_install() {
+  // Configure message notify to use mime so can send messages with attachments.
+  mailsystem_set(array(
+    'message_notify' => 'MimeMailSystem',
+  ));
+}
+
+/**
+ * Update what class message_notify uses for mailing.
+ */
+function oa_messages_update_7201() {
+  mailsystem_set(array(
+    'message_notify' => 'MimeMailSystem',
+  ));
+}

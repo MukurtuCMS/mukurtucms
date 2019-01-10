@@ -1,0 +1,107 @@
+.pane-oa-core-members-widget .tab-content {
+  overflow: visible;
+}
+
+.pane-oa-core-members-widget .form-item-group-name {
+  float: left;
+  margin: 0 10px 0 0;
+}
+
+.pane-oa-core-members-widget .user-badge {
+  padding: 6px 12px;
+}
+
+.pane-node-links {
+  clear: both;
+}
+
+.widget-preview iframe {
+  max-width: 100%;
+}
+
+.help-block {
+  white-space: normal;
+}
+
+.node-teaser .user-picture {
+  float: left;
+  margin-right: 5px;
+}
+
+.node-teaser .submitted {
+  font-style: italic;
+}
+
+.oa-users-submitted .oa-user-picture img {
+  height: 30px;
+  width: 30px;
+}
+
+.select2-drop {
+  /* need drop-down menu to be above any popup dialogs like views */
+  z-index: 10002;
+}
+
+#modal-content .widget-preview-title {
+  /* move Add button to left so wide tables doesnt scroll */
+  left: 10px;
+  right: auto;
+}
+
+#modal-content #views-exposed-pane div.form-item.form-type-checkbox,
+.views-widget-filter-og_group_ref_target_id div.form-item.form-type-checkbox {
+  display: inline-block;
+}
+
+.views-exposed-widget .help-block {
+  display: none;
+}
+
+.oa_pending_count {
+  display: inline-block;
+  background-color: green;
+  color: white;
+  padding: 0 5px;
+  -webkit-border-radius: 10px;
+     -moz-border-radius: 10px;
+          border-radius: 10px;
+}
+
+.chzn-container,
+.chzn-container input[type="text"] {
+  min-width: 120px;
+}
+
+.field-widget-og-complex .chzn-container {
+  min-width: 100%;
+}
+
+.ctools-modal-content form > div > .form-item {
+  border-bottom: 1px solid #DDD;
+  padding-left: 10px;
+  padding-bottom: 6px;
+}
+
+.ctools-modal-content form > div > .form-item > label {
+  font-weight: bold;
+}
+
+#modal-content .general-settings-fieldset label.option {
+  float: none;
+}
+
+#modal-content .panels-section-column {
+  overflow: hidden;
+}
+
+#modal-content .panels-section-column fieldset legend {
+  max-width: 100%;
+}
+
+.pane-node-field-oa-media .field-item {
+  margin-bottom: 5px;
+}
+
+.panels-dnd .oa-layout-fluid {
+  float: left;
+}

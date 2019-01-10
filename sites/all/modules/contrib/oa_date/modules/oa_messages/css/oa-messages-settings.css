@@ -1,0 +1,87 @@
+#oa-users-settings-form div.delivery-prefs div.form-type-radios {
+  display: inline-block;
+}
+
+#oa-users-settings-form div.delivery-prefs div.form-item-oa-messages-delivery-email-type {
+  margin-right: 100px;
+}
+
+#oa-users-settings-form input[type="text"] {
+  float: left;
+  margin-right: 10px;
+}
+
+#oa-users-settings-form #edit-oa-messages-email-type div:first-child {
+  float: left;
+  margin-top: 0;
+  margin-right: 20px;
+}
+
+#oa-users-settings-form .row-fluid {
+  border-bottom: 2px solid #dedede;
+  margin: 5px auto;
+}
+
+#oa-users-settings-form .row-fluid.header {
+  background-color: #dedede;
+  clear: both;
+  height: 25px;
+  padding: 3px 0;
+}
+
+#oa-users-settings-form .header .form-type-checkbox {
+  margin: 0;
+}
+
+#oa-users-settings-form div.column1 {
+  padding-left: 10px;
+}
+
+#oa-users-settings-form fieldset legend {
+  border: none;
+  margin-bottom: .35em;
+}
+
+#oa-users-settings-form div.form-type-select {
+  float: left;
+  margin: 0 10px 0 0;
+}
+
+#oa-users-settings-form #edit-oa-messages-message-notifications-all-notifications {
+  width: 250px;
+}
+
+#oa-users-settings-form div.column2 div.chosen-container {
+  padding: 8px 0;
+}
+
+#oa-users-settings-form div.column2 div.chosen-drop {
+  margin-top: -8px;
+}
+
+#oa-users-settings-form div.column3 div.form-type-checkboxes {
+  margin-left: -52%;
+  margin-bottom: .15em;
+}
+
+#oa-users-settings-form div.column3 div.form-checkboxes {
+  border: 1px solid #dedede;
+  padding-left: 10px;
+}
+
+#oa-users-settings-form div.column3 div.form-type-checkbox {
+  padding-right: 10px;
+  display: inline-block;
+}
+
+#oa-users-settings-form div.column3 div.chosen-drop {
+  margin-top: -10px;
+}
+
+#oa-users-settings-form div.subscribed-content {
+  margin: 25px 0;
+}
+
+#oa-users-settings-form input.btn-primary {
+  float: right;
+}

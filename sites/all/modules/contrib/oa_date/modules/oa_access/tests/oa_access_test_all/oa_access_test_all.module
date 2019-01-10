@@ -1,0 +1,26 @@
+<?php
+/**
+ * @file
+ * Module file for Open Atrium Access Test (default 'All' permissions).
+ */
+
+/**
+ * Implements hook_oa_access_permission().
+ */
+function oa_access_test_all_oa_access_permission() {
+  $permissions = array(
+    'permission that defaults to all for oa_access_test_all' => array(
+      'title' => t('A permission that defaults to the "All" option'),
+      'description' => t('Used to test the functionality to default to the "All" option'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_GROUP_DEFAULT_OPTION_ALL | OA_ACCESS_TEAM_DEFAULT_OPTION_ALL,
+    ),
+  );
+  if (variable_get('oa_access_test_all_initialize_permissions', FALSE)) {
+    $permissions['a permission for oa_access_test_all that is added after install'] = array(
+      'title' => t('Some fickle permission'),
+      'description' => t('A permission for oa_access_test that is only conditionally available'),
+      'type' => OA_ACCESS_DEFAULT_PERMISSION | OA_ACCESS_GROUP_DEFAULT_OPTION_ALL | OA_ACCESS_TEAM_DEFAULT_OPTION_ALL,
+    );
+  }
+  return $permissions;
+}
