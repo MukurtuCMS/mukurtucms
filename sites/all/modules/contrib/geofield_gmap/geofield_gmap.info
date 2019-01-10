@@ -12,9 +12,9 @@ stylesheets[all][] = geofield_gmap.css
 scripts[] = geofield_gmap.js
 
 configure = admin/config/content/geofield_gmap
-; Information added by Drupal.org packaging script on 2015-06-14
-version = "7.x-2.x-dev"
+; Information added by Drupal.org packaging script on 2018-03-21
+version = "7.x-2.0-alpha1"
 core = "7.x"
 project = "geofield_gmap"
-datestamp = "1434317881"
+datestamp = "1521628989"
 

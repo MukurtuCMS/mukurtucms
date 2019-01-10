@@ -68,7 +68,7 @@ function geofield_gmap_initialize(params) {
 
   var location = new google.maps.LatLng(params.lat, params.lng);
   var options = {
-    zoom: Number(params.zoom),
+    zoom: params.zoom,
     center: location,
     mapTypeId: google.maps.MapTypeId.SATELLITE,
     scaleControl: true,
