@@ -1,5 +1,5 @@
 name = Tree
-description = "Provides support for storing tree datastructures."
+description = "Provides support for storing tree data structures."
 core = 7.x
 
 dependencies[] = ctools
@@ -17,9 +17,8 @@ files[] = storage/Tree_Storage_Testable.class.php
 
 files[] = tests/tree.test
 
-; Information added by Drupal.org packaging script on 2015-11-17
-version = "7.x-1.0-alpha1+11-dev"
+; Information added by Drupal.org packaging script on 2018-10-12
+version = "7.x-1.0-alpha1+12-dev"
 core = "7.x"
 project = "tree"
-datestamp = "1447748062"
-
+datestamp = "1539322383"

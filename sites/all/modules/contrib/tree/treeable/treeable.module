@@ -446,7 +446,7 @@ function treeable_field_formatter_info() {
   $field_types = array_keys(field_info_field_types());
 
   return array(
-    ' treeable_list' => array(
+    'treeable_list' => array(
       'label' => t('Hierarchical tree list'),
       'field types' => $field_types,
       'settings' => array('subformatter' => '', 'subformatter_settings' => array())
@@ -548,10 +548,6 @@ function treeable_field_formatter_view($entity_type, $entity, $field, $instance,
  * Implements hook_preprocess_HOOK() where HOOK is "field".
  */
 function treeable_preprocess_field(&$variables) {
-
-  // Mukurtu patch. We are not using this formatter, and it returns PHP notices, so get out of here.
-  return;
-
   $element = $variables['element'];
 
   if ($element['#formatter'] == 'treeable_list') {
