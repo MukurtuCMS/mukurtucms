@@ -1174,5 +1174,12 @@ function file_entity_settings_form($form, &$form_state) {
     '#description' => t('Rename the newly uploaded file to the name of the original file. This action cannot be undone.'),
   );
 
+  $form['file_entity_protect_repeated_render'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Protect against repeat rendering'),
+    '#default_value' => variable_get('file_entity_protect_repeated_render', TRUE),
+    '#description' => t('Avoid rendering the same entity more than 20 times. This can be a sign of an image entity getting caught in a recursive render, but it can also be triggered when the same image is rendered more than 20 times, e.g. in an long content list or data feed.'),
+  );
+
   return system_settings_form($form);
 }
