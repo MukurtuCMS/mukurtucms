@@ -1,0 +1,277 @@
+<?php
+
+/**
+ * @file
+ * Builds placeholder replacement tokens for diff-related data.
+ *
+ * Written by Mike Potter, Phase2 Technology
+ * Similar to Diff module, but allows a specific revision to be indicated
+ * [node:oa-diff:###] where ### is the specific revision id
+ * [node:oa-diff:###:###] to specify the two revisions to diff between
+ */
+
+/**
+ * Implements hook_token_info().
+ */
+function oa_diff_token_info() {
+  $node['oa-diff'] = array(
+    'name' => t('Revision difference'),
+    'description' => t('The differences between a specific node version and its previous revision.'),
+  );
+
+  return array(
+    'tokens' => array('node' => $node),
+  );
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function oa_diff_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $sanitize = !empty($options['sanitize']);
+  // similar to regular diff module, but we do not sanitize results because results
+  // are always an HTML table
+  $replacements = array();
+
+  if ($type == 'node' && !empty($data['node'])) {
+    $node = $data['node'];
+    foreach ($tokens as $name => $original) {
+      $values = explode(':', $name);
+      if (!empty($values[0]) && ($values[0] == 'oa-diff')) {
+        $revisions = node_revision_list($node);
+        if (count($revisions) == 1) {
+          $replacements[$original] = '';
+        }
+        else {
+          module_load_include('inc', 'diff', 'diff.pages');
+          if (isset($values[1]) && is_numeric($values[1])) {
+            $vid = $values[1];
+            if (isset($values[2]) && is_numeric($values[2])) {
+              $next_vid = $values[2];
+            }
+            else {
+              $next_vid = _diff_get_next_vid($revisions, $vid);
+            }
+          }
+          else {
+            $next_vid = $node->vid;
+            $vid = _diff_get_previous_vid($revisions, $next_vid);
+          }
+
+          if ($next_vid) {
+            $state = 'raw_plain';
+            $build = diff_diffs_show($node, $vid, $next_vid, $state);
+            unset($build['diff_table']['#rows']['logs']);
+            unset($build['diff_table']['#rows']['states']);
+            unset($build['diff_table']['#rows']['navigation']);
+            unset($build['diff_table']['#header']);
+            unset($build['diff_preview']);
+
+            $output = drupal_render_children($build);
+            // prevent overflow of messages
+            if (strlen($output) > variable_get('oa_diff_limit', 4096)) {
+              $output = t('Too many differences to list.  See Revisions for details.');
+            }
+            $replacements[$original] = $output;
+          }
+          else {
+            $replacements[$original] = '';
+          }
+        }
+      }
+    }
+  }
+  return $replacements;
+}
+
+function oa_diff_diff_field_settings_alter(&$settings, $context) {
+  $field = $context['field'];
+  if ($field['field_name'] == 'body') {
+    $settings['markdown'] = 'oa_html_to_text';
+  }
+}
+
+/**
+ * Convert HTML to text
+ * same as core drupal_html_to_text but no line wrapping!
+ * and <P> is converted to a single line-break
+ */
+function oa_html_to_text($string, $allowed_tags = NULL) {
+  // Cache list of supported tags.
+  static $supported_tags;
+  if (empty($supported_tags)) {
+    $supported_tags = array(
+      'a',
+      'em',
+      'i',
+      'strong',
+      'b',
+      'br',
+      'p',
+      'blockquote',
+      'ul',
+      'ol',
+      'li',
+      'dl',
+      'dt',
+      'dd',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'hr',
+    );
+  }
+
+  // Make sure only supported tags are kept.
+  $allowed_tags = isset($allowed_tags) ? array_intersect($supported_tags, $allowed_tags) : $supported_tags;
+
+  // Make sure tags, entities and attributes are well-formed and properly nested.
+  $string = _filter_htmlcorrector(filter_xss($string, $allowed_tags));
+
+  // Apply inline styles.
+  $string = preg_replace('!</?(em|i)((?> +)[^>]*)?>!i', '/', $string);
+  $string = preg_replace('!</?(strong|b)((?> +)[^>]*)?>!i', '*', $string);
+
+  // Replace inline <a> tags with the text of link and a footnote.
+  // 'See <a href="http://drupal.org">the Drupal site</a>' becomes
+  // 'See the Drupal site [1]' with the URL included as a footnote.
+  _drupal_html_to_mail_urls(NULL, TRUE);
+  $pattern = '@(<a[^>]+?href="([^"]*)"[^>]*?>(.+?)</a>)@i';
+  $string = preg_replace_callback($pattern, '_drupal_html_to_mail_urls', $string);
+  $urls = _drupal_html_to_mail_urls();
+  $footnotes = '';
+  if (count($urls)) {
+    $footnotes .= "\n";
+    for ($i = 0, $max = count($urls); $i < $max; $i++) {
+      $footnotes .= '[' . ($i + 1) . '] ' . $urls[$i] . "\n";
+    }
+  }
+
+  // Split tags from text.
+  $split = preg_split('/<([^>]+?)>/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+  // Note: PHP ensures the array consists of alternating delimiters and literals
+  // and begins and ends with a literal (inserting $null as required).
+
+  $tag = FALSE; // Odd/even counter (tag or no tag)
+  $casing = NULL; // Case conversion function
+  $output = '';
+  $indent = array(); // All current indentation string chunks
+  $lists = array(); // Array of counters for opened lists
+  foreach ($split as $value) {
+    $chunk = NULL; // Holds a string ready to be formatted and output.
+
+    // Process HTML tags (but don't output any literally).
+    if ($tag) {
+      list($tagname) = explode(' ', strtolower($value), 2);
+      switch ($tagname) {
+        // List counters
+        case 'ul':
+          array_unshift($lists, '*');
+          break;
+        case 'ol':
+          array_unshift($lists, 1);
+          break;
+        case '/ul':
+        case '/ol':
+          array_shift($lists);
+          $chunk = ''; // Ensure blank new-line.
+          break;
+
+          // Quotation/list markers, non-fancy headers
+        case 'blockquote':
+          // Format=flowed indentation cannot be mixed with lists.
+          $indent[] = count($lists) ? ' "' : '>';
+          break;
+        case 'li':
+          $indent[] = isset($lists[0]) && is_numeric($lists[0]) ? ' ' . $lists[0]++ . ') ' : ' * ';
+          break;
+        case 'dd':
+          $indent[] = '    ';
+          break;
+        case 'h3':
+          $indent[] = '.... ';
+          break;
+        case 'h4':
+          $indent[] = '.. ';
+          break;
+        case '/blockquote':
+          if (count($lists)) {
+            // Append closing quote for inline quotes (immediately).
+            $output = rtrim($output, "> \n") . "\"\n";
+            $chunk = ''; // Ensure blank new-line.
+          }
+          // Fall-through
+        case '/li':
+        case '/dd':
+          array_pop($indent);
+          break;
+        case '/h3':
+        case '/h4':
+          array_pop($indent);
+        case '/h5':
+        case '/h6':
+          $chunk = ''; // Ensure blank new-line.
+          break;
+
+          // Fancy headers
+        case 'h1':
+          $indent[] = '======== ';
+          $casing = 'drupal_strtoupper';
+          break;
+        case 'h2':
+          $indent[] = '-------- ';
+          $casing = 'drupal_strtoupper';
+          break;
+        case '/h1':
+        case '/h2':
+          $casing = NULL;
+          // Pad the line with dashes.
+          $output = _drupal_html_to_text_pad($output, ($tagname == '/h1') ? '=' : '-', ' ');
+          array_pop($indent);
+          $chunk = ''; // Ensure blank new-line.
+          break;
+
+          // Horizontal rulers
+        case 'hr':
+          // Insert immediately.
+          $output .= drupal_wrap_mail('', implode('', $indent)) . "\n";
+          $output = _drupal_html_to_text_pad($output, '-');
+          break;
+
+          // Paragraphs and definition lists
+//        case '/p':
+        case '/dl':
+          $chunk = ''; // Ensure blank new-line.
+          break;
+      }
+    }
+    // Process blocks of text.
+    else {
+      // Convert inline HTML text to plain text; not removing line-breaks or
+      // white-space, since that breaks newlines when sanitizing plain-text.
+      $value = trim(decode_entities($value));
+      if (drupal_strlen($value)) {
+        $chunk = $value;
+      }
+    }
+
+    // See if there is something waiting to be output.
+    if (isset($chunk)) {
+      // Apply any necessary case conversion.
+      if (isset($casing)) {
+        $chunk = $casing($chunk);
+      }
+      // Format it and apply the current indentation.
+      $output .= $chunk . MAIL_LINE_ENDINGS;
+      // Remove non-quotation markers from indentation.
+      $indent = array_map('_drupal_html_to_text_clean', $indent);
+    }
+
+    $tag = !$tag;
+  }
+
+  return $output . $footnotes;
+}

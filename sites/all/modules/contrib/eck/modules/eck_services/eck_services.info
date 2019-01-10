@@ -7,9 +7,8 @@ dependencies[] = eck
 dependencies[] = services
 
 
-; Information added by Drupal.org packaging script on 2017-01-04
-version = "7.x-2.0-rc9"
+; Information added by Drupal.org packaging script on 2018-10-15
+version = "7.x-2.0-rc10"
 core = "7.x"
 project = "eck"
-datestamp = "1483524281"
-
+datestamp = "1539631684"

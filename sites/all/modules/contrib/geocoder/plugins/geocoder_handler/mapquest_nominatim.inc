@@ -13,7 +13,7 @@ $plugin = array(
   'title' => t("MapQuest Nominatim"),
   'description' => t('Geocodes via MapQuest Nominatim'),
   'callback' => 'geocoder_mapquest_nominatim',
-  'field_types' => array('text', 'text_long', 'addressfield', 'location', 'text_with_summary', 'computed', 'taxonomy_term_reference'),
+  'field_types' => array('text', 'text_long', 'addressfield', 'location', 'text_with_summary', 'computed', 'taxonomy_term_reference', 'country'),
   'field_callback' => 'geocoder_mapquest_nominatim_field',
   'terms_of_service' => 'http://developer.mapquest.com/web/info/terms-of-use',
 );
@@ -41,6 +41,10 @@ function geocoder_mapquest_nominatim_field($field, $field_item) {
   }
   if ($field['type'] == 'addressfield' && module_exists('addressfield') && !addressfield_field_is_empty($field_item, $field)) {
     $address = geocoder_widget_parse_addressfield($field_item);
+    return geocoder_mapquest_nominatim($address);
+  }
+  if ($field['type'] == 'country') {
+    $address = geocoder_widget_parse_countryfield($field_item);
     return geocoder_mapquest_nominatim($address);
   }
   if ($field['type'] == 'location') {

@@ -64,14 +64,15 @@ function elysia_cron_menu() {
  */
 function elysia_cron_menu_alter(&$items) {
   // Override default cron page.
-  $items['admin/config/system/cron'] = array(
-    'title' => 'Cron Settings',
-    'description' => 'View and manage cron table',
-    'page callback' => 'elysia_cron_admin_page',
-    'access callback' => 'elysia_cron_access',
-    'access arguments' => array('view elysia_cron'),
-    'file' => NULL,
-  ) + $items['admin/config/system/cron'];
+  $items['admin/config/system/cron']['title'] = 'Cron Settings';
+  $items['admin/config/system/cron']['description'] = 'View and manage cron table';
+  $items['admin/config/system/cron']['page callback'] = 'elysia_cron_admin_page';
+  $items['admin/config/system/cron']['access callback'] = 'elysia_cron_access';
+  $items['admin/config/system/cron']['access arguments'] = array('view elysia_cron');
+  $items['admin/config/system/cron']['file'] = NULL;
+
+  $items['admin/reports/status/run-cron']['page callback'] = 'elysia_cron_run';
+  $items['admin/reports/status/run-cron']['page arguments'] = array(TRUE);
 }
 
 /**
@@ -143,6 +144,12 @@ function elysia_cron_exit() {
 function elysia_cron_cron() {
   global $_elysia_cron_exit_phase, $_elysia_cron_drush;
 
+  // First cron run is executed in standard drupal way.
+  // This is to enable the use of install profiles.
+  if (variable_get('cron_last', 0) <= variable_get('install_time', 0)) {
+    return;
+  }
+
   // If cron has been executed via "drush core-cron" or any other custom drush
   // command then we run internal cron handler which is designed to handle
   // cron executions from drush.
@@ -150,11 +157,6 @@ function elysia_cron_cron() {
     elysia_cron_drush_invoke();
   }
 
-  // First cron run is executed in standard drupal way.
-  // This is to enable the use of install profiles.
-  if (variable_get('cron_last', 0) <= variable_get('install_time', 0)) {
-    return;
-  }
   // If the path is 'admin/*', or if the user is not anonymous,
   // this is a manual cron run (probably by admin/logs/status),
   // but not if we are in the exit phase (= this a "poormanscron" run).
@@ -187,7 +189,7 @@ function elysia_cron_cron() {
     variable_set('cron_last', time());
   }
 
-  exit();
+  drupal_exit();
 }
 
 /**
@@ -1143,7 +1145,7 @@ function elysia_cron_prepare_run($manual_run, $start = TRUE) {
 
     // Try to allocate enough time to run all the hook_cron implementations.
     if (!ini_get('safe_mode') && _elysia_cron_function_available('set_time_limit')) {
-      set_time_limit(variable_get('elysia_cron_time_limit', 240));
+      @set_time_limit(variable_get('elysia_cron_time_limit', 240));
     }
 
     // Prevent session information from being saved while cron is running.

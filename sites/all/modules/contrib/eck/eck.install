@@ -89,7 +89,7 @@ function eck_schema() {
       ),
       'machine_name' => array(
         'description' => "A combination of the entity type and the name of"
-        . "this bundle, this combination is unique",
+          . "this bundle, this combination is unique",
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
@@ -177,7 +177,7 @@ function eck_update_7000() {
     ),
     'primary key' => array('id'),
     'indexes' => array(
-      'entity_type'      => array('entity', 'type'),
+      'entity_type' => array('entity', 'type'),
     ),
   );
 
@@ -189,12 +189,12 @@ function eck_update_7000() {
 
   foreach ($results as $record) {
     $nid = db_insert('eck_types')
-    ->fields(array(
+      ->fields(array(
         'entity' => $record->name,
         'type' => $record->name,
         'label' => $record->label,
-    ))
-    ->execute();
+      ))
+      ->execute();
 
     // Also we want to add a field to all the enity tables for the type, and
     // populated with the current type.
@@ -334,7 +334,10 @@ function eck_update_7005() {
   );
 
   // Create the index with the right field names.
-  db_add_index('eck_bundle', 'entity_type_bundle_name', array('entity_type', 'name'));
+  db_add_index('eck_bundle', 'entity_type_bundle_name', array(
+    'entity_type',
+    'name'
+  ));
 }
 
 /**
@@ -388,22 +391,33 @@ function eck_update_7006() {
 
         case 'uid':
           $new_properties['uid'] = array(
-            'label' => 'Author', 'type' => 'integer', 'behavior' => 'author');
+            'label' => 'Author',
+            'type' => 'integer',
+            'behavior' => 'author'
+          );
           break;
 
         case 'created':
           $new_properties['created'] = array(
-            'label' => 'Created', 'type' => 'integer', 'behavior' => 'created');
+            'label' => 'Created',
+            'type' => 'integer',
+            'behavior' => 'created'
+          );
           break;
 
         case 'changed':
           $new_properties['changed'] = array(
-            'label' => 'Changed', 'type' => 'integer', 'behavior' => 'changed');
+            'label' => 'Changed',
+            'type' => 'integer',
+            'behavior' => 'changed'
+          );
           break;
 
         case 'state':
           $new_properties['state'] = array(
-            'label' => 'State', 'type' => 'positive_integer');
+            'label' => 'State',
+            'type' => 'positive_integer'
+          );
           break;
 
       }
@@ -417,15 +431,24 @@ function eck_update_7006() {
       $label = $info['label'];
       switch ($type) {
         case 'text':
-          $new_properties[$property] = array('label' => $label, 'type' => $type);
+          $new_properties[$property] = array(
+            'label' => $label,
+            'type' => $type
+          );
           break;
 
         case 'decimal':
-          $new_properties[$property] = array('label' => $label, 'type' => $type);
+          $new_properties[$property] = array(
+            'label' => $label,
+            'type' => $type
+          );
           break;
 
         default:
-          $new_properties[$property] = array('label' => $label, 'type' => 'integer');
+          $new_properties[$property] = array(
+            'label' => $label,
+            'type' => 'integer'
+          );
           break;
 
       }
@@ -434,11 +457,11 @@ function eck_update_7006() {
     $encode_new = drupal_json_encode($new_properties);
 
     db_update('eck_entity_type')
-    ->fields(array(
-      'properties' => $encode_new,
-    ))
-    ->condition('name', $record->name, '=')
-    ->execute();
+      ->fields(array(
+        'properties' => $encode_new,
+      ))
+      ->condition('name', $record->name, '=')
+      ->execute();
   }
 
   // Now we can drop the custom_properties field now that everything has
@@ -451,7 +474,7 @@ function eck_update_7006() {
 
   db_add_field('eck_bundle', 'machine_name', array(
     'description' => "A combination of the entity type and the name of "
-    . "this bundle, this combination is unique",
+      . "this bundle, this combination is unique",
     'type' => 'varchar',
     'length' => 128,
     'default' => "",
@@ -472,11 +495,11 @@ function eck_update_7007() {
     $entity_type = $record->entity_type;
     $record->machine_name = "{$entity_type}_{$name}";
     db_update('eck_bundle')
-    ->fields(array(
-      'machine_name' => $record->machine_name,
-    ))
-    ->condition('id', $record->id, '=')
-    ->execute();
+      ->fields(array(
+        'machine_name' => $record->machine_name,
+      ))
+      ->condition('id', $record->id, '=')
+      ->execute();
   }
 }
 

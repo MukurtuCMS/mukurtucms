@@ -33,9 +33,35 @@
  */
 
 /**
+ * Implements hook_help().
+ */
+function advanced_help_help($path, $arg) {
+  if ($path == 'admin/help#advanced_help') {
+    $output = '<p>' . t('This module provides extended help and documentation.') . '</p>';
+    if (function_exists('advanced_help_hint_docs')) {
+      $output .= '<p>' . advanced_help_hint_docs('advanced_help', 'https://www.drupal.org/docs/7/modules/advanced-help', TRUE) . '</p>';
+    }
+    else {
+      $output .= t('If you install and enable the module <strong>!url</strong>, you will get more help for <strong>Advanced help</strong>.',
+        array('!url' => l('Advanced help hint', 'https://www.drupal.org/project/advanced_help_hint')));
+    }
+    return $output;
+  }
+}
+
+/**
+ * Implements hook_admin_paths_alter().
+ *
+ * Force help pages for this module to be rendered in admin theme.
+ */
+function advanced_help_admin_paths_alter(&$paths) {
+  $paths['help/advanced_help/*'] = TRUE;
+}
+
+/**
  * Implements hook_menu().
  *
- * Strings in hook_help() should not be run through t().
+ * Strings in hook_menu() should not be run through t().
  */
 function advanced_help_menu() {
   $help_exists = module_exists('help') ? TRUE : FALSE;
@@ -449,11 +475,13 @@ function advanced_help_get_module_name($module) {
  * Page callback to view a help topic.
  */
 function advanced_help_topic_page($module, $topic) {
+  if ('toc' == $topic) {
+    return advanced_help_index_page($module);
+  }
   $info = advanced_help_get_topic($module, $topic);
   if (!$info) {
     return drupal_not_found();
   }
-
   $popup = !empty($_GET['popup']) && user_access('view advanced help popup');
 
   drupal_set_title($info['title']);
@@ -539,9 +567,18 @@ function theme_advanced_help_topic($variables) {
   $topic  = $variables['topic'];
   $type   = $variables['type'];
 
-  $info = advanced_help_get_topic($module, $topic);
-  if (!$info) {
-    return;
+  if ('toc'  == $topic) {
+    $info = array(
+      'title' => 'Index page',
+      'popup width' => 500,
+      'popup height' => 500,
+    );
+  }
+  else {
+    $info = advanced_help_get_topic($module, $topic);
+    if (!$info) {
+      return;
+    }
   }
 
   switch ($type) {
@@ -590,7 +627,7 @@ function theme_advanced_help_topic($variables) {
 function advanced_help_get_topic_filename($module, $topic) {
   $info = advanced_help_get_topic_file_info($module, $topic);
   if ($info) {
-    return "./$info[path]/$info[file]";
+    return "$info[path]/$info[file]";
   }
 }
 
@@ -605,6 +642,9 @@ function _advanced_help_get_module_type($module) {
 
 /**
  * Load and render a help topic.
+ *
+ * The strategy is first to see if a translated file for the current
+ * active language exists.  If not found, look for the default.
  */
 function advanced_help_get_topic_file_info($module, $topic) {
   global $language;
@@ -617,16 +657,14 @@ function advanced_help_get_topic_file_info($module, $topic) {
   // Search paths:
   $module_type = _advanced_help_get_module_type($module);
   $paths = array(
-    // Allow theme override.
-    path_to_theme() . '/help',
-    // Translations.
+    // First see if a translation exists.
     drupal_get_path($module_type, $module) . "/translations/help/$language->language",
     // In same directory as .inc file.
     $info['path'],
   );
 
   foreach ($paths as $path) {
-    if (file_exists("./$path/$info[file]")) {
+    if (file_exists("$path/$info[file]")) {
       return array('path' => $path, 'file' => $info['file']);
     }
   }
@@ -651,7 +689,7 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
     $info = advanced_help_get_topic($module, $topic);
     $file = "./$file_info[path]/$file_info[file]";
 
-    // Fix invalid byte sequences (Issue #1330056).
+    // Fix invalid byte sequences (https://www.drupal.org/node/2659746).
     $output = file_get_contents($file);
     mb_substitute_character(0xfffd);
     $output = mb_convert_encoding($output, 'UTF-8', 'UTF-8');
@@ -726,6 +764,15 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
       $output = preg_replace('/^<!--[^\n]*-->\n/', '', $output);
 
       $output = _filter_autop($output);
+    }
+    if (!empty($info['ini']['format'])) {
+      $filter = $info['ini']['format'];
+      if (filter_format_exists($filter)) {
+        $output = check_markup($output, $filter);
+      }
+      else {
+        drupal_set_message(t('Ini-file request non-existing format: “!format”.', array('!format' => $filter)), 'error');
+      }
     }
 
     if (!empty($info['navigation'])) {
@@ -824,41 +871,43 @@ function advanced_help_get_settings() {
 function _advanced_help_parse_ini() {
   global $language;
   static $ini = NULL;
-
   if (!isset($ini)) {
     $cache = cache_get('advanced_help_ini:' . $language->language);
     if ($cache) {
       $ini = $cache->data;
     }
   }
-
   if (!isset($ini)) {
+    // No cached list of topics - create it.
     $ini = array('topics' => array(), 'settings' => array());
 
-    $help_path = drupal_get_path('module', 'advanced_help') . '/modules';
     foreach (array_merge(module_list(), list_themes()) as $plugin) {
       $module = is_string($plugin) ? $plugin : $plugin->name;
       $module_path = drupal_get_path(is_string($plugin) ? 'module' : 'theme', $module);
-      $info = array();
+
+      // Parse ini-file if it exists
       if (file_exists("$module_path/help/$module.help.ini")) {
-        $path = "$module_path/help";
+        $path_html = "$module_path/help";
         $info = parse_ini_file("./$module_path/help/$module.help.ini", TRUE);
+        if (!$info) {
+          drupal_set_message(t('There is a syntax error in the default .ini-file.  Unable to display topics.'), 'error');
+        }
       }
-      elseif (file_exists("$help_path/$module/$module.help.ini")) {
-        $path = "$help_path/$module";
-        $info = parse_ini_file("./$help_path/$module/$module.help.ini", TRUE);
+      else {
+        $info = array();
       }
-      elseif (!file_exists("$module_path/help")) {
+      if (empty($info) || !empty($info['advanced help settings']['show readme'])) {
         // Look for one or more README files.
         $files = file_scan_directory("./$module_path",
           '/^(readme).*\.(txt|md)$/i', array('recurse' => FALSE));
-        $path = "./$module_path";
+        $path_readme = "$module_path";
         foreach ($files as $name => $fileinfo) {
           $info[$fileinfo->filename] = array(
             'line break' => TRUE,
             'readme file' => TRUE,
             'file' => $fileinfo->filename,
             'title' => $fileinfo->name,
+            'weight' => -99,
           );
         }
       }
@@ -868,6 +917,9 @@ function _advanced_help_parse_ini() {
         $translation = array();
         if (file_exists("$module_path/translations/help/$language->language/$module.help.ini")) {
           $translation = parse_ini_file("$module_path/translations/help/$language->language/$module.help.ini", TRUE);
+          if (!$translation) {
+            drupal_set_message(t('There is a syntax error in the translated .ini-file.'), 'error');
+          }
         }
 
         $ini['settings'][$module] = array();
@@ -900,9 +952,10 @@ function _advanced_help_parse_ini() {
             // Require extension.
             'file' => isset($topic['readme file']) ? $file : $file . '.html',
             // Not in .ini file.
-            'path' => $path,
+            'path' => isset($topic['readme file']) ? $path_readme : $path_html,
             'line break' => isset($topic['line break']) ? $topic['line break'] : (isset($ini['settings'][$module]['line break']) ? $ini['settings'][$module]['line break'] : FALSE),
             'navigation' => isset($topic['navigation']) ? $topic['navigation'] : (isset($ini['settings'][$module]['navigation']) ? $ini['settings'][$module]['navigation'] : TRUE),
+            'show readme' => isset($topic['show readme']) ? $topic['show readme'] : (isset($ini['settings'][$module]['show readme']) ? $ini['settings'][$module]['show readme'] : FALSE),
             'css' => isset($topic['css']) ? $topic['css'] : (isset($ini['settings'][$module]['css']) ? $ini['settings'][$module]['css'] : NULL),
             'readme file' => isset($topic['readme file']) ? $topic['readme file'] : FALSE,
           );
@@ -1147,8 +1200,9 @@ function template_preprocess_advanced_help_popup(&$variables) {
   }
   // Closure should be filled last.
   // There has never been a theme hook for closure (going back to
-  // first release 2008-04-17).  Unable to figure out its purpose.
-  // $variables['closure']           = theme('closure');
+  // first release 2008-04-17), so it is always 0 bytes.
+  // Unable to figure out its purpose - commenting out.
+  // $variables['closure'] = theme('closure');
 }
 
 /**

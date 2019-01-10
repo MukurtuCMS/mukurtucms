@@ -346,29 +346,32 @@ function file_entity_field_formatter_view($entity_type, $entity, $field, $instan
   switch ($display['type']) {
     case 'file_rendered':
       foreach ($items as $delta => $item) {
-        // Protect ourselves from recursive rendering.
-        static $recursive_render_depth = array();
         if (!empty($item)) {
-          $recursive_render_id = $entity_type . $field['field_name'] . $item['fid'];
-          if (isset($recursive_render_depth[$recursive_render_id])) {
-            $recursive_render_depth[$recursive_render_id]++;
-          }
-          else {
-            $recursive_render_depth[$recursive_render_id] = 1;
-          }
+          // The repeat-rendering protection may be disabled if necessary.
+          if (variable_get('file_entity_protect_repeated_render', TRUE)) {
+            // Protect ourselves from repeated rendering.
+            static $repeated_render_depth = array();
+            $repeated_render_id = $entity_type . $field['field_name'] . $item['fid'];
+            if (isset($repeated_render_depth[$repeated_render_id])) {
+              $repeated_render_depth[$repeated_render_id]++;
+            }
+            else {
+              $repeated_render_depth[$repeated_render_id] = 1;
+            }
 
-          if ($recursive_render_depth[$recursive_render_id] > 20) {
-            watchdog(
-              'file_entity',
-              'Recursive rendering detected when rendering entity %entity_type: %entity_id, using the %field_name field. Aborting rendering.',
-              array(
-                '%entity_type' => 'file',
-                '%entity_id' => $item['fid'],
-                '%field_name' => $field['field_name'],
-              ),
-              WATCHDOG_ERROR
-            );
-            return $element;
+            if ($repeated_render_depth[$repeated_render_id] > 20) {
+              watchdog(
+                'file_entity',
+                'Repeated rendering detected when rendering entity %entity_type: %entity_id, using the %field_name field. Aborting rendering.',
+                array(
+                  '%entity_type' => 'file',
+                  '%entity_id' => $item['fid'],
+                  '%field_name' => $field['field_name'],
+                ),
+                WATCHDOG_ERROR
+              );
+              return $element;
+            }
           }
 
           $file = file_load($item['fid']);

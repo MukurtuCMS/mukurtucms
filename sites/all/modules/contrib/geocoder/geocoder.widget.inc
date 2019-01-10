@@ -8,6 +8,12 @@ function geocoder_field_widget_info() {
     'geocoder' => array(
       'label' => t('Geocode from another field'),
       'field types' => array('geofield', 'geolocation_latlng', 'location', 'postgis'),
+      'settings' => array(
+        'geocoder_field' => NULL,
+        'geocoder_handler' => NULL,
+        'handler_settings' => array(),
+        'delta_handling' => 'default',
+      ),
       'behaviors' => array(
         'multiple values' => FIELD_BEHAVIOR_CUSTOM,
         'default value' => FIELD_BEHAVIOR_NONE,
@@ -86,7 +92,7 @@ function geocoder_field_widget_settings_form($this_field, $instance) {
   }
 
   // Extend with virtual fields.
-  $info = entity_get_all_property_info($instance['entity_type']);
+  $info = entity_get_property_info($instance['entity_type']);
   foreach ($info as $property_name => $property) {
     if (isset($property['type']) && in_array($property['type'], array('location', 'text'))) {
       if (!isset($valid_fields[$property_name])) {
@@ -166,11 +172,117 @@ function geocoder_field_widget_settings_form($this_field, $instance) {
     '#required' => TRUE,
   );
 
+  $form['latlng_override'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow manual lat/long override'),
+    '#default_value' => isset($settings['latlng_override']) ? $settings['latlng_override'] : FALSE,
+    '#description' => t('Allow the user to override geolocation lat/long values manually. Useful when geocoding is inaccurate.'),
+  );
+
   // Add javascript to sync allowed values. Note that we are not using AJAX because we do not have access to the raw form_state here
   drupal_add_js(array('geocoder_widget_settings' => array('handlers' => $handlers_by_type, 'types' => $field_types)), 'setting');
   drupal_add_js(drupal_get_path('module', 'geocoder') . '/geocoder.admin.js', 'file');
 
   return $form;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function geocoder_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $base) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'];
+
+  if ($widget['type'] == 'geocoder' && !empty($settings['latlng_override'])) {
+    $instance['widget']['type'] = 'geofield_latlon';
+    $element = geofield_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $base);
+    // At present, the only way we know if the user has overridden the lat/long
+    // values is to perform a geocode and compare with the existing values.
+    $geocoded_value = geocoder_widget_get_field_value($instance['entity_type'], $instance, $form['#entity']);
+    $override_default = FALSE;
+    if ($geocoded_value &&
+      (round($element['lat']['#default_value'], 3) != round($geocoded_value[$element['#language']][$delta]['lat'], 3)
+        || round($element['lon']['#default_value'], 3) != round($geocoded_value[$element['#language']][$delta]['lon'], 3))
+    ) {
+      $override_default = TRUE;
+    }
+
+    $element['geocoder_overridden'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Override lat/long values'),
+      '#weight' => -10,
+      '#default_value' => $override_default,
+      '#description' => t('If address geocoding is inaccurate, check this box to override the lat/long values manually.'),
+    );
+
+    // Add element process to states to lat/long.
+    $element['#process'][] = 'geocoder_process_override';
+    $element['#element_validate'][] = 'geocoder_element_validate';
+
+    return array($delta => $element);
+  }
+}
+
+/**
+ * Geocoder element validate function.
+ */
+function geocoder_element_validate($element, &$form_state) {
+  if (!empty($element['geocoder_overridden']) && !empty($form_state['values'][$element['#field_name']][$element['#language']][$element['#delta']]['geocoder_overridden'])) {
+    // Set the form state value on entity to persist the flag.
+    $form_state['values']['geocoder_overridden'][$element['#field_name']][$element['#language']][$element['#delta']] = TRUE;
+  }
+  else {
+    $form_state['values']['geocoder_overridden'][$element['#field_name']][$element['#language']][$element['#delta']] = FALSE;
+  }
+}
+
+/**
+ * Geocoder element process function.
+ */
+function geocoder_process_override($element) {
+  $parents = $element['#parents'];
+  $first_parent = array_shift($parents);
+  $name = $first_parent . '[' . implode('][', $parents) . '][geocoder_overridden]';
+  // Only display lat/long inputs if override is checked
+  $element['lat']['#states'] = array(
+    'visible' => array(
+      ':input[name="' . $name . '"]' => array('checked' => TRUE),
+    ),
+  );
+  $element['lon']['#states'] = array(
+    'visible' => array(
+      ':input[name="' . $name . '"]' => array('checked' => TRUE),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_attach_load().
+ */
+function geocoder_field_attach_load($entity_type, $entities, $age, $options) {
+  // Loop over all the entities looking for entities with geocoder field.
+  foreach ($entities as &$entity) {
+    list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+    // Examine every geocoder field instance attached to this entity's bundle.
+    $instances = array_intersect_key(field_info_instances($entity_type, $bundle), field_read_fields(array('type' => 'geofield')));
+    foreach ($instances as $field_name => $instance) {
+      if ($instance['widget']['type'] === 'geocoder'
+        && !empty($instance['widget']['settings']['latlng_override'])
+        && !empty($entity->{$field_name})
+        && ($geocoded_value = geocoder_widget_get_field_value($entity_type, $instance, $entity))) {
+        foreach ($entity->{$field_name} as $langcode => $items) {
+          foreach ($items as $delta => $item) {
+            if ((round($item['lat'], 3) != round($geocoded_value[$langcode][$delta]['lat'], 3)
+              || round($item['lon'], 3) != round($geocoded_value[$langcode][$delta]['lon'], 3))
+            ) {
+              $entity->geocoder_overridden[$field_name][$langcode][$delta] = TRUE;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -180,13 +292,27 @@ function geocoder_field_widget_settings_form($this_field, $instance) {
  * and fully processed fields values are accessed.
  */
 function geocoder_field_attach_presave($entity_type, $entity) {
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+  $instances = array_intersect_key(field_info_instances($entity_type, $bundle), field_read_fields(array('type' => 'geofield')));
   // Loop over any geofield using our geocode widget
-  $entity_info = entity_get_info($entity_type);
-  $bundle_name = empty($entity_info['entity keys']['bundle']) ? $entity_type : $entity->{$entity_info['entity keys']['bundle']};
-  foreach (field_info_instances($entity_type, $bundle_name) as $field_instance) {
-    if ($field_instance['widget']['type'] === 'geocoder') {
-      if (($field_value = geocoder_widget_get_field_value($entity_type, $field_instance, $entity)) !== FALSE) {
-        $entity->{$field_instance['field_name']} = $field_value;
+  foreach ($instances as $field_name => $instance) {
+    if ($instance['widget']['type'] === 'geocoder'
+      && !empty($entity->{$field_name})
+      && ($geocoded_value = geocoder_widget_get_field_value($entity_type, $instance, $entity))) {
+      foreach ($entity->{$field_name} as $langcode => $items) {
+        if (empty($items)) {
+          $entity->{$field_name} = $geocoded_value;
+          break;
+        }
+        foreach ($items as $delta => $item) {
+          // Check the entity value.
+          if (!(isset($entity->geocoder_overridden)
+            && isset($entity->geocoder_overridden[$field_name])
+            && isset($entity->geocoder_overridden[$field_name][$langcode])
+            && !empty($entity->geocoder_overridden[$field_name][$langcode][$delta]))) {
+            $entity->{$field_name}[$langcode][$delta] = $geocoded_value[$langcode][$delta];
+          }
+        }
       }
     }
   }
@@ -228,8 +354,8 @@ function geocoder_widget_get_entity_field_value($entity_type, $field_instance, $
   }
   else if ($entity) {
     $wrapper = entity_metadata_wrapper($entity_type, $entity);
-    $field_wrapper = $wrapper->$field_name;
-    $value = $field_wrapper->value();
+    $field_wrapper = $wrapper->value()->$field_name;
+    $value = $field_wrapper[LANGUAGE_NONE];
     $values = array_filter(is_array($value) && isset($value[0]) ? $value : array($value));
     $source_field_values = array_map(function($value) {
       if (is_array($value)) {
@@ -334,27 +460,22 @@ function geocoder_widget_get_field_value($entity_type, $field_instance, $entity 
           // Geocode any value from our source field.
           try {
             $geometry = call_user_func($handler['field_callback'], $field_info, $item, $handler_settings);
+
+            // Save result persistently.
+            geocoder_cache_set($geometry, $handler['name'], $item, $handler_settings);
           }
-          // No-results or errors throw exceptions, which affects 1 field item, not all.
+          // Exception affects just this one field item.
           catch (Exception $e) {
-            $geometry = FALSE;
-
-            $uri_info = entity_uri($entity_type, $entity);
-            list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
-            $label = t('View offending @entity_type (@bundle # @id)', array(
-              '@entity_type' => $entity_type,
-              '@bundle' => $bundle,
-              '@id' => $id,
-            ));
-            watchdog_exception('geocoder', $e, NULL, array(), WATCHDOG_WARNING, l($label, $uri_info['path'], $uri_info));
+            watchdog_exception('geocoder', $e, NULL, array(), WATCHDOG_ERROR, geocoder_widget_get_link($entity_type, $entity));
+            continue;
           }
-
-          // Save result persistently.
-          geocoder_cache_set($geometry, $handler['name'], $item, $handler_settings);
         }
 
         if ($geometry instanceof Geometry) {
           $geometries[] = $geometry;
+        }
+        elseif (variable_get('geocoder_log_empty_results', FALSE)) {
+          watchdog('geocoder', 'No results for geocoding', NULL, WATCHDOG_NOTICE, geocoder_widget_get_link($entity_type, $entity));
         }
       }
 
@@ -486,7 +607,14 @@ function geocoder_widget_parse_addressfield($field_item) {
   $address[] = !empty($field_item['sub_premise']) ? $field_item['sub_premise'] : NULL;
   $address[] = !empty($field_item['thoroughfare']) ? $field_item['thoroughfare'] : NULL;
   $address[] = !empty($field_item['locality']) ? $field_item['locality'] : NULL;
-  $address[] = !empty($field_item['administrative_area']) ? $field_item['administrative_area'] : NULL;
+  $address[] = !empty($field_item['postal_code']) ? $field_item['postal_code'] : NULL;
+  if (!empty($field_item['country']) && !empty($field_item['administrative_area'])) {
+    module_load_include('inc', 'addressfield', 'addressfield.administrative_areas');
+    $address[] = addressfield_get_administrative_areas($field_item['country'])[$field_item['administrative_area']];
+  }
+  else {
+    $address[] = !empty($field_item['administrative_area']) ? $field_item['administrative_area'] : NULL;
+  }
   $address[] = !empty($field_item['sub_administrative_area']) ? $field_item['sub_administrative_area'] : NULL;
 
   if (!empty($field_item['country'])) {
@@ -505,8 +633,6 @@ function geocoder_widget_parse_addressfield($field_item) {
     $address[] = $field_item['country'];
   }
 
-  $address[] = !empty($field_item['postal_code']) ? $field_item['postal_code'] : NULL;
-
   return implode(',', array_filter($address));
 }
 
@@ -515,18 +641,47 @@ function geocoder_widget_parse_addressfield($field_item) {
  */
 function geocoder_widget_parse_locationfield($field_item) {
   $address = '';
-  if (!empty($field_item['name']))        $address .= $field_item['name'] . ',';
   if (!empty($field_item['street']))      $address .= $field_item['street'] . ',';
   if (!empty($field_item['additional']))  $address .= $field_item['additional'] . ',';
   if (!empty($field_item['city']))        $address .= $field_item['city'] . ',';
+  if (!empty($field_item['postal_code'])) $address .= $field_item['postal_code'] . ',';
   if (!empty($field_item['province']) && function_exists('location_province_name')) {
     $province_fullname = location_province_name($field_item['country'], $field_item['province']);
     $address .=  $province_fullname . ',';
   }
   if (!empty($field_item['country']))     $address .= $field_item['country'] . ',';
-  if (!empty($field_item['postal_code'])) $address .= $field_item['postal_code'] . ',';
 
   $address = rtrim($address, ', ');
 
   return $address;
+}
+
+/**
+ * Geocoder Widget - Parse a country field.
+ */
+function geocoder_widget_parse_countryfield($field_item) {
+  $address = '';
+  $country = country_load($field_item['iso2']);
+  if ($country) {
+    $address = $country->name;
+  }
+  return $address;
+}
+
+/**
+ * Geocoder Widget utility function to build a link for an entity, ready for use in watchdog().
+ */
+function geocoder_widget_get_link($entity_type, $entity) {
+  if ($uri_info = entity_uri($entity_type, $entity)) {
+    list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
+    $label = t('View offending @entity_type (@bundle #@id)', array(
+      '@entity_type' => $entity_type,
+      '@bundle' => $bundle,
+      '@id' => $id,
+    ));
+
+    return l($label, $uri_info['path'], $uri_info);
+  }
+
+  return NULL;
 }

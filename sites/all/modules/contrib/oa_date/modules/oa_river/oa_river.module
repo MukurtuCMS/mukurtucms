@@ -1,0 +1,46 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Recent Activity feature.
+ */
+
+include_once 'oa_river.features.inc';
+
+/**
+ * Implements hook_theme()
+ */
+function oa_river_theme() {
+  return array(
+    'views_view_fields__oa_recent_activity__panel_pane' => array(
+      'template'  => 'views-view-fields--oa-recent-activity--panel-pane',
+      'base hook' => 'views_view_fields',
+      'preprocess functions' => array(
+        'template_preprocess',
+        'template_preprocess_views_view_fields',
+        'oa_core_preprocess_views_view_fields',
+      ),
+      'arguments' => array('view' => NULL, 'options' => NULL, 'row' => NULL),
+      'path' => drupal_get_path('module', 'oa_river') . '/templates',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Add a the river view modes to messages.
+ */
+function oa_river_entity_info_alter(&$entity_info) {
+  if (isset($entity_info['message'])) {
+    $view_modes = array(
+      'oa_river_header' => array('label' => t('Open Atrium - River Header')),
+      'oa_river_accordian' => array('label' => t('Open Atrium - River Accordian')),
+      'oa_river_body' => array('label' => t('Open Atrium - River Body')),
+    );
+    foreach ($view_modes as &$view_mode) {
+      $view_mode += array('custom settings' => TRUE);
+    }
+    $entity_info['message']['view modes'] += $view_modes;
+  }
+}
+

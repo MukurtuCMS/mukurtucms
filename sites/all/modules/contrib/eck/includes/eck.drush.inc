@@ -72,7 +72,10 @@ function drush_eck_entity_construction_kit() {
   }
   else {
     $entity_type = $entity_objs[0];
-    drush_log(dt('Only one entity type detected, proceeding with @entity_label, @entity_name, ', array('@entity_label' => $entity_type->label, '@entity_name' => $entity_type->name)), 'ok');
+    drush_log(dt('Only one entity type detected, proceeding with @entity_label, @entity_name, ', array(
+      '@entity_label' => $entity_type->label,
+      '@entity_name' => $entity_type->name
+    )), 'ok');
   }
 
   $bundle_objs = Bundle::loadByEntityType($entity_type);
@@ -93,7 +96,10 @@ function drush_eck_entity_construction_kit() {
   }
   else {
     $bundle = $bundle_objs[0];
-    drush_log(dt('Only one bundle detected, proceeding with @bundle_label, @bundle_name, ', array('@bundle_label' => $bundle->label, '@bundle_name' => $bundle->name)), 'ok');
+    drush_log(dt('Only one bundle detected, proceeding with @bundle_label, @bundle_name, ', array(
+      '@bundle_label' => $bundle->label,
+      '@bundle_name' => $bundle->name
+    )), 'ok');
   }
 
   $rows[] = array('');

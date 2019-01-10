@@ -13,7 +13,7 @@ $plugin = array(
   'title' => t("Yahoo Placefinder"),
   'description' => t('Geocodes via Yahoo Placefinder'),
   'callback' => 'geocoder_yahoo',
-  'field_types' => array('text', 'text_long', 'addressfield', 'location', 'text_with_summary', 'computed', 'taxonomy_term_reference'),
+  'field_types' => array('text', 'text_long', 'addressfield', 'location', 'text_with_summary', 'computed', 'taxonomy_term_reference', 'country'),
   'field_callback' => 'geocoder_yahoo_field',
   'terms_of_service' => 'http://developer.yahoo.com/geo/placefinder/',
 );
@@ -29,8 +29,7 @@ function geocoder_yahoo($address, $options = array()) {
     $consumer_key = $geocoder_settings["geocoder_apikey_yahoo"];
   }
   else {
-    drupal_set_message(t('You must set up your Yahoo API key. Click !config', array('!config' => l(t('here'), $base_path .'admin/config/content/geocoder'))),'error');
-    return;
+    throw new Exception(t('You must set up your Yahoo API key. Click !config', array('!config' => l(t('here'), $base_path .'admin/config/content/geocoder'))));
   }
 
   $request = drupal_http_request("http://where.yahooapis.com/geocode?location=" . urlencode($address) . "&flags=J&appid={$consumer_key}");
@@ -46,6 +45,10 @@ function geocoder_yahoo_field($field, $field_item) {
   }
   if ($field['type'] == 'addressfield' && module_exists('addressfield') && !addressfield_field_is_empty($field_item, $field)) {
     $address = geocoder_widget_parse_addressfield($field_item);
+    return geocoder_yahoo($address);
+  }
+  if ($field['type'] == 'country') {
+    $address = geocoder_widget_parse_countryfield($field_item);
     return geocoder_yahoo($address);
   }
   if ($field['type'] == 'location') {

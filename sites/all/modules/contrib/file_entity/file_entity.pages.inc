@@ -435,6 +435,8 @@ function file_entity_add_upload_submit($form, &$form_state) {
       // Save the file with blanks fields.
       $save = TRUE;
     }
+    // Allow other modules to choose to skip or complete step 4.
+    drupal_alter('file_entity_file_upload_skip_fields', $save, $form_state);
   }
 
   // Form id's can vary depending on how many other forms are displayed, so we
@@ -750,7 +752,7 @@ function file_entity_edit($form, &$form_state, $file) {
     '#title' => t('Associated with'),
     '#maxlength' => 60,
     '#autocomplete_path' => 'user/autocomplete',
-    '#default_value' => !empty($file->uid) ? user_load($file->uid)->name : '',
+    '#default_value' => (!empty($file->uid) && $user = user_load($file->uid)) ? $user->name : '',
     '#weight' => -1,
     '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
@@ -834,6 +836,15 @@ function file_entity_edit_submit($form, &$form_state) {
   // Check if a replacement file has been uploaded.
   if (!empty($form_state['values']['replace_upload'])) {
     $replacement = $form_state['values']['replace_upload'];
+    // Existing image metadata is stored in $file->height and $file->width.
+    // Loop through the replacement metadata and update existing values.
+    if (!empty($replacement->metadata)) {
+      foreach ($replacement->metadata as $metadata_key => $metadata_value) {
+        if (isset($file->{$metadata_key})) {
+          $file->{$metadata_key} = $metadata_value;
+        }
+      }
+    }
     // Move file from temp to permanent home.
     if (!empty($form_state['values']['replace_keep_original_filename'])
     && $form_state['values']['replace_keep_original_filename']) {

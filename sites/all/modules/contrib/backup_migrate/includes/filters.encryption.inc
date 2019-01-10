@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * A filter for encrypting bckups with AES.
@@ -12,33 +11,33 @@
  * @ingroup backup_migrate_filters
  */
 class backup_migrate_filter_encryption extends backup_migrate_filter {
-  var $op_weights = array('backup' => 170, 'restore' => -170);
+  public $op_weights = array('backup' => 170, 'restore' => -170);
 
   /**
-   * This function is called on a backup file after the backup has been completed.
+   * Called on a backup file after the backup has been completed.
    */
-  function backup($file, $settings) {
+  public function backup($file, $settings) {
     return $this->file_encrypt($file, $settings);
   }
 
   /**
-   * This function is called on a backup file before importing it.
+   * Called on a backup file before importing it.
    */
-  function restore($file, $settings) {
+  public function restore($file, $settings) {
     return $this->file_decrypt($file);
   }
 
   /**
-   * Get the form for the settings for this filter.
+   * Gets the form for the settings for this filter.
    */
-  function backup_settings_default() {
+  public function backup_settings_default() {
     return array('encryption' => 'none');
   }
 
   /**
-   * Get the form for the settings for this filter.
+   * Gets the form for the settings for this filter.
    */
-  function backup_settings_form($settings) {
+  public function backup_settings_form($settings) {
     $form = array();
     $options = $this->_backup_migrate_get_encryption_form_item_options();
     if (count($options) > 1) {
@@ -62,9 +61,9 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Return a list of backup filetypes.
+   * Returns a list of backup filetypes.
    */
-  function file_types() {
+  public function file_types() {
     return array(
       "aes" => array(
         "extension" => "aes",
@@ -76,9 +75,9 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Get the compression options as an options array for a form item.
+   * Gets the compression options as an options array for a form item.
    */
-  function _backup_migrate_get_encryption_form_item_options() {
+  public function _backup_migrate_get_encryption_form_item_options() {
     $options = array();
     $options = array('' => t('No Encryption'));
     if (@function_exists("aes_encrypt")) {
@@ -88,13 +87,14 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * AES encrypt a file.
+   * AES encrypts a file.
    */
-  function aes_encrypt($source, $dest) {
+  public function aes_encrypt($source, $dest) {
     $success = FALSE;
     if (function_exists('aes_encrypt')) {
       if ($data = $source->get_contents()) {
-        // Add a marker to the end of the data so we can trim the padding on decrpypt.
+        // Add a marker to the end of the data so we can trim the padding on
+        // decrpypt.
         $data = pack("a*H2", $data, "80");
         if ($data = aes_encrypt($data, FALSE)) {
           $dest->put_contents($data);
@@ -106,9 +106,9 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Gzip decode a file.
+   * AES decodes a file.
    */
-  function aes_decrypt($source, $dest) {
+  public function aes_decrypt($source, $dest) {
     $success = FALSE;
     if (function_exists('aes_decrypt')) {
       if ($data = $source->get_contents()) {
@@ -124,10 +124,11 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Compress a file with the given settings.
-   *  Also updates settings to reflect new file mime and file extension.
+   * Compresses a file with the given settings.
+   *
+   * Also updates settings to reflect new file mime and file extension.
    */
-  function file_encrypt($file, $settings) {
+  public function file_encrypt($file, $settings) {
     if (!empty($settings->filters['encryption'])) {
       switch ($settings->filters['encryption']) {
         case "aes":
@@ -146,10 +147,11 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
   }
 
   /**
-   * Decompress a file with the given settings.
-   *  Also updates settings to reflect new file mime and file extension.
+   * Decompresses a file with the given settings.
+   *
+   * Also updates settings to reflect new file mime and file extension.
    */
-  function file_decrypt($file) {
+  public function file_decrypt($file) {
     $success = FALSE;
     if ($file) {
       switch ($file->type_id()) {
@@ -157,11 +159,11 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
           $from = $file->pop_type();
           $success = $this->aes_decrypt($from, $file);
           break;
+
         default:
           return $file;
-        break;
-    }
-  
+      }
+
       if (!$success) {
         if (function_exists('aes_decrypt')) {
           _backup_migrate_message("Could not decrpyt backup file. Please check that the file is valid and that the encryption key of the server matches the server that created the backup.", array(), 'error');
@@ -173,5 +175,5 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
     }
     return $success ? $file : NULL;
   }
-}
 
+}

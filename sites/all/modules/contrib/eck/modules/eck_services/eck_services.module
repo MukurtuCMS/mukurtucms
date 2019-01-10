@@ -18,6 +18,7 @@ function eck_services_form_eck__entity_type__form_alter(&$form, &$form_state, $f
     }
   }
 }
+
 function _eck_services_entity_type_form_submit($form, &$form_state) {
   if (isset($form_state['values']['enable_services'])) {
     variable_set('eck_services_' . $form_state['build_info']['args'][0] . '_enable',

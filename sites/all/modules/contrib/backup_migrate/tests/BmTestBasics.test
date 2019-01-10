@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * @file
+ * Tests for different parts of the Backup Migrate system.
+ */
+
+/**
+ * Test that the front page still loads.
+ */
+class BmTestBasics extends BmTestBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Basic tests',
+      'description' => 'Run through basic scenarios and functionality.',
+      'group' => 'backup_migrate',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+  }
+
+  /**
+   * Verify the main page has the expected functionality available.
+   */
+  public function testMainPage() {
+    // Load the main B&M page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH);
+    $this->assertResponse(200);
+
+    // @todo Confirm each of the tabs are present.
+    // @todo Confirm each of the local tasks are present.
+    // Confirm the form has the expected fields.
+    $this->assertFieldByName('source_id');
+    $this->assertFieldByName('destination_id');
+    $this->assertFieldByName('profile_id');
+    $this->assertFieldByName('copy');
+    $this->assertFieldByName('copy_destination_id');
+    $this->assertFieldByName('description_enabled');
+    // This item should not have a value "selected", it just defaults to the
+    // first item being the active item.
+    $items = array('db', 'files', 'archive');
+    $this->assertSelectOptions('edit-source-id', $items);
+    $this->assertNoOptionsSelected('edit-source-id');
+    // This item should have a value "selected", not just the first item.
+    $items = array('manual', 'download', 'nodesquirrel');
+    $this->assertSelectOptions('edit-destination-id', $items);
+    $this->assertOptionSelected('edit-destination-id', 'download');
+    // This item should not have a value "selected", it just defaults to the
+    // first item being the active item.
+    $items = array('default');
+    $this->assertSelectOptions('edit-profile-id', $items);
+    $this->assertNoOptionsSelected('edit-profile-id');
+    // This item should not have a value "selected", it just defaults to the
+    // first item being the active item.
+    $items = array('manual', 'download', 'nodesquirrel');
+    $this->assertSelectOptions('edit-copy-destination-id', $items);
+    $this->assertNoOptionsSelected('edit-copy-destination-id');
+  }
+
+  /**
+   * Confirm the initial backup process works.
+   */
+  public function testFirstBackup() {
+    // Load the main B&M page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH);
+    $this->assertResponse(200);
+
+    // Generate a backup and confirm it was created correctly.
+    $edit = array(
+      'destination_id' => 'manual',
+    );
+    $this->drupalPost(NULL, $edit, 'Backup now');
+    $this->assertResponse(200);
+    // Confirm the response is as expected. This is split up into separate
+    // pieces because it'd be more effort than is necessary right now to confirm
+    // what the exact filename is.
+    $this->assertText('Default Database backed up successfully');
+    $this->assertText('in destination Manual Backups Directory');
+    $this->assertLink('download');
+    $this->assertLink('restore');
+    $this->assertLink('delete');
+
+    // Try requesting the backup file.
+    $xpath = $this
+      ->xpath('//a[normalize-space(text())=:label]', array(
+        ':label' => 'download',
+      ));
+    $this->verbose($xpath);
+    $this->assertTrue(isset($xpath[0]['href']));
+    $this->assertNotNull($xpath[0]['href']);
+    // @todo This doesn't work on drupalci, so work out how to fix it.
+    // $this->drupalGet($xpath[0]['href']);
+    $this->assertResponse(200);
+  }
+
+}
+
+// @todo Test permissions.
+// @todo Test admin forms.

@@ -1,4 +1,8 @@
-(function($) {
+/**
+ * @file
+ */
+
+(function ($) {
 
 Drupal.admin = Drupal.admin || {};
 Drupal.admin.behaviors = Drupal.admin.behaviors || {};
@@ -139,7 +143,7 @@ Drupal.admin.getCache = function (hash, onSuccess) {
  *
  * @see toolbar.js
  */
-Drupal.admin.height = function() {
+Drupal.admin.height = function () {
   var $adminMenu = $('#admin-menu');
   var height = $adminMenu.outerHeight();
   // In IE, Shadow filter adds some extra height, so we need to remove it from
@@ -161,7 +165,7 @@ Drupal.admin.height = function() {
 Drupal.admin.attachBehaviors = function (context, settings, $adminMenu) {
   if ($adminMenu.length) {
     $adminMenu.addClass('admin-menu-processed');
-    $.each(Drupal.admin.behaviors, function() {
+    $.each(Drupal.admin.behaviors, function () {
       this(context, settings, $adminMenu);
     });
   }
@@ -206,7 +210,7 @@ Drupal.admin.behaviors.replacements = function (context, settings, $adminMenu) {
  */
 Drupal.admin.behaviors.destination = function (context, settings, $adminMenu) {
   if (settings.admin_menu.destination) {
-    $('a.admin-menu-destination', $adminMenu).each(function() {
+    $('a.admin-menu-destination', $adminMenu).each(function () {
       this.search += (!this.search.length ? '?' : '&') + Drupal.settings.admin_menu.destination;
     });
   }

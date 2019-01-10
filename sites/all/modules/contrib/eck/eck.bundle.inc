@@ -19,32 +19,23 @@ function eck__bundle__menu($entity_type) {
   $path = eck__entity_type__path();
   $menu = array();
 
-  // Dummy menu items so that entity translation will not complain about there
-  // not being a default.
-  // @todo: Remove these dummy items once issue https://drupal.org/node/2273189
-  // is resolved.
-  $menu["$entity_type->name/%"] = array(
-    'page callback' => FALSE,
-    'page arguments' => array(),
-    'access callback' => FALSE,
-    'access arguments' => array(),
-  );
-  $menu["$entity_type->name/%/edit"] = array(
-    'page callback' => FALSE,
-    'page arguments' => array(),
-    'access callback' => FALSE,
-    'access arguments' => array(),
-  );
-
   // DELETE Entity Types.
   $menu["{$path}/{$entity_type->name}/delete"] = array(
     'title' => "Delete",
     'description' => "Delete the '{$entity_type->label}' Entity Type",
     // "eck__entity_type__delete",
     'page callback' => "drupal_get_form",
-    'page arguments' => array("eck__entity_type__delete_form", $entity_type->name),
+    'page arguments' => array(
+      "eck__entity_type__delete_form",
+      $entity_type->name
+    ),
     'access callback' => 'eck__multiple_access_check',
-    'access arguments' => array(array('eck administer entity types', 'eck delete entity types')),
+    'access arguments' => array(
+      array(
+        'eck administer entity types',
+        'eck delete entity types'
+      )
+    ),
     'file' => 'eck.entity_type.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 3,
@@ -100,7 +91,12 @@ function eck__bundle__menu($entity_type) {
     'page callback' => 'drupal_get_form',
     'page arguments' => array("eck__entity_type__form", $entity_type->name),
     'access callback' => 'eck__multiple_access_check',
-    'access arguments' => array(array('eck administer entity types', 'eck edit entity types')),
+    'access arguments' => array(
+      array(
+        'eck administer entity types',
+        'eck edit entity types'
+      )
+    ),
     'file' => 'eck.entity_type.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
@@ -149,16 +145,20 @@ function eck__bundle__list($entity_type) {
   // @todo Do we really need this, can they be here without the right
   // permissions in the first place?
   if (eck__multiple_access_check(array(
-        'eck administer bundles',
-        'eck list bundles',
-        "eck administer {$entity_type->name} bundles",
-        "eck list {$entity_type->name} bundles",
-      )
-    )) {
+      'eck administer bundles',
+      'eck list bundles',
+      "eck administer {$entity_type->name} bundles",
+      "eck list {$entity_type->name} bundles",
+    )
+  )) {
 
-    $header = array(t('Bundle'), array(
-      'data' => t('Operations'),
-      'colspan' => '1'));
+    $header = array(
+      t('Bundle'),
+      array(
+        'data' => t('Operations'),
+        'colspan' => '1'
+      )
+    );
 
     $rows = array();
 
@@ -349,7 +349,10 @@ function eck__bundle__edit_form($form, &$form_state, $entity_type_name, $bundle_
   );
 
   // Let the behaviors to modify form.
-  $vars = eck_property_behavior_invoke_plugin_alter($entity_type, 'bundle_form', array('form' => $form, 'form_state' => $form_state));
+  $vars = eck_property_behavior_invoke_plugin_alter($entity_type, 'bundle_form', array(
+    'form' => $form,
+    'form_state' => $form_state
+  ));
   $form = $vars['form'];
   $form_state = $vars['form_state'];
 
@@ -467,7 +470,9 @@ function eck__bundle__field_autocomplete($entity_type, $bundle, $string = "") {
     // http://drupal.org/node/997394 is fixed.
     $query->addMetadata('account', user_load(1));
 
-    $query->entityCondition('entity_type', $entity_type->name, '=')->entityCondition('bundle', $bundle->name, '=')->fieldCondition($field, $column, $string, 'CONTAINS');
+    $query->entityCondition('entity_type', $entity_type->name, '=')
+      ->entityCondition('bundle', $bundle->name, '=')
+      ->fieldCondition($field, $column, $string, 'CONTAINS');
 
     $results = $query->execute();
 

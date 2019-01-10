@@ -2334,6 +2334,11 @@ function pathauto_file_update_alias(stdClass $file, $op, array $options = array(
     return;
   }
 
+  // Skip processing if pathauto_entity module is enabled.
+  if (module_exists('pathauto_entity')) {
+    return;
+  }
+
   module_load_include('inc', 'pathauto');
   $uri = entity_uri('file', $file);
   pathauto_create_alias('file', $op, $uri['path'], array('file' => $file), $file->type, $options['language']);

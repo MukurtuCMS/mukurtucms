@@ -21,7 +21,7 @@ function geocoder_admin_settings($form, &$form_state) {
   $form['geocoder_apikey_yandex'] = array(
     '#type' => 'textfield',
     '#title' => t('Yandex Maps API Key'),
-    '#description' => t('You can obtain a Yandex API Key at ') . 'http://api.yandex.ru/maps/getkey.xml',
+    '#description' => t('You can obtain a Yandex API Key at !link.', array('!link' => l(t('https://tech.yandex.com/maps/keys'), 'https://tech.yandex.com/maps/keys'))),
     '#default_value' => empty($geocoder_settings['geocoder_apikey_yandex']) ? '' : $geocoder_settings['geocoder_apikey_yandex'],
     '#required' => FALSE,
   );
@@ -31,6 +31,30 @@ function geocoder_admin_settings($form, &$form_state) {
     '#title' => t('Bing API Key'),
     '#description' => t('You can obtain a Bing API Key at ') . 'http://msdn.microsoft.com/en-us/library/ff428642.aspx',
     '#default_value' => empty($geocoder_settings['geocoder_apikey_bing']) ? '' : $geocoder_settings['geocoder_apikey_bing'],
+    '#required' => FALSE,
+  );
+
+  $form['geocoder_apikey_mapzen'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mapzen Search API Key'),
+    '#description' => t('You can obtain a Mapzen Search API Key at ') . 'https://mapzen.com/developers',
+    '#default_value' => empty($geocoder_settings['geocoder_apikey_mapzen']) ? '' : $geocoder_settings['geocoder_apikey_mapzen'],
+    '#required' => FALSE,
+  );
+
+  $form['geocoder_apikey_mapbox'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mapbox Access Token'),
+    '#description' => t('You can obtain a Mapbox access token at ') . ' ' . 'http://www.mapbox.com',
+    '#default_value' => empty($geocoder_settings['geocoder_apikey_mapbox']) ? '' : $geocoder_settings['geocoder_apikey_mapbox'],
+    '#required' => FALSE,
+  );
+
+  $form['geocoder_apikey_mapquest'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MapQuest API Key'),
+    '#description' => t('You can obtain a MapQuest API Key at ') . 'https://developer.mapquest.com/plan_purchase/steps/business_edition/business_edition_free/register',
+    '#default_value' => empty($geocoder_settings['geocoder_apikey_mapquest']) ? '' : $geocoder_settings['geocoder_apikey_mapquest'],
     '#required' => FALSE,
   );
 
@@ -110,6 +134,19 @@ function geocoder_admin_settings($form, &$form_state) {
     '#description' => t('Geocoder caches all queries by default. Do you want that to include the ones with no results? If not, it will be checked every time, probably with the same no-result.'),
   );
 
+  $form['geocoder_log_empty_results'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Log empty results'),
+    '#default_value' => variable_get('geocoder_log_empty_results', FALSE),
+    '#description' => t('Whether to generate a watchdog log when geocoding returns no results.'),
+  );
+  $form['geocoder_recode'] = array(
+     '#type' => 'checkbox',
+     '#title' => t('Force re-geocoding'),
+     '#description' => t('Enable forced re-geocoding of all geocoder fields on entity save (even if there are no changes to the source of the geocoded data). This option can slow down bulk saves and increases the amount of calls to the geocoding service.'),
+     '#default_value' => variable_get('geocoder_recode', FALSE),
+  );
+
   $form['#submit'][] = 'geocoder_admin_settings_submit';
   return system_settings_form($form);
 }
@@ -125,6 +162,9 @@ function geocoder_admin_settings_submit($form, &$form_state) {
   $geocoder_settings['geocoder_apikey_yahoo'] = trim($form_state['values']['geocoder_apikey_yahoo']);
   $geocoder_settings['geocoder_apikey_yandex'] = trim($form_state['values']['geocoder_apikey_yandex']);
   $geocoder_settings['geocoder_apikey_bing'] = trim($form_state['values']['geocoder_apikey_bing']);
+  $geocoder_settings['geocoder_apikey_mapzen'] = trim($form_state['values']['geocoder_apikey_mapzen']);
+  $geocoder_settings['geocoder_apikey_mapbox'] = trim($form_state['values']['geocoder_apikey_mapbox']);
   $geocoder_settings['geocoder_apikey_google'] = trim($form_state['values']['geocoder_apikey_google']);
+  $geocoder_settings['geocoder_apikey_mapquest'] = trim($form_state['values']['geocoder_apikey_mapquest']);
   variable_set("geocoder_settings", $geocoder_settings);
 }

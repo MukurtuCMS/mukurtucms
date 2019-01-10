@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * Functions to handle the email backup destination.
@@ -12,12 +11,12 @@
  * @ingroup backup_migrate_destinations
  */
 class backup_migrate_destination_email extends backup_migrate_destination {
-  var $supported_ops = array('scheduled backup', 'manual backup', 'remote backup', 'configure');
+  public $supported_ops = array('scheduled backup', 'manual backup', 'remote backup', 'configure');
 
   /**
    * Save to (ie. email the file) to the email destination.
    */
-  function save_file($file, $settings) {
+  public function save_file($file, $settings) {
     $size = filesize($file->filepath());
     $max = variable_get('backup_migrate_max_email_size', 20971520);
     if ($size > $max) {
@@ -34,14 +33,14 @@ class backup_migrate_destination_email extends backup_migrate_destination {
   /**
    * Get the form for the settings for this filter.
    */
-  function edit_form() {
+  public function edit_form() {
     $form = parent::edit_form();
     $form['location'] = array(
       "#type" => "textfield",
       "#title" => t("Email Address"),
       "#default_value" => $this->get_location(),
       "#required" => TRUE,
-      "#description" => t('Enter the email address to send the backup files to. Make sure the email sever can handle large file attachments'),
+      "#description" => t('Enter the email address to send the backup files to. Make sure the email server can handle large file attachments'),
     );
     return $form;
   }
@@ -49,11 +48,12 @@ class backup_migrate_destination_email extends backup_migrate_destination {
   /**
    * Validate the configuration form. Make sure the email address is valid.
    */
-  function settings_form_validate($values) {
+  public function settings_form_validate($values) {
     if (!valid_email_address($values['location'])) {
       form_set_error('[location]', t('The e-mail address %mail is not valid.', array('%mail' => $form_state['values']['location'])));
     }
   }
+
 }
 
 /**
@@ -72,28 +72,30 @@ class backup_migrate_destination_email extends backup_migrate_destination {
  *   filename and "filename" which is just the filename.
  */
 function _backup_migrate_destination_email_mail_backup($attachment, $to) {
-  // Send mail
+  // Send mail.
   $attach        = fread(fopen($attachment->path, "r"), filesize($attachment->path));
   $mail          = new mime_mail();
   $mail->from    = variable_get('site_mail', ini_get('sendmail_from'));
-  $mail->headers = 'Errors-To: [EMAIL='. $mail->from .']'. $mail->from .'[/EMAIL]';
+  $mail->headers = 'Errors-To: [EMAIL=' . $mail->from . ']' . $mail->from . '[/EMAIL]';
   $mail->to      = $to;
   $mail->subject = t('Database backup from !site: !file', array('!site' => variable_get('site_name', 'drupal'), '!file' => $attachment->filename));
-  $mail->body    = t('Database backup attached.') ."\n\n";
+  $mail->body    = t('Database backup attached.') . "\n\n";
 
   $mail->add_attachment("$attach", $attachment->filename, "Content-Transfer-Encoding: base64 /9j/4AAQSkZJRgABAgEASABIAAD/7QT+UGhvdG9zaG", NULL, TRUE);
   $mail->send();
 }
-
+/**
+ *
+ */
 class mime_mail {
-  var $parts;
-  var $to;
-  var $from;
-  var $headers;
-  var $subject;
-  var $body;
+  public $parts;
+  public $to;
+  public $from;
+  public $headers;
+  public $subject;
+  public $body;
 
-  function __construct() {
+  public function __construct() {
     $this->parts   = array();
     $this->to      = "";
     $this->from    = "";
@@ -102,7 +104,7 @@ class mime_mail {
     $this->body    = "";
   }
 
-  function add_attachment($message, $name = "", $ctype = "application/octet-stream", $encode = NULL, $attach = FALSE) {
+  public function add_attachment($message, $name = "", $ctype = "application/octet-stream", $encode = NULL, $attach = FALSE) {
     $this->parts[] = array(
       "ctype" => $ctype,
       "message" => $message,
@@ -112,29 +114,36 @@ class mime_mail {
     );
   }
 
-  function build_message($part) {
+  public function build_message($part) {
     $message  = $part["message"];
     $message  = chunk_split(base64_encode($message));
     $encoding = "base64";
     $disposition = $part['attach'] ? "Content-Disposition: attachment; filename=$part[name]\n" : '';
-    return "Content-Type: ". $part["ctype"] . ($part["name"] ? "; name = \"". $part["name"] ."\"" : "") ."\nContent-Transfer-Encoding: $encoding\n$disposition\n$message\n";
+    return "Content-Type: " . $part["ctype"] . ($part["name"] ? "; name = \"" . $part["name"] . "\"" : "") . "\nContent-Transfer-Encoding: $encoding\n$disposition\n$message\n";
   }
 
-  function build_multipart() {
-    $boundary = "b". md5(uniqid(time()));
+  public function build_multipart() {
+    $boundary = "b" . md5(uniqid(time()));
     $multipart = "Content-Type: multipart/mixed; boundary = $boundary\n\nThis is a MIME encoded message.\n\n--$boundary";
     for ($i = sizeof($this->parts) - 1; $i >= 0; $i--) {
-      $multipart .= "\n". $this->build_message($this->parts[$i]) ."--$boundary";
+      $multipart .= "\n" . $this->build_message($this->parts[$i]) . "--$boundary";
     }
     return $multipart .= "--\n";
   }
 
-  function send() {
+  public function send() {
     $mime = "";
-    if (!empty($this->from)) $mime .= "From: ". $this->from ."\n";
-    if (!empty($this->headers)) $mime .= $this->headers ."\n";
-    if (!empty($this->body)) $this->add_attachment($this->body, "", "text/plain");
-    $mime .= "MIME-Version: 1.0\n". $this->build_multipart();
+    if (!empty($this->from)) {
+      $mime .= "From: " . $this->from . "\n";
+    }
+    if (!empty($this->headers)) {
+      $mime .= $this->headers . "\n";
+    }
+    if (!empty($this->body)) {
+      $this->add_attachment($this->body, "", "text/plain");
+    }
+    $mime .= "MIME-Version: 1.0\n" . $this->build_multipart();
     mail(trim($this->to), $this->subject, "", $mime);
   }
+
 }

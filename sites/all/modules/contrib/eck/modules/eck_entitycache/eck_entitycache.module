@@ -8,9 +8,9 @@
 /**
  * Implements hook_entity_info_alter().
  */
-function eck_entitycache_entity_info_alter(&$info){
- 
-  foreach(EntityType::loadAll() as $entity_type){
+function eck_entitycache_entity_info_alter(&$info) {
+
+  foreach (EntityType::loadAll() as $entity_type) {
     // Enable Entity Cache for this entity.
     $info[$entity_type->name]['entity cache'] = TRUE;
     // But disable the field cache.

@@ -107,6 +107,9 @@ function entity_delete_log_entity_delete($entity, $type) {
     $variables['entity_title'] = null;
     $variables['revisions'] = null;
 
+    // Take a snapshot of the entity.
+    $variables['entity'] = $entity;
+
     // Depending on the entity type, let's fill in the remaining log variables.
     switch ($type) {
 
@@ -144,6 +147,8 @@ function entity_delete_log_entity_delete($entity, $type) {
 
     // Give other modules an opportunity via hook_entity_delete_log_alter() to
     // make any changes to the log data variables before insertion.
+
+    // @deprecated because we use entity_save().
     if (sizeof(module_implements('entity_delete_log_alter')) > 0) {
       $variables = module_invoke_all('entity_delete_log_alter', $entity, $type, $variables);
     }
@@ -188,23 +193,14 @@ function entity_delete_log_entity_delete($entity, $type) {
       );
     }
     else {
-      $variables['entity_delete_log_id'] = db_insert('entity_delete_log')->fields(
-        array(
-          'entity_id' => $variables['entity_id'],
-          'entity_type' => $variables['entity_type'],
-          'entity_bundle' => $variables['entity_bundle'],
-          'entity_title' => $variables['entity_title'],
-          'author' => $variables['author'],
-          'revisions' => $variables['revisions'],
-          'created' => $variables['created'],
-          'deleted' => $variables['deleted'],
-          'uid' => $variables['uid'],
-        )
-      )->execute();
+      $entity_delete_log = (object) $variables;
+      entity_save('entity_delete_log', $entity_delete_log);
 
       // Now that we've logged this entity's deletion, let's let others do any
       // extra stuff they need with hook_entity_delete_log_post_process().
-      module_invoke_all('entity_delete_log_post_process', $entity, $type, $variables);
+
+      // @deprecated because we used entity_save().
+      module_invoke_all('entity_delete_log_post_process', $entity, $type, $entity_delete_log);
     }
 
   }
@@ -219,4 +215,37 @@ function entity_delete_log_views_api() {
     'path' => drupal_get_path('module', 'entity_delete_log'),
     'template path' => drupal_get_path('module', 'entity_delete_log'),
   );
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function entity_delete_log_entity_info() {
+  return array(
+    'entity_delete_log' => array(
+      'label' => t('Deleted entity'),
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'entity_delete_log',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'entity_delete_log_id',
+      ),
+      'views controller class' => 'EntityDefaultViewsController',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function entity_delete_log_entity_property_info_alter(&$info) {
+  $info['entity_delete_log']['properties']['uid']['type'] = 'user';
+  $info['entity_delete_log']['properties']['uid']['description'] = 'The user who deleted this entity.';
+
+  $info['entity_delete_log']['properties']['author']['type'] = 'user';
+  $info['entity_delete_log']['properties']['author']['description'] = 'The original user of this deleted entity.';
+
+  $info['entity_delete_log']['properties']['created']['type'] = 'date';
+  $info['entity_delete_log']['properties']['deleted']['type'] = 'date';
 }

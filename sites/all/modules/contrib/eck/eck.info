@@ -18,9 +18,17 @@ files[] = includes/translation.handler.eck.inc
 ; Inline entity form integration
 files[] = includes/eck.inline_entity_form.inc
 
-; Information added by Drupal.org packaging script on 2017-01-04
-version = "7.x-2.0-rc9"
+; Simpletest.
+test_dependencies[] = entityreference
+test_dependencies[] = entity_translation
+files[] = tests/EckTestHelper.test
+files[] = tests/EckCrudTest.test
+files[] = tests/EckEntityTranslationTest.test
+; @todo
+;files[] = tests/EckPermissions.php
+
+; Information added by Drupal.org packaging script on 2018-10-15
+version = "7.x-2.0-rc10"
 core = "7.x"
 project = "eck"
-datestamp = "1483524281"
-
+datestamp = "1539631684"

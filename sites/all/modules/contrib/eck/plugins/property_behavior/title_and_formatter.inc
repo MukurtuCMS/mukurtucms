@@ -2,8 +2,8 @@
 /**
  * @file
  * The title behavior makes a property behave like a title.
- * 
- * 1) When then entity is view, we set the page title to be the 
+ *
+ * 1) When then entity is view, we set the page title to be the
  *    properties value.
  * 2) We set the property as the label of the entity.
  * 3) The property can be entered by the user with a text field.
@@ -73,12 +73,12 @@ function eck_title_and_formatter_property_entity_info($property, $var) {
 
 /**
  * Helper function that gets the title from an entity.
- * 
+ *
  * @param object $entity
  *   an entity object.
  * @param string $property
  *   the name of the property that contains the title.
- * 
+ *
  * @return string
  *   The title of the entity.
  */

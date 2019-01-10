@@ -405,3 +405,19 @@ function hook_file_metadata_info() {
 function hook_file_metadata_info_alter() {
 
 }
+
+/**
+ * Alters skip fields status.
+ *
+ * Use this to choose to skip or complete step 4 of the file upload process.
+ *
+ * @param bool &$skip_fields
+ *   Set to TRUE to skip the form for editing extra file entity fields.
+ * @param array $form_state
+ *   State array of the current upload form.
+ */
+function hook_file_entity_file_upload_skip_fields_alter(&$skip_fields, $form_state) {
+  if ($form_state['file']->type == 'video') {
+    $skip_fields = TRUE;
+  }
+}

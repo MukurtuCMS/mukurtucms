@@ -4,10 +4,10 @@
   "license": "GPLv2",
   "authors": [
     {
-        "name": "Gerardo Gonzalez"
+      "name": "Gerardo Gonzalez"
     }
   ],
-   "require": {
+  "require": {
     "drupal/drupal-extension": "1.0.*@dev"
   }
 }
