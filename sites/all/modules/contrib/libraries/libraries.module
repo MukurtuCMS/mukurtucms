@@ -80,6 +80,52 @@ function libraries_get_path($name, $base_path = FALSE) {
 }
 
 /**
+ * Returns all enabled themes.
+ *
+ * Themes are sorted so that base themes always precede their child themes.
+ *
+ * @return array
+ *   An associative array of theme objects keyed by theme name.
+ */
+function libraries_get_enabled_themes() {
+  $themes = array();
+  foreach (list_themes() as $name => $theme) {
+    if ($theme->status) {
+      $themes[$name] = $theme;
+    }
+  }
+
+  return libraries_sort_themes($themes);
+}
+
+/**
+ * Sort a themes array.
+ *
+ * @param array $themes
+ *   Array of themes as objects, keyed by theme name.
+ * @param string $base
+ *   A base theme (internal use only).
+ *
+ * @return array
+ *   A similar array to $themes, but sorted in such a way that subthemes are
+ *   always located after its base theme.
+ */
+function libraries_sort_themes($themes, $base = '') {
+  $output = array();
+  foreach ($themes as $name => $theme) {
+    if (!isset($theme->base_theme) || $theme->base_theme == $base) {
+      $output[$name] = $theme;
+      unset($themes[$name]);
+      $subthemes = libraries_sort_themes($themes, $name);
+      foreach ($subthemes as $sub_name => $subtheme) {
+        $output[$sub_name] = $subtheme;
+      }
+    }
+  }
+  return $output;
+}
+
+/**
  * Returns an array of library directories.
  *
  * Returns an array of library directories from the all-sites directory
@@ -103,7 +149,7 @@ function libraries_get_libraries() {
   // $config and $profile should never be empty in a proper Drupal setup.
   // However, we should never search into the root filesystem under any
   // circumstances, so just bail out in that case.
-  if (!$profile || !$config) {
+  if (!$profile && !$config) {
     return array();
   }
 
@@ -388,10 +434,12 @@ function &libraries_info($name = NULL) {
       }
     }
 
-    // Gather information from hook_libraries_info() in enabled themes.
+    // Gather information from hook_libraries_info() in enabled themes. Themes
+    // are sorted to ensure that a base theme's template.php is included before
+    // its children's ones.
     $themes = array();
-    foreach (list_themes() as $theme_name => $theme_info) {
-      if ($theme_info->status && file_exists(drupal_get_path('theme', $theme_name) . '/template.php')) {
+    foreach (libraries_get_enabled_themes() as $theme_name => $theme_info) {
+      if (file_exists(drupal_get_path('theme', $theme_name) . '/template.php')) {
         // Collect a list of viable themes for re-use when calling the alter
         // hook.
         $themes[] = $theme_name;
