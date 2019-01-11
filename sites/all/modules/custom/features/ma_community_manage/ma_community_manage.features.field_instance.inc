@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community_manage.features.field_instance.inc
@@ -50,7 +51,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 20,
       ),
     ),
     'entity_type' => 'node',
@@ -124,7 +125,7 @@ function ma_community_manage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 29,
       ),
     ),
     'entity_type' => 'node',
