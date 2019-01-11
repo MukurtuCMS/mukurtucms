@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_views_pages.views_default.inc
@@ -430,6 +431,18 @@ return substr($path, strripos($path, \'/\') + 1);';
   $handler->display->display_options['filters']['promote']['table'] = 'node';
   $handler->display->display_options['filters']['promote']['field'] = 'promote';
   $handler->display->display_options['filters']['promote']['value'] = '1';
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'collection' => 'collection',
+    'community' => 'community',
+    'dictionary_word' => 'dictionary_word',
+    'digital_heritage' => 'digital_heritage',
+    'person' => 'person',
+    'word_list' => 'word_list',
+  );
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
