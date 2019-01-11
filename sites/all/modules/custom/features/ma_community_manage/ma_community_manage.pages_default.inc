@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community_manage.pages_default.inc

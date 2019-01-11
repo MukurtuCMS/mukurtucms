@@ -35,6 +35,33 @@ jQuery(document).ready(function ($) {
 		});
 	}
 
+	// Communities View Resize
+	function mukurtuCommunityViewResize() {
+		var communities = $(".view-communities .views-row");
+		var height = 0;
+		if (communities.length > 0) {
+			// Find the tallest element.
+			var i;
+			for (i = 0; i < communities.length; i++) {
+				thumb = $(communities[i]).find(".field-name-field-community-image-thumbnail");
+				h = $(thumb).height() + 1;
+
+				if (h > height) {
+					height = h;
+				}
+			}
+
+			// Find each community that doesn't have a thumbnail.
+			$(".view-communities .views-row .node-community").each(function () {
+				var thumbnail = $(this).find(".field-name-field-community-image-thumbnail");
+				// No thumbnail, change height to match elements that do have a thumbnail.
+				if (thumbnail.length == 0) {
+					$(this).height(height);
+				}
+			});
+    }
+  }
+
 	function mukurtuMediaelementResize() {
 		for (var pKey in mejs.players) {
 			mejs.players[pKey].setPlayerSize();
@@ -46,6 +73,7 @@ jQuery(document).ready(function ($) {
 		heroImageTwoColumnsResize();
 		refereshPanelAccordion();
 		featuredContentResize();
+		mukurtuCommunityViewResize();
 	}
 
 	window.onresize = mukurtuOnResize;
