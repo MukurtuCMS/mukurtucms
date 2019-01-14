@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.ds.inc
@@ -133,6 +134,13 @@ function ma_collection_ds_field_settings_info() {
         'wrapper' => 'h2',
         'class' => '',
         'ft' => array(),
+      ),
+    ),
+    'field_collection_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
       ),
     ),
   );
@@ -530,22 +538,22 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
-      'left' => array(
-        0 => 'field_collection_image',
-      ),
       'right' => array(
-        1 => 'title',
-        2 => 'group_list_view_fields',
-        3 => 'featured_content_type',
+        0 => 'title',
+        2 => 'featured_content_type',
+        3 => 'group_list_view_fields',
         4 => 'field_collection_summary',
         5 => 'field_collection_credit',
       ),
+      'left' => array(
+        1 => 'field_collection_image',
+      ),
     ),
     'fields' => array(
-      'field_collection_image' => 'left',
       'title' => 'right',
-      'group_list_view_fields' => 'right',
+      'field_collection_image' => 'left',
       'featured_content_type' => 'right',
+      'group_list_view_fields' => 'right',
       'field_collection_summary' => 'right',
       'field_collection_credit' => 'right',
     ),

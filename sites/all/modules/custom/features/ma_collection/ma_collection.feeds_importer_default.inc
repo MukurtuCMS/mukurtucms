@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.feeds_importer_default.inc
