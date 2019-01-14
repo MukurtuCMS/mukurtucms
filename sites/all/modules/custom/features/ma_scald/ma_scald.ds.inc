@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.ds.inc
@@ -278,20 +279,8 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'audio';
   $ds_layout->view_mode = 'mukurtu_scald_recording';
-  $ds_layout->layout = 'bootstrap_9_3';
+  $ds_layout->layout = 'bootstrap_8_4';
   $ds_layout->settings = array(
-    'regions' => array(
-      'left' => array(
-        0 => 'atom',
-      ),
-      'right' => array(
-        1 => 'field_contributor',
-      ),
-    ),
-    'fields' => array(
-      'atom' => 'left',
-      'field_contributor' => 'right',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
@@ -307,6 +296,18 @@ function ma_scald_ds_layout_settings_info() {
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
     'layout_disable_css' => FALSE,
+    'regions' => array(
+      'left' => array(
+        0 => 'atom',
+      ),
+      'right' => array(
+        0 => 'field_contributor',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'left',
+      'field_contributor' => 'right',
+    ),
   );
   $export['scald_atom|audio|mukurtu_scald_recording'] = $ds_layout;
 
