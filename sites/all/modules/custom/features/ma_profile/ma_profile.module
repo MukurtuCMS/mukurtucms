@@ -94,15 +94,15 @@ function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id)
  * Implements hook_user_presave().
  */
 function ma_profile_user_presave(&$edit, $account, $category) {
-    // Copy over any non-community groups from og_user_node
-    if(isset($account->og_user_node[LANGUAGE_NONE])) {
-        foreach($account->og_user_node[LANGUAGE_NONE] as $group) {
-            $group_node = node_load($group['target_id']);
-            if($group_node && $group_node->type <> 'community') {
-                $edit['og_user_node'][LANGUAGE_NONE][] = array('target_id' => $group_node->nid);
-            }
-        }
+  // Preserve og group memberships in our user field.
+  $og_user_node = array();
+  $user_groups = og_get_groups_by_user($account);
+  if (!empty($user_groups['node'])) {
+    foreach ($user_groups['node'] as $gid) {
+      $og_user_node[] = array('target_id' => $gid);
     }
+  }
+  $edit['og_user_node'][LANGUAGE_NONE] = $og_user_node;
 }
 
 /**
