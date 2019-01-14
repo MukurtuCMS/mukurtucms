@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.features.user_permission.inc

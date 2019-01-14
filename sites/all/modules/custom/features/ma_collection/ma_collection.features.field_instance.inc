@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.features.field_instance.inc
@@ -222,7 +223,7 @@ function ma_collection_field_default_field_instances() {
         'weight' => 4,
       ),
       'search_result' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
