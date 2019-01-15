@@ -102,3 +102,15 @@ function mukurtu_block_view_alter(&$data, $block) {
         }
     }
 }
+
+/**
+* Implements hook_node_view_alter().
+*/
+function mukurtu_node_view_alter(&$build) {
+  // For nodes, only show author if user has edit rights.
+  if ($build['#entity_type'] == 'node') {
+    if (isset($build['author']) && (!user_is_logged_in() || !node_access('update', $build['#node']))) {
+      $build['author']['#access'] = FALSE;
+    }
+  }
+}
