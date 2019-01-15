@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.strongarm.inc
@@ -219,6 +220,9 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
         'custom_settings' => FALSE,
       ),
     ),

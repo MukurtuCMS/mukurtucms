@@ -27,10 +27,10 @@
   <?php endif; ?>
   <?php if ($left || $right): ?>
     <div class="row">
-      <<?php print $left_wrapper; ?> class="col-sm-8 <?php print $left_classes; ?>">
+      <<?php print $left_wrapper; ?> class="col-sm-8 dictionaray-word-body <?php print $left_classes; ?>">
         <?php print $left; ?>
       </<?php print $left_wrapper; ?>>
-      <<?php print $right_wrapper; ?> class="col-sm-4 <?php print $right_classes; ?>">
+      <<?php print $right_wrapper; ?> class="col-sm-4 metadata-sidebar <?php print $right_classes; ?>">
        <div class="metadata-wrapper">
         <?php print $right; ?>
        </div>

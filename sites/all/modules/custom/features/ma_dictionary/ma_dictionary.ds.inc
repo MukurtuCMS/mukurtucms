@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.ds.inc
@@ -24,6 +25,13 @@ function ma_dictionary_ds_field_settings_info() {
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Related Digital Heritage Items',
+        ),
+      ),
+    ),
+    'field_additional_media' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
         ),
       ),
     ),
@@ -473,6 +481,9 @@ function ma_dictionary_ds_layout_settings_info() {
         6 => 'field_tags',
         7 => 'field_word_list',
       ),
+      'bottom' => array(
+        8 => 'field_additional_media',
+      ),
     ),
     'fields' => array(
       'field_word_entry' => 'left',
@@ -483,16 +494,11 @@ function ma_dictionary_ds_layout_settings_info() {
       'og_group_ref' => 'right',
       'field_tags' => 'right',
       'field_word_list' => 'right',
+      'field_additional_media' => 'bottom',
     ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
-      ),
-      'left' => array(
-        'dictionary-word-body' => 'dictionary-word-body',
-      ),
-      'right' => array(
-        'metadata-sidebar' => 'metadata-sidebar',
       ),
     ),
     'wrappers' => array(

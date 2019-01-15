@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.features.og_features_role.inc
