@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.features.field_instance.inc
@@ -194,8 +195,9 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
+        'module' => 'text',
         'settings' => array(),
-        'type' => 'hidden',
+        'type' => 'text_default',
         'weight' => 9,
       ),
       'dictionary_word_summary' => array(
@@ -583,12 +585,8 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'atom_reference',
-        'settings' => array(
-          'link' => 0,
-          'override' => 0,
-        ),
-        'type' => 'title',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 26,
       ),
       'dictionary_word_summary' => array(
