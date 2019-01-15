@@ -4,7 +4,7 @@
  * Bootstrap 6-6 stacked template for Display Suite.
  */
 ?>
-<?php if (isset($cr_tabs[$nid])): ?>
+<?php if (isset($cr_tabs[$nid]) && !empty($cr_tabs[$nid])): ?>
 <div class="btn-group">
 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Item Menu <span class="caret"></span></button>
 <h2 class="element-invisible">Primary tabs</h2>
