@@ -30,7 +30,7 @@ function mukurtu_splash_menu() {
   ];
 
   // Page to enable/disable collaboration tools.
-  if (ma_core_prerelease_functionality_enabled('ma_collaboration_tools')) {
+  if (ma_splash_prerelease_functionality_enabled('ma_collaboration_tools')) {
     $items['manage-collaboration-tools'] = [
       'title' => 'Manage Collaboration Tools',
       'page callback' => 'drupal_get_form',
@@ -645,7 +645,7 @@ function mukurtu_splash_block_site_config() {
       ];
     }
 
-    if (ma_core_prerelease_functionality_enabled('ma_collaboration_tools') && user_access('administer site configuration')) {
+    if (ma_splash_prerelease_functionality_enabled('ma_collaboration_tools') && user_access('administer site configuration')) {
       $items[] = [
         'title' => 'Manage Collaboration Tools',
         'href' => 'manage-collaboration-tools',
@@ -862,7 +862,7 @@ function mukurtu_splash_block_batch_import() {
     ];
   }
 
-  if (feeds_access('import', 'digital_heritage_dc') && ma_core_prerelease_functionality_enabled('ma_importexport_dc')) {
+  if (feeds_access('import', 'digital_heritage_dc') && ma_splash_prerelease_functionality_enabled('ma_importexport_dc')) {
     $items[] = [
       'title' => 'Import Digital Heritage Dublin Core and MODS XML Metadata',
       'href' => 'import/digital-heritage-xml-file',
@@ -1623,4 +1623,19 @@ function mukurtu_splash_block_wizard() {
 
 
   return $output;
+}
+
+/**
+ * Internal book-keeping for pre-release functionality.
+ *
+ * This is for restricting public facing elements such as dashboard
+ * links to things we don't want to expose yet. It is not an actual
+ * access control system (e.g., doesn't not enable/disable features).
+ */
+function ma_splash_prerelease_functionality_enabled($feature) {
+  $enabled = variable_get(MUKURTU_PRERELEASE_FUNCTIONALITY);
+  if (isset($enabled[$feature])) {
+    return $enabled[$feature];
+  }
+  return FALSE;
 }
