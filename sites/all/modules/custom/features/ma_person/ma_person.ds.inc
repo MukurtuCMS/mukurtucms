@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_person.ds.inc
@@ -22,6 +23,20 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_date_born' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_date_died' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'field_media_asset' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -42,9 +57,18 @@ function ma_person_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_related_people' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'field_tags' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
       ),
     ),
   );

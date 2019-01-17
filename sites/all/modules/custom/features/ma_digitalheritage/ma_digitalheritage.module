@@ -136,7 +136,7 @@ function ma_digitalheritage_preprocess_page(&$variables) {
 function ma_digitalheritage_preprocess_field(&$variables, $hook) {
     // Display the first image or thumbnail when viewing the media asset field rather than a default icon for any display where we are
     // showing a single image to represent the entire field (e.g., search results). This was previously implemented as a patch to Scald.
-    if($variables['element']['#field_name'] == 'field_media_asset' && $variables['element']['#view_mode'] == 'search_result') {//&& count($variables['items']) == 1) {
+    if($variables['element']['#field_name'] == 'field_media_asset' && $variables['element']['#view_mode'] == 'search_result') {
         // Only process if there are more than 1 scald atoms
         if(isset($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) && count($variables['element']['#object']->field_media_asset[LANGUAGE_NONE]) > 1 ) {
             // Search through the scald atoms and find the first image or thumbnail
@@ -158,7 +158,8 @@ function ma_digitalheritage_preprocess_field(&$variables, $hook) {
     }
 
     // Show only one media item in teaser. We really need to make a standalone display formatter for this.
-    if($variables['element']['#view_mode'] == 'teaser') {
+    $single_media_view_modes = array('teaser', 'search_result');
+    if(in_array($variables['element']['#view_mode'], $single_media_view_modes)) {
         if($variables['element']['#field_name'] == 'field_media_asset') {
             if(count($variables['element']['#items']) > 1) {
                 $first_media = FALSE;

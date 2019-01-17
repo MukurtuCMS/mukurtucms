@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_person.features.field_instance.inc
@@ -21,7 +22,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
-          'format_type' => 'year_month_day',
+          'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
           'multiple_number' => '',
@@ -135,7 +136,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
-          'format_type' => 'year_month_day',
+          'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
           'multiple_number' => '',
