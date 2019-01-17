@@ -187,6 +187,9 @@ function ma_collection_strongarm() {
       'related_person_teaser' => array(
         'custom_settings' => FALSE,
       ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
