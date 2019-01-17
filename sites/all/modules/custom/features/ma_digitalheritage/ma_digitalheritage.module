@@ -61,7 +61,7 @@ function ma_digitalheritage_node_update($node) {
 
     // If this is a Book Child, reindex the parent
     $book_parent = $dh_emw->field_book_parent->value();
-    if (count($book_parent)) {
+    if (!empty($book_parent) && count($book_parent)) {
       search_api_index_specific_items_delayed (search_api_index_load('default_node_index'), array($book_parent->nid));
     }
 
