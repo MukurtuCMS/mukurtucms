@@ -598,7 +598,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'items_per_page' => 10,
+          'items_per_page' => 24,
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 5,
@@ -787,9 +787,8 @@ function ma_collection_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'hidden',
         'weight' => 29,
       ),
       'featured_content' => array(

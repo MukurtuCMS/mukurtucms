@@ -31,7 +31,7 @@ function mukurtu_preprocess_page(&$vars, $hook = null){
     if (isset($vars['node'])) {
         switch ($vars['node']->type) {
         case 'collection':
-            $js = join(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'js', 'collection-grid.js'));
+            $js = join('/', array(drupal_get_path('theme', 'mukurtu'), 'js', 'collection-grid.js'));
             drupal_add_js($js);
             break;
         case 'digital_heritage':
