@@ -270,8 +270,8 @@ function ma_scald_strongarm() {
             'visible' => TRUE,
           ),
           'ma_scald_search_results' => array(
-            'weight' => '0',
-            'visible' => TRUE,
+            'weight' => '1',
+            'visible' => FALSE,
           ),
           'mukurtu_scald_related_items' => array(
             'weight' => '0',

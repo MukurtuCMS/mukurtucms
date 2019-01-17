@@ -799,7 +799,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 2,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -884,7 +884,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 3,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -965,7 +965,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -1066,7 +1066,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -1139,7 +1139,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -1219,7 +1219,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'above',
@@ -1300,7 +1300,7 @@ function ma_scald_field_default_field_instances() {
           'image_style' => 'medium',
         ),
         'type' => 'image',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'mukurtu_carousel_thumbnail' => array(
         'label' => 'hidden',
