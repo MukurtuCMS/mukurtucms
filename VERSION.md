@@ -1,3 +1,9 @@
+## Mukurtu 2.0.14
+- Critical security update for Drupal core to 7.63.
+
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
 ## Mukurtu 2.0.13.1
 - Update Rules and Backup and Migrate modules to avoid installation errors on PHP 7.
 
