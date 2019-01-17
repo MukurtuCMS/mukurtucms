@@ -105,7 +105,7 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
 
         // Print the pager controls, if it isn't a community record
         if(!$is_community_record) {
-            $output .= theme('pager', array('quantity', count($items_per_page)));
+            $output .= theme('pager', array('quantity', $items_per_page));
         }
     }
 
