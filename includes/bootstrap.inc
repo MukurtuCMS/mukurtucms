@@ -8,7 +8,7 @@
 /**
  * The current system version.
  */
-define('VERSION', '7.60');
+define('VERSION', '7.63');
 
 /**
  * Core API compatibility.
@@ -704,6 +704,19 @@ function drupal_environment_initialize() {
   // Set sane locale settings, to ensure consistent string, dates, times and
   // numbers handling.
   setlocale(LC_ALL, 'C');
+
+  // PHP's built-in phar:// stream wrapper is not sufficiently secure. Override
+  // it with a more secure one, which requires PHP 5.3.3. For lower versions,
+  // unregister the built-in one without replacing it. Sites needing phar
+  // support for lower PHP versions must implement hook_stream_wrappers() to
+  // register their desired implementation.
+  if (in_array('phar', stream_get_wrappers(), TRUE)) {
+    stream_wrapper_unregister('phar');
+    if (version_compare(PHP_VERSION, '5.3.3', '>=')) {
+      include_once DRUPAL_ROOT . '/includes/file.phar.inc';
+      file_register_phar_wrapper();
+    }
+  }
 }
 
 /**
@@ -1176,15 +1189,7 @@ function variable_initialize($conf = array()) {
     $variables = $cached->data;
   }
   else {
-    // The variable cache was not available. It might mean that we are running
-    // on an empty database. In that case, just redirect the user to install.php,
-    // unless we've already been there.
-    if (!db_table_exists('variable') && !drupal_installation_attempted()) {
-      include_once DRUPAL_ROOT . '/includes/install.inc';
-      install_goto('install.php');
-    }
-
-    // Avoid a stampede.
+    // Cache miss. Avoid a stampede.
     $name = 'variable_init';
     if (!lock_acquire($name, 1)) {
       // Another request is building the variable cache.
@@ -3793,8 +3798,12 @@ function _drupal_shutdown_function() {
   chdir(DRUPAL_ROOT);
 
   try {
-    while (list($key, $callback) = each($callbacks)) {
+    // Manually iterate over the array instead of using a foreach loop.
+    // A foreach operates on a copy of the array, so any shutdown functions that
+    // were added from other shutdown functions would never be called.
+    while ($callback = current($callbacks)) {
       call_user_func_array($callback['callback'], $callback['arguments']);
+      next($callbacks);
     }
   }
   catch (Exception $exception) {

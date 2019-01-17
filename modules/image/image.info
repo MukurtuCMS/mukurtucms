@@ -7,7 +7,7 @@ dependencies[] = file
 files[] = image.test
 configure = admin/config/media/image-styles
 
-; Information added by Drupal.org packaging script on 2018-10-17
-version = "7.60"
+; Information added by Drupal.org packaging script on 2019-01-16
+version = "7.63"
 project = "drupal"
-datestamp = "1539816636"
+datestamp = "1547681965"
