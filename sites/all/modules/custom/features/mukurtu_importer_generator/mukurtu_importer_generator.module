@@ -38,6 +38,9 @@ function mukurtu_importer_generator_get_default_documentation($field_mapping, $e
   if ($entity_type == 'scald_atom') {
     switch ($target) {
       case 'provider':
+        if (!function_exists('ma_importexport_get_valid_scald_providers')) {
+          return "A single value identifying which scald provider should be used for the atom.";
+        }
         $valid_providers = implode(', ', ma_importexport_get_valid_scald_providers($bundle_name));
         return "A single value identifying which scald provider should be used for the atom. Valid options for this importer are '{$valid_providers}'.";
       case 'file_source':
