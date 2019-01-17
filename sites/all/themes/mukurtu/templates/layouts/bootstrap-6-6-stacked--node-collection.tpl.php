@@ -19,10 +19,18 @@
   <?php endif; ?>
   <?php if ($left || $right): ?>
     <div class="row">
+      <?php
+        $left_col_classes = "col-sm-9 col-sm-pull-3";
+        if (!$right) {
+          $left_col_classes = "col-sm-12";
+        }
+      ?>
+      <?php if ($right): ?>
       <<?php print $right_wrapper; ?> class="col-sm-3 col-sm-push-9 <?php print $right_classes; ?>">
         <?php print $right; ?>
       </<?php print $right_wrapper; ?>>
-      <<?php print $left_wrapper; ?> class="col-sm-9 col-sm-pull-3 <?php print $left_classes; ?>">
+      <?php endif; ?>
+      <<?php print $left_wrapper; ?> class="<?php print $left_col_classes; ?> <?php print $left_classes; ?>">
         <?php print $left; ?>
       </<?php print $left_wrapper; ?>>
     </div>
