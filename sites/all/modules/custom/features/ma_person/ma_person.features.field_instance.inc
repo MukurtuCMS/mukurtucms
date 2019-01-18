@@ -1256,7 +1256,7 @@ function ma_person_field_default_field_instances() {
           'link' => 1,
           'override' => 0,
         ),
-        'type' => 'mukurtu_browse_by_grid_7_4',
+        'type' => 'ma_colorbox',
         'weight' => 1,
       ),
       'paragraphs_editor_preview' => array(
@@ -1306,7 +1306,7 @@ function ma_person_field_default_field_instances() {
           'link' => 1,
           'override' => 0,
         ),
-        'type' => 'mukurtu_browse_by_grid_7_4',
+        'type' => 'ma_colorbox',
         'weight' => 3,
       ),
       'paragraphs_editor_preview' => array(
