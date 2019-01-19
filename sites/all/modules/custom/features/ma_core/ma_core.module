@@ -228,6 +228,16 @@ function ma_core_menu() {
     'type' => MENU_NORMAL_ITEM,
     'weight' => 20,
   );
+
+  // 403 page.
+  $items['mukurtu/access-denied'] = array(
+    'title' => t('Access denied'),
+    'description' => 'Mukurtu Access Denied (403 error)',
+    'page callback' => 'ma_core_access_denied_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -236,6 +246,21 @@ function ma_core_menu() {
  */
 function ma_core_blank_page_callback() {
   return ' ';
+}
+
+/**
+ * Default Mukurtu 403 access denied page.
+ */
+function ma_core_access_denied_page() {
+  $message = array();
+
+  // If the user hasn't logged in, prompt them to try that first.
+  if (!user_is_logged_in()) {
+    $message[] = t("If you followed a link here, !url and try again.", array('!url' => l(t('log in'), "user/login")));
+  }
+  $message[] = t("If you think you should have access, contact the site administrator for more information.");
+
+  return implode(" ", $message);
 }
 
 /**

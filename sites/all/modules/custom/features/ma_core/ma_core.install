@@ -78,3 +78,13 @@ function ma_core_update_7106() {
     variable_set('mail_system', $mail_system);
   }
 }
+
+/**
+ * Set default 403 page, if not already set.
+ */
+function ma_core_update_7107() {
+  $page = variable_get('site_403');
+  if (!$page) {
+    variable_set('site_403', 'mukurtu/access-denied');
+  }
+}
