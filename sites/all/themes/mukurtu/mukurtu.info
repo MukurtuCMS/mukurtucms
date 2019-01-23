@@ -33,6 +33,9 @@ stylesheets[all][] = font-awesome/css/font-awesome.min.css
 ;; Settings
 ;;;;;;;;;;;;;;;;;;;;;
 settings[bootstrap_fluid_container] = 1
+settings[bootstrap_forms_smart_descriptions] = 1
+settings[bootstrap_forms_smart_descriptions_limit] = 1000
+settings[bootstrap_forms_smart_descriptions_allowed_tags] = 'b, br, code, em, i, kbd, span, strong'
 settings[mukurtu_theme_color_scheme] = 'blue-gold'
 settings[mukurtu_theme_email_us_message] = 'Email us at'
 settings[mukurtu_theme_contact_email] = 'support@mukurtu.org'
