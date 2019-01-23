@@ -564,7 +564,9 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
         break;
     }
   } else {
-    unset($_SESSION['mukurtu_breadcrumb']['container']);
+    if (isset($_SESSION['mukurtu_breadcrumb']['container'])) {
+      unset($_SESSION['mukurtu_breadcrumb']['container']);
+    }
   }
 
   // Capture browse pages.
@@ -628,7 +630,7 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
 
         // Handle the page arguments.
         if (count($past_item['search']['item']['page_arguments']) > 1) {
-          foreach (range(1, count($past_item['search']['item']['page_arguments'])) as $delta) {
+          foreach (range(1, count($past_item['search']['item']['page_arguments']) - 1) as $delta) {
             $href .= "/{$past_item['search']['item']['page_arguments'][$delta]}";
           }
         }
@@ -638,7 +640,7 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
         $active_trail[$i] = array(
           'title' => $breadcrumb_title,
           'href' => $href,
-          'localized_options' => array('query' => $past_item['query_parameters']),
+          'localized_options' => array('query' => $past_item['search']['query_parameters']),
         );
       }
     }
