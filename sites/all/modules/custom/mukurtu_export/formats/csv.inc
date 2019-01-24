@@ -28,7 +28,15 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#tree' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_delimiter'] = array(
+  $settings['csv']['advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('File Format Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#tree' => TRUE,
+  );
+
+  $settings['csv']['advanced']['mukurtu_export_csv_delimiter'] = array(
     '#type' => 'textfield',
     '#title' => t('Field delimiter'),
     '#size' => 5,
@@ -39,7 +47,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_enclosure'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_enclosure'] = array(
     '#type' => 'textfield',
       //    '#type' => 'hidden',
     '#title' => t('Escape enclosure'),
@@ -49,7 +57,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_separator'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_separator'] = array(
     '#type' => 'textfield',
     '#title' => t('Record separator'),
     '#size' => 5,
@@ -58,7 +66,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_multivalue_delimiter'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_multivalue_delimiter'] = array(
     '#type' => 'textfield',
     '#title' => t('Multiple value delimiter'),
     '#size' => 5,
@@ -70,7 +78,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_escape_eol'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_escape_eol'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always escape values containing line breaks'),
     '#default_value' => variable_get('mukurtu_export_csv_escape_eol', 1),
@@ -91,13 +99,14 @@ function mukurtu_export_csv_settings($form, $form_state) {
 
   $settings['csv']['mukurtu_export_csv_referenced_content'] = array(
     '#type' => 'radios',
-    '#title' => t('Export referenced content'),
+    '#title' => t('Export related content'),
     '#options' => array(
-      'yes' => 'Export content that is referenced by the selected content (cultural protocols, communities, etc)',
-      'no' => 'Export only the selected content'
+      'all' => 'Export the selected content and all related content (communities, cultural protocols, related items, scald atoms, etc)',
+      'scald_atom' => 'Export the selected content and included referenced scald atoms only',
+      'none' => 'Export only the selected content',
     ),
-    '#default_value' => 'yes',
-    '#description' => t('Select if referenced content should be exported. This may be necessary if importing to a new site.'),
+    '#default_value' => 'scald_atom',
+    '#description' => t('Select if related content should be exported. Exporting all related content may be necessary if importing to a new site, but can result in very large exports. If you are exporting content for re-import on the same site, exporting the selected content only or with referenced scald atoms is usually sufficient.'),
     '#required' => TRUE,
   );
 
@@ -109,7 +118,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
       'no' => 'Export metadata only'
     ),
     '#default_value' => 'yes',
-    '#description' => t('Select if binary files should be downloaded.'),
+    '#description' => t('Select if binary files (e.g., jpg, mp4, pdf, png) should be downloaded.'),
     '#required' => TRUE,
   );
 
@@ -138,16 +147,22 @@ function mukurtu_export_csv_string($string) {
  */
 function mukurtu_export_csv_export($entities, $field_list, $settings) {
   // CSV format settings
-  $delimiter = mukurtu_export_csv_string($settings['mukurtu_export_csv_delimiter']);
-  $enclosure = mukurtu_export_csv_string($settings['mukurtu_export_csv_enclosure']);
-  $separator = mukurtu_export_csv_string($settings['mukurtu_export_csv_separator']);
-  $escape_eol = $settings['mukurtu_export_csv_escape_eol'];
-  $export_referenced = TRUE;
+  $delimiter = mukurtu_export_csv_string($settings['advanced']['mukurtu_export_csv_delimiter']);
+  $enclosure = mukurtu_export_csv_string($settings['advanced']['mukurtu_export_csv_enclosure']);
+  $separator = mukurtu_export_csv_string($settings['advanced']['mukurtu_export_csv_separator']);
+  $escape_eol = $settings['advanced']['mukurtu_export_csv_escape_eol'];
+
+  // None -> NULL, Some -> array of entity types, All -> 'all' in array.
+  $export_referenced = NULL;
   $export_files = TRUE;
 
-  if(isset($settings['mukurtu_export_csv_referenced_content'])) {
-    if($settings['mukurtu_export_csv_referenced_content'] == 'no') {
-      $export_referenced = FALSE;
+  if (isset($settings['mukurtu_export_csv_referenced_content'])) {
+    if ($settings['mukurtu_export_csv_referenced_content'] == 'all') {
+      $export_referenced = array('all' => 'all');
+    }
+
+    if ($settings['mukurtu_export_csv_referenced_content'] == 'scald_atom') {
+      $export_referenced = array('scald_atom' => 'all');
     }
   }
 
@@ -159,7 +174,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
 
   // Content format settings
   $id_format = $settings['mukurtu_export_csv_id_format'];
-  $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
+  $multivalue_delimiter = $settings['advanced']['mukurtu_export_csv_multivalue_delimiter'];
 
   // Batch settings
   $is_batch = mukurtu_export_csv_string($settings['mukurtu_export_csv_is_batch']);
@@ -249,7 +264,7 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
 /**
  * Build the encoded array of fields.
  */
-function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format = 'internal', $is_batch = FALSE, $export_referenced = TRUE, $export_files = TRUE, $previous_encoded_content = array()) {
+function mukurtu_export_csv_encode($entity_type, $bundle_name, $entities, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter, $field_list, $id_format = 'internal', $is_batch = FALSE, $export_referenced = NULL, $export_files = TRUE, $previous_encoded_content = array()) {
   $encoded_content = $previous_encoded_content;
 
   foreach (array_keys($entities) as $entity_key) {
@@ -383,7 +398,7 @@ function _mukurtu_export_csv_get_header_label($entity_type, $bundle_name, $field
 /**
  * Process an entity and update $header and $encoded_content accordingly.
  */
-function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, $entity_type = NULL, $bundle_name = NULL, $field_list = NULL, $id_format = 'internal', $export_referenced = TRUE, $export_files = TRUE, $parent = NULL, $parent_index = 0) {
+function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, $entity_type = NULL, $bundle_name = NULL, $field_list = NULL, $id_format = 'internal', $export_referenced = NULL, $export_files = TRUE, $parent = NULL, $parent_index = 0) {
   // GUID is a special case
   if(is_null($parent) && $id_format == 'guid') {
     $encoded_content[$entity_type][$bundle_name]['guid'][$entity_key][0] = _mukurtu_export_entity_get_guid($entity_type, $var->{_mukurtu_export_entity_id($entity_type, $var)});
@@ -426,31 +441,39 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
         }
       }
 
-      // Run through all the content referenced by this field and decide if we should export it
-      if($export_referenced) {
-        foreach($referenced_entities_to_encode as $referenced_entity_type => $referenced_entity) {
-          foreach($referenced_entity as $r_id => $r_entity) {
+      // Run through all the content referenced by this field and decide if we should export it.
+      if ($export_referenced) {
+        $all = isset($export_referenced['all']) ? TRUE : FALSE;
+        foreach ($referenced_entities_to_encode as $referenced_entity_type => $referenced_entity) {
+          // Is this referenced entity type selected for export?
+          if (!$all && !isset($export_referenced[$referenced_entity_type])) {
+            continue;
+          }
+
+          foreach ($referenced_entity as $r_id => $r_entity) {
             // Check permission?
 
-            // Load entity
+            // Load entity.
             $referenced_entity_object = mukurtu_export_entity_load_wrapper($referenced_entity_type, array($r_id));
-            if(empty($referenced_entity_object)) {
+            if (empty($referenced_entity_object)) {
               continue;
             }
 
-            // Get referenced content bundle type
+            // Get referenced content bundle type.
             $referenced_entity_object_wrapper = entity_metadata_wrapper($referenced_entity_type, $referenced_entity_object[$r_id]);
             $ref_bundle_type = $referenced_entity_object_wrapper->getBundle();
             $new_entity_key = "{$referenced_entity_type}__{$ref_bundle_type}_{$r_id}";
 
-            // Check if already exported, prevent infinite recursion
-            if(isset($encoded_content['__exported_key_list'][$referenced_entity_type][$ref_bundle_type][$new_entity_key])) {
-                continue;
+            // Check if already exported, prevent infinite recursion.
+            if (isset($encoded_content['__exported_key_list'][$referenced_entity_type][$ref_bundle_type][$new_entity_key])) {
+              continue;
             }
 
-            // Encode referenced content
-            mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format, $export_referenced, $export_files);
-            mukurtu_export_csv_post_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format);
+            // If that bundle type is selected for export, encode referenced content.
+            if ($all || $export_referenced[$referenced_entity_type] == 'all' || in_array($ref_bundle_type, $export_referenced[$referenced_entity_type])) {
+              mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format, $export_referenced, $export_files);
+              mukurtu_export_csv_post_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format);
+            }
           }
         }
       }
