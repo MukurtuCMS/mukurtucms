@@ -150,7 +150,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
 
   if (isset($settings['mukurtu_export_csv_referenced_content'])) {
     if ($settings['mukurtu_export_csv_referenced_content'] == 'all') {
-      $export_referenced = array('all');
+      $export_referenced = array('all' => 'all');
     }
 
     if ($settings['mukurtu_export_csv_referenced_content'] == 'scald_atom') {
@@ -435,9 +435,10 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
 
       // Run through all the content referenced by this field and decide if we should export it.
       if ($export_referenced) {
+        $all = isset($export_referenced['all']) ? TRUE : FALSE;
         foreach ($referenced_entities_to_encode as $referenced_entity_type => $referenced_entity) {
           // Is this referenced entity type selected for export?
-          if (!isset($export_referenced[$referenced_entity_type])) {
+          if (!$all && !isset($export_referenced[$referenced_entity_type])) {
             continue;
           }
 
@@ -461,7 +462,7 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
             }
 
             // If that bundle type is selected for export, encode referenced content.
-            if ($export_referenced[$referenced_entity_type] == 'all' || in_array($ref_bundle_type, $export_referenced[$referenced_entity_type])) {
+            if ($all || $export_referenced[$referenced_entity_type] == 'all' || in_array($ref_bundle_type, $export_referenced[$referenced_entity_type])) {
               mukurtu_export_csv_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format, $export_referenced, $export_files);
               mukurtu_export_csv_post_encode_entity($encoded_content, $new_entity_key, $referenced_entity_object[$r_id], $referenced_entity_type, $ref_bundle_type, $field_list, $id_format);
             }
