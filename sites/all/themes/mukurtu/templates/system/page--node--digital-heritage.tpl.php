@@ -174,7 +174,7 @@ if(!empty($node->field_community_record_parent[LANGUAGE_NONE])) {
 ?>
 <?php
 // Is this a multi-page item?
-$edit = (basename(current_path()) == 'edit') ? TRUE : FALSE;
+$edit = (!is_numeric(basename(current_path()))) ? TRUE : FALSE;
 if (!$edit && ($multipage_node->field_book_children || $multipage_node->field_book_parent)):
 ?>
 <?php
