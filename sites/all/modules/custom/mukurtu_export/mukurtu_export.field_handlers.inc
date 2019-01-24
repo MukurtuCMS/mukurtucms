@@ -171,6 +171,11 @@ function mukurtu_export_field_handler_paragraphs($value, $field_info, $options =
 
     if(isset($value['value'])) {
         $referenced_entities['paragraphs_item'][$value['value']] = $value['value'];
+
+        if(isset($options['id_format']) && ($options['id_format'] == 'guid')) {
+            $guid = _mukurtu_export_entity_get_guid('paragraphs_item', $value['value']);
+            return array($guid, $referenced_entities, $files);
+        }
         return array($value['value'], $referenced_entities, $files);
     }
 
