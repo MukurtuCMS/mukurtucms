@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_base_theme.features.inc
