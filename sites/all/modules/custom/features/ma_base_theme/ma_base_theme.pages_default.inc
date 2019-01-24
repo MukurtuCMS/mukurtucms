@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_base_theme.pages_default.inc
