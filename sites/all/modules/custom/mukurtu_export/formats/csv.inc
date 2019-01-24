@@ -117,7 +117,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
       'yes' => 'Package binary files (images, video, etc)',
       'no' => 'Export metadata only'
     ),
-    '#default_value' => 'yes',
+    '#default_value' => 'no',
     '#description' => t('Select if binary files (e.g., jpg, mp4, pdf, png) should be downloaded.'),
     '#required' => TRUE,
   );
@@ -153,7 +153,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
   $escape_eol = $settings['advanced']['mukurtu_export_csv_escape_eol'];
 
   // None -> NULL, Some -> array of entity types, All -> 'all' in array.
-  $export_referenced = NULL;
+  $export_referenced = array('paragraphs_item' => 'all');
   $export_files = TRUE;
 
   if (isset($settings['mukurtu_export_csv_referenced_content'])) {
@@ -162,7 +162,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
     }
 
     if ($settings['mukurtu_export_csv_referenced_content'] == 'scald_atom') {
-      $export_referenced = array('scald_atom' => 'all');
+      $export_referenced = array('paragraphs_item' => 'all', 'scald_atom' => 'all');
     }
   }
 
