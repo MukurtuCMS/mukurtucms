@@ -28,7 +28,15 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#tree' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_delimiter'] = array(
+  $settings['csv']['advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('File Format Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#tree' => TRUE,
+  );
+
+  $settings['csv']['advanced']['mukurtu_export_csv_delimiter'] = array(
     '#type' => 'textfield',
     '#title' => t('Field delimiter'),
     '#size' => 5,
@@ -39,7 +47,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_enclosure'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_enclosure'] = array(
     '#type' => 'textfield',
       //    '#type' => 'hidden',
     '#title' => t('Escape enclosure'),
@@ -49,7 +57,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_separator'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_separator'] = array(
     '#type' => 'textfield',
     '#title' => t('Record separator'),
     '#size' => 5,
@@ -58,7 +66,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_multivalue_delimiter'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_multivalue_delimiter'] = array(
     '#type' => 'textfield',
     '#title' => t('Multiple value delimiter'),
     '#size' => 5,
@@ -70,7 +78,7 @@ function mukurtu_export_csv_settings($form, $form_state) {
     '#required' => TRUE,
   );
 
-  $settings['csv']['mukurtu_export_csv_escape_eol'] = array(
+  $settings['csv']['advanced']['mukurtu_export_csv_escape_eol'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always escape values containing line breaks'),
     '#default_value' => variable_get('mukurtu_export_csv_escape_eol', 1),
@@ -139,10 +147,10 @@ function mukurtu_export_csv_string($string) {
  */
 function mukurtu_export_csv_export($entities, $field_list, $settings) {
   // CSV format settings
-  $delimiter = mukurtu_export_csv_string($settings['mukurtu_export_csv_delimiter']);
-  $enclosure = mukurtu_export_csv_string($settings['mukurtu_export_csv_enclosure']);
-  $separator = mukurtu_export_csv_string($settings['mukurtu_export_csv_separator']);
-  $escape_eol = $settings['mukurtu_export_csv_escape_eol'];
+  $delimiter = mukurtu_export_csv_string($settings['advanced']['mukurtu_export_csv_delimiter']);
+  $enclosure = mukurtu_export_csv_string($settings['advanced']['mukurtu_export_csv_enclosure']);
+  $separator = mukurtu_export_csv_string($settings['advanced']['mukurtu_export_csv_separator']);
+  $escape_eol = $settings['advanced']['mukurtu_export_csv_escape_eol'];
 
   // None -> NULL, Some -> array of entity types, All -> 'all' in array.
   $export_referenced = NULL;
@@ -166,7 +174,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
 
   // Content format settings
   $id_format = $settings['mukurtu_export_csv_id_format'];
-  $multivalue_delimiter = $settings['mukurtu_export_csv_multivalue_delimiter'];
+  $multivalue_delimiter = $settings['advanced']['mukurtu_export_csv_multivalue_delimiter'];
 
   // Batch settings
   $is_batch = mukurtu_export_csv_string($settings['mukurtu_export_csv_is_batch']);
