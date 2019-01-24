@@ -487,6 +487,7 @@ function mukurtu_splash_block_site_welcome() {
  * Helper function to assemble the initial site configuration block.
  */
 function mukurtu_splash_block_site_start() {
+  global $theme;
 
   $items = [];
   $items_layout = [];
@@ -528,7 +529,7 @@ function mukurtu_splash_block_site_start() {
     ];
   }
 
-  if (user_access('edit boxes')) {
+  if (user_access('edit boxes') && ($theme == 'mukurtu_starter')) {
     $items_layout[] = [
       'title' => 'Edit Custom Site Header',
       'href' => 'admin/structure/block/manage/boxes/ma_site_header/configure',
@@ -545,6 +546,16 @@ function mukurtu_splash_block_site_start() {
   }
 
   if (user_access('administer site configuration')) {
+    // Theme settings page link.
+    if (drupal_valid_path('admin/appearance/settings/' . $theme)) {
+      $items_layout[] = [
+        'title' => 'Change Theme Settings',
+        'href' => 'admin/appearance/settings/' . $theme,
+        'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
+        'description' => t('Change settings for the currently active theme.'),
+      ];
+    }
+
     if (variable_get('mukurtu_show_related_items_teasers')) {
       $enable_disable_word = 'Disable';
     }
