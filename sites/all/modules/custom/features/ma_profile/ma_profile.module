@@ -95,14 +95,18 @@ function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id)
  */
 function ma_profile_user_presave(&$edit, $account, $category) {
   // Preserve og group memberships in our user field.
-  $og_user_node = array();
-  $user_groups = og_get_groups_by_user($account);
-  if (!empty($user_groups['node'])) {
-    foreach ($user_groups['node'] as $gid) {
-      $og_user_node[] = array('target_id' => $gid);
+  // Don't do this for new accounts (uid == 0).
+  // og_get_groups_by_user returns *all* groups for uid 0.
+  if (isset($account->uid) && $account->uid > 0) {
+    $og_user_node = array();
+    $user_groups = og_get_groups_by_user($account);
+    if (!empty($user_groups['node'])) {
+      foreach ($user_groups['node'] as $gid) {
+        $og_user_node[] = array('target_id' => $gid);
+      }
     }
+    $edit['og_user_node'][LANGUAGE_NONE] = $og_user_node;
   }
-  $edit['og_user_node'][LANGUAGE_NONE] = $og_user_node;
 }
 
 /**
