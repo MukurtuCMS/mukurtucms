@@ -111,18 +111,7 @@ function ma_base_theme_image_default_styles() {
   $styles['mukurtu_theme_3_2_ratio'] = array(
     'label' => 'Mukurtu theme 3:2 ratio',
     'effects' => array(
-      10 => array(
-        'name' => 'imagecache_alpha',
-        'data' => array(
-          'opacity' => 0.93,
-          'RGB' => array(
-            'HEX' => '#000000',
-          ),
-          'flatten' => 0,
-        ),
-        'weight' => 2,
-      ),
-      11 => array(
+      8 => array(
         'name' => 'image_scale_and_crop',
         'data' => array(
           'width' => 1200,
@@ -137,18 +126,7 @@ function ma_base_theme_image_default_styles() {
   $styles['mukurtu_theme_4_3_ratio'] = array(
     'label' => 'Mukurtu theme 4:3 ratio',
     'effects' => array(
-      12 => array(
-        'name' => 'imagecache_alpha',
-        'data' => array(
-          'opacity' => 0.93,
-          'RGB' => array(
-            'HEX' => '#000000',
-          ),
-          'flatten' => 0,
-        ),
-        'weight' => 1,
-      ),
-      13 => array(
+      10 => array(
         'name' => 'image_scale_and_crop',
         'data' => array(
           'width' => 800,
