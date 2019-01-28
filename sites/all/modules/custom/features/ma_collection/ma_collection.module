@@ -209,6 +209,11 @@ function ma_collection_node_access($node, $op, $account) {
  */
 function ma_collection_form_alter(&$form, $form_state, $form_id) {
 
+  // Don't show the personal collections field.
+  if (isset($form['field_personal_collections'])) {
+    $form['field_personal_collections']['#access'] = FALSE;
+  }
+
   if ($form_id == 'collection_node_form' OR $form_id == 'personal_collection_node_form') {
     $node = $form['#node'];
 

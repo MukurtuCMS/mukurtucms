@@ -316,8 +316,9 @@ function ma_digitalheritage_field_group_info() {
       1 => 'field_book_parent',
       2 => 'field_collection',
       3 => 'field_community_record_children',
-      4 => 'field_related_dh_items',
-      5 => 'field_related_dictionary_words',
+      4 => 'field_personal_collections',
+      5 => 'field_related_dh_items',
+      6 => 'field_related_dictionary_words',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
