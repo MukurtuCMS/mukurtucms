@@ -71,7 +71,7 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
         foreach($entity->{$field['field_name']}[LANGUAGE_NONE] as $related_item) {
             $column = key($field['columns']);
             $related_item_node = node_load($related_item[$column]);
-            if($related_item_node && node_access('view', $related_item_node)) {
+            if($related_item_node && $related_item_node->status && node_access('view', $related_item_node)) {
                 $all_paged_nodes[] = $related_item_node;
             }
         }
