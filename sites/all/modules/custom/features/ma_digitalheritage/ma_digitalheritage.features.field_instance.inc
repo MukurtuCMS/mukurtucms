@@ -257,7 +257,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 58,
+      'weight' => 57,
     ),
   );
 
@@ -356,7 +356,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 59,
+      'weight' => 58,
     ),
   );
 
@@ -712,7 +712,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 57,
+      'weight' => 56,
     ),
   );
 
@@ -3067,7 +3067,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 54,
+      'weight' => 59,
     ),
   );
 
@@ -3369,7 +3369,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 55,
+      'weight' => 54,
     ),
   );
 
@@ -3469,7 +3469,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 56,
+      'weight' => 55,
     ),
   );
 

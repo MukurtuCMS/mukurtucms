@@ -211,6 +211,11 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'personal_collection';
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
+    'collection_item_count' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'featured_content_type' => array(
       'weight' => '2',
       'label' => 'hidden',
@@ -743,14 +748,16 @@ function ma_collection_ds_layout_settings_info() {
       'right' => array(
         1 => 'title',
         2 => 'featured_content_type',
-        3 => 'field_collection_summary',
-        4 => 'field_personal_coll_privacy',
+        3 => 'collection_item_count',
+        4 => 'field_collection_summary',
+        5 => 'field_personal_coll_privacy',
       ),
     ),
     'fields' => array(
       'field_collection_image' => 'left',
       'title' => 'right',
       'featured_content_type' => 'right',
+      'collection_item_count' => 'right',
       'field_collection_summary' => 'right',
       'field_personal_coll_privacy' => 'right',
     ),

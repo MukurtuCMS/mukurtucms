@@ -104,94 +104,83 @@ function ma_collection_form_views_exposed_form_alter(&$form, &$form_state) {
  * Implements hook_node_presave().
  */
 function ma_collection_node_presave($node) {
-
-  // Populate the Digital Heritage Count
-  // This will need some easy refactoring once other items than DH can go into a collection.
+  // Set the Digital Heritage Count.
+  // Cases when we need to update the count:
+  // - New Collection created -> This hook triggers.
+  // - Collection edited -> This hook triggers.
+  // - Contained item deleted/edited and removed from collection -> CER updates collection relation field, this hook triggers.
+  // - Contained item published/unpublished -> ma_collection_node_postupdate saves the collection, which triggers this hook.
   if ($node->type == 'collection' or $node->type == 'personal_collection') {
-    $collection_presave_skip = variable_get('collection_presave_skip', array());
-    if (array_key_exists($node->nid, $collection_presave_skip)) {
-      unset ($collection_presave_skip[$node->nid]);
-      variable_set('collection_presave_skip', $collection_presave_skip);
-      return;
-    }
-
     $collection_emw = entity_metadata_wrapper('node', $node);
-    $new_count = $collection_emw->field_digital_heritage_items->count();
-    $collection_presave_skip[$node->nid] = $node->nid;
-    variable_set('collection_presave_skip', $collection_presave_skip);
-    $collection_emw->field_digital_heritage_count->set ($new_count);
-    $collection_emw->save();
+    $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_digital_heritage_items->value());
+    $collection_emw->field_digital_heritage_count->set($contained_item_count);
   }
-
 }
 
 /**
  * Implements hook_node_insert().
  */
 function ma_collection_node_insert($node) {
-  if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
-    ma_collection_node_update($node);
-  }
 }
 
 /**
  * Implements hook_field_attach_delete().
  */
-// We need to use this hook instead of hook_node_delete because hook_node_delete runs too early
 function ma_collection_field_attach_delete ($entity_type, $entity) {
-  if (isset($entity->type) && $entity->type == 'digital_heritage') {
-    ma_collection_node_update($entity, 1);
-  }
 }
 
 /**
  * Implements hook_node_update().
  */
-function ma_collection_node_update($node, $deleted = NULL) {
+function ma_collection_node_update($node) {
+}
 
-  // Update the Item Count on Collection and Personal Collection nodes when a node that can be in a Collection / Personal Collection
-  // adds or removes a Collection reference, is deleted, or is cloned.
+/**
+ * Implements hook_node_postupdate().
+ */
+function ma_collection_node_postupdate($node) {
+  // Update collection count in the case where a node contained
+  // in a collection has a status change.
+  // Is this a node type currently supported by collections?
   if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
-    ma_collection_update_item_count ($node, 'field_collection', $deleted);
-    ma_collection_update_item_count ($node, 'field_personal_collections', $deleted);
+    // Did it have a status change?
+    // All other recount cases handled by ma_collection_node_presave.
+    // Check all potential collection fields for collections we should trigger updates for.
+    foreach (array('field_collection', 'field_personal_collections') as $collection_field) {
+      if (!empty($node->{$collection_field}[LANGUAGE_NONE])) {
+        foreach ($node->{$collection_field}[LANGUAGE_NONE] as $collection_ref) {
+          // Load and save the collection node. We don't need to change the count here.
+          // We only need to trigger ma_collection_node_presave, which will do the recount.
+          $collection = node_load($collection_ref['target_id']);
+          $collection_emw = entity_metadata_wrapper('node', $collection);
+          $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_digital_heritage_items->value());
+          $old_item_count = (int) $collection_emw->field_digital_heritage_count->value();
+          // Only save if the counts are different.
+          if ($old_item_count != $contained_item_count) {
+            node_save($collection);
+          }
+        }
+      }
+    }
   }
 }
 
 
-function ma_collection_update_item_count ($node, $source_field_name, $deleted) {
-  $wrapper_new = entity_metadata_wrapper('node', $node);
-  $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$source_field_name}->value());
-  $old_refs = array();
-  if (!$deleted AND isset($node->original)) {
-    $wrapper_old = entity_metadata_wrapper('node', $node->original);
-    $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$source_field_name}->value());
-  }
-  if ($old_refs <> $new_refs) {
-    $refs_added = array_diff ($new_refs, $old_refs);
-    $refs_deleted = array_diff ($old_refs, $new_refs);
-    $collections_to_recount = array_merge ($refs_added, $refs_deleted);
-    foreach ($collections_to_recount as $collection) {
-      if($collection == NULL) {
-        continue;
-      }
-      $query = new EntityFieldQuery();
-      $result = $query
-        ->entityCondition('entity_type', 'node')
-        ->entityCondition('bundle', $node->type)
-        ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
-        ->fieldCondition($source_field_name, 'target_id', $collection)
-        ->execute();
-      $new_count = count($result['node']);
-      $collection_presave_skip = variable_get('collection_presave_skip', array());
-      $collection_presave_skip[$collection] = $collection;
-      variable_set('collection_presave_skip', $collection_presave_skip);
-      $collection_emw = entity_metadata_wrapper('node', $collection);
-      if($collection_emw) {
-        $collection_emw->field_digital_heritage_count->set($new_count);
-        $collection_emw->save();
+// Count number of published nodes from a EMW ref value list.
+function ma_collection_get_published_node_count($node_list) {
+  $count = 0;
+  $seen = array();
+  if ($node_list) {
+    foreach ($node_list as $node) {
+      if (isset($node->status) && $node->status == NODE_PUBLISHED && !in_array($node->nid, $seen)) {
+        $count++;
+
+        // Don't count duplicates.
+        $seen[] = $node->nid;
       }
     }
   }
+  return $count;
 }
 
 /**
@@ -219,6 +208,11 @@ function ma_collection_node_access($node, $op, $account) {
  * Collection and Personal Collection node form alter.
  */
 function ma_collection_form_alter(&$form, $form_state, $form_id) {
+
+  // Don't show the personal collections field.
+  if (isset($form['field_personal_collections'])) {
+    $form['field_personal_collections']['#access'] = FALSE;
+  }
 
   if ($form_id == 'collection_node_form' OR $form_id == 'personal_collection_node_form') {
     $node = $form['#node'];
@@ -339,31 +333,36 @@ function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
   return $output;
 }
 
-// Helper function to get the item count of a collection, including subcollections
+/**
+ * Get the item count of a collection including subcollections.
+ *
+ * Checks status and access.
+ * Called in Display Suite code field.
+ */
 function ma_collection_get_item_count($entity) {
-    $item_count = 0;
-    if(!empty($entity->field_collections_child_coll[LANGUAGE_NONE])) {
-        foreach($entity->field_collections_child_coll[LANGUAGE_NONE] as $sctarget) {
-            $subcollection = node_load($sctarget['target_id']);
-            $item_count += ma_collection_get_item_count($subcollection);
-        }
+  $item_count = 0;
+  if (!empty($entity->field_collections_child_coll[LANGUAGE_NONE])) {
+    foreach ($entity->field_collections_child_coll[LANGUAGE_NONE] as $sctarget) {
+      $subcollection = node_load($sctarget['target_id']);
+      $item_count += ma_collection_get_item_count($subcollection);
     }
+  }
 
-    $coll_wrapper = entity_metadata_wrapper('node', $entity);
-    $items = $coll_wrapper->field_digital_heritage_items->value();
-    if (count($items)) {
-        if (user_access('bypass content access control')) {
-            $item_count += count($items);
-        }
-        else {
-            foreach ($items as $item) {
-                if (node_access('view', $item)) {
-                    $item_count++;
-                }
-            }
-        }
+  $coll_wrapper = entity_metadata_wrapper('node', $entity);
+  $items = $coll_wrapper->field_digital_heritage_items->value();
+  if (!empty($items)) {
+    if ($item->status && user_access('bypass content access control')) {
+      $item_count += count($items);
     }
-    return $item_count;
+    else {
+      foreach ($items as $item) {
+        if ($item->status && node_access('view', $item)) {
+          $item_count++;
+        }
+      }
+    }
+  }
+  return $item_count;
 }
 
 /**
