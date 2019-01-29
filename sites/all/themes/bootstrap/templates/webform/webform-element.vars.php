@@ -24,7 +24,7 @@ function bootstrap_preprocess_webform_element(array &$variables) {
     $wrapper_attributes = $element['#wrapper_attributes'];
   }
 
-  // See https://getbootstrap.com/docs/3.3/css/#forms-controls.
+  // See https://getbootstrap.com/docs/3.4/css/#forms-controls.
   if (isset($element['#type'])) {
     if ($element['#type'] === 'radio') {
       $wrapper_attributes['class'][] = 'radio';

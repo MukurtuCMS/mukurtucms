@@ -79,7 +79,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#title' => t('Fluid container'),
     '#default_value' => bootstrap_setting('fluid_container', $theme),
     '#description' => t('Use <code>.container-fluid</code> class. See <a href="!url">Fluid container</a>', array(
-      '!url' => 'https://getbootstrap.com/docs/3.3/css/#grid-example-fluid',
+      '!url' => 'https://getbootstrap.com/docs/3.4/css/#grid-example-fluid',
     )),
   );
 
@@ -106,7 +106,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#title' => t('Colorize Buttons'),
     '#default_value' => bootstrap_setting('button_colorize', $theme),
     '#description' => t('Adds classes to buttons based on their text value. See: <a href="!bootstrap_url" target="_blank">Buttons</a> and <a href="!api_url" target="_blank">hook_bootstrap_colorize_text_alter()</a>', array(
-      '!bootstrap_url' => 'https://getbootstrap.com/docs/3.3/css/#buttons',
+      '!bootstrap_url' => 'https://getbootstrap.com/docs/3.4/css/#buttons',
       '!api_url' => 'https://drupal-bootstrap.org/apis/hook_bootstrap_colorize_text_alter',
     )),
   );
@@ -172,7 +172,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#type' => 'select',
     '#title' => t('Default image shape'),
     '#description' => t('Add classes to an <code>&lt;img&gt;</code> element to easily style images in any project. Note: Internet Explorer 8 lacks support for rounded corners. See: <a href="!bootstrap_url" target="_blank">Image Shapes</a>', array(
-      '!bootstrap_url' => 'https://getbootstrap.com/docs/3.3/css/#images-shapes',
+      '!bootstrap_url' => 'https://getbootstrap.com/docs/3.4/css/#images-shapes',
     )),
     '#default_value' => bootstrap_setting('image_shape', $theme),
     '#empty_option' => t('None'),
@@ -342,7 +342,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#type' => 'fieldset',
     '#title' => t('Region wells'),
     '#description' => t('Enable the <code>.well</code>, <code>.well-sm</code> or <code>.well-lg</code> classes for specified regions. See: documentation on <a href="!wells" target="_blank">Bootstrap Wells</a>.', array(
-      '!wells' => 'https://getbootstrap.com/docs/3.3/components/#wells',
+      '!wells' => 'https://getbootstrap.com/docs/3.4/components/#wells',
     )),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
@@ -526,7 +526,7 @@ function bootstrap_form_system_theme_settings_alter(&$form, $form_state, $form_i
     '#type' => 'fieldset',
     '#title' => t('Tooltips'),
     '#description' => t('Inspired by the excellent jQuery.tipsy plugin written by Jason Frame; Tooltips are an updated version, which don\'t rely on images, use CSS3 for animations, and data-attributes for local title storage. See <a href="!url" target="_blank">Bootstrap tooltips</a> for more documentation.', array(
-      '!url' => 'https://getbootstrap.com/docs/3.3/javascript/#tooltips',
+      '!url' => 'https://getbootstrap.com/docs/3.4/javascript/#tooltips',
     )),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,

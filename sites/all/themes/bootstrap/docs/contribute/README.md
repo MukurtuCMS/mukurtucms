@@ -64,4 +64,4 @@ Please keep in mind though, this **IS NOT** a "support" channel. It's primary
 use is to discuss issues and to help fix bugs with the base theme itself.
 
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.4/

@@ -47,7 +47,7 @@ documentation. For clarity, we will always attempt to use this word verbosely
 in one of the following ways:
 
 - **[Drupal Bootstrap]** refers to the Drupal base theme project.
-- **[Bootstrap Framework](https://getbootstrap.com/docs/3.3/)** refers to the external
+- **[Bootstrap Framework](https://getbootstrap.com/docs/3.4/)** refers to the external
   front end framework.
 - **[drupal_bootstrap](https://api.drupal.org/apis/drupal_bootstrap)** refers
   to Drupal's bootstrapping process or phase.
