@@ -12,17 +12,15 @@ diff --git a/includes/js/owlcarousel.settings.js b/includes/js/owlcarousel.setti
 index 16d9a5c..956a746 100755
 --- a/includes/js/owlcarousel.settings.js
 +++ b/includes/js/owlcarousel.settings.js
-@@ -19,8 +19,8 @@
+@@ -19,6 +19,6 @@
       * @param settings object
       */
-       attachInit: function(carousel, settings) {
--	  var element = $('.owl-carousel');
--//      var element = $('#' + carousel);
-+      //	  var element = $(carousel + '.owl-carousel');
+     attachInit: function(carousel, settings) {
+-      var element = $('#' + carousel);
 +      var element = $('#' + carousel + '.owl-carousel');
- 	this.attachOwlCarousel(element, settings[carousel].settings);
+       this.attachOwlCarousel(element, settings[carousel].settings);
      },
- 
+
 -- 
 1.9.1
 
