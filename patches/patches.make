@@ -85,11 +85,10 @@ projects[feeds][patch][] = contrib/0001-Change-the-FeedsCSVParser-class-to-use-t
 projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scald-atoms.patch
 
 ;;; Feeds Tamper
-; Alter required field tamper to allow 0 as value
-projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
+; Alter required field tamper to allow 0 as value.
 ; Mukurtu Export change to support feed imports using a subset of fields. Treat single element arrays containing
-; a single empty string as empty
-projects[feeds_tamper][patch][] = contrib/0001-Count-an-empty-string-as-the-only-element-in-array-a.patch
+; a single empty string as empty.
+projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
 
 ;;; Fullcalendar Create
 ; Contributed patch:
