@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_frontpage.features.fe_block_settings.inc
@@ -18,9 +19,7 @@ function ma_frontpage_default_fe_block_settings() {
     'delta' => 'mukurtu_wizard',
     'module' => 'mukurtu_splash',
     'node_types' => array(),
-    'pages' => 'node/*/edit
-node/add/*
-dashboard*
+    'pages' => 'dashboard*
 dashboard',
     'roles' => array(),
     'themes' => array(
