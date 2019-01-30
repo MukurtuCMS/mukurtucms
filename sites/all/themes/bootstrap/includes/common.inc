@@ -6,8 +6,8 @@
  */
 
 define('BOOTSTRAP_VERSION_MAJOR', 3);
-define('BOOTSTRAP_VERSION_MINOR', 3);
-define('BOOTSTRAP_VERSION_PATCH', 5);
+define('BOOTSTRAP_VERSION_MINOR', 4);
+define('BOOTSTRAP_VERSION_PATCH', 0);
 define('BOOTSTRAP_VERSION', BOOTSTRAP_VERSION_MAJOR . '.' . BOOTSTRAP_VERSION_MINOR . '.' . BOOTSTRAP_VERSION_PATCH);
 
 /**
@@ -923,6 +923,7 @@ function _bootstrap_glyphicons($version = NULL) {
     $versions['3.3.5'] = $versions['3.3.4'];
     $versions['3.3.6'] = $versions['3.3.5'];
     $versions['3.3.7'] = $versions['3.3.6'];
+    $versions['3.4.0'] = $versions['3.3.7'];
   }
 
   // Return a specific versions icon set.

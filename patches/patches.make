@@ -85,11 +85,10 @@ projects[feeds][patch][] = contrib/0001-Change-the-FeedsCSVParser-class-to-use-t
 projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scald-atoms.patch
 
 ;;; Feeds Tamper
-; Alter required field tamper to allow 0 as value
-projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
+; Alter required field tamper to allow 0 as value.
 ; Mukurtu Export change to support feed imports using a subset of fields. Treat single element arrays containing
-; a single empty string as empty
-projects[feeds_tamper][patch][] = contrib/0001-Count-an-empty-string-as-the-only-element-in-array-a.patch
+; a single empty string as empty.
+projects[feeds_tamper][patch][] = contrib/0001-Alter-required-field-tamper-to-allow-0-as-value.patch
 
 ;;; Fullcalendar Create
 ; Contributed patch:
@@ -117,8 +116,6 @@ projects[og_invite][patch][] = contrib/0001-Go-back-to-using-default-view-but-re
 ;;; Geofield & Geofield Gmap
 ; Feeds Import Not Saving Geofield
 projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
-; Google maps API fix
-projects[geofield_gmap][patch][] = https://www.drupal.org/files/issues/fix-api-key-not-being-used-2746209-16.patch
 
 ;;; Partial Date
 ; Add property info callback

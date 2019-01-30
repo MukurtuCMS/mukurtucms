@@ -64,7 +64,7 @@ you are attempting to integrate the base theme with.
 **A: No, not "officially"**
 
 The [Bootstrap Framework] itself does not officially support older Internet
-Explorer [compatibility modes](https://getbootstrap.com/docs/3.3/getting-started/#support-ie-compatibility-modes).
+Explorer [compatibility modes](https://getbootstrap.com/docs/3.4/getting-started/#support-ie-compatibility-modes).
 To ensure you are using the latest rendering mode for IE, consider installing
 the [HTML5 Tools](https://www.drupal.org/project/html5_tools) module.
 
@@ -125,7 +125,7 @@ theme is updated. This makes keeping track of changes next to impossible.
 Instead, you should create a custom sub-theme that isn't hosted on Drupal.org.
 
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.4/
 [Respond.js]: https://github.com/scottjehl/Respond
 
 ---
@@ -162,5 +162,5 @@ function hook_update_N() {
 
 [Drush]: http://www.drush.org
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.4/
 [jQuery Update]: https://www.drupal.org/project/jquery_update

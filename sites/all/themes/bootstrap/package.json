@@ -15,8 +15,10 @@
     "less-plugin-autoprefix": "^1.4.2",
     "less-plugin-clean-css": "^1.5.1",
     "load-grunt-config": "^0.19.2",
+    "promise-map-series": "^0.2.3",
     "queue": "^4.4.1",
-    "request": "^2.60.0",
+    "semver": "^5.6.0",
+    "simple-json-request": "^0.5.2",
     "sync-exec": "^0.6.1",
     "time-grunt": "^1.2.1"
   },
@@ -30,9 +32,6 @@
     "css": "css",
     "js": "js",
     "libraries": "lib"
-  },
-  "urls": {
-    "jsdelivr": "https://api.jsdelivr.com/v1/bootstrap/libraries"
   },
   "githooks": {
     "post-checkout": [

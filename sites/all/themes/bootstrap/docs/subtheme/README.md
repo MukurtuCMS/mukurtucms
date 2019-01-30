@@ -58,7 +58,7 @@ set default` link next to your newly created sub-theme.
 for additional documentation pertaining to the chosen Starterkit.
 
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.4/
 [jsDelivr CDN]: https://www.jsdelivr.com
 [Less]: http://lesscss.org
 [Sass]: http://sass-lang.com

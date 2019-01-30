@@ -144,14 +144,14 @@ base theme:
 ## Advanced
 | Setting                                          | Default value {.col-xs-4} |
 | ------------------------------------------------ | ------------------------- |
-| bootstrap_cdn_provider         | `'jsdelivr'`                                                       |
-| bootstrap_cdn_custom_css       | `'https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.css'`     |
-| bootstrap_cdn_custom_css_min   | `'https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.min.css'` |
-| bootstrap_cdn_custom_js        | `'https://cdn.jsdelivr.net/bootstrap/3.3.7/js/bootstrap.js'`       |
-| bootstrap_cdn_custom_js_min    | `'https://cdn.jsdelivr.net/bootstrap/3.3.7/js/bootstrap.min.js'`   |
-| bootstrap_cdn_jsdelivr_version | `'3.3.7'`                                                          |
-| bootstrap_cdn_jsdelivr_theme   | `'bootstrap'`                                                      |
+| bootstrap_cdn_provider         | `'jsdelivr'`                                                                |
+| bootstrap_cdn_custom_css       | `'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/css/bootstrap.css'`     |
+| bootstrap_cdn_custom_css_min   | `'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/css/bootstrap.min.css'` |
+| bootstrap_cdn_custom_js        | `'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/js/bootstrap.js'`       |
+| bootstrap_cdn_custom_js_min    | `'https://cdn.jsdelivr.net/npm/bootstrap@3.4.0/dist/js/bootstrap.min.js'`   |
+| bootstrap_cdn_jsdelivr_version | `'3.4.0'`                                                                   |
+| bootstrap_cdn_jsdelivr_theme   | `'bootstrap'`                                                               |
 {.table.table-striped}
 
 [Drupal Bootstrap]: https://www.drupal.org/project/bootstrap
-[Bootstrap Framework]: https://getbootstrap.com/docs/3.3/
+[Bootstrap Framework]: https://getbootstrap.com/docs/3.4/

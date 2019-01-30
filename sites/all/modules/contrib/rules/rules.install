@@ -1,7 +1,8 @@
 <?php
 
 /**
- * @file Rules - Installation file.
+ * @file
+ * Rules - Installation file.
  */
 
 /**
@@ -18,7 +19,7 @@ function rules_enable() {
 function rules_install() {
   module_load_include('inc', 'rules', 'modules/events');
   // Set the modules' weight to 20, see
-  // http://drupal.org/node/445084#comment-1533280 for the reasoning.
+  // https://www.drupal.org/node/445084#comment-1533280 for the reasoning.
   db_query("UPDATE {system} SET weight = 20 WHERE name = 'rules'");
 }
 
@@ -26,8 +27,22 @@ function rules_install() {
  * Implements hook_uninstall().
  */
 function rules_uninstall() {
-  variable_del('rules_event_whitelist');
   variable_del('rules_debug');
+  variable_del('rules_debug_log');
+  variable_del('rules_log_errors');
+  variable_del('rules_log_level');
+
+  variable_del('rules_clean_path');
+  variable_del('rules_path_cleaning_callback');
+  variable_del('rules_path_lower_case');
+  variable_del('rules_path_replacement_char');
+  variable_del('rules_path_transliteration');
+
+  // Delete all the debug region variables and then clear the variables cache.
+  db_delete('variable')
+    ->condition('name', 'rules_debug_region_%', 'LIKE')
+    ->execute();
+  cache_clear_all('variables', 'cache_bootstrap');
 }
 
 /**
@@ -54,7 +69,7 @@ function rules_schema() {
         'description' => 'The label of the configuration.',
         'default' => 'unlabeled',
       ),
-     'plugin' => array(
+      'plugin' => array(
         'type' => 'varchar',
         'length' => 127,
         'not null' => TRUE,
@@ -222,7 +237,7 @@ function rules_update_7200() {
         'description' => 'The label of the configuration.',
         'default' => 'unlabeled',
       ),
-     'plugin' => array(
+      'plugin' => array(
         'type' => 'varchar',
         'length' => 127,
         'not null' => TRUE,
@@ -492,7 +507,7 @@ function rules_update_7212() {
  * Recover the "owner" property for broken configurations.
  */
 function rules_update_7213() {
-  $rows= db_select('rules_config', 'c')
+  $rows = db_select('rules_config', 'c')
     ->fields('c')
     ->condition('status', ENTITY_OVERRIDDEN)
     ->condition('owner', 'rules', '<>')
