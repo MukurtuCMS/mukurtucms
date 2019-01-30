@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_frontpage.views_default.inc

@@ -51,11 +51,12 @@ function mukurtu_splash_toggle_wizard() {
 
   $account = user_load($user->uid);
 
-  if (empty($account->data['disable_wizard']) || $account->data['disable_wizard'] == 0) {
-    $edit = ['data' => ['disable_wizard' => 1]];
-  }
-  else {
-    $edit = ['data' => ['disable_wizard' => 0]];
+  // Hasn't been set yet. Default is disabled, so toggle results in enabled.
+  if (!isset($account->data['disable_wizard'])) {
+    $edit = ['data' => ['disable_wizard' => FALSE]];
+  } else {
+    // It is set for this user, flip the boolean.
+    $edit = ['data' => ['disable_wizard' => !$account->data['disable_wizard']]];
   }
 
   user_save($account, $edit);
@@ -368,7 +369,7 @@ function mukurtu_splash_block_info() {
   ];
 
   $blocks['mukurtu_wizard'] = [
-    'info' => t('Mukurtu Dashboard: Wizard'),
+    'info' => t('Mukurtu Dashboard: Getting Started Guide'),
   ];
 
   $blocks['mukurtu_group_management'] = [
@@ -434,7 +435,7 @@ function mukurtu_splash_block_view($delta = '') {
       $block['content'] = mukurtu_splash_block_user();
       break;
     case 'mukurtu_wizard':
-      $block['subject'] = t('Wizard');
+      $block['subject'] = '';
       $block['content'] = mukurtu_splash_block_wizard();
       break;
     case 'mukurtu_group_management':
@@ -1560,13 +1561,12 @@ function mukurtu_splash_block_wizard() {
   $account = user_load($user->uid);
 
   // condition if the user has session disabled the wizard
-  if (isset($account->data['disable_wizard']) && $account->data['disable_wizard'] == 0) {
+  if (!isset($account->data['disable_wizard']) || $account->data['disable_wizard'] == 1) {
     $attribs = [
       'query' => ['destination' => $_GET['q']],
       'attributes' => ['class' => ['btn', 'btn-default']],
     ];
-    return l('Show Wizard', 'wizard/toggle', $attribs);
-    //return;
+    return l('Getting Started Guide', 'wizard/toggle', $attribs);
   }
 
   // need to determine which step of the wizard is active
@@ -1583,7 +1583,7 @@ function mukurtu_splash_block_wizard() {
         $step = 3;
         break;
       case 'digital-heritage':
-        $step = 5;
+        $step = 6;
         break;
     }
   }
@@ -1598,7 +1598,7 @@ function mukurtu_splash_block_wizard() {
           $step = 3;
           break;
         case 'digital-heritage':
-          $step = 5;
+          $step = 6;
           break;
       }
     }
