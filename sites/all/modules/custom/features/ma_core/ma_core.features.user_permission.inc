@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.user_permission.inc
@@ -1020,16 +1021,6 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'edit own tags'.
-  $permissions['edit own tags'] = array(
-    'name' => 'edit own tags',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'community_tags',
-  );
-
   // Exported permission: 'edit terms in category'.
   $permissions['edit terms in category'] = array(
     'name' => 'edit terms in category',
@@ -1287,15 +1278,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'shortcut',
-  );
-
-  // Exported permission: 'tag content'.
-  $permissions['tag content'] = array(
-    'name' => 'tag content',
-    'roles' => array(
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'community_tags',
   );
 
   // Exported permission: 'translate content'.
