@@ -592,8 +592,6 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
     // In that case, clear the past item.
     $supported_types = array(
       'collection',
-      'community',
-      'cultural_protocol_group',
       'dictionary_word',
       'digital_heritage',
       'person',
@@ -642,6 +640,11 @@ function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
           'href' => $href,
           'localized_options' => array('query' => $past_item['search']['query_parameters']),
         );
+      }
+
+      // menu.inc will crash with an invalid call to 'l' if we somehow pass null to localized_options.
+      if (!isset($active_trail[$i]['localized_options'])) {
+        $active_trail[$i]['localized_options'] = array();
       }
     }
   }
