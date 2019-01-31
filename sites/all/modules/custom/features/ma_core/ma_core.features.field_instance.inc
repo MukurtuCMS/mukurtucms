@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.field_instance.inc
