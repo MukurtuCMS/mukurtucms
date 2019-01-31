@@ -21,7 +21,6 @@ function ma_base_theme_update_7002(&$sandbox) {
   $themes = array(
     'bootstrap',
     'mukurtu',
-    'mukurtu_starter',
   );
   theme_enable($themes);
 }
