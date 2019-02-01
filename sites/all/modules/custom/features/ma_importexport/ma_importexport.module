@@ -34,6 +34,32 @@ function ma_importexport_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_feeds_after_parse().
+ */
+function ma_importexport_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  // Feeds will happily save a GUID of "" to the feeds item database.
+  // For feeds importers that have dual unique fields (guid, nid),
+  // a missing guid will always return the first nid/sid that was
+  // used with an empty guid. We'll lookup existing or provide
+  // sane GUID values in the case that it is empty.
+  if (!empty($result->items)) {
+    foreach ($result->items as &$item) {
+      if (isset($item['guid']) && $item['guid'] == "") {
+        // Node has empty GUID.
+        if (isset($item['nid'])) {
+          $item['guid'] = ma_importexport_make_node_guid($item['nid']);
+        }
+
+        // Scald Atom has empty GUID.
+        if (isset($item['sid'])) {
+          $item['guid'] = ma_importexport_make_atom_guid($item['sid']);
+        }
+      }
+    }
+  }
+}
+
 
 /**
  * Implements hook_feeds_processor_targets_alter().
@@ -310,11 +336,17 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
   // Do not act on the Dublin Core importer.
-  if (ma_importexport_dc_is_xml_importer($source->id)) {
+  if (module_exists('ma_importexport_dc') && ma_importexport_dc_is_xml_importer($source->id)) {
     return;
   }
 
   global $user;
+
+  // Make sure the correct GUID makes it into feeds_item
+  if (isset($item['guid']) && !empty($entity->feeds_item)) {
+    $entity->feeds_item->guid = $item['guid'];
+  }
+
   $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
 
   // Enforce access control on feeds.
@@ -892,44 +924,50 @@ function ma_importexport_access_export($node) {
 
 
 /**
- * Helper function to generate sensible GUIDs for nodes during export
+ * Helper function to generate sensible GUIDs for nodes during export.
  */
 function ma_importexport_make_node_guid($nid) {
   $node = node_load($nid);
 
-  if($node) {
-      // Check for an existing feeds guid
-      $node_feeds_info = feeds_item_info_load('node', $node->nid);
+  if ($node) {
+    // Check for an existing feeds guid.
+    $node_feeds_info = feeds_item_info_load('node', $node->nid);
 
-      if($node_feeds_info && isset($node_feeds_info->guid)) {
-          return $node_feeds_info->guid;
+    if ($node_feeds_info && isset($node_feeds_info->guid)) {
+      // Don't return a blank GUID.
+      if ($node_feeds_info->guid != "") {
+        return $node_feeds_info->guid;
       }
+    }
 
-      // Otherwise generate a new one
-      $guid = $node->type . '_' . $node->nid . '_' . $node->created;
-      return $guid;
+    // Otherwise generate a new one.
+    $guid = $node->type . '_' . $node->nid . '_' . $node->created;
+    return $guid;
   }
   return "";
 }
 
 
 /**
- * Helper function to generate sensible GUIDs for atoms during export
+ * Helper function to generate sensible GUIDs for atoms during export.
  */
 function ma_importexport_make_atom_guid($sid) {
   $atom = scald_atom_load($sid);
 
-  if($atom) {
-      // Check for an existing feeds guid
-      $atom_feeds_info = feeds_item_info_load('scald_atom', $sid);
+  if ($atom) {
+    // Check for an existing feeds guid
+    $atom_feeds_info = feeds_item_info_load('scald_atom', $sid);
 
-      if($atom_feeds_info && isset($atom_feeds_info->guid)) {
-          return $atom_feeds_info->guid;
+    if ($atom_feeds_info && isset($atom_feeds_info->guid)) {
+      // Don't return a blank GUID.
+      if ($node_feeds_info->guid != "") {
+        return $node_feeds_info->guid;
       }
+    }
 
-      // Otherwise generate a new one
-      $guid = $atom->type . '_' . $atom->sid . '_' . $atom->created;
-      return $guid;
+    // Otherwise generate a new one
+    $guid = $atom->type . '_' . $atom->sid . '_' . $atom->created;
+    return $guid;
   }
   return "";
 }
@@ -1021,7 +1059,7 @@ function ma_importexport_sort_digital_heritage_nodes($nids, $options) {
     // Check for unprocessed edges, indicating that graph is not acyclic
     foreach($node_graph as $m => $m_edges) {
         if(!empty($m_edges)) {
-            dpm("Graph of digital heritage items is not acyclic.  Exported files may not import correctly.");   // TODO: Change this
+            dsm("Graph of digital heritage items is not acyclic.  Exported files may not import correctly.");   // TODO: Change this
             // Put them at the end and hope for the best
             $sorted_nodes[] = $m;
         }
