@@ -229,7 +229,15 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
         '#type' => 'checkbox',
         '#title' => $id_label,
         '#default_value' => isset($defaults[$entity_type][$bundle_name][$id]) ? $defaults[$entity_type][$bundle_name][$id] : TRUE,
-        '#weight' => -2
+        '#weight' => -2,
+      );
+
+      // Username
+      $form['export_fields'][$entity_type][$bundle_name]['user_name'] = array(
+          '#type' => 'checkbox',
+          '#title' => 'Username',
+          '#default_value' => isset($defaults[$entity_type][$bundle_name]['user_name']) ? $defaults[$entity_type][$bundle_name]['user_name'] : TRUE,
+          '#weight' => 1000,
       );
 
       // Extra Fields (title, etc)
@@ -245,7 +253,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
                   '#type' => 'checkbox',
                   '#title' => $extra_field['label'],
                   '#default_value' => isset($defaults[$entity_type][$bundle_name][$extra_field_name]) ? $defaults[$entity_type][$bundle_name][$extra_field_name] : TRUE,
-                  '#weight' => -1
+                  '#weight' => -1,
               );
           }
       }
@@ -256,13 +264,13 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
               '#type' => 'checkbox',
               '#title' => 'Scald Provider',
               '#default_value' => isset($defaults[$entity_type][$bundle_name]['data']) ? $defaults[$entity_type][$bundle_name]['data'] : TRUE,
-              '#weight' => -1
+              '#weight' => -1,
           );
           $form['export_fields'][$entity_type][$bundle_name]['file_source'] = array(
               '#type' => 'checkbox',
               '#title' => 'Media Source',
               '#default_value' => isset($defaults[$entity_type][$bundle_name]['data']) ? $defaults[$entity_type][$bundle_name]['data'] : TRUE,
-              '#weight' => -1
+              '#weight' => -1,
           );
       }
 
@@ -279,7 +287,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
             '#type' => 'checkbox',
             '#title' => $title,
             '#default_value' => isset($defaults[$entity_type][$bundle_name]['host_entity']) ? $defaults[$entity_type][$bundle_name]['host_entity'] : TRUE,
-            '#weight' => -1
+            '#weight' => -1,
         );
       }
 
@@ -298,7 +306,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
           '#type' => 'checkbox',
           '#title' => $field['label'],
           '#default_value' => isset($defaults[$entity_type][$bundle_name][$field_name]) ? $defaults[$entity_type][$bundle_name][$field_name] : TRUE,
-          '#weight' => $field['widget']['weight']
+          '#weight' => $field['widget']['weight'],
         );
       }
     }
