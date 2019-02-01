@@ -34,6 +34,32 @@ function ma_importexport_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_feeds_after_parse().
+ */
+function ma_importexport_feeds_after_parse(FeedsSource $source, FeedsParserResult $result) {
+  // Feeds will happily save a GUID of "" to the feeds item database.
+  // For feeds importers that have dual unique fields (guid, nid),
+  // a missing guid will always return the first nid/sid that was
+  // used with an empty guid. We'll lookup existing or provide
+  // sane GUID values in the case that it is empty.
+  if (!empty($result->items)) {
+    foreach ($result->items as &$item) {
+      if (isset($item['guid']) && $item['guid'] == "") {
+        // Node has empty GUID.
+        if (isset($item['nid'])) {
+          $item['guid'] = ma_importexport_make_node_guid($item['nid']);
+        }
+
+        // Scald Atom has empty GUID.
+        if (isset($item['sid'])) {
+          $item['guid'] = ma_importexport_make_atom_guid($item['sid']);
+        }
+      }
+    }
+  }
+}
+
 
 /**
  * Implements hook_feeds_processor_targets_alter().
@@ -310,7 +336,7 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
  */
 function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $entity_id) {
   // Do not act on the Dublin Core importer.
-  if (ma_importexport_dc_is_xml_importer($source->id)) {
+  if (module_exists('ma_importexport_dc') && ma_importexport_dc_is_xml_importer($source->id)) {
     return;
   }
 
