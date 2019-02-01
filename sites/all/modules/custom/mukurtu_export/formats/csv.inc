@@ -313,6 +313,14 @@ function mukurtu_export_csv_post_encode_entity(&$encoded_content, $entity_key, $
       $encoded_content[$entity_type][$bundle_name]['host_entity'][$entity_key][0] = $host_entity_id;
     }
   }
+
+  // User name.
+  if (isset($entity->uid) && $field_list[$entity_type][$bundle_name]['user_name']) {
+    $author = user_load($entity->uid);
+    if ($author && isset($author->name)) {
+      $encoded_content[$entity_type][$bundle_name]['user_name'][$entity_key][0] = $author->name;
+    }
+  }
 }
 
 /**
@@ -399,6 +407,7 @@ function _mukurtu_export_csv_get_header_label($entity_type, $bundle_name, $field
  * Process an entity and update $header and $encoded_content accordingly.
  */
 function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, $entity_type = NULL, $bundle_name = NULL, $field_list = NULL, $id_format = 'internal', $export_referenced = NULL, $export_files = TRUE, $parent = NULL, $parent_index = 0) {
+
   // GUID is a special case
   if(is_null($parent) && $id_format == 'guid') {
     $encoded_content[$entity_type][$bundle_name]['guid'][$entity_key][0] = _mukurtu_export_entity_get_guid($entity_type, $var->{_mukurtu_export_entity_id($entity_type, $var)});
