@@ -434,7 +434,10 @@ function mukurtu_export_csv_encode_entity(&$encoded_content, $entity_key, $var, 
     }
     else {
       // Create a safe text version of this value and store it against the header using a safe key.
-      $options = array('id_format' => $id_format);
+      $options = array(
+        'id_format' => $id_format,
+        'export_files' => $export_files,
+      );
 
       // Get exportable value from field
       //      if(is_null($parent)) {

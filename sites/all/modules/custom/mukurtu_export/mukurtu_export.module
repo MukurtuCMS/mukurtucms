@@ -210,7 +210,6 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
     && (isset($options['id_format']) && ($options['id_format'] == 'guid')
     && isset($value['value']))) {
       return _mukurtu_export_encode_scald_dnd($value['value']);
-      //return array($extracted_value, $referenced_entities, $files);
     }
   }
 
@@ -233,9 +232,25 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
         $file->filename,
       ]);
 
+      // Add file to binary export list.
       $files[$file->fid] = ['uri' => $file->uri, 'filename' => $localname];
+      $exported_file_value = "";
+      // If user has selected to package binary files, we always
+      // want to reference the relative file path.
+      if ($options['export_files']) {
+        $exported_file_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $localname;
+      } else {
+        if ($options['id_format'] == 'internal') {
+          // Internal IDs, metadata only -> Export the internal URI.
+          $exported_file_value = $file->uri;
+        } else {
+          // GUIDs, metadata only -> External URL
+          $exported_file_value = file_create_url($file->uri);
+        }
+      }
+
       return [
-        MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $localname,
+        $exported_file_value,
         $referenced_entities,
         $files,
       ];

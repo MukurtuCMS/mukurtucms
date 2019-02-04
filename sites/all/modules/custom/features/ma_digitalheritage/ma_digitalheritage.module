@@ -39,7 +39,7 @@ function ma_digitalheritage_node_access($node, $op, $account) {
             // OG node_access doesn't know what to do for users with no community memberships yet.
             // This causes users like Language Stewards to be presented with the option to create DH items, which we don't want.
             // Get the list of CPs a user can use, if none, don't let them create DH
-            $cps = ma_cultural_protocol_get_cps_user_can_post_to();
+            $cps = module_exists('ma_culturalprotocol') ? ma_cultural_protocol_get_cps_user_can_post_to() : array();
             if(empty($cps)) {
                 return NODE_ACCESS_DENY;
             }

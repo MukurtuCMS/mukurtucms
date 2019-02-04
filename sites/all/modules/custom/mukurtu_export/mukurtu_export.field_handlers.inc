@@ -83,9 +83,25 @@ function mukurtu_export_field_handler_image($value, $field_info, $options = arra
     $referenced_entities = array();
 
     $saved_file = _mukurtu_export_save_file($value);
-    $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
 
-    return array($return_value, $referenced_entities, $saved_file);
+    $exported_file_value = "";
+      // If user has selected to package binary files, we always
+      // want to reference the relative file path.
+      if (isset($options['export_files']) && $options['export_files']) {
+        $exported_file_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
+      } else {
+        if (isset($options['id_format']) && $options['id_format'] == 'internal') {
+          // Internal IDs, metadata only -> Export the internal URI.
+          $exported_file_value = $value['uri'];
+        } else {
+          // GUIDs, metadata only -> External URL
+          $exported_file_value = file_create_url($value['uri']);
+        }
+      }
+
+//    $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
+
+    return array($exported_file_value, $referenced_entities, $saved_file);
 }
 
 // /**
