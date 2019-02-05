@@ -1363,6 +1363,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
     'field_name' => 'field_section_body',
@@ -1371,7 +1372,7 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 0,
+      'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 1,
       'user_register_form' => FALSE,
@@ -1381,6 +1382,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'rows' => 10,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea',
       'weight' => 3,
