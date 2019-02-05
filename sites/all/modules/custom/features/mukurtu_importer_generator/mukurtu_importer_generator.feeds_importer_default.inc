@@ -143,6 +143,9 @@ function mukurtu_importer_generator_feeds_importer_default() {
                   break;
               case 'partial_date_range':
                   break;
+              case 'datetime':
+                  $mappings[$mapping_i]['target'] = "{$field_name}:start";
+                  break;
               default:
                                 //watchdog(WATCHDOG_NOTICE, "unhandled {$field['type']}");
               }
