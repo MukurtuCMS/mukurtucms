@@ -199,16 +199,26 @@ function mukurtu_export_field_handler_paragraphs($value, $field_info, $options =
 }
 
 /**
- * Handle partial date fields
+ * Handle partial date fields.
  */
 function mukurtu_export_field_handler_partial_date_range($value, $field_info, $options = array()) {
-    $referenced_entities = array();
-    $files = array();
+  $referenced_entities = array();
+  $files = array();
 
-    if(isset($value['timestamp'])) {
-        return array($value['timestamp'], $referenced_entities, $files);
+  // Only supporting part of partial date import currently (from only, yyyy-mm-dd).
+  // Full support may be added later.
+  $date = array();
+  if (isset($value['from']['year'])) {
+    $date[] = $value['from']['year'];
+    if (isset($value['from']['month'])) {
+      $date[] = $value['from']['month'];
+      if (isset($value['from']['day'])) {
+        $date[] = $value['from']['day'];
+      }
     }
-    return array(NULL, $referenced_entities, $files);
+    return array(implode('-', $date), $referenced_entities, $files);
+  }
+  return array(NULL, $referenced_entities, $files);
 }
 
 /**
