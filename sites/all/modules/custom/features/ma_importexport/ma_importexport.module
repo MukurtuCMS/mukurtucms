@@ -130,6 +130,14 @@ function ma_importexport_feeds_processor_targets_alter(&$targets, $entity_type, 
         'callback' => 'ma_importexport_set_paragraph_host_entity',
         'real_target' => 'host_entity',
     );
+
+    // partial_date_range
+    $targets['field_original_date'] = array(
+        'name' => t('Original Date'),
+        'description' => t('Original Date'),
+        'callback' => 'ma_importexport_set_partial_date_target',
+        'real_target' => 'field_original_date',
+    );
 }
 
 /**
@@ -189,6 +197,22 @@ function ma_importexport_set_media_source_target($source, $entity, $target, $val
         $entity->{$target} = $value[0];
         ma_scald_save_atom_source($value[0], $entity);
     }
+}
+
+
+/**
+ * Callback for ma_importexport_feeds_processor_targets_alter.
+ */
+function ma_importexport_set_partial_date_target($source, $entity, $target, $value, $mapping) {
+  // Only supporting part of partial date import currently (from only, yyyy-mm-dd).
+  // Full support may be added later.
+  $import_date = new DateTime($value[0]);
+
+  if ($import_date) {
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['year'] = $import_date->format('Y');
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['month'] = $import_date->format('m');
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['day'] = $import_date->format('d');
+  }
 }
 
 /**

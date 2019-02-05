@@ -141,8 +141,10 @@ function mukurtu_importer_generator_feeds_importer_default() {
               case 'geofield':
                   $mappings[$mapping_i]['target'] = "{$field_name}:wkt";
                   break;
+              case 'partial_date_range':
+                  break;
               default:
-                  //                  watchdog(WATCHDOG_NOTICE, "unhandled {$field['type']}");
+                                //watchdog(WATCHDOG_NOTICE, "unhandled {$field['type']}");
               }
 
               $mapping_i++;
