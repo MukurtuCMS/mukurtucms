@@ -371,6 +371,17 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
     $entity->feeds_item->guid = $item['guid'];
   }
 
+  // The Taxonomy term entity processor is currently failing to lookup
+  // the vid for the given vocabulary. If the vid is missing, the
+  // entity will not be saved, but feeds will report success.
+  if (isset($item['tid']) && !isset($entity->vid) && isset($source->importer->processor->config['bundle'])) {
+    $vocabulary_name = $source->importer->processor->config['bundle'];
+    $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
+    if ($vocabulary) {
+      $entity->vid = $vocabulary->vid;
+    }
+  }
+
   $scald_dnd_enabled_fields = ma_importexport_get_scald_dnd_enabled_fields();
 
   // Enforce access control on feeds.

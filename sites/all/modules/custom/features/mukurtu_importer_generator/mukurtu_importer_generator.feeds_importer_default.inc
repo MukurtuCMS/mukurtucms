@@ -12,7 +12,12 @@ function mukurtu_importer_generator_feeds_importer_default() {
 
   // Fields to not generate import fields for.
   $field_blacklist = array(
-    'all' => array('field_pre_actions', 'field_digital_heritage_count', 'field_media_aggregate'),
+    'all' => array(
+        'field_pre_actions',
+        'field_digital_heritage_count',
+        'field_media_aggregate',
+        'field_node_aggregate',
+    ),
     'node' => array(
         'dictionary_word' => array('field_media_asset'),
     ),

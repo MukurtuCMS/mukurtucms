@@ -171,7 +171,13 @@ function mukurtu_export_format_selection_form_submit($form, &$form_state) {
 function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
   // Blacklist any Mukurtu specific book-keeping fields that definitely don't need to be exported
   $field_blacklist = array(
-      'all' => array('field_pre_actions', 'field_personal_collections', 'field_digital_heritage_count', 'field_media_aggregate'),
+      'all' => array(
+        'field_pre_actions',
+        'field_personal_collections',
+        'field_digital_heritage_count',
+        'field_media_aggregate',
+        'field_node_aggregate',
+      ),
       'node' => array(
           'dictionary_word' => array('field_media_asset'),
           'digital_heritage' => array('field_community_record_parent'),
