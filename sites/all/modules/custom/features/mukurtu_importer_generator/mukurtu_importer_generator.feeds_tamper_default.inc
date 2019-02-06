@@ -131,7 +131,7 @@ function mukurtu_importer_generator_feeds_tamper_default() {
               if($field['type'] == 'entityreference') {
                   if($field['settings']['target_type'] == 'node') {
                       // Requires specific type of node
-                      if($field['settings']['handler'] == 'base') {                                                   
+                      if($field['settings']['handler'] == 'base') {
                           $node_type = array_keys($field['settings']['handler_settings']['target_bundles']);
                           _mukurtu_importer_generator_add_require_valid_node_tamper($export, $importer_id, $field_name, $source, $node_type);
                       }
