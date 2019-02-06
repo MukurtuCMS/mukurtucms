@@ -356,14 +356,25 @@ function mukurtu_export_filter_bidirectional_reference_fields($fields, $export_i
 
         if (count($left) == 3 && count($right) == 3) {
           if (!isset($fields[$left[0]][$left[1]][$left[2]]) || !isset($fields[$right[0]][$right[1]][$right[2]])) {
-            // No defaults set. Select the left side, disable right.
-            $fields[$left[0]][$left[1]][$left[2]] = TRUE;
-            $fields[$right[0]][$right[1]][$right[2]] = FALSE;
+            // No defaults set.
+            if ($left[0] == 'taxonomy_term') {
+              $fields[$left[0]][$left[1]][$left[2]] = FALSE;
+              $fields[$right[0]][$right[1]][$right[2]] = TRUE;
+            } else {
+              // Select the left side, disable right.
+              $fields[$left[0]][$left[1]][$left[2]] = TRUE;
+              $fields[$right[0]][$right[1]][$right[2]] = FALSE;
+            }
           } else {
             if ($fields[$left[0]][$left[1]][$left[2]] && $fields[$right[0]][$right[1]][$right[2]]) {
               // Both left and right are selected to export.
-              // Disable right.
-              $fields[$right[0]][$right[1]][$right[2]] = FALSE;
+              if ($left[0] == 'taxonomy_term') {
+                // Disable left.
+                $fields[$left[0]][$left[1]][$left[2]] = FALSE;
+              } else {
+                // Disable right.
+                $fields[$right[0]][$right[1]][$right[2]] = FALSE;
+              }
             }
             // If we get here, left and right both are set, but only one (or neither) is enabled.
             // We don't need to do anything in that case.
