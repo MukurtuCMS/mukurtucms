@@ -2264,3 +2264,27 @@ function ma_importexport_get_valid_scald_providers($type = NULL) {
 
   return $valid_providers;
 }
+
+
+/**
+ * Delete guids from feeds_item that no longer have valid entities attached.
+ */
+function _ma_import_export_cleanup_guids() {
+  $result = db_select('feeds_item')
+    ->fields('feeds_item', array('entity_type', 'entity_id', 'guid'))
+    ->execute()
+    ->fetchAll();
+
+  if (!empty($result)) {
+    foreach ($result as $item) {
+      $entity = entity_load_single($item->entity_type, $item->entity_id);
+      if (!$entity) {
+        db_delete('feeds_item')
+          ->condition('entity_type', $item->entity_type)
+          ->condition('entity_id', $item->entity_id)
+          ->condition('guid', $item->guid)
+          ->execute();
+      }
+    }
+  }
+}
