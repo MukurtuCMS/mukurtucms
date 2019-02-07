@@ -84,10 +84,8 @@ function mukurtu_create_default_boxes() {
 }
 
 function mukurtu_resolve_dependencies() {
-    // We need the dictionary DB tables to exist, but we want
-    // the dictionary disabled by default.
+    // Install the dictionary by default.
     module_enable(array('ma_dictionary'));
-    module_disable(array('ma_dictionary'));
 
     // Long term the community_tags module will probably be removed.
     // We have removed it as a dependency from the Mukurtu features now, which

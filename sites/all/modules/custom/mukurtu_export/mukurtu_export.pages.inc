@@ -180,7 +180,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       ),
       'node' => array(
           'dictionary_word' => array('field_media_asset'),
-          'digital_heritage' => array('field_community_record_parent'),
+          //'digital_heritage' => array('field_community_record_parent'),
       ),
       'scald_atom' => array(
           'audio' => array('og_group_ref'),
@@ -205,6 +205,7 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
   if(!$reset && isset($_SESSION['mukurtu_export']['export_fields'])) {
     $defaults = $_SESSION['mukurtu_export']['export_fields'];
   }
+  $defaults = mukurtu_export_filter_bidirectional_reference_fields($defaults);
 
   foreach(array_keys(entity_get_info()) as $entity_type) {
 
@@ -331,4 +332,57 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
     }
   }
   return $form;
+}
+
+/**
+ * Take an export field list and disable one side of any circular references.
+ */
+function mukurtu_export_filter_bidirectional_reference_fields($fields, $export_ids = NULL) {
+  // Get all enabled, bidirectional CERs.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'cer')
+    ->fieldCondition('cer_enabled', 'value', '1')
+    ->fieldCondition('cer_bidirectional', 'value', '1')
+    ->addMetaData('account', user_load(1));
+
+  $result = $query->execute();
+
+  if (isset($result['cer'])) {
+    foreach($result['cer'] as $cer) {
+      $entity = entity_load_single('cer', $cer->pid);
+      if ($entity) {
+        $left = explode(':', $entity->cer_left[LANGUAGE_NONE][0]['path']);
+        $right = explode(':', $entity->cer_right[LANGUAGE_NONE][0]['path']);
+
+        if (count($left) == 3 && count($right) == 3) {
+          if (!isset($fields[$left[0]][$left[1]][$left[2]]) || !isset($fields[$right[0]][$right[1]][$right[2]])) {
+            // No defaults set.
+            if ($left[0] == 'taxonomy_term') {
+              $fields[$left[0]][$left[1]][$left[2]] = FALSE;
+              $fields[$right[0]][$right[1]][$right[2]] = TRUE;
+            } else {
+              // Select the left side, disable right.
+              $fields[$left[0]][$left[1]][$left[2]] = TRUE;
+              $fields[$right[0]][$right[1]][$right[2]] = FALSE;
+            }
+          } else {
+            if ($fields[$left[0]][$left[1]][$left[2]] && $fields[$right[0]][$right[1]][$right[2]]) {
+              // Both left and right are selected to export.
+              if ($left[0] == 'taxonomy_term') {
+                // Disable left.
+                $fields[$left[0]][$left[1]][$left[2]] = FALSE;
+              } else {
+                // Disable right.
+                $fields[$right[0]][$right[1]][$right[2]] = FALSE;
+              }
+            }
+            // If we get here, left and right both are set, but only one (or neither) is enabled.
+            // We don't need to do anything in that case.
+          }
+        }
+      }
+    }
+  }
+
+  return $fields;
 }
