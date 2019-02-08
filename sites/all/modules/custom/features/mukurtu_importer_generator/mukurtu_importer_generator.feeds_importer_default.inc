@@ -206,7 +206,7 @@ function mukurtu_importer_generator_feeds_importer_default() {
                       'input_format' => 'filtered_html',
                       'author' => '1',
                       'authorize' => 1,
-                      'skip_hash_check' => 0,
+                      'skip_hash_check' => 1,
                       'bundle' => $bundle_name,
                       'update_non_existent' => 'skip',
                       'insert_new' => 1,

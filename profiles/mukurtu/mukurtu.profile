@@ -23,7 +23,8 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_delete_og_roles' => array(),
     'mukurtu_cycle_search_api' => array(),
     'mukurtu_revert_features' => array(),
-    'mukurtu_create_default_content' => array()
+    'mukurtu_create_default_content' => array(),
+    'mukurtu_revert_features' => array(),
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -44,7 +45,7 @@ function mukurtu_set_misc_vars () {
 }
 
 function mukurtu_set_theme () {
-  theme_enable(array('bootstrap', 'mukurtu'));
+  theme_enable(array('bootstrap', 'mukurtu', 'mukurtu_starter'));
   variable_set ('theme_default', 'mukurtu');
   theme_disable (array('bartik', 'seven'));
 }
@@ -84,9 +85,6 @@ function mukurtu_create_default_boxes() {
 }
 
 function mukurtu_resolve_dependencies() {
-    // Install the dictionary by default.
-    module_enable(array('ma_dictionary'));
-
     // Long term the community_tags module will probably be removed.
     // We have removed it as a dependency from the Mukurtu features now, which
     // allows sites to disable the module if they prefer. Here we enable the
@@ -98,6 +96,7 @@ function mukurtu_revert_features () {
   features_revert_module('ma_search_api'); // First revert search_api to get the node index
   features_revert(); // Revert all features
   features_revert(); // Revert all features a second time, for any straggling components
+  features_revert_module('ma_dictionary');
 }
 function mukurtu_rebuild_permissions () {
   node_access_rebuild();
@@ -267,8 +266,16 @@ function mukurtu_cycle_search_api() {
 }
 
 function mukurtu_create_default_content() {
+  // Install the dictionary by default.
+  module_enable(array('ma_dictionary'));
+  features_revert_module('ma_dictionary');
+
+  // Create frontpage beans.
   _ma_base_theme_create_default_beans();
   _ma_base_theme_set_default_browse('digital-heritage');
+
+  // Cycle the theme feature.
+  features_revert_module('ma_base_theme');
 }
 
 //function mukurtu_client_form() {
