@@ -2299,4 +2299,9 @@ function _ma_import_export_cleanup_guids() {
       }
     }
   }
+
+  // Delete empty GUIDs.
+  db_delete('feeds_item')
+    ->condition('guid', '')
+    ->execute();
 }
