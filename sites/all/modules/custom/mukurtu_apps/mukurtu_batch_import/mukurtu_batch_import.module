@@ -290,47 +290,71 @@ function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
 }
 
 function mukurtu_batch_import_generate_import_steps($files) {
-    $content_import_steps = array();
-    $scald_import_steps = array();
-    $pre_import_community = array();
-    $pre_import_protocol = array();
-    foreach($files as $file) {
-        if(preg_match('/(.+)\.csv/', $file, $matches)) {
-            if($file_type = mukurtu_batch_import_filename_to_entity_bundle_name($matches[1])) {
-                $entity_type = $file_type['entity_type'];
-                $bundle_name = $file_type['bundle_name'];
-                $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
+  $content_import_steps = array();
+  $taxonomy_import_steps = array();
+  $scald_import_steps = array();
+  $pre_import_community = array();
+  $pre_import_protocol = array();
 
-                if($entity_type == 'scald_atom') {
-                    $scald_import_steps[] = array('filename' => $matches[0],
-                                                  'importer' => $importer,
-                                                  'hide_warnings' => FALSE);
-                } else {
-                    $content_import_steps[] = array('filename' => $matches[0],
-                                                    'importer' => $importer,
-                                                    'hide_warnings' => FALSE);
-                }
+  foreach ($files as $file) {
+    if (preg_match('/(.+)\.csv/', $file, $matches)) {
+      if ($file_type = mukurtu_batch_import_filename_to_entity_bundle_name($matches[1])) {
+        $entity_type = $file_type['entity_type'];
+        $bundle_name = $file_type['bundle_name'];
+        $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
 
-                // Communities and protocols need to exist before most other content can be imported.
-                // We'll import them once right away, then again later after media has been imported.
-                if($entity_type == 'node' && $bundle_name == 'community') {
-                    $pre_import_community[] = array('filename' => $matches[0],
-                                                  'importer' => $importer,
-                                                  'hide_warnings' => TRUE);
-                }
+        // Separate out imports by type.
+        // We aren't going to fully resolve dependencies,
+        // but we can import the types in the most likely order.
+        switch ($entity_type) {
+          case 'scald_atom':
+            $scald_import_steps[] = array(
+              'filename' => $matches[0],
+              'importer' => $importer,
+              'hide_warnings' => FALSE,
+            );
+            break;
 
-                if($entity_type == 'node' && $bundle_name == 'cultural_protocol_group') {
-                    $pre_import_protocol[] = array('filename' => $matches[0],
-                                                  'importer' => $importer,
-                                                  'hide_warnings' => TRUE);
-                }
-            }
+          case 'taxonomy_term':
+            $taxonomy_import_steps[] = array(
+              'filename' => $matches[0],
+              'importer' => $importer,
+              'hide_warnings' => TRUE,
+            );
+            break;
+
+          default:
+            $content_import_steps[] = array(
+              'filename' => $matches[0],
+              'importer' => $importer,
+              'hide_warnings' => FALSE,
+            );
         }
+
+        // Communities and protocols need to exist before most other content can be imported.
+        // We'll import them once right away, then again later after media has been imported.
+        if ($entity_type == 'node' && $bundle_name == 'community') {
+          $pre_import_community[] = array(
+            'filename' => $matches[0],
+            'importer' => $importer,
+            'hide_warnings' => TRUE,
+          );
+        }
+
+        if ($entity_type == 'node' && $bundle_name == 'cultural_protocol_group') {
+          $pre_import_protocol[] = array(
+            'filename' => $matches[0],
+            'importer' => $importer,
+            'hide_warnings' => TRUE,
+          );
+        }
+      }
     }
+  }
 
-    $all_steps = array_merge($pre_import_community, $pre_import_protocol, $scald_import_steps,$content_import_steps);
+  $all_steps = array_merge($pre_import_community, $pre_import_protocol, $taxonomy_import_steps, $scald_import_steps, $content_import_steps);
 
-    return $all_steps;
+  return $all_steps;
 }
 
 function mukurtu_batch_import_import_metadata($path) {
