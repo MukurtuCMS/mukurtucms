@@ -17,12 +17,15 @@ function ma_base_theme_update_7001() {
  * Create default front page blocks for new Mukurtu theme.
  */
 function ma_base_theme_update_7002(&$sandbox) {
-  _ma_base_theme_create_default_beans();
   $themes = array(
     'bootstrap',
     'mukurtu',
   );
   theme_enable($themes);
+
+  // Need to pull in beans.
+  features_revert_module('ma_base_theme');
+  _ma_base_theme_create_default_beans();
 }
 
 /**
