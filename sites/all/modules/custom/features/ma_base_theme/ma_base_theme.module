@@ -111,84 +111,101 @@ function ma_base_theme_node_view_alter(&$build) {
     }
 }
 
+/**
+ * Create default front page bean blocks.
+ */
 function _ma_base_theme_create_default_beans() {
-    // Bean structure is exported via features, but bean content is created here
-    $already_created = variable_get('mukurtu_homepage_beans_created', FALSE);
-    if(!$already_created && module_exists("bean")) {
-        $stock_sid = variable_get('mukurtu_stock_homepage_sid', FALSE);
-        if(!$stock_sid) {
-            // Default Image
-            $path = implode(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'images','frontpage-hero.png'));
-            $stock_photo = file_get_contents(drupal_realpath($path));
-            $file = file_save_data($stock_photo, "public://hero.png");
+  // We need bean installed before we can create beans.
+  if (!module_exists("bean")) {
+    return;
+  }
 
-            // Create scald atom for default image
-            $atom = new ScaldAtom('image', 'scald_image');
-            $atom->title = "Default Frontpage Hero Image";
-            $atom->base_id = $file->fid;
-            $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
-            scald_atom_save($atom);
-            variable_set('mukurtu_stock_homepage_sid', $atom->sid);
-        } else {
-            $atom = scald_atom_load($stock_sid);
-        }
+  // Load beans.
+  $one_bean = bean_load_delta('frontpage-hero-image-one-column');
+  $two_bean = bean_load_delta('frontpage-hero-image-two-columns');
 
-        if(!isset($atom->sid)) {
-            return;
-        }
+  // Setup stock homepage image.
+  $stock_sid = variable_get('mukurtu_stock_homepage_sid', FALSE);
+  if (!$stock_sid) {
+    // Default Image.
+    $path = implode(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'images','frontpage-hero.png'));
+    $stock_photo = file_get_contents(drupal_realpath($path));
+    $file = file_save_data($stock_photo, "public://hero.png");
 
-        // Large Hero Image Bean
-        $bean = bean_load_delta('frontpage-hero-image-one-column');
-        if($bean == FALSE) {
-            $bean = bean_create(array('type' => 'hero_image_one_column'));
-        }
+    // Create scald atom for default image.
+    $atom = new ScaldAtom('image', 'scald_image');
+    $atom->title = "Default Frontpage Hero Image";
+    $atom->base_id = $file->fid;
+    $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
+    scald_atom_save($atom);
+    variable_set('mukurtu_stock_homepage_sid', $atom->sid);
+  }
+  else {
+    $atom = scald_atom_load($stock_sid);
+  }
 
-        if(!$already_created) {
-            $bean->label = 'Frontpage Hero Image: One Column';
-            $bean->title = '';
-            $bean->delta = 'frontpage-hero-image-one-column';
-            $bean->field_hero_image = array(
-                LANGUAGE_NONE => array(array(
-                'sid' => $atom->sid,
-                )),
-            );
-            $bean->field_hero_image_caption = array(
-                LANGUAGE_NONE => array(array(
-                    'value' => t("Welcome to Mukurtu"),
-                )),
-            );
-            $bean->save();
-            variable_set('mukurtu_homepage_beans_created', TRUE);
-        }
+  // Give up if after that, we still don't have a valid atom.
+  if (!isset($atom->sid)) {
+    return;
+  }
 
-        // Side by side hero bean
-        $bean = bean_load_delta('frontpage-hero-image-two-columns');
-        if($bean == FALSE) {
-            $bean = bean_create(array('type' => 'hero_image_two_columns'));
-        }
+  // Large one image bean.
+  if ($one_bean == FALSE) {
+    // Create bean if needed.
+    $one_bean = bean_create(array('type' => 'hero_image_one_column'));
+  }
 
-        if(!$already_created) {
-            $bean->label = 'Frontpage Hero Image: Two Columns';
-            $bean->title = '';
-            $bean->delta = 'frontpage-hero-image-two-columns';
-            $bean->field_hero_image = array(
-                LANGUAGE_NONE => array(array(
-                'sid' => $atom->sid,
-                )),
-            );
-            $bean->field_welcome_message = array(
-                LANGUAGE_NONE => array(array(
-                    'value' => t("Add a short welcome message here. You can include links to other pages or use existing media assets."),
-                )),
-            );
-            $bean->field_welcome_title = array(
-                LANGUAGE_NONE => array(array(
-                    'value' => t("Welcome to Mukurtu"),
-                )),
-            );
-            $bean->save();
-        }
-    }
+  // Set default content.
+  $one_bean->label = 'Frontpage Hero Image: One Column';
+  $one_bean->title = '';
+  $one_bean->delta = 'frontpage-hero-image-one-column';
+  $one_bean->field_hero_image = array(
+    LANGUAGE_NONE => array(
+      array(
+        'sid' => $atom->sid,
+      ),
+    ),
+  );
+  $one_bean->field_hero_image_caption = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => t("Welcome to Mukurtu"),
+      ),
+    ),
+  );
+  $one_bean->save();
+
+  // Side by side bean.
+  if ($two_bean == FALSE) {
+    $two_bean = bean_create(array('type' => 'hero_image_two_columns'));
+  }
+
+  // Set default content.
+  $two_bean->label = 'Frontpage Hero Image: Two Columns';
+  $two_bean->title = '';
+  $two_bean->delta = 'frontpage-hero-image-two-columns';
+  $two_bean->field_hero_image = array(
+    LANGUAGE_NONE => array(
+      array(
+        'sid' => $atom->sid,
+      ),
+    ),
+  );
+  $two_bean->field_welcome_message = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => t("Add a short welcome message here. You can include links to other pages or use existing media assets."),
+      ),
+    ),
+  );
+  $two_bean->field_welcome_title = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => t("Welcome to Mukurtu"),
+      ),
+    ),
+  );
+  $two_bean->save();
 }
 
 /**
