@@ -393,6 +393,12 @@ function ma_dictionary_entity_view($entity, $type, $view_mode, $langcode) {
                 }
             }
         }
+
+        // Temporary fix for likely safe_value paragraph issue.
+        // Alternate spelling displaying with encoded characters.
+        if (isset($entity->content['field_alternate_spelling'][0]['#markup'])) {
+            $entity->content['field_alternate_spelling'][0]['#markup'] = decode_entities($entity->content['field_alternate_spelling'][0]['#markup']);
+        }
     }
 }
 
