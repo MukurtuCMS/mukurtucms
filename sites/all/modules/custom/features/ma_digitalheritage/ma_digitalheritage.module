@@ -1226,8 +1226,28 @@ function ma_digitalheritage_form_node_delete_confirm_alter(&$form, &$form_state)
  * Implements hook_redirect_alter().
  */
 function ma_digitalheritage_redirect_alter($redirect) {
-    // Store most recent redirect per session.
-    // We want to use that information to set the default tab for community records.
-    $_SESSION['mukurtu']['redirect_source'] = str_replace('node/', '', $redirect->source);
-    $_SESSION['mukurtu']['redirect_dest'] = str_replace('node/', '', $redirect->redirect);
+  // Store most recent redirect per session.
+  // We want to use that information to set the default tab for community records.
+  $_SESSION['mukurtu']['redirect_source'] = str_replace('node/', '', $redirect->source);
+  $_SESSION['mukurtu']['redirect_dest'] = str_replace('node/', '', $redirect->redirect);
+
+  // Now that CRs show up in search results, we need to be able to click through to an
+  // accessible CR that has an inaccessible parent.
+  // First check if the user can get to the redirect location.
+  // If they can, we don't need to do anything.
+  if (!drupal_valid_path($redirect->redirect)) {
+    // User cannot get to the redirect path.
+    // Do they have access to the original path?
+    if (drupal_valid_path($redirect->source)) {
+      // Is this a community record?
+      $node = menu_get_object('node', 1, $redirect->source);
+
+      if ($node && !empty($node->field_community_record_parent[LANGUAGE_NONE])) {
+        // It is a community record. Disable the redirect.
+        // This will show only the single community record.
+        // Long term we should show the others here.
+        $redirect->redirect = FALSE;
+      }
+    }
+  }
 }
