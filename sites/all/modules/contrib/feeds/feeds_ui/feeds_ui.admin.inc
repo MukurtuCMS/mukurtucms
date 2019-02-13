@@ -401,6 +401,15 @@ function feeds_ui_edit_page(FeedsImporter $importer, $active = 'help', $plugin_k
   $info['actions'] = array(l(t('Change'), $path . '/processor'));
   $config_info[] = $info;
 
+  // Validate configuration.
+  $errors = $importer->validateConfig();
+  if (count($errors)) {
+    $message = t('There are some issues with the importer configuration: !errors', array(
+      '!errors' => theme('item_list', array('items' => $errors)),
+    ));
+    drupal_set_message($message, 'warning');
+  }
+
   return theme('feeds_ui_edit_page', array(
     'info' => $config_info,
     'active' => $active_container,
@@ -493,6 +502,8 @@ function theme_feeds_ui_plugin_form($variables) {
 function feeds_ui_mapping_form($form, &$form_state, $importer) {
   $form['#importer'] = $importer->id;
   $form['#mappings'] = $mappings = $importer->processor->getMappings();
+  $form['#feeds_targets'] = $importer->processor->getMappingTargets();
+  $form['#feeds_sources'] = $importer->parser->getMappingSources();
   $form['help']['#markup'] = feeds_ui_mapping_help();
   $form['#prefix'] = '<div id="feeds-ui-mapping-form-wrapper">';
   $form['#suffix'] = '</div>';
@@ -1032,10 +1043,10 @@ function theme_feeds_ui_container($variables) {
 function theme_feeds_ui_mapping_form($variables) {
   $form = $variables['form'];
 
-  $targets = feeds_importer($form['#importer'])->processor->getMappingTargets();
+  $targets = $form['#feeds_targets'];
   $targets = _feeds_ui_format_options($targets, TRUE);
 
-  $sources = feeds_importer($form['#importer'])->parser->getMappingSources();
+  $sources = $form['#feeds_sources'];
   // Some parsers do not define source options.
   $sources = $sources ? _feeds_ui_format_options($sources, TRUE) : array();
 
@@ -1205,11 +1216,20 @@ function feeds_ui_importer_import_validate($form, &$form_state) {
   }
 
   if (!$form_state['values']['bypass_validation']) {
+    $errors = array();
+
+    $importer = feeds_importer($feeds_importer->id);
+    $importer->setConfig($feeds_importer->config);
     foreach (array('fetcher', 'parser', 'processor') as $type) {
       $plugin = feeds_plugin($feeds_importer->config[$type]['plugin_key'], $feeds_importer->id);
-      if (get_class($plugin) == 'FeedsMissingPlugin') {
-        form_error($form['importer'], t('The plugin %plugin is unavailable.', array('%plugin' => $feeds_importer->config[$type]['plugin_key'])));
+      if (!($plugin instanceof FeedsMissingPlugin)) {
+        $importer->setPlugin($feeds_importer->config[$type]['plugin_key']);
+        $importer->$type->setConfig($feeds_importer->config[$type]['config']);
       }
+    }
+    $errors = array_merge($errors, $importer->validateConfig());
+    if (!empty($errors)) {
+      form_error($form['importer'], theme('item_list', array('items' => $errors)));
     }
   }
 

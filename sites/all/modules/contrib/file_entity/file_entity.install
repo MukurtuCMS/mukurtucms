@@ -167,7 +167,6 @@ function file_entity_schema_alter(&$schema) {
   $schema['file_managed']['indexes']['file_type'] = array('type');
 }
 
-
 /**
  * Implements hook_install().
  */
@@ -246,6 +245,7 @@ function file_entity_uninstall() {
   variable_del('file_entity_file_upload_wizard_skip_file_type');
   variable_del('file_entity_file_upload_wizard_skip_scheme');
   variable_del('file_entity_file_upload_wizard_skip_fields');
+  variable_del('file_entity_protect_repeated_render');
 
   // Remove any items from the file type queue if still there.
   DrupalQueue::get('file_entity_type_determine')->deleteQueue();
@@ -315,7 +315,11 @@ function file_entity_update_7001() {
               if (!empty($display)) {
                 db_merge('file_display')
                   ->key(array(
-                    'name' => implode('__', array($file_type, $view_mode, $formatter_name)),
+                    'name' => implode('__', array(
+                      $file_type,
+                      $view_mode,
+                      $formatter_name,
+                    )),
                   ))
                   ->fields(array(
                     'status' => isset($display['status']) ? $display['status'] : 0,
@@ -336,7 +340,8 @@ function file_entity_update_7001() {
 /**
  * Empty update function to trigger a theme registry rebuild.
  */
-function file_entity_update_7100() { }
+function file_entity_update_7100() {
+}
 
 /**
  * Update all files with empty types to use the first part of filemime.
@@ -544,7 +549,6 @@ function file_entity_update_7203() {
       ->execute();
   }
 }
-
 
 /**
  * Add title and alt text to image file types.
@@ -822,7 +826,11 @@ function file_entity_update_7207() {
  * Add expanded file type permissions to roles with existing file permissions.
  */
 function file_entity_update_7208() {
-  foreach (array('edit own files', 'edit any files', 'delete own files', 'delete any files', 'download own files', 'download any files') as $old_permission) {
+  foreach (array(
+    'edit own files', 'edit any files',
+    'delete own files', 'delete any files',
+    'download own files', 'download any files',
+  ) as $old_permission) {
     $roles = user_roles(FALSE, $old_permission);
 
     foreach ($roles as $rid => $name) {
@@ -1004,9 +1012,10 @@ function file_entity_update_7212(&$sandbox) {
         'value' => serialize((int) $result->{$key}),
       );
     }
-    $sandbox['progress'] += count($results);
     $sandbox['current_fid'] = $result->fid;
   }
+
+  $sandbox['progress'] += count($results);
 
   if (!empty($values)) {
     $query = db_insert('file_metadata');

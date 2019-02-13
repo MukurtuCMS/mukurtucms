@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community.features.menu_links.inc
@@ -31,6 +32,7 @@ function ma_community_menu_default_menu_links() {
     'expanded' => 0,
     'weight' => -47,
     'customized' => 1,
+    'parent_identifier' => 'main-menu_add-content:node/add',
   );
 
   // Translatables

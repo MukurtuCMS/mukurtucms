@@ -7,6 +7,12 @@ module.exports = function (grunt) {
     var force = grunt.option('force');
     var path = require('path');
     var pkg = require('../package');
+    var mapSeries = require('promise-map-series');
+    var simpleJsonRequest = require('simple-json-request');
+    var semver = require('semver');
+    var getJson = function (uri) {
+      return simpleJsonRequest.get({url: uri});
+    };
 
     // Internal variables.
     var libraries = {};
@@ -27,81 +33,117 @@ module.exports = function (grunt) {
       grunt.verbose.writeln((expired ? 'EXPIRED' : 'VALID')[expired ? 'red' : 'green']);
     }
 
+    var getApiV1Json = function ($package) {
+      var $json = {name: $package, assets: []};
+      var $latest = '0.0.0';
+      var $versions = [];
+      return getJson('https://data.jsdelivr.com/v1/package/npm/' + $package)
+        .catch(function (error) {
+          if (!(error instanceof Error)) {
+            error = new Error(error);
+          }
+          grunt.verbose.error(error);
+        })
+        .then(function ($packageJson) {
+          if (!$packageJson) {
+            $packageJson = {versions: []};
+          }
+          if ($packageJson.versions === void 0) {
+            $packageJson.versions = [];
+          }
+          return mapSeries($packageJson.versions, function ($version, $key) {
+            // Skip irrelevant versions.
+            if (!$version.match(/^3\.\d+\.\d+$/)) {
+              return Promise.resolve();
+            }
+            return getJson('https://data.jsdelivr.com/v1/package/npm/' + $package + '@' + $version + '/flat')
+              .then(function ($versionJson) {
+                // Skip empty files.
+                if (!$versionJson.files || !$versionJson.files.length) {
+                  return;
+                }
+
+                $versions.push($version);
+                if (semver.compare($latest, $version) === -1) {
+                  $latest = $version;
+                }
+
+                var $asset = {files: [], version: $version};
+                $versionJson.files.forEach(function ($file) {
+                  // Skip old bootswatch file structure.
+                  if ($package === 'bootswatch' && $file.name.match(/^\/2|\/bower_components/)) {
+                    return;
+                  }
+                  var $matches = $file.name.match(/([^/]*)\/bootstrap(-theme)?(\.min)?\.(js|css)$/, $file['name']);
+                  if ($matches && $matches[1] !== void 0 && $matches[4] !== void 0 && $matches[1] !== 'custom') {
+                    $asset.files.push($file.name);
+                  }
+                });
+                $json.assets.push($asset);
+                $json.lastversion = $latest;
+                $json.versions = $versions;
+              })
+          });
+        })
+        .then(function () {
+          return $json;
+        });
+    };
+
     // Register a private sub-task. Doing this inside the main task prevents
     // this private sub-task from being executed directly and also prevents it
     // from showing up on the list of available tasks on --help.
     grunt.registerTask('sync:api', function () {
       var done = this.async();
-      var request = require('request');
-      grunt.verbose.write(pkg.urls.jsdelivr + ' ');
-      request(pkg.urls.jsdelivr, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          grunt.verbose.ok();
-          var json;
-          grunt.verbose.write("\nParsing JSON response...");
-          try {
-            json = JSON.parse(body);
-            grunt.verbose.ok();
-          } catch (e) {
-            grunt.verbose.error();
-            throw grunt.util.error('Unable to parse the response value (' + e.message + ').', e);
-          }
-          grunt.verbose.write("\nExtracting versions and themes from libraries...");
-          libraries = {};
-          json.forEach(function (library) {
-            if (library.name === 'bootstrap' || library.name === 'bootswatch') {
-              library.assets.forEach(function (asset) {
-                if (asset.version.match(/^3.\d\.\d$/)) {
-                  if (!libraries[library.name]) libraries[library.name] = {};
-                  if (!libraries[library.name][asset.version]) libraries[library.name][asset.version] = {};
-                  asset.files.forEach(function (file) {
-                    if (!file.match(/bootstrap\.min\.css$/)) return;
-                    if (library.name === 'bootstrap') {
-                      libraries[library.name][asset.version]['bootstrap'] = true;
-                    }
-                    else {
-                      libraries[library.name][asset.version][file.split(path.sep)[0]] = true;
-                    }
-                  });
-                }
-              });
-            }
-          });
-          grunt.verbose.ok();
-
-          // Flatten themes.
-          for (var library in libraries) {
-            grunt.verbose.header(library);
-            if (!libraries.hasOwnProperty(library)) continue;
-            var versions = Object.keys(libraries[library]);
-            grunt.verbose.ok('Versions: ' + versions.join(', '));
-            var themeCount = 0;
-            for (var version in libraries[library]) {
-              if (!libraries[library].hasOwnProperty(version)) continue;
-              var themes = Object.keys(libraries[library][version]).sort();
-              libraries[library][version] = themes;
-              if (themes.length > themeCount) {
-                themeCount = themes.length;
+      mapSeries(['bootstrap', 'bootswatch'], function ($package) {
+        return getApiV1Json($package);
+      }).then(function (json) {
+        grunt.verbose.write("\nExtracting versions and themes from libraries...");
+        libraries = {};
+        json.forEach(function (library) {
+          if (library.name === 'bootstrap' || library.name === 'bootswatch') {
+            library.assets.forEach(function (asset) {
+              if (asset.version.match(/^3.\d\.\d$/)) {
+                if (!libraries[library.name]) libraries[library.name] = {};
+                if (!libraries[library.name][asset.version]) libraries[library.name][asset.version] = {};
+                asset.files.forEach(function (file) {
+                  if (!file.match(/bootstrap\.min\.css$/)) return;
+                  if (library.name === 'bootstrap') {
+                    libraries[library.name][asset.version]['bootstrap'] = true;
+                  }
+                  else {
+                    libraries[library.name][asset.version][file.split(path.sep).filter(Boolean)[0]] = true;
+                  }
+                });
               }
-            }
-            grunt.verbose.ok(grunt.util.pluralize(themeCount, 'Themes: 1/Themes: ' + themeCount));
+            });
           }
-          grunt.verbose.writeln();
-          grunt.file.write(librariesCache, JSON.stringify(libraries, null, 2));
+        });
+        grunt.verbose.ok();
 
-          grunt.log.ok('Synced');
+        // Flatten themes.
+        for (var library in libraries) {
+          grunt.verbose.header(library);
+          if (!libraries.hasOwnProperty(library)) continue;
+          var versions = Object.keys(libraries[library]);
+          grunt.verbose.ok('Versions: ' + versions.join(', '));
+          var themeCount = 0;
+          for (var version in libraries[library]) {
+            if (!libraries[library].hasOwnProperty(version)) continue;
+            var themes = Object.keys(libraries[library][version]).sort();
+            libraries[library][version] = themes;
+            if (themes.length > themeCount) {
+              themeCount = themes.length;
+            }
+          }
+          grunt.verbose.ok(grunt.util.pluralize(themeCount, 'Themes: 1/Themes: ' + themeCount));
         }
-        else {
-          grunt.verbose.error();
-          if (error) grunt.verbose.error(error);
-          grunt.verbose.error('Request URL: ' + pkg.urls.jsdelivr);
-          grunt.verbose.error('Status Code: ' + response.statusCode);
-          grunt.verbose.error('Response Headers: ' + JSON.stringify(response.headers, null, 2));
-          grunt.verbose.error('Response:');
-          grunt.verbose.error(body);
-          grunt.fail.fatal('Unable to establish a connection. Run with --verbose to view the response received.');
-        }
-        return done(error);
+        grunt.verbose.writeln();
+        grunt.file.write(librariesCache, JSON.stringify(libraries, null, 2));
+
+        grunt.log.ok('Synced');
+
+        done();
       });
     });
 

@@ -88,15 +88,6 @@ function ma_importexport_user_default_permissions() {
     'module' => 'feeds',
   );
 
-  // Exported permission: 'clear import_digital_heritage_metadata_xml feeds'.
-  $permissions['clear import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'clear import_digital_heritage_metadata_xml feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
   // Exported permission: 'clear import_media_audio feeds'.
   $permissions['clear import_media_audio feeds'] = array(
     'name' => 'clear import_media_audio feeds',
@@ -225,15 +216,6 @@ function ma_importexport_user_default_permissions() {
     'module' => 'feeds',
   );
 
-  // Exported permission: 'import import_digital_heritage_metadata_xml feeds'.
-  $permissions['import import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'import import_digital_heritage_metadata_xml feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
   // Exported permission: 'import import_media_audio feeds'.
   $permissions['import import_media_audio feeds'] = array(
     'name' => 'import import_media_audio feeds',
@@ -347,15 +329,6 @@ function ma_importexport_user_default_permissions() {
     'module' => 'feeds_tamper',
   );
 
-  // Exported permission: 'tamper import_digital_heritage_metadata_xml'.
-  $permissions['tamper import_digital_heritage_metadata_xml'] = array(
-    'name' => 'tamper import_digital_heritage_metadata_xml',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds_tamper',
-  );
-
   // Exported permission: 'tamper import_media_audio'.
   $permissions['tamper import_media_audio'] = array(
     'name' => 'tamper import_media_audio',
@@ -414,6 +387,7 @@ function ma_importexport_user_default_permissions() {
   $permissions['unlock digital_heritage_metadata feeds'] = array(
     'name' => 'unlock digital_heritage_metadata feeds',
     'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
@@ -458,15 +432,6 @@ function ma_importexport_user_default_permissions() {
   // Exported permission: 'unlock import_digital_heritage_community_records feeds'.
   $permissions['unlock import_digital_heritage_community_records feeds'] = array(
     'name' => 'unlock import_digital_heritage_community_records feeds',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'feeds',
-  );
-
-  // Exported permission: 'unlock import_digital_heritage_metadata_xml feeds'.
-  $permissions['unlock import_digital_heritage_metadata_xml feeds'] = array(
-    'name' => 'unlock import_digital_heritage_metadata_xml feeds',
     'roles' => array(
       'administrator' => 'administrator',
     ),

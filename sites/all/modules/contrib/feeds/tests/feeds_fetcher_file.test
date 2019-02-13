@@ -149,7 +149,7 @@ class FeedsFileFetcherTestCase extends FeedsWebTestCase {
     variable_set('feeds_tests_feeds_after_save_sleep', 1);
 
     // Import a file with 9 nodes.
-    $this->importFile('node', $this->absolutePath() . '/tests/feeds/nodes.csv');
+    $this->importFile('node', $this->absolutePath() . '/tests/feeds/nodes.csv', 'Schedule import');
 
     // Assert that the file has been created.
     $this->assertTrue(file_exists('private://feeds/nodes.csv'), 'The imported file is created.');

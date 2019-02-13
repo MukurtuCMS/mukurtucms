@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.strongarm.inc
@@ -203,6 +204,27 @@ function ma_dictionary_strongarm() {
       'map_popup' => array(
         'custom_settings' => FALSE,
       ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -210,10 +232,10 @@ function ma_dictionary_strongarm() {
           'weight' => '24',
         ),
         'path' => array(
-          'weight' => '10',
+          'weight' => '3',
         ),
         'redirect' => array(
-          'weight' => '9',
+          'weight' => '2',
         ),
       ),
       'display' => array(
@@ -226,6 +248,14 @@ function ma_dictionary_strongarm() {
             'weight' => '7',
             'visible' => FALSE,
           ),
+          'dictionary_word_summary' => array(
+            'weight' => '23',
+            'visible' => FALSE,
+          ),
+          'featured_content' => array(
+            'weight' => '23',
+            'visible' => FALSE,
+          ),
         ),
         'dictionary_word_navigation' => array(
           'default' => array(
@@ -234,6 +264,14 @@ function ma_dictionary_strongarm() {
           ),
           'search_result' => array(
             'weight' => '6',
+            'visible' => FALSE,
+          ),
+          'dictionary_word_summary' => array(
+            'weight' => '18',
+            'visible' => FALSE,
+          ),
+          'featured_content' => array(
+            'weight' => '18',
             'visible' => FALSE,
           ),
         ),
@@ -284,7 +322,7 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'search_result' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'diff_standard' => array(
         'custom_settings' => FALSE,
@@ -302,6 +340,27 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'revision' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
         'custom_settings' => FALSE,
       ),
     ),
@@ -345,6 +404,18 @@ function ma_dictionary_strongarm() {
       ),
       'word_entry_in_word_list' => array(
         'custom_settings' => TRUE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'word_entry_search_results' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
       ),
     ),
     'extra_fields' => array(

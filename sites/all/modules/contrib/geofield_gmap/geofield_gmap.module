@@ -24,20 +24,21 @@ function geofield_gmap_menu() {
   return $items;
 }
 
-
 /**
- * Implements hook_field_widget_info_alter().
+ * Implements hook_field_widget_info().
  */
-function geofield_gmap_field_widget_info_alter(&$info) {
-  $info['geofield_gmap'] = array(
-    'label' => t('Google Map'),
-    'field types' => array('geofield'),
-    'settings' => array(
-      'map_type' => 'ROADMAP',
-      'confirm_center_marker' => FALSE,
-      'click_to_place_marker' => FALSE,
+function geofield_gmap_field_widget_info() {
+  return array(
+    'geofield_gmap' => array(
+      'label' => t('Google Map'),
+      'field types' => array('geofield'),
+      'settings' => array(
+        'map_type' => 'ROADMAP',
+        'confirm_center_marker' => FALSE,
+        'click_to_place_marker' => FALSE,
+      ),
+      'module' => 'geofield_gmap',
     ),
-    'module' => 'geofield_gmap',
   );
 }
 
@@ -86,7 +87,7 @@ function geofield_gmap_field_widget_form(&$form, &$form_state, $field, $instance
     $element['geom'] = array(
       '#type' => 'geofield_latlon',
       '#title' => check_plain($instance['label']),
-      '#description' => check_plain($instance['description']),
+      '#description' => field_filter_xss($instance['description']),
       '#default_value' => $latlon_value,
       '#required' => $instance['required'],
       '#geolocation' => (!empty($settings['html5_geolocation'])) ? $settings['html5_geolocation'] : FALSE,
@@ -118,15 +119,15 @@ function geofield_gmap_field_widget_form(&$form, &$form_state, $field, $instance
  * Callback for afterbuild for widget for js addition.
  */
 function geofield_gmap_widget_gmap_afterbuild($element, &$form_state) {
-  $key = variable_get('geofield_gmap_google_api_key','');
-  if(!empty($key)) {
-      $key = '&key='.$key;
-  }
+
+  // Retrieve the Google API Key, if there is one.
+  $api_key = variable_get('geofield_gmap_google_api_key');
+  $api_key_query_param = !empty($api_key) ? '?key=' . $api_key : '';
 
   // Attach GMAP API and autocomplete library.
   $element['#attached']['library'][] = array('system', 'ui.autocomplete');
   $element['#attached']['js'][] = array(
-    'data' => '//maps.googleapis.com/maps/api/js?sensor=false' . $key,
+    'data' => '//maps.googleapis.com/maps/api/js' . $api_key_query_param,
     'type' => 'external',
     'preprocess' => FALSE,
   );
@@ -149,15 +150,15 @@ function geofield_gmap_widget_gmap_afterbuild($element, &$form_state) {
       $gmapid => array(
         'lat' => floatval($element['geom']['lat']['#default_value']),
         'lng' => floatval($element['geom']['lon']['#default_value']),
-        'zoom' => $element['geom']['#zoom_level'],
+        'zoom' => intval($element['geom']['#zoom_level']),
         'latid' => $element['geom']['lat']['#id'],
         'lngid' => $element['geom']['lon']['#id'],
         'searchid' => 'search-' . $id,
         'mapid' => $gmapid,
         'widget' => TRUE,
         'map_type' => $element['#gmap_map_type'],
-        'confirm_center_marker' => ($element['#gmap_confirm_center_marker'] ? 'true' : 'false'),
-        'click_to_place_marker' => ($element['#gmap_click_to_place_marker'] ? 'true' : 'false'),
+        'confirm_center_marker' => (bool) $element['#gmap_confirm_center_marker'],
+        'click_to_place_marker' => (bool) $element['#gmap_click_to_place_marker'],
       ),
     )),
     'type' => 'setting',

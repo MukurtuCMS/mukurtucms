@@ -1165,3 +1165,42 @@ class FeedsTamperURLdecodeTestCase extends FeedsTamperUnitTestCase {
   }
 
 }
+
+/**
+ * Tests for the Tamper plugin 'encode'.
+ */
+class FeedsTamperEncodeDecodeTestCase extends FeedsTamperUnitTestCase {
+
+  /**
+   * The ID of the plugin to be tested.
+   *
+   * @var string
+   */
+  protected $plugin_id = 'encode';
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Plugins: Encode',
+      'description' => 'Unit tests for "Encode/Decode" plugin.',
+      'group' => 'Feeds Tamper',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function test() {
+    $this->execute(array(), 'a:0:{}', array('mode' => 'serialize'));
+    $this->execute('a:0:{}', array(), array('mode' => 'unserialize'));
+
+    $this->execute('abcdef 123 @#`|\\"$%&/()=?\'^*', 's:28:"abcdef 123 @#`|\"$%&/()=?\'^*";', array('mode' => 'serialize'));
+    $this->execute('s:28:"abcdef 123 @#`|\"$%&/()=?\'^*";', 'abcdef 123 @#`|\"$%&/()=?\'^*', array('mode' => 'unserialize'));
+
+    $this->execute('abcdef 123 @#`|\\"$%&/()=?\'^*', 'YWJjZGVmIDEyMyBAI2B8XCIkJSYvKCk9PydeKg==', array('mode' => 'base64_encode'));
+    $this->execute('YWJjZGVmIDEyMyBAI2B8XCIkJSYvKCk9PydeKg==', 'abcdef 123 @#`|\\"$%&/()=?\'^*', array('mode' => 'base64_decode'));
+  }
+
+}

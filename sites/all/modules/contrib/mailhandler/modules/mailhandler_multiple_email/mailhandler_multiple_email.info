@@ -1,0 +1,15 @@
+name = Mailhandler Multiple Email support
+description = Allows Mailhandler to work with the Multiple Email module.
+core = 7.x
+dependencies[] = "mailhandler"
+dependencies[] = "multiple_email"
+package = "Mailhandler"
+
+files[] = plugins/mailhandler/authenticate/MailhandlerMultipleEmailAuthenticate.class.php
+
+; Information added by Drupal.org packaging script on 2017-12-05
+version = "7.x-2.11"
+core = "7.x"
+project = "mailhandler"
+datestamp = "1512494003"
+

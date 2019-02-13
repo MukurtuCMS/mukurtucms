@@ -409,13 +409,13 @@ class OgAccessUseGroupDefaultsTestCase extends DrupalWebTestCase {
 }
 
 /**
- * Tests group memberships that require approval.
+ * Tests moderated group memberships.
  */
-class OgAccessModeratedGroupApproval extends DrupalWebTestCase {
+class OgAccessModeratedGroup extends DrupalWebTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'OG group membership approval',
+      'name' => 'OG moderated group membership',
       'description' => 'Test groups that require membership approval.',
       'group' => 'Organic groups access',
     );
@@ -448,17 +448,22 @@ class OgAccessModeratedGroupApproval extends DrupalWebTestCase {
   }
 
   /**
-   * Test that membership requests made via direct API calls result in proper
-   * pending status for private groups that require approval.
+   * Test membership creation attempt made via direct API calls, by non-admins.
    */
-  public function testMemberShipRequestStatus() {
+  public function testMembershipRequest() {
+    // The call of drupalLogin() in setUp() is not effective for API calls,
+    // switching users here to test the permission check.
+    global $user;
+    $current_user = $user;
+    $user = $this->user;
     // Save user as a member of the group, without passing state.
     $this->user->og_user_node[LANGUAGE_NONE][0]['target_id'] = $this->group->nid;
     user_save($this->user);
+    $user = $current_user;
 
-    // User's membership should be pending.
+    // User's membership should not exist.
     $membership = og_get_membership('node', $this->group->nid, 'user', $this->user->uid);
-    $this->assertEqual($membership->state, OG_STATE_PENDING, t('User membership is pending.'));
+    $this->assertFalse(is_object($membership), t('Non-admins cannot add members to private groups.'));
   }
 
   /**

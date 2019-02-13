@@ -172,7 +172,7 @@ function mukurtu_build_tk_label_text($entity, $license) {
 function license_build_default_tk_label_text ($license_uri) {
     $pattern = '/http:\/\/localcontexts.org\/tk\/([a-z]+)\/.*/';
     $letter = preg_match($pattern, $license_uri, $matches);
-    $github_url = "https://raw.githubusercontent.com/kimberlycw/Local-Contexts/1.1/{$matches[1]}/description.txt";
+    $github_url = "https://raw.githubusercontent.com/kimberlycw/Local-Contexts/master/{$matches[1]}/description.txt";
     $desc = file_get_contents($github_url);
     $tk_user_text = '<p>' . $desc . '</p>';
     return $tk_user_text;
@@ -197,6 +197,25 @@ function license_menu() {
   $items['dashboard/toggle-custom-tk-label-text'] = array(
     'title' => 'Toggle Between Site-Wide and Community-Level Custom TK Label Text',
     'page callback' => 'license_toggle_custom_tk_label_text',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'weight' => 100,
+  );
+
+  // Callback to export customized TK Labels
+  $items['tk-labels/export'] = array(
+    'title' => 'Export TK Labels',
+    'page callback' => 'license_custom_tk_label_export',
+    'page arguments' => null,
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'weight' => 100,
+  );
+
+  $items['tk-labels/export/%'] = array(
+    'title' => 'Export TK Labels',
+    'page callback' => 'license_custom_tk_label_export',
+    'page arguments' => array(2),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
     'weight' => 100,
@@ -234,6 +253,13 @@ function license_custom_tk_label_form_shared($community_nid = NULL) {
     'expand' => 'bottom-right',
   );
 
+  
+  // Export link
+  $form['tk_label_export_link'] = array(
+    '#type' => 'item',
+    '#markup' => l(t("Download Customized TK Labels"), "tk-labels/export/{$community_nid}", array('attributes' => array('class' => array('btn', 'btn-default', 'tk-label-export')))),
+  );
+
   foreach ($tk_labels as $tk_label_uri => $tk_label_name) {
     $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
     $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
@@ -251,7 +277,7 @@ function license_custom_tk_label_form_shared($community_nid = NULL) {
       $custom_tk_variable_name = 'mukurtu_comm_' . $checkbox_fieldname;
       $customized_comm_tk_labels = variable_get($custom_tk_variable_name);
       $default_checkbox_value = $customized_comm_tk_labels[$community_nid]['custom'];
-      $default_textfield_value = $customized_comm_tk_labels[$community_nid]['text'];
+      $default_textfield_value = isset($customized_comm_tk_labels[$community_nid]['text']) ? $customized_comm_tk_labels[$community_nid]['text'] : '';
     }
 		
 		// Site-wide
@@ -315,4 +341,89 @@ function license_toggle_custom_tk_label_text () {
     variable_set ('mukurtu_use_sitewide_custom_tk_label_text', 1);
   }
   drupal_goto ('dashboard');
+}
+
+// Export customized TK Labels
+// This is super quick and dirty. Long term we should consider switching TK Labels to some sort of entity
+// and using the existing export system.
+function license_custom_tk_label_export($community = NULL) {
+  $prefix = "";
+
+  // Site wide labels
+  if(is_null($community)) {
+    if(user_access('administer site configuration')) {
+      $prefix = 'mukurtu_';
+    } else {
+      return;
+    }
+  } else {
+    // Community labels
+    $node = node_load($community);
+    if(node_access('update', $node)) {
+      $prefix = 'mukurtu_comm_';
+    } else {
+      return;
+    }
+  }
+
+  $rows = array();
+  $rows[] = array('Title', 'Image', 'Description');
+  $tk_labels_info = field_info_field('field_licence_trad');
+  $tk_labels = $tk_labels_info['settings']['allowed_values'];
+
+  foreach ($tk_labels as $tk_label_uri => $tk_label_name) {
+    $tk_label_name_safe = str_replace(' ', '_', $tk_label_name);
+    $tk_label_name_safe = str_replace('.', '_', $tk_label_name_safe);
+    $checkbox_fieldname = 'custom_' . $tk_label_name_safe;
+    $textfield_fieldname = 'customized_' . $tk_label_name_safe;
+
+    // Build url to image
+    $image = license_traditional_build_license_label_uri($tk_label_uri);
+
+    // Get the custom description
+    if(is_null($community)) {
+      $customized = variable_get($prefix . $checkbox_fieldname);
+      if($customized == 1) {
+        $custom_description = variable_get($prefix . $textfield_fieldname);
+        $rows[] = array($tk_label_name, $image, $custom_description);
+      }
+    } else {
+      $stored = variable_get($prefix . $checkbox_fieldname);
+      if(!empty($stored)) {
+        if(isset($stored[$community]['text']) && $stored[$community]['custom'] == 1) {
+          $rows[] = array($tk_label_name, $image, $stored[$community]['text']);
+        }
+      }
+    }
+  }
+
+  // If we have custom labels, save to CSV and download
+  if(!empty($rows)) {
+    _license_download_license_export($rows);
+  }
+}
+
+// Take a CSV array, write it to a temp file, download it
+function _license_download_license_export($export) {
+  $temp_name = drupal_tempnam('temporary://', 'file');
+  $file = fopen($temp_name, "w");
+
+  foreach ($export as $line) {
+    fputcsv($file, $line);
+  }
+
+  fclose($file);
+
+  header('Content-Description: File Transfer');
+  header('Content-Type: application/octet-stream');
+  header('Content-Disposition: attachment; filename=tklabels.csv');
+  header('Content-Transfer-Encoding: binary');
+  header('Expires: 0');
+  header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+  header('Pragma: public');
+  header('Content-Length: ' . filesize($temp_name));
+  ob_clean();
+  flush();
+  readfile($temp_name);
+  exit;  
 }

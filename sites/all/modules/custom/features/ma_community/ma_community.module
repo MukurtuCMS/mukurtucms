@@ -7,6 +7,24 @@
 include_once('ma_community.features.inc');
 
 /**
+ * Implements hook_boot().
+ */
+function ma_community_boot() {
+  global $conf;
+
+  $community_changes = array(
+      'Request group membership' => 'Request community membership',
+      'Unsubscribe from group' => 'Remove community membership',
+      'Are you sure you want to unsubscribe from the group %title?' => 'Are you sure you want to remove your membership from the community %title?',
+      'In order to join any group, you must <a href="!login">login</a>. After you have successfully done so, you will need to request membership again.' => 'In order to join any community, you must <a href="!login">login</a>. After you have successfully done so, you will need to request membership again.',
+      'You already have a pending membership for the group @group.' => 'You already have a pending membership for the community @group.',
+      'You are already a member of the group @group.' => 'You are already a member of the community @group.',
+      'Are you sure you want to join the group %title?' => 'Are you sure you want to join the community %title?',
+  );
+  $conf['locale_custom_strings_en'][''] = array_merge($conf['locale_custom_strings_en'][''], $community_changes);
+}
+
+/**
  * Implements hook_node_insert().
  */
 function ma_community_node_insert($node) {
@@ -43,6 +61,17 @@ function ma_community_node_access($node, $op, $account) {
     return NODE_ACCESS_IGNORE;
 }
 
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_community_form_og_ui_add_users_alter(&$form, &$form_state) {
+    // For the OG add user form, default to "Not an invitation"
+    if(isset($form['membership_fields']['og_membership_invitation'][LANGUAGE_NONE])){
+        $form['membership_fields']['og_membership_invitation'][LANGUAGE_NONE]['#default_value'] = 0;
+    }
+}
+
 /**
  * Implements hook_form_FORM_ID_alter().
  */
@@ -68,11 +97,16 @@ function ma_community_form_community_node_form_alter(&$form, &$form_state) {
       $form['#group_children'][$checkbox_fieldname] = 'group_custom_tk_label_text';
       $form['#group_children'][$textfield_container] = 'group_custom_tk_label_text';
     }
-  }
 
+    $form['#group_children']['tk_label_export_link'] = 'group_custom_tk_label_text';
+  }
 
   // Hide the Child Communities field in all cases
   $form['field_child_communities']['#access'] = FALSE;
+
+  // Hide Notified Community Managers field for 2.1 release.
+  // May need to expose this conditionally at some point.
+  $form['field_dhan_notified_users']['#access'] = FALSE;
 
   if ($current_nid = $form['nid']['#value']) {
     // Hide the Parent Community field if the user is not a Community Manager of the current community

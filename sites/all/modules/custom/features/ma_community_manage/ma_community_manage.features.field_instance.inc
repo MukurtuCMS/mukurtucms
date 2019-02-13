@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community_manage.features.field_instance.inc
@@ -28,23 +29,29 @@ function ma_community_manage_field_default_field_instances() {
         'type' => 'list_default',
         'weight' => 22,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 29,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 20,
       ),
     ),
     'entity_type' => 'node',
@@ -68,7 +75,7 @@ function ma_community_manage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 4,
+      'weight' => 5,
     ),
     'widget_type' => 'options_select',
   );
@@ -96,23 +103,29 @@ function ma_community_manage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 17,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 28,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 29,
       ),
     ),
     'entity_type' => 'node',
@@ -140,7 +153,7 @@ function ma_community_manage_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_views_pages.features.inc

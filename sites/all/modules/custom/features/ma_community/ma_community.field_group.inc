@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community.field_group.inc
@@ -23,10 +24,10 @@ function ma_community_field_group_info() {
     'label' => 'Advanced',
     'weight' => '1',
     'children' => array(
-      0 => 'group_access',
-      1 => 'og_roles_permissions',
+      0 => 'field_membership_list_options',
+      1 => 'group_access',
       2 => 'group_register',
-      3 => 'field_membership_list_options',
+      3 => 'og_roles_permissions',
       4 => 'group_custom_tk_label_text',
     ),
     'format_type' => 'htab',
@@ -60,7 +61,8 @@ function ma_community_field_group_info() {
       2 => 'field_community_image',
       3 => 'field_community_image_thumbnail',
       4 => 'field_parent_community',
-      5 => 'title',
+      5 => 'field_community_featured_colls',
+      6 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -86,7 +88,7 @@ function ma_community_field_group_info() {
   $field_group->parent_name = 'group_advanced';
   $field_group->data = array(
     'label' => 'Custom TK Label Text',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -113,7 +115,7 @@ function ma_community_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_advanced',
       1 => 'group_basic',

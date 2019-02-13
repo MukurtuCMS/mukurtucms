@@ -668,12 +668,20 @@ function media_parse_to_file($url, $params = array()) {
 }
 
 /**
- * Utility function to recursively run check_plain on an array.
+ * Custom implementation of array_walk_recursive() that works around a crash
+ * some users have been experiencing with that function in PHP 7.
  *
- * @todo There is probably something in core I am not aware of that does this.
+ * @see https://www.drupal.org/project/media/issues/2998097
  */
-function media_recursive_check_plain(&$value, $key) {
-  $value = check_plain($value);
+function media_array_walk_recursive(&$array) {
+  foreach ($array as $key => $value) {
+    if (is_array($array[$key])) {
+      media_array_walk_recursive($array[$key]);
+    }
+    else {
+      $array[$key] = check_plain($array[$key]);
+    }
+  }
 }
 
 /**
@@ -1193,6 +1201,9 @@ function media_file_displays_alter(&$displays, $file, $view_mode) {
   if (!empty($title)) {
     $file->title = decode_entities(token_replace($title, array('file' => $file), $replace_options));
   }
+
+  // Reduce memory footprint and response size in media browser.
+  $file->file_contents = '';
 }
 
 /**
@@ -1260,7 +1271,7 @@ function media_set_browser_params() {
       }
     }
 
-    array_walk_recursive($params, 'media_recursive_check_plain');
+    media_array_walk_recursive($params);
 
     // Provide some default parameters.
     $params += array(

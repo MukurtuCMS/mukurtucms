@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for "region" theme hook [pre]process functions.
@@ -9,11 +10,14 @@
  *
  * See template for list of available variables.
  *
+ * @param array $variables
+ *   An associative array of variables, passed by reference.
+ *
  * @see region.tpl.php
  *
  * @ingroup theme_preprocess
  */
-function bootstrap_preprocess_region(&$variables) {
+function bootstrap_preprocess_region(array &$variables) {
   global $theme;
 
   $region = $variables['region'];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.field_group.inc
@@ -23,20 +24,22 @@ function ma_dictionary_field_group_info() {
     'label' => 'Basic',
     'weight' => '6',
     'children' => array(
-      0 => 'field_collection_summary',
-      1 => 'field_description',
-      2 => 'field_collection_image',
-      3 => 'field_collection_credit',
-      4 => 'title',
+      0 => 'field_collection_credit',
+      1 => 'field_collection_image',
+      2 => 'field_collection_summary',
+      3 => 'field_description',
+      4 => 'field_tags',
+      5 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Basic',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-basic field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-basic field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_basic|node|word_list|form'] = $field_group;
@@ -62,12 +65,13 @@ function ma_dictionary_field_group_info() {
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Basic',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-dictionary_word-basic field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-dictionary_word-basic field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_dictionary_word_basic|node|dictionary_word|form'] = $field_group;
@@ -87,18 +91,19 @@ function ma_dictionary_field_group_info() {
     'children' => array(
       0 => 'field_dictionary_word_related_dh',
       1 => 'field_item_privacy_setting',
-      2 => 'og_group_ref',
+      2 => 'field_related_dictionary_words',
       3 => 'field_word_list',
-      4 => 'field_related_dictionary_words',
+      4 => 'og_group_ref',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Relations',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-dictionary_word-relations field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-dictionary_word-relations field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_dictionary_word_relations|node|dictionary_word|form'] = $field_group;
@@ -114,7 +119,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '18',
+    'weight' => '36',
     'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
@@ -144,7 +149,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_dictionary_word_basic',
       1 => 'group_dictionary_word_relations',
@@ -171,7 +176,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_basic',
       1 => 'group_words',
@@ -321,18 +326,19 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Words',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_words',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'formatter' => 'closed',
+      'label' => 'Words',
       'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-words field-group-htab',
         'required_fields' => 1,
+        'classes' => 'group-words field-group-htab',
+        'description' => '',
       ),
+      'formatter' => 'open',
     ),
   );
   $field_groups['group_words|node|word_list|form'] = $field_group;

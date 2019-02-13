@@ -1,0 +1,39 @@
+.scald-atom {
+    .field-name-download-atom {
+        text-align: center;
+        padding-top: 30px;
+
+        a {
+            background-color: @brand-primary;
+            color: #fff;
+            padding: 10px 20px 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+
+            &:hover,
+            &:focus {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+                text-decoration: none;
+            }
+        }
+    }
+
+    // Video controls take up extra space, increase padding for "access" link.
+    .scald_video + .field-name-download-atom {
+        padding-top: 50px;
+    }
+}
+
+.scald-menu {
+    .view-filters {
+        .views-exposed-form {
+            .views-exposed-widgets {
+                .input-group {
+                    .form-control {
+                        z-index: 0;
+                    }
+                }
+            }
+        }
+    }
+}

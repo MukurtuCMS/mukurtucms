@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_table().
@@ -31,19 +32,7 @@
  *     - "data": The string to display in the table cell.
  *     - "header": Indicates this cell is a header.
  *     - Any HTML attributes, such as "colspan", to apply to the table cell.
- *     Here's an example for $rows:
- * @code
- *     $rows = array(
- *       // Simple row
- *       array(
- *         'Cell 1', 'Cell 2', 'Cell 3'
- *       ),
- *       // Row with attributes on the row and some of its cells.
- *       array(
- *         'data' => array('Cell 1', array('data' => 'Cell 2', 'colspan' => 2)), 'class' => array('funky')
- *       )
- *     );
- * @endcode
+ *     See theme_table() for a $rows example.
  *   - footer: An array containing the table footer. Each element of the array
  *     can be either a localized string or an associative array with the
  *     following keys:
@@ -65,26 +54,7 @@
  *       include a "data" attribute. To add attributes to COL elements, set the
  *       "data" attribute with an array of columns, each of which is an
  *       associative array of HTML attributes.
- *     Here's an example for $colgroup:
- * @code
- *     $colgroup = array(
- *       // COLGROUP with one COL element.
- *       array(
- *         array(
- *           'class' => array('funky'), // Attribute for the COL element.
- *         ),
- *       ),
- *       // Colgroup with attributes and inner COL elements.
- *       array(
- *         'data' => array(
- *           array(
- *             'class' => array('funky'), // Attribute for the COL element.
- *           ),
- *         ),
- *         'class' => array('jazzy'), // Attribute for the COLGROUP element.
- *       ),
- *     );
- * @endcode
+ *     See theme_table() for a $colgroup example.
  *     These optional tags are used to group and set properties on columns
  *     within a table. For example, one may easily group three columns and
  *     apply same background style to all.
@@ -99,7 +69,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_table($variables) {
+function bootstrap_table(array $variables) {
   $header = $variables['header'];
   $rows = $variables['rows'];
   $footer = $variables['footer'];
@@ -111,7 +81,7 @@ function bootstrap_table($variables) {
   $responsive = $variables['responsive'];
 
   // Add sticky headers, if applicable.
-  if (count($header) && $sticky) {
+  if (is_array($header) && count($header) && $sticky) {
     drupal_add_js('misc/tableheader.js');
     // Add 'sticky-enabled' class to the table to identify it for JS.
     // This is needed to target tables constructed by this function.
@@ -131,7 +101,7 @@ function bootstrap_table($variables) {
   }
 
   // Format the table columns:
-  if (count($colgroups)) {
+  if (!empty($colgroups)) {
     foreach ($colgroups as $number => $colgroup) {
       $attributes = array();
 
@@ -166,7 +136,7 @@ function bootstrap_table($variables) {
   }
 
   // Add the 'empty' row message if available.
-  if (!count($rows) && $empty) {
+  if (empty($rows) && !empty($empty)) {
     $header_count = 0;
     foreach ($header as $header_cell) {
       if (is_array($header_cell)) {
@@ -186,7 +156,7 @@ function bootstrap_table($variables) {
   }
 
   // Format the table header:
-  if (count($header)) {
+  if (!empty($header)) {
     $ts = tablesort_init($header);
     // HTML requires that the thead tag has tr tags in it followed by tbody
     // tags. Using ternary operator to check and see if we have any rows.
@@ -204,7 +174,7 @@ function bootstrap_table($variables) {
   }
 
   // Format the table rows:
-  if (count($rows)) {
+  if (!empty($rows)) {
     $output .= "<tbody>\n";
     foreach ($rows as $row) {
       // Check if we're dealing with a simple or complex row.
@@ -235,7 +205,7 @@ function bootstrap_table($variables) {
   }
 
   // Format the table footer:
-  if (count($footer)) {
+  if (!empty($footer)) {
     $output .= "<tfoot>\n";
     foreach ($footer as $row) {
       // Check if we're dealing with a simple or complex row.

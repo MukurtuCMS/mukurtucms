@@ -1,0 +1,17 @@
+name = OA variables
+description = Configure variables overrides for oa
+core = 7.x
+package = Open Atrium
+dependencies[] = ctools
+dependencies[] = og_variables
+dependencies[] = strongarm
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[variable][] = variable_realm_list_og
+project path = sites/all/modules/contrib/oa_core/modules
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

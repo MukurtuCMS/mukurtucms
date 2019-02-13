@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.features.field_instance.inc
@@ -52,7 +53,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Rather than a quick gloss (like the description field) the Cultural Narrative field allows one to provide lengthy commentary, stories, observations, or any relevant context for the DH item. For example, if the item is a basket, this field may contain a narrative from the basket-maker about his/her technique or it may tell a story about how the baskets were used by previous generations and how they are used today. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
+    'description' => 'The Cultural Narrative field is used to add historical or social context, expert community knowledge, community stories, and other relevant context to the Digital Heritage Item. This is generally information that is community specific. For example, if the item is a basket, this field may contain a narrative from the basket­maker about their technique, or it may tell a story about how the baskets were used by previous generations and how they are used today. Audio or video are embedded by dragging Media Assets from the media library into this field. For the Media Asset to display correctly there must be a line break or text below where the Media Asset will be embedded. Note, certain media types (eg. audio, Youtube video) do not render fully within the edit box, but will display correctly when the Digital heritage Item is saved. Using the plain text editor setting provides better control over embedded media.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -80,12 +81,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 16,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -110,28 +117,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 34,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 36,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'body',
     'label' => 'Cultural Narrative',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'display_summary' => 0,
       'dnd_enabled' => 1,
@@ -145,6 +153,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'rows' => 15,
         'summary_rows' => 5,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea_with_summary',
       'weight' => 7,
@@ -157,7 +166,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.',
+    'description' => 'Book Pages (also identified as Multi-Page Documents) allow multiple media assets to be presented within a single Digital Heritage Item in a paged display where each page can have unique metadata. Book Pages are often used to represent books, publications, scrapbooks or other print resources, but can also can be used with any media assets to create digital scrapbooks, or other unique presentations. Book Pages can be placed in any order by dragging and dropping them into the preferred order.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -169,16 +178,23 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 42,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 46,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 43,
+        'weight' => 61,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -202,21 +218,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 5,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 52,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 35,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_book_children',
@@ -237,9 +254,10 @@ function ma_digitalheritage_field_default_field_instances() {
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 30,
+      'weight' => 57,
     ),
   );
 
@@ -261,16 +279,23 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 41,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 45,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 42,
+        'weight' => 60,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -294,19 +319,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 25,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 51,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 31,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -331,7 +356,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 31,
+      'weight' => 58,
     ),
   );
 
@@ -340,7 +365,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.',
+    'description' => 'Categories are high-level descriptive terms that group Digital Heritage Items together and help users browse and discover Digital Heritage Items. Categories are unique to each site and reflect the scope of the items included. One set of Categories is used to describe all Digital Heritage Items within the site. Each Digital Heritage Item must belong to at least one Category. Check the box beside each relevant Category. ',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -370,6 +395,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 12,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
       ),
       'full' => array(
         'label' => 'above',
@@ -408,10 +439,10 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 3,
+        'weight' => 6,
       ),
       'taxonomy_record_teaser' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'textformatter',
         'settings' => array(
           'textformatter_class' => 'textformatter-list',
@@ -432,7 +463,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 6,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -456,9 +487,11 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 3,
+        'weight' => 4,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_category',
     'label' => 'Category',
@@ -471,19 +504,20 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 0,
+        'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 57,
+      'weight' => 7,
     ),
   );
 
   // Exported field_instance: 'node-digital_heritage-field_collection'.
   $field_instances['node-digital_heritage-field_collection'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => array(),
+    'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A collection is an aggregation of digital heritage items.',
+    'description' => 'Collections are curated, narrated groups of Digital Heritage Items within a site. Collections can contain Digital Heritage Items from more than one Community, and each Digital Heritage Item can be displayed in multiple Collections. Select existing Collections from the dropdown menu, or begin typing the name of a Collection and use the autocomplete tool to select the desired Collection.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -495,15 +529,23 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 35,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 39,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => 1,
         ),
         'type' => 'entityreference_label',
@@ -531,25 +573,26 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 29,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 45,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 30,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_collection',
-    'label' => 'Collection',
+    'label' => 'Collections',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -564,9 +607,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 26,
+      'weight' => 53,
     ),
   );
 
@@ -577,7 +621,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.',
+    'description' => 'Community Records provide multiple layers of information, or contributions from multiple voices. This field displays all existing Community Records attached to the Digital Heritage Item. The display order of the Community Records can be changed by dragging and dropping them into the preferred order.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -589,16 +633,23 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 39,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 43,
+      ),
       'full' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 44,
+        'weight' => 62,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -622,21 +673,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 26,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 49,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 32,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_record_children',
@@ -657,9 +709,10 @@ function ma_digitalheritage_field_default_field_instances() {
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 29,
+      'weight' => 56,
     ),
   );
 
@@ -682,16 +735,23 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 38,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 42,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 45,
+        'weight' => 63,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -715,19 +775,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 19,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 48,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 33,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -792,6 +852,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'node_reference_default',
         'weight' => 34,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -850,14 +916,14 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 2,
+        'weight' => 5,
       ),
       'taxonomy_record_teaser' => array(
-        'label' => 'above',
+        'label' => 'inline',
         'module' => 'node_reference',
         'settings' => array(),
         'type' => 'node_reference_default',
-        'weight' => 5,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -878,7 +944,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 2,
+        'weight' => 3,
       ),
     ),
     'entity_type' => 'node',
@@ -906,7 +972,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. More than one Contributor may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).',
+    'description' => 'A Contributor can be a person, people, clan, tribal nation, community group or, organization who aided in making the content of a Digital Heritage Item or Media Asset. This could be the person who wrote, compiled, or illustrated a book or recorded a song; the people who edited or produced a film, or collaborated or consulted on a project. Contributors with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John “Nickname” Smith).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -946,6 +1012,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 24,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -955,15 +1027,20 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_comma_full_stop' => 0,
           'textformatter_comma_override' => 0,
           'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(),
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
           'textformatter_separator_custom' => '',
           'textformatter_separator_custom_class' => 'textformatter-separator',
           'textformatter_separator_custom_tag' => 'span',
           'textformatter_term_plain' => 0,
-          'textformatter_type' => 'ul',
+          'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -987,21 +1064,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 44,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 38,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 40,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_contributor',
@@ -1016,9 +1094,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 59,
+      'weight' => 9,
     ),
   );
 
@@ -1027,7 +1106,14 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Geocode Address is a visual map-based location picker for identifying a precise location of. Enter an address or location name in the text field, and then refine the placement using the map’s zoom and drag tools to manually move the location pin. This field will automatically co-populate with the Latitude and Longitude fields. A Google Maps API Key may need to be configured through the site Dashboard to enable this field.<br>
+<br>
+<b>Latitude</b><br>
+Latitude is a geographic coordinate used in conjunction with Longitude to precisely specify a location. Use the Signed Decimal Degrees format (+/-DDD.DDDDD). This field will automatically co-populate with Geocode Address.<br>
+<br>
+<b>Longitude</b><br>
+Longitude is a geographic coordinate used in conjunction with Latitude to precisely specify a location. Use the Signed Decimal Degrees format (+/-DDD.DDDDD). This field will automatically co-populate with Geocode Address.
+',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1103,6 +1189,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 31,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'geofield_map',
@@ -1132,7 +1224,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 7,
+        'weight' => 8,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1156,47 +1248,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 45,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
-        'module' => 'geofield_map',
-        'settings' => array(
-          'geofield_map_baselayers_hybrid' => 1,
-          'geofield_map_baselayers_map' => 1,
-          'geofield_map_baselayers_physical' => 1,
-          'geofield_map_baselayers_satellite' => 1,
-          'geofield_map_center' => array(
-            'geocode' => 'Find my location',
-            'lat' => '',
-            'lon' => '',
-          ),
-          'geofield_map_controltype' => 'default',
-          'geofield_map_draggable' => 1,
-          'geofield_map_height' => '300px',
-          'geofield_map_maptype' => 'map',
-          'geofield_map_max_zoom' => 0,
-          'geofield_map_min_zoom' => 0,
-          'geofield_map_mtc' => 'standard',
-          'geofield_map_overview' => 0,
-          'geofield_map_overview_opened' => 0,
-          'geofield_map_pancontrol' => 1,
-          'geofield_map_scale' => 1,
-          'geofield_map_scrollwheel' => 0,
-          'geofield_map_streetview_show' => 1,
-          'geofield_map_width' => '100%',
-          'geofield_map_zoom' => 8,
-        ),
-        'type' => 'geofield_map_map',
-        'weight' => 5,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 38,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_coverage',
@@ -1218,10 +1285,11 @@ function ma_digitalheritage_field_default_field_instances() {
         'confirm_center_marker' => 0,
         'html5_geolocation' => 0,
         'map_type' => 'HYBRID',
+        'treeable' => 0,
         'zoom_level' => 1,
       ),
       'type' => 'geofield_gmap',
-      'weight' => 33,
+      'weight' => 34,
     ),
   );
 
@@ -1231,7 +1299,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Describe the location of this resource. If it was an event, where did it take place? If it is a document or physical object, where was it created or where can it be located now? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
+    'description' => 'A text description of the location. Location Description adds additional context to a Geocode address, and can be used instead of a Geocode Address if the location should be identified, but not precisely located on a map.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1259,12 +1327,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 32,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1288,29 +1362,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 38,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
-        'module' => 'text',
         'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 6,
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 37,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_coverage_description',
     'label' => 'Location Description',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -1322,9 +1396,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'rows' => 5,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 34,
+      'weight' => 35,
     ),
   );
 
@@ -1333,7 +1408,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).',
+    'description' => 'A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. Separate multiple Creators with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1373,6 +1448,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 23,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -1382,15 +1463,20 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_comma_full_stop' => 0,
           'textformatter_comma_override' => 0,
           'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(),
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
           'textformatter_separator_custom' => '',
           'textformatter_separator_custom_class' => 'textformatter-separator',
           'textformatter_separator_custom_tag' => 'span',
           'textformatter_term_plain' => 0,
-          'textformatter_type' => 'ul',
+          'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 19,
+        'weight' => 20,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1414,21 +1500,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 39,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 41,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_creator',
@@ -1443,9 +1530,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 58,
+      'weight' => 8,
     ),
   );
 
@@ -1454,7 +1542,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Date refers to the date of creation of the content, when it was written, filmed, recorded or made. This is an open text field, but for consistency and searchability use YYYY-MM-DD for a specific date. YYYY is the minimal level of information preferred for this field. ',
+    'description' => 'Original Date Description refers to the date of creation of the Media Asset; i.e. when it was written, filmed, recorded, or made. This is an open text field, limited to 255 characters, and is intended for use when a strictly formatted date is not appropriate (eg: Summer 1950, date unknown).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1482,12 +1570,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 21,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1511,35 +1605,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 40,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
-        'module' => 'services_views',
-        'settings' => array(
-          'data_element_key' => '',
-          'skip_empty_values' => 0,
-          'skip_safe' => 0,
-          'skip_text_format' => 1,
-          'term_name' => 1,
-        ),
-        'type' => 'services',
-        'weight' => 4,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 46,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_date',
-    'label' => 'Original Date',
+    'label' => 'Original Date Description',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -1550,10 +1638,11 @@ function ma_digitalheritage_field_default_field_instances() {
       'active' => 1,
       'module' => 'text',
       'settings' => array(
-        'size' => 12,
+        'size' => 100,
+        'treeable' => 0,
       ),
       'type' => 'text_textfield',
-      'weight' => 60,
+      'weight' => 11,
     ),
   );
 
@@ -1562,7 +1651,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
+    'description' => 'Field for briefly describing the Media Asset within a Digital Heritage Item. This can include physical characteristics (i.e. photograph, manuscript, newspaper clipping), content information (i.e. what is depicted, content of text), and any other general relevant information. Audio or video are embedded by dragging Media Assets from the media library into this field. For the Media Asset to display correctly there must be a line break or text below where the Media Asset will be embedded. Note, certain media types (eg. audio, Youtube video) do not render fully within the edit box, but will display correctly when the Digital heritage Item is saved. Using the plain text editor setting provides better control over embedded media.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1591,12 +1680,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 3,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -1624,31 +1719,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 28,
       ),
       'taxonomy_record_teaser' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(
-          'trim_length' => 300,
-        ),
-        'type' => 'text_summary_or_trimmed',
-        'weight' => 3,
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 23,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_description',
     'label' => 'Description',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'display_summary' => 0,
       'dnd_enabled' => 1,
@@ -1662,6 +1755,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'rows' => 5,
         'summary_rows' => 5,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea_with_summary',
       'weight' => 10,
@@ -1673,7 +1767,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.',
+    'description' => 'Type is the nature, genre, or function of the Media Asset or Digital Heritage Item. Examples include Image, Text, Sound, Video. Separate multiple Types with semicolons.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -1692,6 +1786,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'taxonomy_term_reference_link',
         'weight' => 37,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 41,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -1700,7 +1800,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 29,
+        'weight' => 30,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1724,21 +1824,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 14,
+        'weight' => 30,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 47,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 34,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_dh_type',
@@ -1753,6 +1854,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
       'weight' => 26,
@@ -1764,7 +1866,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. ',
+    'description' => 'Format is the specific physical or digital manifestation of the Media Asset or Digital Heritage Item. Include physical format (eg: pamphlet, glass slide, open reel), duration or extent (eg: 90 minutes, 20 pages), dimensions (eg: 4x6”, 12x6x8cm), digital filetype (eg: PDF, JPG, MP3, MP4), or other details as needed.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1791,6 +1893,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 33,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -1808,7 +1916,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 30,
+        'weight' => 31,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1832,21 +1940,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 49,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 55,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 44,
+        'weight' => 52,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_format',
@@ -1861,6 +1970,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
       'weight' => 25,
@@ -1872,7 +1982,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.',
+    'description' => 'A unique, unambiguous reference to the Digital Heritage Item or Media Asset. Identifiers are often provided by the contributing institution or organization so the original item can be located. Examples include call numbers or accession numbers.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -1900,12 +2010,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 19,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 27,
+        'weight' => 28,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -1929,27 +2045,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 48,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 42,
+        'weight' => 50,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_identifier',
     'label' => 'Identifier',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -1961,6 +2079,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'text_textfield',
       'weight' => 27,
@@ -1977,7 +2096,7 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
     ),
     'deleted' => 0,
-    'description' => '',
+    'description' => 'If a Digital Heritage Item is shared with members of more than one Cultural Protocol, this setting identifies how those protocols interact to provide appropriate access. Selecting All provides more granular access, and will only allow users to access the Digital Heritage Item if they are members of each Cultural Protocol listed. Selecting Any provides more open access, and will allow users to access the Digital Heritage Item if they are enrolled in one or more of the Cultural Protocols listed. If only using one Cultural Protocol, the default setting is All, but either setting can be used.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -2004,11 +2123,17 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 46,
+        'weight' => 64,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2032,21 +2157,23 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 35,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 43,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 27,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_item_privacy_setting',
     'label' => 'Item Sharing Settings',
@@ -2057,9 +2184,11 @@ function ma_digitalheritage_field_default_field_instances() {
     'widget' => array(
       'active' => 1,
       'module' => 'options',
-      'settings' => array(),
+      'settings' => array(
+        'treeable' => 0,
+      ),
       'type' => 'options_buttons',
-      'weight' => 56,
+      'weight' => 6,
     ),
   );
 
@@ -2068,8 +2197,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The language or languages used in the piece of content. This includes text, audio, video. You may enter multiple languages, separated by semicolons. 
-',
+    'description' => 'The language or languages used in the Digital Heritage Item or Media Asset. This includes text, audio, video. Separate multiple Languages with semicolons.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -2100,6 +2228,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 17,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -2108,7 +2242,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2132,21 +2266,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 46,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 47,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_language',
@@ -2161,6 +2296,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
       'weight' => 28,
@@ -2172,7 +2308,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'There are different licensing options available to you for your content if you have copyright of the materials. ',
+    'description' => 'Creative Commons licenses are an extension of Copyright that allow a copyright holder to specify the ways in which their work may be altered, shared, and used. For more information on Creative Commons licensing, visit creativecommons.org',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -2200,12 +2336,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 28,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 24,
+        'weight' => 25,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2229,21 +2371,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 37,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 42,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 45,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_licence_std_cc',
@@ -2257,9 +2400,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 50,
+      'weight' => 51,
     ),
   );
 
@@ -2268,7 +2412,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'TK labels allow you to provide added context to materials which are in the public domain or for which you may not hold copyright. The labels provide added information to those outside your community who may want to reuse the materials. Find out more about TK Labels at: www.localcontexts.org',
+    'description' => 'Traditional Knowledge (TK) Labels are non-legal, social and educational tags that Indigenous communities can use to add information about access, use, and attribution of public domain and/or third-party owned content. TK labels can be used alongside either traditional copyright or Creative Commons’ licenses. TK Labels can be customized within the site Dashboard. To learn more about TK Labels visit: localcontexts.org',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -2296,12 +2440,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 27,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'license',
         'settings' => array(),
         'type' => 'license_formatter',
-        'weight' => 23,
+        'weight' => 24,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2325,21 +2475,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 41,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 41,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 43,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_licence_trad',
@@ -2353,9 +2504,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 49,
+      'weight' => 50,
     ),
   );
 
@@ -2364,7 +2516,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Media assets are the core element of Digital Heritage Items and can be images, documents, video, or audio files. Media assets are uploaded to the SCALD media library and then embedded here. Digital Heritage Item can include more than one media asset. Media assets are not required for Digital Heritage Items.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -2398,6 +2550,16 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 1,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
+      ),
       'full' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -2406,7 +2568,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'map_popup' => array(
         'label' => 'hidden',
@@ -2452,7 +2614,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
-        'weight' => 2,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -2462,15 +2624,17 @@ function ma_digitalheritage_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'ma_scald_search_results',
-        'weight' => 4,
+        'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_media_asset',
     'label' => 'Media Assets',
     'required' => 0,
     'settings' => array(
+      'allow_override' => 0,
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -2484,9 +2648,234 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'atom_reference',
       'settings' => array(
         'context' => 'mukurtu_scald_media_assets_edit_',
+        'treeable' => 0,
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 54,
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_original_date'.
+  $field_instances['node-digital_heritage-field_original_date'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Original Date refers to the date of creation of the Media Asset; i.e. when it was written, filmed, recorded, or made. Type the Year, and select the Month, and Day from the dropdown menus. Partial dates (eg: YYYY, YYYY-MM) can be entered.',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'partial_date',
+        'settings' => array(
+          'component_settings' => array(),
+          'format' => 'medium',
+          'use_override' => 'none',
+        ),
+        'type' => 'partial_date_default',
+        'weight' => 45,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 49,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'module' => 'partial_date',
+        'settings' => array(
+          'component_settings' => array(
+            'components' => array(
+              'approx' => array(
+                'value' => 'Approximate',
+                'weight' => -1,
+              ),
+              'c1' => array(
+                'value' => '',
+                'weight' => 7,
+              ),
+              'c2' => array(
+                'value' => '',
+                'weight' => 8,
+              ),
+              'c3' => array(
+                'value' => '',
+                'weight' => 9,
+              ),
+              'day' => array(
+                'empty' => '',
+                'format' => 'j-S',
+                'weight' => 2,
+              ),
+              'hour' => array(
+                'empty' => '',
+                'format' => 'h',
+                'weight' => 3,
+              ),
+              'minute' => array(
+                'empty' => '',
+                'format' => 'i',
+                'weight' => 4,
+              ),
+              'month' => array(
+                'empty' => '',
+                'format' => 'F',
+                'weight' => 1,
+              ),
+              'second' => array(
+                'empty' => '',
+                'format' => 's',
+                'weight' => 5,
+              ),
+              'timezone' => array(
+                'empty' => '',
+                'format' => 'T',
+                'weight' => 6,
+              ),
+              'year' => array(
+                'empty' => '',
+                'format' => 'Y-ce',
+                'weight' => 0,
+              ),
+            ),
+            'display' => array(
+              'day' => 'estimate_label',
+              'hour' => 'estimate_label',
+              'minute' => 'estimate_label',
+              'month' => 'estimate_label',
+              'second' => 'estimate_label',
+              'timezone' => 'date_only',
+              'year' => 'estimate_label',
+            ),
+            'meridiem' => 'a',
+            'separator' => array(
+              'date' => ' ',
+              'datetime' => ' ',
+              'other' => ' ',
+              'range' => '',
+              'time' => ':',
+            ),
+            'year_designation' => 'bc',
+          ),
+          'format' => 'custom',
+          'use_override' => 'none',
+        ),
+        'type' => 'partial_date_default',
+        'weight' => 18,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_original_date',
+    'label' => 'Original Date',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'partial_date',
+      'settings' => array(
+        0 => FALSE,
+        'estimates' => array(
+          'from' => array(
+            'day' => 0,
+            'hour' => 0,
+            'minute' => 0,
+            'month' => 0,
+            'second' => 0,
+            'year' => 0,
+          ),
+          'to' => array(
+            'day' => 0,
+            'hour' => 0,
+            'minute' => 0,
+            'month' => 0,
+            'second' => 0,
+            'year' => 0,
+          ),
+        ),
+        'granularity' => array(
+          'from' => array(
+            'day' => 'day',
+            'hour' => 0,
+            'minute' => 0,
+            'month' => 'month',
+            'second' => 0,
+            'timezone' => 0,
+            'year' => 'year',
+          ),
+          'to' => array(
+            'day' => 0,
+            'hour' => 0,
+            'minute' => 0,
+            'month' => 0,
+            'second' => 0,
+            'timezone' => 0,
+            'year' => 0,
+          ),
+        ),
+        'help_txt' => array(
+          'und' => array(
+            '_remove' => '',
+            'check_approximate' => '',
+            'components' => '',
+            'txt_long' => 'Longer description of date',
+            'txt_short' => 'Short description of date',
+          ),
+        ),
+        'hide_remove' => 1,
+        'increments' => array(
+          'minute' => 1,
+          'second' => 1,
+        ),
+        'theme_overrides' => array(
+          'check_approximate' => 0,
+          'range_inline' => 0,
+          'txt_long' => 0,
+          'txt_short' => 0,
+        ),
+        'treeable' => 0,
+        'tz_handling' => 'none',
+      ),
+      'type' => 'partial_date',
+      'weight' => 10,
     ),
   );
 
@@ -2495,7 +2884,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).',
+    'description' => 'The person or people represented or referenced in the Digital Heritage Item or Media Asset. This may be people identifiable in a photograph, people speaking in an audio recording, present in a video, or referenced in a document. The People field is a way to identify people that may have been left out of the record because they were not a Creator or Contributor. Commas are valid (Last name, First name). Separate multiple People with semicolons (John Smith; Jane Doe).',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2514,6 +2903,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'taxonomy_term_reference_link',
         'weight' => 43,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 47,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -2522,7 +2917,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2546,21 +2941,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 23,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 39,
+        'weight' => 53,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 29,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_people',
@@ -2575,9 +2971,189 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 31,
+      'weight' => 32,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-digital_heritage-field_personal_collections'.
+  $field_instances['node-digital_heritage-field_personal_collections'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 47,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 51,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 58,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_personal_collections',
+    'label' => 'Personal Collections',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 59,
+    ),
+  );
+
+  // Exported field_instance: 'node-digital_heritage-field_pre_actions'.
+  $field_instances['node-digital_heritage-field_pre_actions'] = array(
+    'bundle' => 'digital_heritage',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'community_record' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 46,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 50,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 59,
+      ),
+      'map_popup' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -2586,8 +3162,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
-',
+    'description' => 'A Publisher can be a person, an organization, or a service responsible for publishing the media asset or Digital Heritage Item. Separate multiple Publishers with semicolons.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -2618,6 +3193,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 25,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -2626,7 +3207,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 26,
+        'weight' => 27,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2650,21 +3231,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 42,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 39,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_publisher',
@@ -2679,6 +3261,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
       'weight' => 47,
@@ -2688,10 +3271,10 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_related_dh_items'.
   $field_instances['node-digital_heritage-field_related_dh_items'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => array(),
+    'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A reference to one or many related digital heritage items.',
+    'description' => 'Related Digital Heritage Items are items that have a close connection, and are used to guide viewers from one item to another. Examples include multiple photos of a single building, similar versions of a photograph or document, or multi-part video compilations. Previews of related Digital Heritage items display at the bottom of the Digital Heritage Item, and at the top right, if Related Items Teasers are enabled. A Digital Heritage Item can be related to several other items. The relationship between two Digital Heritage Items is bi-directional. Select related Digital Heritage Items from the dropdown menu, or begin typing the name of an item and use the autocomplete tool to select the desired item.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2706,10 +3289,17 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 36,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 40,
       ),
       'full' => array(
         'label' => 'above',
@@ -2718,7 +3308,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2742,21 +3332,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 31,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 46,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 28,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_dh_items',
@@ -2775,9 +3366,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 27,
+      'weight' => 54,
     ),
   );
 
@@ -2788,7 +3380,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'A reference to one or many related dictionary words.',
+    'description' => 'Related Dictionary Words are entries in the Dictionary that describe, contextualize, appear in, or are otherwise connected to, and should be displayed alongside, the Digital Heritage Item. Previews of related Dictionary Words display at the bottom of the Digital Heritage Item. A Digital Heritage Item can be related to several Dictionary Words. The relationship between a Digital Heritage Item and a Dictionary Word is bi-directional. Select Related Dictionary Words from the dropdown menu, or begin typing a word and use the autocomplete tool to select the desired Dictionary Word.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -2803,10 +3395,17 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
+          'bypass_access' => FALSE,
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
         'weight' => 44,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 48,
       ),
       'full' => array(
         'label' => 'above',
@@ -2815,7 +3414,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 10,
+        'weight' => 11,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2833,21 +3432,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 20,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 54,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 24,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_dictionary_words',
@@ -2866,9 +3466,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 28,
+      'weight' => 55,
     ),
   );
 
@@ -2877,7 +3478,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Who holds the rights to the content and who should be contacted for permission to reproduce the content. You may want to add and email address or other contact information if you\'d like people to contact you for permission to use, reproduce, circulate and or cite your materials.',
+    'description' => 'A statement about who holds the legal rights to the Digital Heritage Item, Media Asset, or presented knowledge. Consider adding contact information if the rights holder should be contacted for permission to use, reproduce, circulate, reference, or cite the Digital Heritage Item.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -2905,12 +3506,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 20,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 22,
+        'weight' => 23,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -2934,27 +3541,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 50,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 43,
+        'weight' => 51,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_rights',
     'label' => 'Rights',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -2966,6 +3575,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'rows' => 2,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea',
       'weight' => 48,
@@ -2977,8 +3587,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Reference to a resource from which the present content is derived, for example if the content is part of a larger collection, ie. "McWhorter Collection" or "Smith Photos."
-',
+    'description' => 'Source provides a reference to a resource, collection, or institution from where the Digital Heritage Item or Media Asset is contributed or originated. Examples include collections (eg: “McWhorter Collection”), institutions (eg: “Library of Congress, American Folklife Center), or donors (eg: “Donated by John Smith”).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -3006,12 +3615,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 18,
       ),
+      'featured_content' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 25,
+        'weight' => 26,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3035,27 +3650,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 47,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 41,
+        'weight' => 49,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_source',
     'label' => 'Source',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -3067,6 +3684,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'text_textfield',
       'weight' => 29,
@@ -3078,8 +3696,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
-',
+    'description' => 'The main topic or topics presented in the Digital Heritage Item. Subjects may be derived from existing classification systems (for example, Library of Congress Classification Numbers or Dewey Decimal numbers), controlled vocabularies (such as Medical Subject Headings or Art and Architecture Thesaurus descriptors), or can be created as needed within the site. Separate multiple Subjects with semicolons.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -3110,6 +3727,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 26,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'ds',
@@ -3118,7 +3741,7 @@ function ma_digitalheritage_field_default_field_instances() {
           'taxonomy_term_separator' => ', ',
         ),
         'type' => 'ds_taxonomy_separator',
-        'weight' => 28,
+        'weight' => 29,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3142,21 +3765,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 43,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 40,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 42,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_subject',
@@ -3171,9 +3795,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
-      'weight' => 30,
+      'weight' => 31,
     ),
   );
 
@@ -3182,7 +3807,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Please provide a brief summary of this item in less than 140 characters. Other fields will allow for more elaboration about the content.',
+    'description' => 'A brief description of the Digital Heritage Item, limited to 140 characters. The summary is displayed with the Digital Heritage Item teaser when browsing, and can help distinguish between items with similar or identical titles. Other fields allow for longer, more in depth description.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -3210,12 +3835,19 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 0,
+        'weight' => 2,
       ),
       'map_popup' => array(
         'label' => 'inline',
@@ -3240,29 +3872,31 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 7,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
+        'module' => 'text',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 18,
+        'type' => 'text_default',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 5,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_summary',
     'label' => 'Summary',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -3274,9 +3908,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'text_textfield',
-      'weight' => 53,
+      'weight' => 3,
     ),
   );
 
@@ -3285,7 +3920,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. We suggest adding 3-5 keywords. Separate multiple keywords with semicolons.',
+    'description' => 'Keywords are terms used to describe a Digital Heritage Item to ensure that the item will be discoverable when searching or browsing. Keywords are more flexible and specific than Categories. Contributors can create new Keywords as needed when creating or editing a Digital Heritage Item. Consider adding 3-­5 Keywords that will help users discover the Digital Heritage Item through searching or browsing. Separate multiple Keywords with semicolons (eg: basket; weaving).',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'hidden',
@@ -3315,6 +3950,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 13,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
       ),
       'full' => array(
         'label' => 'above',
@@ -3349,21 +3990,22 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 33,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 30,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 40,
+        'weight' => 48,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_tags',
@@ -3378,6 +4020,7 @@ function ma_digitalheritage_field_default_field_instances() {
       'settings' => array(
         'autocomplete_path' => 'taxonomy/autocomplete',
         'size' => 60,
+        'treeable' => 0,
       ),
       'type' => 'taxonomy_autocomplete',
       'weight' => 11,
@@ -3389,7 +4032,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'This is the primary field for providing in-depth knowledge about this piece of content. This field is an open field to provide you with maximum flexibility to express your knowledge in the most appropriate way. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
+    'description' => 'The Traditional Knowledge field is used to add in-­depth community-specific knowledge about the Digital Heritage Item, and is often used to provide information of social, spiritual, or esoteric significance. For example, if the item is a basket, this field may contain community, tribe, or clan specific knowledge about the significance of design that is not more generally known. Audio or video are embedded by dragging Media Assets from the media library into this field. For the Media Asset to display correctly there must be a line break or text below where the Media Asset will be embedded. Note, certain media types (eg. audio, Youtube video) do not render fully within the edit box, but will display correctly when the Digital heritage Item is saved. Using the plain text editor setting provides better control over embedded media.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -3417,12 +4060,18 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 29,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'map_popup' => array(
         'label' => 'above',
@@ -3446,28 +4095,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 36,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 44,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_tk_body',
     'label' => 'Traditional Knowledge',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -3479,9 +4129,10 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'rows' => 15,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -3490,7 +4141,7 @@ function ma_digitalheritage_field_default_field_instances() {
     'bundle' => 'digital_heritage',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Transcription is a plain text field used to provide a text transcription of an audio or video recording, or of text in an image or document. Including a transcription allows the text to be discoverable when searching for Digital Heritage Items.',
     'display' => array(
       'community_record' => array(
         'label' => 'hidden',
@@ -3505,6 +4156,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 40,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 44,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -3535,28 +4192,29 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 18,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 50,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 25,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_transcription',
     'label' => 'Transcription',
     'required' => 0,
     'settings' => array(
-      'context' => 'debug',
+      'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -3568,18 +4226,20 @@ function ma_digitalheritage_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'rows' => 5,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 32,
+      'weight' => 33,
     ),
   );
 
   // Exported field_instance: 'node-digital_heritage-og_group_ref'.
   $field_instances['node-digital_heritage-og_group_ref'] = array(
     'bundle' => 'digital_heritage',
-    'default_value' => array(),
+    'default_value' => NULL,
+    'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'Communities represent groups of contributors. Communities can be large or small. Contributions could be media assets, complete Digital Heritage Items, knowledge, metadata, or other contributions. Cultural Protocols are how Communities provide users specific types of access to Digital heritage Items. Each Cultural Protocol is created by and managed within a Community. Digital Heritage Items must belong to at least one Community and one Cultural Protocol within that Community. First select a Community from the dropdown menu, and then select the appropriate Cultural Protocol within that Community. Multiple Communities, and multiple Cultural Protocols within each Community can be selected.',
     'display' => array(
       'browse_teaser' => array(
         'label' => 'above',
@@ -3621,6 +4281,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
+      ),
       'full' => array(
         'label' => 'above',
         'module' => 'textformatter',
@@ -3664,36 +4330,31 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 32,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 44,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 26,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'og_group_ref',
     'label' => 'Protocol',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
-        'og_widget' => array(
-          'access_override' => 0,
-          'admin' => array(
-            'widget_type' => 'entityreference_autocomplete',
-          ),
-          'default' => array(
-            'widget_type' => 'entityreference_autocomplete_tags',
-          ),
-          'status' => TRUE,
+        'prepopulate' => array(
+          'status' => 0,
         ),
       ),
       'user_register_form' => FALSE,
@@ -3711,13 +4372,14 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
     ),
     'widget' => array(
-      'active' => 0,
+      'active' => 1,
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 55,
+      'weight' => 5,
     ),
   );
 
@@ -3739,6 +4401,12 @@ function ma_digitalheritage_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'taxonomy_browse_by' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -3769,72 +4437,84 @@ function ma_digitalheritage_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('A Contributor can be a person, an organization, or a service responsible for making a contribution to the content of a resource. A Contributor is secondary to a Creator because this role is not primarily responsible for a resource\'s content. A Contributor enhances or facilitates the availability of a resource. More than one Contributor may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
-  t('A Creator can be a person, people or organization primarily responsible for making a resource. For example, the Creator field could list who took the photograph, made the basket, or filmed the tutorial. More than one Creator may be entered, separated by semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
-  t('A Publisher can be a person, an organization, or a service responsible for publishing the content. You may enter multiple publishers, separated by semicolons.
-');
-  t('A collection is an aggregation of digital heritage items.');
-  t('A reference to one or many related dictionary words.');
-  t('A reference to one or many related digital heritage items.');
-  t('An unambiguous reference to the resource within a given context. Your institution may already have its own system of unique identifiers for your materials. Recommended best practice is to identify the resource by a string of numbers and/or letters conforming to a formal identification system.');
+  t('A Contributor can be a person, people, clan, tribal nation, community group or, organization who aided in making the content of a Digital Heritage Item or Media Asset. This could be the person who wrote, compiled, or illustrated a book or recorded a song; the people who edited or produced a film, or collaborated or consulted on a project. Contributors with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John “Nickname” Smith).');
+  t('A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. Separate multiple Creators with semicolons (John Smith; Jane Doe). Commas are valid (last name, first name), as are quotes (John "Nickname" Smith).');
+  t('A Publisher can be a person, an organization, or a service responsible for publishing the media asset or Digital Heritage Item. Separate multiple Publishers with semicolons.');
+  t('A brief description of the Digital Heritage Item, limited to 140 characters. The summary is displayed with the Digital Heritage Item teaser when browsing, and can help distinguish between items with similar or identical titles. Other fields allow for longer, more in depth description.');
+  t('A statement about who holds the legal rights to the Digital Heritage Item, Media Asset, or presented knowledge. Consider adding contact information if the rights holder should be contacted for permission to use, reproduce, circulate, reference, or cite the Digital Heritage Item.');
+  t('A text description of the location. Location Description adds additional context to a Geocode address, and can be used instead of a Geocode Address if the location should be identified, but not precisely located on a map.');
+  t('A unique, unambiguous reference to the Digital Heritage Item or Media Asset. Identifiers are often provided by the contributing institution or organization so the original item can be located. Examples include call numbers or accession numbers.');
   t('Book Pages');
+  t('Book Pages (also identified as Multi-Page Documents) allow multiple media assets to be presented within a single Digital Heritage Item in a paged display where each page can have unique metadata. Book Pages are often used to represent books, publications, scrapbooks or other print resources, but can also can be used with any media assets to create digital scrapbooks, or other unique presentations. Book Pages can be placed in any order by dragging and dropping them into the preferred order.');
   t('Book Parent');
+  t('Categories are high-level descriptive terms that group Digital Heritage Items together and help users browse and discover Digital Heritage Items. Categories are unique to each site and reflect the scope of the items included. One set of Categories is used to describe all Digital Heritage Items within the site. Each Digital Heritage Item must belong to at least one Category. Check the box beside each relevant Category. ');
   t('Category');
-  t('Choose one or more general cultural categories that best describes your material. This field can be used for content browsing.');
-  t('Collection');
+  t('Collections');
+  t('Collections are curated, narrated groups of Digital Heritage Items within a site. Collections can contain Digital Heritage Items from more than one Community, and each Digital Heritage Item can be displayed in multiple Collections. Select existing Collections from the dropdown menu, or begin typing the name of a Collection and use the autocomplete tool to select the desired Collection.');
   t('Comment');
+  t('Communities represent groups of contributors. Communities can be large or small. Contributions could be media assets, complete Digital Heritage Items, knowledge, metadata, or other contributions. Cultural Protocols are how Communities provide users specific types of access to Digital heritage Items. Each Cultural Protocol is created by and managed within a Community. Digital Heritage Items must belong to at least one Community and one Cultural Protocol within that Community. First select a Community from the dropdown menu, and then select the appropriate Cultural Protocol within that Community. Multiple Communities, and multiple Cultural Protocols within each Community can be selected.');
   t('Community');
   t('Community Record Parent');
   t('Community Records');
+  t('Community Records provide multiple layers of information, or contributions from multiple voices. This field displays all existing Community Records attached to the Digital Heritage Item. The display order of the Community Records can be changed by dragging and dropping them into the preferred order.');
   t('Contributor');
+  t('Creative Commons licenses are an extension of Copyright that allow a copyright holder to specify the ways in which their work may be altered, shared, and used. For more information on Creative Commons licensing, visit creativecommons.org');
   t('Creator');
   t('Cultural Narrative');
-  t('Date refers to the date of creation of the content, when it was written, filmed, recorded or made. This is an open text field, but for consistency and searchability use YYYY-MM-DD for a specific date. YYYY is the minimal level of information preferred for this field. ');
-  t('Describe the location of this resource. If it was an event, where did it take place? If it is a document or physical object, where was it created or where can it be located now? You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
   t('Description');
+  t('Field for briefly describing the Media Asset within a Digital Heritage Item. This can include physical characteristics (i.e. photograph, manuscript, newspaper clipping), content information (i.e. what is depicted, content of text), and any other general relevant information. Audio or video are embedded by dragging Media Assets from the media library into this field. For the Media Asset to display correctly there must be a line break or text below where the Media Asset will be embedded. Note, certain media types (eg. audio, Youtube video) do not render fully within the edit box, but will display correctly when the Digital heritage Item is saved. Using the plain text editor setting provides better control over embedded media.');
   t('Format');
+  t('Format is the specific physical or digital manifestation of the Media Asset or Digital Heritage Item. Include physical format (eg: pamphlet, glass slide, open reel), duration or extent (eg: 90 minutes, 20 pages), dimensions (eg: 4x6”, 12x6x8cm), digital filetype (eg: PDF, JPG, MP3, MP4), or other details as needed.');
+  t('Geocode Address is a visual map-based location picker for identifying a precise location of. Enter an address or location name in the text field, and then refine the placement using the map’s zoom and drag tools to manually move the location pin. This field will automatically co-populate with the Latitude and Longitude fields. A Google Maps API Key may need to be configured through the site Dashboard to enable this field.<br>
+<br>
+<b>Latitude</b><br>
+Latitude is a geographic coordinate used in conjunction with Longitude to precisely specify a location. Use the Signed Decimal Degrees format (+/-DDD.DDDDD). This field will automatically co-populate with Geocode Address.<br>
+<br>
+<b>Longitude</b><br>
+Longitude is a geographic coordinate used in conjunction with Latitude to precisely specify a location. Use the Signed Decimal Degrees format (+/-DDD.DDDDD). This field will automatically co-populate with Geocode Address.
+');
   t('Identifier');
+  t('If a Digital Heritage Item is shared with members of more than one Cultural Protocol, this setting identifies how those protocols interact to provide appropriate access. Selecting All provides more granular access, and will only allow users to access the Digital Heritage Item if they are members of each Cultural Protocol listed. Selecting Any provides more open access, and will allow users to access the Digital Heritage Item if they are enrolled in one or more of the Cultural Protocols listed. If only using one Cultural Protocol, the default setting is All, but either setting can be used.');
   t('Item Sharing Settings');
   t('Keywords');
-  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. We suggest adding 3-5 keywords. Separate multiple keywords with semicolons.');
+  t('Keywords are terms used to describe a Digital Heritage Item to ensure that the item will be discoverable when searching or browsing. Keywords are more flexible and specific than Categories. Contributors can create new Keywords as needed when creating or editing a Digital Heritage Item. Consider adding 3-­5 Keywords that will help users discover the Digital Heritage Item through searching or browsing. Separate multiple Keywords with semicolons (eg: basket; weaving).');
   t('Language');
   t('Licensing Options');
   t('Location');
   t('Location Description');
   t('Media Assets');
+  t('Media assets are the core element of Digital Heritage Items and can be images, documents, video, or audio files. Media assets are uploaded to the SCALD media library and then embedded here. Digital Heritage Item can include more than one media asset. Media assets are not required for Digital Heritage Items.');
   t('Original Date');
+  t('Original Date Description');
+  t('Original Date Description refers to the date of creation of the Media Asset; i.e. when it was written, filmed, recorded, or made. This is an open text field, limited to 255 characters, and is intended for use when a strictly formatted date is not appropriate (eg: Summer 1950, date unknown).');
+  t('Original Date refers to the date of creation of the Media Asset; i.e. when it was written, filmed, recorded, or made. Type the Year, and select the Month, and Day from the dropdown menus. Partial dates (eg: YYYY, YYYY-MM) can be entered.');
   t('People');
-  t('Please provide a brief summary of this item in less than 140 characters. Other fields will allow for more elaboration about the content.');
+  t('Personal Collections');
+  t('Pre-Actions');
   t('Protocol');
   t('Publisher');
-  t('Rather than a quick gloss (like the description field) the Cultural Narrative field allows one to provide lengthy commentary, stories, observations, or any relevant context for the DH item. For example, if the item is a basket, this field may contain a narrative from the basket-maker about his/her technique or it may tell a story about how the baskets were used by previous generations and how they are used today. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
-  t('Reference to a resource from which the present content is derived, for example if the content is part of a larger collection, ie. "McWhorter Collection" or "Smith Photos."
-');
   t('Related Dictionary Words');
+  t('Related Dictionary Words are entries in the Dictionary that describe, contextualize, appear in, or are otherwise connected to, and should be displayed alongside, the Digital Heritage Item. Previews of related Dictionary Words display at the bottom of the Digital Heritage Item. A Digital Heritage Item can be related to several Dictionary Words. The relationship between a Digital Heritage Item and a Dictionary Word is bi-directional. Select Related Dictionary Words from the dropdown menu, or begin typing a word and use the autocomplete tool to select the desired Dictionary Word.');
   t('Related Digital Heritage Items');
+  t('Related Digital Heritage Items are items that have a close connection, and are used to guide viewers from one item to another. Examples include multiple photos of a single building, similar versions of a photograph or document, or multi-part video compilations. Previews of related Digital Heritage items display at the bottom of the Digital Heritage Item, and at the top right, if Related Items Teasers are enabled. A Digital Heritage Item can be related to several other items. The relationship between two Digital Heritage Items is bi-directional. Select related Digital Heritage Items from the dropdown menu, or begin typing the name of an item and use the autocomplete tool to select the desired item.');
   t('Rights');
   t('Source');
+  t('Source provides a reference to a resource, collection, or institution from where the Digital Heritage Item or Media Asset is contributed or originated. Examples include collections (eg: “McWhorter Collection”), institutions (eg: “Library of Congress, American Folklife Center), or donors (eg: “Donated by John Smith”).');
   t('Subject');
   t('Summary');
-  t('TK labels allow you to provide added context to materials which are in the public domain or for which you may not hold copyright. The labels provide added information to those outside your community who may want to reuse the materials. Find out more about TK Labels at: www.localcontexts.org');
-  t('The language or languages used in the piece of content. This includes text, audio, video. You may enter multiple languages, separated by semicolons. 
-');
-  t('The main topic of the content. Typically, a subject will be expressed as keywords or key phrases or classification codes that describe the topic of the resource. You may have your own subject headings you wish to use. You may enter multiple subjects, separated by semicolons.
-');
-  t('The nature or genre of the content. Type includes terms describing general categories, functions or genres for content. For example, Image, Physical Object, Text, etc. You may enter multiple types, separated by semicolons.');
-  t('The person or people in the content. Typically this will be people identifiable in a photograph, people speaking on an audio file, or the main people mentioned in a document. Commas are valid (last name, first name). Multiple names should be separated with a semicolon (John Smith; Jane Doe).');
-  t('The physical or digital manifestation of the resource. Typically, Format may include the media-type, physical medium, duration or dimensions of the resource. ');
-  t('There are different licensing options available to you for your content if you have copyright of the materials. ');
-  t('This is the primary field for describing a specific item. Include physical characteristics (for example: Photograph (lantern slide); manuscript; newspaper clipping) and content information (for an image, what is depicted; for a text item, what is it about). Also give additional date information or other relevant details. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
-  t('This is the primary field for providing in-depth knowledge about this piece of content. This field is an open field to provide you with maximum flexibility to express your knowledge in the most appropriate way. You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
+  t('The Cultural Narrative field is used to add historical or social context, expert community knowledge, community stories, and other relevant context to the Digital Heritage Item. This is generally information that is community specific. For example, if the item is a basket, this field may contain a narrative from the basket­maker about their technique, or it may tell a story about how the baskets were used by previous generations and how they are used today. Audio or video are embedded by dragging Media Assets from the media library into this field. For the Media Asset to display correctly there must be a line break or text below where the Media Asset will be embedded. Note, certain media types (eg. audio, Youtube video) do not render fully within the edit box, but will display correctly when the Digital heritage Item is saved. Using the plain text editor setting provides better control over embedded media.');
+  t('The Traditional Knowledge field is used to add in-­depth community-specific knowledge about the Digital Heritage Item, and is often used to provide information of social, spiritual, or esoteric significance. For example, if the item is a basket, this field may contain community, tribe, or clan specific knowledge about the significance of design that is not more generally known. Audio or video are embedded by dragging Media Assets from the media library into this field. For the Media Asset to display correctly there must be a line break or text below where the Media Asset will be embedded. Note, certain media types (eg. audio, Youtube video) do not render fully within the edit box, but will display correctly when the Digital heritage Item is saved. Using the plain text editor setting provides better control over embedded media.');
+  t('The language or languages used in the Digital Heritage Item or Media Asset. This includes text, audio, video. Separate multiple Languages with semicolons.');
+  t('The main topic or topics presented in the Digital Heritage Item. Subjects may be derived from existing classification systems (for example, Library of Congress Classification Numbers or Dewey Decimal numbers), controlled vocabularies (such as Medical Subject Headings or Art and Architecture Thesaurus descriptors), or can be created as needed within the site. Separate multiple Subjects with semicolons.');
+  t('The person or people represented or referenced in the Digital Heritage Item or Media Asset. This may be people identifiable in a photograph, people speaking in an audio recording, present in a video, or referenced in a document. The People field is a way to identify people that may have been left out of the record because they were not a Creator or Contributor. Commas are valid (Last name, First name). Separate multiple People with semicolons (John Smith; Jane Doe).');
   t('Thumbnail Image');
   t('Traditional Knowledge');
+  t('Traditional Knowledge (TK) Labels are non-legal, social and educational tags that Indigenous communities can use to add information about access, use, and attribution of public domain and/or third-party owned content. TK labels can be used alongside either traditional copyright or Creative Commons’ licenses. TK Labels can be customized within the site Dashboard. To learn more about TK Labels visit: localcontexts.org');
   t('Traditional Knowledge Labels');
   t('Transcription');
+  t('Transcription is a plain text field used to provide a text transcription of an audio or video recording, or of text in an image or document. Including a transcription allows the text to be discoverable when searching for Digital Heritage Items.');
   t('Type');
-  t('Use the arrows to change the order of Book Pages. Do not attempt to add or remove Book Pages from here.');
-  t('Use the arrows to change the order of Community Records. Do not attempt to add or remove Community Records from here.');
-  t('Who holds the rights to the content and who should be contacted for permission to reproduce the content. You may want to add and email address or other contact information if you\'d like people to contact you for permission to use, reproduce, circulate and or cite your materials.');
+  t('Type is the nature, genre, or function of the Media Asset or Digital Heritage Item. Examples include Image, Text, Sound, Video. Separate multiple Types with semicolons.');
 
   return $field_instances;
 }

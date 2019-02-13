@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * General file handling code for Backup and Migrate.
@@ -51,7 +50,7 @@ function _backup_migrate_temp_files_delete() {
 }
 
 /**
- * Delete a temporary file or folder
+ * Delete a temporary file or folder.
  */
 function _backup_migrate_temp_files_delete_file($file) {
   if (file_exists($file) && (is_writable($file) || is_link($file))) {
@@ -62,6 +61,7 @@ function _backup_migrate_temp_files_delete_file($file) {
           _backup_migrate_temp_files_delete_file("$dir/$file");
         }
       }
+      closedir($handle);
       rmdir($dir);
     }
     else {
@@ -84,6 +84,7 @@ function _backup_migrate_move_files($from, $to) {
           _backup_migrate_move_files("$from/$file", "$to/$file");
         }
       }
+      closedir($handle);
     }
     else {
       rename($from, $to);
@@ -105,7 +106,7 @@ function backup_migrate_temp_directory() {
   }
 
   // Use a full path so that the files can be deleted during the shutdown function if needed.
-  $file = $tmp .'/'. uniqid('backup_migrate_');
+  $file = $tmp . '/' . uniqid('backup_migrate_');
   mkdir($file);
   backup_migrate_temp_files_add($file);
   return $file;
@@ -136,7 +137,7 @@ function _backup_migrate_filename_append_prepare($filename, $append_str) {
   }
   return $filename;
 }
-  
+
 /**
  * Construct a filename using token and some cleaning.
  */
@@ -144,12 +145,12 @@ function _backup_migrate_construct_filename($settings) {
   // Get the raw filename from the settings.
   $filename = $settings->filename;
 
-  // Replace any tokens
+  // Replace any tokens.
   if (module_exists('token') && function_exists('token_replace')) {
     $filename = token_replace($filename);
   }
 
-  // Remove illegal characters
+  // Remove illegal characters.
   $filename = _backup_migrate_clean_filename($filename);
 
   // Generate a timestamp if needed.
@@ -178,7 +179,8 @@ function _backup_migrate_default_filename() {
     return '[site:name]';
   }
   else {
-    // Cleaning the string isn't strictly necessary but it looks better in the settings field.
+    // Cleaning the string isn't strictly necessary but it looks better in the
+    // settings field.
     return _backup_migrate_clean_filename(variable_get('site_name', "backup_migrate"));
   }
 }
@@ -203,17 +205,17 @@ function _backup_migrate_file_dispose_buffer($buffer) {
  * A backup file which allows for saving to and reading from the server.
  */
 class backup_file {
-  var $file_info = array();
-  var $type = array();
-  var $ext = array();
-  var $path = "";
-  var $name = "";
-  var $handle = NULL;
+  public $file_info = array();
+  public $type = array();
+  public $ext = array();
+  public $path = "";
+  public $name = "";
+  public $handle = NULL;
 
   /**
    * Construct a file object given a file path, or create a temp file for writing.
    */
-  function __construct($params = array()) {
+  public function __construct($params = array()) {
     if (isset($params['filepath']) && file_exists($params['filepath'])) {
       $this->set_filepath($params['filepath']);
     }
@@ -226,7 +228,7 @@ class backup_file {
   /**
    * Get the file_id if the file has been saved to a destination.
    */
-  function file_id() {
+  public function file_id() {
     // The default file_id is the filename. Destinations can override the file_id if needed.
     return isset($this->file_info['file_id']) ? $this->file_info['file_id'] : $this->filename();
   }
@@ -234,14 +236,17 @@ class backup_file {
   /**
    * Get the current filepath.
    */
-  function filepath() {
-    return drupal_realpath($this->path);
+  public function filepath() {
+    if ($filepath = drupal_realpath($this->path)) {
+      return $filepath;
+    }
+    return $this->path;
   }
 
   /**
    * Get the final filename.
    */
-  function filename($name = NULL) {
+  public function filename($name = NULL) {
     if ($name) {
       $this->name = $name;
     }
@@ -253,11 +258,11 @@ class backup_file {
   /**
    * Set the current filepath.
    */
-  function set_filepath($path) {
+  public function set_filepath($path) {
     $this->path = $path;
     $params = array(
       'filename' => basename($path),
-      'file_id' => basename($path)
+      'file_id' => basename($path),
     );
     if (file_exists($path)) {
       $params['filesize'] = filesize($path);
@@ -269,56 +274,55 @@ class backup_file {
   /**
    * Get one or all pieces of info for the file.
    */
-  function info($key = NULL) {
+  public function info($key = NULL) {
     if ($key) {
       return @$this->file_info[$key];
     }
     return $this->file_info;
   }
 
-
   /**
    * Get one or all pieces of info for the file.
    */
-  function info_set($key, $value) {
+  public function info_set($key, $value) {
     $this->file_info[$key] = $value;
   }
   /**
    * Get the file extension.
    */
-  function extension() {
+  public function extension() {
     return implode(".", $this->ext);
   }
 
   /**
    * Get the file type.
    */
-  function type() {
+  public function type() {
     return $this->type;
   }
 
   /**
    * Get the file mimetype.
    */
-  function mimetype() {
+  public function mimetype() {
     return @$this->type['filemime'] ? $this->type['filemime'] : 'application/octet-stream';
   }
 
   /**
    * Get the file mimetype.
    */
-  function type_id() {
+  public function type_id() {
     return @$this->type['id'];
   }
 
-  function filesize() {
+  public function filesize() {
     if (empty($this->file_info['filesize'])) {
       $this->calculate_filesize();
     }
     return $this->file_info['filesize'];
   }
 
-  function calculate_filesize() {
+  public function calculate_filesize() {
     $this->file_info['filesize'] = '';
     if (!empty($this->path) && file_exists($this->path)) {
       $this->file_info['filesize'] = filesize($this->path);
@@ -328,28 +332,28 @@ class backup_file {
   /**
    * Can this file be used to backup to.
    */
-  function can_backup() {
+  public function can_backup() {
     return @$this->type['backup'];
   }
 
   /**
    * Can this file be used to restore to.
    */
-  function can_restore() {
+  public function can_restore() {
     return @$this->type['restore'];
   }
 
   /**
    * Can this file be used to restore to.
    */
-  function is_recognized_type() {
+  public function is_recognized_type() {
     return @$this->type['restore'] || @$this->type['backup'];
   }
 
   /**
    * Open a file for reading or writing.
    */
-  function open($write = FALSE, $binary = FALSE) {
+  public function open($write = FALSE, $binary = FALSE) {
     if (!$this->handle) {
       $path = $this->filepath();
 
@@ -374,7 +378,7 @@ class backup_file {
   /**
    * Close a file when we're done reading/writing.
    */
-  function close() {
+  public function close() {
     fclose($this->handle);
     $this->handle = NULL;
   }
@@ -382,7 +386,7 @@ class backup_file {
   /**
    * Write a line to the file.
    */
-  function write($data) {
+  public function write($data) {
     if (!$this->handle) {
       $this->handle = $this->open(TRUE);
     }
@@ -394,7 +398,7 @@ class backup_file {
   /**
    * Read a line from the file.
    */
-  function read($size = NULL) {
+  public function read($size = NULL) {
     if (!$this->handle) {
       $this->handle = $this->open();
     }
@@ -407,14 +411,14 @@ class backup_file {
   /**
    * Write data to the file.
    */
-  function put_contents($data) {
+  public function put_contents($data) {
     file_put_contents($this->filepath(), $data);
   }
 
   /**
    * Read data from the file.
    */
-  function get_contents() {
+  public function get_contents() {
     return file_get_contents($this->filepath());
   }
 
@@ -422,10 +426,10 @@ class backup_file {
    * Transfer file using http to client. Similar to the built in file_transfer,
    *  but it calls module_invoke_all('exit') so that temp files can be deleted.
    */
-  function transfer() {
+  public function transfer() {
     $headers = array(
       array('key' => 'Content-Type', 'value' => $this->mimetype()),
-      array('key' => 'Content-Disposition', 'value' => 'attachment; filename="'. $this->filename() .'"'),
+      array('key' => 'Content-Disposition', 'value' => 'attachment; filename="' . $this->filename() . '"'),
     );
     // In some circumstances, web-servers will double compress gzipped files.
     // This may help aleviate that issue by disabling mod-deflate.
@@ -470,7 +474,7 @@ class backup_file {
   /**
    * Push a file extension onto the file and return the previous file path.
    */
-  function push_type($extension) {
+  public function push_type($extension) {
     $types = _backup_migrate_filetypes();
     if ($type = @$types[$extension]) {
       $this->push_filetype($type);
@@ -484,7 +488,7 @@ class backup_file {
   /**
    * Push a file extension onto the file and return the previous file path.
    */
-  function pop_type() {
+  public function pop_type() {
     $out = new backup_file(array('filepath' => $this->filepath()));
     $this->pop_filetype();
     $this->temporary_file();
@@ -494,7 +498,7 @@ class backup_file {
   /**
    * Set the current file type.
    */
-  function set_filetype($type) {
+  public function set_filetype($type) {
     $this->type = $type;
     $this->ext = array($type['extension']);
   }
@@ -502,7 +506,7 @@ class backup_file {
   /**
    * Set the current file type.
    */
-  function push_filetype($type) {
+  public function push_filetype($type) {
     $this->ext[] = $type['extension'];
     $this->type = $type;
   }
@@ -510,7 +514,7 @@ class backup_file {
   /**
    * Pop the current file type.
    */
-  function pop_filetype() {
+  public function pop_filetype() {
     array_pop($this->ext);
     $this->detect_filetype_from_extension();
   }
@@ -518,7 +522,7 @@ class backup_file {
   /**
    * Set the file info.
    */
-  function set_file_info($file_info) {
+  public function set_file_info($file_info) {
     $this->file_info = $file_info;
 
     $this->ext = explode('.', @$this->file_info['filename']);
@@ -533,7 +537,7 @@ class backup_file {
   /**
    * Get the filetype info of the given file, or false if the file is not a valid type.
    */
-  function detect_filetype_from_extension() {
+  public function detect_filetype_from_extension() {
     $ext = end($this->ext);
     $this->type = array();
     $types = _backup_migrate_filetypes();
@@ -548,17 +552,17 @@ class backup_file {
   /**
    * Get a temporary file name with path.
    */
-  function temporary_file() {
+  public function temporary_file() {
     $file = drupal_tempnam('temporary://', 'backup_migrate_');
     // Add the version without the extension. The tempnam function creates this for us.
     backup_migrate_temp_files_add($file);
 
     if ($this->extension()) {
-      $file .= '.'. $this->extension();
+      $file .= '.' . $this->extension();
       // Add the version with the extension. This is the one we will actually use.
       backup_migrate_temp_files_add($file);
     }
     $this->path = $file;
   }
-}
 
+}

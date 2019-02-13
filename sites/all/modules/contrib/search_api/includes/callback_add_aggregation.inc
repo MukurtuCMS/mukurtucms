@@ -328,10 +328,10 @@ class SearchApiAlterAddAggregation extends SearchApiAbstractAlterCallback {
           'count' => 'integer',
           'max' => 'integer',
           'min' => 'integer',
-          'first' => 'string',
-          'first_char' => 'string',
-          'last' => 'string',
-          'list' => 'list<string>',
+          'first' => 'token',
+          'first_char' => 'token',
+          'last' => 'token',
+          'list' => 'list<token>',
         );
       case 'description':
         return array(

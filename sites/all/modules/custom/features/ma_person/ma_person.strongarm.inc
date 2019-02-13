@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_person.strongarm.inc
@@ -106,7 +107,7 @@ function ma_person_strongarm() {
         'custom_settings' => FALSE,
       ),
       'search_result' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'diff_standard' => array(
         'custom_settings' => FALSE,
@@ -131,6 +132,21 @@ function ma_person_strongarm() {
       ),
       'taxonomy_record_teaser' => array(
         'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
       ),
     ),
     'extra_fields' => array(
@@ -203,6 +219,13 @@ function ma_person_strongarm() {
   $strongarm->name = 'pathauto_node_person_pattern';
   $strongarm->value = 'person/[node:title]';
   $export['pathauto_node_person_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_interpersonal_relationship_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_interpersonal_relationship_pattern'] = $strongarm;
 
   return $export;
 }

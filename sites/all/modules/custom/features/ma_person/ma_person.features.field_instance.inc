@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_person.features.field_instance.inc
@@ -21,7 +22,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
-          'format_type' => 'year_month_day',
+          'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
           'multiple_number' => '',
@@ -29,7 +30,13 @@ function ma_person_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 1,
+        'weight' => 2,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'full' => array(
         'label' => 'above',
@@ -41,6 +48,7 @@ function ma_person_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 1,
@@ -50,6 +58,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 13,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -61,6 +81,7 @@ function ma_person_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -94,11 +115,13 @@ function ma_person_field_default_field_instances() {
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
+        'treeable' => FALSE,
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 5,
+      'weight' => 3,
     ),
   );
 
@@ -113,7 +136,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
-          'format_type' => 'year_month_day',
+          'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
           'multiple_number' => '',
@@ -121,7 +144,13 @@ function ma_person_field_default_field_instances() {
           'show_remaining_days' => 0,
         ),
         'type' => 'date_default',
-        'weight' => 2,
+        'weight' => 3,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'full' => array(
         'label' => 'above',
@@ -133,6 +162,7 @@ function ma_person_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 2,
@@ -142,6 +172,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 14,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -153,6 +195,7 @@ function ma_person_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -186,11 +229,13 @@ function ma_person_field_default_field_instances() {
         'input_format_custom' => '',
         'label_position' => 'above',
         'no_fieldset' => 0,
+        'repeat_collapsed' => 0,
         'text_parts' => array(),
+        'treeable' => FALSE,
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 6,
+      'weight' => 4,
     ),
   );
 
@@ -209,7 +254,13 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 34,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
       ),
       'full' => array(
         'label' => 'above',
@@ -222,6 +273,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 19,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 34,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -251,7 +314,7 @@ function ma_person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 7,
+      'weight' => 5,
     ),
   );
 
@@ -272,7 +335,13 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'default',
         ),
         'type' => 'entityreference_entity_view',
-        'weight' => 7,
+        'weight' => 8,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 8,
       ),
       'full' => array(
         'label' => 'above',
@@ -290,6 +359,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 17,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
@@ -337,10 +418,23 @@ function ma_person_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'mukurtu_display_formatters_image_carousel',
-        'settings' => array(),
-        'type' => 'mukurtu_image_carousel_formatter',
-        'weight' => 5,
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 0,
+      ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -359,6 +453,26 @@ function ma_person_field_default_field_instances() {
         'type' => 'mukurtu_scald_taxonomy_thumbnail',
         'weight' => 1,
       ),
+      'related_person_teaser' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_scald_tiny_thumbnail',
+        'weight' => 1,
+      ),
+      'search_result' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 1,
+          'override' => 0,
+        ),
+        'type' => 'ma_scald_search_results',
+        'weight' => 0,
+      ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -370,9 +484,13 @@ function ma_person_field_default_field_instances() {
         'weight' => 1,
       ),
       'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_scald_search_results',
         'weight' => 0,
       ),
     ),
@@ -414,7 +532,13 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 36,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'full' => array(
         'label' => 'above',
@@ -427,6 +551,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 18,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 36,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -481,7 +617,13 @@ function ma_person_field_default_field_instances() {
         'module' => 'mukurtu_display_formatters_referenced_content_view',
         'settings' => array(),
         'type' => 'mukurtu_referenced_content_formatter',
-        'weight' => 6,
+        'weight' => 7,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -499,6 +641,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 16,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'hidden',
@@ -533,7 +687,80 @@ function ma_person_field_default_field_instances() {
         'apply_chosen' => '',
       ),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_pre_actions'.
+  $field_instances['node-person-field_pre_actions'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
+      'person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 37,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -546,10 +773,18 @@ function ma_person_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_display_formatters_paragraphs_carousel',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 5,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
         'settings' => array(),
-        'type' => 'mukurtu_paragraphs_carousel_formatter',
-        'weight' => 3,
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'full' => array(
         'label' => 'above',
@@ -563,6 +798,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 15,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -620,7 +867,13 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'paragraphs_view',
-        'weight' => 5,
+        'weight' => 6,
+      ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 6,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -636,6 +889,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
+      'search_result' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -677,7 +942,97 @@ function ma_person_field_default_field_instances() {
       'module' => 'paragraphs',
       'settings' => array(),
       'type' => 'paragraphs_embed',
-      'weight' => 4,
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_tags'.
+  $field_instances['node-person-field_tags'] = array(
+    'bundle' => 'person',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 4,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_tags',
+    'label' => 'Keywords',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 6,
     ),
   );
 
@@ -692,7 +1047,13 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 35,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
       ),
       'full' => array(
         'label' => 'above',
@@ -705,6 +1066,18 @@ function ma_person_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 20,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 35,
       ),
       'taxonomy_record_teaser' => array(
         'label' => 'above',
@@ -772,7 +1145,7 @@ function ma_person_field_default_field_instances() {
         'settings' => array(
           'links' => 1,
           'use_content_language' => 1,
-          'view_mode' => 'person_teaser',
+          'view_mode' => 'related_person_teaser',
         ),
         'type' => 'entityreference_entity_view',
         'weight' => 0,
@@ -883,7 +1256,7 @@ function ma_person_field_default_field_instances() {
           'link' => 1,
           'override' => 0,
         ),
-        'type' => 'mukurtu_scald_taxonomy_thumbnail',
+        'type' => 'ma_colorbox',
         'weight' => 1,
       ),
       'paragraphs_editor_preview' => array(
@@ -933,7 +1306,7 @@ function ma_person_field_default_field_instances() {
           'link' => 1,
           'override' => 0,
         ),
-        'type' => 'mukurtu_scald_taxonomy_thumbnail',
+        'type' => 'ma_colorbox',
         'weight' => 3,
       ),
       'paragraphs_editor_preview' => array(
@@ -990,6 +1363,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'paragraphs_item',
     'field_name' => 'field_section_body',
@@ -998,7 +1372,7 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
-      'dnd_enabled' => 0,
+      'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 1,
       'user_register_form' => FALSE,
@@ -1008,6 +1382,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'text',
       'settings' => array(
         'rows' => 10,
+        'treeable' => 0,
       ),
       'type' => 'text_textarea',
       'weight' => 3,
@@ -1067,9 +1442,12 @@ function ma_person_field_default_field_instances() {
   t('Deceased');
   t('Found in');
   t('Groups audience');
+  t('Keywords');
+  t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.');
   t('Left Media');
   t('Media Assets');
   t('Mukurtu Terms');
+  t('Pre-Actions');
   t('Related People');
   t('Related Person');
   t('Relationship Type');

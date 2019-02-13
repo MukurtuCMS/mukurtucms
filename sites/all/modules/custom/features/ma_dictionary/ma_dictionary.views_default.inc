@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.views_default.inc
@@ -225,7 +226,7 @@ function ma_dictionary_views_default_views() {
   $handler->display->display_options['pager']['options']['quantity'] = '9';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'entity';
-  $handler->display->display_options['row_options']['view_mode'] = 'search_result';
+  $handler->display->display_options['row_options']['view_mode'] = 'dictionary_word_summary';
   /* Header: Global: Text area */
   $handler->display->display_options['header']['area']['id'] = 'area';
   $handler->display->display_options['header']['area']['table'] = 'views';
@@ -283,6 +284,20 @@ function ma_dictionary_views_default_views() {
   $handler = $view->new_display('panel_pane', 'Content pane', 'all');
   $handler->display->display_options['exposed_block'] = TRUE;
   $handler->display->display_options['inherit_panels_path'] = '1';
+
+  /* Display: Dictionary Browse */
+  $handler = $view->new_display('panel_pane', 'Dictionary Browse', 'panel_pane_1');
+  $handler->display->display_options['display_description'] = 'Dictionary browse for Mukurtu theme v2';
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'entity';
+  $handler->display->display_options['row_options']['view_mode'] = 'dictionary_word_summary';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
+  $handler->display->display_options['exposed_block'] = TRUE;
+  $handler->display->display_options['defaults']['header'] = FALSE;
+  $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['dictionary_words'] = array(
     t('Master'),
     t('more'),
@@ -305,6 +320,8 @@ function ma_dictionary_views_default_views() {
     t('Fulltext search'),
     t('Content pane'),
     t('View panes'),
+    t('Dictionary Browse'),
+    t('Dictionary browse for Mukurtu theme v2'),
   );
   $export['dictionary_words'] = $view;
 

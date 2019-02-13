@@ -90,3 +90,254 @@ function ma_base_theme_modify_default_image_style($image_style_name){
 
     image_default_style_save($image_style);
 }
+
+/**
+ * Implements hook_node_view_alter().
+ */
+function ma_base_theme_node_view_alter(&$build) {
+    // Only display the first media item for certain view modes
+    $view_modes = array('featured_content');
+    if($build['#entity_type'] == 'node' && in_array($build['#view_mode'], $view_modes)){
+        if(isset($build['field_media_asset'])) {
+            $count = 0;
+            foreach($build['field_media_asset']['#items'] as $index => $media_item) {
+                if($count++ > 0) {
+                    if(isset($build['field_media_asset'][$index])) {
+                        unset($build['field_media_asset'][$index]);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Create default front page bean blocks.
+ */
+function _ma_base_theme_create_default_beans() {
+  // We need bean installed before we can create beans.
+  if (!module_exists("bean")) {
+    return;
+  }
+
+  // Load beans.
+  $one_bean = bean_load_delta('frontpage-hero-image-one-column');
+  $two_bean = bean_load_delta('frontpage-hero-image-two-columns');
+
+  // Setup stock homepage image.
+  $stock_sid = variable_get('mukurtu_stock_homepage_sid', FALSE);
+  if (!$stock_sid) {
+    // Default Image.
+    $path = implode(DIRECTORY_SEPARATOR, array(drupal_get_path('theme', 'mukurtu'), 'images','frontpage-hero.png'));
+    $stock_photo = file_get_contents(drupal_realpath($path));
+    $file = file_save_data($stock_photo, "public://hero.png");
+
+    // Create scald atom for default image.
+    $atom = new ScaldAtom('image', 'scald_image');
+    $atom->title = "Default Frontpage Hero Image";
+    $atom->base_id = $file->fid;
+    $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
+    scald_atom_save($atom);
+    variable_set('mukurtu_stock_homepage_sid', $atom->sid);
+  }
+  else {
+    $atom = scald_atom_load($stock_sid);
+  }
+
+  // Give up if after that, we still don't have a valid atom.
+  if (!isset($atom->sid)) {
+    return;
+  }
+
+  // Large one image bean.
+  if ($one_bean == FALSE) {
+    // Create bean if needed.
+    $one_bean = bean_create(array('type' => 'hero_image_one_column'));
+  }
+
+  // Set default content.
+  $one_bean->label = 'Frontpage Hero Image: One Column';
+  $one_bean->title = '';
+  $one_bean->delta = 'frontpage-hero-image-one-column';
+  $one_bean->field_hero_image = array(
+    LANGUAGE_NONE => array(
+      array(
+        'sid' => $atom->sid,
+      ),
+    ),
+  );
+  $one_bean->field_hero_image_caption = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => t("Welcome to Mukurtu"),
+      ),
+    ),
+  );
+  $one_bean->save();
+
+  // Side by side bean.
+  if ($two_bean == FALSE) {
+    $two_bean = bean_create(array('type' => 'hero_image_two_columns'));
+  }
+
+  // Set default content.
+  $two_bean->label = 'Frontpage Hero Image: Two Columns';
+  $two_bean->title = '';
+  $two_bean->delta = 'frontpage-hero-image-two-columns';
+  $two_bean->field_hero_image = array(
+    LANGUAGE_NONE => array(
+      array(
+        'sid' => $atom->sid,
+      ),
+    ),
+  );
+  $two_bean->field_welcome_message = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => t("Add a short welcome message here. You can include links to other pages or use existing media assets."),
+      ),
+    ),
+  );
+  $two_bean->field_welcome_title = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => t("Welcome to Mukurtu"),
+      ),
+    ),
+  );
+  $two_bean->save();
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_base_theme_menu() {
+  $items = array();
+
+  // Select default browse page.
+  $items['admin/config/mukurtu/select-default-browse-page'] = array(
+    'title' => 'Mukurtu Default Browse Page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_base_theme_choose_browse_form', 1),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
+  );
+  return $items;
+}
+
+/**
+ * Form to pick default browse page.
+ */
+function ma_base_theme_choose_browse_form($form, &$form_state) {
+  $option = variable_get('mukurtu_default_browse_page');
+
+  $form['mukurtu_default_browse_page'] = array(
+    '#type' => 'radios',
+    '#title' => t('Default Browse Page'),
+    '#default_value' => $option,
+    '#options' => array(
+      'digital-heritage' => 'Browse Digital Heritage Only',
+      'browse' => 'Browse All Content',
+      'both' => 'Enable Both',
+    ),
+    '#description' => t('Select the default browse page.'),
+    '#required' => TRUE,
+  );
+
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'ma_base_theme_choose_browse_form_submit';
+  return $form;
+}
+
+/**
+ * Custom submit handler for ma_base_theme_choose_browse_form.
+ */
+function ma_base_theme_choose_browse_form_submit($form, &$form_state) {
+  _ma_base_theme_set_default_browse($form_state['values']['mukurtu_default_browse_page']);
+}
+
+/**
+ * Set default browse to either 'digital-heritage','browse' (all), or 'both'.
+ */
+function _ma_base_theme_set_default_browse($page = 'digital-heritage') {
+  // Clear any old redirects.
+  $dh_redirect = redirect_load_by_source('digital-heritage');
+  $browse_redirect = redirect_load_by_source('browse');
+  $delete_rids = array();
+  if (!empty($dh_redirect)) {
+    $delete_rids[] = $dh_redirect->rid;
+  }
+  if (!empty($browse_redirect)) {
+    $delete_rids[] = $browse_redirect->rid;
+  }
+  redirect_delete_multiple($delete_rids);
+
+  $option = $page;
+
+  switch ($page) {
+    case 'browse':
+      // Set redirect from digital-heritage -> browse.
+      $redirect = new stdClass();
+      redirect_object_prepare(
+        $redirect,
+        array(
+          'source' => 'digital-heritage',
+          'source_options' => array(),
+          'redirect' => 'browse',
+          'redirect_options' => array(),
+          'language' => LANGUAGE_NONE,
+        )
+      );
+      redirect_save($redirect);
+
+      // Hide digital-heritage menu link, show browse link.
+      $browse_menu_hidden = 0;
+      $dh_menu_hidden = 1;
+      break;
+
+    case 'both':
+      // Enable both menu options.
+      $browse_menu_hidden = 0;
+      $dh_menu_hidden = 0;
+      break;
+
+    case 'digital-heritage':
+    default:
+      $option = 'digital-heritage';
+      // Set redirect from browse -> digitial-heritage.
+      $redirect = new stdClass();
+      redirect_object_prepare(
+        $redirect,
+        array(
+          'source' => 'browse',
+          'source_options' => array(),
+          'redirect' => 'digital-heritage',
+          'redirect_options' => array(),
+          'language' => LANGUAGE_NONE,
+        )
+      );
+      redirect_save($redirect);
+
+      // Hide browse menu link, show digital-heritage menu link.
+      $browse_menu_hidden = 1;
+      $dh_menu_hidden = 0;
+  }
+
+  $browse_menu = menu_load_links('menu-browse-menu');
+  foreach ($browse_menu as &$menu_item) {
+    // Set 'browse' menu option.
+    if ($menu_item['link_path'] == 'browse') {
+      $menu_item['hidden'] = $browse_menu_hidden;
+      menu_link_save($menu_item);
+    }
+
+    // Set 'digital-heritage' menu option.
+    if ($menu_item['link_path'] == 'digital-heritage') {
+      $menu_item['hidden'] = $dh_menu_hidden;
+      menu_link_save($menu_item);
+    }
+  }
+
+  variable_set('mukurtu_default_browse_page', $option);
+}

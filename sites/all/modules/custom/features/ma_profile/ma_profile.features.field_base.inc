@@ -10,6 +10,33 @@
 function ma_profile_field_default_field_bases() {
   $field_bases = array();
 
+  // Exported field_base: 'field_notifications_freq_def'.
+  $field_bases['field_notifications_freq_def'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_notifications_freq_def',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'right away' => 'Right Away',
+        'daily digest' => 'Daily Digest',
+        'weekly digest' => 'Weekly Digest',
+      ),
+      'allowed_values_function' => '',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
   // Exported field_base: 'og_membership_request'.
   $field_bases['og_membership_request'] = array(
     'active' => 1,
@@ -26,7 +53,9 @@ function ma_profile_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -67,6 +96,7 @@ function ma_profile_field_default_field_bases() {
       ),
       'handler_submit' => 'Change handler',
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',

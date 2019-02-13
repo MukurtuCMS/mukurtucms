@@ -1,16 +1,17 @@
 <p>The advanced help configuration file is in simple .ini file format.
 It has an optional section for global settings that might be inherited
-for each help file, followed by sections for each help file.</p>
+for each help topic, followed by sections for each topic.</p>
 
-<p>Global settings may be put into a section named <code>[advanced help
-settings]</code>.  This means that this name is reserved and it cannot
-be a help file in any module or theme. The following settings may be
-set in this section, with the default value (if any) in brackets.</p>
+<p>Global settings may be put into a section named <code>[advanced
+help settings]</code>.  This means that this name is reserved and it
+cannot be a topic in any module or theme. The following settings may
+be set in this section, with the default value (if any) in
+brackets.</p>
 
 <dl>
 <dt><code>line break</code> (FALSE)</dt>
-<dd>If set, the line break filter will be applied to all help files
-defined by this module or theme, unless that help file specifically is
+<dd>If set, the line break filter will be applied to all help topics
+defined by this module or theme, unless that topic specifically is
 set otherwise.  The line break converts line breaks
 into <code>br</code> and <code>p</code> tags automatically.</dd>
 
@@ -19,7 +20,7 @@ into <code>br</code> and <code>p</code> tags automatically.</dd>
 <em>previous topic</em>, Up (parent), <em>next topic</em>.</dd>
 
 <dt><code>css</code></dt>
-<dd>Specify a css file that will be used for all help files (unless
+<dd>Specify a css file that will be used for all topics (unless
 overridden), including the .css extension. This .css file must reside
 in the help directory along with the .html files, and will not be
 affected by translation.</dd>
@@ -35,19 +36,26 @@ use a more friendly name than appears in the project's .info file.</dd>
 module/theme index. It overrides the <code>name</code> setting above,
 as well as the project's name in its .info file.</dd>
 
+<dt><code>show readme</code> (FALSE)</dt>
+<dd>For projects that comes with a set of HTML-files, the default is
+to hide the project's <code>README</code>-file. Setting this TRUE will
+show the README along with the HTML-files.</dd>
+
 <dt><code>hide</code> (FALSE)</dt>
 <dd>This may be used to hide a module or theme in the module/theme
-index. This is particularly useful for modules who insert their help
-files into the hierarchy of another module or theme, as might be done
-by modules that extend <strong>Views</strong> or derived themes that
-extend base themes like <strong>Zen</strong>. By setting this to TRUE
+index. This is particularly useful for modules who insert their topics
+into the hierarchy of another module or theme. By setting this to TRUE
 the project will not appear as its own entry.</dd>
+
 </dl>
 
 <p>Each section after that will correspond to a single help file for a
-single topic.  It starts with the topic name in square brackets
-(e.g. <code>[ini-file]</code>).  The following settings may be set for
-each file/topic, with the default value (if any) in brackets.</p>
+single topic.  It starts with the topic machine name in square
+brackets (e.g. <code>[introduction]</code>).  The file containing the
+documentation for that topic will have the same machine name with the
+extension <code>html</code> (e.g. <code>introduction.html</code>) The
+following settings may be set for each file/topic, with the default
+value (if any) in brackets.</p>
 
 <dl>
 <dt><code>title</code></dt>
@@ -58,7 +66,7 @@ enclose it in quotes.  (This setting is currently not optional.)</dd>
 <dt><code>file</code> (topic name)</dt>
 <dd>The filename, without the .html extension, used for the file with
 the help text for the topic. This is optional; if not specified, the
-topic name wil be the file name.</dd>
+topic name will be the file name.</dd>
 
 <dt><code>weight</code> (0)</dt>
 <dd>The weight, used for sorting topics on the administration
@@ -68,15 +76,21 @@ are sorted alphabetically.</dd>
 <dt><code>parent</code></dt>
 <dd>The topic ID to use in a hierarchy; children will be listed
 beneath parents in the topic list, and will have the parent in their
-breadcrumb trail. You may parent this topic to a topic in another
-module or theme by using <code>module%topic</code>
+breadcrumb trail. You may parent this topic to a topic
+in <em>another</em> module or theme by using <code>module%topic</code>
 or <code>theme%topic</code> as the identifier,
 where <code>module</code> or <code>theme</code> is the project's short
 name. For example if parent is set to, '<code>views%display</code>',
 the topic will be regarded as a child of the
 <code>display</code> topic in the <strong>Views</strong> module.</dd>
 
-<dt><code>line break</code> (FALSE)</dt>
+<dt><code>format</code></dt>
+<dd>Run topic through this text format (use the format's machine
+name).  For example: To convert line breaks into <code>br</code>
+and <code>p</code> tags automatically, use the <code>full_html</code>
+format.</dd>
+
+<dt><code>line break</code></dt>
 <dd>Set the line break filter for this topic. Set to FALSE to disable
 the line break filter if this has been turned on in the global
 settings.</dd>
@@ -93,25 +107,5 @@ will override any .css file added by the global settings.</dd>
 <dd>The height in pixels of the popup window.</dd>
 </dl>
 
-<p>For example, here is a version of the <code>advanced_help.help.ini</code> file:</p>
-
-<pre>
-[readme]
-title = README
-weight = -11
-
-[using-advanced-help]
-title = Using advanced help
-weight = -10
-
-[translation]
-title = Translating advanced help
-
-[ini-file]
-title = Help .ini file format
-line break = FALSE
-
-[why-advanced-help]
-title = Why advanced help?
-line break = TRUE
-</pre>
+<p>Take a look at the .ini-file for this project to see an ini-file
+example.</p>

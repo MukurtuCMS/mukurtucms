@@ -1,0 +1,595 @@
+<?php
+/**
+ * @file
+ * Code for the Open Atrium Comments feature.
+ */
+
+include_once 'oa_comment.features.inc';
+include_once 'oa_comment.theme.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function oa_comment_menu() {
+  $items = array();
+  $items['oa/%ctools_js/comment/reply/%node/%comment'] = array(
+    'title' => '',
+    'page callback' => 'oa_comment_comment_actions',
+    'page arguments' => array(4, 3, 1, 5),
+    'access callback' => 'node_access',
+    'access arguments' => array('view', 4),
+    'file' => 'oa_comment.ajax.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['oa/%ctools_js/comment/%comment/edit'] = array(
+    'title' => '',
+    'page callback' => 'oa_comment_comment_actions',
+    'page arguments' => array(3, 4, 1),
+    'access callback' => 'comment_access',
+    'access arguments' => array(4, 3),
+    'file' => 'oa_comment.ajax.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function oa_comment_form_comment_form_alter(&$form, $form_state) {
+  drupal_add_css(drupal_get_path('module', 'oa_comment') . '/oa_comment.css');
+  drupal_add_js(drupal_get_path('module', 'oa_comment') . '/js/toggle-comment-visibility.js');
+  // Adding a custom validate function to the comment form.
+  array_unshift($form['#validate'], 'oa_comment_form_validate');
+  // Using 'input' here as the value doesn't store for multiple paragraph
+  // attachments being added.
+  $has_related = !empty($form_state['input']['field_oa_related'][LANGUAGE_NONE][0]);
+  // We want to require either the body field or a paragraph field be added. We
+  // require the body field by default but if we see they have added a paragraph
+  // to the comment then we can safely remove the required body.
+  if ($has_related) {
+    $form['comment_body'][LANGUAGE_NONE]['#required'] = $form['comment_body'][LANGUAGE_NONE][0]['#required'] = FALSE;
+  }
+  // Hide the author and subject from comments.
+  $form['author']['#access'] = FALSE;
+  $form['subject']['#access'] = FALSE;
+  // Remove the title and required from comments.
+  $form['comment_body'][LANGUAGE_NONE][0]['#title'] = '';
+  $form['comment_body'][LANGUAGE_NONE][0]['#required'] = FALSE;
+  // Remove the preview button.
+  $form['actions']['preview']['#access'] = FALSE;
+}
+
+/**
+ * Implements hook_ctools_render_alter().
+ */
+function oa_comment_ctools_render_alter(&$info, &$page, &$context) {
+  // Ensures ctools modal js is added for panelized nodes since hook_node_view()
+  // isn't guaranteed to be called (based on if panes that trigger node_view()
+  // are added.
+  // If the page handler is the node_view handler.
+  if ($context['handler']->name == 'node_view_panelizer') {
+    // If we have the node object.
+    if (isset($context['contexts']['argument_entity_id:node_1']->data)) {
+      if (!empty($context['contexts']['argument_entity_id:node_1']->data->comment_count)) {
+        ctools_include('modal');
+        ctools_modal_add_js();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function oa_comment_node_view($node, $view_mode) {
+  if (!empty($node->content['comments'])) {
+    ctools_include('modal');
+    ctools_modal_add_js();
+  }
+  if (!empty($node->content['links']['comment']['#links'])) {
+    if (isset($node->content['links']['comment']['#links']['comment-add'])) {
+      // Remove the 'Add new comment' link on nodes.
+      unset($node->content['links']['comment']['#links']['comment-add']);
+    }
+  }
+}
+
+/**
+ * Implements hook_comment_presave().
+ *
+ * @see comment_save()
+ */
+function oa_comment_comment_presave($comment) {
+  // This occurs when a comment has been submitted without a body but with a
+  // paragraph attachment.
+  if ($comment->subject == '(No subject)' || (empty($comment->comment_body[LANGUAGE_NONE]) && !empty($comment->field_oa_related[LANGUAGE_NONE]))) {
+    // Clear the subject value.
+    $comment->subject = '';
+    // Get information about the type of paragraph we are adding.
+    $paragraph_item = paragraphs_item_load_multiple(array($comment->field_oa_related[LANGUAGE_NONE][0]['value']));
+    // Get all available paragraph bundles.
+    $bundles = paragraphs_bundle_load();
+    foreach ($paragraph_item as $id => $item) {
+      $bundle = $item->bundle;
+      // Set the name to that of the paragraph bundle.
+      $name = $bundles[$bundle]->name;
+    }
+    // Build a custom body so it's not blank when adding a paragraph attachment
+    // with no comment body.
+    $comment->comment_body[$comment->language][0]['value'] = '<p><i class="fa fa-paperclip"></i>' . ' ' . t('!name', array('!name' => $name)) . '</p>';
+    $comment->comment_body[$comment->language][0]['format'] = 'panopoly_wysiwyg_text';
+  }
+  return $comment;
+}
+
+/**
+ * Implements hook_form_validate().
+ */
+function oa_comment_form_validate(&$form, &$form_state) {
+  // If the comment body is empty and a user tries to save the form they will
+  // get redirected to "comment/reply/%node". We want to keep then on the page
+  // they are on so we redirect them back to the node.
+  // @todo: Is there a better way?
+  if ($form_state['values']['comment_body'][LANGUAGE_NONE][0]['value'] == '' && empty($form_state['values']['field_oa_related'][LANGUAGE_NONE][0])) {
+    $form_state['redirect'] = 'node/' . $form['#node']->nid;
+    drupal_redirect_form($form_state);
+  }
+}
+
+/**
+ * Implements hook_oa_settings_form().
+ */
+function oa_comment_oa_settings_form(&$form_state) {
+  $forms = array();
+
+  $form = array();
+
+  $form['oa_comment_strip_sig'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Strip signatures from comments'),
+    '#description' => t('After the first line matching this string, any further text will be hidden. A typical value is <strong>"-- "</strong> that is two dashes followed by a blank in an otherwise empty line. Leave blank to include signature text in nodes.'),
+    '#default_value' => variable_get('oa_comment_strip_sig', '-- '),
+  );
+
+  $form_state['comments_enabled'] = oa_comment_content_types_enabled();
+  foreach (node_type_get_names() as $machine_name => $name) {
+    $default = variable_get('comment_' . $machine_name, COMMENT_NODE_OPEN);
+    $form[$machine_name] = array(
+      '#type' => 'fieldset',
+      '#title' => check_plain($name),
+    );
+    $form[$machine_name]['comment_' . $machine_name] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Comments'),
+      // _HIDDEN is 0 so can be used as false, but may be set to _CLOSED (1).
+      '#default_value' => in_array($default, array(COMMENT_NODE_OPEN, COMMENT_NODE_HIDDEN)) ? $default : COMMENT_NODE_HIDDEN,
+      '#return_value' => COMMENT_NODE_OPEN,
+    );
+    if (module_exists('oa_related')) {
+      $enabled_related = oa_related_get_content_types();
+      $paragraphs_enabled = variable_get('oa_related_comment_' . $machine_name, in_array($machine_name, $enabled_related));
+      $form[$machine_name]['oa_related_comment_' . $machine_name] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Paragraphs field'),
+        '#description' => t('Disabling this will remove the field from the comments for this type and loose any data in those fields.'),
+        '#default_value' => $paragraphs_enabled,
+        '#states' => array(
+          'visible' => array(
+            ':input[name="comment_' . $machine_name . '"]' => array('checked' => TRUE),
+          ),
+        ),
+      );
+      if ($paragraphs_enabled) {
+        $form_state['comments_oa_related_enabled'][$machine_name] = $machine_name;
+      }
+    }
+  }
+
+  if (module_exists('oa_related')) {
+    $enabled_related = oa_related_get_content_types();
+    // Add enabling of oa_related.
+    $_bundles = paragraphs_bundle_load();
+    foreach ($_bundles as $machine_name => $bundle) {
+      $bundles[$machine_name] = $bundle->name;
+    }
+    $form['comment_paragraph_bundles'] = array(
+      '#title' => t('Enabled paragraph bundles'),
+      '#description' => t('Select which bundles comments with paragraphs field should have.'),
+      '#type' => 'checkboxes',
+      '#required' => TRUE,
+      '#default_value' => array_filter(variable_get('comment_paragraph_bundles', array_keys($bundles))),
+      '#options' => $bundles,
+    );
+    $form_state['comment_paragraph_bundles'] = $form['comment_paragraph_bundles']['#default_value'];
+  }
+
+  $forms[] = array(
+    'caption' => t('Comments'),
+    'form' => $form,
+    'submit' => 'oa_comment_oa_settings_form_submit',
+  );
+
+  return $forms;
+}
+
+/**
+ * Submit handler for oa_comment_oa_settings_form.
+ */
+function oa_comment_oa_settings_form_submit($form, &$form_state) {
+  drupal_static_reset('oa_comment_content_types_enabled');
+  $update = FALSE;
+  foreach (node_type_get_names() as $machine_name => $name) {
+    if (isset($form_state['values']['comment_' . $machine_name])) {
+      variable_set('comment_' . $machine_name, $form_state['values']['comment_' . $machine_name]);
+      $is_enabled = $form_state['values']['comment_' . $machine_name] == COMMENT_NODE_OPEN;
+      $was_enabled = in_array($machine_name, $form_state['comments_enabled']);
+      $update = $update || $is_enabled != $was_enabled;
+      if (isset($form_state['values']['oa_related_comment_' . $machine_name])) {
+        variable_set('oa_related_comment_' . $machine_name, $form_state['values']['oa_related_comment_' . $machine_name]);
+        $is_enabled = !empty($form_state['values']['oa_related_comment_' . $machine_name]);
+        $was_enabled = in_array($machine_name, $form_state['comments_oa_related_enabled']);
+        $update = $update || $is_enabled != $was_enabled;
+      }
+    }
+  }
+  if (isset($form_state['values']['comment_paragraph_bundles'])) {
+    $filtered = array_filter($form_state['values']['comment_paragraph_bundles']);
+    variable_set('comment_paragraph_bundles', $filtered);
+    $form_state['values']['comment_paragraph_bundles'] = $filtered;
+    $update = $update || $form_state['comment_paragraph_bundles'] != $filtered;
+  }
+  if ($update && module_exists('oa_related')) {
+    features_template_revert();
+  }
+}
+
+/**
+ * Return lists of content types with comments set to open.
+ */
+function oa_comment_content_types_enabled() {
+  $types = &drupal_static(__FUNCTION__);
+  if (!isset($types)) {
+    $types = array();
+    foreach (node_type_get_names() as $machine_name => $name) {
+      if (variable_get('comment_' . $machine_name, COMMENT_NODE_OPEN) == COMMENT_NODE_OPEN) {
+        $types[$machine_name] = $machine_name;
+      }
+    }
+  }
+  return $types;
+}
+
+/**
+ * Implements hook_features_template_info().
+ */
+function oa_comment_features_template_info() {
+  $data = &drupal_static(__FUNCTION__);
+  if (empty($data)) {
+    $data = array();
+    if (module_exists('oa_related')) {
+      $enabled_related = oa_related_get_content_types();
+      // Only process enabled content types as if disabled, comments won't show up
+      // so whether they have the field won't matter and thus no dataloss.
+      foreach (oa_comment_content_types_enabled() as $content_type) {
+        // Only have an entry if this will exist or needs to be deleted.
+        $data[] = array(
+          'plugin' => 'field_instance',
+          'template' => 'oa_comment_field_default_field_instances_template',
+          'deleted' => variable_get('oa_related_comment_' . $content_type, in_array($content_type, $enabled_related)) ? 0 : 1,
+          'entity_type' => 'comment',
+          'bundle_type' => 'comment_node_' . $content_type,
+          'field' => 'field_oa_related',
+        );
+      }
+    }
+  }
+  return $data;
+}
+
+/**
+ * Template callback for field_topic.
+ *
+ * Used as a template for other bundles.
+ * References to document_page will be replaced by features_template.
+ */
+function oa_comment_field_default_field_instances_template() {
+  $field_instances = array();
+
+  foreach (paragraphs_bundle_load() as $machine_name => $bundle) {
+    $bundles[$machine_name] = $machine_name;
+  }
+
+  // Exported field_instance:
+  // 'comment-comment_node_discussion_topic-field_oa_related'
+  $field_instances['comment-comment_node_discussion_topic-field_oa_related'] = array(
+    'bundle' => 'comment_node_discussion_topic',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 1,
+      ),
+    ),
+    'entity_type' => 'comment',
+    'field_name' => 'field_oa_related',
+    'label' => 'Paragraphs',
+    'required' => 0,
+    'settings' => array(
+      'add_mode' => 'button',
+      'add_mode_instructions' => '',
+      'allowed_bundles' => array_intersect_key($bundles, array_filter(variable_get('comment_paragraph_bundles', $bundles))),
+      'default_edit_mode' => 'open',
+      'hide_instructions' => 1,
+      'title' => 'Paragraph',
+      'title_multiple' => 'Paragraphs',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'paragraphs',
+      'settings' => array(),
+      'type' => 'paragraphs_embed',
+      'weight' => 2,
+    ),
+  );
+
+  return $field_instances;
+}
+
+/**
+ * Implements hook_node_type_insert().
+ */
+function oa_comment_node_type_insert($info) {
+  drupal_static_reset('oa_comment_content_types_enabled');
+  if (module_exists('oa_related') && variable_get('comment_' . $info->type, COMMENT_NODE_OPEN)) {
+    node_type_cache_reset();
+    features_template_revert();
+  }
+}
+
+/**
+ * Implements hook_fasttoggle_available_links().
+ */
+function oa_comment_fasttoggle_available_links($type = NULL, $obj = NULL) {
+  $result = array();
+  // Add another comment access check.
+  if (is_null($type) || $type == "comment") {
+    $result['comment'] = array(
+      'fields' => array(
+        'status' => array(
+          'instances' => array(
+            'status' => array(
+              'access' => array('oa_comment_fasttoggle_comment_access_status'),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  return $result;
+}
+
+/**
+ * Allow access to unpublish comment if user created comment.
+ */
+function oa_comment_fasttoggle_comment_access_status($obj, $type, $group, $instance) {
+  global $user;
+  return fasttoggle_allow_access_if($type == 'comment' && $group == 'status' && !empty($obj->uid) && $obj->uid == $user->uid);
+}
+
+/**
+ * Given an ID, find all the paragraph IDS for it.
+ *
+ * @param $nid
+ *   The NID of the content to find paragraph ids for.
+ *
+ * @return
+ *   An array with 'node' key with value of ids on node, second 'comment' with
+ *   ids from the comments.
+ */
+function oa_comment_find_paragraph_ids($nid) {
+  $ids = &drupal_static(__FUNCTION__);
+  if (!isset($ids[$nid])) {
+    $ids[$nid] = array('node' => array(), 'comment' => array());
+    $node = node_load($nid);  // drupal has this cached
+    if (!empty($node) && ($paragraphs = field_get_items('node', $node, 'field_oa_related'))) {
+      foreach ($paragraphs as $item) {
+        $ids[$nid]['node'][] = $item['value'];
+      }
+    }
+
+    // Query the comment table to find paragraph ids.
+    $query = db_select('field_data_field_oa_related', 'r');
+    $query->condition('r.deleted', 0);
+    $query->fields('r', array('field_oa_related_value'));
+    $query->join('comment', 'c', "r.entity_type = 'comment' AND r.entity_id = c.cid");
+    $query->condition('c.nid', $nid);
+    $query->condition('c.status', COMMENT_PUBLISHED);
+    $paragraph_ids = $query->execute()->fetchCol();
+
+    foreach ($paragraph_ids as $paragraph_id) {
+      $ids[$nid]['comment'][] = $paragraph_id;
+    }
+  }
+  return $ids[$nid];
+}
+
+/**
+ * Implements hook_views_pre_build().
+ */
+function oa_comment_views_pre_build(&$view) {
+  // (This alter could be done later in the execution process as well.)
+  if ($view->name == 'oa_comment_media' && !empty($view->args[0])) {
+    $ids = oa_comment_find_paragraph_ids($view->args[0]);
+    $ids = array_merge($ids['node'], $ids['comment']);
+    if (!empty($ids)) {
+      $view->display_handler->handlers['relationship']['reverse_field_oa_media_paragraphs_item']->definition['join_extra'][] = array(
+        'field' => 'entity_id',
+        'value' => $ids,
+        'numeric' => TRUE,
+      );
+    }
+    $view->display_handler->handlers['relationship']['reverse_field_oa_media_node']->definition['join_extra'][] = array(
+      'field' => 'entity_id',
+      'value' => $view->args[0],
+      'numeric' => TRUE,
+    );
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function oa_comment_views_query_alter(&$view, &$query) {
+  // If using aggregation, sort handler is ignored.
+  // Aggregation is done after views query alter and there is basically no
+  // way to customize how it is done, so we add in a tag here to alter the dbtng
+  // query. This is very fragile :(
+  foreach (array_values($view->sort) as $key => $sort) {
+    if ($sort->definition['handler'] == 'views_handler_sort_oa_comment_last_date' && $sort->options['group_type'] != 'group') {
+      if (!empty($query->orderby[$key]['field']) && !empty($query->fields[$query->orderby[$key]['field']])) {
+        $query->options['query_tags'][] = 'oa_comments_add_last_date_alter';
+        // Store the field we are altering to find out later.
+        $field_to_change = &drupal_static('oa_comment_query_oa_comments_add_last_date_alter_alter');
+        $field_to_change= $sort->relationship . '_' . $sort->real_field;
+        break;
+      }
+    }
+  }
+
+  if ($view->name == 'oa_comment_media') {
+    $query->add_field('field_oa_related_paragraphs_item_1', 'thread', 'thread');
+    // sort by comment thread
+    array_unshift($query->orderby, array(
+      'field' => 'thread',
+      'direction' => 'ASC',
+    ));
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter() for oa_comments_add_last_date_alter.
+ */
+function oa_comment_query_oa_comments_add_last_date_alter_alter(QueryAlterableInterface $query) {
+  $expressions = & $query->getExpressions();
+  $tables = & $query->getTables();
+  $field_to_change = &drupal_static('oa_comment_query_oa_comments_add_last_date_alter_alter');
+  if (!empty($expressions[$field_to_change])) {
+    foreach ($tables as $table) {
+      if ($table['table'] == 'node') {
+        $node_alias =  $table['alias'];
+        $current = $expressions[$field_to_change]['expression'];
+        $expressions[$field_to_change]['expression'] = 'COALESCE(' . $current . ',' . $node_alias . '.changed)';
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ *
+ * Perform field-level replacement/processing here.
+ */
+function oa_comment_preprocess_views_view_fields(&$vars) {
+  $row = $vars['row'];
+  if ($vars['view']->name == 'oa_comment_media') {
+    // Convert thread to a human comment number
+    // First, remove trailing slash.
+    $thread = substr($row->thread, 0, -1);
+    $parts = explode('.', $thread);
+    foreach ($parts as $key => &$part) {
+      $parts[$key] = vancode2int($part);
+      // First id starts at 1, but rest start at zero.
+      if ($key > 0) {
+        $parts[$key]++;
+      }
+    }
+    $vars['thread'] = implode('.', $parts);
+    $options = !empty($row->field_oa_related_paragraphs_item_1_cid)
+      ? array('fragment' => 'comment-' . $row->field_oa_related_paragraphs_item_1_cid)
+      : array();
+    $options['attributes'] = array('title' => t('Jump to comment'));
+    $nid = !empty($row->field_oa_related_paragraphs_item_1_nid)
+      ? $row->field_oa_related_paragraphs_item_1_nid
+      : (!empty($row->field_oa_related_paragraphs_item_nid)
+         ? $row->field_oa_related_paragraphs_item_nid
+         : $row->field_oa_media_file_managed_1_nid);
+    $vars['thread_link'] = l('#' . $vars['thread'], 'node/' . $nid, $options);
+    $file = file_load($row->fid);
+
+    $options = array();
+    if (!variable_get('file_entity_allow_insecure_download', FALSE)) {
+      $options['query']['token'] = file_entity_get_download_token($file);
+    }
+    $filename = ($file) ? drupal_basename($file->uri) : check_plain($row->file_managed_filename);
+    $vars['download_link'] = l(t('download'), "file/" . $row->fid . "/download", $options);
+    $vars['download_url'] = url("file/" . $row->fid . "/download", $options);
+    $vars['download_name'] = check_plain($row->file_managed_filename);
+    $vars['download_filename'] = $filename;
+    $vars['download_type'] = pathinfo($filename, PATHINFO_EXTENSION);
+    $vars['download_size'] = ($file) ? format_size($file->filesize) : '';
+    $vars['download_class'] = ($file) ? 'oa-media-' . $file->type : '';
+  }
+  if ($vars['view']->name == 'oa_comment_topics') {
+    // determine new/updated for node itself
+    $mark = MARK_READ;
+    if ((empty($row->history_timestamp) && ($row->node_changed > NODE_NEW_LIMIT))) {
+      $mark = MARK_NEW;
+    }
+    elseif (!empty($row->history_timestamp) && $row->node_changed > $row->history_timestamp && $row->node_changed > NODE_NEW_LIMIT) {
+      $mark = MARK_UPDATED;
+    }
+    $vars['new_mark'] = theme('mark', array('type' => $mark));
+    $vars['mark_class'] = $mark == MARK_NEW ? 'mark-new' : ($mark == MARK_UPDATED ? 'mark-updated' : '');
+
+    // Now determine new/updated comment numbers
+    $comment_count = $vars['fields']['cid_1']->raw;
+    $new_count = $row->history_timestamp_new_comments;
+    $updated_count = $row->history_timestamp_updated_comments;
+    if ($comment_count > 0) {
+      // If we have comments, color code the comment icon instead of using the mark
+      unset($vars['new_mark']);
+    }
+    if ($new_count == $comment_count) {
+      // all comments are new, so remove other two comment icons
+      $updated_count = 0;
+      $comment_count = 0;
+    }
+    elseif ($updated_count == $comment_count) {
+      // all comments are updated, so remove other two comment icons
+      $new_count = 0;
+      $comment_count = 0;
+    }
+    elseif ($new_count == $updated_count) {
+      // if new and updated are the same, just show as new
+      $updated_count = 0;
+    }
+    $vars['comment_count'] = $comment_count;
+    $vars['new_count'] = $new_count;
+    $vars['updated_count'] = $updated_count;
+    $vars['reply_title'] = t('@count ', array('@count' => $comment_count)) . format_plural($comment_count, t('reply'), t('replies'));
+    if ($new_count > 0) {
+      $vars['reply_title'] .= t(', @count new', array('@count' => $new_count));
+    }
+    if ($updated_count > 0) {
+      $vars['reply_title'] .= t(', @count updated', array('@count' => $updated_count));
+    }
+    $vars['reply_class'] = ($new_count > 0) ? 'new' : (($updated_count > 0) ? 'updated' : '');
+
+    $link_options = ($row->node_changed == $row->comment_last_date || empty($row->comment_node_cid_1)) ? array()
+      : array('fragment' => 'comment-' . $row->comment_node_cid_1);
+    $vars['last_comment'] = l($vars['fields']['last_date']->content, 'node/' . $row->nid, $link_options);
+    $vars['last_comment_link'] = url('node/' . $row->nid, $link_options);
+  }
+}

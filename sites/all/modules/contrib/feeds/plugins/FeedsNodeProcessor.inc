@@ -33,6 +33,25 @@ class FeedsNodeProcessor extends FeedsProcessor {
   }
 
   /**
+   * Overrides parent::languageOptions().
+   */
+  public function languageOptions() {
+    // Content types can have "extended" language enabled, allowing all
+    // available languages, not just enabled. Account for this here.
+    if (module_exists('i18n_node')) {
+      $node = new stdClass();
+      $node->type = $this->bundle();
+      $node->is_new = TRUE;
+      node_object_prepare($node);
+      $languages = array(LANGUAGE_NONE => t('Language neutral')) + i18n_node_language_list($node);
+      return $languages;
+    }
+
+    // If i18n_node is not enabled, default to enabled languages.
+    return parent::languageOptions();
+  }
+
+  /**
    * Creates a new node in memory and returns it.
    */
   protected function newEntity(FeedsSource $source) {
@@ -128,8 +147,15 @@ class FeedsNodeProcessor extends FeedsProcessor {
   protected function entityValidate($entity) {
     parent::entityValidate($entity);
 
+    // Set or correct user ID.
     if (!isset($entity->uid) || !is_numeric($entity->uid)) {
        $entity->uid = $this->config['author'];
+    }
+    elseif (!is_int($entity->uid)) {
+      // Cast user ID to an integer to prevent array_flip() notices in
+      // DrupalDefaultEntityController::load() which occur when an user ID is
+      // not an integer nor a string.
+      $entity->uid = (int) $entity->uid;
     }
   }
 

@@ -15,14 +15,22 @@ class FeedsParserResult extends FeedsResult {
   public $items;
   public $current_item;
 
+  // Mukurtu specific change. We want to keep track of which
+  // fields were actually provided in the input. We'll use
+  // this information in the processor later to allow
+  // partial update of content (leaving unspecified fields
+  // intact for existing entities).
+  public $input_fields;
+
   /**
    * Constructor.
    */
-  public function __construct($items = array()) {
+  public function __construct($items = array(), $nid = NULL, $input_fields = array()) {
     $this->title = '';
     $this->description = '';
     $this->link = '';
     $this->items = $items;
+    $this->input_fields = $input_fields;
   }
 
   /**
@@ -430,13 +438,14 @@ class FeedsEnclosure extends FeedsElement {
    *
    * @return string
    *   The content of the referenced resource.
+   *
+   * @throws FeedsHTTPRequestException
+   *   In case the result code of the HTTP request is not in the 2xx series.
    */
   public function getContent() {
     feeds_include_library('http_request.inc', 'http_request');
-    $result = http_request_get($this->getUrlEncodedValue());
-    if ($result->code != 200) {
-      throw new Exception(t('Download of @url failed with code !code.', array('@url' => $this->getUrlEncodedValue(), '!code' => $result->code)));
-    }
+    $result = feeds_http_request($this->getUrlEncodedValue());
+    http_request_check_result($this->getUrlEncodedValue(), $result);
     return $result->data;
   }
 

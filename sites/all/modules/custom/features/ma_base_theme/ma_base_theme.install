@@ -11,6 +11,30 @@ function ma_base_theme_update_7001() {
     $mukurtu_starter_settings['bootstrap_tooltip_placement'] = 'auto bottom';
     variable_set('theme_mukurtu_starter_settings', $mukurtu_starter_settings);
 }
+
+
+/**
+ * Create default front page blocks for new Mukurtu theme.
+ */
+function ma_base_theme_update_7002(&$sandbox) {
+  $themes = array(
+    'bootstrap',
+    'mukurtu',
+  );
+  theme_enable($themes);
+
+  // Need to pull in beans.
+  features_revert_module('ma_base_theme');
+  _ma_base_theme_create_default_beans();
+}
+
+/**
+ * Set default discovery to digital-heritage browse.
+ */
+function ma_base_theme_update_7003(&$sandbox) {
+  _ma_base_theme_set_default_browse('digital-heritage');
+}
+
 //function ma_base_theme_install () {
 //  $themes_to_enable = array (
 //    'bootstrap',

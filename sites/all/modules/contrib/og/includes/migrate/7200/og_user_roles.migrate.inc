@@ -34,7 +34,7 @@ class OgMigrateUserRoles extends OgEntityMigration {
     ),
   );
 
-  public function __construct() {
+  public function __construct($arguments = array()) {
     $this->description = t('Update the group ID in user roles.');
 
     $query = db_select('temp_og_users_roles', 'ogur');
@@ -48,7 +48,7 @@ class OgMigrateUserRoles extends OgEntityMigration {
 
     $this->query = $query;
 
-    parent::__construct();
+    parent::__construct($arguments);
 
     $this->addFieldMapping('uid', 'uid');
     $this->addFieldMapping('rid');

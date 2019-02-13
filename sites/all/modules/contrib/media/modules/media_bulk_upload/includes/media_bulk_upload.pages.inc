@@ -38,6 +38,7 @@ function media_bulk_upload_file_page_edit_multiple($files) {
 
     // Remove the 'replace file' functionality.
     $form['multiform'][$key]['replace_upload']['#access'] = FALSE;
+    $form['multiform'][$key]['replace_keep_original_filename']['#access'] = FALSE;
 
     // Remove any actions.
     $form['multiform'][$key]['actions']['#access'] = FALSE;

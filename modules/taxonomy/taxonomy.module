@@ -1430,8 +1430,8 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
       }
     }
   }
-  return implode(', ', $typed_tags);
-}
+  // Mukurtu patch -- delimit by the semicolon instead of comma
+  return implode('; ', $typed_tags);}
 
 /**
  * Implements hook_field_info().
@@ -1769,7 +1769,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
     }
 
     // Translate term names into actual terms.
-    $typed_terms = drupal_explode_tags($tags);
+    $typed_terms = ma_core_taxonomy_explode_tags($tags); // mukurtu patch
     foreach ($typed_terms as $typed_term) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.

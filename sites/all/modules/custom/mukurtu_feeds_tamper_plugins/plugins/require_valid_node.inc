@@ -33,22 +33,31 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_form($importer, $elemen
     '#description' => t('Allowing this field to be empty will make this field optional.'),
   );
 
-  $form['node_type'] = array(
-      '#type' => 'radios',
-      '#options' => $options,
-      '#title' => t('Node Type'),
-      '#default_value' => !empty($settings['node_type']) ? $settings['node_type'] : 'any'
-  );
+    $defaults = !empty($settings['node_type']) ? $settings['node_type'] : array('any');
+    if(!is_array($defaults)) {
+        $defaults = array($defaults);
+    }
+    $form['node_type'] = array(
+        '#type' => 'checkboxes',
+        '#options' => $options,
+        '#title' => t('Node Types'),
+        '#multiple' => TRUE,
+        '#default_value' => $defaults
+    );
 
   return $form;
 }
 
 function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item_key, $element_key, &$field, $settings, $source) {
     // Check settings for allowed node type
-    if(!empty($settings['node_type']) && in_array($settings['node_type'], array_keys(node_type_get_types()))) {
+    //if(!empty($settings['node_type']) && in_array($settings['node_type'], array_keys(node_type_get_types()))) {
+    if(!empty($settings['node_type'])) {
         $node_type = $settings['node_type'];
+        if(!is_array($node_type)) {
+            $node_type = array($node_type);
+        }
     } else {
-        $node_type = 'any';
+        $node_type = array('any');
     }
 
     // Check settings to see if we are allowing empty values
@@ -82,14 +91,15 @@ function mukurtu_feeds_tamper_plugins_require_valid_node_callback($result, $item
         if(!empty($referenced_node)) {
             
             // A setting of 'any' means any type is valid, so if it's a real node we can move on to the next          
-            if($node_type == 'any') {
+            if(in_array('any', $node_type)) {
                 continue;
             }
 
             // If the node doesn't match the specified type, don't import the item and also notify the user why it failed
-            if($referenced_node->type != $node_type) {
+            //if($referenced_node->type != $node_type) {
+            if(!in_array($referenced_node->type, $node_type)) {
                 unset($result->items[$item_key]);
-                _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'did not reference the requried node type of "' . $node_type . '"');
+                _mukurtu_feeds_tamper_plugins_require_valid_node_log($source, $item_key, $element_key, $node_ref, 'did not reference the required node type of "' . implode(', ', $node_type) . '"');
                 return;
             }
             

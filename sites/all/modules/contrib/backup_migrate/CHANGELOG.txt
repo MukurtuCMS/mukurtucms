@@ -1,0 +1,240 @@
+Backup and Migrate 7.x-3.6, 2018-12-15
+--------------------------------------
+#2293601 by KimNyholm, fastturtle: Errors shown because directory handles are
+  not closed when no longer needed.
+#2937023 by DamienMcKenna: Add a test for the basic UI functionality.
+#2945704 by DamienMcKenna: Write tests for each backup filename option.
+#2939277 by DamienMcKenna, baronmunchowsen: File mode change on
+  sources.archivesource.inc.
+#2935403 by DamienMcKenna, jacob.embree: Improve coding standards compliance.
+#2962822 by laryn: Spelling mistake: "frequecy".
+#2917959 by DamienMcKenna: Updated backup_migrate_update_7305() to fix schema
+  problems.
+#2996191 by mwnciau, DamienMcKenna: Special characters in database password
+  causes PHP notifications.
+#2949211 by gturnbull, DamienMcKenna, Alex Bukach, Eli.Stone, joelpittet:
+  Optional memory limit setting to work around out-of-memory errors during
+  backups.
+#2494757 by pbuyle, DamienMcKenna, Ives, Calystod: Allow running a scheduled
+  backup with Drush.
+#2404113 by DamienMcKenna, John Cook, danharper, salmino: Different host for
+  AWS type server.
+#2829492 by axel.rutz, RickJ, DamienMcKenna, devad, Kris77, pietrocap,
+  couturier: Big file backup breaks with "MySQL server has gone away".
+#3001702 by DamienMcKenna: Code cleanup on 7.x-3.x branch.
+#2831470 by snehal.addweb, bfodeke, jigish.addweb: Delete query in
+  hook_uninstall() can potentially remove unintended variables.
+#3004759 by Manthan.addweb, echoz: Notice: Undefined index: exclude_filepaths...
+  visiting Advanced Backup tab.
+#3013355 by jacob.embree: Syntax error in backup_migrate.js.
+#2415421 by ron_s, coredumperror, blake.thompson, John Bickar: Backup and
+  Migrate module and private file system.
+#3002975 by DamienMcKenna: Improve logging around the cron and backup processes.
+#2747197 by RickJ: Network errors writing to Nodesquirrel handled badly.
+#3014594 by DamienMcKenna: backup_migrate_uninstall() doesn't delete all.
+  variables; renamed "backup_migrate_backup_memory_limit" variable to
+  "backup_migrate_memory_limit".
+#3014601 by DamienMcKenna: Re-enable all tests.
+#3014143 by DamienMcKenna: Add master switch to turn off hook_cron.
+#3014603 by DamienMcKenna: Add a CHANGELOG.txt file.
+#3014596 by DamienMcKenna: Require PHP 5.4.
+#2943719 by DamienMcKenna: Reduce memory usage during MySQL database generation.
+#2338841 by catch, dasha_v, DamienMcKenna: Incorrect translated string +
+  menu_rebuild() performance issue.
+#1104012 by DamienMcKenna, axel.rutz, EmanueleQuinto, gisle, jacob.embree, Pere
+  Orga, frenkx: On restore, provide option to drop all tables.
+#2891272 by DamienMcKenna, webservant316: phpsnif 7.1 says Method name
+  \backup_migrate_destination_nodesquirrel::__xmlrpc\" is discouraged; PHP has
+  reserved all method names with a double underscore prefix for future use. 
+#3014597 by DamienMcKenna: Document the advanced backup options.
+#2382541 by sano, DamienMcKenna, couturier, dman, modulist: Updated
+  instructions for installing the S3 library.
+#3016278 by DamienMcKenna: Some debug messages aren't hidden behind
+  backup_migrate_verbose.
+#3016282 by DamienMcKenna: "Cannot add field
+  backup_migrate_profiles.machine_name: field already exists" error.
+#3017042 by DamienMcKenna, freelylw, gisle: Settings form field dependency
+  broken.
+#3018002 by DamienMcKenna: Improve the module's documentation.
+By DamienMcKenna: "server" not "sever" :-)
+#3018853 by RickJ: Temporary files not deleted.
+#2735337 by RickJ: Settings objects only offer Revert, not Delete.
+
+
+Backup and Migrate 7.x-3.5, 2018-02-05
+--------------------------------------
+#2941981 by DamienMcKenna, Rick J, camhoward: Backup files being overwritten
+  because of a change to the append_timestamp setting.
+#2940451 by Darren Oh: Unlimited max_execution_time treated as 0 seconds.
+
+
+Backup and Migrate 7.x-3.4, 2018-01-24
+--------------------------------------
+By DamienMcKenna, pere-orga, ikit-claw, cashwilliams: Make all permissions
+  restricted.
+#1058820 by kbasarab, sobi3ch, gbirch, avatxus: Add option to overwrite file.
+#2498191 by DamienMcKenna: Unable to backup to NodeSquirrel using PHP 5.6.9
+  (on Windows) due to changes in SSL validation rules.
+#2742855 by hanoii: Caching profile objects led to unwanted behaviors because of
+  stale data.
+#2703351 by DamienMcKenna, ultrabob: Redundant methods in
+  backup_migrate_location_remote.
+#2728345 by Rick J: Nodesquirrel destination class doesn't return its name.
+#2728331 by Rick J: Incorrect paging count in saved backup list.
+#2498179 by junaidpv: Use drupal_mail() for system notifications.
+#2920311 by DamienMcKenna: Check backup directory permissions / web
+  accessibility.
+#2912459 by DamienMcKenna: Add an initial test.
+#2880434 by DamienMcKenna, benqwerty: Minor changes to drush help output.
+#2914644 by DamienMcKenna, jacob.embree: List all files which contain classes in
+  the info file so other modules can use the classes.
+#2663928 by DamienMcKenna, fietserwin: public://languages should also be
+  excluded by default.
+#2388347 by DamienMcKenna: Nodequirrel destination class doesn't define $errno,
+  $errstr but assumes they're available.
+#2899586 by juankvillegas, DamienMcKenna: Ensure the page variable is numeric in
+  backup_migrate_nodesquirrel_status_form().
+
+
+Backup and Migrate 7.x-3.3, 2017-10-18
+--------------------------------------
+#2290707 by DamienMcKenna, mitsuroseba, Darren Oh: Exclude the data from the
+  following tables - does not work.
+#2830554 by axel.rutz: Support Ultimate Cron.
+#2728349 by Rick J: Disabled schedules still run under Elysia cron.
+
+
+Backup and Migrate 7.x-3.2, 2017-09-27
+--------------------------------------
+#2702229 by DamienMcKenna: Automatically add all cache tables to the 'nodata'
+  list, exclude simpletest tables.
+#2618516 by rocketeerbkw: Fatal error when restoring "Entire Site".
+#2839264 by wizonesolutions: Error: [] operator not supported for strings in
+  backup_migrate_crud_ui_list_all().
+#2633304 by adamelleston: 'clone' is a reserved keyword introduced in PHP
+  version 5.0 and cannot be invoked as a function.
+#2547065 by snehi: Description for filesource location is inaccurate.
+#2672478 by serverofworld, lklimek: Wrong destination when running multiple
+  schedules using the same profile.
+#1542274 by dale42, LGLC, AjitS: Restore fails with foreign key constraint error
+  (due to incorrect comment detection).
+#2623598 by SylvainM, joelstein: Deprecated: Methods with the same name as their
+  class will not be constructors in a future version of PHP.
+#2513720 by rrfegade: Code Spell errors.
+By ronan: Cleaned up use of manage url generator.
+#2495681 by DamienMcKenna: Secure all endpoint connections to NodeSquirrel
+  destination service.
+#2495677 by DamienMcKenna: Inconsistent use of https for manage.nodesquirrel.com
+  hostname.
+#2277383 by hswong3i: Fix schema mismatch after upgrade 7.x-3.x.
+
+
+Backup and Migrate 7.x-3.1, 2015-05-11
+--------------------------------------
+By ronan: Added pantheon notice and free notice to NodeSquirrel page.
+#2347637: Add a Note to Backup doesn't work with Jquery > 1.7.
+By ronan: Set Nodesquirrel schedule to use smart delete by default.
+#2477503: Error returned, but exit status is 0.
+#2369461: Scheduled Backups stopped working after 7.x-3.0?.
+#2390057: Site doesn't come out of maintenance mode when backing up entire site.
+#2455265: Update Version Number in README.TXT.
+By ronan: Updated NS messaging slightly.
+#2393615: Compression not running (only when backing up entire site).
+#2324949: Update #7303 Failing.
+#2421183: Stream URI - Not ignored (Recognized?) during backups.
+#2378739: "Exclude the data from the following tables" not respected when "Use
+  cli commands" is checked.
+#2307655 Fixed adding of full system path to site archive.
+#2290707 by marvoey Advanced Backup link on quick backup page goes to wrong
+  place.
+#2290707 Exclude the data from the following tables - does not work.
+By ronan: Moved run time check before scheduled backup attempt to fix too-
+  frequent schedule issue.
+#2280743: Files restore duplicating directory structure
+  (sites/default/files/sites/default/files).
+#2276663 Permissions - Access backup files.
+#2283701 by alarcombe. Restore not possible from archive.
+#2286835 by Fernando Vesga. Advanced backup page link error.
+#2287157 by topsitemakers. Links to "Create new destination" and "Create new
+  schedule" are invalid.
+#2287239 by topsitemakers. Minor typo in an error message.
+#2278865 by topsitemakers Undefined index: files in
+  theme_backup_migrate_file_list.
+
+
+Backup and Migrate 7.x-3.0, 2014-05-27
+--------------------------------------
+By ronan: Fixed comment on install hook.
+#2266381 Warning: Invalid argument supplied for foreach() in
+  backup_migrate_schedules_cron() on line 48.
+#1001654 Fixed ctools exportables.
+By ronan: Added nodesquirrel scheduling back. Fixed issue with restore from
+  previous radios. Added function to retrieve the most recent backup from the
+  given destination. This may be used in a drush command.
+By ronan: Removed link to help text when help module is off.
+By ronan: Removed confusing 'Quick Schedule' tab.
+#2225335 Drush commands not working.
+By ronan: Increased machine_name length in ui for compatibility with migrated
+  items.
+By ronan: Fixed a couple of php errors.
+By ronan: Minor wording tweaks.
+By ronan: Added better status for NodeSquirrel.
+By ronan: Removed dpm.
+By ronan: Added dependency to offline message on restore.
+By ronan: Removed stray console.log from the js.
+By ronan: Added most recent saved backups to the restore tab.
+By ronan: Ported MySQL views support.
+By ronan: Fixed some issues saving profiles.
+By ronan: Added a @TODO to remind me to fix saving on the advance backup page.
+#1974740 allow backup of codebase & files to skip unreadable files.
+By ronan: Merge branch 'refs/heads/NodeSquirrel-Language' into 7.x-3.x.
+By ronan: Fixed up some language and links to NodeSquirrel.
+By ronan: Cleaned up directory handling to support more directory structures.
+By ronan: Added some description language for NodeSquirrel.
+#2166813 Files backup fails when PEAR is not installed.
+#2155381 by JulienD Remove useless files[] directive from .info files.
+#1947206 by Les Lim. "No data" tables are exported even when they're in the
+  "Exclude the following tables altogether" list.
+#2031393 A debugging function call left behind.
+#2031777 Wrong function signature on form callback.
+#2065573 wrong default file token.
+#2039951 settings page gone for schedules.
+#2009392 Settings don't save for file or entire site sources.
+#1998788 missing i in NodeSquirrel.
+By ronan: Moved NodeSquirrel tab to match the 2.x branch.
+By ronan: Some d7 style cleanup.
+By ronan: Fixed nodesquirrel destination with new id structure.
+By ronan: Added checkplain to description on listing.
+By ronan: Fixed an issue with multiselect js invading other pages.
+#1564408 Gzip backups are compressed twice when downloaded.
+#1991686 thx morningtime. Undefined property: backup_migrate_schedule::$last_run
+By ronan: Switch to hourly default to align with smart delete default.
+#839254 Switched to using drupal_reapath to allow for stream wrapper schemas.
+#839254 Checking absolute paths within the docroot.
+#839254 check for access restriction ignores custom destination path.
+#1503202 Suhosin refuses sending mail because of to many new lines in mail
+  header (possible attacker).
+#1529174 Fatal Error when database name is longer than 21 characters.
+By ronan: Fixed 'Restore again' link.
+#1974720 error message on attempting to restore manual backup.
+#1974744 warning on creation of new settings profile.
+By ronan: Fixed inconsistent use of 'source' and 'destination'.
+By ronan: Changed destination_id to machine_name to fix issue with default file
+  destinations.
+By ronan: Fixed error noise caused by ftp not connecting.
+By ronan: Fixed error on file delete form.
+By ronan: Fixed fatal error in metadata util when a backup fails.
+#1968210 error message on attempting backup of entire site.
+By ronan: Improved error reporting when a non-existant file (such as a broken
+  symlink) cannot be backed up.
+#1968196 Error message on install in php 5.4.
+By ronan: Fixed checkboxes.
+By ronan: Fixed fatal error with token replace.
+By ronan: Created full upgrade path from 2.x. Fixed source settings.
+By ronan: Fixed db scheme issue. Fixed file source realpath issue.
+By ronan: Switched type to subtype for ctools compatibility.
+By ronan: Added machine_name js and ctools exportables.
+By ronan: Fixed source specific settings in backup.
+By ronan: Fixed issue with edit screen for source settings in profiles.
+By ronan: Fixed export.
+By ronan: Cleaned up more fatal errors. Better handling of translatable titles.

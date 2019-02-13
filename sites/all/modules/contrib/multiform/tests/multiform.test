@@ -75,6 +75,7 @@ class MultiformTestCase extends DrupalWebTestCase {
    */
   public function testRequiredFields() {
     $first_text = array('multiform[multiform_test2_1_0][required_text_1]' => 'test1 value');
+    $first_text_empty = array('multiform[multiform_test2_1_0][required_text_1]' => '');
     $second_text = array('multiform[multiform_test2_2_1][required_text_2]' => 'test2 value');
     // No required fields.
     $this->drupalPost('multiform-test/2', array(), 'save');
@@ -91,12 +92,12 @@ class MultiformTestCase extends DrupalWebTestCase {
     $this->assertNoText('test2 field is required.');
 
     // Send first form's required field.
-    $this->drupalPost(NULL, array_merge($first_text,array()), 'save');
+    $this->drupalPost(NULL, array_merge($first_text, array()), 'save');
     $this->assertNoText('multiform_test2_2multiform_test2_submit_button');
     $this->assertText('test2 field is required.');
 
     // Send second form's required field.
-    $this->drupalPost(NULL, $second_text, 'save');
+    $this->drupalPost(NULL, array_merge($first_text_empty, $second_text), 'save');
     $this->assertNoText('multiform_test2_2multiform_test2_submit_button');
     $this->assertText('test1 field is required.');
   }

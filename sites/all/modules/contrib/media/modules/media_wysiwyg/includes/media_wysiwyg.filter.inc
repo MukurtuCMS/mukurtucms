@@ -5,7 +5,7 @@
  * Functions related to the WYSIWYG editor and the media input filter.
  */
 
-define('MEDIA_WYSIWYG_TOKEN_REGEX', '/\[\[\{.*?"type":"media".+?\}\]\]/s');
+define('MEDIA_WYSIWYG_TOKEN_REGEX', '/\[\[\{.*?"type":"media".*?\}\]\]/s');
 
 /**
  * Filter callback for media markup filter.
@@ -139,6 +139,16 @@ function media_wysiwyg_token_to_markup($match, $wysiwyg = FALSE, $langcode = NUL
   $match = str_replace("[[", "", $match);
   $match = str_replace("]]", "", $match);
   $tag = $match[0];
+
+  // Drupal modules with email support often include site name in the subject line
+  // wrapped in brackets. With a token, this is rendered as "[[site:name]]". Such a
+  // format will cause a conflict with media_wysiwyg, which is looking for the same.
+  if (module_exists('token_filter')) {
+    $token_filter = _token_filter_filter_tokens('[' . $tag . ']', '', '', $langcode, NULL, NULL);
+    if ($token_filter != '[' . $tag . ']') {
+      return '[[' . $tag . ']]';
+    }
+  }
 
   try {
     if (!is_string($tag)) {

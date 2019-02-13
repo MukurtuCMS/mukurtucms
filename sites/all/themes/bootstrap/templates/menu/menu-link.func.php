@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_menu_link() and suggestion(s).
@@ -49,10 +50,6 @@ function bootstrap_menu_link(array $variables) {
       // Generate as standard dropdown.
       $title .= ' <span class="caret"></span>';
       $attributes['class'][] = 'dropdown';
-
-      // Set dropdown trigger element to # to prevent inadvertant page loading
-      // when a submenu link is clicked.
-      $options['attributes']['data-target'] = '#';
       $options['attributes']['class'][] = 'dropdown-toggle';
       $options['attributes']['data-toggle'] = 'dropdown';
     }
@@ -94,8 +91,8 @@ function bootstrap_menu_link__book_toc(array $variables) {
   if ($link) {
     $title = l($title, $href, $options);
   }
-  // Otherwise, filter the title if "html" is not set, otherwise l() will automatically
-  // sanitize using check_plain(), so no need to call that here.
+  // Otherwise, filter the title if "html" is not set, otherwise l() will
+  // automatically sanitize using check_plain(), so no need to call that here.
   elseif (empty($options['html'])) {
     $title = filter_xss_admin($title);
   }

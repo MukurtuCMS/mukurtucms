@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.field_group.inc

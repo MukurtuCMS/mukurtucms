@@ -130,7 +130,11 @@ function multiform_get_form() {
     // We forced $form_state['no_redirect'] to TRUE above, so unset it in order
     // to allow the redirection to proceed.
     unset($redirect['no_redirect']);
-    drupal_redirect_form($redirect);
+    $errors = form_get_errors();
+    // Do not redirect with errors.
+    if (empty($errors)) {
+      drupal_redirect_form($redirect);
+    }
   }
   return $form;
 }

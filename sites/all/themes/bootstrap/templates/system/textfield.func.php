@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_textfield().
@@ -20,7 +21,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_textfield($variables) {
+function bootstrap_textfield(array $variables) {
   $element = $variables['element'];
   $element['#attributes']['type'] = 'text';
   element_set_attributes($element, array(

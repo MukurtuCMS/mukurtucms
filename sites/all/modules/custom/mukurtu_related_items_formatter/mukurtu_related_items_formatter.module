@@ -66,7 +66,17 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
     );
 
     if(!empty($entity->{$field['field_name']})) {
-        $item_count = count($entity->{$field['field_name']}[LANGUAGE_NONE]);
+        // Remove the nodes the user doesn't have access to
+        $all_paged_nodes = array();
+        foreach($entity->{$field['field_name']}[LANGUAGE_NONE] as $related_item) {
+            $column = key($field['columns']);
+            $related_item_node = node_load($related_item[$column]);
+            if($related_item_node && $related_item_node->status && node_access('view', $related_item_node)) {
+                $all_paged_nodes[] = $related_item_node;
+            }
+        }
+
+        $total_item_count = count($all_paged_nodes);
         $is_community_record = FALSE;
 
         // Right now the default pager only supports a single pager per page. This can be a problem for
@@ -74,34 +84,28 @@ function mukurtu_related_items_formatter_field_formatter_view($entity_type, $ent
         // custom pager, we will display all related items on community records.
         if(isset($entity->field_community_record_parent) && !empty($entity->field_community_record_parent[LANGUAGE_NONE])) {
             $current_page = 0;
-            $page_limit = $item_count;
+            $page_limit = $total_item_count;
             $is_community_record = TRUE;
             $i = 0;
         } else {
             // Total number of referenced entities
-            $current_page = pager_default_initialize($item_count, $items_per_page);
+            $current_page = pager_default_initialize($total_item_count, $items_per_page);
             $i = $current_page * $items_per_page;
             $page_limit = $i + $items_per_page;
         }
 
         // Render each related item
-        while(isset($entity->{$field['field_name']}[LANGUAGE_NONE][$i]) && $i < $page_limit) {
-            $related_item = $entity->{$field['field_name']}[LANGUAGE_NONE][$i];
-            $column = key($field['columns']);
-            $related_item_node = node_load($related_item[$column]);
-            if(node_access('view', $related_item_node)) {
-                if($related_item_node) {
-                    $related_item_node_view = node_view($related_item_node, 'search_result');
-                    $render = drupal_render($related_item_node_view);
-                    $output .= $render;
-                }
-            }
-            $i = $i + 1;
+        $item_count = 0;
+        while(isset($all_paged_nodes[$i]) && $item_count < $items_per_page) {
+            $related_item_node_view = node_view($all_paged_nodes[$i++], 'search_result');
+            $render = drupal_render($related_item_node_view);
+            $output .= $render;
+            $item_count++;
         }
 
         // Print the pager controls, if it isn't a community record
         if(!$is_community_record) {
-            $output .= theme('pager', array('quantity', count($items_per_page)));
+            $output .= theme('pager', array('quantity', $items_per_page));
         }
     }
 

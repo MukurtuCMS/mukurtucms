@@ -1,0 +1,127 @@
+.view-mukurtu-frontpage-featured-content {
+    a {
+        &:hover,
+        &:focus {
+            text-decoration: none;
+        }
+    }
+
+    .views-row {
+        padding-bottom: 30px;
+    }
+
+    .field-name-featured-content-view-link {
+        position: absolute;
+        background-color: @brand-primary;
+        padding: 10px;
+        z-index: 1;
+
+        &:hover,
+        &:focus {
+            background-color: @mukurtu-navbar-default-link-hover-bg;
+        }
+
+        a {
+            color: #fff;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            background: url(@mukurtu-arrow-right-path) no-repeat 0% 50%;
+            background-position: center right;
+            padding-right: 15px;
+        }
+    }
+
+    .field-name-field-media-asset {
+        position: relative;
+        img {
+            margin: auto;
+            width: 100%;
+        }
+
+        .scald-atom {
+            .mejs-container {
+                height: 66.67% !important;
+            }
+        }
+
+        // Shrink audio controls on featured content
+        .mejs__container {
+            &.mejs__audio {
+                margin: auto;
+                position: absolute;
+                bottom: 0;
+                width: 100% !important;
+                .mejs-controls {
+                    width: 80%;
+                }
+            }
+        }
+    }
+
+    .field-name-featured-content-type {
+        font-weight: bold;
+        font-size: 13px;
+        letter-spacing: @mukurtu-expanded-letter-spacing;
+        padding-top: 20px;
+        text-align: center;
+        text-transform: uppercase;
+
+        // Desktop
+        @media (min-width: @screen-md-min) {
+            font-size: 15px;
+        }
+    }
+
+    .field-name-title {
+        h2 {
+            margin-top: 0px;
+
+            a {
+                .arrow-right;
+                .font-light;
+                color: @link-color;
+                font-size: 26px;
+                padding-right: 20px;
+
+                &:hover,
+                &:focus {
+                    color: @brand-secondary;
+                }
+            }
+        }
+    }
+
+    .field-name-field-summary {
+        font-size: 13px;
+        text-align: center;
+    }
+
+    // Tablet
+    @media (min-width: @screen-sm-min) {
+        .views-row-3 {
+            display: none;
+        }
+
+        .field-name-title {
+            h2 {
+                a {
+                    .font-light;
+                    font-size: 30px;
+                }
+            }
+        }
+    }
+
+    // Desktop
+    @media (min-width: @screen-md-min) {
+        .views-row-3 {
+            display: block;
+        }
+
+        .field-name-field-summary {
+            font-size: 16px;
+        }
+    }
+}

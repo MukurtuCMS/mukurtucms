@@ -548,9 +548,6 @@ class FeedsRSStoNodesTest extends FeedsWebTestCase {
     // Just remove the mappings rather than creating a new importer.
     $this->removeMappings('syndication', $this->getCurrentMappings('syndication'));
 
-    // Set our process limit to something simple.
-    variable_set('feeds_process_limit', 5);
-
     $this->setPlugin('syndication', 'FeedsFileFetcher');
     $this->setPlugin('syndication', 'FeedsCSVParser');
 
@@ -572,13 +569,85 @@ class FeedsRSStoNodesTest extends FeedsWebTestCase {
       ),
     ));
 
-    $this->importFile('syndication', $this->absolutePath() . '/tests/feeds/many_nodes_ordered.csv');
-    $this->assertEqual(5, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+    $this->importFile('syndication', $this->absolutePath() . '/tests/feeds/many_nodes_ordered.csv', 'Schedule import');
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+
+    // Assert that the import button is disabled.
+    $this->assertFieldDisabled('op');
+
+    // Assert that there is one import task in the queue.
+    $this->assertEqual(1, db_query("SELECT COUNT(*) FROM {queue} WHERE name = 'feeds_source_import'")->fetchField());
 
     // The feed should still be scheduled because it is being processed.
     // @see https://drupal.org/node/2275893
     $this->cronRun();
     $this->assertEqual(86, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+
+    // Assert that the import button is no longer disabled.
+    $this->drupalGet('import/syndication');
+    $this->assertFieldEnabled('op');
+
+    // Assert that there are no more import tasks in the queue.
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {queue} WHERE name = 'feeds_source_import'")->fetchField());
+  }
+
+  /**
+   * Tests clearing items in background.
+   */
+  public function testClearInBackground() {
+    // Just remove the mappings rather than creating a new importer.
+    $this->removeMappings('syndication', $this->getCurrentMappings('syndication'));
+
+    $this->setSettings('syndication', NULL, array(
+      'content_type' => '',
+    ));
+
+    $this->setPlugin('syndication', 'FeedsFileFetcher');
+    $this->setPlugin('syndication', 'FeedsCSVParser');
+
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'GUID',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+    ));
+
+    // Import 86 nodes.
+    $this->importFile('syndication', $this->absolutePath() . '/tests/feeds/many_nodes_ordered.csv');
+    $this->assertEqual(86, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+
+    // Turn on "Process in background option" and turn off periodic import.
+    $this->setSettings('syndication', NULL, array(
+      'process_in_background' => TRUE,
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+
+    // Now schedule clearing in background.
+    $this->drupalPost('import/syndication/delete-items', array(), t('Schedule delete'));
+    $this->assertEqual(86, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+
+    // Assert that the delete button is disabled.
+    $this->drupalGet('import/syndication/delete-items');
+    $this->assertFieldDisabled('op');
+
+    // Assert that there is one clear task in the queue.
+    $this->assertEqual(1, db_query("SELECT COUNT(*) FROM {queue} WHERE name = 'feeds_source_clear'")->fetchField());
+
+    // And run cron.
+    $this->cronRun();
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+
+    // Assert that the delete button is no longer disabled.
+    $this->drupalGet('import/syndication/delete-items');
+    $this->assertFieldEnabled('op');
+
+    // Assert that there are no more clear tasks in the queue.
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {queue} WHERE name = 'feeds_source_clear'")->fetchField());
   }
 
   /**
@@ -654,6 +723,91 @@ class FeedsRSStoNodesTest extends FeedsWebTestCase {
     $this->drupalPost('import/syndication', array(), 'Import');
     $this->assertText('Created 8 nodes.');
     $this->assertNoText('Updated 2 nodes.');
+  }
+
+  /**
+   * Tests mapping to the node author using a float value.
+   *
+   * @see feeds_tests_feeds_after_parse()
+   */
+  public function testUidTargetWithFloat() {
+    // Set flag to turn uid values to floats.
+    variable_set('feeds_tests_feeds_after_parse_uid_float_value', TRUE);
+
+    // Rebuild node type information.
+    drupal_static_reset();
+    node_types_rebuild();
+
+    // Create a role with permission to create articles.
+    $rid = $this->drupalCreateRole(array(
+      'access content',
+      'create article content',
+    ));
+
+    // Create account with uid 201.
+    user_save(drupal_anonymous_user(), array(
+      'uid' => 201,
+      'name' => 'Morticia',
+      'mail' => 'morticia@example.com',
+      'pass' => 'mort',
+      'status' => 1,
+      'roles' => array(
+        $rid => $rid,
+      ),
+    ));
+
+    // Create account with uid 202.
+    user_save(drupal_anonymous_user(), array(
+      'uid' => 202,
+      'name' => 'Joe',
+      'mail' => 'joe@example.com',
+      'pass' => 'joe',
+      'status' => 1,
+      'roles' => array(
+        $rid => $rid,
+      ),
+    ));
+
+    // Create and configure importer.
+    $this->createImporterConfiguration('Content CSV', 'csv');
+    $this->setSettings('csv', NULL, array(
+      'content_type' => '',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+    $this->setPlugin('csv', 'FeedsFileFetcher');
+    $this->setPlugin('csv', 'FeedsCSVParser');
+    // Ensure that the "Authorize" option is enabled.
+    $this->setSettings('csv', 'FeedsNodeProcessor', array(
+      'authorize' => TRUE,
+    ));
+    $this->addMappings('csv', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'uid',
+        'target' => 'uid',
+      ),
+    ));
+
+    // Import CSV file.
+    $this->importFile('csv', $this->absolutePath() . '/tests/feeds/content_uid.csv');
+    $this->assertText('Created 2 nodes');
+
+    // And assert that the two created nodes have the expected author assigned.
+    $expected_values = array(
+      1 => array(
+        'uid' => 201,
+      ),
+      2 => array(
+        'uid' => 202,
+      ),
+    );
+    for ($i = 1; $i <= 2; $i++) {
+      $node = node_load($i);
+      $this->assertEqual($expected_values[$i]['uid'], $node->uid);
+    }
   }
 
   /**

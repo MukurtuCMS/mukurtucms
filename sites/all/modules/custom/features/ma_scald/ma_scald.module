@@ -13,9 +13,10 @@ include_once 'ma_scald.features.inc';
 function ma_scald_boot() {
   global $conf;
   // The default scald deletion message doesn't make sense because we hide the fetch checkbox, so we remove that message.
-  $conf['locale_custom_strings_en'][''] = array(
+  $scald_message = array(
    '<p>Note that unchecking the Fetch checkbox in the "<em>Openly available actions</em>" field of this atom <a href="!url">edit form</a> makes the atom disappear for everyone but Scald administrators, and is usually a better idea.</p><p>This action cannot be undone.</p>'      => '<p>This action cannot be undone.</p>',
    );
+  $conf['locale_custom_strings_en'][''] = array_merge($conf['locale_custom_strings_en'][''], $scald_message);
 }
 
 /**
@@ -41,30 +42,93 @@ function ma_scald_ds_fields_info($entity_type) {
  * Handle very specific scald delete access cases
  */
 function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
-    global $user;
+  global $user;
 
-    $user_account = $account;
-    if($user_account == NULL) {
-        $user_account = $user;
-    }
+  $user_account = $account;
+  if ($user_account == NULL) {
+    $user_account = $user;
+  }
 
-    switch ($action) {
-    case 'delete':
-        // Let users delete their own atoms if they aren't being used somewhere
-        if(user_access('delete any atom') || (user_access('delete own atom') && $atom->publisher == $user->uid)) {
-            $references = ma_scald_get_atom_references($atom);
+  switch ($action) {
+    case 'view':
+      // Ignore atoms with no protocol, those are open.
+      if (empty($atom->field_scald_protocol) || empty($atom->field_scald_protocol[LANGUAGE_NONE])) {
+        return SCALD_ATOM_ACCESS_ALLOW;
+      }
 
-            if(empty($references)) {
-                return SCALD_ATOM_ACCESS_ALLOW;
-            } else {
-                return SCALD_ATOM_ACCESS_DENY;
-            }
+      // Check all protocols, atoms are 'any', so bail out on any membership.
+      foreach($atom->field_scald_protocol[LANGUAGE_NONE] as $protocol_ref) {
+        $node = node_load($protocol_ref['target_id']);
+        if ($node && node_access('view', $node, $account)) {
+          return SCALD_ATOM_ACCESS_ALLOW;
         }
-        return SCALD_ATOM_ACCESS_DENY;
-        break;
-    }
+      }
 
-    return SCALD_ATOM_ACCESS_IGNORE;
+      // Deny by default.
+      return SCALD_ATOM_ACCESS_DENY;
+
+    case 'delete':
+      // Let users delete their own atoms if they aren't being used somewhere.
+      if (user_access('delete any atom') || (user_access('delete own atom') && $atom->publisher == $user->uid)) {
+        $references = ma_scald_get_atom_references($atom);
+
+        if (empty($references)) {
+          return SCALD_ATOM_ACCESS_ALLOW;
+        } else {
+          return SCALD_ATOM_ACCESS_DENY;
+        }
+      }
+      return SCALD_ATOM_ACCESS_DENY;
+  }
+
+  return SCALD_ATOM_ACCESS_IGNORE;
+}
+
+/**
+ * Remove any references to scald atoms the user does not have access to.
+ */
+function ma_scald_atom_reference_field_filter($entity, $field_name, $account = NULL) {
+  // Exit if the entity doesn't exist, the field doesn't exist, or the field is empty.
+  if (!$entity || !isset($entity->{$field_name}) || empty($entity->{$field_name}[LANGUAGE_NONE])) {
+    return;
+  }
+
+  // Check access for each atom.
+  foreach ($entity->{$field_name}[LANGUAGE_NONE] as $delta => $atom_ref) {
+    if (isset($atom_ref['sid']) && is_null(ma_scald_atom_load($atom_ref['sid'], $account))) {
+      // Unset if user has no access.
+      unset($entity->{$field_name}[LANGUAGE_NONE][$delta]);
+    }
+  }
+
+  // Reorder keys from 0.
+  $entity->{$field_name}[LANGUAGE_NONE] = array_values($entity->{$field_name}[LANGUAGE_NONE]);
+
+  // Remove completely if empty.
+  if (empty($entity->{$field_name}[LANGUAGE_NONE])) {
+    $entity->{$field_name} = array();
+  }
+}
+
+/**
+ * Load scald atom with access check.
+ */
+function ma_scald_atom_load($sid, $account = NULL) {
+  global $user;
+
+  $user_account = $account;
+  if ($user_account == NULL) {
+    $user_account = $user;
+  }
+
+  $atom = scald_atom_load($sid);
+  if ($atom) {
+    if (scald_invoke_atom_access($atom, 'view', $user_account)) {
+      return $atom;
+    }
+  }
+
+  return NULL;
 }
 
 // Return an array of content where the given atom is referenced
@@ -234,7 +298,7 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
 function ma_scald_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'scald_atom_add_form_options') {
     $atom_index = 0;
-    
+
     // Add a custom validation handler so that the user cannot unset a CP if they are not allowed to post to it
     $form['#validate'][] = 'ma_scald_prevent_unsetting_cp_when_no_permission';
     $cp_options = ma_cultural_protocol_get_cps_user_can_post_to ();
@@ -263,7 +327,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       if(isset($entity->base_id)) {
 	$file = file_load($entity->base_id);
       }
-      
+
       $language = $entity->language;
 
       if (!isset($entity->created)) {
@@ -291,7 +355,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
             //'field_gps_latitude' => '',
             //'field_gps_longitude' => '',
           );
-	  
+
           foreach ($field_assocs as $exif_field => $scald_field) {
             if (isset($file->{$exif_field}[$language][0]['value']) && $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] == NULL) {
               $form['atom' . $atom_index][$scald_field][$language][0]['value']['#default_value'] = $file->{$exif_field}[$language][0]['value'];
@@ -427,7 +491,7 @@ function ma_scald_scald_player() {
  * Implements hook_scald_prerender().
  */
 function ma_scald_scald_prerender($atom, $context, $options, $mode) {
-    $default_thumbnail_contexts = array('ma_scald_search_results', 'mukurtu_scald_related_items');
+    $default_thumbnail_contexts = array('mukurtu_scald_related_items', 'mukurtu_carousel_thumbnail', 'mukurtu_multi_page_carousel');
 
     if($atom->type == 'audio' && !in_array($context, $default_thumbnail_contexts)) {
         // Soundcloud already integrates the thumbnail with the display, remove it for rendering so it isn't duplicated
@@ -451,31 +515,10 @@ function ma_scald_scald_prerender($atom, $context, $options, $mode) {
 
     if($mode == 'player') {
         if($atom->type <> 'image' && in_array($context, $default_thumbnail_contexts)) {
-            // Use the atom thumbnail if there is one
-            if (isset($atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'])) {
-                if($atom->type == 'file' || $atom->type == 'video') {
-                    $atom->rendered->player = array('#markup' => '');
-                    return;
-                }
-                $image_styles = array (
-                    'ma_scald_search_results' => 'medium',
-                    'mukurtu_scald_related_items' => 'related_items_teaser'
-                );
-                $thumbnail_image = theme_image_style (array (
-                    'style_name' => $image_styles[$context],
-                    'path' => $atom->scald_thumbnail[LANGUAGE_NONE][0]['uri'],
-                ));
+            // Fetch our default thumbnail if the atom doesn't have one.
+            if (empty($atom->scald_thumbnail[LANGUAGE_NONE])) {
+                $atom->scald_thumbnail[LANGUAGE_NONE][] = _ma_scald_default_thumbnail($atom->type);
             }
-            // If no atom thumbnail, use our default thumbnails
-            else {
-                $image_widths = array (
-                    'ma_scald_search_results' => '220',
-                    'mukurtu_scald_related_items' => '280'
-                );
-                $thumbnail_image = '<img src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/default_' . $atom->type . '_thumbnail_' . $image_widths[$context] . '.jpg">';
-            }
-
-            $atom->rendered->player = array('#markup' => l($thumbnail_image, $options['link'], array('html' => TRUE)));
         }
     }
 }
@@ -495,4 +538,328 @@ function ma_scald_get_first_image_atom_content($atom_content_field) {
         }
     }
     return $atom_content_field;
+}
+
+// This is the handler function for the scald atom "Media Source" field
+// during import. Typically this will either be the path to a file, an
+// external content ID (e.g., YouTube), or a URL to the external content.
+// See ma_importexport_set_media_source_target
+// We pair this with the scald provider to call all of the scald form
+// functions to recreate the base atom from scratch.
+function ma_scald_save_atom_source($source, &$entity) {
+    $type = isset($entity->type) ? $entity->type : NULL;
+
+    if($source) {
+        ma_scald_create_basic_atom($source, $entity, $type);
+    }
+    return;
+}
+
+/**
+ * Helper function that takes a media source ($filepath) and a scald provider and
+ * runs through all the scald form functions (source, add, options) for creating the atom.
+ *
+ * This is ideal because it offloads all the details to the scald provider and scald
+ * will still call the relevant hooks.
+ */
+function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
+    ctools_include('object-cache');
+    ctools_include('wizard');
+    // We are going to be making calls to the native Scald form functions, load those pages
+    module_load_include('inc', 'scald', 'includes/scald.pages');
+
+    $form_info = array(
+        'id' => 'scald-atom-add',
+        'path' => 'atom/add/' . $type . '/' . 'nojs' . '/%step',
+        'show trail' => TRUE,
+        'show back' => FALSE,
+        'show cancel' => TRUE,
+        'show return' => FALSE,
+        'next callback' => 'scald_atom_add_wizard_next',
+        'finish callback' => 'scald_atom_add_wizard_finish',
+        'cancel callback' => 'scald_atom_add_wizard_cancel',
+        'order' => array(
+          'source' => t('Source'),
+          'add' => t('Add'),
+          'options' => t('Options'),
+        ),
+        'forms' => array(
+          'source' => array(
+            'form id' => 'scald_atom_add_form_source',
+          ),
+          'add' => array(
+            'form id' => 'scald_atom_add_form_add',
+          ),
+          'options' => array(
+            'form id' => 'scald_atom_add_form_options',
+          ),
+        ),
+      );
+
+    // Clear the cache or else we might get stuff from the previous item
+    ctools_object_cache_clear('scald_atom', 'add');
+    $form_state = array(
+        'ajax' => FALSE,
+        'scald' => ctools_object_cache_get('scald_atom', 'add'),
+    );
+    $form_state['values']['atom0'][] = $atom;
+
+    // Copy initialization from scald_atom_add_page
+    // Start by getting the list of all the modules that said they can provide
+    // this atom type.
+    $scald_types = scald_types();
+    $providers = scald_atom_providers_opt();
+    $sources = $providers[$type];
+    $source = key($sources);
+
+    // Check the Scald provider. We are doing a few things here.
+    // - If no provider is given, try to infer something sane.
+    // - If a provider is given, make sure it's correct.
+    // - If not correct, try to infer something sane.
+    $scald_providers = scald_atom_providers_opt();
+    $type_providers = array();
+    if (isset($scald_providers[$type])) {
+      $type_providers = array_keys($scald_providers[$type]);
+    }
+    if (empty($atom->provider) || !in_array($atom->provider, $type_providers)) {
+      $atom->provider = _ma_scald_guess_provider_from_media_source($type, $atom->file_source);
+    }
+
+    // Grab provider from the atom.
+    if (isset($atom->provider)) {
+      $provider = $atom->provider;
+    } else {
+      // If at this point we have no provider, just exit.
+      // Scald is perfectly happy to write garbage atoms to the
+      // database which cannot be deleted via scald_atom_delete.
+      return;
+    }
+
+    if (isset($form_state['scald']['atoms'][0])) {
+        $form_state['atom'] = $form_state['scald']['atoms'][0];
+    }
+
+    if (empty($form_state['scald'])) {
+        $form_state['scald'] = array(
+            'type' => $scald_types[$type],
+            'source' => $provider, //isset($source) ? $source : NULL,
+            'provider' => $provider,
+        );
+    }
+
+    // Source
+    $form_state['scald']['step'] = 'source';
+    $source_form = ctools_wizard_multistep_form($form_info, 'source', $form_state);
+    //$source_form = array();
+    $source_form = scald_atom_add_form_source($source_form, $form_state);
+
+    // Add
+    $form_state['scald']['step'] = 'add';
+    $add_form = ctools_wizard_multistep_form($form_info, 'add', $form_state);
+    //$add_form = array();
+    $add_form = scald_atom_add_form_add($add_form, $form_state);
+
+    switch($provider) {
+        case 'scald_dailymotion':
+        case 'scald_soundcloud':
+        case 'scald_youtube':
+        case 'scald_vimeo':
+            $form_state['values']['identifier'] = $filepath;
+            break;
+        default:
+            // Simulate uploading file
+            $location = $add_form['file']['#upload_location'];
+            $file_object = file_uri_to_object($filepath);
+            $file = file_copy($file_object, $location);
+            $form_state['values']['file'] = $file->fid;
+    }
+
+    // Options
+    $form_state['scald']['step'] = 'options';
+    //$options_form = ctools_wizard_multistep_form($form_info, 'options', $form_state);
+    $options_form = array();
+    //field_attach_form('scald_atom', $atom, $options_form, $form_state);
+    $options_form = scald_atom_add_form_options($options_form, $form_state);
+
+    if (isset($form_state['scald']['atoms'][0])) {
+        $form_state['atom'] = $form_state['scald']['atoms'][0];
+        $form_state['values']['atom0'][] = $form_state['atom'];
+    }
+
+    $provider_atom = _ma_scald_atom_add_form_options_submit($options_form, $form_state);
+    $atom = _ma_scald_merge_provider_atom($atom, $provider_atom);
+}
+
+/**
+ * Nearly wholesale copy of scald_atom_add_form_options_submit, except
+ * we don't want to:
+ * 1. Save the scald atom
+ * 2. Display the atom creation notice
+ *
+ * Instead we return the atom, so that our import functions can integrate
+ * the atom fields that scald/scald provider created.
+ */
+function _ma_scald_atom_add_form_options_submit(&$form, &$form_state) {
+    if (!$atoms = $form_state['scald']['atoms']) {
+      return;
+    }
+
+    $atom_keys = array();
+    foreach(array_keys($atoms) as $delta) {
+      $atom_keys[] = 'atom' . $delta;
+    }
+    $values_excluding_atoms = array_diff_key($form_state['values'], array_flip($atom_keys));
+
+    foreach ($atoms as $delta => $atom) {
+      $index = 'atom' . $delta;
+      $values = &$form_state['values'][$index];
+
+      if (isset($values['scald_actions']) && is_array($values['scald_actions'])) {
+        $bitstream = 0;
+        $actions = scald_actions();
+        foreach ($actions as $name => $action) {
+          if (!empty($values['scald_actions'][$name])) {
+            $bitstream |= $action['bitmask'];
+          }
+        }
+        $values['actions'] = $bitstream;
+      }
+
+      $op = empty($atom->sid) ? t('created') : t('updated');
+
+      // Prepare a form state that is suitable for modules that provide extra fields.
+      $atom_form_state = array('values' => $values + $values_excluding_atoms) + $form_state;
+      // Add back the structure required for fields and maintain a reference to
+      // the original form state values.
+      $atom_form_state['values'][$index] = &$values;
+
+    // This fixes that strange scald taxonomy term issue, that seems to mostly be a soundcloud issue.
+    // Definitely a bit of a hack.
+    $fields_info = field_info_instances('scald_atom', $atom->type);
+    foreach($fields_info as $field_name => $value) {
+        $field_info = field_info_field($field_name);
+        if($field_info['type'] == 'taxonomy_term_reference' && !empty($atom->{$field_name}[LANGUAGE_NONE])) {
+            foreach($atom->{$field_name}[LANGUAGE_NONE] as $delta => $field_value) {
+                $atom->{$field_name}[LANGUAGE_NONE][$delta]['vocabulary_machine_name'] = $field_info['settings']['allowed_values'][0]['vocabulary'];
+            }
+        }
+    }
+
+    if($atom->type == 'file') {
+        $atom->scald_file[LANGUAGE_NONE][0]['display'] = 1;
+        $atom->atom0['scald_thumbnail'][LANGUAGE_NONE][0]['display'] = 1;
+        $atom->atom0['scald_file'][LANGUAGE_NONE][0]['display'] = 1;
+        $atom->scald_thumbnail_default = 1;
+        $atom->data['scald_thumbnail_default'] = 1;
+    }
+      // Let entity add its properties to the atom.
+      entity_form_submit_build_entity('scald_atom', $atom, $form[$index], $atom_form_state);
+
+      // Then return it...
+      return $atom;
+    }
+    return NULL;
+}
+
+/**
+ * Copy the non-empty fields from the provider atom to the feeds atom.
+ * Only copying the first level, this isn't a recursive deep dive.
+ */
+function _ma_scald_merge_provider_atom($feeds_atom, $provider_atom) {
+    $provider_fields = array_keys(get_object_vars($provider_atom));
+    $skip_fields = array('0', '1', 'atom0');
+
+    foreach($provider_fields as $field) {
+        if(in_array($field, $skip_fields)) {
+            continue;
+        }
+
+        if(!empty($provider_atom->{$field})) {
+            if(!is_array($provider_atom->{$field})
+               || (is_array($provider_atom->{$field}) && !empty($provider_atom->{$field}))) {
+                $feeds_atom->{$field} = $provider_atom->{$field};
+            }
+        }
+    }
+
+    return $feeds_atom;
+}
+
+/**
+ * Generate default scald thumbnail for Mukurtu.
+ */
+function _ma_scald_default_thumbnail($type) {
+    $fid = variable_get("mukurtu_scald_default_thumbnail_$type", NULL);
+    $file = file_load($fid);
+    if (!$file) {
+        $filename = drupal_get_path('module', 'ma_digitalheritage') . "/images/default_{$type}_thumbnail_280.jpg";
+        $handle = fopen(drupal_realpath($filename), 'r');
+
+        // Given a type we don't have a stock image for, use generic "no media" image.
+        if(!$handle) {
+            $filename = drupal_get_path('module', 'ma_digitalheritage') . "/images/no_media_available.jpg";
+            $handle = fopen(drupal_realpath($filename), 'r');
+        }
+        $file = file_save_data($handle, "public://atoms/default_thumbnail_{$type}.jpg", FILE_EXISTS_REPLACE);
+        fclose($handle);
+
+        if($file) {
+            variable_set("mukurtu_scald_default_thumbnail_$type", $file->fid);
+        }
+    }
+
+    return (array) $file;
+}
+
+/**
+ * Given a media source (file path, URL, etc...) and a
+ * scald atom type, return the most likely scald provider.
+ */
+function _ma_scald_guess_provider_from_media_source($type, $media_source) {
+  $scald_providers = scald_atom_providers_opt();
+  if (isset($scald_providers[$type])) {
+    $type_providers = array_keys($scald_providers[$type]);
+    // If there is only a single provider for the type, use that.
+    if (count($type_providers) == 1) {
+      return current($type_providers);
+    }
+
+    // Check media sources. These are very much Mukurtu specific
+    // and are not taking into account any user added providers.
+    switch ($type) {
+      case 'audio':
+        // Check Soundcloud (scald_soundcloud).
+        if (function_exists(scald_soundcloud_parse_id)) {
+          if (scald_soundcloud_parse_id($media_source, FALSE)) {
+            return 'scald_soundcloud';
+          }
+        }
+        // Default to standard audio provider.
+        return 'scald_audio';
+
+      case 'video':
+        // Check Dailymotion (scald_dailymotion).
+        if (function_exists(scald_dailymotion_parse_id)) {
+          if (scald_dailymotion_parse_id($media_source)) {
+            return 'scald_dailymotion';
+          }
+        }
+        // Check Vimeo (scald_vimeo).
+        if (function_exists(scald_vimeo_parse_id)) {
+          if (scald_vimeo_parse_id($media_source, FALSE)) {
+            return 'scald_vimeo';
+          }
+        }
+        // Check YouTube (scald_youtube).
+        if (function_exists(scald_youtube_parse_id)) {
+          if (scald_youtube_parse_id($media_source, FALSE)) {
+            return 'scald_youtube';
+          }
+        }
+        // Default to basic video provider.
+        return 'scald_video';
+    }
+    return current($type_providers);
+  }
+  return NULL;
 }

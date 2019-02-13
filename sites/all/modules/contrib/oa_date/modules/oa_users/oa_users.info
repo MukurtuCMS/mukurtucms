@@ -1,0 +1,32 @@
+name = Open Atrium Users
+description = User layouts
+core = 7.x
+package = Open Atrium
+dependencies[] = ctools
+dependencies[] = entityreference
+dependencies[] = features
+dependencies[] = image
+dependencies[] = og
+dependencies[] = og_ui
+dependencies[] = page_manager
+dependencies[] = realname
+dependencies[] = strongarm
+dependencies[] = text
+features[ctools][] = page_manager:pages_default:1
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[field_base][] = field_user_display_name
+features[field_base][] = og_user_node
+features[field_instance][] = user-user-field_user_display_name
+features[field_instance][] = user-user-og_user_node
+features[page_manager_pages][] = user_actitivy
+features[variable][] = realname_pattern
+features[variable][] = user_picture_style
+features_exclude[field_base][field_user_about] = field_user_about
+features_exclude[field_base][field_user_picture] = field_user_picture
+
+; Information added by Drupal.org packaging script on 2018-10-18
+version = "7.x-2.91"
+core = "7.x"
+project = "oa_core"
+datestamp = "1539884795"

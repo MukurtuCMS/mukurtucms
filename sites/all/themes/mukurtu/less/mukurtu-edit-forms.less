@@ -1,0 +1,28 @@
+#edit-field-pre-actions {
+    padding-top: 50px;
+}
+
+// Node edit forms
+.page-node-add,
+.page-node-edit {
+
+    // Make sure autocomplete forms display correctly on edit forms
+    .table-responsive {
+        overflow: visible;
+    }
+
+    &.node-type-collection {
+        .field-name-field-digital-heritage-items {
+            height: auto !important;
+        }
+    }
+
+    // Hide loading icon on community/protocol picker
+    #edit-oggroup-fieldset-body {
+        .form-item {
+            .input-group {
+                display: none;
+            }
+        }
+    }
+}

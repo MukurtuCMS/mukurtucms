@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_item_list().
@@ -33,7 +34,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_item_list($variables) {
+function bootstrap_item_list(array $variables) {
   $items = $variables['items'];
   $title = $variables['title'];
   $type = $variables['type'];
@@ -97,11 +98,13 @@ function bootstrap_item_list($variables) {
               unset($item['children'][$child_key]);
             }
           }
-          $value .= theme('item_list', array(
-            'items' => $item['children'],
-            'type' => $type,
-            'attributes' => $child_list_attributes,
-          ));
+          $build = array(
+            '#theme' => 'item_list',
+            '#items' => $item['children'],
+            '#type' => $type,
+            '#attributes' => $child_list_attributes,
+          );
+          $value .= drupal_render($build);
         }
       }
       else {

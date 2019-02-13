@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community_manage.views_default.inc
@@ -30,11 +31,12 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['query']['options']['query_comment'] = FALSE;
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '12';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '24';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['pager']['options']['id'] = '0';
-  $handler->display->display_options['style_plugin'] = 'grid';
-  $handler->display->display_options['style_options']['row_class'] = 'grid-2';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['style_options']['row_class'] = 'col-xs-12 col-sm-6 col-md-4';
   $handler->display->display_options['row_plugin'] = 'entity';
   $handler->display->display_options['row_options']['view_mode'] = 'thumbed';
   /* Field: Content: Node field */
@@ -663,7 +665,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Contextual filter: Field: Protocol (old) (og_group_ref) */
+  /* Contextual filter: Field: Protocol (og_group_ref) */
   $handler->display->display_options['arguments']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['table'] = 'og_membership';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
@@ -697,8 +699,8 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['footer']['area']['id'] = 'area';
   $handler->display->display_options['footer']['area']['table'] = 'views';
   $handler->display->display_options['footer']['area']['field'] = 'area';
-  $handler->display->display_options['footer']['area']['content'] = '<div class="add-members-link btn btn-default"><a href="/digital-heritage/community/!1">Browse All Digital Heritage in %1</a></div>';
-  $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  $handler->display->display_options['footer']['area']['content'] = '<div class="add-members-link btn btn-default"><a href="<?php print url("digital-heritage/community"); ?>/!1">Browse All Digital Heritage in %1</a></div>';
+  $handler->display->display_options['footer']['area']['format'] = 'ds_code';
   $handler->display->display_options['footer']['area']['tokenize'] = TRUE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   /* Contextual filter: Content: Community (field_community_ref) */
@@ -720,7 +722,7 @@ function ma_community_manage_views_default_views() {
   $handler->display->display_options['relationships']['og_membership_rel']['field'] = 'og_membership_rel';
   $handler->display->display_options['relationships']['og_membership_rel']['required'] = TRUE;
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  /* Contextual filter: Field: Protocol (old) (og_group_ref) */
+  /* Contextual filter: Field: Protocol (og_group_ref) */
   $handler->display->display_options['arguments']['og_group_ref_target_id']['id'] = 'og_group_ref_target_id';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['table'] = 'og_membership';
   $handler->display->display_options['arguments']['og_group_ref_target_id']['field'] = 'og_group_ref_target_id';
@@ -743,7 +745,7 @@ function ma_community_manage_views_default_views() {
     t('Community'),
     t('All'),
     t('more'),
-    t('<div class="add-members-link btn btn-default"><a href="/digital-heritage/community/!1">Browse All Digital Heritage in %1</a></div>'),
+    t('<div class="add-members-link btn btn-default"><a href="<?php print url("digital-heritage/community"); ?>/!1">Browse All Digital Heritage in %1</a></div>'),
     t('Protocol'),
     t('OG membership from node'),
   );

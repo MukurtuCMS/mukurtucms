@@ -134,42 +134,32 @@ function ma_search_api_node_update($node) {
  */
 function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
 
-  // Rebuild permissions and reindex any DH nodes that were queued up for this op, just before the view is rendered.
-  if ($view->name == 'digital_heritage_grid_list') {
-    $dh_nodes_to_rebuild_and_reindex = variable_get ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
-    if (count($dh_nodes_to_rebuild_and_reindex)) {
-      $dh_nodes_to_rebuild_and_reindex = array_unique ($dh_nodes_to_rebuild_and_reindex);
-      # dpm ($dh_nodes_to_rebuild_and_reindex, '$dh_nodes_to_rebuild_and_reindex');
-      // Rebuild perms
-      foreach ($dh_nodes_to_rebuild_and_reindex as $dh_nid) {
-        node_access_acquire_grants(node_load($dh_nid));
+  // Rebuild permissions and reindex any nodes-in-CP that were queued up for this op, just before the view is rendered.
+  $types_to_process = [
+    'digital_heritage_grid_list' => 'mukurtu_dh_nodes_to_rebuild_perms_and_reindex',
+    'dictionary_words' => 'mukurtu_dw_nodes_to_rebuild_perms_and_reindex',
+    'collections_grid_list' => 'mukurtu_coll_nodes_to_rebuild_perms_and_reindex',
+  ];
+  foreach ($types_to_process as $view_name => $process_nids_var) {
+    if ($view->name == $view_name) {
+      $dh_nodes_to_rebuild_and_reindex = variable_get ($process_nids_var, array());
+      if (count($dh_nodes_to_rebuild_and_reindex)) {
+        $dh_nodes_to_rebuild_and_reindex = array_unique ($dh_nodes_to_rebuild_and_reindex);
+        // Rebuild perms
+        foreach ($dh_nodes_to_rebuild_and_reindex as $dh_nid) {
+          node_access_acquire_grants(node_load($dh_nid));
+        }
+        // Reindex
+        search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuild_and_reindex);
+        variable_set ($process_nids_var, array());
       }
-      // Reindex
-      search_api_index_specific_items (search_api_index_load('default_node_index'), $dh_nodes_to_rebuild_and_reindex);
-      variable_set ('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
-    }
-  }
-
-  // Rebuild permissions and reindex any DW nodes that were queued up for this op, just before the view is rendered.
-  if ($view->name == 'dictionary_words') {
-    $dw_nodes_to_rebuild_and_reindex = variable_get ('mukurtu_dw_nodes_to_rebuild_perms_and_reindex', array());
-    if (count($dw_nodes_to_rebuild_and_reindex)) {
-      $dw_nodes_to_rebuild_and_reindex = array_unique ($dw_nodes_to_rebuild_and_reindex);
-      # dpm ($dw_nodes_to_rebuild_and_reindex, '$dw_nodes_to_rebuild_and_reindex');
-      // Rebuild perms
-      foreach ($dw_nodes_to_rebuild_and_reindex as $dw_nid) {
-        node_access_acquire_grants(node_load($dw_nid));
-      }
-      // Reindex
-      search_api_index_specific_items (search_api_index_load('default_node_index'), $dw_nodes_to_rebuild_and_reindex);
-      variable_set ('mukurtu_dw_nodes_to_rebuild_perms_and_reindex', array());
     }
   }
 
 }
 
 
-//  See "HOW DIGITAL HERITAGE (AND DICTIONARY WORDS) CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
+
 /**
  * Implements hook_search_api_query_alter().
  * Exclude user defined nodes from search index
@@ -177,49 +167,106 @@ function ma_search_api_views_pre_view(&$view, &$display_id, &$args) {
  */
 function ma_search_api_search_api_query_alter($sapi_query) {
 
+  $current_page = arg(0);
+
+  // Permissions alterations. See "HOW NODES-IN-CULTURAL PROTOCOL PERMISSIONS ARE IMPLEMENTED" comment in mukurtu_protocol_field.module explaining our multi-pronged approach, including what this hook does
   if (!user_access('bypass content access control')) {
 
-    $current_page = arg(0);
+    switch ($current_page) {
+      case 'digital-heritage':
+      case 'dictionary':
+      case 'collections':
 
-    if ($current_page == 'digital-heritage' OR $current_page = 'dictionary') {
+        $type_map = array (
+          'digital-heritage' => 'digital_heritage',
+          'dictionary' => 'dictionary_word',
+          'collections' => 'collection',
+        );
 
-      $type_map = array (
-        'digital-heritage' => 'digital_heritage',
-        'dictionary' => 'dictionary_word',
-      );
-
-      // Get all STRICT CPs that the user is not a member of
-      $cp_query = new EntityFieldQuery();
-      $cp_query->entityCondition('entity_type', 'node')
-        ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
-        ->entityCondition('bundle', 'cultural_protocol_group')
-        ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
-      // Only groups the user is not a member of
-      if ($user_groups = og_get_groups_by_user()) {
-        $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
-      }
-      $result = $cp_query->execute();
-
-      // Of all the CPs that the user cannot access, get all DH/DWs within them that have Item Sharing set to "ALL"
-      if (isset($result['node'])) {
-        $cp_nids = array_keys($result['node']);
-        # dpm($cp_nids, 'cp nids');
-        $dh_query = new EntityFieldQuery();
-        $dh_query->entityCondition('entity_type', 'node')
+        // Get all STRICT CPs that the user is not a member of
+        $cp_query = new EntityFieldQuery();
+        $cp_query->entityCondition('entity_type', 'node')
           ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
-          ->entityCondition('bundle', $type_map[$current_page])
-          ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
-          ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
-        $result = $dh_query->execute();
-
-        // Filter our the DH/DW items the user should not see
-        if (isset($result['node'])) {
-          $dh_dw_nids = array_keys($result['node']);
-          # dpm($dh_dw_nids, 'dh/dw nids excluded');
-          $filter = $sapi_query->createFilter('AND');
-          $filter->condition('nid', $dh_dw_nids, 'NOT IN');
-          $sapi_query->filter($filter);
+          ->entityCondition('bundle', 'cultural_protocol_group')
+          ->fieldCondition(OG_ACCESS_FIELD, 'value', 2, '='); // only Strict CPs
+        // Only groups the user is not a member of
+        if ($user_groups = og_get_groups_by_user()) {
+          $cp_query->propertyCondition('nid', $user_groups['node'], 'NOT IN');
         }
+        $result = $cp_query->execute();
+
+        // Of all the CPs that the user cannot access, get all nodes-in-CP within them that have Item Sharing set to "ALL"
+        if (isset($result['node'])) {
+          $cp_nids = array_keys($result['node']);
+          # dpm($cp_nids, 'cp nids');
+          $dh_query = new EntityFieldQuery();
+          $dh_query->entityCondition('entity_type', 'node')
+            ->addMetaData('account', user_load(1))// run the query as admin, or else node_access will limit
+            ->entityCondition('bundle', $type_map[$current_page])
+            ->fieldCondition('og_group_ref', 'target_id', $cp_nids, 'IN')
+            ->fieldCondition('field_item_privacy_setting', 'value', 'all'); // we are only restricting DH items with Item Sharing set to "ALL"
+          $result = $dh_query->execute();
+
+          // Filter out the nodes-in-CP the user should not see
+          if (isset($result['node'])) {
+            $nids_in_cp = array_keys($result['node']);
+            $filter = $sapi_query->createFilter('AND');
+            $filter->condition('nid', $nids_in_cp, 'NOT IN');
+            $sapi_query->filter($filter);
+          }
+        }
+
+    }
+  }
+
+
+  // Custom sorts
+  $sort_pages = array('browse', 'collections', 'digital-heritage');
+  if (in_array($current_page, $sort_pages)) { // Add Dictionary here later.
+
+    // Sort according to the session var, otherwise fallback to default
+    if (isset($_SESSION[$current_page . '_custom_sort_order'])) {
+
+      $custom_sort = $_SESSION[$current_page . '_custom_sort_order'];
+
+      // Unset existing sorts
+      $sort =& $sapi_query->getSort();
+      $sort = array();
+
+      // Sort map
+      $sort_map = array(
+        'alphabetical' => array(
+          'sort' => 'search_api_aggregation_2',
+        ),
+        'changed' => array(
+          'sort' => 'changed',
+          'reverse' => TRUE,
+        ),
+        'added' => array(
+          'sort' => 'created',
+          'reverse' => TRUE,
+        ),
+        'oldest' => array(
+          'sort' => 'field_original_date:timestamp',
+        ),
+        'newest' => array(
+          'sort' => 'field_original_date:timestamp',
+          'reverse' => TRUE,
+        ),
+        'relevance' => array(
+          'sort' => 'search_api_aggregation_4',
+        ),
+      );
+      $sort_direction = 'ASC';
+      if (isset($sort_map[$custom_sort]['reverse']) AND $sort_map[$custom_sort]['reverse']) {
+        $sort_direction = 'DESC';
+      }
+      $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_direction);
+
+
+      // When sorting by oldest or newest, filter out DH nodes that do not have an original date set.
+      if ($custom_sort == 'oldest' OR $custom_sort == 'newest') {
+        $sapi_query->condition('field_original_date:timestamp', NULL, '<>');
       }
 
     }
@@ -243,7 +290,7 @@ function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
     return SCALD_ATOM_ACCESS_IGNORE;
   }
   if ($groups = $group_wrapper->field_scald_protocol->value()) {
-    foreach ($groups as $group) { 
+    foreach ($groups as $group) {
       if (node_access('view', $group)) {
         return SCALD_ATOM_ACCESS_IGNORE;
       }
@@ -314,9 +361,16 @@ function ma_search_api_list_of_indexed_fields() {
 
   // Build the output
   $output = '<p>The following fields will return results if their contents match searches made at ' . l("Browse Digital Heritage", 'digital-heritage') . ' or ' . l("Browse Collections", 'collections') . '.<p>';
+  if (drupal_valid_path('admin/config/search/search_api/index/default_node_index/fields')) {
+    $output .= '<p>' . t('Indexed fields can be altered at the') . ' ' . l(t("Search API node index page"), 'admin/config/search/search_api/index/default_node_index/fields') . '.';
+    $output .= '</p>';
+  }
   $content_types_to_show = array ( // Limit the list to just the content types that have search pages
     'digital_heritage',
     'collection',
+    'dictionary_word',
+    'word_list',
+    'person',
   );
   $types = node_type_get_types();
   foreach ($indexed_fields_per_content_type as $content_type => $indexed_fields) {
@@ -336,16 +390,102 @@ function ma_search_api_list_of_indexed_fields() {
 
 // Return the config for the Search API whitespace tokenizer regex
 function ma_search_api_get_whitespace_tokenizer_regex() {
-    // Default value
-    $spaces = "[\p{P}|\p{C}|\p{Z}|\p{S}]";
+  // Default value
+  $spaces = "[\p{P}|\p{C}|\p{Z}|\p{S}]";
 
-    $server = search_api_server_load('search_api_db_server');
-    if($server) {
-        $index = search_api_index_load('default_node_index');
-        if($index) {
-            $spaces = $index->options['processors']['search_api_tokenizer']['settings']['spaces'];
-        }
+  $server = search_api_server_load('search_api_db_server');
+  if($server) {
+    $index = search_api_index_load('default_node_index');
+    if($index) {
+      $spaces = $index->options['processors']['search_api_tokenizer']['settings']['spaces'];
     }
+  }
 
-    return $spaces;
+  return $spaces;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ *
+ * Custom index fields.
+ */
+function ma_search_api_entity_property_info_alter(&$info) {
+  $info['node']['properties']['dh_original_year'] = array(
+    'type'            => 'integer',
+    'label'           => t('DH Original Year'),
+    'sanitized'       => TRUE,
+    'getter callback' => 'ma_search_api_getter_callback_dh_original_year',
+  );
+}
+// The sort is done on the timestamp component of the original date field. This is being indexed when/if we add a year filter.
+function ma_search_api_getter_callback_dh_original_year($item) {
+  if (isset($item->field_original_date[LANGUAGE_NONE][0]['from']['year'])) {
+    return $item->field_original_date[LANGUAGE_NONE][0]['from']['year'];
+  }
+}
+
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_search_api_block_info() {
+  $blocks['ma_custom_sorts'] = array(
+    'info' => t('Custom sorts for the browse pages'),
+  );
+  return $blocks;
+}
+
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_search_api_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+
+    case 'ma_custom_sorts':
+      $block['subject'] = 'Sort';
+      $search_form = drupal_get_form('ma_search_api_sort_form');
+      $block['content'] = drupal_render($search_form);
+      break;
+  }
+
+  return $block;
+
+}
+
+/**
+ * Returns the render array for the form.
+ */
+function ma_search_api_sort_form($form, &$form_state) {
+  $current_page = arg(0);
+  $sort_options = array(
+    'relevance' => t('Search Relevance'),
+    'changed' => t('Date Changed'),
+    'added' => t('Date Added'),
+    'newest' => t('Newest'),
+    'oldest' => t('Oldest'), // NOTE: If the Original Date field is unset, date = 0, so those DH nodes will appear at top of Oldest list. This is a limitation of using the DB for the Search API backend. It should be resolveable when / if switching to SOLR.
+    'alphabetical' => t('Alphabetical'),
+  );
+  if ($current_page <> 'digital-heritage') {
+    unset($sort_options['newest']);
+    unset($sort_options['oldest']);
+  }
+
+  $form['sort'] = array(
+    '#type' => 'select',
+    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'changed',
+    '#options' => $sort_options,
+    '#attributes' => array('onchange' => 'this.form.submit();'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes' => array('class' => array('element-invisible')),
+  );
+  return $form;
+}
+function ma_search_api_sort_form_submit($form, $form_state){
+  if (isset ($form_state['values']['sort'])) {
+    $_SESSION[arg(0) . '_custom_sort_order'] = $form_state['values']['sort'];
+  }
 }

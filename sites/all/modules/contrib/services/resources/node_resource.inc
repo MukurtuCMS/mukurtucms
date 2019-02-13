@@ -468,7 +468,7 @@ function _node_resource_delete($nid) {
 }
 
 /**
- * Return an array of optionally paged nids baed on a set of criteria.
+ * Return an array of optionally paged nids based on a set of criteria.
  *
  * An example request might look like
  *

@@ -10,6 +10,31 @@
 function ma_culturalprotocol_og_features_default_permissions() {
   $permissions = array();
 
+  // Exported og permission: 'node:community:create collection content'
+  $permissions['node:community:create collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:delete any collection content'
+  $permissions['node:community:delete any collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:delete own collection content'
+  $permissions['node:community:delete own collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:update any collection content'
+  $permissions['node:community:update any collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:update own collection content'
+  $permissions['node:community:update own collection content'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:cultural_protocol_group:add user'
   $permissions['node:cultural_protocol_group:add user'] = array(
     'roles' => array(
@@ -170,6 +195,51 @@ function ma_culturalprotocol_og_features_default_permissions() {
       'contributor' => 'contributor',
       'protocol steward' => 'protocol steward',
     ),
+  );
+
+  // Exported og permission: 'node:language_community:administer comments'
+  $permissions['node:language_community:administer comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:create collection content'
+  $permissions['node:language_community:create collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:delete any collection content'
+  $permissions['node:language_community:delete any collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:delete own collection content'
+  $permissions['node:language_community:delete own collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:delete own comments'
+  $permissions['node:language_community:delete own comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:modify any comments'
+  $permissions['node:language_community:modify any comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:post comments'
+  $permissions['node:language_community:post comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:update any collection content'
+  $permissions['node:language_community:update any collection content'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:language_community:update own collection content'
+  $permissions['node:language_community:update own collection content'] = array(
+    'roles' => array(),
   );
 
   return $permissions;

@@ -1,0 +1,362 @@
+<?php
+/**
+ * @file
+ * Tests for Mailhandler modules.
+ */
+
+/**
+ * Mailhandler test cases.
+ */
+class MailhandlerTestCase extends DrupalWebTestCase {
+  protected $mailhandler_user;
+  protected $profile = 'testing';
+
+  /**
+   * Implements getInfo().
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Mailbox creation and import',
+      'description' => 'Create mailboxes and feeds importers and make sure they work.',
+      'group' => 'Mailhandler',
+    );
+  }
+
+  /**
+   * Implements setUp().
+   */
+  public function setUp() {
+    parent::setUp('taxonomy', 'file', 'mailhandler', 'mailhandler_php_imap', 'mailhandler_default', 'text', 'multiple_email', 'mailhandler_multiple_email');
+    $permissions = array('administer nodes', 'bypass node access', 'administer mailhandler', 'administer feeds', 'administer taxonomy', 'administer content types', 'use multiple emails');
+    $this->mailhandler_user = $this->drupalCreateUser($permissions);
+    // Create and log in our privileged user.
+    $this->mailhandler_user->is_new = FALSE;
+    user_save($this->mailhandler_user, array('mail' => 'from@example.com'));
+    $this->drupalLogin($this->mailhandler_user);
+    $edit = array('email' => 'second@example.com');
+    $this->drupalPost('user/' . $this->mailhandler_user->uid . '/edit/email-addresses', $edit, t('Save'));
+    $src = drupal_get_path('module', 'mailhandler') . '/tests/mbox/';
+    $dest = file_directory_temp() . '/mailhandler_test';
+    shell_exec("cp -r $src $dest");
+  }
+
+  /**
+   * Create a mailbox given a prefix.
+   */
+  public function createMailbox($prefix) {
+    $edit = array();
+    $edit['admin_title'] = $prefix . '@example.com';
+    $edit['mail'] = $prefix . '_example_com';
+    $edit['settings[type]'] = 'local';
+    $edit['settings[folder]'] = file_directory_temp() . '/mailhandler_test/' . $prefix;
+    $edit['settings[flag_after_read]'] = FALSE;
+    $edit['settings[delete_after_read]'] = FALSE;
+    $this->drupalPost(MAILHANDLER_MENU_PREFIX . '/mailhandler/add', $edit, t('Save'));
+    $this->assertText(t('@title has been created.', array('@title' => $prefix . '_example_com')));
+  }
+
+  /**
+   * Create mailboxes for every mbox in directory.
+   */
+  public function createMailboxes() {
+    $dir = file_directory_temp() . '/mailhandler_test';
+    $files = scandir($dir);
+    $files = array_diff($files, array('..', '.'));
+    foreach ($files as $mailbox) {
+      $this->createMailbox($mailbox);
+    }
+  }
+
+  /**
+   * Create a source node.
+   */
+  public function createSource($prefix, $count = 0, $auth_required = FALSE) {
+    $edit = array();
+    $edit['feeds[MailhandlerFetcher][source]'] = $prefix . '_example_com';
+    $edit['feeds[MailhandlerParser][auth_required]'] = $auth_required;
+    $edit['title'] = $prefix . '@example.com';
+    $this->drupalPost('node/add/mailhandler-source', $edit, t('Save'));
+    $text = 'There are no new nodes.';
+    if ($count == 1) {
+      $text = 'Created ' . $count . ' node.';
+    }
+    elseif ($count > 1) {
+      $text = 'Created ' . $count . ' nodes.';
+    }
+    $this->assertText(t($text));
+  }
+
+  /**
+   * Get a node by title.
+   */
+  public function getNodeByTitle($title) {
+    return node_load(array('title' => $title));
+  }
+
+  /**
+   * Create mapping in feeds processor.
+   */
+  public function createMapping($source, $target) {
+    $edit = array();
+    $edit['source'] = $source;
+    $edit['target'] = $target;
+    $this->drupalPost(MAILHANDLER_MENU_PREFIX . '/feeds/mailhandler_nodes/mapping', $edit, t('Save'));
+  }
+
+  /**
+   * Create a taxonomy term.
+   */
+  public function createTerm($name) {
+    $edit = array('name' => $name);
+    $this->drupalPost(MAILHANDLER_MENU_PREFIX . '/taxonomy/tags/add', $edit, t('Save'));
+  }
+
+  /**
+   * Test case.
+   */
+  public function testMailhandlerImport() {
+    // Create article content type.
+    $type = array(
+      'type' => 'article',
+      'name' => st('Article'),
+      'base' => 'node_content',
+      'description' => st('Use <em>articles</em> for time-sensitive content like news, press releases or blog posts.'),
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+    );
+
+    $type = node_type_set_defaults($type);
+    node_type_save($type);
+    node_add_body_field($type);
+
+    // Create mailboxes.
+    $this->createMailboxes();
+
+    // Add field_files to articles.
+    $field = array(
+      'field_name' => 'field_files',
+      'type' => 'file',
+      'settings' => array(),
+      'cardinality' => 1,
+    );
+    field_create_field($field);
+    $instance = array(
+      'field_name' => 'field_files',
+      'label' => 'Files',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'required' => FALSE,
+      'settings' => array(
+        'file_extensions' => 'txt png',
+      ),
+      'widget' => array(
+        'type' => 'file_generic',
+        'settings' => array(),
+      ),
+    );
+    field_create_instance($instance);
+
+    // Create tags vocabulary and field.
+    $description = st('Use tags to group articles on similar topics into categories.');
+    $help = st('Enter a comma-separated list of words to describe your content.');
+    $vocabulary = (object) array(
+      'name' => st('Tags'),
+      'description' => $description,
+      'machine_name' => 'tags',
+      'help' => $help,
+
+    );
+    taxonomy_vocabulary_save($vocabulary);
+
+    $this->createTerm('term1');
+    $this->createTerm('term2');
+    $this->createTerm('term/slash');
+    $this->createTerm('term:colon');
+
+    $field = array(
+      'field_name' => 'field_' . $vocabulary->machine_name,
+      'type' => 'taxonomy_term_reference',
+      // Set cardinality to unlimited for tagging.
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'settings' => array(
+        'allowed_values' => array(
+          array(
+            'vocabulary' => $vocabulary->machine_name,
+            'parent' => 0,
+          ),
+        ),
+      ),
+    );
+    field_create_field($field);
+
+    $instance = array(
+      'field_name' => 'field_' . $vocabulary->machine_name,
+      'entity_type' => 'node',
+      'label' => 'Tags',
+      'bundle' => 'article',
+      'description' => $vocabulary->help,
+      'widget' => array(
+        'type' => 'taxonomy_autocomplete',
+        'weight' => -4,
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'taxonomy_term_reference_link',
+          'weight' => 10,
+        ),
+        'teaser' => array(
+          'type' => 'taxonomy_term_reference_link',
+          'weight' => 10,
+        ),
+      ),
+    );
+    field_create_instance($instance);
+
+    // Add from fields to articles.
+    $fields = array('field_from_address', 'field_from_name', 'field_text_test');
+    foreach ($fields as $field_name) {
+      $field = array(
+        'field_name' => $field_name,
+        'type' => 'text',
+        'settings' => array(),
+        'cardinality' => 1,
+      );
+      field_create_field($field);
+      $instance = array(
+        'field_name' => $field_name,
+        'label' => $field_name,
+        'entity_type' => 'node',
+        'bundle' => 'article',
+        'required' => FALSE,
+        'settings' => array(),
+        'widget' => array(
+          'type' => 'text_textfield',
+          'settings' => array(),
+        ),
+      );
+      field_create_instance($instance);
+    }
+
+    // Override Mailhandler Default importer, map taxonomy, files, and text fields.
+    $this->drupalGet(MAILHANDLER_MENU_PREFIX . '/feeds/mailhandler_nodes/settings/MailhandlerParser');
+    $edit = array();
+    $edit['available_commands'] = 'status' . "\n" . 'taxonomy' . "\n" . 'Nachname';
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->drupalGet(MAILHANDLER_MENU_PREFIX . '/feeds/mailhandler_nodes/settings/FeedsNodeProcessor');
+    $edit = array();
+    $edit['bundle'] = 'article';
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->createMapping('body_html', 'body');
+    $this->createMapping('taxonomy', 'field_tags');
+    $this->createMapping('attachments', 'field_files:uri');
+    $this->createMapping('from-address', 'field_from_address');
+    $this->createMapping('from-name', 'field_from_name');
+    $this->createMapping('Nachname', 'field_text_test');
+
+    // Test import of an empty mailbox.
+    $this->createSource('empty');
+
+    // Test import of message - auth user, auth required.
+    $this->createSource('test1', 1, TRUE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 1'));
+    $tags = field_get_items('node', $node, 'field_tags', LANGUAGE_NONE);
+    $this->assertTrue($node->status);
+    $this->assertEqual($tags[0]['tid'], 1);
+    $this->assertEqual($tags[1]['tid'], 2);
+    // Test that from-address and from-name headers work.
+    $from_address = field_get_items('node', $node, 'field_from_address', LANGUAGE_NONE);
+    $this->assertEqual($from_address[0]['value'], 'from@example.com');
+    $from_name = field_get_items('node', $node, 'field_from_name', LANGUAGE_NONE);
+    $this->assertEqual($from_name[0]['value'], 'Dane Powell');
+    $edit = array();
+    $this->drupalPost('node/' . $node->nid . '/delete', $edit, t('Delete'));
+
+    // Test import of message - auth user, auth not required.
+    $this->createSource('test1', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 1'));
+    $tags = field_get_items('node', $node, 'field_tags', LANGUAGE_NONE);
+    $this->assertTrue($node->status);
+    $this->assertEqual($tags[0]['tid'], 1);
+    $this->assertEqual($tags[1]['tid'], 2);
+
+    // Test import of message - anon user, auth required.
+    $this->createSource('test2', 0, TRUE);
+    $this->assertFalse($node = $this->drupalGetNodeByTitle('This is a test message 2'));
+
+    // Test import of message - anon user, auth not required.
+    $this->createSource('test2', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 2'));
+    $tags = field_get_items('node', $node, 'field_tags', LANGUAGE_NONE);
+    $this->assertFalse($node->status);
+    // Test that taxonomy and commands with special characters work.
+    $this->assertEqual($tags[0]['tid'], 1);
+    $this->assertEqual($tags[1]['tid'], 2);
+    $this->assertEqual($tags[2]['tid'], 3);
+    $this->assertEqual($tags[3]['tid'], 4);
+
+    // Test import of multiple messages.
+    $this->createSource('test3', 2);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test message 1 of 2'));
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test message 2 of 2'));
+
+    // Test import of messages with attachments.
+    $this->createSource('attachment1', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test attachments 1'));
+    $files = field_get_items('node', $node, 'field_files', LANGUAGE_NONE);
+    $this->assertEqual($files[0]['filemime'], 'text/plain');
+    $this->assertEqual($files[0]['filesize'], 778);
+
+    // Test import of single-part messages.
+    $this->createSource('singlepart', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a single-part message'));
+    $files = field_get_items('node', $node, 'field_files', LANGUAGE_NONE);
+    $this->assertEqual($files[0]['filemime'], 'image/png');
+
+    // Test import of messages with MIME-encoded headers.
+    $this->createSource('mime', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('mime header'));
+
+    // Test Multiple Email plugin.
+    $this->drupalGet(MAILHANDLER_MENU_PREFIX . '/feeds/mailhandler_nodes/settings/MailhandlerParser');
+    $edit = array();
+    $edit['authenticate_plugin'] = 'MailhandlerMultipleEmailAuthenticate';
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->createSource('test4', 1, TRUE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('This is a test message 4'));
+    $this->assertEqual($node->uid, $this->mailhandler_user->uid);
+
+    // Test import of messages in ISO-8859 encoding.
+    $this->createSource('test5', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Deutscher Verband für Meeresmüll'));
+
+    // Test import of binary content.
+    $this->createSource('inline', 1);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test inline image'));
+    $files = field_get_items('node', $node, 'field_files', LANGUAGE_NONE);
+    $filename_actual = drupal_realpath('public://') . '/../../' . $files[0]['filename'];
+    $filename_actual1 = drupal_realpath('public://') . '/' . $files[0]['filename'];
+    if (file_exists($filename_actual1)) {
+      $filename_actual = $filename_actual1;
+    }
+    $handle_actual = fopen($filename_actual, 'r');
+    $filestring_actual = fread($handle_actual, filesize($filename_actual));
+    $filename_expected = drupal_get_path('module', 'mailhandler') . '/tests/druplicon.png';
+    $handle_expected = fopen($filename_expected, 'r');
+    $filestring_expected = fread($handle_expected, filesize($filename_expected));
+    $this->assertTrue($filestring_expected === $filestring_actual);
+
+    // Test that URLs in the first line of an email don't get stripped (interpreted as command).
+    $this->createSource('firstline_url', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test firstline URLS'));
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertLinkByHref('http://example.com');
+
+    // Test that capitalized commands work.
+    $this->createSource('capital_commands', 1, FALSE);
+    $this->assertTrue($node = $this->drupalGetNodeByTitle('Test capital commands'));
+    $text_test = field_get_items('node', $node, 'field_text_test', LANGUAGE_NONE);
+    $this->assertEqual($text_test[0]['value'], 'testing');
+  }
+
+}

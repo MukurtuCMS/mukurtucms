@@ -709,6 +709,7 @@ function services_get_updates() {
     // _resource_resource_method_update_N_N().
     $regexp = '/_(?P<resource>.+)_resource_(?P<method>.+)_update_(?P<major>\d+)_(?P<minor>\d+)$/';
     $functions = get_defined_functions();
+
     // Narrow this down to functions ending with an integer, since all
     // _resource_resource_method_update_N_N() functions end this way, and there are other
     // possible functions which match '_update_'. We use preg_grep() here
@@ -716,7 +717,13 @@ function services_get_updates() {
     // through all PHP functions can take significant page execution time.
     // Luckily this only happens when the cache is cleared for an endpoint
     // and resources are re-generated.
-    foreach (preg_grep('/_\d+$/', $functions['user']) as $function) {
+    $functions = preg_grep('/_\d+$/', $functions['user']);
+
+    // Sort functions in alphabetical order, so functions with a larger version
+    // number will be used when needed
+    asort($functions);
+
+    foreach ($functions as $function) {
       // If this function is a service update function, add it to the list of
       // services updates.
       if (preg_match($regexp, $function, $matches)) {

@@ -1,0 +1,168 @@
+<?php
+
+/**
+ * @file
+ * Tests the profiles functionality.
+ */
+
+/**
+ * Test that the front page still loads.
+ */
+class BmTestProfiles extends BmTestBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Destination tests',
+      'description' => 'Run through basic scenarios and functionality.',
+      'group' => 'backup_migrate',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
+
+    // Log in as user 1, so that permissions are irrelevant.
+    $this->loginUser1();
+  }
+
+  /**
+   * Verify the profile page has the expected functionality available.
+   */
+  public function testProfilePage() {
+    // Load the main B&M page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings');
+    $this->assertResponse(200);
+
+    // Confirm the page has the expected settings details.
+    $this->assertText('Settings Profiles');
+    $this->assertText('Default Settings');
+    $this->assertLink('Create a new settings profile');
+  }
+
+  /**
+   * Confirm adding a new backup process works.
+   */
+  public function testAddDefaultProfile() {
+    // Load the main B&M page.
+    $this->drupalGet(BACKUP_MIGRATE_MENU_PATH . '/settings/profile/add');
+    $this->assertResponse(200);
+
+    backup_migrate_include('files', 'profiles');
+    $filename = _backup_migrate_default_filename();
+    $defaults = _backup_migrate_profile_default_profile();
+
+    // Verify all of the expected fields exist.
+    $this->assertFieldByName('name');
+    $this->assertFieldByName('name', 'Untitled Profile');
+    $this->assertFieldByName('machine_name');
+    $this->assertFieldByName('filename');
+    $this->assertFieldByName('filename', $filename);
+    // @todo Confirm all of the expected options are present.
+    $this->assertFieldByName('append_timestamp');
+    $this->assertFieldByName('timestamp_format');
+    $this->assertFieldByName('timestamp_format', $defaults['timestamp_format']);
+    $this->assertFieldByName('filters[compression]');
+    $items = $this->supportedCompressors();
+    $this->assertSelectOptions('edit-filters-compression', $items);
+    $this->assertOptionSelected('edit-filters-compression', 'gzip');
+    $this->assertFieldByName('filters[sources][db][exclude_tables][]');
+    $this->assertFieldByName('filters[sources][db][nodata_tables][]');
+    $this->assertFieldByName('filters[sources][db][utils_lock_tables]');
+    $this->assertFieldByName('filters[sources][files][exclude_filepaths]');
+    $this->assertFieldByName('filters[sources][archive][exclude_filepaths]');
+    $this->assertFieldByName('filters[utils_site_offline]');
+    $this->assertFieldByName('filters[utils_site_offline_message]');
+    $this->assertFieldByName('filters[utils_description]');
+    $this->assertFieldByName('filters[use_cli]');
+    $this->assertFieldByName('filters[ignore_errors]');
+    $this->assertFieldByName('filters[notify_success_enable]');
+    $this->assertFieldByName('filters[notify_success_email]');
+    $this->assertFieldByName('filters[notify_failure_enable]');
+    $this->assertFieldByName('filters[notify_failure_email]');
+  }
+
+  /**
+   * Confirm the backup filename processes work as expected.
+   */
+  public function testFilenameOptions() {
+    // Load the profile. This will be interacted with directly because otherwise
+    // the number of form fields will likely make it impossible to execute
+    // properly due to the max_input_vars setting defaulting to 1000.
+    $profile = $this->getProfile();
+
+    // Run a backup.
+    $this->runBackup();
+
+    // Confirm that there is only one file and it has a timestamp of some sort.
+    $files1 = $this->listBackupFiles();
+    $this->verbose($files1);
+    $this->assertTrue(count($files1) === 1, 'One backup file was found.');
+    $this->assertFileTimestamp(array_shift($files1));
+
+    // Run another backup.
+    $this->runBackup();
+
+    // Confirm that there are two backup files.
+    $files1b = $this->listBackupFiles();
+    $this->verbose($files1b);
+    $this->assertTrue(count($files1b) === 2, 'Two backup files were found.');
+
+    // Cleanup before the next test - purge existing backups.
+    $this->deleteBackups();
+
+    // Change settings to "create separate backups".
+    $profile->append_timestamp = 0;
+    $profile->save();
+
+    // Run a backup.
+    $this->runBackup();
+
+    // Confirm that separate files are retained.
+    $files2 = $this->listBackupFiles();
+    $this->verbose($files2);
+    $this->assertTrue(count($files2) === 1, 'One backup file was found.');
+    $this->assertNoFileTimestamp(array_shift($files2));
+
+    // Run another backup.
+    $this->runBackup();
+
+    // Confirm that separate files are retained.
+    $files2b = $this->listBackupFiles();
+    $this->verbose($files2b);
+    $this->assertTrue(count($files2b) === 2, 'Two backup files were found.');
+
+    // Cleanup before the next test - purge existing backups.
+    $this->deleteBackups();
+
+    // Change settings to "overwrite".
+    $profile->append_timestamp = 2;
+    $profile->save();
+
+    // Run a backup.
+    $this->runBackup();
+
+    // Confirm that a new file was created.
+    $files3 = $this->listBackupFiles();
+    $this->verbose($files3);
+    $this->assertTrue(count($files3) === 1, 'One backup file was found.');
+    $this->assertNoFileTimestamp(array_shift($files3));
+
+    // Run the backup again.
+    $this->runBackup();
+
+    // Confirm that a new file was not created.
+    $files3b = $this->listBackupFiles();
+    $this->verbose($files3b);
+    $this->assertTrue(count($files3b) === 1, 'One backup file was found.');
+
+    // Cleanup - purge all backups.
+    $this->deleteBackups();
+  }
+
+}

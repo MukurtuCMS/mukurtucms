@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.feeds_importer_default.inc
@@ -27,6 +28,7 @@ function ma_collection_feeds_importer_default() {
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
       ),
     ),
     'parser' => array(
@@ -87,7 +89,7 @@ function ma_collection_feeds_importer_default() {
           ),
           7 => array(
             'source' => 'Digital Heritage Items',
-            'target' => 'field_digital_heritage_items:guid_or_nid',
+            'target' => 'field_digital_heritage_items:guid_or_target_id',
             'unique' => FALSE,
           ),
         ),

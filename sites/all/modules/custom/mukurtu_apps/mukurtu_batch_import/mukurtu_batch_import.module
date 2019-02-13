@@ -13,7 +13,7 @@ function mukurtu_batch_import_menu() {
     'access arguments' => array('administer site configuration'),
   );
 
-  return $items;	  
+  return $items;
 }
 
 
@@ -28,12 +28,12 @@ function mukurtu_batch_import_form() {
 
   $form['mukurtu_batch_import_form'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Import Batch Content'),  
+    '#title' => t('Import Batch Content'),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
-  
+
   $form['mukurtu_batch_import_form']['header'] = array(
     '#type' => 'markup',
     '#markup' => '<p>' . t('Upload content into Mukurtu by uploading a zip archive.') . '</p>',
@@ -44,11 +44,11 @@ function mukurtu_batch_import_form() {
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('1. Gather your files') . '</h3>',
     '#collapsible' => FALSE,
-    '#description' => '<p>' . l('Download a sample zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '</p><p>' . t('This zip file contains sample CSV files that demonstrate the proper format to import audio, files, images, video, and digital heritage items.  You can also export your existing content in the proper format from the <a href="@management_link">digital heritage management page</a>.', array('@management_link' => '/manage/digital-heritage')) . '</p>',
+    '#description' => '<p>For CSV imports, ' . l('download a sample Zip file', drupal_get_path('module', 'mukurtu_batch_import') . '/demo.zip') . '. This Zip file contains sample CSV files from a simple digital heritage export. You can also export your existing content in the proper format from the ' . l('digital heritage management page', '/manage/digital-heritage') . '.</p><p>For Dublin Core and MODS XML imports, export an XML file from your system and create a Zip archive including the XML file and media files. The media files should be prefixed in their media field in the XML with "[mukurtu:batch_import_temp_directory]/".</p><p>Information about CSV field formats can be found on the type specific ' . l("Mukurtu Import", 'import') . ' pages in the "Field Format Section" section. CSV files should be named to reflect their content type or match the corresponding importer name. For example, for a CSV file containing digital heritage items valid names would include "Node - Digital Heritage.csv" or "Digital Heritage.csv".</p>',
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
-  
+
   $form['mukurtu_batch_import_form']['upload'] = array(
     '#type' => 'fieldset',
     '#title' => '<h3>' . t('2. Upload your zip file') . '</h3>',
@@ -91,9 +91,9 @@ function mukurtu_batch_import_form() {
 /*   $form['actions']['import']['#type'] = 'submit'; */
 /*   $form['actions']['import']['#value'] = t('Import'); */
 /*   $form['actions']['import']['#submit'] = array('mukurtu_batch_import_import'); */
-  
-  
-  
+
+
+
 /*
     $list = _media_browser_plus_folder_list();
   return array(
@@ -105,11 +105,11 @@ function mukurtu_batch_import_form() {
     '#options' => $list,
     '#description' => t('Select a folder for the media to be put in'),
   );
-  
+
 */
-  
-  
-  $form['actions']['submit']['#value'] = t("Import");
+
+
+  $form['actions']['submit']['#value'] = t("Continue");
 /*   array_push($form['actions']['import']['#submit'], 'mukurtu_batch_import_import'); */
   array_push($form['#submit'], 'mukurtu_batch_import_import');
 
@@ -119,16 +119,16 @@ function mukurtu_batch_import_form() {
 }
 
 function mukurtu_batch_import_import($form, &$form_state) {
-  $fid = $form_state['values']['mukurtu_batch_import_form']['upload']['folder'];  
+  $fid = $form_state['values']['mukurtu_batch_import_form']['upload']['folder'];
   $file = file_load($fid);
 
   if($file) {
-    mukurtu_batch_import_parse_zip($file); 
+    mukurtu_batch_import_parse_zip($file);
   }
 }
 
 function mukurtu_batch_import_parse_zip($file) {
- 
+
   $file_path = drupal_realpath($file->uri);
 
   // Create a unique temporary folder to extract the zip file in
@@ -137,28 +137,24 @@ function mukurtu_batch_import_parse_zip($file) {
   mkdir($temp_extract_path); */
 
   $temp_extract_path = 'private://mukurtu_batch_import/' . uniqid('zip_import_');
-  //  mkdir($temp_extract_path);
-  
+
   $zip = new ZipArchive;
   if ($zip->open($file_path) === TRUE) {
     $zip->extractTo($temp_extract_path);
     $zip->close();
-    dsm('Zip file extracted');      
+    dsm('Zip file extracted');
   } else {
     dsm('Zip file not extracted.');
   }
-  
-  //  $media_path = $folder_path . '/media';
-  //  $metadata_path = $folder_path . '/metadata';
 
   $feedback = array();
   mukurtu_batch_import_import_metadata($temp_extract_path);
 
   // Record/store feedback
-  //  mukurtu_batch_import_feedback($messages);
   $messages = drupal_get_messages('status');
+
   // Delete extracted files from temporary directory
-  //  file_unmanaged_delete_recursive($temp_extract_path);
+  // file_unmanaged_delete_recursive($temp_extract_path);
 }
 
 /**
@@ -233,102 +229,224 @@ function mukurtu_batch_import_media_batch($files, &$context) {
 }
 */
 
+// For a given entity type/bundle name, return various forms the filename might take
+function mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) {
+    $entity_info = entity_get_info($entity_type);
+    $bundle_info = $entity_info['bundles'][$bundle_name];
+
+    $filters = array('-', '_', ' ', '_bundle');
+
+    $variants[] = "{$entity_info['label']} - {$bundle_info['label']}";
+    $variants[] = "{$entity_type}_{$bundle_name}";
+    $variants[] = $bundle_name;
+
+    foreach($filters as $filter) {
+        if(stripos($bundle_name, $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', $bundle_name);
+        }
+        if(stripos("{$entity_type}_{$bundle_name}", $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', "{$entity_type}_{$bundle_name}");
+       }
+
+       if(stripos("{$entity_info['label']} - {$bundle_info['label']}", $filter) !== FALSE) {
+            $variants[] = str_replace($filter, '', "{$entity_info['label']} - {$bundle_info['label']}");
+       }
+    }
+
+    // Legacy filename support for older version of Mukurtu
+    if($entity_type == 'node') {
+        switch($bundle_name) {
+        case 'cultural_protocol_group':
+            $variants[] = 'protocol';
+        }
+    }
+
+    return $variants;
+}
+
+// Try to figure out which importer a file should use based on its filename
+function mukurtu_batch_import_filename_to_entity_bundle_name($filename) {
+    $filename = strtolower($filename);
+    $entities = _mukurtu_export_get_entity_bundle_array();
+    $matches = array(0 => NULL);
+    foreach($entities as $entity_type => $bundle) {
+        foreach($bundle as $bundle_name) {
+            foreach(mukurtu_batch_import_get_name_variants($entity_type, $bundle_name) as $variant) {
+                if(stripos($filename, strtolower($variant)) !== FALSE) {
+                    $file_type['entity_type'] = $entity_type;
+                    $file_type['bundle_name'] = $bundle_name;
+
+                    // Keep track of how many characters matched. We are assuming that
+                    // the longer the match, the better.
+                    $matches[strlen($variant)] = $file_type;
+                }
+            }
+        }
+    }
+
+    ksort($matches);
+    $bestmatch = end($matches);
+    return $bestmatch;
+}
+
+function mukurtu_batch_import_generate_import_steps($files) {
+  $content_import_steps = array();
+  $taxonomy_import_steps = array();
+  $scald_import_steps = array();
+  $pre_import_community = array();
+  $pre_import_protocol = array();
+
+  foreach ($files as $file) {
+    if (preg_match('/(.+)\.csv/', $file, $matches)) {
+      if ($file_type = mukurtu_batch_import_filename_to_entity_bundle_name($matches[1])) {
+        $entity_type = $file_type['entity_type'];
+        $bundle_name = $file_type['bundle_name'];
+        $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
+
+        // Separate out imports by type.
+        // We aren't going to fully resolve dependencies,
+        // but we can import the types in the most likely order.
+        switch ($entity_type) {
+          case 'scald_atom':
+            $scald_import_steps[] = array(
+              'filename' => $matches[0],
+              'importer' => $importer,
+              'hide_warnings' => FALSE,
+            );
+            break;
+
+          case 'taxonomy_term':
+            $taxonomy_import_steps[] = array(
+              'filename' => $matches[0],
+              'importer' => $importer,
+              'hide_warnings' => TRUE,
+            );
+            break;
+
+          default:
+            $content_import_steps[] = array(
+              'filename' => $matches[0],
+              'importer' => $importer,
+              'hide_warnings' => FALSE,
+            );
+        }
+
+        // Communities and protocols need to exist before most other content can be imported.
+        // We'll import them once right away, then again later after media has been imported.
+        if ($entity_type == 'node' && $bundle_name == 'community') {
+          $pre_import_community[] = array(
+            'filename' => $matches[0],
+            'importer' => $importer,
+            'hide_warnings' => TRUE,
+          );
+        }
+
+        if ($entity_type == 'node' && $bundle_name == 'cultural_protocol_group') {
+          $pre_import_protocol[] = array(
+            'filename' => $matches[0],
+            'importer' => $importer,
+            'hide_warnings' => TRUE,
+          );
+        }
+      }
+    }
+  }
+
+  $all_steps = array_merge($pre_import_community, $pre_import_protocol, $taxonomy_import_steps, $scald_import_steps, $content_import_steps);
+
+  return $all_steps;
+}
 
 function mukurtu_batch_import_import_metadata($path) {
   module_load_include('inc', 'feeds', 'feeds.pages');
-
-  $import_steps = array();
-  // Preload Communities and Protocols, don't show warnings, they might reference non-existant media yet to be imported
-  $import_steps[] = array('filename' => 'communities.csv',
-                          'importer' => 'import_communities',
-                          'hide_warnings' => TRUE);
-  $import_steps[] = array('filename' => 'protocols.csv',
-                          'importer' => 'import_cultural_protocols',
-                          'hide_warnings' => TRUE);
-
-  // Import Media
-  $import_steps[] = array('filename' => 'media_audio.csv',
-                          'importer' => 'import_media_audio',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_files.csv',
-                          'importer' => 'import_media_files',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_images.csv',
-                          'importer' => 'import_media_images',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'media_video.csv',
-                          'importer' => 'import_media_video',
-                          'hide_warnings' => FALSE);
-
-  // Re-import Communities and Protocols, parent objects and media should exist now
-  $import_steps[] = array('filename' => 'communities.csv',
-                          'importer' => 'import_communities',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'protocols.csv',
-                          'importer' => 'import_cultural_protocols',
-                          'hide_warnings' => FALSE);
-
-  // Import collections and digital heritage items
-  $import_steps[] = array('filename' => 'collections.csv',
-                          'importer' => 'import_collection',
-                          'hide_warnings' => FALSE);
-  $import_steps[] = array('filename' => 'digitalheritage.csv',
-                          'importer' => 'digital_heritage_metadata',
-                          'hide_warnings' => FALSE);
-
 
   // Some zip archive programs place files inside a single folder. Rather than failing, if there is one directory in the root,
   // check if the files are there first.
   $files = scandir($path);
 
   foreach($files as $key => $file) {
-      if($file == '.' || $file == '..') {
+      if($file == '.' || $file == '..' || $file == '__MACOSX') {
           unset($files[$key]);
       }
   }
 
+  // Single folder in the extracted Zip archive
   if(count($files) == 1) {
       foreach($files as $file) {
           if(is_dir($path . DIRECTORY_SEPARATOR . $file)) {
               $path = $path . DIRECTORY_SEPARATOR . $file;
+              $files = scandir($path);
           }
       }
+  }
+
+  // Check if it's an XML importer
+  $xml_import = 0;
+  foreach ($files as $file) {
+    if (strpos($file, '.xml')) {
+
+      // If XML importer, define simple single import step.
+      $xml_import = 1;
+      $import_steps = [
+        [
+          'filename' => $file,
+          'importer' => 'digital_heritage_xml_dc_or_mods', // we don't know yet whether it's DC or MODS so we just use a generic name, which is fine because this doesn't get used within the batch importer, but does need to be defined.
+          'hide_warnings' => FALSE,
+        ],
+      ];
+      break;
+    }
+  }
+
+  // If it's not an XML importer, build the import steps.
+  if (!$xml_import) {
+    // Take the files we've found and figure out which importers to use and in what order
+    $import_steps = mukurtu_batch_import_generate_import_steps($files);
   }
 
   if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
       unset($_SESSION['mukurtu_zip_import']['hide_warnings']);
   }
   $success = FALSE;
+
+  // Run each import step
   foreach($import_steps as $import_step) {
       $filename = $import_step['filename'];
       $importer_id = $import_step['importer'];
       $hide_warnings = $import_step['hide_warnings'];
 
-      $csv_path = $path . DIRECTORY_SEPARATOR . $filename;
-      if(file_exists($csv_path)) {
+      $import_file_path = $path . DIRECTORY_SEPARATOR . $filename;
+      if(file_exists($import_file_path)) {
           // Success in this case is finding at least one of the files we were looking for
           $success = TRUE;
 
           // Save as a managed file.
-          $csv = file_get_contents($csv_path);
+          $import_file = file_get_contents($import_file_path);
 
           // Crude method to support relative file paths
-          $csv = str_replace('[mukurtu:batch_import_temp_directory]', $path, $csv);
+          $import_file = str_replace(MUKURTU_EXPORT_IMPORT_DIR, $path, $import_file);
 
-          //      $destination = 'private://feeds/';
           $destination = $path;
           file_prepare_directory($destination, FILE_CREATE_DIRECTORY);
 
           // Prefix will create a different file for imports that get run twice
           // Without this, feeds could try and run twice using the same file, which usually results in conflict
           $prefix = $hide_warnings ? 'hidden_' : '';
-          $file = file_save_data($csv, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
+          $file = file_save_data($import_file, $destination . DIRECTORY_SEPARATOR . $prefix . $filename, FILE_EXISTS_REPLACE);
 
           if($hide_warnings) {
               $_SESSION['mukurtu_zip_import']['hide_warnings'][] = $importer_id;
           }
 
-          // Load the Feeds Source object.
+        // If it's an XML import, then set the imported file and go to the import options form, leaving this code at this point.
+        if ($xml_import) {
+          variable_set('dh_xml_import_fid', $file->fid);
+          variable_set('dh_xml_import_is_batch', 1);
+          drupal_goto('import/digital-heritage-xml-context');
+        }
+
+        // Not an XML importer. Proceed as normal.
+        // Load the Feeds Source object.
           $source = feeds_source($importer_id);
           $fetcher_config = $source->getConfigFor($source->importer->fetcher);
           $fetcher_config['source'] = $file->uri;
@@ -336,17 +454,24 @@ function mukurtu_batch_import_import_metadata($path) {
 
           // Set the source fetcher config.
           $source->setConfigFor($source->importer->fetcher, $fetcher_config);
-      
+
           // Save the source.
           $source->save();
 
           // Do the import
-          $source->startImport();
+          if($hide_warnings) {
+            // For double run imports (community/protocol) we do the import *right now* rather than
+            // scheduling.
+            while (FEEDS_BATCH_COMPLETE != $source->import());
+          } else {
+            $source->startImport();
+          }
       }
   }
 
+  // If we didn't find any valid files, warn the user.
   if(!$success) {
-      dpm("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
+      drupal_set_message("The importer could not find the required files inside the zip archive. Please check that the zip archive is valid.", NULL, 'warning');
   }
 }
 
@@ -377,7 +502,7 @@ function mukurtu_batch_import_feeds_after_import($source) {
         if(isset($_SESSION['mukurtu_zip_import']['hide_warnings'])) {
             foreach($_SESSION['mukurtu_zip_import']['hide_warnings'] as $key => $hide_id) {
                 if($hide_id == $id) {
-                    // Hide warnings is should probably be named hide errors
+                    // Hide warnings should probably be named hide errors
                     // We clear errors for the initial imports that might not have imported their dependencies yet
                     unset($_SESSION['mukurtu_zip_import']['hide_warnings'][$key]);
                     drupal_get_messages('error', TRUE);
@@ -392,7 +517,7 @@ function mukurtu_batch_import_form_ajax($form, $form_state) {
 
   $commands = array();
   $commands[] = ajax_command_replace('.fieldset-description', $messages);
-  
+
   // Set message.
   $commands[] = ajax_command_remove('#messages-wrap');
   $commands[] = ajax_command_after('#breadcrumb-wrap', '<div id="messages-wrap">' . theme('status_messages') . '</div>');

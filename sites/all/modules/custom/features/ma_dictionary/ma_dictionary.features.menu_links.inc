@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.features.menu_links.inc
@@ -29,6 +30,7 @@ function ma_dictionary_menu_default_menu_links() {
     'expanded' => 0,
     'weight' => -45,
     'customized' => 1,
+    'parent_identifier' => 'main-menu_add-content:node/add',
   );
 
   // Translatables

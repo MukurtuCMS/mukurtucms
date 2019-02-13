@@ -29,9 +29,7 @@ class FeedsFileFetcherResult extends FeedsFetcherResult {
    * Overrides parent::getFilePath().
    */
   public function getFilePath() {
-    if (!is_readable($this->file_path)) {
-      throw new Exception(t('File @filepath is not accessible.', array('@filepath' => $this->file_path)));
-    }
+    $this->checkFile();
     return $this->sanitizeFile($this->file_path);
   }
 }
@@ -217,7 +215,7 @@ class FeedsFileFetcher extends FeedsFetcher {
       'direct' => FALSE,
       'directory' => $scheme . '://feeds',
       'allowed_schemes' => $schemes,
-    );
+    ) + parent::configDefaults();
   }
 
   /**

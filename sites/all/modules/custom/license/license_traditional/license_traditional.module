@@ -16,7 +16,7 @@ function license_traditional_license_load($data) {
 function license_traditional_build_license_label_uri($uri) {
   $pattern = '/http:\/\/localcontexts.org\/tk\/([a-z]+)\/.*/';
   $letter= preg_match($pattern, $uri, $matches);
-  return "https://github.com/kimberlycw/Local-Contexts/raw/1.1/{$matches[1]}/label_{$matches[1]}.png";
+  return "https://github.com/kimberlycw/Local-Contexts/raw/master/{$matches[1]}/label_{$matches[1]}.png";
 }
 
 function license_traditional_license_display($license, $entity) {

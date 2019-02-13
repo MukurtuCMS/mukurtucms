@@ -864,7 +864,7 @@ function _user_resource_resend_welcome_email($uid) {
 }
 
 /**
- * Return an array of optionally paged uids baed on a set of criteria.
+ * Return an array of optionally paged uids based on a set of criteria.
  *
  * An example request might look like
  *

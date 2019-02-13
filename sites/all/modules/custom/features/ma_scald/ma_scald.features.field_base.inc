@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.features.field_base.inc
@@ -27,6 +28,7 @@ function ma_scald_field_default_field_bases() {
     'settings' => array(
       'display_default' => 0,
       'display_field' => 0,
+      'treeable' => FALSE,
       'uri_scheme' => 'private',
     ),
     'translatable' => 0,
@@ -50,6 +52,7 @@ function ma_scald_field_default_field_bases() {
     'settings' => array(
       'display_default' => 0,
       'display_field' => 0,
+      'treeable' => FALSE,
       'uri_scheme' => 'private',
     ),
     'translatable' => 0,
@@ -73,6 +76,7 @@ function ma_scald_field_default_field_bases() {
     'settings' => array(
       'display_default' => 0,
       'display_field' => 0,
+      'treeable' => FALSE,
       'uri_scheme' => 'private',
     ),
     'translatable' => 0,
@@ -100,8 +104,10 @@ function ma_scald_field_default_field_bases() {
         'second' => 0,
         'year' => 'year',
       ),
+      'repeat' => 0,
       'timezone_db' => 'UTC',
       'todate' => '',
+      'treeable' => FALSE,
       'tz_handling' => 'site',
     ),
     'translatable' => 0,
@@ -124,6 +130,7 @@ function ma_scald_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -143,7 +150,9 @@ function ma_scald_field_default_field_bases() {
     ),
     'locked' => 0,
     'module' => 'text',
-    'settings' => array(),
+    'settings' => array(
+      'treeable' => FALSE,
+    ),
     'translatable' => 0,
     'type' => 'text_long',
   );
@@ -193,6 +202,7 @@ function ma_scald_field_default_field_bases() {
     'settings' => array(
       'backend' => 'default',
       'srid' => 4326,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'geofield',
@@ -214,6 +224,7 @@ function ma_scald_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -235,6 +246,7 @@ function ma_scald_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -256,6 +268,7 @@ function ma_scald_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -292,6 +305,7 @@ function ma_scald_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -319,6 +333,7 @@ function ma_scald_field_default_field_bases() {
         1 => 'Invitation',
       ),
       'allowed_values_function' => '',
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -341,6 +356,7 @@ function ma_scald_field_default_field_bases() {
     'module' => 'text',
     'settings' => array(
       'max_length' => 255,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'text',
@@ -367,6 +383,7 @@ function ma_scald_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'treeable' => FALSE,
     ),
     'title' => 'Authors',
     'translatable' => 0,
@@ -390,6 +407,7 @@ function ma_scald_field_default_field_bases() {
     'settings' => array(
       'display_default' => 0,
       'display_field' => 0,
+      'treeable' => FALSE,
       'uri_scheme' => 'private',
     ),
     'translatable' => 0,
@@ -417,6 +435,7 @@ function ma_scald_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
+      'treeable' => FALSE,
     ),
     'title' => 'Scald tags',
     'translatable' => 0,
@@ -439,6 +458,7 @@ function ma_scald_field_default_field_bases() {
     'module' => 'image',
     'settings' => array(
       'default_image' => 0,
+      'treeable' => FALSE,
       'uri_scheme' => 'private',
     ),
     'translatable' => 0,

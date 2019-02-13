@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community.strongarm.inc
@@ -111,6 +112,30 @@ function ma_community_strongarm() {
       ),
       'thumbed' => array(
         'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => TRUE,
+      ),
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'community_record' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
       ),
     ),
     'extra_fields' => array(

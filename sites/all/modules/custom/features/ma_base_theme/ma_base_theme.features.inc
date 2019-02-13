@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_base_theme.features.inc
@@ -8,6 +9,9 @@
  * Implements hook_ctools_plugin_api().
  */
 function ma_base_theme_ctools_plugin_api($module = NULL, $api = NULL) {
+  if ($module == "bean_admin_ui" && $api == "bean") {
+    return array("version" => "5");
+  }
   if ($module == "boxes" && $api == "box") {
     return array("version" => "1");
   }
@@ -20,9 +24,19 @@ function ma_base_theme_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "file_entity" && $api == "file_default_displays") {
     return array("version" => "1");
   }
+  if ($module == "page_manager" && $api == "pages_default") {
+    return array("version" => "1");
+  }
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => "1");
   }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function ma_base_theme_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
 }
 
 /**
@@ -89,6 +103,51 @@ function ma_base_theme_image_default_styles() {
           'upscale' => 0,
         ),
         'weight' => -9,
+      ),
+    ),
+  );
+
+  // Exported image style: mukurtu_theme_3_2_ratio.
+  $styles['mukurtu_theme_3_2_ratio'] = array(
+    'label' => 'Mukurtu theme 3:2 ratio',
+    'effects' => array(
+      8 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 1200,
+          'height' => 800,
+        ),
+        'weight' => 2,
+      ),
+    ),
+  );
+
+  // Exported image style: mukurtu_theme_4_3_ratio.
+  $styles['mukurtu_theme_4_3_ratio'] = array(
+    'label' => 'Mukurtu theme 4:3 ratio',
+    'effects' => array(
+      10 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 800,
+          'height' => 600,
+        ),
+        'weight' => 2,
+      ),
+    ),
+  );
+
+  // Exported image style: mukurtu_theme_7_4_ratio.
+  $styles['mukurtu_theme_7_4_ratio'] = array(
+    'label' => 'Mukurtu theme 7:4 ratio',
+    'effects' => array(
+      14 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 700,
+          'height' => 400,
+        ),
+        'weight' => 1,
       ),
     ),
   );

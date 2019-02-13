@@ -957,13 +957,13 @@ function ds_render_block_field($field) {
           return drupal_render($renderable_block);
           break;
         case DS_BLOCK_TITLE_CONTENT:
-          if (isset($block->subject) && isset($block->content['#markup'])) {
-            return '<h2 class="block-title">' . $block->subject . '</h2>' . $block->content['#markup'];
+          if (isset($block->subject) && isset($block->content) && $block->content) {
+            return '<h2 class="block-title">' . $block->subject . '</h2>' . drupal_render($block->content);
           }
           break;
         case DS_BLOCK_CONTENT:
-          if (isset($block->content['#markup'])) {
-            return $block->content['#markup'];
+          if (isset($block->content) && $block->content) {
+            return drupal_render($block->content);
           }
           break;
       }

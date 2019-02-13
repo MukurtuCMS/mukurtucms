@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collection.facetapi_defaults.inc

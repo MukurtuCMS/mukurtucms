@@ -18,7 +18,6 @@ features[ctools][] = views:views_default:3.0
 features[features_api][] = api:2
 features[field_instance][] = node-community-group_register
 features[field_instance][] = node-community-og_roles_permissions
-features[page_manager_handlers][] = node_view_panel_context_2
 features[page_manager_pages][] = admin_dashboard_communities
 features[user_permission][] = access rules debug
 features[user_permission][] = administer rules

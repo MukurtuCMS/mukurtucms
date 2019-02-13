@@ -296,6 +296,9 @@ class views_data_export_plugin_style_export extends views_plugin_style {
    */
   function add_http_headers() {
 
+    // Patch to discard the contents of the output buffer to avoid having an empty row at the begining of file.
+    ob_clean();
+
     drupal_add_http_header('Cache-Control', 'max-age=60, must-revalidate');
 
     if (!empty($this->definition['export headers'])) {

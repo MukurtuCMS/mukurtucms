@@ -180,6 +180,7 @@ function media_wysiwyg_format_form_view_mode(&$form, $form_state, $file) {
       'class' => 'button',
       'title' => t('Use for replace fox or edit file fields.'),
     ),
+    'query' => drupal_get_destination(),
   );
   if (!empty($_GET['render'])) {
     $link_options['query']['render'] = $_GET['render'];

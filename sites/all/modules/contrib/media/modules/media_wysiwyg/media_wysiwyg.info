@@ -16,8 +16,8 @@ files[] = tests/media_wysiwyg.paragraph_fix_filter.test
 
 configure = admin/config/media/browser
 
-; Information added by Drupal.org packaging script on 2018-04-25
-version = "7.x-2.19"
+; Information added by Drupal.org packaging script on 2018-10-24
+version = "7.x-2.21"
 core = "7.x"
 project = "media"
-datestamp = "1524677887"
+datestamp = "1540363086"

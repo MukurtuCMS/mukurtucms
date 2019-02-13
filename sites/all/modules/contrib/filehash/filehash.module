@@ -1,0 +1,306 @@
+<?php
+
+/**
+ * @file
+ * Generate hashes for each uploaded file.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function filehash_menu() {
+  $items['admin/config/media/filehash'] = array(
+    'title' => 'File hash',
+    'description' => 'Configure file hash settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('filehash_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'filehash.admin.inc',
+  );
+  $items['admin/config/media/filehash/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/config/media/filehash/bulk'] = array(
+    'title' => 'Bulk generate',
+    'description' => 'Generates hashes for each uploaded file.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('filehash_bulk'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'filehash.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Returns array of enabled hash algorithms.
+ */
+function filehash_algos() {
+  return array_diff(variable_get('filehash_algos', array()), array(0));
+}
+
+/**
+ * Implements hook_file_delete().
+ */
+function filehash_file_delete($file) {
+  db_delete('filehash')
+    ->condition('fid', $file->fid)
+    ->execute();
+}
+
+/**
+ * Implements hook_file_insert().
+ */
+function filehash_file_insert($file) {
+  filehash_save($file);
+}
+
+/**
+ * Implements hook_file_load().
+ */
+function filehash_file_load($files) {
+  $algos = filehash_algos();
+  if ($algos) {
+    $result = db_select('filehash')
+      ->fields('filehash')
+      ->condition('fid', array_keys($files), 'IN')
+      ->execute();
+    foreach ($result as $record) {
+      foreach ($algos as $algo) {
+        $files[$record->fid]->filehash[$algo] = $record->$algo;
+      }
+    }
+    // Generate hash if it does not already exist for the file.
+    foreach ($files as $fid => $file) {
+      foreach ($algos as $algo) {
+        if (empty($file->filehash[$algo])) {
+          filehash_save($files[$fid]);
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_file_update().
+ */
+function filehash_file_update($file) {
+  filehash_save($file);
+}
+
+/**
+ * Implements hook_file_validate().
+ */
+function filehash_file_validate($file) {
+  $errors = array();
+  // Zero size may indicate unreadable remote media source; bypass dedupe.
+  if ($file->filesize && variable_get('filehash_dedupe', 0)) {
+    foreach (filehash_algos() as $algo) {
+      if ($fid = db_query("SELECT fid FROM {filehash} WHERE $algo = :hash LIMIT 1", array(':hash' => hash_file($algo, $file->uri)))->fetchField()) {
+        $duplicate = file_load($fid);
+        if (file_download_access($duplicate->uri)) {
+          $errors[] = t('This file has already been uploaded as %filename.', array('%filename' => $duplicate->filename));
+        }
+        else {
+          $errors[] = t('Sorry, duplicate files are not permitted.');
+        }
+        break;
+      }
+    }
+  }
+  return $errors;
+}
+
+/**
+ * Returns array of human-readable hash algorithm names.
+ */
+function filehash_names() {
+  return array('md5' => 'MD5', 'sha1' => 'SHA-1', 'sha256' => 'SHA-256');
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function filehash_node_view($node, $view_mode) {
+  static $fields;
+  // Add <media:hash> elements for at most one file per RSS item.
+  if ($view_mode == 'rss') {
+    // The <media:hash> element only supports MD5 and SHA-1.
+    $algos = filehash_algos();
+    if (isset($algos['md5']) || isset($algos['sha1'])) {
+      if (!isset($fields)) {
+        // The following field types are currently supported.
+        $fields = field_read_fields(array(
+          'type' => array('file', 'image', 'media'),
+        ));
+      }
+      foreach (field_info_instances('node', $node->type) as $instance) {
+        if (isset($fields[$instance['field_name']])) {
+          foreach ($node->{$instance['field_name']} as $language) {
+            foreach ($language as $file) {
+              // Media fields have a file object rather than a file array.
+              if ($fields[$instance['field_name']]['type'] == 'media') {
+                filehash_rss_elements((array) $file['file'], $node);
+                return;
+              }
+              elseif ($fields[$instance['field_name']]['type'] == 'image') {
+                filehash_rss_elements($file, $node);
+                return;
+              }
+              elseif ($file['display']) {
+                filehash_rss_elements($file, $node);
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Adds <media:hash> RSS elements to $node object.
+ */
+function filehash_rss_elements(array $file, $node) {
+  $names = array('md5' => 'md5', 'sha1' => 'sha-1');
+  foreach ($names as $algo => $name) {
+    if (!empty($file['filehash'][$algo])) {
+      $node->rss_elements[] = array(
+        'key' => 'media:hash',
+        'attributes' => array('algo' => $name),
+        'value' => $file['filehash'][$algo],
+      );
+    }
+  }
+  $node->rss_namespaces['xmlns:media'] = 'http://search.yahoo.com/mrss/';
+}
+
+/**
+ * Calculates and saves the file hashes.
+ */
+function filehash_save($file) {
+  $file->filehash = array_fill_keys(array('md5', 'sha1', 'sha256'), NULL);
+  foreach (filehash_algos() as $algo) {
+    $file->filehash[$algo] = hash_file($algo, $file->uri);
+  }
+  db_merge('filehash')
+    ->key(array('fid' => $file->fid))
+    ->fields($file->filehash)
+    ->execute();
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function filehash_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function filehash_field_formatter_info() {
+  $algos = filehash_algos();
+  return array(
+    'filehash_table' => array(
+      'label' => t('Table of files with file hashes'),
+      'field types' => array('file', 'image', 'media'),
+      'settings' => array('algo' => array_pop($algos)),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function filehash_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $names = filehash_names();
+  $options = array();
+  foreach (filehash_algos() as $algo) {
+    $options[$algo] = $names[$algo];
+  }
+  $element['algo'] = array(
+    '#title' => t('Hash algorithm'),
+    '#type' => 'select',
+    '#default_value' => $instance['display'][$view_mode]['settings']['algo'],
+    '#options' => $options,
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function filehash_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $algos = filehash_names();
+  if (isset($algos[$instance['display'][$view_mode]['settings']['algo']])) {
+    return t('@algo hash', array('@algo' => $algos[$instance['display'][$view_mode]['settings']['algo']]));
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function filehash_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  if (!empty($items)) {
+    $element[0] = array(
+      '#theme' => 'filehash_table',
+      '#items' => $items,
+      '#settings' => $display['settings'],
+    );
+  }
+  return $element;
+}
+
+/**
+ * Returns HTML for a file attachments table with hashes.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - items: An array of file attachments.
+ *   - settings: The field instance display settings.
+ *
+ * @ingroup themeable
+ */
+function theme_filehash_table(array $variables) {
+  $names = filehash_names();
+  $header = array(
+    t('Attachment'),
+    t('Size'),
+    t('@algo hash', array('@algo' => $names[$variables['settings']['algo']])),
+  );
+  $rows = array();
+  foreach ($variables['items'] as $delta => $item) {
+    // Media field items contain a file object.
+    if (!isset($item['uri']) && isset($item['file'])) {
+      $file = $item['file'];
+    }
+    else {
+      $file = (object) $item;
+    }
+    $rows[] = array(
+      theme('file_link', array('file' => $file)),
+      format_size($file->filesize),
+      substr(chunk_split($file->filehash[$variables['settings']['algo']], 1, '<wbr />'), 0, -7),
+    );
+  }
+  return empty($rows) ? '' : theme('table', array('header' => $header, 'rows' => $rows));
+}
+
+/**
+ * Implements hook_theme().
+ */
+function filehash_theme() {
+  return array(
+    'filehash_table' => array(
+      'variables' => array('items' => array(), 'settings' => array()),
+    ),
+  );
+}

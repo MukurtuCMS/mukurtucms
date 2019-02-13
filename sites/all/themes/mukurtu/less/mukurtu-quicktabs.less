@@ -1,0 +1,104 @@
+.quicktabs-wrapper.quicktabs-style-excel {
+    ul.quicktabs-tabs {
+        .fullwidth;
+        height: 52px;
+        background: none;
+        background-color: @mukurtu-navbar-collapse-bg;
+        padding: 0px;
+
+        li {
+            height: 100%;
+            margin: 0px;
+            border-left: 1px solid rgba(70, 70, 70, 0.25);
+            background-color: @mukurtu-navbar-collapse-bg;
+
+            // Stack and center CR tabs on mobile, add drop shadow for each li
+            display: inline;
+            width: 100%;
+            text-align: center;
+            .record-drop-shadow;
+            padding-left: 0px;
+
+            &.first {
+                background: none;
+            }
+
+            // Stack CR tabs left->right on non-mobile
+            // Tablet
+            @media (min-width: @screen-sm-min) {
+                display: block;
+                width: auto;
+                text-align: left;
+                padding-left: 10px;
+
+                &::after {
+                    content:none;
+                }
+            }
+
+            a {
+                font-weight: bold;
+                font-size: 16px;
+                height: 100%;
+                background: none;
+                line-height: 44px;
+
+                &.first,
+                &.active,
+                &.last {
+                    background: none;
+                }
+            }
+
+            &:hover {
+                background-color: @mukurtu-navbar-default-link-hover-bg;
+
+                a {
+                    color: #fff;
+                }
+            }
+
+            // Active CR tab
+            &.active {
+                background: none;
+                background-color: @brand-primary;
+                text-align: center;
+                a {
+                    color: #fff;
+                }
+
+                // Active CR down arrow icon
+                // Tablet
+                @media (min-width: @screen-sm-min) {
+                    &::after {
+                        content : "";
+                        display: inline-block;
+                        position: relative;
+                        top: -2px;
+                        border-style: solid;
+                        border-width: 15px 15px 0 15px;
+                        border-color: @brand-primary transparent transparent transparent;
+                        z-index: 2;
+                    }
+                }
+            }
+
+            &:first-of-type {
+                border-left: none;
+            }
+        }
+
+        // Drop shadow for CR tabs
+        // Tablet
+        &::after {
+            @media (min-width: @screen-sm-min) {
+                .section-shadow;
+                content: "";
+                height: 12px;
+                display: block;
+                position: relative;
+                top: 100%;
+            }
+        }
+    }
+}

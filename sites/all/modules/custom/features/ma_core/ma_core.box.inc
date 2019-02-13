@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.box.inc

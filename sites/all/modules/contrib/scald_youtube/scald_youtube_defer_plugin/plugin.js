@@ -48,8 +48,7 @@
 
       editor.ui.addButton('scald_youtube_defer_button', {
         label: 'Defer Youtube videos',
-        command: 'defer_youtube_videos',
-        icon: this.path + 'images/my_plugin_button.gif'
+        command: 'defer_youtube_videos'
       });
     }
   });

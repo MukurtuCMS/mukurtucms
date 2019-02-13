@@ -94,15 +94,19 @@ function ma_profile_form_user_profile_form_alter(&$form, &$form_state, $form_id)
  * Implements hook_user_presave().
  */
 function ma_profile_user_presave(&$edit, $account, $category) {
-    // Copy over any non-community groups from og_user_node
-    if(isset($account->og_user_node[LANGUAGE_NONE])) {
-        foreach($account->og_user_node[LANGUAGE_NONE] as $group) {
-            $group_node = node_load($group['target_id']);
-            if($group_node && $group_node->type <> 'community') {
-                $edit['og_user_node'][LANGUAGE_NONE][] = array('target_id' => $group_node->nid);
-            }
-        }
+  // Preserve og group memberships in our user field.
+  // Don't do this for new accounts (uid == 0).
+  // og_get_groups_by_user returns *all* groups for uid 0.
+  if (isset($account->uid) && $account->uid > 0) {
+    $og_user_node = array();
+    $user_groups = og_get_groups_by_user($account);
+    if (!empty($user_groups['node'])) {
+      foreach ($user_groups['node'] as $gid) {
+        $og_user_node[] = array('target_id' => $gid);
+      }
     }
+    $edit['og_user_node'][LANGUAGE_NONE] = $og_user_node;
+  }
 }
 
 /**
@@ -110,16 +114,19 @@ function ma_profile_user_presave(&$edit, $account, $category) {
  */
 function ma_profile_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'full') {
-
+    $empty = TRUE;
     // Only show Community nodes (not CPs) when viewing a user profile page under the "Communities" field (which is actually a field that contains all the users groups)
-    foreach ($account->og_user_node[LANGUAGE_NONE] as $group) {
-      $group_node = node_load ($group['target_id']);
-      if ($group_node->type <> 'community') {
-        unset ($account->content['og_user_node'][0]['#items'][$group['target_id']]);
+    foreach ($account->og_user_node[LANGUAGE_NONE] as $delta => $group) {
+      if ($group['entity']->type <> 'community') {
+        unset($account->og_user_node[LANGUAGE_NONE][$delta]);
+        unset($account->content['og_user_node']['#items'][$delta]);
+      } else {
+        $empty = FALSE;
       }
     }
+
     // If no groups are left, then hide the whole field
-    if (count($account->content['og_user_node'][0]['#items']) == 0) {
+    if ($empty) {
       unset ($account->content['og_user_node']);
     }
   }

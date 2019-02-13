@@ -17,11 +17,14 @@ function mukurtu_install_tasks($install_state) {
     'mukurtu_default_tax_terms' => array(),
     'mukurtu_default_menu_links' => array(),
     'mukurtu_create_default_pages' => array(),
-    'mukurtu_create_default_contexts' => array(),
+    //    'mukurtu_create_default_contexts' => array(),
     'mukurtu_set_permissions' => array(),
     'mukurtu_set_scald_drawer_thumbnails' => array(),
     'mukurtu_delete_og_roles' => array(),
     'mukurtu_cycle_search_api' => array(),
+    'mukurtu_revert_features' => array(),
+    'mukurtu_create_default_content' => array(),
+    'mukurtu_revert_features' => array(),
 //    'mukurtu_client_form' => array(
 //      'display_name' => st('Setup Client'),
 //      'type' => 'form',
@@ -42,8 +45,8 @@ function mukurtu_set_misc_vars () {
 }
 
 function mukurtu_set_theme () {
-  theme_enable (array('mukurtu_starter'));
-  variable_set ('theme_default', 'mukurtu_starter');
+  theme_enable(array('bootstrap', 'mukurtu', 'mukurtu_starter'));
+  variable_set ('theme_default', 'mukurtu');
   theme_disable (array('bartik', 'seven'));
 }
 
@@ -82,11 +85,6 @@ function mukurtu_create_default_boxes() {
 }
 
 function mukurtu_resolve_dependencies() {
-    // We need the dictionary DB tables to exist, but we want
-    // the dictionary disabled by default.
-    module_enable(array('ma_dictionary'));
-    module_disable(array('ma_dictionary'));
-
     // Long term the community_tags module will probably be removed.
     // We have removed it as a dependency from the Mukurtu features now, which
     // allows sites to disable the module if they prefer. Here we enable the
@@ -98,6 +96,7 @@ function mukurtu_revert_features () {
   features_revert_module('ma_search_api'); // First revert search_api to get the node index
   features_revert(); // Revert all features
   features_revert(); // Revert all features a second time, for any straggling components
+  features_revert_module('ma_dictionary');
 }
 function mukurtu_rebuild_permissions () {
   node_access_rebuild();
@@ -106,7 +105,7 @@ function mukurtu_rebuild_permissions () {
 function mukurtu_default_tax_terms () {
   $taxonomy = array(
     'category' => array(
-      'General',
+      'Default',
     ),
   );
   foreach ($taxonomy as $vocabulary_name => $terms) {
@@ -218,7 +217,7 @@ function mukurtu_create_default_contexts () {
 
   // frontpage context
   $context = new stdClass();
-  $context->disabled = FALSE; /* Edit this to true to make a default context disabled initially */
+  $context->disabled = TRUE; /* Edit this to true to make a default context disabled initially */
   $context->api_version = 3;
   $context->name = 'front_page';
   $context->description = '';
@@ -264,6 +263,19 @@ function mukurtu_cycle_search_api() {
             }
         }
     }
+}
+
+function mukurtu_create_default_content() {
+  // Install the dictionary by default.
+  module_enable(array('ma_dictionary'));
+  features_revert_module('ma_dictionary');
+
+  // Create frontpage beans.
+  _ma_base_theme_create_default_beans();
+  _ma_base_theme_set_default_browse('digital-heritage');
+
+  // Cycle the theme feature.
+  features_revert_module('ma_base_theme');
 }
 
 //function mukurtu_client_form() {

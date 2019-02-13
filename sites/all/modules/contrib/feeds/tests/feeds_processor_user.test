@@ -998,6 +998,59 @@ class FeedsCSVtoUsersTest extends FeedsWebTestCase {
   }
 
   /**
+   * Tests if an user with an invalid name is not imported.
+   */
+  public function testInvalidUsername() {
+    // Import a file that contains the mail address of user 1.
+    $this->importFile('user_import', $this->absolutePath() . '/tests/feeds/user_validation/invalid-username.csv');
+    $this->assertText('Failed importing 1 user');
+    $this->assertText('The username contains an illegal character.');
+  }
+
+  /**
+   * Tests importing an user which name is already taken.
+   */
+  public function testUserNameAlreadyTaken() {
+    // Create an account.
+    user_save(drupal_anonymous_user(), array(
+      'name' => 'Morticia',
+      'mail' => 'morticia2@example.com',
+      'pass' => 'mort',
+      'status' => 1,
+    ));
+
+    // Import a file that contains a username that is already taken.
+    $this->importFile('user_import', $this->absolutePath() . '/tests/feeds/user_validation/username-already-taken.csv');
+    $this->assertText('Failed importing 1 user');
+    $this->assertText("The name 'Morticia' is already taken.");
+  }
+
+  /**
+   * Tests importing an user which mail address is already taken.
+   */
+  public function testMailAlreadyTaken() {
+    // Do not mark mail address as unique.
+    $path = 'admin/structure/feeds/user_import/mapping';
+    $this->drupalPostAJAX($path, array(), 'mapping_settings_edit_1');
+    $edit = array("config[1][settings][unique]" => FALSE);
+    $this->drupalPostAJAX(NULL, $edit, 'mapping_settings_update_1');
+    $this->drupalPost(NULL, array(), t('Save'));
+
+    // Create an account.
+    user_save(drupal_anonymous_user(), array(
+      'name' => 'Morticia2',
+      'mail' => 'morticia@example.com',
+      'pass' => 'mort',
+      'status' => 1,
+    ));
+
+    // Import a file that contains a mail address that is already taken.
+    $this->importFile('user_import', $this->absolutePath() . '/tests/feeds/user_validation/username-already-taken.csv');
+    $this->assertText('Failed importing 1 user');
+    $this->assertText("The e-mail address 'morticia@example.com' is already taken.");
+  }
+
+  /**
    * Log in an imported user.
    *
    * @param string $username

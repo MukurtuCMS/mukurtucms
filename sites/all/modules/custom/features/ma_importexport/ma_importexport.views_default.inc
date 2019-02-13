@@ -152,11 +152,10 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_category']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_category']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_category']['delta_offset'] = '0';
-  /* Field: Field: Tags */
+  /* Field: Field: Keywords */
   $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
   $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
   $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
-  $handler->display->display_options['fields']['field_tags']['label'] = 'Keywords';
   $handler->display->display_options['fields']['field_tags']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tags']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_tags']['hide_alter_empty'] = FALSE;
@@ -202,7 +201,7 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_creator']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -329,18 +328,17 @@ function ma_importexport_views_default_views() {
   $handler->display->display_options['fields']['status']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['status']['type'] = 'boolean';
   $handler->display->display_options['fields']['status']['not'] = 0;
-  /* Field: Content: Collection */
+  /* Field: Content: Collections */
   $handler->display->display_options['fields']['field_collection']['id'] = 'field_collection';
   $handler->display->display_options['fields']['field_collection']['table'] = 'field_data_field_collection';
   $handler->display->display_options['fields']['field_collection']['field'] = 'field_collection';
-  $handler->display->display_options['fields']['field_collection']['label'] = 'Collections';
   $handler->display->display_options['fields']['field_collection']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_collection']['type'] = 'entityreference_entity_id';
   $handler->display->display_options['fields']['field_collection']['settings'] = array(
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_collection']['delta_offset'] = '0';
-  /* Field: Content: Sharing Protocol */
+  /* Field: Content: Sharing protocol */
   $handler->display->display_options['fields']['group_access']['id'] = 'group_access';
   $handler->display->display_options['fields']['group_access']['table'] = 'field_data_group_access';
   $handler->display->display_options['fields']['group_access']['field'] = 'group_access';
@@ -544,11 +542,10 @@ print $output;
   $handler->display->display_options['fields']['field_category']['hide_alter_empty'] = FALSE;
   $handler->display->display_options['fields']['field_category']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_category']['delta_offset'] = '0';
-  /* Field: Field: Tags */
+  /* Field: Field: Keywords */
   $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
   $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
   $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
-  $handler->display->display_options['fields']['field_tags']['label'] = 'Keywords';
   $handler->display->display_options['fields']['field_tags']['alter']['strip_tags'] = TRUE;
   $handler->display->display_options['fields']['field_tags']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_tags']['element_default_classes'] = FALSE;
@@ -596,7 +593,7 @@ print $output;
   $handler->display->display_options['fields']['field_creator']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_creator']['group_column'] = 'entity_id';
   $handler->display->display_options['fields']['field_creator']['delta_offset'] = '0';
-  /* Field: Content: Original Date */
+  /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
@@ -796,7 +793,7 @@ print $output;
     t('Licensing Options'),
     t('Published'),
     t('Collections'),
-    t('Sharing Protocol'),
+    t('Sharing protocol'),
     t('Export as zip'),
     t('Export as XML'),
     t('title'),
@@ -805,7 +802,7 @@ print $output;
     t('Broken handler field_data_field_communities.field_communities'),
     t('Broken handler field_data_field_culturalprotocol.field_culturalprotocol'),
     t('Broken handler field_data_field_relation.field_relation'),
-    t('Original Date'),
+    t('Original Date Description'),
     t('Sharing Protocols'),
   );
   $export['export'] = $view;

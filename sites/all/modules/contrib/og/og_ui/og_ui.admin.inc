@@ -311,6 +311,7 @@ function og_ui_edit_membership($form, &$form_state, $group_type, $gid, $og_membe
       '#options' => $og_roles,
       '#title' => t('Roles'),
       '#default_value' => array_keys(og_get_user_roles($group_type, $gid, $account->uid)),
+      '#disabled' => $og_membership->state != OG_STATE_ACTIVE,
     );
   }
 
@@ -470,8 +471,8 @@ function og_ui_group_types_overview($type) {
  * Menu callback: administer roles.
  *
  * @ingroup forms
- * @see og_user_admin_roles_validate()
- * @see og_user_admin_roles_submit()
+ * @see og_ui_admin_roles_validate()
+ * @see og_ui_admin_roles_submit()
  * @see theme_group_user_admin_new_role()
  */
 function og_ui_admin_roles($form, $form_state, $group_type = '', $gid = 0, $bundle = '', $rid = 0) {

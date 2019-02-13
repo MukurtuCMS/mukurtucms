@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_base_theme.strongarm.inc
@@ -112,13 +113,6 @@ grid-6';
     'bootstrap_toggle_jquery_error' => 0,
   );
   $export['theme_bootstrap_settings'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'theme_default';
-  $strongarm->value = 'mukurtu_starter';
-  $export['theme_default'] = $strongarm;
 
   return $export;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.field_group.inc
@@ -45,18 +46,18 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Additional Metadata',
-    'weight' => '4',
+    'weight' => '11',
     'children' => array(
       0 => 'field_dh_type',
-      1 => 'field_transcription',
-      2 => 'field_coverage',
-      3 => 'field_coverage_description',
-      4 => 'field_format',
-      5 => 'field_identifier',
-      6 => 'field_language',
-      7 => 'field_source',
-      8 => 'field_subject',
-      9 => 'field_people',
+      1 => 'field_people',
+      2 => 'field_transcription',
+      3 => 'field_coverage',
+      4 => 'field_coverage_description',
+      5 => 'field_format',
+      6 => 'field_identifier',
+      7 => 'field_language',
+      8 => 'field_source',
+      9 => 'field_subject',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -82,17 +83,18 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Mukurtu Essentials',
-    'weight' => '1',
+    'weight' => '8',
     'children' => array(
-      0 => 'field_summary',
-      1 => 'field_category',
-      2 => 'field_contributor',
-      3 => 'field_creator',
-      4 => 'field_date',
-      5 => 'field_item_privacy_setting',
-      6 => 'field_media_asset',
-      7 => 'og_group_ref',
-      8 => 'title',
+      0 => 'field_original_date',
+      1 => 'field_summary',
+      2 => 'field_category',
+      3 => 'field_contributor',
+      4 => 'field_creator',
+      5 => 'field_date',
+      6 => 'field_item_privacy_setting',
+      7 => 'field_media_asset',
+      8 => 'og_group_ref',
+      9 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -118,7 +120,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Rights and Permissions',
-    'weight' => '3',
+    'weight' => '10',
     'children' => array(
       0 => 'field_licence_std_cc',
       1 => 'field_licence_trad',
@@ -149,18 +151,22 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'List View Fields',
-    'weight' => '2',
+    'weight' => '1',
     'children' => array(
       0 => 'field_community_ref',
       1 => 'field_summary',
       2 => 'field_category',
-      3 => 'title',
+      3 => 'digital_heritage_page_number',
+      4 => 'featured_content_type',
+      5 => 'mukurtu_icon_actions',
+      6 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'List View Fields',
       'instance_settings' => array(
-        'classes' => 'col-md-8 col-md-pull-4',
+        'id' => '',
+        'classes' => '',
         'description' => '',
         'show_label' => '0',
         'label_element' => 'h3',
@@ -183,11 +189,8 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Location',
-    'weight' => '4',
-    'children' => array(
-      0 => 'field_coverage',
-      1 => 'field_coverage_description',
-    ),
+    'weight' => '22',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'Location',
@@ -216,10 +219,8 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Media',
-    'weight' => '1',
-    'children' => array(
-      0 => 'field_media_asset',
-    ),
+    'weight' => '21',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'Media',
@@ -248,13 +249,8 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Metadata',
-    'weight' => '3',
-    'children' => array(
-      0 => 'field_community_ref',
-      1 => 'field_category',
-      2 => 'field_date',
-      3 => 'field_description',
-    ),
+    'weight' => '23',
+    'children' => array(),
     'format_type' => 'div',
     'format_settings' => array(
       'label' => 'Metadata',
@@ -283,7 +279,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Mukurtu Core',
-    'weight' => '2',
+    'weight' => '9',
     'children' => array(
       0 => 'body',
       1 => 'field_description',
@@ -314,14 +310,15 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Relations',
-    'weight' => '5',
+    'weight' => '12',
     'children' => array(
       0 => 'field_book_children',
       1 => 'field_book_parent',
       2 => 'field_collection',
       3 => 'field_community_record_children',
-      4 => 'field_related_dh_items',
-      5 => 'field_related_dictionary_words',
+      4 => 'field_personal_collections',
+      5 => 'field_related_dh_items',
+      6 => 'field_related_dictionary_words',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -347,7 +344,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Tabs',
-    'weight' => '0',
+    'weight' => '1',
     'children' => array(
       0 => 'group_dublin',
       1 => 'group_essentials',
@@ -420,7 +417,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Transcription:',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'field_transcription',
     ),

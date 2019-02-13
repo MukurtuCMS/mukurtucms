@@ -1,8 +1,36 @@
 <?php
+
 /**
  * @file
  * ma_base_theme.ds.inc
  */
+
+/**
+ * Implements hook_ds_field_settings_info().
+ */
+function ma_base_theme_ds_field_settings_info() {
+  $export = array();
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'bean|hero_image_two_columns|default';
+  $ds_fieldsetting->entity_type = 'bean';
+  $ds_fieldsetting->bundle = 'hero_image_two_columns';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'field_welcome_title' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+          'lbw' => 1,
+        ),
+      ),
+    ),
+  );
+  $export['bean|hero_image_two_columns|default'] = $ds_fieldsetting;
+
+  return $export;
+}
 
 /**
  * Implements hook_ds_custom_fields_info().
@@ -61,6 +89,258 @@ function ma_base_theme_ds_custom_fields_info() {
     ),
   );
   $export['component_media_items'] = $ds_field;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_layout_settings_info().
+ */
+function ma_base_theme_ds_layout_settings_info() {
+  $export = array();
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'bean|front_page_hero_image|default';
+  $ds_layout->entity_type = 'bean';
+  $ds_layout->bundle = 'front_page_hero_image';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'bootstrap_6_6';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_hero_image',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'field_welcome_message',
+      ),
+    ),
+    'fields' => array(
+      'field_hero_image' => 'left',
+      'title' => 'right',
+      'field_welcome_message' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['bean|front_page_hero_image|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'bean|front_page_hero_image|form';
+  $ds_layout->entity_type = 'bean';
+  $ds_layout->bundle = 'front_page_hero_image';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'label',
+      ),
+      'left' => array(
+        1 => 'field_hero_image',
+      ),
+      'right' => array(
+        2 => 'title',
+        3 => 'field_welcome_message',
+      ),
+      'hidden' => array(
+        4 => 'view_mode',
+        5 => 'revision',
+        6 => 'redirect',
+        7 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'label' => 'top',
+      'field_hero_image' => 'left',
+      'title' => 'right',
+      'field_welcome_message' => 'right',
+      'view_mode' => 'hidden',
+      'revision' => 'hidden',
+      'redirect' => 'hidden',
+      '_add_existing_field' => 'hidden',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['bean|front_page_hero_image|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'bean|hero_image_one_column|form';
+  $ds_layout->entity_type = 'bean';
+  $ds_layout->bundle = 'hero_image_one_column';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'label',
+        1 => 'field_hero_image',
+        2 => 'field_hero_image_caption',
+      ),
+      'hidden' => array(
+        3 => 'title',
+        4 => 'view_mode',
+        5 => 'revision',
+        6 => 'redirect',
+        7 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'label' => 'central',
+      'field_hero_image' => 'central',
+      'field_hero_image_caption' => 'central',
+      'title' => 'hidden',
+      'view_mode' => 'hidden',
+      'revision' => 'hidden',
+      'redirect' => 'hidden',
+      '_add_existing_field' => 'hidden',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['bean|hero_image_one_column|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'bean|hero_image_two_columns|default';
+  $ds_layout->entity_type = 'bean';
+  $ds_layout->bundle = 'hero_image_two_columns';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'bootstrap_6_6';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'left' => array(
+        0 => 'field_hero_image',
+      ),
+      'right' => array(
+        1 => 'field_welcome_title',
+        2 => 'field_welcome_message',
+      ),
+    ),
+    'fields' => array(
+      'field_hero_image' => 'left',
+      'field_welcome_title' => 'right',
+      'field_welcome_message' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['bean|hero_image_two_columns|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'bean|hero_image_two_columns|form';
+  $ds_layout->entity_type = 'bean';
+  $ds_layout->bundle = 'hero_image_two_columns';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'label',
+      ),
+      'left' => array(
+        1 => 'field_hero_image',
+      ),
+      'right' => array(
+        2 => 'field_welcome_title',
+        3 => 'field_welcome_message',
+      ),
+      'hidden' => array(
+        4 => 'title',
+        5 => 'view_mode',
+        6 => 'revision',
+        7 => 'redirect',
+        8 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'label' => 'top',
+      'field_hero_image' => 'left',
+      'field_welcome_title' => 'right',
+      'field_welcome_message' => 'right',
+      'title' => 'hidden',
+      'view_mode' => 'hidden',
+      'revision' => 'hidden',
+      'redirect' => 'hidden',
+      '_add_existing_field' => 'hidden',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['bean|hero_image_two_columns|form'] = $ds_layout;
 
   return $export;
 }

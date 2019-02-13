@@ -52,7 +52,12 @@ Drupal.ajax.prototype.beforeSend = function (xmlhttprequest, options) {
     }
     this.progress.element = $(progressBar.element).addClass('ajax-progress ajax-progress-bar');
     this.progress.object = progressBar;
-    $element.closest('.file-widget,.form-item').after(this.progress.element);
+    if (!$element.closest('.file-widget,.form-item').length) {
+      $element.before(this.progress.element);
+    }
+    else {
+      $element.closest('.file-widget,.form-item').after(this.progress.element);
+    }
   }
   else if (this.progress.type == 'throbber') {
     this.progress.element = $('<div class="ajax-progress ajax-progress-throbber"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i></div>');

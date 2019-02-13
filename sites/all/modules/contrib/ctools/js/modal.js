@@ -268,7 +268,7 @@
           // We also have to check jQuery version to prevent
           // IE8 + jQuery 1.4.4 to break on other events
           // bound to the submit button.
-          if (jQuery.fn.jquery === '1.4' && typeof event.bubbles === "undefined") {
+          if (jQuery.fn.jquery.substr(0, 3) === '1.4' && typeof event.bubbles === "undefined") {
             $(this.form).trigger('submit');
             return false;
           }
@@ -302,10 +302,11 @@
 
     // Attach behaviors within a modal dialog.
     var settings = response.settings || ajax.settings || Drupal.settings;
-    Drupal.attachBehaviors('#modalContent', settings);
+    Drupal.attachBehaviors($('#modalContent'), settings);
 
     if ($('#modal-content').hasClass('ctools-modal-loading')) {
       $('#modal-content').removeClass('ctools-modal-loading');
+      modalContentResize();
     }
     else {
       // If the modal was already shown, and we are simply replacing its
@@ -313,6 +314,43 @@
       // (When first showing the modal, focus will be placed on the close
       // button by the show() function called above.)
       $('#modal-content :focusable:first').focus();
+    }
+
+    // Trigger a window resize after a delay to ensure that the modal is
+    // centered properly.
+    // See https://www.drupal.org/node/1803104
+    Drupal.CTools.Modal.center_modal();
+
+  }
+
+  /**
+   * Ensure modal is centered.
+   */
+  Drupal.CTools.Modal.center_modal = function() {
+    // If the modal doesn't exist, bail.
+    var $modal_content = $('#modalContent');
+    if ($modal_content.length === 0) {
+      return;
+    }
+    // Get the middle of the window.
+    var windowCenter =  $(window).width() / 2;
+    // Get left, width, and center of the modal.
+    var modalLeft = $modal_content.offset().left;
+    var modalWidth = $modal_content.width();
+    var modalCenter = modalLeft + modalWidth / 2;
+    // Check to see how far off the modal and window middles are.
+    var diff = windowCenter - modalCenter;
+    // Consider the modal not centered if it has a width less than 10, or if
+    // its left edge is not at zero and the difference between the window
+    // center and the modal center is greater than |1| (we allow a difference
+    // of 1 positive and negative in case division result a float).
+    if (modalWidth < 10 || (modalLeft > 0 && (diff > 1 || diff < -1))) {
+      // Modal is not centered. Trigger resize to force modal to center and
+      // wait 10 ms before retrying.
+      $(window).trigger('resize').delay(10).queue(function(){
+        $(this).dequeue();
+        Drupal.CTools.Modal.center_modal();
+      });
     }
   }
 
@@ -554,6 +592,7 @@
 
     // Create our content div, get the dimensions, and hide it
     var modalContent = $('#modalContent').css('top','-1000px');
+    var $modalHeader = modalContent.find('.modal-header');
     var mdcTop = wt + ( winHeight / 2 ) - (  modalContent.outerHeight() / 2);
     var mdcLeft = ( winWidth / 2 ) - ( modalContent.outerWidth() / 2);
     $('#modalBackdrop').css(css).css('top', 0).css('height', docHeight + 'px').css('width', docWidth + 'px').show();
@@ -561,7 +600,7 @@
 
     // Bind a click for closing the modalContent
     modalContentClose = function(){close(); return false;};
-    $('.close').bind('click', modalContentClose);
+    $('.close', $modalHeader).bind('click', modalContentClose);
 
     // Bind a keypress on escape for closing the modalContent
     modalEventEscapeCloseHandler = function(event) {
@@ -577,7 +616,7 @@
     // close button, but we should save the original focus to restore it after
     // the dialog is closed.
     var oldFocus = document.activeElement;
-    $('.close').focus();
+    $('.close', $modalHeader).focus();
 
     // Close the open modal content and backdrop
     function close() {
@@ -586,7 +625,7 @@
       $('body').unbind( 'focus', modalEventHandler);
       $('body').unbind( 'keypress', modalEventHandler );
       $('body').unbind( 'keydown', modalTabTrapHandler );
-      $('.close').unbind('click', modalContentClose);
+      $('.close', $modalHeader).unbind('click', modalContentClose);
       $('body').unbind('keypress', modalEventEscapeCloseHandler);
       $(document).trigger('CToolsDetachBehaviors', $('#modalContent'));
 
@@ -636,7 +675,8 @@
 
       // Apply the changes
       $('#modalBackdrop').css('height', docHeight + 'px').css('width', docWidth + 'px').show();
-      modalContent.css('top', mdcTop + 'px').css('left', mdcLeft + 'px').show();
+      var topPx = mdcTop < 0 ? 0 : mdcTop;
+      modalContent.css('top', topPx + 'px').css('left', mdcLeft + 'px').show();
     };
     $(window).bind('resize', modalContentResize);
   };
@@ -662,9 +702,11 @@
     $('body').unbind('focus', modalEventHandler);
     $('body').unbind('keypress', modalEventHandler);
     $('body').unbind( 'keydown', modalTabTrapHandler );
-    $('.close').unbind('click', modalContentClose);
+    var $modalContent = $('#modalContent');
+    var $modalHeader = $modalContent.find('.modal-header');
+    $('.close', $modalHeader).unbind('click', modalContentClose);
     $('body').unbind('keypress', modalEventEscapeCloseHandler);
-    $(document).trigger('CToolsDetachBehaviors', $('#modalContent'));
+    $(document).trigger('CToolsDetachBehaviors', $modalContent);
 
     // jQuery magic loop through the instances and run the animations or removal.
     content.each(function(){

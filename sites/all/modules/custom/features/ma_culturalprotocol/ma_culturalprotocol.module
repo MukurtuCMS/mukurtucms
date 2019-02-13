@@ -125,7 +125,7 @@ function ma_culturalprotocol_node_insert($node) {
     _set_cp_steward_on_cp_create ($node);
 
     $cp_new = entity_metadata_wrapper('node', $node);
-    _process_dh_dw_node_access ($cp_new);
+    _process_nodes_in_cp_node_access ($cp_new);
   }
 }
 
@@ -140,7 +140,7 @@ function ma_culturalprotocol_node_update($node) {
     if ($node->original) { // Even though we are in hook_update, there can be cases where this is empty
       $cp_old = entity_metadata_wrapper('node', $node->original);
     }
-    _process_dh_dw_node_access ($cp_new, $cp_old);
+    _process_nodes_in_cp_node_access ($cp_new, $cp_old);
   }
 }
 
@@ -186,8 +186,38 @@ function ma_culturalprotocol_node_access($node, $op, $account) {
             // OG node_access doesn't know what to do for users with no community memberships yet.
             // This causes users like Language Stewards to be presented with the option to create protocols, which we don't want.
             // Here we explicitly check for the ability to create protocols
-            if(!user_access('create cultural_protocol_group content')) {
-                return NODE_ACCESS_DENY;
+            $access = FALSE;
+            $groups_for_user = og_get_groups_by_user($account, 'node');
+            foreach($groups_for_user as $group) {
+              $roles = og_get_user_roles('node', $group);
+              if(in_array('community manager', $roles)) {
+                // Check if user has global permission to create protocols.
+                if(user_access('create cultural_protocol_group content', $account)) {
+                  $access = TRUE;
+                  break;
+                }
+
+                // Check if user has OG permission to create protocols.
+                if(og_user_access("node", $group, 'create cultural_protocol_group content', $account)) {
+                  $access = TRUE;
+                  break;
+                }
+
+                $cps = ma_cultural_protocol_get_cps_for_user($roles, $group);
+                if(!empty($cps)) {
+                  foreach(array_keys($cps) as $cp) {
+                    // Check each protocol for OG permission to create protocols.
+                    if(og_user_access("node", $cp, 'create cultural_protocol_group content', $account)) {
+                      $access = TRUE;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+
+            if(!$access) {
+              return NODE_ACCESS_DENY;
             }
             break;
         case 'delete':
@@ -262,41 +292,33 @@ function _process_group_signup_permissions($node) {
   }
 }
 
-function _process_dh_dw_node_access ($cp_new, $cp_old = NULL) {
+function _process_nodes_in_cp_node_access ($cp_new, $cp_old = NULL) {
   if (!is_null($cp_old)) {
     if ($cp_old->group_access->value() == $cp_new->group_access->value()
       AND $cp_old->og_roles_permissions->value() == $cp_new->og_roles_permissions->value()
     ) {
-      return; // No need to reprocess the DH/DW nodes if neither of these fields changed
+      return; // No need to reprocess the nodes-in-CP if neither of these fields changed
     }
   }
 
-  // DH items
-  $query = new EntityFieldQuery();
-  $result = $query
-    ->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'digital_heritage')
-    ->fieldCondition('og_group_ref', 'target_id', $cp_new->getIdentifier())
-    ->execute();
-  $dh_nids = empty($result['node']) ? array() : array_keys($result['node']);
-  if (count($dh_nids)) {
-    $dh_nodes_to_rebuid_and_reindex = variable_get('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', array());
-    $dh_nodes_to_rebuid_and_reindex = array_merge($dh_nodes_to_rebuid_and_reindex, $dh_nids);
-    variable_set('mukurtu_dh_nodes_to_rebuild_perms_and_reindex', $dh_nodes_to_rebuid_and_reindex);
-  }
-
-  // DWs
-  $query = new EntityFieldQuery();
-  $result = $query
-    ->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'dictionary_word')
-    ->fieldCondition('og_group_ref', 'target_id', $cp_new->getIdentifier())
-    ->execute();
-  $dw_nids = empty($result['node']) ? array() : array_keys($result['node']);
-  if (count($dw_nids)) {
-    $dw_nodes_to_rebuid_and_reindex = variable_get('mukurtu_dw_nodes_to_rebuild_perms_and_reindex', array());
-    $dw_nodes_to_rebuid_and_reindex = array_merge($dw_nodes_to_rebuid_and_reindex, $dw_nids);
-    variable_set('mukurtu_dw_nodes_to_rebuild_perms_and_reindex', $dw_nodes_to_rebuid_and_reindex);
+  $types_to_process = [
+    'digital_heritage' => 'mukurtu_dh_nodes_to_rebuild_perms_and_reindex',
+    'dictionary_word' => 'mukurtu_dw_nodes_to_rebuild_perms_and_reindex',
+    'collection' => 'mukurtu_coll_nodes_to_rebuild_perms_and_reindex',
+  ];
+  foreach ($types_to_process as $type_to_process => $process_nids_var) {
+    $query = new EntityFieldQuery();
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', $type_to_process)
+      ->fieldCondition('og_group_ref', 'target_id', $cp_new->getIdentifier())
+      ->execute();
+    $nids = empty($result['node']) ? array() : array_keys($result['node']);
+    if (count($nids)) {
+      $nodes_to_rebuid_and_reindex = variable_get($process_nids_var, array());
+      $nodes_to_rebuid_and_reindex = array_merge($nodes_to_rebuid_and_reindex, $nids);
+      variable_set($process_nids_var, $nodes_to_rebuid_and_reindex);
+    }
   }
 
 }
@@ -378,42 +400,177 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
 }
 
 
-/**
- * Helper function used both by for DH/DW custom protocol field and scald protocol field (default OG) to reduce down the available groups the user is a member of to those the user has posting permissions on, because OG on its own is not handling this
+/*
+ * Helper function used nodes-in-CP custom protocol field and scald protocol field (default OG) to reduce down the available groups the user is a member of to those the user has posting permissions on, because OG on its own is not handling this
  */
-function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL) {
-  $groups_for_user = og_get_groups_by_user(null, 'node');
-  $allowed_groups_for_user[] = array();
-  foreach ($groups_for_user as $group_for_user) {
-    $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
-    if (array_intersect(array('contributor', 'protocol steward'), $roles_for_user_in_group)) {
-      $allowed_groups_for_user[] = $group_for_user;
+function ma_cultural_protocol_get_cps_user_can_post_to ($community_nid = NULL, $import_form = FALSE) {
+  $roles = [
+    'contributor',
+    'protocol steward'
+  ];
+  return ma_cultural_protocol_get_cps_for_user($roles, $community_nid, $import_form);
+}
+
+/*
+ * CPs that a user is a Protocol Steward of.
+ */
+function ma_cultural_protocol_get_cps_user_is_steward() {
+  $roles = [
+    'protocol steward'
+  ];
+  return ma_cultural_protocol_get_cps_for_user($roles);
+}
+
+/*
+ * Checks if a user is a member of any of its CPs
+ */
+function ma_cultural_protocol_user_is_member_of_at_least_one_cp_of_node($node, $user = NULL) {
+  if (!$user) {
+    global $user;
+  }
+  foreach ($node->og_group_ref[LANGUAGE_NONE] as $cp) {
+    if (og_is_member('node', $cp['target_id'], 'user', $user)) {
+      return TRUE;
     }
   }
+}
 
-  // EFQ to get sub protocols for a community (or all if no community specified)
-  $query = new EntityFieldQuery();
-
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'cultural_protocol_group')
-    ->propertyCondition('status', NODE_PUBLISHED);
-  if ($community_nid) {
-    $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
-  }
-
-  $result = $query->execute();
-
-  if (isset($result['node'])) {
-    $protocol_items_nids = array_keys($result['node']);
-    $protocol_items = entity_load('node', $protocol_items_nids);
-
-    $cps = array();
-    foreach ($protocol_items as $protocol_item) {
-      if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
-        $cps[$protocol_item->nid] = $protocol_item->title;
+/*
+ * Helper function for the CPs for user helper functions.
+ */
+function ma_cultural_protocol_get_cps_for_user($roles, $community_nid = NULL, $import_form = FALSE) {
+  $groups_for_user = og_get_groups_by_user(null, 'node');
+  if (count($groups_for_user)) {
+    $allowed_groups_for_user[] = [];
+    foreach ($groups_for_user as $group_for_user) {
+      $roles_for_user_in_group = og_get_user_roles('node', $group_for_user);
+      if ($import_form OR array_intersect($roles, $roles_for_user_in_group)) {
+        $allowed_groups_for_user[] = $group_for_user;
       }
     }
-    return $cps;
-  }
 
+    // EFQ to get sub protocols for a community (or all if no community specified)
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'cultural_protocol_group')
+      ->propertyCondition('status', NODE_PUBLISHED);
+    if ($community_nid) {
+      $query->fieldCondition('og_group_ref', 'target_id', $community_nid, '=');
+    }
+
+    $result = $query->execute();
+
+    if (isset($result['node'])) {
+      $protocol_items_nids = array_keys($result['node']);
+      $protocol_items = entity_load('node', $protocol_items_nids);
+
+      $cps = [];
+      foreach ($protocol_items as $protocol_item) {
+        if (in_array($protocol_item->nid, $allowed_groups_for_user)) {
+          $cps[$protocol_item->nid] = $protocol_item->title;
+        }
+      }
+      return $cps;
+    }
+  }
+}
+
+/**
+ * Collab Pages functions shared with cultural protocol feature. Included here because ma_collaboration_tools can be disabled.
+ */
+
+/**
+ * Overall map of the collab pages types, to be used by the helper functions below.
+ */
+function ma_culturalprotocol_collab_node_types_map() {
+  return [
+    'event' => ['parent' => 'calendar', 'ref_field' => 'field_event_calendar_section'],
+    'discussion_topic' => ['parent' => 'discussion_space', 'ref_field' => 'field_discussion_disc_space'],
+    'document_page' => ['parent' => 'document_library', 'ref_field' => 'field_document_doc_lib_section'],
+  ];
+}
+
+/**
+ * Get the collab child node types
+ */
+function ma_culturalprotocol_collab_child_node_types() {
+  return array_keys(ma_culturalprotocol_collab_node_types_map());
+}
+
+/**
+ * Get the collab parent node types
+ */
+function ma_culturalprotocol_collab_parent_node_types() {
+  $parent_types = [];
+  foreach (ma_culturalprotocol_collab_node_types_map() as $child_type => $child_type_props) {
+    $parent_types[] = $child_type_props['parent'];
+  }
+  return $parent_types;
+}
+
+/**
+ * Get all the collab node types
+ */
+function ma_culturalprotocol_all_collab_node_types() {
+  return array_merge(['following_notification'], ma_culturalprotocol_collab_parent_node_types(), ma_culturalprotocol_collab_child_node_types());
+}
+
+/**
+ * Internal function used by the helper functions.
+ */
+function _ma_cultural_protocol_get_node_types_in_cps() {
+  return [
+    'optional' => [
+      'collection',
+      'dictionary_word',
+    ],
+    'required' => [
+      'digital_heritage',
+      'calendar',
+      'discussion_space',
+      'document_library',
+    ],
+    'collab_pages' => ma_culturalprotocol_collab_child_node_types(),
+  ];
+}
+
+/**
+ * Helper function returns whether a node type *can* be in a CP (including collab pages)
+ */
+function ma_cultural_protocol_node_type_can_have_cp($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['optional'], $node_types['required'], $node_types['collab_pages']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * Helper function returns whether a node type *can* be in a CP (not including collab pages)
+ */
+function ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['optional'], $node_types['required']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * Helper function returns whether a node type *must* be in a CP
+ */
+function ma_cultural_protocol_node_type_must_have_cp($node_type) {
+  $node_types = _ma_cultural_protocol_get_node_types_in_cps();
+  if (in_array($node_type, array_merge($node_types['required'], $node_types['collab_pages']))) {
+    return TRUE;
+  }
+}
+
+/**
+ * This is an intermediary function, called by the custom follow-unfollow field.
+ * Need this to avoid error if ma_collaboration_tools is disabled.
+ */
+function ma_culturalprotocol_follow_unfollow($entity) {
+  if (module_exists('ma_collaboration_tools')) {
+    return ma_collaboration_tools_follow_unfollow($entity);
+  }
 }

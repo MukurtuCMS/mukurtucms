@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.ds.inc
@@ -213,13 +214,19 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
+        0 => 'scald_thumbnail',
+        1 => 'atom',
       ),
     ),
     'fields' => array(
+      'scald_thumbnail' => 'ds_content',
       'atom' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -228,6 +235,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|audio|ma_scald_search_results'] = $ds_layout;
 
@@ -271,20 +279,8 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->entity_type = 'scald_atom';
   $ds_layout->bundle = 'audio';
   $ds_layout->view_mode = 'mukurtu_scald_recording';
-  $ds_layout->layout = 'ds_3col_equal_width';
+  $ds_layout->layout = 'bootstrap_8_4';
   $ds_layout->settings = array(
-    'regions' => array(
-      'left' => array(
-        0 => 'atom',
-      ),
-      'middle' => array(
-        1 => 'field_contributor',
-      ),
-    ),
-    'fields' => array(
-      'atom' => 'left',
-      'field_contributor' => 'middle',
-    ),
     'classes' => array(
       'layout_class' => array(
         '' => '',
@@ -292,7 +288,6 @@ function ma_scald_ds_layout_settings_info() {
     ),
     'wrappers' => array(
       'left' => 'div',
-      'middle' => 'div',
       'right' => 'div',
     ),
     'layout_wrapper' => 'div',
@@ -300,7 +295,19 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
+    'regions' => array(
+      'left' => array(
+        0 => 'atom',
+      ),
+      'right' => array(
+        0 => 'field_contributor',
+      ),
+    ),
+    'fields' => array(
+      'atom' => 'left',
+      'field_contributor' => 'right',
+    ),
   );
   $export['scald_atom|audio|mukurtu_scald_recording'] = $ds_layout;
 
@@ -383,12 +390,10 @@ function ma_scald_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'atom',
-        1 => 'scald_thumbnail',
+        0 => 'scald_thumbnail',
       ),
     ),
     'fields' => array(
-      'atom' => 'ds_content',
       'scald_thumbnail' => 'ds_content',
     ),
     'classes' => array(
@@ -404,6 +409,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|file|ma_scald_search_results'] = $ds_layout;
 
@@ -503,6 +509,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|image|default'] = $ds_layout;
 
@@ -688,6 +695,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|video|default'] = $ds_layout;
 
@@ -744,14 +752,16 @@ function ma_scald_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'atom',
-        1 => 'scald_thumbnail',
       ),
     ),
     'fields' => array(
       'atom' => 'ds_content',
-      'scald_thumbnail' => 'ds_content',
     ),
-    'classes' => array(),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
     'wrappers' => array(
       'ds_content' => 'div',
     ),
@@ -760,6 +770,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|video|ma_scald_search_results'] = $ds_layout;
 

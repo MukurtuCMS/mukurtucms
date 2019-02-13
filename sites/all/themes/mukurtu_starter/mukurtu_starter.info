@@ -41,6 +41,7 @@ stylesheets[all][] = font-awesome/css/font-awesome.min.css
 ; ;;;;;;;;;;;;;;;;;;;;;
 ;
 scripts[] = js/scripts.js
+scripts[] = js/mukurturesize.js
 scripts[] = js/masonry.pkgd.min.js
 scripts[] = 'bootstrap/js/affix.js'
 scripts[] = 'bootstrap/js/alert.js'

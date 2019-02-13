@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Stub file for bootstrap_menu_local_action().
@@ -20,7 +21,7 @@
  *
  * @ingroup theme_functions
  */
-function bootstrap_menu_local_action($variables) {
+function bootstrap_menu_local_action(array $variables) {
   $link = $variables['element']['#link'];
 
   $options = isset($link['localized_options']) ? $link['localized_options'] : array();

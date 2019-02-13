@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.strongarm.inc
@@ -104,108 +105,23 @@ function ma_digitalheritage_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'ds_classes_fields';
-  $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8
-col-md-4
-col-md-3
-col-md-6
-col-md-8
-col-md-12
-clearfix';
-  $export['ds_classes_fields'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_classes_regions';
-  $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8';
-  $export['ds_classes_regions'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_fields_extra';
-  $strongarm->value = 0;
-  $export['ds_extras_fields_extra'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_fields_extra_list';
-  $strongarm->value = '';
-  $export['ds_extras_fields_extra_list'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_field_permissions';
-  $strongarm->value = 0;
-  $export['ds_extras_field_permissions'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_field_template';
+  $strongarm->name = 'diff_enable_revisions_page_node_digital_heritage';
   $strongarm->value = 1;
-  $export['ds_extras_field_template'] = $strongarm;
+  $export['diff_enable_revisions_page_node_digital_heritage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_flag';
-  $strongarm->value = 0;
-  $export['ds_extras_flag'] = $strongarm;
+  $strongarm->name = 'diff_show_preview_changes_node_digital_heritage';
+  $strongarm->value = 1;
+  $export['diff_show_preview_changes_node_digital_heritage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_hidden_region';
-  $strongarm->value = 0;
-  $export['ds_extras_hidden_region'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_hide_page_sidebars';
-  $strongarm->value = 0;
-  $export['ds_extras_hide_page_sidebars'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_hide_page_title';
-  $strongarm->value = 0;
-  $export['ds_extras_hide_page_title'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_region_to_block';
-  $strongarm->value = 0;
-  $export['ds_extras_region_to_block'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_switch_field';
-  $strongarm->value = 0;
-  $export['ds_extras_switch_field'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_switch_view_mode';
-  $strongarm->value = 0;
-  $export['ds_extras_switch_view_mode'] = $strongarm;
-
-  $strongarm = new stdClass();
-  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
-  $strongarm->api_version = 1;
-  $strongarm->name = 'ds_extras_vd';
-  $strongarm->value = 0;
-  $export['ds_extras_vd'] = $strongarm;
+  $strongarm->name = 'diff_view_mode_preview_node_digital_heritage';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_digital_heritage'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
@@ -266,6 +182,9 @@ col-md-4 col-md-push-8';
         'custom_settings' => FALSE,
       ),
       'taxonomy_record_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'featured_content' => array(
         'custom_settings' => TRUE,
       ),
     ),

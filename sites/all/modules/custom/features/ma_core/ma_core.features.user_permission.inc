@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.user_permission.inc
@@ -82,10 +83,22 @@ function ma_core_user_default_permissions() {
   $permissions['access contextual links'] = array(
     'name' => 'access contextual links',
     'roles' => array(
+      'Curator' => 'Curator',
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
+    ),
+    'module' => 'contextual',
+  );
+
+  // Exported permission: 'access mail logger'.
+  $permissions['access mail logger'] = array(
+    'name' => 'access mail logger',
+    'roles' => array(
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
-    'module' => 'contextual',
+    'module' => 'mail_logger',
   );
 
   // Exported permission: 'access site in maintenance mode'.
@@ -196,7 +209,6 @@ function ma_core_user_default_permissions() {
   $permissions['administer category vocabulary terms'] = array(
     'name' => 'administer category vocabulary terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -294,15 +306,6 @@ function ma_core_user_default_permissions() {
     'module' => 'filter',
   );
 
-  // Exported permission: 'administer flags'.
-  $permissions['administer flags'] = array(
-    'name' => 'administer flags',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'flag',
-  );
-
   // Exported permission: 'administer geofield_gmap'.
   $permissions['administer geofield_gmap'] = array(
     'name' => 'administer geofield_gmap',
@@ -391,15 +394,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'locale',
-  );
-
-  // Exported permission: 'administer maillog'.
-  $permissions['administer maillog'] = array(
-    'name' => 'administer maillog',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'administer menu'.
@@ -573,7 +567,6 @@ function ma_core_user_default_permissions() {
   $permissions['administer tags vocabulary terms'] = array(
     'name' => 'administer tags vocabulary terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -795,15 +788,6 @@ function ma_core_user_default_permissions() {
     'module' => 'backup_migrate',
   );
 
-  // Exported permission: 'delete maillog'.
-  $permissions['delete maillog'] = array(
-    'name' => 'delete maillog',
-    'roles' => array(
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
-  );
-
   // Exported permission: 'delete own article content'.
   $permissions['delete own article content'] = array(
     'name' => 'delete own article content',
@@ -849,7 +833,6 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in category'] = array(
     'name' => 'delete terms in category',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -961,7 +944,6 @@ function ma_core_user_default_permissions() {
   $permissions['delete terms in tags'] = array(
     'name' => 'delete terms in tags',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1059,21 +1041,10 @@ function ma_core_user_default_permissions() {
     'module' => 'node',
   );
 
-  // Exported permission: 'edit own tags'.
-  $permissions['edit own tags'] = array(
-    'name' => 'edit own tags',
-    'roles' => array(
-      'administrator' => 'administrator',
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'community_tags',
-  );
-
   // Exported permission: 'edit terms in category'.
   $permissions['edit terms in category'] = array(
     'name' => 'edit terms in category',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1185,7 +1156,6 @@ function ma_core_user_default_permissions() {
   $permissions['edit terms in tags'] = array(
     'name' => 'edit terms in tags',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1225,7 +1195,6 @@ function ma_core_user_default_permissions() {
   $permissions['merge tags terms'] = array(
     'name' => 'merge tags terms',
     'roles' => array(
-      'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
     ),
@@ -1317,6 +1286,7 @@ function ma_core_user_default_permissions() {
       'Curator' => 'Curator',
       'Mukurtu Administrator' => 'Mukurtu Administrator',
       'administrator' => 'administrator',
+      'authenticated user' => 'authenticated user',
     ),
     'module' => 'comment',
   );
@@ -1328,15 +1298,6 @@ function ma_core_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'shortcut',
-  );
-
-  // Exported permission: 'tag content'.
-  $permissions['tag content'] = array(
-    'name' => 'tag content',
-    'roles' => array(
-      'authenticated user' => 'authenticated user',
-    ),
-    'module' => 'community_tags',
   );
 
   // Exported permission: 'translate content'.
@@ -1485,16 +1446,6 @@ function ma_core_user_default_permissions() {
       'authenticated user' => 'authenticated user',
     ),
     'module' => 'advanced_help',
-  );
-
-  // Exported permission: 'view maillog'.
-  $permissions['view maillog'] = array(
-    'name' => 'view maillog',
-    'roles' => array(
-      'Mukurtu Administrator' => 'Mukurtu Administrator',
-      'administrator' => 'administrator',
-    ),
-    'module' => 'maillog',
   );
 
   // Exported permission: 'view own unpublished content'.

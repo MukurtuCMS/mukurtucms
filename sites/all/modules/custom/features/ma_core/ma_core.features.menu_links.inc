@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.menu_links.inc
@@ -10,6 +11,29 @@
 function ma_core_menu_default_menu_links() {
   $menu_links = array();
 
+  // Exported menu link: main-menu_add-content:node/add.
+  $menu_links['main-menu_add-content:node/add'] = array(
+    'menu_name' => 'main-menu',
+    'link_path' => 'node/add',
+    'router_path' => 'node/add',
+    'link_title' => 'Add Content',
+    'options' => array(
+      'attributes' => array(),
+      'item_attributes' => array(
+        'id' => '',
+        'class' => '',
+        'style' => '',
+      ),
+      'identifier' => 'main-menu_add-content:node/add',
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 1,
+    'expanded' => 1,
+    'weight' => -50,
+    'customized' => 1,
+  );
   // Exported menu link: main-menu_dashboard:dashboard.
   $menu_links['main-menu_dashboard:dashboard'] = array(
     'menu_name' => 'main-menu',
@@ -17,15 +41,20 @@ function ma_core_menu_default_menu_links() {
     'router_path' => 'dashboard',
     'link_title' => 'Dashboard',
     'options' => array(
-      'attributes' => array(),
       'identifier' => 'main-menu_dashboard:dashboard',
+      'attributes' => array(),
+      'item_attributes' => array(
+        'id' => '',
+        'class' => '',
+        'style' => '',
+      ),
     ),
     'module' => 'system',
     'hidden' => 0,
     'external' => 0,
     'has_children' => 1,
     'expanded' => 0,
-    'weight' => -40,
+    'weight' => -41,
     'customized' => 1,
   );
   // Exported menu link: main-menu_log-in:user/login.
@@ -39,11 +68,11 @@ function ma_core_menu_default_menu_links() {
       'identifier' => 'main-menu_log-in:user/login',
     ),
     'module' => 'menu',
-    'hidden' => 0,
+    'hidden' => 1,
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -41,
+    'weight' => -39,
     'customized' => 1,
   );
   // Exported menu link: main-menu_log-out:user/logout.
@@ -57,11 +86,11 @@ function ma_core_menu_default_menu_links() {
       'identifier' => 'main-menu_log-out:user/logout',
     ),
     'module' => 'system',
-    'hidden' => 0,
+    'hidden' => 1,
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -42,
+    'weight' => -40,
     'customized' => 1,
   );
   // Exported menu link: main-menu_user-account:user.
@@ -72,24 +101,26 @@ function ma_core_menu_default_menu_links() {
     'link_title' => 'User account',
     'options' => array(
       'alter' => TRUE,
-      'attributes' => array(
-        'class' => array(
-          0 => 'pull-right',
-        ),
-      ),
       'identifier' => 'main-menu_user-account:user',
+      'attributes' => array(),
+      'item_attributes' => array(
+        'id' => '',
+        'class' => '',
+        'style' => '',
+      ),
     ),
     'module' => 'system',
     'hidden' => 0,
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -43,
+    'weight' => -42,
     'customized' => 1,
   );
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Add Content');
   t('Dashboard');
   t('Log in');
   t('Log out');

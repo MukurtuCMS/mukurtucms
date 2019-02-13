@@ -20,6 +20,11 @@ function file_entity_path_alias_types() {
  * Implements hook_pathauto().
  */
 function file_entity_pathauto($op) {
+  // Allow Pathauto Entity settings to override File Entity's pathauto.
+  if (module_exists('pathauto_entity')) {
+    return;
+  }
+
   switch ($op) {
     case 'settings':
       $settings = array();

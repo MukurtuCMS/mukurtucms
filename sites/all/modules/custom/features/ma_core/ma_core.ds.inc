@@ -1,8 +1,33 @@
 <?php
+
 /**
  * @file
  * ma_core.ds.inc
  */
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_core_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'create_content_block_ds_field';
+  $ds_field->label = 'Create Content Block DS';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'block' => 'ma_core|create_content',
+    'block_render' => '1',
+  );
+  $export['create_content_block_ds_field'] = $ds_field;
+
+  return $export;
+}
 
 /**
  * Implements hook_ds_layout_settings_info().

@@ -81,8 +81,8 @@ function og_help($path, $arg) {
   switch ($path) {
     case 'admin/help#og':
       $path = drupal_get_path('module', 'og');
-      $output  = '<p>' . t("Read the <a href='@url'>README.txt</a> file in the Organic groups module directory.", array('@url' => "/$path/README.txt")) . '</p>';
-      $output .= '<p>' . t("Information about Organic Groups can also be found on the module's<a href='@og'>documentation page</a>.", array('@og' => 'http://drupal.org/documentation/modules/og')) . '</p>';
+      $output  = '<p>' . t("Read the <a href='@url'>README.md</a> file in the Organic groups module directory.", array('@url' => "/$path/README.md")) . '</p>';
+      $output .= '<p>' . t("Information about Organic Groups can also be found on the module's <a href='@og'>documentation page</a>.", array('@og' => 'http://drupal.org/documentation/modules/og')) . '</p>';
       return $output;
   }
 }
@@ -546,10 +546,12 @@ function og_node_access($node, $op, $account) {
     }
 
     // mukurtu patch
-    // Edit perms on DH nodes should be determined by our custom logic, same as view perms for DH nodes
+    // Edit perms on nodes-in-CP nodes should be determined by our custom logic, same as view perms
     // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
-    if ($op == 'update' && $node->type=='digital_heritage') {
-        return mukurtu_protocol_field_update_dh_dw_access($node);
+    if ($op == 'update') {
+      if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
+        return mukurtu_protocol_field_update_node_in_cp_access($node);
+      }
     }
     // end patch
 
@@ -679,7 +681,15 @@ function og_field_create_instance($instance) {
 
   $og_field = og_fields_info(OG_AUDIENCE_FIELD);
   $og_field['field']['settings']['target_type'] = $entity_type;
-  $og_field['instance']['label'] = t('Group membership');
+  if ($entity_type == 'node') {
+    $og_field['instance']['label'] = t('Group membership');
+  }
+  else {
+    $entity_info = entity_get_info($entity_type);
+    $og_field['instance']['label'] = t('@label group membership', array(
+      '@label' => $entity_info['label'],
+    ));
+  }
 
   // If the user entity type has multiple bundles, make sure to attach a field
   // instance to all of them.
@@ -716,6 +726,10 @@ function og_field_delete_instance($instance) {
  */
 function og_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
   list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+
+  if (!isset($form['#entity'])) {
+    $form['#entity'] = $entity;
+  }
 
   if (og_get_group_audience_fields($entity_type, $bundle)) {
     $form['#validate'][] = 'og_form_group_reference_validate';
@@ -790,7 +804,7 @@ function og_form_group_manager_validate($form, &$form_state) {
     return;
   }
   $entity = $form_state[$entity_type];
-  $langcode = $form_state['values']['language'];
+  $langcode = isset($form_state['values']['language']) ? $form_state['values']['language'] : LANGUAGE_NONE;
 
   if (!isset($form_state['values']['uid']) || !isset($entity->uid)) {
     // There is no user ID property on the entity.
@@ -878,7 +892,7 @@ function og_entity_update($entity, $entity_type) {
   }
 
   list($id, , $bundle) = entity_extract_ids($entity_type, $entity);
-  if (!empty($entity->uid) && !og_is_member($entity_type, $entity, 'user', $entity->uid)) {
+  if (!empty($entity->uid) && !og_is_member($entity_type, $id, 'user', $entity->uid, array())) {
     // Subscribe the group manager, in case the owner changed.
     og_group($entity_type, $id, array('entity' => $entity->uid));
     // Assign roles to group manager.
@@ -889,10 +903,10 @@ function og_entity_update($entity, $entity_type) {
       }
     }
   }
-  $original_entity = $entity->original;
+  $original_entity = isset($entity->original) ? $entity->original : NULL;
   $property = OG_DEFAULT_ACCESS_FIELD;
 
-  if (!empty($entity->{$property}) && $entity->{$property} != $original_entity->{$property}) {
+  if (!empty($entity->{$property}) && !empty($original_entity->{$property}) && $entity->{$property} != $original_entity->{$property}) {
     if (!og_is_group_default_access($entity_type, $entity)) {
       // Override default roles.
       og_roles_override($entity_type, $bundle, $id);
@@ -1818,15 +1832,21 @@ function og_membership_access($op, $entity, $account = NULL, $entity_type = 'og_
  *   The entity type.
  * @param $entity
  *   The entity object, or the entity ID.
+ *
+ * @return
+ *   TRUE or FALSE if the entity is a group.
  */
 function og_is_group($entity_type, $entity) {
-  $wrapper = entity_metadata_wrapper($entity_type, $entity);
-  $bundle = $wrapper->getBundle();
-
+  if (is_numeric($entity)) {
+    $entity = entity_load_single($entity_type, $entity);
+  }
+  list(,, $bundle) = entity_extract_ids($entity_type, $entity);
   if (!field_info_instance($entity_type, OG_GROUP_FIELD, $bundle)) {
     return variable_get("og_is_group__{$entity_type}__{$bundle}", FALSE);
   }
-  return !empty($wrapper->{OG_GROUP_FIELD}) && $wrapper->{OG_GROUP_FIELD}->value();
+  $items = field_get_items($entity_type, $entity, OG_GROUP_FIELD);
+
+  return !empty($items[0]['value']);
 }
 
 
@@ -2216,6 +2236,16 @@ function og_user_access($group_type, $gid, $string, $account = NULL, $skip_alter
  *   The entity object, or the entity ID.
  * @param $account
  *   (optional) The user object. If empty the current user will be used.
+ * @param $skip_alter
+ *   (optional) If TRUE then user access will not be sent to other modules
+ *   using drupal_alter(). This can be used by modules implementing
+ *   hook_og_user_access_alter() that still want to use og_user_access(), but
+ *   without causing a recursion. Defaults to FALSE.
+ * @param $ignore_admin
+ *   (optional) When TRUE the specific permission is checked, ignoring the
+ *   "administer group" permission if the user has it. When FALSE, a user
+ *   with "administer group" will be granted all permissions.
+ *   Defaults to FALSE.
  *
  * @return
  *   Returns TRUE if the user has access to the permission, otherwise FALSE, or
@@ -2223,7 +2253,7 @@ function og_user_access($group_type, $gid, $string, $account = NULL, $skip_alter
  *   a distinction between FALSE - no access, and NULL - no access as no OG
  *   context found.
  */
-function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
+function og_user_access_entity($perm, $entity_type, $entity, $account = NULL, $skip_alter = FALSE, $ignore_admin = FALSE) {
   if (empty($account)) {
     global $user;
     $account = clone $user;
@@ -2272,7 +2302,7 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
   if ($is_group_content && $groups = og_get_entity_groups($entity_type, $entity)) {
     foreach ($groups as $group_type => $gids) {
       foreach ($gids as $gid) {
-        if (og_user_access($group_type, $gid, $perm, $account)) {
+        if (og_user_access($group_type, $gid, $perm, $account, $skip_alter, $ignore_admin)) {
           return TRUE;
         }
       }
@@ -2299,9 +2329,9 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
  *   (optional) The field name associated with the group.
  *
  * @return
- *  An array with the group's entity type as the key, and array - keyed by
- *  the OG membership ID and the group ID as the value. If nothing found,
- *  then an empty array.
+ *   An associative array keyed by the group's entity type. Each value is itself
+ *   an array, where each item has for its key the OG membership ID and for its
+ *   value the group ID.
  */
 function og_get_entity_groups($entity_type = 'user', $entity = NULL, $states = array(OG_STATE_ACTIVE), $field_name = NULL) {
   $cache = &drupal_static(__FUNCTION__, array());
@@ -2566,8 +2596,8 @@ function og_get_all_group_content_bundle() {
  * @param $entity
  *   The entity object. If empty the current user will be used.
  * @param $states
- *   (optional) Array with the state to return. If empty groups of all state will
- *   return.
+ *   (optional) Array with the membership states to check against. If omitted
+ *   then only active (OG_STATE_ACTIVE) memberships will be checked.
  *
  * @return
  *   TRUE if the entity (e.g. the user) belongs to a group and is not pending or
@@ -3068,7 +3098,7 @@ function og_role_grant($group_type, $gid, $uid, $rid) {
   }
 
   // Get the existing user roles.
-  $user_roles = og_get_user_roles($group_type, $gid, $uid);
+  $user_roles = og_get_user_roles($group_type, $gid, $uid, TRUE, FALSE);
   if (empty($user_roles[$rid])) {
     $role = new stdClass();
     $role->uid = $uid;
@@ -3547,7 +3577,10 @@ function og_node_create_links($group_type, $gid, $field_name, $destination = NUL
  *   types will be fetched.
  *
  * @return
- *   An array with the group IDs or an empty array.
+ *   If $group_type is provided then an array of group IDs matching the
+ *   specified group type. If $group_type is not provided then an associative
+ *   array is returned containing arrays of group IDs keyed by group type. If
+ *   no results are found an empty array is returned.
  */
 function og_get_groups_by_user($account = NULL, $group_type = NULL) {
   if (empty($account)) {
@@ -3555,18 +3588,18 @@ function og_get_groups_by_user($account = NULL, $group_type = NULL) {
     $account = $user;
   }
 
+  $gids = array();
+
   if (!og_get_group_audience_fields()) {
     // User entity doesn't have group audience fields.
-    return;
+    return $gids;
   }
-
-  $gids = array();
 
   // Get all active OG membership that belong to the user.
   $wrapper = entity_metadata_wrapper('user', $account->uid);
   $og_memberships = $wrapper->{'og_membership__' . OG_STATE_ACTIVE}->value();
   if (!$og_memberships) {
-    return;
+    return $gids;
   }
 
   foreach ($og_memberships as $og_membership) {
@@ -3575,12 +3608,10 @@ function og_get_groups_by_user($account = NULL, $group_type = NULL) {
     }
   }
 
-  if (empty($group_type)) {
-    return $gids;
+  if (isset($group_type)) {
+    return isset($gids[$group_type]) ? $gids[$group_type] : array();
   }
-  elseif (!empty($gids[$group_type])) {
-    return $gids[$group_type];
-  }
+  return $gids;
 }
 
 /**

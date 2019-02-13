@@ -122,11 +122,7 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
     foreach ($items as $item) {
       $gid = $item['target_id'];
 
-      // Must provide correct state in the event that approval is required.
-      if (empty($item['state']) && $entity_type == 'user' && !og_user_access($group_type, $gid, 'subscribe without approval', $entity)) {
-        $item['state'] = OG_STATE_PENDING;
-      }
-      elseif (empty($item['state']) || !in_array($gid, $diff['insert'])) {
+      if (empty($item['state']) || !in_array($gid, $diff['insert'])) {
         // State isn't provided, or not an "insert" operation.
         continue;
       }
@@ -207,26 +203,20 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
       // that this field is attached to.
       foreach ($entity_types as $entity_type) {
         $entity_info = entity_get_info($entity_type);
-        $data['og_membership'] = array(
-          'table' => array(
-            'join' => array(
-              $entity_info['base table'] => array(
-                // Join entity base table on its id field with left_field.
-                'left_field' => $entity_info['entity keys']['id'],
-                'field' => 'etid',
-                'extra' => array(
-                  0 => array(
-                    'field' => 'entity_type',
-                    'value' => $entity_type,
-                  ),
-                ),
-              ),
+        $data['og_membership']['table']['join'][$entity_info['base table']] = array(
+          // Join entity base table on its id field with left_field.
+          'left_field' => $entity_info['entity keys']['id'],
+          'field' => 'etid',
+          'extra' => array(
+            0 => array(
+              'field' => 'entity_type',
+              'value' => $entity_type,
             ),
           ),
-          // Copy the original config from the table definition.
-          $field['field_name'] => $data['field_data_' . $field['field_name']][$field['field_name']],
-          $field['field_name'] . '_target_id' => $data['field_data_' . $field['field_name']][$field['field_name'] . '_target_id'],
         );
+          // Copy the original config from the table definition.
+        $data['og_membership'][$field['field_name']] = $data['field_data_' . $field['field_name']][$field['field_name']];
+        $data['og_membership'][$field['field_name'] . '_target_id'] = $data['field_data_' . $field['field_name']][$field['field_name'] . '_target_id'];
 
         // Change config with settings from og_membership table.
         foreach (array('filter', 'argument', 'sort', 'relationship') as $op) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.facetapi_defaults.inc

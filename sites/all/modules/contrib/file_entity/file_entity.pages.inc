@@ -435,6 +435,8 @@ function file_entity_add_upload_submit($form, &$form_state) {
       // Save the file with blanks fields.
       $save = TRUE;
     }
+    // Allow other modules to choose to skip or complete step 4.
+    drupal_alter('file_entity_file_upload_skip_fields', $save, $form_state);
   }
 
   // Form id's can vary depending on how many other forms are displayed, so we
@@ -750,7 +752,7 @@ function file_entity_edit($form, &$form_state, $file) {
     '#title' => t('Associated with'),
     '#maxlength' => 60,
     '#autocomplete_path' => 'user/autocomplete',
-    '#default_value' => !empty($file->uid) ? user_load($file->uid)->name : '',
+    '#default_value' => (!empty($file->uid) && $user = user_load($file->uid)) ? $user->name : '',
     '#weight' => -1,
     '#description' => t('Leave blank for %anonymous.', array('%anonymous' => variable_get('anonymous', t('Anonymous')))),
   );
@@ -834,35 +836,37 @@ function file_entity_edit_submit($form, &$form_state) {
   // Check if a replacement file has been uploaded.
   if (!empty($form_state['values']['replace_upload'])) {
     $replacement = $form_state['values']['replace_upload'];
-    // Move file from temp to permanent home.
-    if (pathinfo($replacement->uri, PATHINFO_EXTENSION) == pathinfo($file->uri, PATHINFO_EXTENSION)) {
-      if ($new_file_uri = file_unmanaged_copy($replacement->uri, $file->uri, FILE_EXISTS_REPLACE)) {
-        // Remove temporary file.
-        file_delete($replacement);
-      }
-    } else {
-      if (!empty($form_state['values']['replace_keep_original_filename'])
-      && $form_state['values']['replace_keep_original_filename']) {
-        $destination_uri = rtrim($file->uri, drupal_basename($file->uri)) . drupal_basename($file->uri);
-      }
-      else {
-        $destination_uri = rtrim($file->uri, drupal_basename($file->uri)) . drupal_basename($replacement->uri);
-      }
-      $replace_mode = $destination_uri == $file->uri ? FILE_EXISTS_REPLACE : FILE_EXISTS_RENAME;
-      if ($new_file_uri = file_unmanaged_copy($replacement->uri, $destination_uri, $replace_mode)) {
-        // @todo Add watchdog() about replaced file here?
-
-        // Remove temporary file.
-        file_delete($replacement);
-
-        // Update if the uri target has changed.
-        if ($new_file_uri != $file->uri) {
-          // Store the original file uri to delete if save is successful.
-          $orphaned_uri = $file->uri;
-
-          // Update file entity uri.
-          $file->uri = $new_file_uri;
+    // Existing image metadata is stored in $file->height and $file->width.
+    // Loop through the replacement metadata and update existing values.
+    if (!empty($replacement->metadata)) {
+      foreach ($replacement->metadata as $metadata_key => $metadata_value) {
+        if (isset($file->{$metadata_key})) {
+          $file->{$metadata_key} = $metadata_value;
         }
+      }
+    }
+    // Move file from temp to permanent home.
+    if (!empty($form_state['values']['replace_keep_original_filename'])
+    && $form_state['values']['replace_keep_original_filename']) {
+      $destination_uri = rtrim($file->uri, drupal_basename($file->uri)) . drupal_basename($file->uri);
+    }
+    else {
+      $destination_uri = rtrim($file->uri, drupal_basename($file->uri)) . drupal_basename($replacement->uri);
+    }
+    $replace_mode = $destination_uri == $file->uri ? FILE_EXISTS_REPLACE : FILE_EXISTS_RENAME;
+    if ($new_file_uri = file_unmanaged_copy($replacement->uri, $destination_uri, $replace_mode)) {
+      // @todo Add watchdog() about replaced file here?
+
+      // Remove temporary file.
+      file_delete($replacement);
+
+      // Update if the uri target has changed.
+      if ($new_file_uri != $file->uri) {
+        // Store the original file uri to delete if save is successful.
+        $orphaned_uri = $file->uri;
+
+        // Update file entity uri.
+        $file->uri = $new_file_uri;
       }
     }
   }

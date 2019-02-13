@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_community.features.field_instance.inc
@@ -66,27 +67,34 @@ function ma_community_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 1,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'full' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'teaser' => array(
-        'label' => 'hidden',
+        'label' => 'inline',
         'module' => 'text',
         'settings' => array(
-          'trim_length' => 600,
+          'trim_length' => 255,
         ),
         'type' => 'text_summary_or_trimmed',
-        'weight' => 0,
+        'weight' => 3,
       ),
       'thumbed' => array(
         'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 12,
+        'weight' => 26,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -125,12 +133,15 @@ function ma_community_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 21,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'full' => array(
         'label' => 'above',
@@ -151,19 +162,19 @@ function ma_community_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 8,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 25,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 18,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -190,6 +201,73 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-community-field_community_featured_colls'.
+  $field_instances['node-community-field_community_featured_colls'] = array(
+    'bundle' => 'community',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Use the arrows to change the order of Featured Collections.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_community_featured_colls',
+    'label' => 'Featured Collections',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'apply_chosen' => '',
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'entityreference_autocomplete',
+      'weight' => 6,
+    ),
+  );
+
   // Exported field_instance: 'node-community-field_community_image'.
   $field_instances['node-community-field_community_image'] = array(
     'bundle' => 'community',
@@ -203,6 +281,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 18,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
       'full' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -211,19 +295,19 @@ function ma_community_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 24,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 30,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -265,16 +349,30 @@ function ma_community_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 19,
       ),
+      'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 1,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 34,
       ),
       'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_scald_search_results',
         'weight' => 0,
       ),
       'thumbed' => array(
@@ -284,7 +382,7 @@ function ma_community_field_default_field_instances() {
           'link' => 1,
           'override' => 0,
         ),
-        'type' => 'mukurtu_scald_thumbnail_image',
+        'type' => 'mukurtu_browse_by_grid',
         'weight' => 1,
       ),
     ),
@@ -313,6 +411,75 @@ function ma_community_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-community-field_dhan_notified_users'.
+  $field_instances['node-community-field_dhan_notified_users'] = array(
+    'bundle' => 'community',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Community Managers that are notified of insertions, changes, and deletions of Digital Heritage nodes in this Protocol.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 26,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_dhan_notified_users',
+    'label' => 'Notified Community Managers',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
   // Exported field_instance: 'node-community-field_membership_list_options'.
   $field_instances['node-community-field_membership_list_options'] = array(
     'bundle' => 'community',
@@ -326,28 +493,33 @@ function ma_community_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
+        'type' => 'hidden',
         'weight' => 23,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 27,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 22,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 23,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -365,7 +537,7 @@ function ma_community_field_default_field_instances() {
         'apply_chosen' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -379,12 +551,15 @@ function ma_community_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 20,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'full' => array(
         'label' => 'above',
@@ -405,19 +580,19 @@ function ma_community_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 7,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 20,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 22,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -441,6 +616,67 @@ function ma_community_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-community-field_pre_actions'.
+  $field_instances['node-community-field_pre_actions'] = array(
+    'bundle' => 'community',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+      'thumbed' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_pre_actions',
+    'label' => 'Pre-Actions',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 0,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 0,
     ),
   );
 
@@ -468,23 +704,29 @@ Strict - Your community page is invisible to all site users who are not members 
         'type' => 'hidden',
         'weight' => 15,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 26,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 14,
+        'weight' => 27,
       ),
     ),
     'entity_type' => 'node',
@@ -529,23 +771,29 @@ Strict - Your community page is invisible to all site users who are not members 
         'type' => 'list_default',
         'weight' => 6,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 27,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 11,
+        'weight' => 25,
       ),
     ),
     'entity_type' => 'node',
@@ -596,23 +844,29 @@ Strict - Your community page is invisible to all site users who are not members 
         'type' => 'hidden',
         'weight' => 16,
       ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 22,
+      ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 35,
       ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 30,
       ),
       'thumbed' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 28,
       ),
     ),
     'ds_extras_field_template' => '',
@@ -657,18 +911,23 @@ Strict - Your community page is invisible to all site users who are not members 
   t('Banner Image');
   t('Child Communities');
   t('Comment');
+  t('Community Managers that are notified of insertions, changes, and deletions of Digital Heritage nodes in this Protocol.');
   t('Community Parent');
   t('Description');
+  t('Featured Collections');
   t('Group type');
   t('Membership List Options');
+  t('Notified Community Managers');
   t('Open - Your community page is visible to all visitors of your site. Any items under open protocols are also accessible.<br>
 Strict - Your community page is invisible to all site users who are not members or your community. All protocols created within this community are inaccessible to users outside of this community.');
   t('Parent Community');
+  t('Pre-Actions');
   t('Sharing protocol');
   t('These options set the membership list visibility for visitors and community members. The full membership list will always be visible to community managers.');
   t('This image is used in the Community listings page. Use a 1:1 width to height ratio.
 ');
   t('Thumbnail Image');
+  t('Use the arrows to change the order of Featured Collections.');
   t('Use this field with caution! If you assign the current Community to a Parent Community, all members of the current Community will be added as members on the Parent Community. If you subsequently unassign the current Community from the Parent Community, the members will remain added to the Parent Community.');
   t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 

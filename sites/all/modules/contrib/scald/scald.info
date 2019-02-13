@@ -25,9 +25,8 @@ files[] = tests/scald.test
 files[] = scald.features.inc
 # @codingStandardsIgnoreEnd
 
-; Information added by Drupal.org packaging script on 2017-02-26
-version = "7.x-1.9"
+; Information added by Drupal.org packaging script on 2018-07-30
+version = "7.x-1.11"
 core = "7.x"
 project = "scald"
-datestamp = "1488106991"
-
+datestamp = "1532952793"

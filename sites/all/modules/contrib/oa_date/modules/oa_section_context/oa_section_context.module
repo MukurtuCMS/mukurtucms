@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * @file
+ * Provides hook implementations and functionality for oa_section_context.
+ */
+
+/**
+ * Name of Session variable used for saving Section ID.
+ */
+define('OA_SESSION_SECTION', 'oa_section_id');
+
+/**
+ * Determines the current section id value
+ */
+function oa_section_get_section_context() {
+  $menu = menu_get_object();
+  if (!isset($menu->nid) || !($node = node_load($menu->nid))) {
+    // not a node page
+    // so only return SESSION if it's already set
+    return isset($_SESSION[OA_SESSION_SECTION]) ? $_SESSION[OA_SESSION_SECTION] : 0;
+  }
+
+  $set_session = 0;
+  if ($node->type == 'oa_section') {
+    // get section id directly from section nodes
+    $set_session = $node->nid;
+  }
+  elseif (isset($node->{OA_SECTION_FIELD}[LANGUAGE_NONE][0]['target_id'])) {
+    // otherwise get section id from any section field reference
+    $set_session = $node->{OA_SECTION_FIELD}[LANGUAGE_NONE][0]['target_id'];
+  }
+
+  return $set_session;
+}
+
+/**
+ * Implements hook_init
+ * Put the section context into session variable
+ */
+function oa_section_context_init() {
+  global $user;
+
+  // don't create a session for anonymous users unless session already started
+  // needed to allow Varnish to cache anonymous pages
+  if (($user->uid == 0) && !drupal_session_started()) {
+    return;
+  }
+
+  $set_session = oa_section_get_section_context();
+
+  if ($set_session && ($node = node_load($set_session)) && node_access('view', $node)) {
+    $_SESSION[OA_SESSION_SECTION] = $set_session;
+  }
+  // Want to unset session context if viewing a node that is not a section and
+  // does not have a section reference.
+  elseif (isset($_SESSION[OA_SESSION_SECTION])) {
+    unset($_SESSION[OA_SESSION_SECTION]);
+  }
+}
+
+/**
+ * Implements hook_form_alter
+ *
+ * Instantiates the default value for the field 'oa_section_ref' from
+ * session context if it exists.
+ */
+function oa_section_context_form_node_form_alter(&$form, &$form_state, $form_id) {
+  if (!empty($_GET['oa_section_ref']) && is_numeric($_GET['oa_section_ref'])) {
+    $section = $_GET['oa_section_ref'];
+  }
+  elseif (!empty($_SESSION[OA_SESSION_SECTION])) {
+    $section = $_SESSION[OA_SESSION_SECTION];
+  }
+  if (!empty($form[OA_SECTION_FIELD][LANGUAGE_NONE]['#options']) && empty($form[OA_SECTION_FIELD][LANGUAGE_NONE]['#default_value']) && !empty($section) && array_key_exists($section, $form[OA_SECTION_FIELD][LANGUAGE_NONE]['#options'])) {
+    $form[OA_SECTION_FIELD][LANGUAGE_NONE]['#default_value'] = $section;
+  }
+}
+
+/**
+ * Implements hook_entity_property_info().
+ *
+ * Add the current-section to the system token (i.e. like current-user).
+ */
+function oa_section_context_entity_property_info() {
+  $info = array();
+  // Add meta-data about the basic node properties.
+  $properties = &$info['site']['properties'];
+
+  $properties['oa_section_context'] = array(
+    'label' => t('Current OA section'),
+    'description' => t('The current Open Atrium Section from context, if exists.'),
+    'getter callback' => 'oa_section_context_get_properties',
+    'type' => 'node',
+  );
+
+  return $info;
+}
+
+/**
+ * Property getter callback.
+ *
+ * Get the current section from context.
+ *
+ * @code
+ *   $wrapper = entity_metadata_site_wrapper();
+ *   $group = $wrapper->oa_section_context->value();
+ * @endcode
+ */
+function oa_section_context_get_properties($data = FALSE, array $options, $name) {
+  if ($section_id = oa_section_get_section_context()) {
+    return entity_load_single('node', $section_id);
+  }
+}
+
+

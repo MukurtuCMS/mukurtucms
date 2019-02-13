@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @file
  * All of the destination handling code needed for Backup and Migrate.
@@ -26,19 +25,19 @@ function backup_migrate_backup_migrate_destination_subtypes() {
     $out += array(
       'file' => array(
         'description' => t('Save the backup files to any directory on this server which the web-server can write to.'),
-        'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.file.inc',
+        'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.file.inc',
         'class' => 'backup_migrate_destination_files',
         'type_name' => t('Server Directory'),
         'local' => TRUE,
         'can_create' => TRUE,
       ),
       'file_manual' => array(
-        'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.file.inc',
+        'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.file.inc',
         'type_name' => t('Server Directory'),
         'class' => 'backup_migrate_destination_files_manual',
       ),
       'file_scheduled' => array(
-        'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.file.inc',
+        'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.file.inc',
         'type_name' => t('Server Directory'),
         'class' => 'backup_migrate_destination_files_scheduled',
       ),
@@ -46,16 +45,16 @@ function backup_migrate_backup_migrate_destination_subtypes() {
   }
   $out += array(
     'browser_download' => array(
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.browser.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.browser.inc',
       'class' => 'backup_migrate_destination_browser_download',
     ),
     'browser_upload' => array(
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.browser.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.browser.inc',
       'class' => 'backup_migrate_destination_browser_upload',
     ),
     'nodesquirrel' => array(
-      'description' => t('Save the backup files to the NodeSquirrel.com backup service.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.nodesquirrel.inc',
+      'description' => t('Save the backup files to the <a href="@link" target="_blank">NodeSquirrel</a> backup service.', array('@link' => url('http://nodesquirrel.com'))),
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.nodesquirrel.inc',
       'class' => 'backup_migrate_destination_nodesquirrel',
       'type_name' => t('NodeSquirrel.com'),
       'can_create' => TRUE,
@@ -63,15 +62,15 @@ function backup_migrate_backup_migrate_destination_subtypes() {
     ),
     'ftp' => array(
       'description' => t('Save the backup files to any a directory on an FTP server.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.ftp.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.ftp.inc',
       'class' => 'backup_migrate_destination_ftp',
       'type_name' => t('FTP Directory'),
       'can_create' => TRUE,
       'remote' => TRUE,
     ),
     's3' => array(
-      'description' => t('Save the backup files to a bucket on your !link.', array('!link' => l(t('Amazon S3 account'), 'http://aws.amazon.com/s3/'))),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.s3.inc',
+      'description' => t('Save the backup files to a bucket on your <a href="@link" target="_blank">Amazon S3 account</a>.', array('@link' => url('http://aws.amazon.com/s3/'))),
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.s3.inc',
       'class' => 'backup_migrate_destination_s3',
       'type_name' => t('Amazon S3 Bucket'),
       'can_create' => TRUE,
@@ -80,7 +79,7 @@ function backup_migrate_backup_migrate_destination_subtypes() {
     'email' => array(
       'type_name' => t('Email'),
       'description' => t('Send the backup as an email attachment to the specified email address.'),
-      'file' => drupal_get_path('module', 'backup_migrate') .'/includes/destinations.email.inc',
+      'file' => drupal_get_path('module', 'backup_migrate') . '/includes/destinations.email.inc',
       'class' => 'backup_migrate_destination_email',
       'can_create' => TRUE,
       'remote' => TRUE,
@@ -190,7 +189,7 @@ function backup_migrate_destination_get_latest_file($destination_id) {
   if ($destination = backup_migrate_get_destination($destination_id)) {
     $files = $destination->list_files();
     $max = 0;
-    foreach ((array)$files as $file) {
+    foreach ((array) $files as $file) {
       $info = $file->info();
 
       // If there's a datestamp, it should override the filetime as it's probably more reliable.
@@ -276,7 +275,7 @@ function _backup_migrate_destination_get_file_links($destination_id, $file_id) {
  * List the backup files in the given destination.
  */
 function backup_migrate_ui_destination_display_files($destination_id = NULL) {
-  drupal_add_css(drupal_get_path('module', 'backup_migrate') .'/backup_migrate.css');
+  drupal_add_css(drupal_get_path('module', 'backup_migrate') . '/backup_migrate.css');
 
   $rows = $sort = array();
   if ($destination = backup_migrate_get_destination($destination_id)) {
@@ -302,7 +301,7 @@ function _backup_migrate_ui_destination_display_files($destination = NULL, $limi
 
     // Get the fetch link.
     if ($destination->cache_files && $destination->fetch_time) {
-      $fetch = '<div class="description">'. t('This listing was fetched !time ago. !refresh', array('!time' => format_interval(time() - $destination->fetch_time, 1), '!refresh' => l(t('fetch now'), $_GET['q'], array('query' => array('refresh' => 'true'))))) .'</div>';
+      $fetch = '<div class="description">' . t('This listing was fetched !time ago. !refresh', array('!time' => format_interval(time() - $destination->fetch_time, 1), '!refresh' => l(t('fetch now'), $_GET['q'], array('query' => array('refresh' => 'true'))))) . '</div>';
     }
 
     $out .= $fetch;
@@ -317,9 +316,9 @@ function _backup_migrate_ui_destination_display_files($destination = NULL, $limi
  * List the backup files in the given destination.
  */
 function _backup_migrate_ui_destination_display_file_list($files, $options = array()) {
-  drupal_add_css(drupal_get_path('module', 'backup_migrate') .'/backup_migrate.css');
+  drupal_add_css(drupal_get_path('module', 'backup_migrate') . '/backup_migrate.css');
 
-  // Set some default options
+  // Set some default options.
   $options += array(
     'pager' => TRUE,
     'more' => FALSE,
@@ -347,7 +346,7 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
     $sort_dir   = tablesort_get_sort($headers) == 'desc' ? SORT_DESC : SORT_ASC;
 
     $i          = 0;
-    foreach ((array)$files as $id => $file) {
+    foreach ((array) $files as $id => $file) {
       $info = $file->info();
 
       // If there's a datestamp, it should override the filetime as it's probably more reliable.
@@ -361,17 +360,17 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
       }
       // Add the backup source.
       if (!empty($info['bam_sourcename'])) {
-        $description .= ' <div title="'. check_plain($info['bam_sourcename']) .'" class="backup-migrate-tags"><span class="backup-migrate-label">'. t('Source:') .' </span>' . check_plain($info['bam_sourcename']) . '</div>';
+        $description .= ' <div title="' . check_plain($info['bam_sourcename']) . '" class="backup-migrate-tags"><span class="backup-migrate-label">' . t('Source:') . ' </span>' . check_plain($info['bam_sourcename']) . '</div>';
       }
       // Add the tags as a new row.
       if (!empty($info['tags'])) {
-        $tags = check_plain(implode(', ', (array)$info['tags']));
+        $tags = check_plain(implode(', ', (array) $info['tags']));
         $description .= ' <div title="' . $tags . '" class="backup-migrate-tags"><span class="backup-migrate-label">' . t('Tags:') . ' </span>' . $tags . '</div>';
       }
       // Add the other info.
       if (!empty($info['bam_other_safe'])) {
         foreach ($info['bam_other_safe'] as $label => $data) {
-          $description .= ' <div class="backup-migrate-tags"><span class="backup-migrate-label">' . $label . ' </span>' . $data . '</div>';        
+          $description .= ' <div class="backup-migrate-tags"><span class="backup-migrate-label">' . $label . ' </span>' . $data . '</div>';
         }
       }
 
@@ -416,8 +415,8 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
           '',
           t('older »'),
           t('oldest »'),
-          );
-        $pager = theme('pager', $tags, $limit, $element, array(), ceil($total/$limit));
+        );
+        $pager = theme('pager', $tags, $limit, $element, array(), ceil($total / $limit));
 
         $end = min($total, $start + $limit);
       }
@@ -445,7 +444,7 @@ function _backup_migrate_ui_destination_display_file_list($files, $options = arr
  * List the backup files in the given destination.
  */
 function _backup_migrate_ui_destination_display_file_list_options($files, $limit = NULL) {
-  drupal_add_css(drupal_get_path('module', 'backup_migrate') .'/backup_migrate.css');
+  drupal_add_css(drupal_get_path('module', 'backup_migrate') . '/backup_migrate.css');
 
   $rows = $sort = array();
   if ($files) {
@@ -461,7 +460,7 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
     $sort_dir   = tablesort_get_sort($headers) == 'desc' ? SORT_DESC : SORT_ASC;
 
     $i          = 0;
-    foreach ((array)$files as $file) {
+    foreach ((array) $files as $file) {
       $info = $file->info();
 
       // If there's a datestamp, it should override the filetime as it's probably more reliable.
@@ -475,17 +474,17 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
       }
       // Add the backup source.
       if (!empty($info['bam_sourcename'])) {
-        $description .= ' <div title="'. check_plain($info['bam_sourcename']) .'" class="backup-migrate-tags"><span class="backup-migrate-label">'. t('Source:') .' </span>' . check_plain($info['bam_sourcename']) . '</div>';
+        $description .= ' <div title="' . check_plain($info['bam_sourcename']) . '" class="backup-migrate-tags"><span class="backup-migrate-label">' . t('Source:') . ' </span>' . check_plain($info['bam_sourcename']) . '</div>';
       }
       // Add the tags as a new row.
       if (!empty($info['tags'])) {
-        $tags = check_plain(implode(', ', (array)$info['tags']));
+        $tags = check_plain(implode(', ', (array) $info['tags']));
         $description .= ' <div title="' . $tags . '" class="backup-migrate-tags"><span class="backup-migrate-label">' . t('Tags:') . ' </span>' . $tags . '</div>';
       }
       // Add the other info.
       if (!empty($info['bam_other_safe'])) {
         foreach ($info['bam_other_safe'] as $label => $data) {
-          $description .= ' <div class="backup-migrate-tags"><span class="backup-migrate-label">' . $label . ' </span>' . $data . '</div>';        
+          $description .= ' <div class="backup-migrate-tags"><span class="backup-migrate-label">' . $label . ' </span>' . $data . '</div>';
         }
       }
 
@@ -507,7 +506,6 @@ function _backup_migrate_ui_destination_display_file_list_options($files, $limit
       $total = count($rows);
       $end = $limit;
       $start = 0;
-
 
       $showing = t('Showing @start to @end of @total files.', array('@start' => $start + 1, '@end' => $end + 1, '@total' => $total));
 
@@ -573,7 +571,7 @@ function backup_migrate_ui_destination_restore_file_confirm($form, &$form_state,
 
   $form['destination_id'] = array('#type' => 'value', '#value' => $destination_id);
   $form['file_id'] = array('#type' => 'value', '#value' => $file_id);
-  $form = confirm_form($form, t('Are you sure you want to restore the database?'), BACKUP_MIGRATE_MENU_PATH . "/destination/list/files/". $destination_id, t('Are you sure you want to restore the database from the backup file %file_id? This will delete some or all of your data and cannot be undone. <strong>Always test your backups on a non-production server!</strong>', array('%file_id' => $file_id)), t('Restore'), t('Cancel'));
+  $form = confirm_form($form, t('Are you sure you want to restore the database?'), BACKUP_MIGRATE_MENU_PATH . "/destination/list/files/" . $destination_id, t('Are you sure you want to restore the database from the backup file %file_id? This will delete some or all of your data and cannot be undone. <strong>Always test your backups on a non-production server!</strong>', array('%file_id' => $file_id)), t('Restore'), t('Cancel'));
   drupal_set_message(t('Restoring will delete some or all of your data and cannot be undone. <strong>Always test your backups on a non-production server!</strong>'), 'warning', FALSE);
   $form = array_merge_recursive($form, backup_migrate_filters_settings_form(backup_migrate_filters_settings_default('restore'), 'restore'));
   $form['actions']['#weight'] = 100;
@@ -582,8 +580,8 @@ function backup_migrate_ui_destination_restore_file_confirm($form, &$form_state,
   if (@$form['advanced']) {
     $form['advanced']['#type'] = 'fieldset';
     $form['advanced']['#title'] = t('Advanced Options');
-    $form['advanced']['#collapsed'] = true;
-    $form['advanced']['#collapsible'] = true;
+    $form['advanced']['#collapsed'] = TRUE;
+    $form['advanced']['#collapsible'] = TRUE;
   }
 
   return $form;
@@ -598,7 +596,7 @@ function backup_migrate_ui_destination_restore_file_confirm_submit($form, &$form
   if ($destination_id && $file_id) {
     backup_migrate_perform_restore($destination_id, $file_id, $form_state['values']);
   }
-  $redir = user_access('access backup files') ? BACKUP_MIGRATE_MENU_PATH . "/destination/list/files/". $destination_id : BACKUP_MIGRATE_MENU_PATH;
+  $redir = user_access('access backup files') ? BACKUP_MIGRATE_MENU_PATH . "/destination/list/files/" . $destination_id : BACKUP_MIGRATE_MENU_PATH;
   $form_state['redirect'] = $redir;
 }
 
@@ -611,7 +609,7 @@ function backup_migrate_ui_destination_delete_file($destination_id = NULL, $file
   }
   _backup_migrate_message('Cannot delete the file: %file_id because it does not exist.', array('%file_id' => $file_id), 'error');
   if ($destination_id && user_access('access backup files')) {
-    drupal_goto(BACKUP_MIGRATE_MENU_PATH .'/destination/list/files/' . $destination_id);
+    drupal_goto(BACKUP_MIGRATE_MENU_PATH . '/destination/list/files/' . $destination_id);
   }
   drupal_goto(BACKUP_MIGRATE_MENU_PATH);
 }
@@ -622,7 +620,7 @@ function backup_migrate_ui_destination_delete_file($destination_id = NULL, $file
 function backup_migrate_ui_destination_delete_file_confirm($form, &$form_state, $destination_id, $file_id) {
   $form['destination_id'] = array('#type' => 'value', '#value' => $destination_id);
   $form['file_id'] = array('#type' => 'value', '#value' => $file_id);
-  return confirm_form($form, t('Are you sure you want to delete the backup file?'), BACKUP_MIGRATE_MENU_PATH . '/destination/list/files/'. $destination_id, t('Are you sure you want to delete the backup file %file_id? <strong>This action cannot be undone.</strong>', array('%file_id' => $file_id)), t('Delete'), t('Cancel'));
+  return confirm_form($form, t('Are you sure you want to delete the backup file?'), BACKUP_MIGRATE_MENU_PATH . '/destination/list/files/' . $destination_id, t('Are you sure you want to delete the backup file %file_id? <strong>This action cannot be undone.</strong>', array('%file_id' => $file_id)), t('Delete'), t('Cancel'));
 }
 
 /**
@@ -635,7 +633,7 @@ function backup_migrate_ui_destination_delete_file_confirm_submit($form, &$form_
     backup_migrate_destination_delete_file($destination_id, $file_id);
     _backup_migrate_message('Database backup file deleted: %file_id', array('%file_id' => $file_id));
   }
-  $form_state['redirect'] = user_access('access backup files') ? BACKUP_MIGRATE_MENU_PATH . "/destination/list/files/". $destination_id : BACKUP_MIGRATE_MENU_PATH;
+  $form_state['redirect'] = user_access('access backup files') ? BACKUP_MIGRATE_MENU_PATH . "/destination/list/files/" . $destination_id : BACKUP_MIGRATE_MENU_PATH;
 }
 
 /* Utilities */
@@ -644,7 +642,7 @@ function backup_migrate_ui_destination_delete_file_confirm_submit($form, &$form_
  * Get pulldown to select existing source options.
  */
 function _backup_migrate_get_destination_pulldown($op, $destination_id = NULL, $copy_destination_id = NULL) {
-  drupal_add_js(drupal_get_path('module', 'backup_migrate') .'/backup_migrate.js');
+  drupal_add_js(drupal_get_path('module', 'backup_migrate') . '/backup_migrate.js');
 
   $destinations = _backup_migrate_get_destination_form_item_options($op);
   $form = array(
@@ -656,7 +654,7 @@ function _backup_migrate_get_destination_pulldown($op, $destination_id = NULL, $
     '#title' => t('Backup Destination'),
     '#options' => $destinations,
     '#default_value' => $destination_id,
-    //'#process' => array('_backup_migrate_process_destination_pulldown'),
+    // '#process' => array('_backup_migrate_process_destination_pulldown'),
   );
   if (user_access('administer backup and migrate')) {
     $form['destination_id']['#description'] = l(t('Create new destination'), BACKUP_MIGRATE_MENU_PATH . '/settings/destination/add');
@@ -679,8 +677,6 @@ function _backup_migrate_get_destination_pulldown($op, $destination_id = NULL, $
     '#default_value' => $copy_destination_id,
   );
 
-
-
   return $form;
 }
 
@@ -693,16 +689,16 @@ function _backup_migrate_process_destination_pulldown($element) {
     'backup_migrate' => array(
       'destination_selectors' => array(
         $id => array(
-          'destination_selector' => $id, 
+          'destination_selector' => $id,
           'copy_destination_selector' => $element['copy_destination']['copy_destination_id']['#id'],
           'copy' => $element['copy']['#id'],
           'labels' => array(
             t('Local') => t('Save an offsite copy to'),
             t('Offsite') => t('Save a local copy to'),
-          )
-        )
-      )
-    )
+          ),
+        ),
+      ),
+    ),
   );
   drupal_add_js($settings, 'setting');
 
@@ -750,7 +746,7 @@ function _backup_migrate_get_destination_form_item_options($op) {
       t('Local') => $local,
       t('Offsite') => $remote,
     );
-  } 
+  }
   else {
     $out = $remote + $local;
   }
@@ -761,25 +757,26 @@ function _backup_migrate_get_destination_form_item_options($op) {
  * A base class for creating destinations.
  */
 class backup_migrate_destination extends backup_migrate_location {
-  var $db_table = "backup_migrate_destinations";
-  var $type_name = "destination";
-  var $default_values = array('settings' => array());
-  var $singular = 'destination';
-  var $plural = 'destinations';
-  var $title_plural = 'Destinations';
-  var $title_singular = 'Destination';
-  var $cache_files = FALSE;
-  var $fetch_time = NULL;
-  var $cache_expire = 86400; // 24 hours
-  var $weight = 0;
+  public $db_table = "backup_migrate_destinations";
+  public $type_name = "destination";
+  public $default_values = array('settings' => array());
+  public $singular = 'destination';
+  public $plural = 'destinations';
+  public $title_plural = 'Destinations';
+  public $title_singular = 'Destination';
+  public $cache_files = FALSE;
+  public $fetch_time = NULL;
+  public $cache_expire = 86400;
+  // 24 hours.
+  public $weight = 0;
 
-  var $destination_type = "";
-  var $supported_ops = array();
+  public $destination_type = "";
+  public $supported_ops = array();
 
   /**
    * This function is not supposed to be called. It is just here to help the po extractor out.
    */
-  function strings() {
+  public function strings() {
     // Help the pot extractor find these strings.
     t('Destination');
     t('Destinations');
@@ -790,7 +787,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Save the given file to the destination.
    */
-  function save_file($file, $settings) {
+  public function save_file($file, $settings) {
     $this->file_cache_clear();
 
     // Save the file metadata if the destination supports it.
@@ -801,15 +798,15 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Save the given file to the destination.
    */
-  function _save_file($file, $settings) {
+  public function _save_file($file, $settings) {
     // This must be overriden.
     return $file;
   }
 
   /**
-   * Save the file metadata
+   * Save the file metadata.
    */
-  function save_file_info($file, $settings) {
+  public function save_file_info($file, $settings) {
     $info = $this->create_info_file($file);
     // Save the info file and the actual file.
     return $this->_save_file($info, $settings);
@@ -818,7 +815,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Load the file with the given destination specific id and return as a backup_file object.
    */
-  function load_file($file_id) {
+  public function load_file($file_id) {
     // This must be overriden.
     return NULL;
   }
@@ -826,7 +823,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Check if a file exists in the given destination.
    */
-  function file_exists($file_id) {
+  public function file_exists($file_id) {
     // Check if the file exists in the list of available files. Actual destination types may have more efficient ways of doing this.
     $files = $this->list_files();
     return isset($files[$file_id]);
@@ -835,7 +832,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * List all the available files in the given destination with their destination specific id.
    */
-  function list_files() {
+  public function list_files() {
     $files = NULL;
     if ($this->cache_files) {
       $files = $this->file_cache_get();
@@ -846,6 +843,7 @@ class backup_migrate_destination extends backup_migrate_location {
       if ($this->cache_files) {
         $this->file_cache_set($files);
       }
+      _backup_migrate_temp_files_delete();
     }
 
     $out = array();
@@ -863,22 +861,21 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * List all the available files in the given destination with their destination specific id.
    */
-  function count_files() {
+  public function count_files() {
     return count($this->list_files());
   }
-
 
   /**
    * List all the available files in the given destination with their destination specific id.
    */
-  function _list_files() {
+  public function _list_files() {
     return array();
   }
 
   /**
    * Load up the file's metadata from the accompanying .info file if applicable.
    */
-  function load_files_info($files) {
+  public function load_files_info($files) {
     foreach ($files as $key => $file) {
       // See if there is an info file with the same name as the backup.
       if (isset($files[$key . '.info'])) {
@@ -887,7 +884,7 @@ class backup_migrate_destination extends backup_migrate_location {
         // Allow the stored metadata to override the detected metadata.
         unset($info['filename']);
         $file->file_info = $info + $file->file_info;
-        // Remove the metadata file from the list
+        // Remove the metadata file from the list.
         unset($files[$key . '.info']);
       }
 
@@ -896,14 +893,13 @@ class backup_migrate_destination extends backup_migrate_location {
       $file->info_set('remote', $this->get('remote'));
     }
 
-
     return $files;
   }
 
   /**
    * Create an ini file and write the meta data.
    */
-  function create_info_file($file) {
+  public function create_info_file($file) {
     $info = $this->_file_info_file($file);
     $data = _backup_migrate_array_to_ini($file->file_info);
     $info->put_contents($data);
@@ -913,7 +909,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Create the info file object.
    */
-  function _file_info_file($file) {
+  public function _file_info_file($file) {
     $info = new backup_file(array('filename' => $this->_file_info_filename($file->file_id())));
     return $info;
   }
@@ -921,24 +917,23 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Determine the file name of the info file for a file.
    */
-  function _file_info_filename($file_id) {
+  public function _file_info_filename($file_id) {
     return $file_id . '.info';
   }
-
 
   /**
    * Cache the file list.
    */
-  function file_cache_set($files) {
-    cache_set('backup_migrate_file_list:'. $this->get_id(), $files, 'cache', time() + $this->cache_expire);
+  public function file_cache_set($files) {
+    cache_set('backup_migrate_file_list:' . $this->get_id(), $files, 'cache', time() + $this->cache_expire);
   }
 
   /**
    * Retrieve the file list.
    */
-  function file_cache_get() {
+  public function file_cache_get() {
     backup_migrate_include('files');
-    $cache = cache_get('backup_migrate_file_list:'. $this->get_id());
+    $cache = cache_get('backup_migrate_file_list:' . $this->get_id());
     if (!empty($cache->data) && $cache->created > (time() - $this->cache_expire)) {
       $this->fetch_time = $cache->created;
       return $cache->data;
@@ -950,7 +945,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Retrieve the file list.
    */
-  function file_cache_clear() {
+  public function file_cache_clear() {
     if ($this->cache_files) {
       $this->file_cache_set(NULL);
     }
@@ -959,7 +954,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Delete the file with the given destination specific id.
    */
-  function delete_file($file_id) {
+  public function delete_file($file_id) {
     $this->file_cache_clear();
     $this->_delete_file($file_id);
     $this->_delete_file($this->_file_info_filename($file_id));
@@ -968,14 +963,14 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Delete the file with the given destination specific id.
    */
-  function _delete_file($file_id) {
+  public function _delete_file($file_id) {
     // This must be overriden.
   }
 
   /**
    * Get the edit form for the item.
    */
-  function edit_form() {
+  public function edit_form() {
     if (get_class($this) !== 'backup_migrate_destination') {
       $form = parent::edit_form();
       $form['subtype'] = array(
@@ -990,17 +985,17 @@ class backup_migrate_destination extends backup_migrate_location {
           'title' => t('Offsite Destinations'),
           'description' => t('For the highest level of protection, set up an offsite backup destination in a location separate from your website.'),
           'items' => array(),
-         ),
+        ),
         'local' => array(
           'title' => t('Local Destinations'),
           'description' => t('Local backups are quick and convenient but do not provide the additional safety of offsite backups.'),
           'items' => array(),
-         ),
+        ),
         'other' => array(
           'title' => t('Other Destinations'),
           'description' => t('These destinations have not been classified because they were created for Backup and Migrate version 2. They may not work correctly with this version.'),
           'items' => array(),
-         ),
+        ),
 
       );
 
@@ -1009,8 +1004,8 @@ class backup_migrate_destination extends backup_migrate_location {
       foreach ($types as $key => $type) {
         if (@$type['can_create']) {
           $type_url_str = str_replace('_', '-', $key);
-          $out = '<dt>'. l($type['type_name'], $path . "/add/$type_url_str", array('attributes' => array('title' => t('Add a new @s destination.', array('@s' => $type['type_name']))))) .'</dt>';
-          $out .= '<dd>'. filter_xss_admin($type['description']) .'</dd>';
+          $out = '<dt>' . l($type['type_name'], $path . "/add/$type_url_str", array('attributes' => array('title' => t('Add a new @s destination.', array('@s' => $type['type_name']))))) . '</dt>';
+          $out .= '<dd>' . filter_xss_admin($type['description']) . '</dd>';
 
           if (!empty($type['local'])) {
             $items['local']['items'][] = $out;
@@ -1027,7 +1022,7 @@ class backup_migrate_destination extends backup_migrate_location {
         $output = '<p>' . t('Choose the type of destination you would like to create:') . '</p>';
         foreach ($items as $group) {
           if (count($group['items'])) {
-            $group['body'] = '<dl>'. implode('', $group['items']) .'</dl>';
+            $group['body'] = '<dl>' . implode('', $group['items']) . '</dl>';
             $output .= theme('backup_migrate_group', $group);
           }
         }
@@ -1046,27 +1041,27 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Get the message to send to the user when confirming the deletion of the item.
    */
-  function delete_confirm_message() {
+  public function delete_confirm_message() {
     return t('Are you sure you want to delete the destination %name? Backup files already saved to this destination will not be deleted.', array('%name' => $this->get_name()));
   }
 
   /**
    * Get a boolean representing if the destination is remote or local.
    */
-  function get_remote() {
+  public function get_remote() {
     return $this->op('remote backup');
   }
 
   /**
    * Get the action links for a destination.
    */
-  function get_action_links() {
+  public function get_action_links() {
     $out = parent::get_action_links();
     $item_id = $this->get_id();
 
     // Don't display the download/delete/restore ops if they are not available for this destination.
     if ($this->op('list files') && user_access("access backup files")) {
-      $out = array('list files' => l(t("list files"), $this->get_settings_path() . '/list/files/'. $item_id)) + $out;
+      $out = array('list files' => l(t("list files"), $this->get_settings_path() . '/list/files/' . $item_id)) + $out;
     }
     if (!$this->op('configure') || !user_access('administer backup and migrate')) {
       unset($out['edit']);
@@ -1077,7 +1072,7 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Get the action links for a file on a given destination.
    */
-  function get_file_links($file_id) {
+  public function get_file_links($file_id) {
     $out = array();
 
     // Don't display the download/delete/restore ops if they are not available for this destination.
@@ -1088,13 +1083,13 @@ class backup_migrate_destination extends backup_migrate_location {
 
     $destination_id = $this->get_id();
     if ($can_read && user_access("access backup files")) {
-      $out[] = l(t("download"), $path . '/downloadfile/'. $destination_id .'/'. $file_id);
+      $out[] = l(t("download"), $path . '/downloadfile/' . $destination_id . '/' . $file_id);
     }
     if ($can_read && user_access("restore from backup")) {
-      $out[] = l(t("restore"), $path . '/list/restorefile/' . $destination_id .'/'. $file_id);
+      $out[] = l(t("restore"), $path . '/list/restorefile/' . $destination_id . '/' . $file_id);
     }
     if ($can_delete && user_access("delete backup files")) {
-      $out[] = l(t("delete"), $path . '/list/deletefile/' . $destination_id .'/'. $file_id);
+      $out[] = l(t("delete"), $path . '/list/deletefile/' . $destination_id . '/' . $file_id);
     }
     return $out;
   }
@@ -1102,55 +1097,55 @@ class backup_migrate_destination extends backup_migrate_location {
   /**
    * Determine if we can read the given file.
    */
-  function can_read_file($file_id) {
+  public function can_read_file($file_id) {
     return $this->op('restore');
   }
 
   /**
    * Determine if we can read the given file.
    */
-  function can_delete_file($file_id) {
+  public function can_delete_file($file_id) {
     return $this->op('delete');
   }
 
   /**
    * Get the form for the settings for this destination type.
    */
-  function settings_default() {
+  public function settings_default() {
     return array();
   }
 
   /**
    * Get the form for the settings for this destination.
    */
-  function settings_form($form) {
+  public function settings_form($form) {
     return $form;
   }
 
   /**
    * Validate the form for the settings for this destination.
    */
-  function settings_form_validate($form_values) {
+  public function settings_form_validate($form_values) {
   }
 
   /**
    * Submit the settings form. Any values returned will be saved.
    */
-  function settings_form_submit($form_values) {
+  public function settings_form_submit($form_values) {
     return $form_values;
   }
 
   /**
    * Check that a destination is valid.
    */
-  function confirm_destination() {
-    return true;
+  public function confirm_destination() {
+    return TRUE;
   }
 
   /**
    * Add the menu items specific to the destination type.
    */
-  function get_menu_items() {
+  public function get_menu_items() {
     $items = parent::get_menu_items();
 
     $path = $this->get_settings_path();
@@ -1189,7 +1184,6 @@ class backup_migrate_destination extends backup_migrate_location {
     return $items;
   }
 
-
 }
 
 /**
@@ -1199,21 +1193,21 @@ class backup_migrate_destination_remote extends backup_migrate_destination {
   /**
    * The location is a URI so parse it and store the parts.
    */
-  function get_location() {
+  public function get_location() {
     return $this->url(FALSE);
   }
 
   /**
    * The location to display is the url without the password.
    */
-  function get_display_location() {
+  public function get_display_location() {
     return $this->url(TRUE);
   }
 
   /**
    * Return the location with the password.
    */
-  function set_location($location) {
+  public function set_location($location) {
     $this->location = $location;
     $this->set_url($location);
   }
@@ -1221,7 +1215,7 @@ class backup_migrate_destination_remote extends backup_migrate_destination {
   /**
    * Destination configuration callback.
    */
-  function edit_form() {
+  public function edit_form() {
     $form = parent::edit_form();
     $form['scheme'] = array(
       "#type" => "textfield",
@@ -1271,10 +1265,10 @@ class backup_migrate_destination_remote extends backup_migrate_destination {
   /**
    * Submit the configuration form. Glue the url together and add the old password back if a new one was not specified.
    */
-  function edit_form_submit($form, &$form_state) {
+  public function edit_form_submit($form, &$form_state) {
     $form_state['values']['pass'] = $form_state['values']['pass'] ? $form_state['values']['pass'] : $form_state['values']['old_password'];
     $form_state['values']['location'] = $this->glue_url($form_state['values'], FALSE);
     parent::edit_form_submit($form, $form_state);
   }
-}
 
+}

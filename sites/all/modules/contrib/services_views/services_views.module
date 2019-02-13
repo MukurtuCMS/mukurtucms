@@ -1,11 +1,12 @@
 <?php
+
 /**
  * @file
- *  Provides a generic but powerful API for web services.
+ * Provides a generic but powerful API for web services.
  */
 
 /**
- * Implementation of hook_views_api().
+ * Implements hook_views_api().
  */
 function services_views_views_api() {
   return array(
@@ -34,7 +35,7 @@ function services_views_menu() {
 }
 
 /**
- * Implementation of hook_services_resources().
+ * Implements hook_services_resources().
  */
 function services_views_services_resources() {
   $resources['views'] = array();
@@ -145,18 +146,18 @@ function services_views_services_resources() {
   return $resources;
 }
 
-
 /**
  * Check the access permission to a given views.
  *
- * @param $op
- *  String. The operation that's going to be performed.
- * @param $args
- *  Array. The arguments that will be passed to the callback.
- * @return
- *  Boolean. TRUE if the user is allowed to load the given view.
+ * @param string $op
+ *   The operation that's going to be performed.
+ * @param array $args
+ *   The arguments that will be passed to the callback.
+ *
+ * @return bool
+ *   TRUE if the user is allowed to load the given view.
  */
-function services_views_access($op = 'view', $args = array()) {
+function services_views_access($op = 'view', array $args = array()) {
   switch ($op) {
     case 'view':
       $router_item = menu_get_item();
@@ -165,35 +166,40 @@ function services_views_access($op = 'view', $args = array()) {
       $prefix = 'services_views_' . $endpoint;
       $whitelist = variable_get($prefix . '_white_list', 0);
       $listed_views = variable_get($prefix . "_view_displays", array());
-      $listed_view_key = $args['view_name'] . '|' . $args['display_id'];
       $view = views_get_view($args['view_name']);
       if (empty($view)) {
         return services_error(t('View @view could not be found', array('@view' => $args['view_name'])), 404);
       }
-      if (!isset($view->display[$args['display_id']])) {
+      // Determine the display we want to use.
+      $display_id = $args['display_id'];
+      if (empty($view->display[$display_id]) || $view->display[$display_id]->display_plugin != 'services') {
+        $display_id = 'services_clone_' . $display_id;
+        if (empty($view->display[$display_id]) || $view->display[$display_id]->display_plugin != 'services') {
+          return services_error(t('Display @display on view @view could not be found', array(
+            '@display' => $args['display_id'],
+            '@view' => $args['view_name'],
+          )), 404);
+        }
+      }
+      $listed_view_key = $args['view_name'] . '|' . $display_id;
+      if (!empty($whitelist) && empty($listed_views[$listed_view_key])) {
         return services_error(t('Display @display on view @view could not be found', array(
           '@display' => $args['display_id'],
           '@view' => $args['view_name'],
         )), 404);
       }
-      if ($whitelist && empty($listed_views[$listed_view_key])) {
+      elseif (empty($whitelist) && !empty($listed_views[$listed_view_key])) {
         return services_error(t('Display @display on view @view could not be found', array(
           '@display' => $args['display_id'],
           '@view' => $args['view_name'],
         )), 404);
       }
-      elseif (!$whitelist && !empty($listed_views[$listed_view_key])) {
-        return services_error(t('Display @display on view @view could not be found', array(
-          '@display' => $args['display_id'],
-          '@view' => $args['view_name'],
-        )), 404);
-      }
-      return $view->access($args['display_id']);
+      return $view->access($display_id);
   }
 }
 
 /**
- * Implements hook_views_plugins
+ * Implements hook_views_plugins().
  */
 function services_views_views_plugins() {
   $plugins = array(
@@ -307,7 +313,7 @@ function services_views_field_formatter_settings_form($field, $instance, $view_m
       '#default_value' => $settings['skip_empty_values'],
     );
 
-    // Add text field settings
+    // Add text field settings.
     if ($field['module'] == 'text') {
       $element['skip_text_format'] = array(
         '#type' => 'checkbox',
@@ -316,7 +322,7 @@ function services_views_field_formatter_settings_form($field, $instance, $view_m
       );
     }
 
-    // Add taxonomy reference field settings
+    // Add taxonomy reference field settings.
     if ($field['module'] == 'taxonomy') {
       $element['term_name'] = array(
         '#type' => 'checkbox',
@@ -348,12 +354,12 @@ function services_views_field_formatter_settings_summary($field, $instance, $vie
     $output[] = t('Skip safe values: %key', array("%key" => $skipsafe));
     $output[] = t('Skip empty values: %key', array("%key" => $skipempty));
 
-    // Add text field settings
+    // Add text field settings.
     if ($field['module'] == 'text') {
       $output[] = t('Skip text format: %key', array("%key" => $skipformat));
     }
 
-    // Add taxonomy reference field settings
+    // Add taxonomy reference field settings.
     if ($field['module'] == 'taxonomy') {
       $output[] = t('Use term name: %key', array("%key" => $termname));
     }
@@ -375,7 +381,7 @@ function services_views_field_formatter_view($entity_type, $entity, $field, $ins
 
   if ($display['type'] == 'services') {
     foreach ($items as $delta => $item) {
-      // Apply the settings filters
+      // Apply the settings filters.
       $filtered_item = array();
       foreach ($item as $key => $val) {
         if ($settings['skip_safe'] && $key == 'safe_value') {
@@ -410,7 +416,7 @@ function services_views_field_formatter_view($entity_type, $entity, $field, $ins
  * Implements hook_entity_info_alter().
  */
 function services_views_entity_info_alter(&$info) {
-  // Add a view_mode to field_collections called Services
+  // Add a view_mode to field_collections called Services.
   if (isset($info['field_collection_item'])) {
     $info['field_collection_item']['view modes']['services'] = array(
       'label' => t('Services'),
@@ -448,7 +454,7 @@ function services_views_insecure_view_displays_report() {
     if (!empty($displays)) {
       $rows[$view_name] = array(
         'view' => l(check_plain($view->human_name), "admin/structure/views/view/$view_name"),
-        'displays' => implode(', ', $displays)
+        'displays' => implode(', ', $displays),
       );
     }
   }
@@ -463,7 +469,7 @@ function services_views_insecure_view_displays_report() {
       '#rows' => $rows,
       '#empty' => t('There are no insecure view displays.'),
       '#sticky' => TRUE,
-    )
+    ),
   );
 }
 
@@ -483,13 +489,18 @@ function services_views_view_resource_settings($endpoint_name) {
  */
 function services_views_view_resource_settings_form($form, &$form_state, $endpoint_name) {
   $views = array();
+  $prefix = "services_views_" . $endpoint_name;
+  $is_whitelist = variable_get($prefix . '_white_list', 0);
+  $display_exceptions = variable_get($prefix . "_view_displays", array());
   foreach (views_get_enabled_views() as $view_name => $view) {
     foreach ($view->display as $view_display_name => $display) {
+      if ($display->display_plugin != 'services') {
+        continue;
+      }
       $views[$view_name . '|' . $view_display_name] = check_plain($view->human_name) . ': ' . check_plain($display->display_title);
     }
   }
   $form = array();
-  $prefix = "services_views_" . $endpoint_name;
   $form[$prefix . "_white_list"] = array(
     '#type' => 'radios',
     '#title' => t('Filter method'),
@@ -497,13 +508,103 @@ function services_views_view_resource_settings_form($form, &$form_state, $endpoi
       "0" => t('All views displays except those checked'),
       "1" => t('Only the views displays checked'),
     ),
-    '#default_value' => variable_get($prefix . '_white_list', 0),
+    '#default_value' => $is_whitelist,
   );
   $form[$prefix . "_view_displays"] = array(
     '#type' => 'checkboxes',
     '#title' => t('Views to filter'),
     '#options' => $views,
-    '#default_value' => variable_get($prefix . "_view_displays", array()),
+    '#default_value' => $display_exceptions,
   );
   return system_settings_form($form);
+}
+
+function services_views_convert_white_list_to_clones() {
+  $endpoints = services_endpoint_load_all();
+  $displays_to_clone = array();
+  // Compile a list of all view displays that need to be cloned across all
+  // endpoints.
+  foreach ($endpoints as $endpoint) {
+    // If the whole endpoint is disabled, ignore it.
+    if (!empty($endpoint->disabled)) {
+      continue;
+    }
+    // If the views resource is disabled, ignore this endpoint.
+    $resources = services_get_resources($endpoint->name);
+    if (empty($resources['views']['endpoint']) || empty($resources['views']['endpoint']['operations']['retrieve']['enabled'])) {
+      continue;
+    }
+    $skipped_endpoints = array();
+    $prefix = "services_views_" . $endpoint->name;
+    $is_whitelist = variable_get($prefix . "_white_list", array());
+    $view_display_exceptions = variable_get($prefix . "_view_displays", array());
+    if (empty($is_whitelist) && empty($view_display_exceptions)) {
+      $skipped_endpoints[] = $endpoint->name;
+      continue;
+    }
+    foreach (views_get_enabled_views() as $view_name => $view) {
+      $displays_to_clone[$view_name] = array();
+      foreach ($view->display as $view_display_name => $display) {
+        $view_key = $view_name . '|' . $view_display_name;
+        // If it's a services view, lets not clone it.
+        if ($display->display_plugin == 'services') {
+          continue;
+        }
+        // If we are whitelisting and the item is not been whitelisted...
+        if (!empty($is_whitelist) && empty($view_display_exceptions[$view_key])) {
+          continue;
+        }
+        // If we are blacklisting and the item has been blacklisted...
+        if (empty($is_whitelist) && !empty($view_display_exceptions[$view_key])) {
+          continue;
+        }
+        // If we haven't encountered this display before, clone it.
+        if (empty($displays_to_clone[$view_name]) || empty($displays_to_clone[$view_name][$view_display_name])) {
+          $view = views_get_view($view_name, TRUE);
+          $displays_to_clone[$view_name][$view_display_name] = services_views_clone_display($view, $view_display_name);
+        }
+        // Remove the old white/blacklist record and add the new one.
+        $cloned_display_name = $displays_to_clone[$view_name][$view_display_name];
+        $cloned_view_key = $view_name . '|' . $cloned_display_name;
+        $view_display_exceptions[$cloned_view_key] = empty($is_whitelist) ? 0 : $cloned_view_key;
+        $view_display_exceptions[$view_key] = empty($is_whitelist) ? $view_key : 0;
+      }
+    }
+    variable_set($prefix . "_view_displays", $view_display_exceptions);
+  }
+  // Display a message complaining about cloning all displays and security.
+  if (!empty($skipped_endpoints)) {
+    $count = count($skipped_endpoints);
+    if ($count > 1) {
+      $skipped_endpoints[$count - 1] = 'and ' . $skipped_endpoints[$count - 1];
+    }
+    $message = t(
+      'Cowardly refusing to make a clone of all view displays. Please configure the specific views you would like to have cloned in the !endpoints. There will be no new views cloned over to a Services display. If all displays need to be cloned, restore to the latest backup, and update your settings white list them all and try again.',
+      array(
+        '!endpoints' => format_plural(
+          count($skipped_endpoints),
+          '!endpoint_list endpoint',
+          '!endpoint_list endpoints',
+          array('!endpoint_list' => implode(', ', $skipped_endpoints))
+        ),
+      )
+    );
+    drupal_set_message($message, 'warning');
+  }
+}
+
+function services_views_clone_display($view, $display_name) {
+  $display = $view->display[$display_name];
+  $display_names = array_keys($view->display);
+  $new_display_name = substr('services_clone_' . $display_name, 0, 62);
+  $count = 0;
+  while (in_array($new_display_name, $display_names)) {
+    $new_display_name = substr('services_clone_' . $display_name, 0, 62) . '_' . ++$count;
+  }
+  $view->add_display('services', "Services Clone of " . $display->display_title, $new_display_name);
+  $new_display = $view->display[$new_display_name];
+  $new_display->display_options = $display->display_options;
+  $new_display->display_options['path'] = $view->name . '/' . $display_name;
+  $view->save();
+  return $new_display_name;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.facetapi_defaults.inc

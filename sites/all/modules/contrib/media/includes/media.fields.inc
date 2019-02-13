@@ -127,9 +127,11 @@ function media_field_widget_form(&$form, &$form_state, $field, $instance, $langc
   // on the elements for further usage in media_element_process().
   if (module_invoke('entity_translation', 'enabled', $element['#entity_type'], $element['#entity'])) {
     $translation_handler = entity_translation_get_handler($element['#entity_type'], $element['#entity']);
-    $element['#media_parent_entity_form_langcode'] = $translation_handler->getActiveLanguage();
-    if ($source_langcode = $translation_handler->getSourceLanguage()) {
-      $element['#media_parent_entity_source_langcode'] = $source_langcode;
+    if ($translation_handler) {
+      $element['#media_parent_entity_form_langcode'] = $translation_handler->getActiveLanguage();
+      if ($source_langcode = $translation_handler->getSourceLanguage()) {
+        $element['#media_parent_entity_source_langcode'] = $source_langcode;
+      }
     }
   }
   elseif (module_exists('translation') && $element['#entity_type'] == 'node' && translation_supported_type($element['#entity']->type)) {

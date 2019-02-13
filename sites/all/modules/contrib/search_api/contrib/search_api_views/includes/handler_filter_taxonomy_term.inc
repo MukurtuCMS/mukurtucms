@@ -321,9 +321,13 @@ class SearchApiViewsHandlerFilterTaxonomyTerm extends SearchApiViewsHandlerFilte
    * {@inheritdoc}
    */
   protected function ids_to_strings(array $ids) {
+    $ids = array_filter($ids);
+    if (!$ids) {
+      return '';
+    }
     return implode(', ', db_select('taxonomy_term_data', 'td')
       ->fields('td', array('name'))
-      ->condition('td.tid', array_filter($ids))
+      ->condition('td.tid', $ids)
       ->execute()
       ->fetchCol());
   }

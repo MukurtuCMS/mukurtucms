@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.filter.inc
@@ -18,13 +19,13 @@ function ma_core_filter_default_formats() {
     'status' => 1,
     'weight' => -10,
     'filters' => array(
-      'filter_scald_link_filter' => array(
-        'weight' => 0,
+      'mee_scald_widgets' => array(
+        'weight' => -44,
         'status' => 1,
         'settings' => array(),
       ),
       'filter_html' => array(
-        'weight' => 1,
+        'weight' => -43,
         'status' => 1,
         'settings' => array(
           'allowed_html' => '<a> <em> <strong> <cite> <blockquote> <code> <ul> <ol> <li> <dl> <dt> <dd>',
@@ -33,17 +34,17 @@ function ma_core_filter_default_formats() {
         ),
       ),
       'filter_autop' => array(
-        'weight' => 2,
-        'status' => 1,
-        'settings' => array(),
-      ),
-      'filter_htmlcorrector' => array(
-        'weight' => 10,
+        'weight' => -41,
         'status' => 1,
         'settings' => array(),
       ),
       'media_filter' => array(
-        'weight' => 10,
+        'weight' => -40,
+        'status' => 1,
+        'settings' => array(),
+      ),
+      'filter_htmlcorrector' => array(
+        'weight' => -39,
         'status' => 1,
         'settings' => array(),
       ),
@@ -77,7 +78,7 @@ function ma_core_filter_default_formats() {
         'weight' => 10,
         'status' => 1,
         'settings' => array(
-          'allowed_html' => '<a> <em> <strong> <cite> <blockquote> <code> <ul> <ol> <li> <dl> <dt> <dd><h3><h4><p><br><video><object><embed><table><td><tr><th><iframe><img><script><div>',
+          'allowed_html' => '<a> <em> <strong> <cite> <blockquote> <code> <ul> <ol> <li> <dl> <dt> <dd><h3><h4><p><br><video><object><embed><table><td><tr><th><iframe><img><script><div><span><i>',
           'filter_html_help' => 1,
           'filter_html_nofollow' => 0,
         ),

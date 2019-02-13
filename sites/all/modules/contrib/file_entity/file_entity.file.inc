@@ -116,13 +116,23 @@ function file_entity_file_update($file) {
       _file_entity_update_image_field_dimensions($file);
     }
 
-    // Flush image style derivatives whenever an image is updated.
-    image_path_flush($file->uri);
+    // Flush image style derivatives whenever an image is replaced.
+    if (empty($file->file_entity_skip_image_flush) && file_entity_has_file_changed($file)) {
+      image_path_flush($file->uri);
+    }
   }
 
   // Clear any related field caches.
   file_entity_invalidate_field_caches($file);
 }
+
+/**
+ * Returns whether the file has changed
+ */
+function file_entity_has_file_changed($file) {
+  return empty($file->is_new) || empty($file->original) || $file->filesize != $file->original->filesize || $file->uri != $file->original->uri;
+}
+
 
 /**
  * Implements hook_file_delete().
@@ -197,7 +207,7 @@ function file_entity_file_load($files) {
 /**
  * Implements hook_entitycache_ENTITY_TYPE_load().
  */
-function file_entitycache_file_load($files) {
+function file_entity_entitycache_file_load($files) {
   // Integrates with entitycache - ensures the alt and title text on images is
   // localized.
   file_entity_set_title_alt_properties($files);
@@ -207,13 +217,6 @@ function file_entitycache_file_load($files) {
  * Implements hook_entity_load().
  */
 function file_entity_entity_load($entities, $entity_type) {
-  file_entity_set_title_alt_properties_on_file_fields($entities, $entity_type);
-}
-
-/**
- * Implements hook_entitycache_load().
- */
-function file_entity_entitycache_load($entities, $entity_type) {
   file_entity_set_title_alt_properties_on_file_fields($entities, $entity_type);
 }
 

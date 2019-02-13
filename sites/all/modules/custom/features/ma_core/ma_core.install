@@ -55,3 +55,36 @@ function ma_core_update_7103() {
 function ma_core_update_7104() {
     module_enable(array('mukurtu_taxonomy_records', 'ma_person'));
 }
+
+/**
+ * Bulk add file hashes
+ */
+function ma_core_update_7105() {
+  module_enable(array('ma_file_fixity'));
+  features_revert_module('ma_file_fixity');
+  ma_file_fixity_bulk_generate_file_hashes();
+}
+
+/**
+ * Remove old maillog module configuration, if needed.
+ */
+function ma_core_update_7106() {
+  $mail_system = variable_get('mail_system');
+  if (isset($mail_system['default-system']) && $mail_system['default-system'] == 'MaillogMailSystem') {
+    $mail_system['default-system'] = 'DefaultMailSystem';
+    if (isset($mail_system['maillog']) && $mail_system['maillog'] == 'MaillogMailSystem') {
+      unset($mail_system['maillog']);
+    }
+    variable_set('mail_system', $mail_system);
+  }
+}
+
+/**
+ * Set default 403 page, if not already set.
+ */
+function ma_core_update_7107() {
+  $page = variable_get('site_403');
+  if (!$page) {
+    variable_set('site_403', 'mukurtu/access-denied');
+  }
+}

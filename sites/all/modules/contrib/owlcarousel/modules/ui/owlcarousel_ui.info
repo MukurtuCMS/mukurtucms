@@ -10,9 +10,8 @@ configure = admin/config/user-interface/owlcarousel
 
 
 
-; Information added by Drupal.org packaging script on 2016-05-21
+; Information added by Drupal.org packaging script on 2018-11-05
 version = "7.x-2.x-dev"
 core = "7.x"
 project = "owlcarousel"
-datestamp = "1463808548"
-
+datestamp = "1541408583"

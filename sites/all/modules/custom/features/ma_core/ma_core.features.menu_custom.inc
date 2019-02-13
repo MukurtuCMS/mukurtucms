@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_core.features.menu_custom.inc

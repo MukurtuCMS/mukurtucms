@@ -38,6 +38,10 @@ function feeds_hook_info() {
     'feeds_processor_targets',
     'feeds_processor_targets_alter',
     'feeds_parser_sources_alter',
+    'feeds_config_defaults',
+    'feeds_fetcher_config_defaults',
+    'feeds_parser_config_defaults',
+    'feeds_processor_config_defaults',
   );
 
   return array_fill_keys($hooks, array('group' => 'feeds'));
@@ -53,19 +57,32 @@ function feeds_cron() {
     ->execute();
 
   // Find importers that need to be rescheduled.
-  if (!$importers = feeds_reschedule()) {
-    return;
+  $importers = feeds_reschedule();
+  if ($importers) {
+    // @todo Maybe we should queue this somehow as well. This could be potentially
+    // very long.
+    $sources = db_query("SELECT feed_nid, id FROM {feeds_source} WHERE id IN (:ids)", array(':ids' => $importers));
+
+    foreach ($sources as $source) {
+      feeds_source($source->id, $source->feed_nid)->schedule();
+    }
+
+    feeds_reschedule(FALSE);
   }
 
-  // @todo Maybe we should queue this somehow as well. This could be potentially
-  // very long.
-  $sources = db_query("SELECT feed_nid, id FROM {feeds_source} WHERE id IN (:ids)", array(':ids' => $importers));
-
-  foreach ($sources as $source) {
-    feeds_source($source->id, $source->feed_nid)->schedule();
+  // Sync the files in the cache directory with entries in the cache every now
+  // and then. By default: every six hours.
+  $last_check = variable_get('feeds_sync_cache_feeds_http_last_check');
+  $interval = variable_get('feeds_sync_cache_feeds_http_interval', 21600);
+  if ($last_check < (REQUEST_TIME - $interval)) {
+    // Check first if the task isn't already queued.
+    $queue = DrupalQueue::get('feeds_sync_cache_feeds_http');
+    if ($queue->numberOfItems() < 1) {
+      // Queue sync task.
+      FeedsHTTPCache::getInstance('cache_feeds_http')->startSync();
+    }
+    variable_set('feeds_sync_cache_feeds_http_last_check', REQUEST_TIME);
   }
-
-  feeds_reschedule(FALSE);
 }
 
 /**
@@ -78,6 +95,9 @@ function feeds_cron_job_scheduler_info() {
   $info['feeds_source_import'] = array(
     'queue name' => 'feeds_source_import',
   );
+  // feeds_source_clear never gets called, since we now use the queue directly.
+  // This is left in case any background jobs still running after an
+  // upgrade.
   $info['feeds_source_clear'] = array(
     'queue name' => 'feeds_source_clear',
   );
@@ -108,6 +128,9 @@ function feeds_cron_queue_info() {
   $queues['feeds_push_unsubscribe'] = array(
     'worker callback' => 'feeds_push_unsubscribe',
   );
+  $queues['feeds_sync_cache_feeds_http'] = array(
+    'worker callback' => 'feeds_sync_cache_feeds_http',
+  );
 
   return $queues;
 }
@@ -117,7 +140,9 @@ function feeds_cron_queue_info() {
  */
 function feeds_source_import(array $job) {
   $source = _feeds_queue_worker_helper($job, 'import');
-  $source->scheduleImport();
+  if ($source->doesExist()) {
+    $source->scheduleImport();
+  }
 }
 
 /**
@@ -125,7 +150,9 @@ function feeds_source_import(array $job) {
  */
 function feeds_source_clear(array $job) {
   $source = _feeds_queue_worker_helper($job, 'clear');
-  $source->scheduleClear();
+  if ($source->doesExist()) {
+    $source->scheduleClear();
+  }
 }
 
 /**
@@ -133,7 +160,9 @@ function feeds_source_clear(array $job) {
  */
 function feeds_source_expire(array $job) {
   $source = _feeds_queue_worker_helper($job, 'expire');
-  $source->scheduleExpire();
+  if ($source->doesExist()) {
+    $source->scheduleExpire();
+  }
 }
 
 /**
@@ -150,13 +179,22 @@ function _feeds_queue_worker_helper(array $job, $method) {
     $source->existing()->$method();
   }
   catch (FeedsNotExistingException $e) {
-    // Do nothing.
+    // Eventually remove the job from job scheduler.
+    JobScheduler::get('feeds_source_import')->remove($job);
   }
   catch (Exception $e) {
     $source->log($method, $e->getMessage(), array(), WATCHDOG_ERROR);
   }
 
   return $source;
+}
+
+/**
+ * Scheduler callback for syncing the feeds cache directory with the entries in
+ * the cache.
+ */
+function feeds_sync_cache_feeds_http(array $job) {
+  FeedsHTTPCache::getInstance('cache_feeds_http')->sync($job['files']);
 }
 
 /**
@@ -261,7 +299,12 @@ function feeds_permission() {
  *
  * Declare form callbacks for all known classes derived from FeedsConfigurable.
  */
-function feeds_forms() {
+function feeds_forms($form_id, $args) {
+  // Check if the requested form is a Feeds form.
+  if (!stripos($form_id, '_feeds_form')) {
+    return;
+  }
+
   $forms = array();
   $forms['FeedsImporter_feeds_form']['callback'] = 'feeds_form';
   $plugins = FeedsPlugin::all();
@@ -379,9 +422,11 @@ function feeds_admin_paths() {
  */
 function feeds_importer_load($id) {
   try {
-    return feeds_importer($id)->existing();
+    $importer = feeds_importer($id);
+    if ($importer->doesExist()) {
+      return $importer;
+    }
   }
-  catch (FeedsNotExistingException $e) {}
   catch (InvalidArgumentException $e) {}
 
   return FALSE;
@@ -491,7 +536,7 @@ function feeds_exit() {
   }
 
   if (drupal_static('feeds_log_error', FALSE)) {
-    watchdog('feeds', 'Feeds reported errors, visit the Feeds log for details.', array(), WATCHDOG_ERROR, 'admin/reports/dblog/feeds');
+    watchdog('feeds', 'Feeds reported errors, visit the Feeds log for details.', array(), WATCHDOG_ERROR, l(t('view'), 'admin/reports/feeds'));
   }
 }
 
@@ -650,9 +695,11 @@ function feeds_node_presave($node) {
  */
 function feeds_node_insert($node) {
   // Source attached to node.
-  feeds_node_update($node);
   if (isset($node->feeds) && $importer_id = feeds_get_importer_id($node->type)) {
     $source = feeds_source($importer_id, $node->nid);
+    $source->addConfig($node->feeds);
+    $source->save();
+
     // Start import if requested.
     if (feeds_importer($importer_id)->config['import_on_create'] && !isset($node->feeds['suppress_import'])) {
       $source->startImport();
@@ -671,6 +718,7 @@ function feeds_node_update($node) {
     $source = feeds_source($importer_id, $node->nid);
     $source->addConfig($node->feeds);
     $source->save();
+    $source->ensureSchedule();
   }
 }
 
@@ -696,7 +744,7 @@ function feeds_form_node_form_alter(&$form, $form_state) {
     $form['#attributes']['enctype'] = 'multipart/form-data';
 
     // Build form.
-    $source = feeds_source($importer_id, empty($form['#node']->nid) ? 0 : $form['#node']->nid);
+    $source = feeds_source($importer_id, empty($form['#node']->nid) ? NULL : $form['#node']->nid);
     $form['feeds'] = array(
       '#type' => 'fieldset',
       '#title' => t('Feed'),
@@ -753,7 +801,7 @@ function feeds_features_pipe_feeds_importer_alter(&$pipe, $data, &$export) {
  * required if there are any importers using those plugins.
  */
 function feeds_system_info_alter(array &$info, $file, $type) {
-  if ($type !== 'module' || !module_hook($file->name, 'feeds_plugins')) {
+  if ($type !== 'module' || !module_exists($file->name) || !module_hook($file->name, 'feeds_plugins')) {
     return;
   }
 
@@ -883,7 +931,7 @@ function feeds_admin_menu_output_build(array &$content) {
   foreach (feeds_importer_load_all() as $importer) {
     $content['menu']['admin/content']['admin/content/feeds_import'][$importer->id] = array(
       '#title' => t($importer->config['name']),
-      '#href' => !empty($importer->config['content_type']) ? 'node/add/' . $importer->config['content_type'] : 'import/' . check_plain($importer->id),
+      '#href' => !empty($importer->config['content_type']) ? 'node/add/' . str_replace('_', '-', $importer->config['content_type']) : 'import/' . check_plain($importer->id),
       '#access' => user_access('administer feeds') || user_access("import $importer->id feeds"),
     );
   }
@@ -1412,40 +1460,74 @@ function feeds_get_subscription_jobs() {
 function feeds_entity_property_info_alter(&$info) {
 
   foreach ($info as $entity_type => $entity_info) {
+    $info[$entity_type]['properties']['feeds_item_guid'] = array(
+      'label' => 'Feeds Item GUID',
+      'type' => 'text',
+      'description' => t('Feeds Item GUID.'),
+      'getter callback' => 'feeds_get_feeds_item_property',
+    );
+    $info[$entity_type]['properties']['feeds_item_url'] = array(
+      'label' => 'Feeds Item URL',
+      'type' => 'text',
+      'description' => t('Feeds Item URL.'),
+      'getter callback' => 'feeds_get_feeds_item_property',
+    );
     $info[$entity_type]['properties']['feed_nid'] = array(
       'label' => 'Feed NID',
       'type' => 'integer',
       'description' => t('Nid of the Feed Node that imported this entity.'),
-      'getter callback' => 'feeds_get_feed_nid_entity_callback',
+      'getter callback' => 'feeds_get_feeds_item_property',
     );
     $info[$entity_type]['properties']['feed_node'] = array(
       'label' => 'Feed node',
       'type' => 'node',
       'description' => t('Feed Node that imported this entity.'),
-      'getter callback' => 'feeds_get_feed_nid_entity_callback',
+      'getter callback' => 'feeds_get_feeds_item_property',
     );
   }
 }
 
 /**
- * Gets the feed_nid for an entity for use in entity metadata.
+ * Entity API getter callback for getting a feeds_item property on an entity.
+ *
+ * @param object $entity
+ *   An entity object.
+ * @param array $options
+ *   Options are ignored, but it is a param that is given by the Entiy API.
+ * @param string $name
+ *   The name of the property to get.
+ * @param string $entity_type
+ *   The entity's type.
+ *
+ * @return mixed
+ *   The feeds_item property.
  */
-function feeds_get_feed_nid_entity_callback($entity, array $options, $name, $entity_type) {
-  list($entity_id, , ) = entity_extract_ids($entity_type, $entity);
+function feeds_get_feeds_item_property($entity, array $options, $name, $entity_type) {
+  // Map property name to actual feeds_item column.
+  $property_map = array(
+    'feed_node' => 'feed_nid',
+    'feed_nid' => 'feed_nid',
+    'feeds_item_guid' => 'guid',
+    'feeds_item_url' => 'url',
+  );
+  $property_name = $property_map[$name];
 
-  $feed_nid = NULL;
+  // First check if the entity has already the feeds item loaded with the
+  // requested property and return its value if it does.
+  if (isset($entity->feeds_item->$property_name)) {
+    return $entity->feeds_item->$property_name;
+  }
+
+  // No feed item. Try to load the feed item if the entity has an ID.
+  list($entity_id, , ) = entity_extract_ids($entity_type, $entity);
   if ($entity_id) {
-    $feed_nid = feeds_get_feed_nid($entity_id, $entity_type);
-    if ($feed_nid === FALSE) {
-      return NULL;
+    $feeds_item = feeds_item_info_load($entity_type, $entity_id);
+
+    // Check again for the requested property and return its value if it exists.
+    if (isset($feeds_item->$property_name)) {
+      return $feeds_item->$property_name;
     }
   }
-  // If the entity has no ID (yet) try read the feed nid from the object
-  // directly.
-  elseif (isset($entity->feeds_item->feed_nid)) {
-    $feed_nid = $entity->feeds_item->feed_nid;
-  }
-  return $feed_nid;
 }
 
 /**

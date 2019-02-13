@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_digitalheritage.ds.inc
@@ -45,23 +46,64 @@ function ma_digitalheritage_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|digital_heritage|featured_content';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'digital_heritage';
+  $ds_fieldsetting->view_mode = 'featured_content';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_view_link' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_media_asset' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|digital_heritage|featured_content'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|digital_heritage|full';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'digital_heritage';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'mukurtu_icon_actions' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'dh_related_items_teasers' => array(
       'weight' => '12',
       'label' => 'above',
       'format' => 'default',
     ),
     'comments' => array(
-      'weight' => '11',
+      'weight' => '33',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'author' => array(
-      'weight' => '31',
+      'weight' => '32',
       'label' => 'above',
       'format' => 'author_linked',
     ),
@@ -107,6 +149,13 @@ function ma_digitalheritage_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_media_asset' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'func' => 'theme_field',
+        ),
+      ),
+    ),
   );
   $export['node|digital_heritage|full'] = $ds_fieldsetting;
 
@@ -138,6 +187,21 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'digital_heritage';
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
+    'digital_heritage_page_number' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'mukurtu_icon_actions' => array(
+      'weight' => '3',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
       'weight' => '1',
       'label' => 'hidden',
@@ -149,10 +213,24 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
-    'field_media_asset' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
-          'classes' => 'col-md-4 col-md-push-8',
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_category' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
         ),
       ),
     ),
@@ -167,7 +245,7 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'taxonomy_record_teaser';
   $ds_fieldsetting->settings = array(
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -187,8 +265,13 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'digital_heritage';
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -198,9 +281,25 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
-    'field_media_asset' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_summary' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_category' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
       ),
     ),
   );
@@ -229,6 +328,107 @@ function ma_digitalheritage_ds_custom_fields_info() {
     'block_render' => '3',
   );
   $export['dh_related_items_teasers'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'digital_heritage_page_number';
+  $ds_field->label = 'Digital Heritage Page Number';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+  if (!empty($entity->field_book_children[LANGUAGE_NONE])) {
+    $pages = count($entity->field_book_children[LANGUAGE_NONE]) + 1;
+    print t("@pages pages", array(\'@pages\' => $pages));
+    return;
+  }
+
+  if (!empty($entity->field_book_parent[LANGUAGE_NONE])) {
+    $parent_nid = $entity->field_book_parent[LANGUAGE_NONE][0][\'target_id\'];
+    $parent = node_load($parent_nid);
+    $pages = count(array_keys($parent->field_book_children[LANGUAGE_NONE])) + 1;
+    $page = 1;
+    foreach ($parent->field_book_children[LANGUAGE_NONE] as $child_page) {
+      $page++;
+      if ($child_page[\'target_id\'] == $entity->nid) {
+        break;
+      }
+    }
+    print t("Page @page of @pages", array(\'@page\' => $page, \'@pages\' => $pages));
+    return;
+  }
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['digital_heritage_page_number'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'featured_content_type';
+  $ds_field->label = 'Featured Content Type';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+$info = entity_get_info(\'node\');
+$type = $entity->type;
+if(isset($info[\'bundles\'][$type])) {
+    print $info[\'bundles\'][$type][\'label\'];
+}
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['featured_content_type'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'featured_content_view_link';
+  $ds_field->label = 'Featured Content View Link';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<a href="<?php print drupal_get_path_alias(\'node/\' . $entity->nid)?>"><?php print t(\'View Content\');?></a>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['featured_content_view_link'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'mukurtu_icon_actions';
+  $ds_field->label = 'Mukurtu Icon Actions';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+  ma_collection_add_to_personal_collection_icon_ds_field($entity);
+?>',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['mukurtu_icon_actions'] = $ds_field;
 
   return $export;
 }
@@ -337,6 +537,47 @@ function ma_digitalheritage_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|digital_heritage|featured_content';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'digital_heritage';
+  $ds_layout->view_mode = 'featured_content';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'featured_content_view_link',
+        1 => 'field_media_asset',
+        2 => 'featured_content_type',
+        3 => 'title',
+        4 => 'field_summary',
+      ),
+    ),
+    'fields' => array(
+      'featured_content_view_link' => 'central',
+      'field_media_asset' => 'central',
+      'featured_content_type' => 'central',
+      'title' => 'central',
+      'field_summary' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|digital_heritage|featured_content'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|digital_heritage|form';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
@@ -345,83 +586,90 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'ds_content' => array(
-        0 => 'group_tabs',
-        1 => 'group_essentials',
-        2 => 'group_mukurtu_core',
+        0 => 'field_pre_actions',
+        1 => 'group_tabs',
         3 => 'title',
-        5 => 'group_licensing',
-        7 => 'group_dublin',
-        9 => 'group_relations',
+        5 => 'field_summary',
+        6 => 'field_media_asset',
+        8 => 'og_group_ref',
+        10 => 'field_item_privacy_setting',
         11 => 'body',
-        12 => 'field_tk_body',
-        13 => 'field_description',
-        14 => 'field_tags',
-        15 => 'field_format',
-        16 => 'field_dh_type',
-        17 => 'field_collection',
-        18 => 'field_related_dh_items',
-        19 => 'field_identifier',
-        20 => 'field_related_dictionary_words',
-        21 => 'field_language',
-        22 => 'field_source',
-        23 => 'field_community_record_children',
-        24 => 'field_book_children',
-        25 => 'field_subject',
-        26 => 'field_people',
-        27 => 'field_book_parent',
-        28 => 'field_transcription',
-        29 => 'field_coverage',
-        30 => 'field_coverage_description',
-        31 => 'field_publisher',
-        32 => 'field_rights',
-        33 => 'field_licence_trad',
-        34 => 'field_licence_std_cc',
-        35 => 'field_summary',
-        36 => 'field_media_asset',
-        37 => 'og_group_ref',
-        38 => 'field_item_privacy_setting',
-        39 => 'field_category',
-        40 => 'field_creator',
-        41 => 'field_contributor',
-        42 => 'field_date',
+        12 => 'field_category',
+        13 => 'field_creator',
+        14 => 'group_essentials',
+        15 => 'field_tk_body',
+        16 => 'group_mukurtu_core',
+        17 => 'field_contributor',
+        18 => 'group_licensing',
+        19 => 'field_description',
+        20 => 'field_original_date',
+        21 => 'field_date',
+        22 => 'field_tags',
+        23 => 'group_dublin',
+        24 => 'group_relations',
+        25 => 'field_format',
+        26 => 'field_dh_type',
+        27 => 'field_identifier',
+        28 => 'field_language',
+        29 => 'field_source',
+        30 => 'field_subject',
+        31 => 'field_people',
+        32 => 'field_transcription',
+        33 => 'field_coverage',
+        34 => 'field_coverage_description',
+        35 => 'field_publisher',
+        36 => 'field_rights',
+        37 => 'field_licence_trad',
+        38 => 'field_licence_std_cc',
+        39 => 'field_collection',
+        40 => 'field_related_dh_items',
+        41 => 'field_related_dictionary_words',
+        42 => 'field_community_record_children',
+        43 => 'field_book_children',
+        44 => 'field_book_parent',
+        45 => 'field_personal_collections',
       ),
       'hidden' => array(
-        4 => 'field_community_record_parent',
-        6 => 'path',
-        8 => 'field_community_ref',
-        10 => 'redirect',
-        43 => '_add_existing_field',
+        2 => 'field_community_record_parent',
+        4 => 'path',
+        7 => 'field_community_ref',
+        9 => 'redirect',
+        46 => '_add_existing_field',
       ),
     ),
     'fields' => array(
+      'field_pre_actions' => 'ds_content',
       'group_tabs' => 'ds_content',
-      'group_essentials' => 'ds_content',
-      'group_mukurtu_core' => 'ds_content',
-      'title' => 'ds_content',
       'field_community_record_parent' => 'hidden',
-      'group_licensing' => 'ds_content',
+      'title' => 'ds_content',
       'path' => 'hidden',
-      'group_dublin' => 'ds_content',
+      'field_summary' => 'ds_content',
+      'field_media_asset' => 'ds_content',
       'field_community_ref' => 'hidden',
-      'group_relations' => 'ds_content',
+      'og_group_ref' => 'ds_content',
       'redirect' => 'hidden',
+      'field_item_privacy_setting' => 'ds_content',
       'body' => 'ds_content',
+      'field_category' => 'ds_content',
+      'field_creator' => 'ds_content',
+      'group_essentials' => 'ds_content',
       'field_tk_body' => 'ds_content',
+      'group_mukurtu_core' => 'ds_content',
+      'field_contributor' => 'ds_content',
+      'group_licensing' => 'ds_content',
       'field_description' => 'ds_content',
+      'field_original_date' => 'ds_content',
+      'field_date' => 'ds_content',
       'field_tags' => 'ds_content',
+      'group_dublin' => 'ds_content',
+      'group_relations' => 'ds_content',
       'field_format' => 'ds_content',
       'field_dh_type' => 'ds_content',
-      'field_collection' => 'ds_content',
-      'field_related_dh_items' => 'ds_content',
       'field_identifier' => 'ds_content',
-      'field_related_dictionary_words' => 'ds_content',
       'field_language' => 'ds_content',
       'field_source' => 'ds_content',
-      'field_community_record_children' => 'ds_content',
-      'field_book_children' => 'ds_content',
       'field_subject' => 'ds_content',
       'field_people' => 'ds_content',
-      'field_book_parent' => 'ds_content',
       'field_transcription' => 'ds_content',
       'field_coverage' => 'ds_content',
       'field_coverage_description' => 'ds_content',
@@ -429,14 +677,13 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_rights' => 'ds_content',
       'field_licence_trad' => 'ds_content',
       'field_licence_std_cc' => 'ds_content',
-      'field_summary' => 'ds_content',
-      'field_media_asset' => 'ds_content',
-      'og_group_ref' => 'ds_content',
-      'field_item_privacy_setting' => 'ds_content',
-      'field_category' => 'ds_content',
-      'field_creator' => 'ds_content',
-      'field_contributor' => 'ds_content',
-      'field_date' => 'ds_content',
+      'field_collection' => 'ds_content',
+      'field_related_dh_items' => 'ds_content',
+      'field_related_dictionary_words' => 'ds_content',
+      'field_community_record_children' => 'ds_content',
+      'field_book_children' => 'ds_content',
+      'field_book_parent' => 'ds_content',
+      'field_personal_collections' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -452,6 +699,7 @@ function ma_digitalheritage_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|digital_heritage|form'] = $ds_layout;
 
@@ -461,23 +709,25 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'full';
-  $ds_layout->layout = 'ds_2col';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
-        0 => 'field_summary',
-        1 => 'field_media_asset',
-        2 => 'field_description',
-        3 => 'body',
-        4 => 'field_tk_body',
-        5 => 'field_people',
-        6 => 'group_transcription',
-        7 => 'field_coverage',
-        8 => 'field_coverage_description',
-        9 => 'field_related_dh_items',
-        10 => 'field_related_dictionary_words',
-        11 => 'field_transcription',
-        12 => 'comments',
+        0 => 'field_media_asset',
+        2 => 'field_summary',
+        3 => 'field_description',
+        4 => 'body',
+        5 => 'field_tk_body',
+        6 => 'field_people',
+        7 => 'group_transcription',
+        8 => 'field_coverage',
+        9 => 'field_coverage_description',
+        10 => 'field_transcription',
+        11 => 'field_related_dh_items',
+        12 => 'field_related_dictionary_words',
+      ),
+      'top' => array(
+        1 => 'mukurtu_icon_actions',
       ),
       'right' => array(
         13 => 'dh_related_items_teasers',
@@ -486,25 +736,30 @@ function ma_digitalheritage_ds_layout_settings_info() {
         16 => 'field_category',
         17 => 'field_tags',
         18 => 'field_collection',
-        19 => 'field_date',
-        20 => 'field_creator',
-        21 => 'field_contributor',
-        22 => 'field_language',
-        23 => 'field_rights',
-        24 => 'field_licence_trad',
-        25 => 'field_licence_std_cc',
-        26 => 'field_source',
-        27 => 'field_publisher',
-        28 => 'field_identifier',
-        29 => 'field_subject',
-        30 => 'field_dh_type',
-        31 => 'field_format',
-        32 => 'author',
+        19 => 'field_original_date',
+        20 => 'field_date',
+        21 => 'field_creator',
+        22 => 'field_contributor',
+        23 => 'field_language',
+        24 => 'field_rights',
+        25 => 'field_licence_trad',
+        26 => 'field_licence_std_cc',
+        27 => 'field_source',
+        28 => 'field_publisher',
+        29 => 'field_identifier',
+        30 => 'field_subject',
+        31 => 'field_dh_type',
+        32 => 'field_format',
+        33 => 'author',
+      ),
+      'bottom' => array(
+        34 => 'comments',
       ),
     ),
     'fields' => array(
-      'field_summary' => 'left',
       'field_media_asset' => 'left',
+      'mukurtu_icon_actions' => 'top',
+      'field_summary' => 'left',
       'field_description' => 'left',
       'body' => 'left',
       'field_tk_body' => 'left',
@@ -512,16 +767,16 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'group_transcription' => 'left',
       'field_coverage' => 'left',
       'field_coverage_description' => 'left',
+      'field_transcription' => 'left',
       'field_related_dh_items' => 'left',
       'field_related_dictionary_words' => 'left',
-      'field_transcription' => 'left',
-      'comments' => 'left',
       'dh_related_items_teasers' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',
       'field_category' => 'right',
       'field_tags' => 'right',
       'field_collection' => 'right',
+      'field_original_date' => 'right',
       'field_date' => 'right',
       'field_creator' => 'right',
       'field_contributor' => 'right',
@@ -536,6 +791,7 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_dh_type' => 'right',
       'field_format' => 'right',
       'author' => 'right',
+      'comments' => 'bottom',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -543,15 +799,17 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
+      'top' => 'div',
       'left' => 'div',
       'right' => 'div',
+      'bottom' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
-    'layout_disable_css' => 0,
+    'layout_disable_css' => FALSE,
   );
   $export['node|digital_heritage|full'] = $ds_layout;
 
@@ -598,25 +856,33 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'search_result';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
+      'left' => array(
         0 => 'field_media_asset',
-        1 => 'title',
-        2 => 'group_list_view_fields',
-        3 => 'field_community_ref',
-        4 => 'field_category',
-        5 => 'field_summary',
+      ),
+      'right' => array(
+        1 => 'group_list_view_fields',
+        2 => 'title',
+        3 => 'featured_content_type',
+        4 => 'mukurtu_icon_actions',
+        5 => 'digital_heritage_page_number',
+        6 => 'field_community_ref',
+        7 => 'field_category',
+        8 => 'field_summary',
       ),
     ),
     'fields' => array(
-      'field_media_asset' => 'ds_content',
-      'title' => 'ds_content',
-      'group_list_view_fields' => 'ds_content',
-      'field_community_ref' => 'ds_content',
-      'field_category' => 'ds_content',
-      'field_summary' => 'ds_content',
+      'field_media_asset' => 'left',
+      'group_list_view_fields' => 'right',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'mukurtu_icon_actions' => 'right',
+      'digital_heritage_page_number' => 'right',
+      'field_community_ref' => 'right',
+      'field_category' => 'right',
+      'field_summary' => 'right',
     ),
     'limit' => array(
       'field_media_asset' => '1',
@@ -627,13 +893,15 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'left' => 'div',
+      'right' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['node|digital_heritage|search_result'] = $ds_layout;
 
@@ -643,35 +911,25 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'taxonomy_record_teaser';
-  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->layout = 'bootstrap_3_9';
   $ds_layout->settings = array(
     'regions' => array(
-      'central' => array(
-        0 => 'title',
-        1 => 'group_media_div',
-        2 => 'field_media_asset',
-        3 => 'group_metadata_div',
-        4 => 'field_description',
-        5 => 'field_date',
-        6 => 'group_location_div',
-        7 => 'field_community_ref',
-        8 => 'field_coverage',
-        9 => 'field_coverage_description',
-        10 => 'field_category',
+      'left' => array(
+        0 => 'field_media_asset',
+      ),
+      'right' => array(
+        1 => 'title',
+        2 => 'field_summary',
+        3 => 'field_community_ref',
+        4 => 'field_category',
       ),
     ),
     'fields' => array(
-      'title' => 'central',
-      'group_media_div' => 'central',
-      'field_media_asset' => 'central',
-      'group_metadata_div' => 'central',
-      'field_description' => 'central',
-      'field_date' => 'central',
-      'group_location_div' => 'central',
-      'field_community_ref' => 'central',
-      'field_coverage' => 'central',
-      'field_coverage_description' => 'central',
-      'field_category' => 'central',
+      'field_media_asset' => 'left',
+      'title' => 'right',
+      'field_summary' => 'right',
+      'field_community_ref' => 'right',
+      'field_category' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -679,7 +937,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'central' => 'div',
+      'left' => 'div',
+      'right' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
@@ -696,25 +955,27 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'digital_heritage';
   $ds_layout->view_mode = 'teaser';
-  $ds_layout->layout = 'bootstrap_9_3';
+  $ds_layout->layout = 'bootstrap_4_8';
   $ds_layout->settings = array(
     'regions' => array(
       'left' => array(
-        0 => 'title',
-        1 => 'field_summary',
-        2 => 'field_community_ref',
-        3 => 'field_category',
+        0 => 'field_media_asset',
       ),
       'right' => array(
-        4 => 'field_media_asset',
+        1 => 'title',
+        2 => 'featured_content_type',
+        3 => 'field_community_ref',
+        4 => 'field_category',
+        5 => 'field_summary',
       ),
     ),
     'fields' => array(
-      'title' => 'left',
-      'field_summary' => 'left',
-      'field_community_ref' => 'left',
-      'field_category' => 'left',
-      'field_media_asset' => 'right',
+      'field_media_asset' => 'left',
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'field_community_ref' => 'right',
+      'field_category' => 'right',
+      'field_summary' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -751,6 +1012,16 @@ function ma_digitalheritage_ds_view_modes_info() {
     'node' => 'node',
   );
   $export['community_record'] = $ds_view_mode;
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'featured_content';
+  $ds_view_mode->label = 'Featured Content';
+  $ds_view_mode->entities = array(
+    'node' => 'node',
+    'paragraphs_item' => 'paragraphs_item',
+  );
+  $export['featured_content'] = $ds_view_mode;
 
   $ds_view_mode = new stdClass();
   $ds_view_mode->api_version = 1;

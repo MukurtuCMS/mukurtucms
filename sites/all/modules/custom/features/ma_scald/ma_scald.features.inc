@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_scald.features.inc
@@ -44,6 +45,21 @@ function ma_scald_image_default_styles() {
         'data' => array(
           'width' => 240,
           'height' => 146,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
+  // Exported image style: tiny_thumbnail.
+  $styles['tiny_thumbnail'] = array(
+    'label' => 'Tiny Thumbnail',
+    'effects' => array(
+      15 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 35,
+          'height' => 35,
         ),
         'weight' => 1,
       ),

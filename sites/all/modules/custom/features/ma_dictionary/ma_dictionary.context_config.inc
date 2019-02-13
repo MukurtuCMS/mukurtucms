@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dictionary.context_config.inc

@@ -6,6 +6,8 @@
 
 include_once('ma_core.features.inc');
 
+define('MUKURTU_PRERELEASE_FUNCTIONALITY', 'mukurtu_prerelease_functionality');
+
 /**
  * Implementation of hook_init().
  */
@@ -64,35 +66,89 @@ function ma_core_get_nids_from_array_of_nodes ($nodes = NULL) {
 }
 
 /**
- * Implements hook_views_pre_build().
+ * Implements hook_views_pre_view().
  */
-// Add the Add and Manage Members links to the group member list, for users with perm to do so
-// Note: og_members is an og-provisioned view and view-ui customizations cannot be exported to features
-function ma_core_views_pre_build(&$view) {
+function ma_core_views_pre_view(&$view, &$display_id, &$args) {
   if ($view->name == 'group_members') {
-    $gid = arg(1);
-    if (og_user_access('node', $gid, 'manage members')) {
-        // We always want to show the buttons to users who can use them, so we need to have an empty
-        // "no results" message so that the view is actually displayed
-        $options = array(
-            'id' => 'empty_text',
-            'table' => 'views',
-            'field' => 'area',
-            'empty' => FALSE,
-            'content' => '',
-            'format' => 'filtered_html',
-            'tokenize' => 0,
-        );
-        $view->set_item('default', 'empty', 'empty_text', $options);
 
-        // Display the user management buttons
-        $output = '<div class="add-manage-members-links">';
-        $output .= '<div class="add-members-link btn btn-default btn-sm">' . l('Add Members', 'group/node/' . $gid . '/admin/people/add-user') . '</div>';
-        $output .= '<div class="manage-members-link btn btn-default btn-sm">' . l('Manage Members', 'group/node/' . $gid . '/admin/people') . '</div>';
-        $output .= '</div>';
-        $view->add_item('default', 'footer', 'views', 'area', array('content' => $output, 'format' => 'full_html', 'empty' => 1));
+    // Hide the manage/add members links in footer unless user can admin this group.
+    if (is_numeric(arg(1))) {
+      $gid = arg(1);
+      if (!og_user_access('node', $gid, 'manage members')) {
+        $view->set_item_option('block_1', 'footer', 'area', 'content', NULL);
+      }
     }
   }
+}
+
+/**
+ * Implements hook_entity_prepare_view().
+ */
+function ma_core_entity_prepare_view($entities, $type, $langcode) {
+  if ($type == 'node') {
+    foreach ($entities as $uid => &$entity) {
+      $fields = field_info_instances($type, $entity->type);
+      // Check all scald atom reference fields, remove any atoms
+      // the user doesn't have accces to.
+      foreach ($fields as $field) {
+        $field_info = field_info_field($field['field_name']);
+        if ($field_info['type'] == 'atom_reference') {
+          // Strip out inaccessible media.
+          ma_scald_atom_reference_field_filter($entity, $field_info['field_name']);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function ma_core_views_pre_render(&$view) {
+  if ($view->name == 'group_members') {
+    if (is_numeric(arg(1))) {
+      $gid = arg(1);
+
+      // Add the user role(s) after the user names. This can't quite be done in view config alone.
+      $results = &$view->result;
+      $roles_order = [
+        'Community Manager',
+        'Protocol Steward',
+        'Contributor'
+      ];
+      foreach ($results as &$result) {
+        $roles = og_get_user_roles('node', $gid, $result->uid);
+        $formatted_roles = [];
+        foreach ($roles as $role) {
+          if ($role <> 'member') {
+            $formatted_roles[] = ucwords ($role);
+          }
+        }
+        if (count($formatted_roles)) {
+          usort ($formatted_roles, "ma_core_sort_og_roles");
+          $result->users_name = $result->users_name . ' (' . implode(', ', $formatted_roles) . ')';
+        }
+      }
+
+    }
+  }
+}
+
+/**
+ * Helper function to sort the OG roles so that Protocol Steward is listed ahead of Contributor.
+ */
+function ma_core_sort_og_roles($leftItem, $rightItem){
+  $order =  $roles_order = [
+    'Community Manager',
+    'Protocol Steward',
+    'Contributor'
+  ];
+
+  $flipped = array_flip($order);
+
+  $leftPos = $flipped[$leftItem];
+  $rightPos = $flipped[$rightItem];
+  return $leftPos >= $rightPos;
 }
 
 /**
@@ -121,13 +177,35 @@ function ma_core_og_get_users_per_role_and_group ($role_name, $group_bundle, $gi
 /**
  * Get all users of a group
  */
-function ma_core_og_get_users_in_group($gid) {
+function ma_core_og_get_uids_in_group($gid) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'user')
     ->fieldCondition('og_user_node', 'target_id', $gid);
-
   if ($results = $query->execute()) {
     $uids = array_keys($results['user']);
+    return $uids;
+  }
+}
+
+/**
+ * Get all users of a group
+ */
+function ma_core_og_get_users_in_group($gid) {
+  $uids = ma_core_og_get_uids_in_group($gid);
+  if (count($uids)) {
+    return user_load_multiple(ma_core_og_get_uids_in_group($gid));
+  }
+}
+
+
+/**
+ * Helper function to load users by core role.
+ */
+function ma_core_get_users_per_role ($role_name) {
+  if ($role = user_role_load_by_name($role_name)) {
+    $query = 'SELECT DISTINCT(ur.uid)  FROM {users_roles} AS ur WHERE ur.rid = (:rid)';
+    $result = db_query($query, [':rid' => $role->rid]);
+    $uids = $result->fetchCol();
     return user_load_multiple($uids);
   }
 }
@@ -155,6 +233,16 @@ function ma_core_menu() {
     'type' => MENU_NORMAL_ITEM,
     'weight' => 20,
   );
+
+  // 403 page.
+  $items['mukurtu/access-denied'] = array(
+    'title' => t('Access denied'),
+    'description' => 'Mukurtu Access Denied (403 error)',
+    'page callback' => 'ma_core_access_denied_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -163,6 +251,21 @@ function ma_core_menu() {
  */
 function ma_core_blank_page_callback() {
   return ' ';
+}
+
+/**
+ * Default Mukurtu 403 access denied page.
+ */
+function ma_core_access_denied_page() {
+  $message = array();
+
+  // If the user hasn't logged in, prompt them to try that first.
+  if (!user_is_logged_in()) {
+    $message[] = t("If you followed a link here, !url and try again.", array('!url' => l(t('log in'), "user/login")));
+  }
+  $message[] = t("If you think you should have access, contact the site administrator for more information.");
+
+  return implode(" ", $message);
 }
 
 /**
@@ -229,3 +332,607 @@ function ma_core_get_create_tax_term ($term_name, $vocab_name) {
   }
 }
 
+/**
+ * Implementation of HOOK_form_alter()
+ */
+function ma_core_form_alter(&$form, $form_state, $form_id) {
+
+  // Duplicate a the node form action buttons at the top of the form.
+  // Normally we could just duplicate the field here and set its weight,
+  // but because our forms are managed in DS, the field needs to be created there
+  // first, or else we can't move the field high enough on the form. So we create
+  // a dummy Pre-Actions field (a boolean) in Manage Fields, and then rewrite it here,
+  // simply duplicating the contents of form actions as they appear at bottom.
+  if (isset($form['#node_edit_form']) AND $form['#node_edit_form']) {
+    $form['field_pre_actions'] = $form['actions'];
+    $form['field_pre_actions']['#weight'] = -5; // for those content types where the field layout is not in DS.
+  }
+
+  // Disable taxonomy term delete button for users that don't have edit rights to all referenced content
+  if($form_id == 'taxonomy_form_term' && !$form_state['submitted']) {
+      $tid = $form['#term']['tid'];
+      $referenced_nodes = taxonomy_select_nodes($tid);
+
+      if(!ma_core_can_delete_taxonomy_term($tid)) {
+          $form['actions']['delete']['#disabled'] = TRUE;
+          $form['actions']['delete']['#attributes'] = array(
+              'title' => t('This term cannot be deleted because you do not have edit access to some content that references this term.')
+          );
+      }
+  }
+
+  // Add an extra warning to the term delete confirmation form
+  if($form_id == 'taxonomy_form_term' && (isset($form_state['confirm_delete']) && $form_state['confirm_delete'])) {
+      $message = "Deleting a term will also remove the term and all its children from all content that reference it.";
+      $form['description']['#markup'] = $form['description']['#markup'] . '<br>' . t($message);
+  }
+
+}
+
+/**
+ * For a given taxonomy term ID, return if the user has edit rights to all referenced content
+ */
+function ma_core_can_delete_taxonomy_term($tid) {
+    // Get nodes that reference this term
+    $referenced_nodes = taxonomy_select_nodes($tid);
+
+    // Also get nodes that reference child terms
+    $child_terms = taxonomy_get_children($tid);
+    if(!empty($child_terms)) {
+        foreach($child_terms as $child_term) {
+            $referenced_nodes = array_merge($referenced_nodes, taxonomy_select_nodes($child_term->tid));
+        }
+    }
+
+    // Check edit access for all referenced content
+    $can_delete = TRUE;
+    if(count($referenced_nodes) > 0) {
+        foreach($referenced_nodes as $referenced_nid) {
+            if(!node_access('delete', $referenced_nid)) {
+                $can_delete = FALSE;
+                break;
+            }
+        }
+    }
+
+    return $can_delete;
+}
+
+/**
+ * Implements hook_taxonomy_term_delete().
+ */
+function ma_core_taxonomy_term_delete($term) {
+    // Get nodes that reference that term
+    $referenced_nodes = taxonomy_select_nodes($term->tid);
+    if(count($referenced_nodes) > 0) {
+        // Load each node and inspect each of their fields for the term.
+        // Currently we are only inspecting taxonomy_term_reference fields, but in theory, other fields
+        // such as entityreference fields, could also contain that term. We aren't hunting down those at
+        // this time.
+        foreach($referenced_nodes as $referenced_nid) {
+            $node = node_load($referenced_nid);
+            if($node) {
+                $fields = field_info_instances('node', $node->type);
+                foreach($fields as $field) {
+                    $field_info = field_info_field($field['field_name']);
+                    if($field_info['type'] == 'taxonomy_term_reference') {
+                        $wrapper = entity_metadata_wrapper('node', $node);
+                        $term_list = $wrapper->{$field['field_name']}->value();
+
+                        // Remove term from content
+                        foreach($term_list as $k => $t) {
+                            if($t->tid == $term->tid) {
+                                unset($term_list[$k]);
+                                $wrapper->{$field['field_name']}->set($term_list);
+                                $wrapper->save();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_core_block_info() {
+  $blocks['create_content'] = array(
+    'info' => t('Create Content'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_core_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'create_content':
+      $block['subject'] = t('Create Content');
+      $block['content'] = ma_core_create_content_block();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * The Create Content block which appears on the Community, CP, Calendar Section, Discussion Section, and Document Section node views.
+ */
+function ma_core_create_content_block() {
+
+  $nid = arg(1);
+  if (is_numeric($nid)) {
+    $node = node_load($nid);
+
+    switch ($node->type) {
+      case 'community':
+        $link_sources = [
+          'cultural_protocol_group' => '?og_group_ref=' . $nid,
+          'digital_heritage' => '/' . $nid,
+        ];
+        break;
+      case 'cultural_protocol_group':
+        $link_sources = [
+          'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
+        ];
+        if (module_exists('ma_collaboration_tools')) {
+          foreach (ma_culturalprotocol_collab_parent_node_types() as $parent_type) {
+            $link_sources[$parent_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid . '?destination=node/' . arg(1) . '/last_tab';
+          }
+        }
+        break;
+      default:
+        return; // Safeguard. This should never happen.
+    }
+
+    // Output the links
+    $links = "";
+    foreach ($link_sources as $target_type => $link_query) {
+      $target_type_link = str_replace('_', '-', $target_type);
+      if (og_user_access('node', $nid, 'create ' . $target_type . ' content')) {
+        $links .= '<div class="view-content"><a href="' . '/node/add/' . $target_type_link . $link_query . '">Create ' . node_type_get_names()[$target_type] . '</a></div>';
+      }
+    }
+
+    return $links;
+  }
+}
+
+/**
+ * Helper function recursively unset keys from an array.
+ */
+function recursive_unset(&$array, $unwanted_key) {
+  unset($array[$unwanted_key]);
+  foreach ($array as &$value) {
+    if (is_array($value)) {
+      recursive_unset($value, $unwanted_key);
+    }
+  }
+}
+
+/**
+ * Helper function to recursively compare arrays, including associative keys.
+ */
+function array_diff_assoc_recursive($array1, $array2) {
+  $difference=array();
+  foreach($array1 as $key => $value) {
+    if( is_array($value) ) {
+      if( !isset($array2[$key]) || !is_array($array2[$key]) ) {
+        $difference[$key] = $value;
+      } else {
+        $new_diff = array_diff_assoc_recursive($value, $array2[$key]);
+        if( !empty($new_diff) )
+          $difference[$key] = $new_diff;
+      }
+    } else if( !array_key_exists($key,$array2) || $array2[$key] !== $value ) {
+      $difference[$key] = $value;
+    }
+  }
+  return $difference;
+}
+
+/**
+ * Custom breadcrumbs for Mukurtu.
+ */
+function ma_core_menu_breadcrumb_alter(&$active_trail, $item) {
+  // Return immediately if Mukurtu breadcrumbs are disabled.
+  if (variable_get('mukurtu_breadcrumbs_opt_out', FALSE)) {
+    return;
+  }
+
+  $trail_keys = array_keys($active_trail);
+  $i = end($trail_keys);
+
+  // Keep track of where we are. For container type pages (browse pages, collections, dictionary, word lists)
+  // we want to try and include breadcrumbs back to the origin
+  // Grab the previous item. Currently we are only tracking one previous item.
+  $past_item = NULL;
+  if (isset($_SESSION['mukurtu_breadcrumb'])) {
+    $past_item = $_SESSION['mukurtu_breadcrumb'];
+  }
+
+  // If we are on a possible container, store the item.
+  if (isset($item['page_arguments'][0]->type)) {
+    switch ($item['page_arguments'][0]->type) {
+      case "community":
+      case "collection":
+      case "personal_collection":
+      case "word_list":
+        $_SESSION['mukurtu_breadcrumb']['container']['item'] = $item;
+        $_SESSION['mukurtu_breadcrumb']['container']['trail'] = $active_trail[$i];
+        $_SESSION['mukurtu_breadcrumb']['container']['query_parameters'] = drupal_get_query_parameters();
+        //$past_item = NULL;
+        break;
+    }
+  } else {
+    if (isset($_SESSION['mukurtu_breadcrumb']['container'])) {
+      unset($_SESSION['mukurtu_breadcrumb']['container']);
+    }
+  }
+
+  // Capture browse pages.
+  $supported_browse_pages = array(
+    'browse_all_content',
+    'digital_heritage_browse',
+    'collections',
+    'dictionary_browse',
+  );
+  $supported_paths = array(
+    'user/%',
+  );
+  if (isset($item['page_arguments'][0]) &&
+    (in_array($item['page_arguments'][0], $supported_browse_pages)) || in_array($item['path'], $supported_paths)) {
+    $_SESSION['mukurtu_breadcrumb']['search']['item'] = $item;
+    $_SESSION['mukurtu_breadcrumb']['search']['trail'] = $active_trail[$i];
+    $_SESSION['mukurtu_breadcrumb']['search']['query_parameters'] = drupal_get_query_parameters();
+    $past_item = NULL;
+  }
+
+  if (isset($item['page_arguments'][0]->type)) {
+    // Some pages we don't want to mess with the breadcrumb.
+    // In that case, clear the past item.
+    $supported_types = array(
+      'collection',
+      'dictionary_word',
+      'digital_heritage',
+      'person',
+      'personal_collection',
+      'word_list',
+    );
+    if (!in_array($item['page_arguments'][0]->type, $supported_types)) {
+      $past_item = NULL;
+    }
+
+    // At this point, we have information about the previous page that
+    // we would like to include in the breadcrumbs.
+    if (!empty($past_item)) {
+      // We keep track of the most recent search and up to one container type.
+      // Check if we have one or both of those.
+      $offset = 1;
+      if (isset($past_item['container'])) {
+        $offset = 2;
+        // Insert container.
+        $active_trail[$i + $offset - 1] = $past_item['container']['trail'];
+      }
+
+      // Insert the past item in the next to last breadcrumb slot.
+      $active_trail[$i + $offset] = $active_trail[$i];
+
+      // Insert search.
+      $active_trail[$i] = $past_item['search']['trail'];
+
+      // The search pages are more complicated, we want to retain both
+      // the exact page arguments and query parameters.
+      if (is_string($past_item['search']['item']['page_arguments'][0]) &&
+        stripos($past_item['search']['item']['page_arguments'][0], 'browse') !== FALSE) {
+        $href = $past_item['search']['item']['path'];
+
+        // Handle the page arguments.
+        if (count($past_item['search']['item']['page_arguments']) > 1) {
+          foreach (range(1, count($past_item['search']['item']['page_arguments']) - 1) as $delta) {
+            $href .= "/{$past_item['search']['item']['page_arguments'][$delta]}";
+          }
+        }
+
+        // Update the breadcrumb, include the query parameters.
+        $breadcrumb_title = t('Search Results');
+        $active_trail[$i] = array(
+          'title' => $breadcrumb_title,
+          'href' => $href,
+          'localized_options' => array('query' => $past_item['search']['query_parameters']),
+        );
+      }
+
+      // menu.inc will crash with an invalid call to 'l' if we somehow pass null to localized_options.
+      if (!isset($active_trail[$i]['localized_options'])) {
+        $active_trail[$i]['localized_options'] = array();
+      }
+    }
+  }
+}
+
+
+/**
+ * Copy of menu_local_tasks from includes/menu.inc.
+ *
+ * Modified to return the local tasks for a given nid, rather than
+ * the current page. Small change, but duplicating rather than
+ * maintaining a patch in anticipation of future tweaking.
+ */
+function ma_core_menu_local_tasks($nid, $level = 0) {
+  $root_path = &drupal_static(__FUNCTION__ . ':root_path', '');
+  $empty = array(
+    'tabs' => array('count' => 0, 'output' => array()),
+    'actions' => array('count' => 0, 'output' => array()),
+    'root_path' => &$root_path,
+  );
+
+  if (!isset($data)) {
+    $data = array();
+    // Set defaults in case there are no actions or tabs.
+    $actions = $empty['actions'];
+    $tabs = array();
+    $router_item = menu_get_item("node/{$nid}");
+
+    // If this router item points to its parent, start from the parents to
+    // compute tabs and actions.
+    if ($router_item && ($router_item['type'] & MENU_LINKS_TO_PARENT)) {
+      $router_item = menu_get_item($router_item['tab_parent_href']);
+    }
+
+    // If we failed to fetch a router item or the current user doesn't have
+    // access to it, don't bother computing the tabs.
+    if (!$router_item || !$router_item['access']) {
+      return $empty;
+    }
+
+    // Get all tabs (also known as local tasks) and the root page.
+    $cid = 'local_tasks:' . $router_item['tab_root'];
+    if ($cache = cache_get($cid, 'cache_menu')) {
+      $result = $cache->data;
+    }
+    else {
+      $result = db_select('menu_router', NULL, array('fetch' => PDO::FETCH_ASSOC))
+        ->fields('menu_router')
+        ->condition('tab_root', $router_item['tab_root'])
+        ->condition('context', MENU_CONTEXT_INLINE, '<>')
+        ->orderBy('weight')
+        ->orderBy('title')
+        ->execute()
+        ->fetchAll();
+      cache_set($cid, $result, 'cache_menu');
+    }
+    $map = $router_item['original_map'];
+    $children = array();
+    $tasks = array();
+    $root_path = $router_item['path'];
+
+    foreach ($result as $item) {
+      _menu_translate($item, $map, TRUE);
+      if ($item['tab_parent']) {
+        // All tabs, but not the root page.
+        $children[$item['tab_parent']][$item['path']] = $item;
+      }
+      // Store the translated item for later use.
+      $tasks[$item['path']] = $item;
+    }
+
+    // Find all tabs below the current path.
+    $path = $router_item['path'];
+    // Tab parenting may skip levels, so the number of parts in the path may not
+    // equal the depth. Thus we use the $depth counter (offset by 1000 for ksort).
+    $depth = 1001;
+    $actions['count'] = 0;
+    $actions['output'] = array();
+    while (isset($children[$path])) {
+      $tabs_current = array();
+      $actions_current = array();
+      $next_path = '';
+      $tab_count = 0;
+      $action_count = 0;
+      foreach ($children[$path] as $item) {
+        // Local tasks can be normal items too, so bitmask with
+        // MENU_IS_LOCAL_TASK before checking.
+        if (!($item['type'] & MENU_IS_LOCAL_TASK)) {
+          // This item is not a tab, skip it.
+          continue;
+        }
+        if ($item['access']) {
+          $link = $item;
+          // The default task is always active. As tabs can be normal items
+          // too, so bitmask with MENU_LINKS_TO_PARENT before checking.
+          if (($item['type'] & MENU_LINKS_TO_PARENT) == MENU_LINKS_TO_PARENT) {
+            // Find the first parent which is not a default local task or action.
+            for ($p = $item['tab_parent']; ($tasks[$p]['type'] & MENU_LINKS_TO_PARENT) == MENU_LINKS_TO_PARENT; $p = $tasks[$p]['tab_parent']);
+            // Use the path of the parent instead.
+            $link['href'] = $tasks[$p]['href'];
+            // Mark the link as active, if the current path happens to be the
+            // path of the default local task itself (i.e., instead of its
+            // tab_parent_href or tab_root_href). Normally, links for default
+            // local tasks link to their parent, but the path of default local
+            // tasks can still be accessed directly, in which case this link
+            // would not be marked as active, since l() only compares the href
+            // with $_GET['q'].
+            if ($link['href'] != $_GET['q']) {
+              $link['localized_options']['attributes']['class'][] = 'active';
+            }
+            $tabs_current[] = array(
+              '#theme' => 'menu_local_task',
+              '#link' => $link,
+              '#active' => TRUE,
+            );
+            $next_path = $item['path'];
+            $tab_count++;
+          }
+          else {
+            // Actions can be normal items too, so bitmask with
+            // MENU_IS_LOCAL_ACTION before checking.
+            if (($item['type'] & MENU_IS_LOCAL_ACTION) == MENU_IS_LOCAL_ACTION) {
+              // The item is an action, display it as such.
+              $actions_current[] = array(
+                '#theme' => 'menu_local_action',
+                '#link' => $link,
+              );
+              $action_count++;
+            }
+            else {
+              // Otherwise, it's a normal tab.
+              $tabs_current[] = array(
+                '#theme' => 'menu_local_task',
+                '#link' => $link,
+              );
+              $tab_count++;
+            }
+          }
+        }
+      }
+      $path = $next_path;
+      $tabs[$depth]['count'] = $tab_count;
+      $tabs[$depth]['output'] = $tabs_current;
+      $actions['count'] += $action_count;
+      $actions['output'] = array_merge($actions['output'], $actions_current);
+      $depth++;
+    }
+    $data['actions'] = $actions;
+    // Find all tabs at the same level or above the current one.
+    $parent = $router_item['tab_parent'];
+    $path = $router_item['path'];
+    $current = $router_item;
+    $depth = 1000;
+    while (isset($children[$parent])) {
+      $tabs_current = array();
+      $next_path = '';
+      $next_parent = '';
+      $count = 0;
+      foreach ($children[$parent] as $item) {
+        // Skip local actions.
+        if ($item['type'] & MENU_IS_LOCAL_ACTION) {
+          continue;
+        }
+        if ($item['access']) {
+          $count++;
+          $link = $item;
+          // Local tasks can be normal items too, so bitmask with
+          // MENU_LINKS_TO_PARENT before checking.
+          if (($item['type'] & MENU_LINKS_TO_PARENT) == MENU_LINKS_TO_PARENT) {
+            // Find the first parent which is not a default local task.
+            for ($p = $item['tab_parent']; ($tasks[$p]['type'] & MENU_LINKS_TO_PARENT) == MENU_LINKS_TO_PARENT; $p = $tasks[$p]['tab_parent']);
+            // Use the path of the parent instead.
+            $link['href'] = $tasks[$p]['href'];
+            if ($item['path'] == $router_item['path']) {
+              $root_path = $tasks[$p]['path'];
+            }
+          }
+          // We check for the active tab.
+          if ($item['path'] == $path) {
+            // Mark the link as active, if the current path is a (second-level)
+            // local task of a default local task. Since this default local task
+            // links to its parent, l() will not mark it as active, as it only
+            // compares the link's href to $_GET['q'].
+            if ($link['href'] != $_GET['q']) {
+              $link['localized_options']['attributes']['class'][] = 'active';
+            }
+            $tabs_current[] = array(
+              '#theme' => 'menu_local_task',
+              '#link' => $link,
+              '#active' => TRUE,
+            );
+            $next_path = $item['tab_parent'];
+            if (isset($tasks[$next_path])) {
+              $next_parent = $tasks[$next_path]['tab_parent'];
+            }
+          }
+          else {
+            $tabs_current[] = array(
+              '#theme' => 'menu_local_task',
+              '#link' => $link,
+            );
+          }
+        }
+      }
+      $path = $next_path;
+      $parent = $next_parent;
+      $tabs[$depth]['count'] = $count;
+      $tabs[$depth]['output'] = $tabs_current;
+      $depth--;
+    }
+    // Sort by depth.
+    ksort($tabs);
+    // Remove the depth, we are interested only in their relative placement.
+    $tabs = array_values($tabs);
+    $data['tabs'] = $tabs;
+
+    // Allow modules to alter local tasks or dynamically append further tasks.
+    drupal_alter('menu_local_tasks', $data, $router_item, $root_path);
+  }
+
+  if (isset($data['tabs'][$level])) {
+    return array(
+      'tabs' => $data['tabs'][$level],
+      'actions' => $data['actions'],
+      'root_path' => $root_path,
+    );
+  }
+  // @todo If there are no tabs, then there still can be actions; for example,
+  //   when added via hook_menu_local_tasks_alter().
+  elseif (!empty($data['actions']['output'])) {
+    return array('actions' => $data['actions']) + $empty;
+  }
+  return $empty;
+}
+
+/**
+ * Copy of menu_primary_local_tasks from includes/menu.inc.
+ */
+function ma_core_menu_primary_local_tasks($nid) {
+  $links = ma_core_menu_local_tasks($nid, 0);
+  // Do not display single tabs.
+  return ($links['tabs']['count'] > 1 ? $links['tabs']['output'] : '');
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function ma_core_preprocess_node(&$variables) {
+  // For any node full view, make a copy of the local tasks that we
+  // can use in the node template.
+  if ($variables['view_mode'] == 'full' && isset($variables['node']->nid)) {
+    $nid = $variables['node']->nid;
+    $variables['mukurtu_tabbed_local_tasks'][$nid] = ma_core_menu_primary_local_tasks($nid);
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function ma_core_preprocess_page(&$variables) {
+  $types = array(
+    'calendar',
+    'cultural_protocol_group',
+    'discussion_space',
+    'discussion_topic',
+    'document_library',
+    'document_page',
+    'event',
+  );
+  if (isset($variables['node']) && in_array($variables['node']->type, $types)) {
+    // If the local tasks are being displayed separately within the CP tab,
+    // then hide the default local tasks which appear above the tabs.
+    unset($variables['tabs']);
+  }
+}
+
+/**
+ * Implements hook_admin_paths_alter().
+ */
+function ma_core_admin_paths_alter(&$paths) {
+
+  // This tells the batch API *not* to use the admin theme but instead the user theme.
+  // This allows allows us to use custom template files for the XML export views (both DC and MODS, which use Batch API)
+  // without having to hack core (seven, the admin theme).
+  $paths['batch'] = false;
+}

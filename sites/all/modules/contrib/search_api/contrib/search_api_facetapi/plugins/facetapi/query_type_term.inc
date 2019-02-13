@@ -115,7 +115,7 @@ class SearchApiFacetapiTerm extends FacetapiQueryType implements FacetapiQueryTy
     if ($filter == '!') {
       $query_filter->condition($field, NULL, $exclude ? '<>' : '=');
     }
-    elseif ($filter[0] == '[' && $filter[strlen($filter) - 1] == ']' && ($pos = strpos($filter, ' TO '))) {
+    elseif ($filter && $filter[0] == '[' && $filter[strlen($filter) - 1] == ']' && ($pos = strpos($filter, ' TO '))) {
       $lower = trim(substr($filter, 1, $pos));
       $upper = trim(substr($filter, $pos + 4, -1));
       if ($lower == '*' && $upper == '*') {

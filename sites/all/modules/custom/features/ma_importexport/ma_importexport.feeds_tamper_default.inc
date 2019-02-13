@@ -149,7 +149,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-collections-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-communities-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -165,7 +165,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-communities-explode'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-communities-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -180,7 +180,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-communities-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-community_record_parent-require_valid_community_record_p';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -303,7 +303,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-creator-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-cultural_protocols-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -319,7 +319,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-cultural_protocols-explode'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-cultural_protocols-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -427,7 +427,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-language-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-media-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -443,7 +443,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-media-explode'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-media-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -489,7 +489,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-media_assets-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-media_internet-explode';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -505,7 +505,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-media_internet-explode'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-media_internet-trim';
   $feeds_tamper->importer = 'digital_heritage_metadata';
@@ -778,7 +778,7 @@ function ma_importexport_feeds_tamper_default() {
   $export['digital_heritage_metadata-subject-trim'] = $feeds_tamper;
 
   $feeds_tamper = new stdClass();
-  $feeds_tamper->disabled = FALSE; /* Edit this to true to make a default feeds_tamper disabled initially */
+  $feeds_tamper->disabled = TRUE; /* Edit this to true to make a default feeds_tamper disabled initially */
   $feeds_tamper->api_version = 2;
   $feeds_tamper->id = 'digital_heritage_metadata-title-required';
   $feeds_tamper->importer = 'digital_heritage_metadata';

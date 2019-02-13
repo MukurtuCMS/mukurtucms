@@ -297,7 +297,7 @@ function _file_resource_delete($fid) {
 }
 
 /**
- * Return an array of optionally paged fids baed on a set of criteria.
+ * Return an array of optionally paged fids based on a set of criteria.
  *
  * An example request might look like
  *

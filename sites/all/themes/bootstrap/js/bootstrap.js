@@ -10,6 +10,8 @@ var Drupal = Drupal || {};
 (function($, Drupal){
   "use strict";
 
+  var $document = $(document);
+
   Drupal.behaviors.bootstrap = {
     attach: function(context) {
       // Provide some Bootstrap tab/Drupal integration.
@@ -76,14 +78,15 @@ var Drupal = Drupal || {};
    */
   Drupal.behaviors.bootstrapPopovers = {
     attach: function (context, settings) {
-      if (!settings.bootstrap || !settings.bootstrap.popoverEnabled) {
+      // Immediately return if popovers are not available.
+      if (!settings.bootstrap || !settings.bootstrap.popoverEnabled || !$.fn.popover) {
         return;
       }
 
       // Popover autoclose.
       if (settings.bootstrap.popoverOptions.triggerAutoclose) {
         var $currentPopover = null;
-        $(document)
+        $document
           .on('show.bs.popover', '[data-toggle=popover]', function () {
             var $trigger = $(this);
             var popover = $trigger.data('bs.popover');
@@ -121,7 +124,8 @@ var Drupal = Drupal || {};
         }
 
         // Retrieve content from a target element.
-        var $target = $(options.target || $element.is('a[href^="#"]') && $element.attr('href')).clone();
+        var target = options.target || $element.is('a[href^="#"]') && $element.attr('href');
+        var $target = $document.find(target).clone();
         if (!options.content && $target[0]) {
           $target.removeClass('element-invisible hidden').removeAttr('aria-hidden');
           options.content = $target.wrap('<div/>').parent()[options.html ? 'html' : 'text']() || '';
@@ -145,7 +149,12 @@ var Drupal = Drupal || {};
         }
       }
     },
-    detach: function (context) {
+    detach: function (context, settings) {
+      // Immediately return if popovers are not available.
+      if (!settings.bootstrap || !settings.bootstrap.popoverEnabled || !$.fn.popover) {
+        return;
+      }
+
       // Destroy all popovers.
       $(context).find('[data-toggle="popover"]')
         .off('click.drupal.bootstrap.popover')

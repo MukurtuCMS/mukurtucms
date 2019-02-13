@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Test module for feeds_ex.
+ */
+
+/**
+ * Implements hook_feeds_plugins().
+ */
+function feeds_ex_test_feeds_plugins() {
+  return array(
+    'FeedsExTestUi' => array(
+      'name' => 'Test UI parser',
+      'description' => 'Do not use this.',
+      'handler' => array(
+        'parent' => 'FeedsExBase',
+        'class' => 'FeedsExTestUi',
+        'file' => 'FeedsExTestUi.inc',
+      ),
+    ),
+  );
+}

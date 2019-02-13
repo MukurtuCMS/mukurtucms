@@ -17,18 +17,51 @@ function ma_profile_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'user';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'ds_user_picture' => array(
+    'personal_collections' => array(
       'weight' => '1',
-      'label' => 'hidden',
-      'format' => 'ds_picture_large',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'My Personal Collections',
+          'lb-col' => TRUE,
+        ),
+      ),
     ),
     'og_user_node' => array(
       'formatter_settings' => array(
-        'ft' => array(),
+        'ft' => array(
+          'lb' => 'My Communities',
+          'lb-col' => TRUE,
+        ),
       ),
     ),
   );
   $export['user|user|default'] = $ds_fieldsetting;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_custom_fields_info().
+ */
+function ma_profile_ds_custom_fields_info() {
+  $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'personal_collections';
+  $ds_field->label = 'Personal Collections';
+  $ds_field->field_type = 6;
+  $ds_field->entities = array(
+    'user' => 'user',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'block' => 'views|personal_collections-block',
+    'block_render' => '3',
+  );
+  $export['personal_collections'] = $ds_field;
 
   return $export;
 }
@@ -45,19 +78,17 @@ function ma_profile_ds_layout_settings_info() {
   $ds_layout->entity_type = 'user';
   $ds_layout->bundle = 'user';
   $ds_layout->view_mode = 'default';
-  $ds_layout->layout = 'ds_1col';
+  $ds_layout->layout = 'bootstrap_12';
   $ds_layout->settings = array(
     'regions' => array(
-      'ds_content' => array(
-        0 => 'summary',
-        1 => 'ds_user_picture',
-        2 => 'og_user_node',
+      'central' => array(
+        0 => 'og_user_node',
+        1 => 'personal_collections',
       ),
     ),
     'fields' => array(
-      'summary' => 'ds_content',
-      'ds_user_picture' => 'ds_content',
-      'og_user_node' => 'ds_content',
+      'og_user_node' => 'central',
+      'personal_collections' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -65,13 +96,14 @@ function ma_profile_ds_layout_settings_info() {
       ),
     ),
     'wrappers' => array(
-      'ds_content' => 'div',
+      'central' => 'div',
     ),
     'layout_wrapper' => 'div',
     'layout_attributes' => '',
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['user|user|default'] = $ds_layout;
 
@@ -89,14 +121,15 @@ function ma_profile_ds_layout_settings_info() {
         1 => 'googleanalytics',
         2 => 'contact',
         3 => 'locale',
-        4 => 'wysiwyg',
-        5 => 'picture',
-        6 => 'timezone',
-        7 => 'og_user_node',
-        8 => 'redirect',
+        4 => 'picture',
+        5 => 'timezone',
+        6 => 'og_user_node',
+        7 => 'redirect',
       ),
       'hidden' => array(
-        9 => '_add_existing_field',
+        8 => 'field_notifications_freq_def',
+        9 => 'ckeditor',
+        10 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -104,11 +137,12 @@ function ma_profile_ds_layout_settings_info() {
       'googleanalytics' => 'ds_content',
       'contact' => 'ds_content',
       'locale' => 'ds_content',
-      'wysiwyg' => 'ds_content',
       'picture' => 'ds_content',
       'timezone' => 'ds_content',
       'og_user_node' => 'ds_content',
       'redirect' => 'ds_content',
+      'field_notifications_freq_def' => 'hidden',
+      'ckeditor' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
@@ -124,6 +158,7 @@ function ma_profile_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['user|user|form'] = $ds_layout;
 

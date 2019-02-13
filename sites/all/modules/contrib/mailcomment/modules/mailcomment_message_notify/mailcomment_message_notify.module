@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * Implements hook_mail_alter().
+ */
+function mailcomment_message_notify_mail_alter(&$message) {
+  if ($message['module'] != 'message_notify') {
+    return;
+  }
+  $recipient_uid = $message['params']['message_entity']->uid;
+  $recipient = user_load($recipient_uid);
+  if (!user_access('post comments', $recipient)) {
+    return;
+  }
+  // Make sure replies are allowed for this message type.
+  $name = 'mailcomment_message_notify_' . $message['key'];
+  if (!variable_get($name, FALSE)) {
+    return;
+  }
+
+  $messageid_params = array();
+  if (isset($message['params']['message_entity']->field_comment_ref)) {
+    // This is a comment.
+    $cid = $message['params']['message_entity']->field_comment_ref['und'][0]['target_id'];
+    $comment = comment_load($cid);
+    $messageid_params['uid'] = $comment->uid;
+    $messageid_params['cid'] = $comment->cid;
+    $messageid_params['nid'] = $comment->nid;
+    $messageid_params['time'] = $comment->created;
+    $ancestor_msg_id = mailcomment_mail_comment_ancestor_message_id($messageid_params['nid'], $messageid_params['cid']);
+    if (variable_get('mailcomment_alter_subjects', 1)) {
+      $subject = $message['subject'];
+      $subject = t('Re:') . ' ' . $subject;
+      $message['subject'] = $subject;
+    }
+  }
+  elseif (isset($message['params']['message_entity']->field_node_ref)) {
+    // This is a node.
+    $nid = $message['params']['message_entity']->field_node_ref['und'][0]['target_id'];
+    $node = node_load($nid);
+    $messageid_params['uid'] = $node->uid;
+    $messageid_params['nid'] = $node->nid;
+    $messageid_params['cid'] = 0;
+    $messageid_params['time'] = $node->created;
+    if (variable_get('mailcomment_alter_subjects', 1)) {
+      $subject = $message['subject'];
+      $subject = variable_get('site_name', '') ? '[' . variable_get('site_name', '') . '] ' . $node->title : $subject;
+      $message['subject'] = $subject;
+    }
+  }
+  else {
+    // Don't know what this is.
+    return;
+  }
+  $reply = variable_get('mailcomment_mailbox', variable_get('site_mail', ''));
+  $message['headers']['Reply-To'] = $reply;
+  $message['headers']['Message-ID'] = mailcomment_build_messageid($messageid_params);
+  // Add marker text into the message header part taking care of already existing text
+  $insert_reply_text = variable_get('mailcomment_insert_reply_text', 1);
+  $text = variable_get('mailcomment_reply_text', t('((( Reply ABOVE this LINE to POST a COMMENT )))'));
+  if ($text && $insert_reply_text) {
+    $prefix = array($text);
+    $prefix[] = $message['body'][0];
+    $body = implode("\n", $prefix);
+    $message['body'][0] = $body;
+  }
+  $messageid_params['uid'] = $recipient->uid;
+  $message['body'][0] .=  'View original post: ' . url('mailcomment/redirect/' . mailcomment_build_messageid($messageid_params), array('absolute' => TRUE));
+  if (isset($ancestor_msg_id)) {
+    $message['headers']['In-Reply-To'] = $ancestor_msg_id;
+  }
+}
+
+function mailcomment_message_notify_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id != 'message_type_form') {
+    return;
+  }
+  $name = 'mailcomment_message_notify_' . $form['name']['#default_value'];
+  $form['mailcomment'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Allow users to reply to this message by email."),
+    '#default_value' => variable_get($name, FALSE),
+  );
+  $form['#submit'][] = 'mailcomment_message_notify_form_submit';
+}
+
+function mailcomment_message_notify_form_submit($form, &$form_state) {
+  $name = 'mailcomment_message_notify_' . $form_state['values']['name'];
+  $value = $form_state['values']['mailcomment'];
+  variable_set($name, $value);
+}
