@@ -352,7 +352,7 @@ function mukurtu_batch_import_generate_import_steps($files) {
     }
   }
 
-  $all_steps = array_merge($pre_import_community, $pre_import_protocol, $taxonomy_import_steps, $scald_import_steps, $content_import_steps);
+  $all_steps = array_merge($taxonomy_import_steps, $pre_import_community, $pre_import_protocol, $scald_import_steps, $content_import_steps);
 
   return $all_steps;
 }
