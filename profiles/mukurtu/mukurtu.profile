@@ -268,14 +268,18 @@ function mukurtu_cycle_search_api() {
 function mukurtu_create_default_content() {
   // Install the dictionary by default.
   module_enable(array('ma_dictionary'));
-  features_revert_module('ma_dictionary');
 
   // Create frontpage beans.
   _ma_base_theme_create_default_beans();
-  _ma_base_theme_set_default_browse('digital-heritage');
 
   // Cycle the theme feature.
   features_revert_module('ma_base_theme');
+
+  // Set default browse mode.
+  _ma_base_theme_set_default_browse('digital-heritage');
+
+  // Cycle the dictionary.
+  features_revert_module('ma_dictionary');
 }
 
 //function mukurtu_client_form() {
