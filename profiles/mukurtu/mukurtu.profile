@@ -266,6 +266,9 @@ function mukurtu_cycle_search_api() {
 }
 
 function mukurtu_create_default_content() {
+  // Cycle the theme feature.
+  features_revert_module('ma_base_theme');
+
   // Install the dictionary by default.
   module_enable(array('ma_dictionary'));
 
