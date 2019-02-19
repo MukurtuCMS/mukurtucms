@@ -83,6 +83,8 @@ projects[feeds][patch][] = contrib/0001-Add-support-for-partial-content-updates.
 projects[feeds][patch][] = contrib/0001-Change-the-FeedsCSVParser-class-to-use-the-new-input.patch
 ; Fix feeds processor to work with partial updating of scald atoms as well
 projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scald-atoms.patch
+; Skip OG field validation for admins
+projects[feeds][patch][] = contrib/0001-Skip-protocol-field-OG-validation-during-import-for-.patch
 
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value.
@@ -108,6 +110,8 @@ projects[mailhandler][patch][] = contrib/do_not_show_mailhandler_mailbox_message
 projects[og][patch][] = https://www.drupal.org/files/1298238-feeds-og-audience-mapper.patch
 ; 1. Use custom mukurtu permission logic when editing nodes-in-CPs; 2. Fix bug where Community admins get edit perms on CP nodes therein, even if they should not have that permission.
 projects[og][patch][] = contrib/132925713-Apply-Mukurtu-og-patches.patch
+; Second part of patch to skip OG field validation for admins during feeds import
+projects[og][patch][] = contrib/0002-Skip-protocol-field-OG-validation-during-import-for-.patch
 
 ;;; Organic groups invite
 ; Comment out view modification for group members admin view
