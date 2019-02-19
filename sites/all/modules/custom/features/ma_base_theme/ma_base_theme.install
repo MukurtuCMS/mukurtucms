@@ -37,7 +37,7 @@ function ma_base_theme_update_7003(&$sandbox) {
     'link_path' => 'browse',
     'link_title' => 'Browse',
     'menu_name' => 'menu-browse-menu',
-    'weight' => -40,
+    'weight' => -43,
     'expanded' => 0,
     'customized' => 1,
   );
