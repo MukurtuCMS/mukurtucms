@@ -95,8 +95,9 @@ function mukurtu_resolve_dependencies() {
 function mukurtu_revert_features () {
   features_revert_module('ma_search_api'); // First revert search_api to get the node index
   features_revert(); // Revert all features
+//  features_revert_module('ma_dictionary');
   features_revert(); // Revert all features a second time, for any straggling components
-  features_revert_module('ma_dictionary');
+//  features_revert(array('ma_dictionary' => array('menu_links', 'user_permission')));
 }
 function mukurtu_rebuild_permissions () {
   node_access_rebuild();
@@ -137,6 +138,16 @@ function mukurtu_default_menu_links () {
     'menu_name' => 'menu-browse-menu',
     'weight' => -45,
     'expanded' => 0,
+  );
+  menu_link_save($item);
+
+  $item = array(
+    'link_path' => 'browse',
+    'link_title' => 'Browse',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -40,
+    'expanded' => 0,
+    'customized' => 1,
   );
   menu_link_save($item);
 
@@ -282,7 +293,7 @@ function mukurtu_create_default_content() {
   _ma_base_theme_set_default_browse('digital-heritage');
 
   // Cycle the dictionary.
-  features_revert_module('ma_dictionary');
+  features_revert(array('ma_dictionary' => array('menu_links', 'user_permission')));
 }
 
 //function mukurtu_client_form() {
