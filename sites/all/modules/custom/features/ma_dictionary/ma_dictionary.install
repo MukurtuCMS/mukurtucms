@@ -25,6 +25,13 @@ function ma_dictionary_install() {
 }
 
 /**
+ * Implements hook_enable().
+ */
+function ma_dictionary_enable() {
+  variable_set('mukurtu_dictionary_install_fix', FALSE);
+}
+
+/**
  * Index existing dictionary words for search facets.
  */
 function ma_dictionary_update_7001(&$sandbox) {

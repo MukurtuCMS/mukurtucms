@@ -89,7 +89,7 @@ function mukurtu_resolve_dependencies() {
     // We have removed it as a dependency from the Mukurtu features now, which
     // allows sites to disable the module if they prefer. Here we enable the
     // module as part of new installs for the sake of consistency.
-    module_enable(array('community_tags'));
+    module_enable(array('community_tags', 'ma_dictionary'));
 }
 
 function mukurtu_revert_features () {
@@ -97,6 +97,7 @@ function mukurtu_revert_features () {
   features_revert(); // Revert all features
   features_revert(); // Revert all features a second time, for any straggling components
 }
+
 function mukurtu_rebuild_permissions () {
   node_access_rebuild();
 }
@@ -287,9 +288,6 @@ function mukurtu_create_default_content() {
   // Cycle the theme feature.
   features_revert_module('ma_base_theme');
 
-  // Install the dictionary by default.
-  module_enable(array('ma_dictionary'));
-
   // Create frontpage beans.
   _ma_base_theme_create_default_beans();
 
@@ -298,56 +296,6 @@ function mukurtu_create_default_content() {
 
   // Set default browse mode.
   _ma_base_theme_set_default_browse('digital-heritage');
-
-  // Cycle the dictionary.
-  features_revert(array('ma_dictionary' => array('menu_links', 'user_permission')));
-
-  // Dictionary feature keeps installing as overridden.
-  // Tired of trying to resolve that, just manually set them.
-  // Once it's figured out we can remove this block.
-  $main_menu = menu_load_links("main-menu");
-  $item = array(
-    'link_path' => 'node/add/dictionary-word',
-    'link_title' => '+ Dictionary Word',
-    'menu_name' => 'main-menu',
-    'weight' => -45,
-    'expanded' => 0,
-    'customized' => 1,
-    'options' => array(
-      'attributes' => array('title' => 'Add a word to the dictionary'),
-      'identifier' => 'main-menu_-dictionary-word:node/add/dictionary-word',
-    ),
-    'plid' => $main_menu[0]['mlid'],
-  );
-  menu_link_save($item);
-
-  $admin = user_role_load_by_name('administrator');
-  $admin_permissions = array(
-    'clear import_dictionary_word_additional_entries feeds',
-    'clear import_dictionary_word_lists feeds',
-    'clear import_dictionary_words feeds',
-    'import import_dictionary_word_additional_entries feeds',
-    'import import_dictionary_word_lists feeds',
-    'import import_dictionary_words feeds',
-    'tamper import_dictionary_word_additional_entries',
-    'tamper import_dictionary_word_lists',
-    'tamper import_dictionary_words',
-    'unlock import_dictionary_word_additional_entries feeds',
-    'unlock import_dictionary_word_lists feeds',
-    'unlock import_dictionary_words feeds',
-  );
-  $mukurtuadmin = user_role_load_by_name('Mukurtu Administrator');
-  $mukurtuadmin_permissions = array(
-    'clear import_dictionary_word_additional_entries feeds',
-    'clear import_dictionary_word_lists feeds',
-    'clear import_dictionary_words feeds',
-    'import import_dictionary_word_additional_entries feeds',
-    'import import_dictionary_word_lists feeds',
-    'import import_dictionary_words feeds',
-  );
-  user_role_grant_permissions($admin->rid, $admin_permissions);
-  user_role_grant_permissions($mukurtuadmin->rid, $mukurtuadmin_permissions);
-  // End manual dictionary feature tweaking.
 }
 
 //function mukurtu_client_form() {
