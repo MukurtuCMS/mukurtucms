@@ -865,10 +865,10 @@ function mukurtu_splash_block_batch_import() {
 
   $markup = '';
 
-  if (feeds_access('import', 'digital_heritage_metadata')) {
+  if (feeds_access('import', 'mukurtu_import_node_digital_heritage')) {
     $items[] = [
-      'title' => 'Import Digital Heritage Metadata',
-      'href' => 'import/digital_heritage_metadata',
+      'title' => 'Import Digital Heritage Items',
+      'href' => 'import/mukurtu_import_node_digital_heritage',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Batch import many digital heritage items from CSV file. If the media assets have associated metadata, import the media files first using the media importers.'),
     ];
@@ -883,46 +883,46 @@ function mukurtu_splash_block_batch_import() {
     ];
   }
 
-  if (feeds_access('import', 'import_digital_heritage_community_records')) {
+/*   if (feeds_access('import', 'import_digital_heritage_community_records')) {
     $items[] = [
       'title' => 'Import Digital Heritage Community Records',
       'href' => 'import/import_digital_heritage_community_records',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Batch import many community records for pre-existing digital heritage items from CSV file.'),
     ];
-  }
+  } */
 
-  if (feeds_access('import', 'import_media_images')) {
+  if (feeds_access('import', 'mukurtu_import_scald_atom_image')) {
     $items[] = [
       'title' => 'Import Images',
-      'href' => 'import/import_media_images',
+      'href' => 'import/mukurtu_import_scald_atom_image',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Batch import images and associated metadata from CSV file.'),
     ];
   }
 
-  if (feeds_access('import', 'import_media_audio')) {
+  if (feeds_access('import', 'mukurtu_import_scald_atom_audio')) {
     $items[] = [
       'title' => 'Import Audio',
-      'href' => 'import/import_media_audio',
+      'href' => 'import/mukurtu_import_scald_atom_audio',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Batch import audio files and associated metadata from CSV file.'),
     ];
   }
 
-  if (feeds_access('import', 'import_media_video')) {
+  if (feeds_access('import', 'mukurtu_import_scald_atom_video')) {
     $items[] = [
       'title' => 'Import Video',
-      'href' => 'import/import_media_video',
+      'href' => 'import/mukurtu_import_scald_atom_video',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Batch import video files and associated metadata from CSV file.'),
     ];
   }
 
-  if (feeds_access('import', 'import_media_files')) {
+  if (feeds_access('import', 'mukurtu_import_scald_atom_file')) {
     $items[] = [
       'title' => 'Import Files',
-      'href' => 'import/import_media_files',
+      'href' => 'import/mukurtu_import_scald_atom_file',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Batch import files and associated metadata from CSV file.'),
     ];
@@ -936,18 +936,25 @@ function mukurtu_splash_block_batch_import() {
     if (module_exists('ma_dictionary')) {
       $items[] = [
         'title' => 'Import Dictionary Words',
-        'href' => 'import/import_dictionary_words',
+        'href' => 'import/mukurtu_import_node_dictionary_word',
         'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
         'description' => t('Batch import many dictionary words.'),
       ];
 
       $items[] = [
         'title' => 'Import Dictionary Word Entries',
-        'href' => 'import/import_dictionary_word_additional_entries',
+        'href' => 'import/mukurtu_import_paragraphs_item_dictionary_word_bundle',
         'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
         'description' => t('Batch import additional dictionary word entries.'),
       ];
     }
+
+    $items[] = [
+      'title' => 'List All Importers',
+      'href' => 'import',
+      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
+      'description' => t('View a list of all available importers.'),
+    ];
 
     $items[] = [
       'title' => 'Export Digital Heritage Metadata',
@@ -958,7 +965,7 @@ function mukurtu_splash_block_batch_import() {
 
     if (feeds_access('import', 'digital_heritage_metadata')) {
       $items[] = [
-        'title' => 'Import content from Zip Archive',
+        'title' => 'Import from Zip Archive',
         'href' => 'manage/zip_import',
         'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
         'description' => t('Batch import content from a Zip Archive.'),
