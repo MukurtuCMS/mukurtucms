@@ -277,6 +277,12 @@ class OgBehaviorHandler extends EntityReference_BehaviorHandler_Abstract {
         continue;
       }
 
+      // Mukurtu patch.
+      // Skip validation if coming from a Mukurtu importer.
+      if ($field_mode == 'mukurtu_import') {
+        continue;
+      }
+
       $instance['field_mode'] = $field_mode;
       $valid_ids = entityreference_get_selection_handler($field, $instance, $entity_type, $entity)->validateReferencableEntities($ids);
 

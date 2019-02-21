@@ -315,6 +315,16 @@ function link_field_validate($entity_type, $entity, $field, $instance, $langcode
     }
   }
 
+  foreach ($items as $delta => $value) {
+    if (isset($value['attributes']) && is_string($value['attributes'])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+        'error' => 'link_required',
+        'message' => t('String values are not acceptable for attributes.'),
+        'error_element' => array('url' => TRUE, 'title' => FALSE),
+      );
+    }
+  }
+
   if ($instance['settings']['url'] === 'optional' && $instance['settings']['title'] === 'optional' && $instance['required'] && !$optional_field_found) {
     $errors[$field['field_name']][$langcode][0][] = array(
       'error' => 'link_required',

@@ -372,6 +372,18 @@ abstract class FeedsProcessor extends FeedsPlugin {
 
         // Set property and field values.
         $this->map($source, $parser_result, $entity);
+
+        // Mukurtu patch.
+        // If importing user is an admin/mukurtu admin, flag field to skip
+        // OG validation. Long term we should make these disparate OG/protocol
+        // systems work together.
+        global $user;
+        if (!empty($entity->og_group_ref[LANGUAGE_NONE]) && (in_array('Mukurtu Administrator', $user->roles) || in_array('administrator', $user->roles))) {
+          foreach ($entity->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+            $entity->og_group_ref[LANGUAGE_NONE][$delta]['field_mode'] = 'mukurtu_import';
+          }
+        }
+
         $this->entityValidate($entity);
 
         // Allow modules to alter the entity before saving.

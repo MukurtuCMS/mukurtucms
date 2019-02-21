@@ -6,20 +6,29 @@
  */
 
 /**
- * Enable the "Browse Dictionary" browse menu item
+ * Create the "Browse Dictionary" browse menu item.
  */
-function ma_dictionary_install () {
-    /*
-        $item = array(
-        'link_path' => 'dictionary',
-        'link_title' => 'Browse Dictionary',
-        'menu_name' => 'menu-browse-menu',
-        'weight' => -40,
-        'expanded' => 0,
-        'customized' => 1,
-        );
-        menu_link_save($item);
-    */
+function ma_dictionary_install() {
+  $item = array(
+    'link_path' => 'dictionary',
+    'link_title' => 'Dictionary',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -40,
+    'customized' => 1,
+  );
+  $mlid = menu_link_save($item);
+
+  // Disable by default.
+  $ml = menu_link_load($mlid);
+  $ml['hidden'] = TRUE;
+  menu_link_save($ml);
+}
+
+/**
+ * Implements hook_enable().
+ */
+function ma_dictionary_enable() {
+  variable_set('mukurtu_dictionary_install_fix', FALSE);
 }
 
 /**

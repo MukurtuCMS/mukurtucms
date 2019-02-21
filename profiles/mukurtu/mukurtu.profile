@@ -89,15 +89,15 @@ function mukurtu_resolve_dependencies() {
     // We have removed it as a dependency from the Mukurtu features now, which
     // allows sites to disable the module if they prefer. Here we enable the
     // module as part of new installs for the sake of consistency.
-    module_enable(array('community_tags'));
+    module_enable(array('community_tags', 'ma_dictionary'));
 }
 
 function mukurtu_revert_features () {
   features_revert_module('ma_search_api'); // First revert search_api to get the node index
   features_revert(); // Revert all features
   features_revert(); // Revert all features a second time, for any straggling components
-  features_revert_module('ma_dictionary');
 }
+
 function mukurtu_rebuild_permissions () {
   node_access_rebuild();
 }
@@ -140,6 +140,25 @@ function mukurtu_default_menu_links () {
   );
   menu_link_save($item);
 
+  $item = array(
+    'link_path' => 'browse',
+    'link_title' => 'Browse',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -43,
+    'expanded' => 0,
+    'customized' => 1,
+  );
+  menu_link_save($item);
+
+  $item = array(
+    'link_path' => 'dictionary',
+    'link_title' => 'Browse Dictionary',
+    'menu_name' => 'menu-browse-menu',
+    'weight' => -40,
+    'expanded' => 0,
+    'customized' => 1,
+  );
+  menu_link_save($item);
 }
 
 function mukurtu_set_permissions () {
@@ -266,8 +285,8 @@ function mukurtu_cycle_search_api() {
 }
 
 function mukurtu_create_default_content() {
-  // Install the dictionary by default.
-  module_enable(array('ma_dictionary'));
+  // Cycle the theme feature.
+  features_revert_module('ma_base_theme');
 
   // Create frontpage beans.
   _ma_base_theme_create_default_beans();
@@ -277,9 +296,6 @@ function mukurtu_create_default_content() {
 
   // Set default browse mode.
   _ma_base_theme_set_default_browse('digital-heritage');
-
-  // Cycle the dictionary.
-  features_revert_module('ma_dictionary');
 }
 
 //function mukurtu_client_form() {

@@ -1,0 +1,35 @@
+From db2ae66a7045eaf19f26fa429a9cef76b796ecc9 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Tue, 19 Feb 2019 14:50:12 -0800
+Subject: [PATCH] Skip protocol field OG validation during import for admins
+
+---
+ .../feeds/plugins/FeedsProcessor.inc | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/plugins/FeedsProcessor.inc b/plugins/FeedsProcessor.inc
+index 582de3aa..16750f60 100644
+--- a/plugins/FeedsProcessor.inc
++++ b/plugins/FeedsProcessor.inc
+@@ -372,6 +372,18 @@ abstract class FeedsProcessor extends FeedsPlugin {
+
+         // Set property and field values.
+         $this->map($source, $parser_result, $entity);
++
++        // Mukurtu patch.
++        // If importing user is an admin/mukurtu admin, flag field to skip
++        // OG validation. Long term we should make these disparate OG/protocol
++        // systems work together.
++        global $user;
++        if (!empty($entity->og_group_ref[LANGUAGE_NONE]) && (in_array('Mukurtu Administrator', $user->roles) || in_array('administrator', $user->roles))) {
++          foreach ($entity->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
++            $entity->og_group_ref[LANGUAGE_NONE][$delta]['field_mode'] = 'mukurtu_import';
++          }
++        }
++
+         $this->entityValidate($entity);
+
+         // Allow modules to alter the entity before saving.
+--
+2.19.0.windows.1
+
