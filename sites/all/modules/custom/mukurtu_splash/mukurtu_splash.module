@@ -883,51 +883,6 @@ function mukurtu_splash_block_batch_import() {
     ];
   }
 
-/*   if (feeds_access('import', 'import_digital_heritage_community_records')) {
-    $items[] = [
-      'title' => 'Import Digital Heritage Community Records',
-      'href' => 'import/import_digital_heritage_community_records',
-      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Batch import many community records for pre-existing digital heritage items from CSV file.'),
-    ];
-  } */
-
-  if (feeds_access('import', 'mukurtu_import_scald_atom_image')) {
-    $items[] = [
-      'title' => 'Import Images',
-      'href' => 'import/mukurtu_import_scald_atom_image',
-      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Batch import images and associated metadata from CSV file.'),
-    ];
-  }
-
-  if (feeds_access('import', 'mukurtu_import_scald_atom_audio')) {
-    $items[] = [
-      'title' => 'Import Audio',
-      'href' => 'import/mukurtu_import_scald_atom_audio',
-      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Batch import audio files and associated metadata from CSV file.'),
-    ];
-  }
-
-  if (feeds_access('import', 'mukurtu_import_scald_atom_video')) {
-    $items[] = [
-      'title' => 'Import Video',
-      'href' => 'import/mukurtu_import_scald_atom_video',
-      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Batch import video files and associated metadata from CSV file.'),
-    ];
-  }
-
-  if (feeds_access('import', 'mukurtu_import_scald_atom_file')) {
-    $items[] = [
-      'title' => 'Import Files',
-      'href' => 'import/mukurtu_import_scald_atom_file',
-      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
-      'description' => t('Batch import files and associated metadata from CSV file.'),
-    ];
-  }
-
   // Only show these import/export dashboard links to Mukurtu or Drupal Admins
   $mukurtu_admin = user_role_load_by_name('Mukurtu Administrator');
   $drupal_admin = user_role_load_by_name('administrator');
@@ -950,17 +905,24 @@ function mukurtu_splash_block_batch_import() {
     }
 
     $items[] = [
-      'title' => 'List All Importers',
+      'title' => 'All Importers',
       'href' => 'import',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('View a list of all available importers.'),
     ];
 
     $items[] = [
-      'title' => 'Export Digital Heritage Metadata',
+      'title' => 'Export Digital Heritage Items',
       'href' => 'manage/digital-heritage',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
       'description' => t('Select digital heritage items for exporting to a CSV or XML file.'),
+    ];
+
+    $items[] = [
+      'title' => 'Export Dictionary Words',
+      'href' => 'manage/dictionary-words',
+      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
+      'description' => t('Select dictionary words for exporting to a CSV file.'),
     ];
 
     if (feeds_access('import', 'digital_heritage_metadata')) {

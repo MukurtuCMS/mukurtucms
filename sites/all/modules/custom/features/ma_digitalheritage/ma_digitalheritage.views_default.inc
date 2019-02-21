@@ -455,7 +455,7 @@ function ma_digitalheritage_views_default_views() {
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Manage Digital Heritage';
+  $handler->display->display_options['title'] = 'Export Digital Heritage';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'php';
   $handler->display->display_options['access']['php_access'] = '$admin = user_role_load_by_name(\'administrator\');
@@ -480,18 +480,10 @@ return FALSE;';
   $handler->display->display_options['style_options']['columns'] = array(
     'views_bulk_operations' => 'views_bulk_operations',
     'title' => 'title',
-    'field_media_asset' => 'field_media_asset',
+    'field_dictionary_word_language' => 'field_dictionary_word_language',
+    'field_tags' => 'field_tags',
     'changed' => 'changed',
-    'field_summary' => 'field_summary',
-    'field_community_ref' => 'field_community_ref',
-    'field_category' => 'field_category',
-    'field_creator' => 'field_creator',
-    'field_contributor' => 'field_contributor',
     'field_date' => 'field_date',
-    'field_collection' => 'field_collection',
-    'field_book_parent' => 'field_book_parent',
-    'field_book_children' => 'field_book_children',
-    'field_community_record_parent' => 'field_community_record_parent',
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
@@ -507,10 +499,17 @@ return FALSE;';
       'separator' => '',
       'empty_column' => 0,
     ),
-    'field_media_asset' => array(
+    'field_dictionary_word_language' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
-      'empty_column' => 1,
+      'empty_column' => 0,
+    ),
+    'field_tags' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
     ),
     'changed' => array(
       'sortable' => 1,
@@ -519,58 +518,7 @@ return FALSE;';
       'separator' => '',
       'empty_column' => 1,
     ),
-    'field_summary' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_community_ref' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_category' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_creator' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_contributor' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
     'field_date' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_collection' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_book_parent' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_book_children' => array(
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 1,
-    ),
-    'field_community_record_parent' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
@@ -832,12 +780,122 @@ return FALSE;';
     ),
   );
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
+  /* Display: Digital Heritage */
+  $handler = $view->new_display('page', 'Digital Heritage', 'page');
   $handler->display->display_options['path'] = 'manage/digital-heritage';
+
+  /* Display: Dictionary */
+  $handler = $view->new_display('page', 'Dictionary', 'page_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Export Dictionary Words';
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Bulk operations: Content */
+  $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['label'] = 'Select All';
+  $handler->display->display_options['fields']['views_bulk_operations']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '0';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['row_clickable'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
+    'action::mukurtu_export_action' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 0,
+      'skip_permission_check' => 0,
+      'override_label' => 0,
+      'label' => '',
+    ),
+  );
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  /* Field: Content: Language */
+  $handler->display->display_options['fields']['field_dictionary_word_language']['id'] = 'field_dictionary_word_language';
+  $handler->display->display_options['fields']['field_dictionary_word_language']['table'] = 'field_data_field_dictionary_word_language';
+  $handler->display->display_options['fields']['field_dictionary_word_language']['field'] = 'field_dictionary_word_language';
+  /* Field: Field: Tags */
+  $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
+  $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
+  $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
+  $handler->display->display_options['fields']['field_tags']['label'] = 'Keywords';
+  $handler->display->display_options['fields']['field_tags']['delta_offset'] = '0';
+  /* Field: Content: Updated date */
+  $handler->display->display_options['fields']['changed']['id'] = 'changed';
+  $handler->display->display_options['fields']['changed']['table'] = 'node';
+  $handler->display->display_options['fields']['changed']['field'] = 'changed';
+  $handler->display->display_options['fields']['changed']['date_format'] = 'short';
+  $handler->display->display_options['fields']['changed']['second_date_format'] = 'exif';
+  /* Field: Content: Original Date Description */
+  $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
+  $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
+  $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'dictionary_word' => 'dictionary_word',
+    'word_list' => 'word_list',
+  );
+  /* Filter criterion: Content: Title */
+  $handler->display->display_options['filters']['title']['id'] = 'title';
+  $handler->display->display_options['filters']['title']['table'] = 'node';
+  $handler->display->display_options['filters']['title']['field'] = 'title';
+  $handler->display->display_options['filters']['title']['operator'] = 'contains';
+  $handler->display->display_options['filters']['title']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title']['expose']['operator_id'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['label'] = 'Title';
+  $handler->display->display_options['filters']['title']['expose']['operator'] = 'title_op';
+  $handler->display->display_options['filters']['title']['expose']['identifier'] = 'title';
+  $handler->display->display_options['filters']['title']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  /* Filter criterion: Content: Language (field_dictionary_word_language) */
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['id'] = 'field_dictionary_word_language_tid';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['table'] = 'field_data_field_dictionary_word_language';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['field'] = 'field_dictionary_word_language_tid';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['value'] = '';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['operator_id'] = 'field_dictionary_word_language_tid_op';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['label'] = 'Language';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['operator'] = 'field_dictionary_word_language_tid_op';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['identifier'] = 'field_dictionary_word_language_tid';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    6 => 0,
+    3 => 0,
+    5 => 0,
+    4 => 0,
+  );
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['type'] = 'select';
+  $handler->display->display_options['filters']['field_dictionary_word_language_tid']['vocabulary'] = 'language';
+  $handler->display->display_options['path'] = 'manage/dictionary-words';
   $translatables['export_digital_heritage'] = array(
     t('Master'),
-    t('Manage Digital Heritage'),
+    t('Export Digital Heritage'),
     t('more'),
     t('Apply'),
     t('Reset'),
@@ -868,7 +926,11 @@ return FALSE;';
     t('Is Community Record'),
     t('Book Parent (field_book_parent)'),
     t('Book Pages'),
-    t('Page'),
+    t('Digital Heritage'),
+    t('Dictionary'),
+    t('Export Dictionary Words'),
+    t('Language'),
+    t('Keywords'),
   );
   $export['export_digital_heritage'] = $view;
 
