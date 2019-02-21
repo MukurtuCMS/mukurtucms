@@ -18,8 +18,8 @@ files[] = tests/link.validate.test
 files[] = views/link_views_handler_argument_target.inc
 files[] = views/link_views_handler_filter_protocol.inc
 
-; Information added by Drupal.org packaging script on 2018-05-13
-version = "7.x-1.5"
+; Information added by Drupal.org packaging script on 2019-02-20
+version = "7.x-1.6"
 core = "7.x"
 project = "link"
-datestamp = "1526190487"
+datestamp = "1550680687"
