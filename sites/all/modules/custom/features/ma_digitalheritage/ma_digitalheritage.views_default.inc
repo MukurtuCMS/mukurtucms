@@ -852,7 +852,6 @@ return FALSE;';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
     'dictionary_word' => 'dictionary_word',
-    'word_list' => 'word_list',
   );
   /* Filter criterion: Content: Title */
   $handler->display->display_options['filters']['title']['id'] = 'title';
