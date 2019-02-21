@@ -15,21 +15,24 @@ function ma_dictionary_init() {
     // Dictionary feature keeps installing as overridden.
     // Tired of trying to resolve that, just manually set them.
     // Once it's figured out we can remove this block.
-    $main_menu = menu_load_links("main-menu");
-    $item = array(
-      'link_path' => 'node/add/dictionary-word',
-      'link_title' => '+ Dictionary Word',
-      'menu_name' => 'main-menu',
-      'weight' => -45,
-      'expanded' => 0,
-      'customized' => 1,
-      'options' => array(
-        'attributes' => array('title' => 'Add a word to the dictionary'),
-        'identifier' => 'main-menu_-dictionary-word:node/add/dictionary-word',
-      ),
-      'plid' => $main_menu[0]['mlid'],
-    );
-    menu_link_save($item);
+    $existing_item = menu_link_get_preferred('node/add/dictionary-word', 'main-menu');
+    if (empty($existing_item) || $existing_item['plid'] == '0') {
+      $main_menu = menu_load_links("main-menu");
+      $item = array(
+        'link_path' => 'node/add/dictionary-word',
+        'link_title' => '+ Dictionary Word',
+        'menu_name' => 'main-menu',
+        'weight' => -45,
+        'expanded' => 0,
+        'customized' => 1,
+        'options' => array(
+          'attributes' => array('title' => 'Add a word to the dictionary'),
+          'identifier' => 'main-menu_-dictionary-word:node/add/dictionary-word',
+        ),
+        'plid' => $main_menu[0]['mlid'],
+      );
+      menu_link_save($item);
+    }
 
     $admin = user_role_load_by_name('administrator');
     $admin_permissions = array(
