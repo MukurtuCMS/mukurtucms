@@ -218,7 +218,7 @@ function mukurtu_export_field_handler_partial_date_range($value, $field_info, $o
     }
     return array(implode('-', $date), $referenced_entities, $files);
   }
-  return array(NULL, $referenced_entities, $files);
+  return array('', $referenced_entities, $files);
 }
 
 /**
