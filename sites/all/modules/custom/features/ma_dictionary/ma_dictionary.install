@@ -50,6 +50,9 @@ function ma_dictionary_update_7001(&$sandbox) {
   // Load each dictionary word, aggregate the media,
   // save the dictionary word.
   $nids = array_keys($results['node']);
+  if (!function_exists('_ma_dictionary_get_media_assets')) {
+    module_load_include('module', 'ma_dictionary');
+  }
   foreach ($nids as $nid) {
     $node = node_load($nid);
     $node->field_media_asset[LANGUAGE_NONE] = _ma_dictionary_get_media_assets($node);
