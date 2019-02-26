@@ -668,4 +668,3 @@ if (isset($_ENV['PANTHEON_ENVIRONMENT']) && php_sapi_name() != 'cli') {
 if (file_exists(DRUPAL_ROOT . '/' . conf_path() . '/settings.local.php')) {
   include DRUPAL_ROOT . '/' . conf_path() . '/settings.local.php';
 }
-
