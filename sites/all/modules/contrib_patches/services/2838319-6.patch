@@ -1,0 +1,111 @@
+From b3b0ebe7a26467c91d785c1e1eed01fbb8baf699 Mon Sep 17 00:00:00 2001
+From: signalpoint <signalpoint@150680.no-reply.drupal.org>
+Date: Mon, 26 Oct 2015 16:36:59 -0500
+Subject: [PATCH] Issue #2601764. Support entity_load option on entity index
+ resources.
+
+---
+ resources/comment_resource.inc  |  2 +-
+ resources/node_resource.inc     |  2 +-
+ resources/taxonomy_resource.inc |  4 ++--
+ resources/user_resource.inc     |  2 +-
+ services.module                 | 17 ++++++++++++++---
+ 5 files changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/resources/comment_resource.inc b/resources/comment_resource.inc
+index 95df2f5..741dffd 100644
+--- a/resources/comment_resource.inc
++++ b/resources/comment_resource.inc
+@@ -351,7 +351,7 @@ function _comment_resource_index($page, $fields, $parameters, $page_size, $optio
+ 
+   $results = services_resource_execute_index_query($comment_select);
+ 
+-  return services_resource_build_index_list($results, 'comment', 'cid');
++  return services_resource_build_index_list($results, 'comment', 'cid', $options);
+ }
+ 
+ /**
+diff --git a/resources/node_resource.inc b/resources/node_resource.inc
+index d7459f9..7898eda 100644
+--- a/resources/node_resource.inc
++++ b/resources/node_resource.inc
+@@ -498,7 +498,7 @@ function _node_resource_index($page, $fields, $parameters, $page_size, $options
+ 
+   $results = services_resource_execute_index_query($node_select);
+ 
+-  return services_resource_build_index_list($results, 'node', 'nid');
++  return services_resource_build_index_list($results, 'node', 'nid', $options);
+ }
+ 
+ /**
+diff --git a/resources/taxonomy_resource.inc b/resources/taxonomy_resource.inc
+index 074f791..7a13e16 100644
+--- a/resources/taxonomy_resource.inc
++++ b/resources/taxonomy_resource.inc
+@@ -661,7 +661,7 @@ function _taxonomy_term_resource_index($page, $fields, $parameters, $page_size,
+ 
+   $results = services_resource_execute_index_query($taxonomy_select);
+ 
+-  return services_resource_build_index_list($results, 'taxonomy_term', 'tid');
++  return services_resource_build_index_list($results, 'taxonomy_term', 'tid', $options);
+ }
+ 
+ /**
+@@ -700,5 +700,5 @@ function _taxonomy_vocabulary_resource_index($page, $fields, $parameters, $page_
+ 
+   $results = $taxonomy_select->execute();
+ 
+-  return services_resource_build_index_list($results, 'taxonomy_vocabulary', 'vid');
++  return services_resource_build_index_list($results, 'taxonomy_vocabulary', 'vid', $options);
+ }
+diff --git a/resources/user_resource.inc b/resources/user_resource.inc
+index 04801fb..e057646 100644
+--- a/resources/user_resource.inc
++++ b/resources/user_resource.inc
+@@ -782,7 +782,7 @@ function _user_resource_index($page, $fields, $parameters, $page_size, $options
+ 
+   $results = services_resource_execute_index_query($user_select);
+ 
+-  return services_resource_build_index_list($results, 'user', 'uid');
++  return services_resource_build_index_list($results, 'user', 'uid', $options);
+ }
+ 
+ /**
+diff --git a/services.module b/services.module
+index 358ca03..81e95d5 100644
+--- a/services.module
++++ b/services.module
+@@ -978,10 +978,16 @@ function services_str_getcsv($input, $delimiter = ',', $enclosure = '"', $escape
+  *   String type of index that is being processed.
+  * @param $field
+  *   String field to use for looking up uri.
++ * @param $options
++ *   Additional query options.
+  */
+-function services_resource_build_index_list($results, $type, $field) {
+-  // Put together array of matching items to return.
++function services_resource_build_index_list($results, $type, $field, $options = array()) {
++  // Put together array of matching items to return and set aside the entity ids
++  // in case we need to do a full enity load. In case we do fully load the
++  // entities, wrap them in an array to be consistent with the default index
++  // result items.
+   $items = array();
++  $entity_ids = array();
+   foreach ($results as $result) {
+     if ($uri = services_resource_uri(array($type, $result->{$field}))) {
+       $result->uri = $uri;
+@@ -990,8 +996,13 @@ function services_resource_build_index_list($results, $type, $field) {
+       }
+     }
+     $items[] = $result;
++    $entity_ids[] = $result->{$field};
++  }
++  if (isset($options['entity_load']) && $options['entity_load'] && !empty($entity_ids)) {
++    $items = array();
++    $entities = entity_load($type, $entity_ids);
++    foreach ($entities as $entity_id => $entity) { $items[] = $entity; }
+   }
+-
+   return $items;
+ }
+ 
