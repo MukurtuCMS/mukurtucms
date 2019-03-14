@@ -348,7 +348,7 @@ function _comment_resource_index($page, $fields, $parameters, $page_size, $optio
 
   $results = services_resource_execute_index_query($comment_select);
 
-  return services_resource_build_index_list($results, 'comment', 'cid');
+  return services_resource_build_index_list($results, 'comment', 'cid', $options);
 }
 
 /**

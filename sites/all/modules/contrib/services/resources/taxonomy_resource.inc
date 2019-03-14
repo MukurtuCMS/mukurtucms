@@ -661,7 +661,7 @@ function _taxonomy_term_resource_index($page, $fields, $parameters, $page_size, 
 
   $results = services_resource_execute_index_query($taxonomy_select);
 
-  return services_resource_build_index_list($results, 'taxonomy_term', 'tid');
+  return services_resource_build_index_list($results, 'taxonomy_term', 'tid', $options);
 }
 
 /**
@@ -700,5 +700,5 @@ function _taxonomy_vocabulary_resource_index($page, $fields, $parameters, $page_
 
   $results = $taxonomy_select->execute();
 
-  return services_resource_build_index_list($results, 'taxonomy_vocabulary', 'vid');
+  return services_resource_build_index_list($results, 'taxonomy_vocabulary', 'vid', $options);
 }

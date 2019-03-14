@@ -1,6 +1,11 @@
 name = Mukurtu Mobile Client
+description = Required to be able to connect to the site with the Mukurtu mobile client.
 core = 7.x
 package = Features
+dependencies[] = ctools
 dependencies[] = ma_services
+dependencies[] = strongarm
+features[ctools][] = strongarm:strongarm:1
 features[features_api][] = api:2
+features[variable][] = services_node_index_page_size
 project path = sites/all/modules/custom/features

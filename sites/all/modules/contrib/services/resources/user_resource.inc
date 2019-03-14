@@ -900,7 +900,7 @@ function _user_resource_index($page, $fields, $parameters, $page_size, $options 
 
   $results = services_resource_execute_index_query($user_select);
 
-  return services_resource_build_index_list($results, 'user', 'uid');
+  return services_resource_build_index_list($results, 'user', 'uid', $options);
 }
 
 /**

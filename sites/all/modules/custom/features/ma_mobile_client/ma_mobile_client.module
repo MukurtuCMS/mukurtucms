@@ -2,5 +2,7 @@
 
 /**
  * @file
- * Drupal needs this blank file.
+ * Code for the Mukurtu Mobile Client feature.
  */
+
+include_once 'ma_mobile_client.features.inc';
