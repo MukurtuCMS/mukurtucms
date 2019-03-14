@@ -1,0 +1,6 @@
+name = Mukurtu Mobile Client
+core = 7.x
+package = Features
+dependencies[] = ma_services
+features[features_api][] = api:2
+project path = sites/all/modules/custom/features
