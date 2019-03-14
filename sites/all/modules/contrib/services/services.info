@@ -28,8 +28,8 @@ files[] = tests/services.test
 dependencies[] = ctools
 
 
-; Information added by Drupal.org packaging script on 2019-01-19
-version = "7.x-3.21"
+; Information added by Drupal.org packaging script on 2019-02-27
+version = "7.x-3.23"
 core = "7.x"
 project = "services"
-datestamp = "1547922795"
+datestamp = "1551302295"

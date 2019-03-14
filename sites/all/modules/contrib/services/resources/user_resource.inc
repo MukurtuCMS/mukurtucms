@@ -462,8 +462,16 @@ function _user_resource_update($uid, $account) {
 
   // Prepare values for password.
   if (isset($account['pass'])) {
-    $form_state['values']['pass']['pass1'] = $account['pass'];
-    $form_state['values']['pass']['pass2'] = $account['pass'];
+    // For legacy usage, passwords come in as a single string. To match the
+    // actual form state value keys used by Drupal, we also can collect two
+    // passwords via an array.
+    if (is_array($account['pass'])) {
+      $form_state['values']['pass'] = $account['pass'];
+    }
+    else {
+      $form_state['values']['pass']['pass1'] = $account['pass'];
+      $form_state['values']['pass']['pass2'] = $account['pass'];
+    }
   }
 
   // If user is changing name, make sure they have permission.
@@ -472,8 +480,6 @@ function _user_resource_update($uid, $account) {
   }
 
   $form_state['values']['op'] = variable_get('services_user_save_button_resource_update', t('Save'));
-  $form_state['values']['#user_category'] = $category;
-  $form_state['values']['#account'] = $account_loaded;
   $form_state['programmed_bypass_access_check'] = FALSE;
   $ret = drupal_form_submit('user_profile_form', $form_state, $account_loaded, $category);
 

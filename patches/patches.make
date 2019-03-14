@@ -172,11 +172,6 @@ projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-reg
 ; 1. Index display and sort ALL characters. 2. Option to skip padding
 projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_characters_and_option_to_skip_padding.patch
 
-;;; Services
-; Fix services issue with multivals
-; see https://www.drupal.org/project/services/issues/2224803
-projects[services][patch][] = contrib/fix_services_multivals-2224803-comment-8844431
-
 ;;; Tree (treeable)
 ; Skip treeable field formatter patch
 projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch

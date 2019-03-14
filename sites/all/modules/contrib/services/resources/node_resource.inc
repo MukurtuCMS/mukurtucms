@@ -325,11 +325,7 @@ function _node_resource_create($node) {
   // but always make the node author default to the current user (if the user
   // has permission to change it, $form_state['values'] will override this
   // default when the form is submitted).
-
-  //Patched to support multi value fields (e.g. field_ media_asset "sid") - Dario 20150726
-  //based on proposed fix in comment https://www.drupal.org/node/2224803#comment-8844431
-  //$stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language')));
-  $stub_node = $node;
+  $stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language')));
   $stub_node->name = $user->name;
 
   // Contributed modules may check the triggering element in the form state.
@@ -432,7 +428,6 @@ function _node_resource_update($nid, $node) {
   $form_state = array();
   $form_state['values'] = $node;
   $form_state['values']['op'] = variable_get('services_node_save_button_' . $node_type . '_resource_update', t('Save'));
-  $form_state['node'] = $old_node;
   $form_state['programmed_bypass_access_check'] = FALSE;
 
   // Contributed modules may check the triggering element in the form state.
