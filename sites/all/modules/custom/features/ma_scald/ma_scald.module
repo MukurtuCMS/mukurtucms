@@ -38,36 +38,32 @@ function ma_scald_ds_fields_info($entity_type) {
 
 /**
  * Implements hook_scald_atom_access().
- *
- * Handle very specific scald delete access cases
  */
 function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
-  global $user;
-
-  $user_account = $account;
-  if ($user_account == NULL) {
-    $user_account = $user;
-  }
 
   switch ($action) {
+
+    // When viewing atoms, respect its protocols.
+    // This is usually left blank (in which case IGNORE), but if set, if user has access to ANY of the CPs, then they get scald view access (IGNORE, to allow other handling).
+    // DENY if groups are set but they have access to none of them.
     case 'view':
-      // Ignore atoms with no protocol, those are open.
-      if (empty($atom->field_scald_protocol) || empty($atom->field_scald_protocol[LANGUAGE_NONE])) {
-        return SCALD_ATOM_ACCESS_ALLOW;
+      $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
+      if (!isset($group_wrapper->field_scald_protocol)) {
+        return SCALD_ATOM_ACCESS_IGNORE;
       }
-
-      // Check all protocols, atoms are 'any', so bail out on any membership.
-      foreach($atom->field_scald_protocol[LANGUAGE_NONE] as $protocol_ref) {
-        $node = node_load($protocol_ref['target_id']);
-        if ($node && node_access('view', $node, $account)) {
-          return SCALD_ATOM_ACCESS_ALLOW;
+      if ($groups = $group_wrapper->field_scald_protocol->value()) {
+        foreach ($groups as $group) {
+          if (node_access('view', $group, $account)) {
+            return SCALD_ATOM_ACCESS_IGNORE;
+          }
         }
+        return SCALD_ATOM_ACCESS_DENY;
       }
+      return SCALD_ATOM_ACCESS_IGNORE;
 
-      // Deny by default.
-      return SCALD_ATOM_ACCESS_DENY;
-
+    // Handle very specific scald delete access cases
     case 'delete':
+      global $user;
       // Let users delete their own atoms if they aren't being used somewhere.
       if (user_access('delete any atom') || (user_access('delete own atom') && $atom->publisher == $user->uid)) {
         $references = ma_scald_get_atom_references($atom);
