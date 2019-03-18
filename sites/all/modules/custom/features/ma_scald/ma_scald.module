@@ -44,17 +44,17 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
   switch ($action) {
 
     // When viewing atoms, respect its protocols.
-    // This is usually left blank (in which case IGNORE), but if set, if user has access to ANY of the CPs, then they get scald view access (IGNORE, to allow other handling).
+    // This is usually left blank, but if set, if user has access to ANY of the CPs, then they get scald view access.
     // DENY if groups are set but they have access to none of them.
     case 'view':
       $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
       if (!isset($group_wrapper->field_scald_protocol)) {
-        return SCALD_ATOM_ACCESS_IGNORE;
+        return SCALD_ATOM_ACCESS_ALLOW;
       }
       if ($groups = $group_wrapper->field_scald_protocol->value()) {
         foreach ($groups as $group) {
           if (node_access('view', $group, $account)) {
-            return SCALD_ATOM_ACCESS_IGNORE;
+            return SCALD_ATOM_ACCESS_ALLOW;
           }
         }
         return SCALD_ATOM_ACCESS_DENY;
