@@ -81,6 +81,29 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
 }
 
 /**
+ * Implements hook_file_download().
+ *
+ * Scald images get checked at scald_file_download_access(), but the other atom types
+ * do not (presumably do their render configuration), so for direct access
+ * via file/{file_id} or filepath, check the against the file's atom's protocol perms here,
+ * returning -1 if the user should not be allowed to access directly.
+ */
+function ma_scald_file_download($uri, $field_type = 'file') {
+  $query = db_select('file_usage', 'fu');
+  $query->addField('fu', 'id');
+  $query->join('file_managed', 'fm', 'fm.fid = fu.fid');
+  $query->condition('fm.uri', $uri, '=');
+  $query->condition('fu.type', 'scald_atom', '=');
+  $result= $query->execute();
+
+  foreach($result as $record) { // TODO: confirm there is only ever one record (one atom per file)
+    if (ma_scald_scald_atom_access($record->id, 'view') === false) {
+      return -1;
+    }
+  }
+}
+
+/**
  * Remove any references to scald atoms the user does not have access to.
  */
 function ma_scald_atom_reference_field_filter($entity, $field_name, $account = NULL) {
