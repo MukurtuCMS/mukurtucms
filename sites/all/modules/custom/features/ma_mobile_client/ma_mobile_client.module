@@ -6,3 +6,32 @@
  */
 
 include_once 'ma_mobile_client.features.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function ma_mobile_client_menu() {
+  $items = array();
+
+  // Callback that toggles the display of the Related Items teasers
+  $items['admin/toggle-mukurtu-mobile'] = array(
+    'title' => 'Toggle Mukurtu Mobile',
+    'page callback' => 'ma_mobile_client_toggle_mukurtu_mobile',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+function ma_mobile_client_toggle_mukurtu_mobile() {
+  if (variable_get('mukurtu_mobile_enabled')) {
+    variable_set ('mukurtu_mobile_enabled', 0);
+    drupal_set_message('Mukurtu Mobile disabled.');
+  }
+  else {
+    variable_set ('mukurtu_mobile_enabled', 1);
+    drupal_set_message('Mukurtu Mobile enabled.');
+  }
+  drupal_goto ('dashboard');
+}

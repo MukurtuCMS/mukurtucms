@@ -645,6 +645,21 @@ function mukurtu_splash_block_site_config() {
       ];
     }
 
+    if (module_exists('ma_mobile_client')) {
+      if (variable_get('mukurtu_mobile_enabled')) {
+        $enable_disable_word = 'Disable';
+      }
+      else {
+        $enable_disable_word = 'Enable';
+      }
+      $items[] = [
+        'title' => $enable_disable_word . ' Mukurtu Mobile',
+        'href' => 'admin/toggle-mukurtu-mobile',
+        'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
+        'description' => t($enable_disable_word . ' access to the site via the Mukurtu Mobile app.'), // TODO: link to the app here.
+      ];
+    }
+
     if (user_access('administer modules')) {
       $items[] = [
         'title' => 'Enable/Disable Mukurtu Modules',
