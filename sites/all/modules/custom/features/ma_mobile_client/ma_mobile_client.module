@@ -105,6 +105,7 @@ function ma_mobile_client_generate_toggle_link($node) {
  */
 function ma_mobile_client_services_resources() {
   $api = array(
+
     'one_time_login' => array(
       'operations' => array(
         'retrieve' => array(
@@ -123,6 +124,26 @@ function ma_mobile_client_services_resources() {
         ),
       ),
     ),
+
+    'synced_nodes' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => "Retrieve a structured array of a user's list of synced nodes",
+          'callback' => '_ma_mobile_client_get_user_synced_nodes',
+          'access callback' => 'user_is_logged_in',
+          'args' => array(
+            array(
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
+
   );
 
   return $api;
@@ -137,4 +158,18 @@ function _ma_mobile_client_get_one_time_login ($fn) {
     'user' => $user,
     'login_link' =>  user_pass_reset_url($user),
   );
+}
+
+/**
+ * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
+ */
+function _ma_mobile_client_get_user_synced_nodes ($fn) {
+  global $user; // TODO: confirm this user is the correct one
+  $uw = entity_metadata_wrapper('user', $user);
+  $synced_nodes = $uw->field_mm_sync->value();
+  $synced_nids = [];
+  foreach ($synced_nodes as $synced_node) {
+    $synced_nids[$synced_node->type][$synced_node->nid] = $synced_node->changed;
+  }
+  return $synced_nids;
 }
