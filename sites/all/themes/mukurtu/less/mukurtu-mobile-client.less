@@ -1,0 +1,24 @@
+.mobile-sync-icon img {
+  // TODO: add filter so that icon inherits a link class color (both hovered and not).
+  // More important for the red-bone theme to not have a blue phone icon, but also will provide hover color.
+  // filter: opacity(.5) drop-shadow(0 0 0 yellow);
+  width: 12px;
+  height: 20px;
+  vertical-align: top;
+}
+
+// Align Mobile sync icon with the Personal Collection icon in the search results
+.view-mode-search_result {
+  .field-name-mukurtu-icon-actions, .field-name-mukurtu-mobile-sync {
+    display: inline-block;
+  }
+}
+
+// Align Mobile sync icon with the Personal Collection icon in full node view
+.view-mode-full {
+  .field-name-mukurtu-mobile-sync {
+    float: right;
+    margin-top: -25px;
+    margin-right: 25px;
+  }
+}

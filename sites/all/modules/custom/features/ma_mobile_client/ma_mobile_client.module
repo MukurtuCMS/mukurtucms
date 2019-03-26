@@ -8,22 +8,8 @@
 include_once 'ma_mobile_client.features.inc';
 
 /**
- * Implements hook_menu().
+ * Called by dashboard link -- toggle Mukurtu Mobile enabled.
  */
-function ma_mobile_client_menu() {
-  $items = array();
-
-  // Callback that toggles the display of the Related Items teasers
-  $items['admin/toggle-mukurtu-mobile'] = array(
-    'title' => 'Toggle Mukurtu Mobile',
-    'page callback' => 'ma_mobile_client_toggle_mukurtu_mobile',
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
-
-  return $items;
-}
-
 function ma_mobile_client_toggle_mukurtu_mobile() {
   if (variable_get('mukurtu_mobile_enabled')) {
     variable_set ('mukurtu_mobile_enabled', 0);
@@ -34,4 +20,81 @@ function ma_mobile_client_toggle_mukurtu_mobile() {
     drupal_set_message('Mukurtu Mobile enabled.');
   }
   drupal_goto ('dashboard');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ma_mobile_client_menu() {
+  $items = [];
+
+  $items['admin/toggle-mukurtu-mobile'] = [
+    'title' => 'Toggle Mukurtu Mobile',
+    'page callback' => 'ma_mobile_client_toggle_mukurtu_mobile',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  ];
+
+  $items['node/%node/mobile-sync-toggle'] = [
+      'page callback' => 'ma_mobile_client_toggle_sync_node',
+      'page arguments' => array(1),
+      'access arguments' => 'user_is_logged_in',
+      'type' => MENU_CALLBACK,
+      'delivery callback' => 'ajax_deliver',
+    ];
+
+  return $items;
+}
+
+/**
+ * Add or Remove a node from a user's mukurtu mobile synced nodes list (via ajax link)
+ */
+function ma_mobile_client_toggle_sync_node($node) {
+
+  // Save to the user the new list of synced nodes.
+  global $user;
+  $uw = entity_metadata_wrapper('user', $user);
+  $synced_nodes = $uw->field_mm_sync->raw();
+  if (($key = array_search($node->nid, $synced_nodes)) !== FALSE) {
+    unset($synced_nodes[$key]);
+  }
+  else {
+    $synced_nodes[] =  $node->nid;
+  }
+  $uw->field_mm_sync->set($synced_nodes);
+  $uw->save();
+
+  // Update the mobile sync icon link (image and tooltip) for this node via ajax.
+  return array(
+    '#type' => 'ajax',
+    '#commands' => [ajax_command_replace('.mobile-sync-' . $node->nid, ma_mobile_client_generate_toggle_link($node))],
+  );
+
+}
+
+
+/**
+ * Generate the link to sync/unsync a node for a user.
+ */
+function ma_mobile_client_generate_toggle_link($node) {
+  if (user_is_logged_in()) {
+    global $user;
+    $uw = entity_metadata_wrapper('user', $user);
+    $synced_nodes = $uw->field_mm_sync->raw();
+    if (in_array($node->nid, $synced_nodes)) {
+      $icon = "synced";
+      $link_text = 'Remove this ' . node_type_get_name($node) . ' from your Mukurtu Mobile synced content.';
+    }
+    else {
+      $icon = "unsynced";
+      $link_text = 'Add this ' . node_type_get_name($node) . ' to your Mukurtu Mobile synced content.';
+    }
+    $classes = [
+      'use-ajax',
+      'mobile-sync-icon',
+      'mobile-sync-' . $node->nid,
+    ];
+    return l('<img src="/sites/all/themes/mukurtu/images/icons/mobile-' . $icon . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle', ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
+  }
+
 }

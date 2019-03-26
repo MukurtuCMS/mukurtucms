@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_profile.features.field_base.inc
@@ -9,6 +10,44 @@
  */
 function ma_profile_field_default_field_bases() {
   $field_bases = array();
+
+  // Exported field_base: 'field_mm_sync'.
+  $field_bases['field_mm_sync'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_mm_sync',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'duplicates' => 1,
+      'handler' => 'base',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'sort' => array(
+          'type' => 'none',
+        ),
+        'target_bundles' => array(),
+      ),
+      'target_type' => 'node',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
+  );
 
   // Exported field_base: 'field_notifications_freq_def'.
   $field_bases['field_notifications_freq_def'] = array(

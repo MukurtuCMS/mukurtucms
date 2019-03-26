@@ -156,10 +156,11 @@ function ma_digitalheritage_field_group_info() {
       0 => 'field_community_ref',
       1 => 'field_summary',
       2 => 'field_category',
-      3 => 'digital_heritage_page_number',
-      4 => 'featured_content_type',
-      5 => 'mukurtu_icon_actions',
-      6 => 'title',
+      3 => 'mukurtu_mobile_sync',
+      4 => 'digital_heritage_page_number',
+      5 => 'featured_content_type',
+      6 => 'mukurtu_icon_actions',
+      7 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -417,7 +418,7 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Transcription:',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_transcription',
     ),

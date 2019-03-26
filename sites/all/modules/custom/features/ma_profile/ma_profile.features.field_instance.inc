@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_profile.features.field_instance.inc
@@ -44,6 +45,52 @@ function ma_profile_field_default_field_instances() {
       ),
       'type' => 'text_textarea',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_mm_sync'.
+  $field_instances['user-user-field_mm_sync'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 6,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'user',
+    'field_name' => 'field_mm_sync',
+    'label' => 'Synced to Mukurtu Mobile',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'entityreference',
+      'settings' => array(
+        'match_operator' => 'CONTAINS',
+        'path' => '',
+        'size' => 60,
+        'treeable' => 0,
+      ),
+      'type' => 'entityreference_autocomplete_tags',
+      'weight' => 31,
     ),
   );
 
@@ -146,6 +193,7 @@ function ma_profile_field_default_field_instances() {
   t('Communities');
   t('Notifications Email Frequency Default');
   t('Request message');
+  t('Synced to Mukurtu Mobile');
   t('This can be overridden per content.');
   t('This is the text a user may send to the group administrators.');
 

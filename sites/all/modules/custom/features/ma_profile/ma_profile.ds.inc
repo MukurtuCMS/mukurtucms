@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_profile.ds.inc
@@ -119,30 +120,30 @@ function ma_profile_ds_layout_settings_info() {
       'ds_content' => array(
         0 => 'account',
         1 => 'googleanalytics',
-        2 => 'contact',
-        3 => 'locale',
-        4 => 'picture',
-        5 => 'timezone',
-        6 => 'og_user_node',
-        7 => 'redirect',
+        2 => 'picture',
+        3 => 'contact',
+        4 => 'locale',
+        5 => 'og_user_node',
+        6 => 'timezone',
+        9 => 'redirect',
       ),
       'hidden' => array(
-        8 => 'field_notifications_freq_def',
-        9 => 'ckeditor',
+        7 => 'field_notifications_freq_def',
+        8 => 'ckeditor',
         10 => '_add_existing_field',
       ),
     ),
     'fields' => array(
       'account' => 'ds_content',
       'googleanalytics' => 'ds_content',
+      'picture' => 'ds_content',
       'contact' => 'ds_content',
       'locale' => 'ds_content',
-      'picture' => 'ds_content',
-      'timezone' => 'ds_content',
       'og_user_node' => 'ds_content',
-      'redirect' => 'ds_content',
+      'timezone' => 'ds_content',
       'field_notifications_freq_def' => 'hidden',
       'ckeditor' => 'hidden',
+      'redirect' => 'ds_content',
       '_add_existing_field' => 'hidden',
     ),
     'classes' => array(
