@@ -98,3 +98,43 @@ function ma_mobile_client_generate_toggle_link($node) {
   }
 
 }
+
+
+/**
+ * Implements of hook_services_resources().
+ */
+function ma_mobile_client_services_resources() {
+  $api = array(
+    'one_time_login' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => 'Retrieve a one-time-login URL for the currently authed user, to use to auth the user in the mobile browser',
+          'callback' => '_ma_mobile_client_get_one_time_login',
+          'access callback' => 'user_is_logged_in',
+          'args' => array(
+            array(
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  return $api;
+}
+
+/**
+ * Provide a one-time-login link.
+ */
+function _ma_mobile_client_get_one_time_login ($fn) {
+  global $user; // TODO: confirm this user is the correct one
+  return array (
+    'user' => $user,
+    'login_link' =>  user_pass_reset_url($user),
+  );
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_services.services.inc
@@ -47,6 +48,22 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'groups' => array(
+      'alias' => 'groups',
+      'operations' => array(
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'one_time_login' => array(
+      'alias' => 'one-time-login',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'node' => array(
       'alias' => 'node',
       'operations' => array(
@@ -88,14 +105,6 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
-    'groups' => array(
-      'alias' => 'groups',
-      'operations' => array(
-        'index' => array(
-          'enabled' => '1',
-        ),
-      ),
-    ),
     'system' => array(
       'actions' => array(
         'connect' => array(
@@ -128,9 +137,19 @@ function ma_services_default_services_endpoint() {
       'actions' => array(
         'login' => array(
           'enabled' => '1',
+          'settings' => array(
+            'services' => array(
+              'resource_api_version' => '1.0',
+            ),
+          ),
         ),
         'logout' => array(
           'enabled' => '1',
+          'settings' => array(
+            'services' => array(
+              'resource_api_version' => '1.0',
+            ),
+          ),
         ),
         'register' => array(
           'enabled' => '1',
