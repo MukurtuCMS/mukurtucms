@@ -38,7 +38,7 @@ function ma_mobile_client_menu() {
   $items['node/%node/mobile-sync-toggle/%'] = [
       'page callback' => 'ma_mobile_client_toggle_sync_node',
       'page arguments' => array(1, 3),
-      'access arguments' => 'user_is_logged_in',
+      'access callback' => 'user_is_logged_in',
       'type' => MENU_CALLBACK,
       'delivery callback' => 'ajax_deliver',
     ];
@@ -50,6 +50,12 @@ function ma_mobile_client_menu() {
  * Add or Remove a node from a user's mukurtu mobile synced nodes list (via ajax link)
  */
 function ma_mobile_client_toggle_sync_node($node, $color) {
+
+  // This would only happen via someone intentionally trying to hack in (hitting the toggle URL).
+  // Important because otherwise a node they can't access will sync to their phone.
+  if (!node_access('view', $node)) {
+    return;
+  }
 
   // Save to the user the new list of synced nodes.
   global $user;
