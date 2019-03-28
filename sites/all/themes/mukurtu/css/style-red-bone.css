@@ -12388,3 +12388,11 @@ body #admin-menu {
 .node-collection.view-mode-full .field-name-mukurtu-mobile-sync {
   margin-top: 20px;
 }
+.view-mode-collections_browse .field-name-title,
+.view-mode-collections_browse .field-name-mukurtu-mobile-sync {
+  display: inline-block;
+}
+.view-mode-collections_browse .field-name-mukurtu-mobile-sync {
+  float: right;
+  padding: 20px;
+}

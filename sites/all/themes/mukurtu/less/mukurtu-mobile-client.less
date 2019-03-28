@@ -11,7 +11,7 @@
   }
 }
 
-// Align Mobile sync icon with the Personal Collection icon in full node view
+// Mobile Sync align icon with the Personal Collection icon in full node view
 .view-mode-full {
   .field-name-mukurtu-mobile-sync {
     float: right;
@@ -20,10 +20,18 @@
   }
 }
 
-// Overrides for collection node.
+// Mobile Sync alignment overrides for collection node.
 .node-collection.view-mode-full {
   .field-name-mukurtu-mobile-sync {
     margin-top: 20px;
   }
 }
-
+.view-mode-collections_browse {
+  .field-name-title, .field-name-mukurtu-mobile-sync {
+    display: inline-block;
+  }
+  .field-name-mukurtu-mobile-sync {
+    float: right;
+    padding: 20px;
+  }
+}

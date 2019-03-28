@@ -18,8 +18,13 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'collection';
   $ds_fieldsetting->view_mode = 'collections_browse';
   $ds_fieldsetting->settings = array(
-    'collection_item_count' => array(
+    'mukurtu_mobile_sync' => array(
       'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'collection_item_count' => array(
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -35,7 +40,7 @@ function ma_collection_ds_field_settings_info() {
       ),
     ),
     'node_link' => array(
-      'weight' => '4',
+      'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -334,14 +339,16 @@ function ma_collection_ds_layout_settings_info() {
         0 => 'field_collection_image',
       ),
       'right' => array(
-        1 => 'title',
-        2 => 'collection_item_count',
-        3 => 'field_collection_summary',
-        4 => 'node_link',
+        1 => 'mukurtu_mobile_sync',
+        2 => 'title',
+        3 => 'collection_item_count',
+        4 => 'field_collection_summary',
+        5 => 'node_link',
       ),
     ),
     'fields' => array(
       'field_collection_image' => 'left',
+      'mukurtu_mobile_sync' => 'right',
       'title' => 'right',
       'collection_item_count' => 'right',
       'field_collection_summary' => 'right',
