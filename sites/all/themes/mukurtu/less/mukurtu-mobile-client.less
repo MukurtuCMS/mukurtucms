@@ -6,31 +6,31 @@
 
 // Align Mobile sync icon with the Personal Collection icon in the search results
 .view-mode-search_result {
-  .field-name-mukurtu-icon-actions, .field-name-mukurtu-mobile-sync {
+  .field-name-mukurtu-icon-actions, .field-name-mukurtu-mobile-sync, .field-name-mukurtu-mobile-sync-white {
     display: inline-block;
   }
 }
 
 // Mobile Sync align icon with the Personal Collection icon in full node view
 .view-mode-full {
-  .field-name-mukurtu-mobile-sync {
+  .field-name-mukurtu-mobile-sync, .field-name-mukurtu-mobile-sync-white {
     float: right;
     margin-top: -25px;
     margin-right: 25px;
   }
 }
 
-// Mobile Sync alignment overrides for collection node.
-.node-collection.view-mode-full {
-  .field-name-mukurtu-mobile-sync {
+// Mobile Sync alignment overrides for collection and personal collection nodes.
+.node-collection.view-mode-full, .node-personal-collection.view-mode-full {
+  .field-name-mukurtu-mobile-sync, .field-name-mukurtu-mobile-sync-white {
     margin-top: 20px;
   }
 }
-.view-mode-collections_browse {
-  .field-name-title, .field-name-mukurtu-mobile-sync {
+.view-mode-collections_browse, .node-personal-collection.node-teaser {
+  .field-name-title, .field-name-mukurtu-mobile-sync, .field-name-mukurtu-mobile-sync-white {
     display: inline-block;
   }
-  .field-name-mukurtu-mobile-sync {
+  .field-name-mukurtu-mobile-sync, .field-name-mukurtu-mobile-sync-white {
     float: right;
     padding: 20px;
   }

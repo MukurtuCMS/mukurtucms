@@ -88,9 +88,12 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
     'mukurtu_mobile_sync' => array(
-      'weight' => '1',
+      'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
     ),
     'dh_related_items_teasers' => array(
       'weight' => '13',
@@ -98,9 +101,12 @@ function ma_digitalheritage_ds_field_settings_info() {
       'format' => 'default',
     ),
     'mukurtu_icon_actions' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
     ),
     'comments' => array(
       'weight' => '34',
@@ -723,8 +729,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'top' => array(
-        0 => 'mukurtu_icon_actions',
-        1 => 'mukurtu_mobile_sync',
+        0 => 'mukurtu_mobile_sync',
+        1 => 'mukurtu_icon_actions',
       ),
       'left' => array(
         2 => 'field_media_asset',
@@ -735,8 +741,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
         7 => 'field_people',
         8 => 'group_transcription',
         9 => 'field_coverage',
-        10 => 'field_coverage_description',
-        11 => 'field_transcription',
+        10 => 'field_transcription',
+        11 => 'field_coverage_description',
         12 => 'field_related_dh_items',
         13 => 'field_related_dictionary_words',
       ),
@@ -768,8 +774,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
-      'mukurtu_icon_actions' => 'top',
       'mukurtu_mobile_sync' => 'top',
+      'mukurtu_icon_actions' => 'top',
       'field_media_asset' => 'left',
       'field_summary' => 'left',
       'field_description' => 'left',
@@ -778,8 +784,8 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_people' => 'left',
       'group_transcription' => 'left',
       'field_coverage' => 'left',
-      'field_coverage_description' => 'left',
       'field_transcription' => 'left',
+      'field_coverage_description' => 'left',
       'field_related_dh_items' => 'left',
       'field_related_dictionary_words' => 'left',
       'dh_related_items_teasers' => 'right',

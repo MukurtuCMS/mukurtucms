@@ -18,7 +18,7 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'collection';
   $ds_fieldsetting->view_mode = 'collections_browse';
   $ds_fieldsetting->settings = array(
-    'mukurtu_mobile_sync' => array(
+    'mukurtu_mobile_sync_white' => array(
       'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
@@ -61,7 +61,7 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'collection';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'mukurtu_mobile_sync' => array(
+    'mukurtu_mobile_sync_white' => array(
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
@@ -206,8 +206,13 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'personal_collection';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'mukurtu_mobile_sync_white' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
-      'weight' => '1',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -221,13 +226,18 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'personal_collection';
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
+    'mukurtu_mobile_sync' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'collection_item_count' => array(
-      'weight' => '3',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'featured_content_type' => array(
-      'weight' => '2',
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -339,8 +349,8 @@ function ma_collection_ds_layout_settings_info() {
         0 => 'field_collection_image',
       ),
       'right' => array(
-        1 => 'mukurtu_mobile_sync',
-        2 => 'title',
+        1 => 'title',
+        2 => 'mukurtu_mobile_sync_white',
         3 => 'collection_item_count',
         4 => 'field_collection_summary',
         5 => 'node_link',
@@ -348,8 +358,8 @@ function ma_collection_ds_layout_settings_info() {
     ),
     'fields' => array(
       'field_collection_image' => 'left',
-      'mukurtu_mobile_sync' => 'right',
       'title' => 'right',
+      'mukurtu_mobile_sync_white' => 'right',
       'collection_item_count' => 'right',
       'field_collection_summary' => 'right',
       'node_link' => 'right',
@@ -388,7 +398,7 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'top' => array(
-        0 => 'mukurtu_mobile_sync',
+        0 => 'mukurtu_mobile_sync_white',
         1 => 'field_collection_image',
         2 => 'title',
         3 => 'field_collection_summary',
@@ -403,7 +413,7 @@ function ma_collection_ds_layout_settings_info() {
       ),
     ),
     'fields' => array(
-      'mukurtu_mobile_sync' => 'top',
+      'mukurtu_mobile_sync_white' => 'top',
       'field_collection_image' => 'top',
       'title' => 'top',
       'field_collection_summary' => 'top',
@@ -648,17 +658,19 @@ function ma_collection_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'top' => array(
-        0 => 'field_collection_image',
-        1 => 'title',
-        2 => 'field_personal_coll_privacy',
-        3 => 'field_collection_summary',
-        4 => 'field_description',
+        0 => 'mukurtu_mobile_sync_white',
+        1 => 'field_collection_image',
+        2 => 'title',
+        3 => 'field_personal_coll_privacy',
+        4 => 'field_collection_summary',
+        5 => 'field_description',
       ),
       'bottom' => array(
-        5 => 'field_digital_heritage_items',
+        6 => 'field_digital_heritage_items',
       ),
     ),
     'fields' => array(
+      'mukurtu_mobile_sync_white' => 'top',
       'field_collection_image' => 'top',
       'title' => 'top',
       'field_personal_coll_privacy' => 'top',
@@ -761,15 +773,17 @@ function ma_collection_ds_layout_settings_info() {
       ),
       'right' => array(
         1 => 'title',
-        2 => 'featured_content_type',
-        3 => 'collection_item_count',
-        4 => 'field_collection_summary',
-        5 => 'field_personal_coll_privacy',
+        2 => 'mukurtu_mobile_sync',
+        3 => 'featured_content_type',
+        4 => 'collection_item_count',
+        5 => 'field_collection_summary',
+        6 => 'field_personal_coll_privacy',
       ),
     ),
     'fields' => array(
       'field_collection_image' => 'left',
       'title' => 'right',
+      'mukurtu_mobile_sync' => 'right',
       'featured_content_type' => 'right',
       'collection_item_count' => 'right',
       'field_collection_summary' => 'right',

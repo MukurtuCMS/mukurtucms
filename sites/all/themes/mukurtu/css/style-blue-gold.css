@@ -12371,22 +12371,34 @@ body #admin-menu {
   vertical-align: top;
 }
 .view-mode-search_result .field-name-mukurtu-icon-actions,
-.view-mode-search_result .field-name-mukurtu-mobile-sync {
+.view-mode-search_result .field-name-mukurtu-mobile-sync,
+.view-mode-search_result .field-name-mukurtu-mobile-sync-white {
   display: inline-block;
 }
-.view-mode-full .field-name-mukurtu-mobile-sync {
+.view-mode-full .field-name-mukurtu-mobile-sync,
+.view-mode-full .field-name-mukurtu-mobile-sync-white {
   float: right;
   margin-top: -25px;
   margin-right: 25px;
 }
-.node-collection.view-mode-full .field-name-mukurtu-mobile-sync {
+.node-collection.view-mode-full .field-name-mukurtu-mobile-sync,
+.node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync,
+.node-collection.view-mode-full .field-name-mukurtu-mobile-sync-white,
+.node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync-white {
   margin-top: 20px;
 }
 .view-mode-collections_browse .field-name-title,
-.view-mode-collections_browse .field-name-mukurtu-mobile-sync {
+.node-personal-collection.node-teaser .field-name-title,
+.view-mode-collections_browse .field-name-mukurtu-mobile-sync,
+.node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync,
+.view-mode-collections_browse .field-name-mukurtu-mobile-sync-white,
+.node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync-white {
   display: inline-block;
 }
-.view-mode-collections_browse .field-name-mukurtu-mobile-sync {
+.view-mode-collections_browse .field-name-mukurtu-mobile-sync,
+.node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync,
+.view-mode-collections_browse .field-name-mukurtu-mobile-sync-white,
+.node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync-white {
   float: right;
   padding: 20px;
 }

@@ -35,9 +35,9 @@ function ma_mobile_client_menu() {
     'type' => MENU_CALLBACK,
   ];
 
-  $items['node/%node/mobile-sync-toggle'] = [
+  $items['node/%node/mobile-sync-toggle/%'] = [
       'page callback' => 'ma_mobile_client_toggle_sync_node',
-      'page arguments' => array(1),
+      'page arguments' => array(1, 3),
       'access arguments' => 'user_is_logged_in',
       'type' => MENU_CALLBACK,
       'delivery callback' => 'ajax_deliver',
@@ -49,7 +49,7 @@ function ma_mobile_client_menu() {
 /**
  * Add or Remove a node from a user's mukurtu mobile synced nodes list (via ajax link)
  */
-function ma_mobile_client_toggle_sync_node($node) {
+function ma_mobile_client_toggle_sync_node($node, $color) {
 
   // Save to the user the new list of synced nodes.
   global $user;
@@ -67,7 +67,7 @@ function ma_mobile_client_toggle_sync_node($node) {
   // Update the mobile sync icon link (image and tooltip) for this node via ajax.
   return array(
     '#type' => 'ajax',
-    '#commands' => [ajax_command_replace('.mobile-sync-' . $node->nid, ma_mobile_client_generate_toggle_link($node))],
+    '#commands' => [ajax_command_replace('.mobile-sync-' . $node->nid, ma_mobile_client_generate_toggle_link($node, $color))],
   );
 
 }
@@ -76,7 +76,7 @@ function ma_mobile_client_toggle_sync_node($node) {
 /**
  * Generate the link to sync/unsync a node for a user.
  */
-function ma_mobile_client_generate_toggle_link($node) {
+function ma_mobile_client_generate_toggle_link($node, $color = '') {
   if (user_is_logged_in()) {
     global $user;
     $uw = entity_metadata_wrapper('user', $user);
@@ -89,25 +89,21 @@ function ma_mobile_client_generate_toggle_link($node) {
       $icon = "unsynced";
       $link_text = 'Add this ' . node_type_get_name($node) . ' to your Mukurtu Mobile synced content.';
     }
-    switch ($node->type) {
-      case 'collection':
-        $color = 'white';
-        break;
-      default:
-        switch (theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu')) {
-          case 'red-bone':
-            $color = 'red';
-            break;
-          default:
-            $color = 'blue';
-        }
+    if (!$color) {
+      switch (theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu')) {
+        case 'red-bone':
+          $color = 'red';
+          break;
+        default:
+          $color = 'blue';
+      }
     }
     $classes = [
       'use-ajax',
       'mobile-sync-icon',
       'mobile-sync-' . $node->nid,
     ];
-    return l('<img src="/sites/all/themes/mukurtu/images/icons/mobile-' . $icon . '-' . $color . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle', ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
+    return l('<img src="/sites/all/themes/mukurtu/images/icons/mobile-' . $icon . '-' . $color . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle/' . $color, ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
   }
 
 }
