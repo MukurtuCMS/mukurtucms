@@ -46,8 +46,17 @@
     line-height: inherit;
     font-weight: 400;
   }
-  .views-field-php img {
-    float: right;
-    margin-right: 25px;
+  .views-row {
+    padding-bottom: 0.3em;
+    .views-field-nothing, .views-field-php {
+      display: inline-block;
+    }
+    .views-field-nothing {
+      max-width: calc(100% - 37px);
+    }
+    .views-field-php {
+      float: right;
+      margin-right: 25px;
+    }
   }
 }

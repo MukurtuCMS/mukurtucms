@@ -12432,7 +12432,17 @@ body #admin-menu {
   line-height: inherit;
   font-weight: 400;
 }
-.field-name-mm-sync-content-view-field .views-field-php img {
+.field-name-mm-sync-content-view-field .views-row {
+  padding-bottom: 0.3em;
+}
+.field-name-mm-sync-content-view-field .views-row .views-field-nothing,
+.field-name-mm-sync-content-view-field .views-row .views-field-php {
+  display: inline-block;
+}
+.field-name-mm-sync-content-view-field .views-row .views-field-nothing {
+  max-width: calc(63%);
+}
+.field-name-mm-sync-content-view-field .views-row .views-field-php {
   float: right;
   margin-right: 25px;
 }
