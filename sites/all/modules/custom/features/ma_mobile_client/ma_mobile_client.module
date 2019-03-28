@@ -84,6 +84,13 @@ function ma_mobile_client_toggle_sync_node($node, $color) {
  */
 function ma_mobile_client_generate_toggle_link($node, $color = '') {
   if (user_is_logged_in()) {
+
+    // If viewing another user's profile page, do not render the sync icons for any of the items in the blocks.
+    // (would be very confusing because the sync would happen for viewing user, though the nodes displayed are for the viewed user)
+    if (arg(0) == 'user' && !ma_mobile_client_viewing_own_profile()) {
+      return;
+    }
+
     if (!$node->type) {
       $node->type = $node->node_type; // when called by the My Mukurtu Mobile Content view (as opposed to the DS field)
     }
@@ -117,6 +124,18 @@ function ma_mobile_client_generate_toggle_link($node, $color = '') {
 
 }
 
+/**
+ * Check if viewing own profile page.
+ *
+ * Used as the view perm for My Mukurtu Mobile Content, and also in ma_mobile_client_generate_toggle_link()
+ * to hide the sync icon on the nodes in the other blocks (Community, Protocols) when not viewing own profile.
+ */
+function ma_mobile_client_viewing_own_profile() {
+  global $user;
+  if ($user->uid == arg(1)) {
+    return TRUE;
+  }
+}
 
 /**
  * Implements of hook_services_resources().

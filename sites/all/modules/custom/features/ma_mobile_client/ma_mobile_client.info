@@ -7,6 +7,7 @@ dependencies[] = ds
 dependencies[] = ma_services
 dependencies[] = strongarm
 dependencies[] = views
+dependencies[] = views_php
 features[ctools][] = ds:ds:1
 features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
