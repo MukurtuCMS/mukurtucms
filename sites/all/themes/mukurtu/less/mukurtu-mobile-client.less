@@ -5,26 +5,36 @@
 }
 
 // Positioning of the mobile sync icon.
+
 @icon1: field-name-mukurtu-mobile-sync;
 @icon2: field-name-mukurtu-mobile-sync-white;
+
 .view-mode-search_result {
   .field-name-mukurtu-icon-actions, .@{icon1}, .@{icon2} {
     display: inline-block;
   }
 }
-.node-digital-heritage.view-mode-full, .node-community.view-mode-full, .node-cultural-protocol-group.view-mode-full, .node-personal-collection.node-teaser, .node-community.node-teaser {
+.node-digital-heritage.view-mode-full, .node-community.view-mode-full, .node-cultural-protocol-group.view-mode-full, .node-dictionary-word.view-mode-full, .node-personal-collection.node-teaser, .node-community.node-teaser {
   .@{icon1}, .@{icon2} {
     float: right;
     margin-top: -25px;
     margin-right: 25px;
   }
 }
-.view-mode-collections_browse, .node-collection.view-mode-full, .node-personal-collection.view-mode-full {
+.view-mode-collections_browse, .node-collection.view-mode-full, .node-personal-collection.view-mode-full, .node-word-list.view-mode-full {
   .field-name-title, .@{icon1}, .@{icon2} {
     display: inline-block;
   }
   .@{icon1}, .@{icon2} {
     float: right;
     padding: 20px;
+  }
+}
+.view-mode-dictionary_word_summary {
+  .@{icon1}, .@{icon2} {
+    float: right;
+    padding: 0 !important;
+    padding-top: 23px !important;
+    padding-right: 8px !important;
   }
 }

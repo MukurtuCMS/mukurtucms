@@ -12384,11 +12384,13 @@ body #admin-menu {
 .node-digital-heritage.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-community.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-cultural-protocol-group.view-mode-full .field-name-mukurtu-mobile-sync,
+.node-dictionary-word.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync,
 .node-community.node-teaser .field-name-mukurtu-mobile-sync,
 .node-digital-heritage.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-community.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-cultural-protocol-group.view-mode-full .field-name-mukurtu-mobile-sync-white,
+.node-dictionary-word.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync-white,
 .node-community.node-teaser .field-name-mukurtu-mobile-sync-white {
   float: right;
@@ -12398,20 +12400,32 @@ body #admin-menu {
 .view-mode-collections_browse .field-name-title,
 .node-collection.view-mode-full .field-name-title,
 .node-personal-collection.view-mode-full .field-name-title,
+.node-word-list.view-mode-full .field-name-title,
 .view-mode-collections_browse .field-name-mukurtu-mobile-sync,
 .node-collection.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync,
+.node-word-list.view-mode-full .field-name-mukurtu-mobile-sync,
 .view-mode-collections_browse .field-name-mukurtu-mobile-sync-white,
 .node-collection.view-mode-full .field-name-mukurtu-mobile-sync-white,
-.node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync-white {
+.node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync-white,
+.node-word-list.view-mode-full .field-name-mukurtu-mobile-sync-white {
   display: inline-block;
 }
 .view-mode-collections_browse .field-name-mukurtu-mobile-sync,
 .node-collection.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync,
+.node-word-list.view-mode-full .field-name-mukurtu-mobile-sync,
 .view-mode-collections_browse .field-name-mukurtu-mobile-sync-white,
 .node-collection.view-mode-full .field-name-mukurtu-mobile-sync-white,
-.node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync-white {
+.node-personal-collection.view-mode-full .field-name-mukurtu-mobile-sync-white,
+.node-word-list.view-mode-full .field-name-mukurtu-mobile-sync-white {
   float: right;
   padding: 20px;
+}
+.view-mode-dictionary_word_summary .field-name-mukurtu-mobile-sync,
+.view-mode-dictionary_word_summary .field-name-mukurtu-mobile-sync-white {
+  float: right;
+  padding: 0 !important;
+  padding-top: 23px !important;
+  padding-right: 8px !important;
 }
