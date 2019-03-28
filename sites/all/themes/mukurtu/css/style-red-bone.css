@@ -12424,8 +12424,6 @@ body #admin-menu {
 }
 .view-mode-dictionary_word_summary .field-name-mukurtu-mobile-sync,
 .view-mode-dictionary_word_summary .field-name-mukurtu-mobile-sync-white {
-  float: right;
-  padding: 0 !important;
-  padding-top: 23px !important;
-  padding-right: 8px !important;
+  float: left !important;
+  padding: 25px 15px 0 15px !important;
 }
