@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_culturalprotocol.ds.inc
@@ -98,8 +99,8 @@ function ma_culturalprotocol_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'cultural_protocol_group';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'create_content_block_ds_field' => array(
-      'weight' => '7',
+    'mukurtu_mobile_sync' => array(
+      'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -110,6 +111,11 @@ function ma_culturalprotocol_ds_field_settings_info() {
     ),
     'group_members' => array(
       'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'create_content_block_ds_field' => array(
+      'weight' => '7',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -332,25 +338,26 @@ function ma_culturalprotocol_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'top' => array(
-        0 => 'field_protocol_image',
+        0 => 'mukurtu_mobile_sync',
+        1 => 'field_protocol_image',
       ),
       'left' => array(
-        1 => 'body',
-        2 => 'group_management_links',
-        3 => 'protocol_dh_items',
+        2 => 'body',
+        3 => 'group_management_links',
+        4 => 'protocol_dh_items',
       ),
       'right' => array(
-        4 => 'group_members',
-        5 => 'og_group_ref',
-        6 => 'create_content_block_ds_field',
+        5 => 'group_members',
+        6 => 'og_group_ref',
+        7 => 'create_content_block_ds_field',
       ),
     ),
     'fields' => array(
+      'mukurtu_mobile_sync' => 'top',
       'field_protocol_image' => 'top',
       'body' => 'left',
       'group_management_links' => 'left',
       'protocol_dh_items' => 'left',
-      'body' => 'left',
       'group_members' => 'right',
       'og_group_ref' => 'right',
       'create_content_block_ds_field' => 'right',

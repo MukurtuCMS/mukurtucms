@@ -79,7 +79,7 @@ function ma_community_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -162,7 +162,7 @@ function ma_community_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 7,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -225,7 +225,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 32,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -295,7 +295,7 @@ function ma_community_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'mukurtu_scald_banner_image',
-        'weight' => 1,
+        'weight' => 0,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -363,7 +363,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 36,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -439,7 +439,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 11,
+        'weight' => 28,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -507,7 +507,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 29,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -580,7 +580,7 @@ function ma_community_field_default_field_instances() {
           'textformatter_type' => 'ul',
         ),
         'type' => 'textformatter_list',
-        'weight' => 6,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -646,7 +646,7 @@ function ma_community_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 31,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -714,7 +714,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -781,7 +781,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 33,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -854,7 +854,7 @@ Strict - Your community page is invisible to all site users who are not members 
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',

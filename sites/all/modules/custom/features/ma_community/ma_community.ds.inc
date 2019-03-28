@@ -94,28 +94,18 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'create_content_block_ds_field' => array(
-      'weight' => '10',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'community_membership_status' => array(
+    'mukurtu_mobile_sync' => array(
       'weight' => '0',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'featured_collections' => array(
+    'community_browse_all_dh_link' => array(
       'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'community_browse_all_dh_link' => array(
-      'weight' => '8',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'community_dh_items' => array(
-      'weight' => '3',
+      'weight' => '4',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -124,13 +114,33 @@ function ma_community_ds_field_settings_info() {
         ),
       ),
     ),
-    'community_protocol_items' => array(
+    'community_membership_status' => array(
       'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'community_protocol_items' => array(
+      'weight' => '7',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_collections' => array(
+      'weight' => '11',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'group_management_links' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'group_members' => array(
-      'weight' => '4',
+      'weight' => '6',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'create_content_block_ds_field' => array(
+      'weight' => '12',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -538,30 +548,33 @@ function ma_community_ds_layout_settings_info() {
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
-      'right' => array(
-        0 => 'community_membership_status',
-        4 => 'group_members',
-        5 => 'community_protocol_items',
-        6 => 'field_parent_community',
-        7 => 'field_child_communities',
-        8 => 'community_browse_all_dh_link',
-        9 => 'featured_collections',
-        10 => 'create_content_block_ds_field',
-      ),
       'top' => array(
+        0 => 'mukurtu_mobile_sync',
         1 => 'field_community_image',
       ),
       'left' => array(
-        2 => 'body',
-        3 => 'community_dh_items',
+        2 => 'group_management_links',
+        3 => 'body',
+        4 => 'community_dh_items',
+      ),
+      'right' => array(
+        5 => 'community_membership_status',
+        6 => 'group_members',
+        7 => 'community_protocol_items',
+        8 => 'field_parent_community',
+        9 => 'field_child_communities',
+        10 => 'community_browse_all_dh_link',
+        11 => 'featured_collections',
+        12 => 'create_content_block_ds_field',
       ),
     ),
     'fields' => array(
-      'community_membership_status' => 'right',
+      'mukurtu_mobile_sync' => 'top',
       'field_community_image' => 'top',
-      'body' => 'left',
       'group_management_links' => 'left',
+      'body' => 'left',
       'community_dh_items' => 'left',
+      'community_membership_status' => 'right',
       'group_members' => 'right',
       'community_protocol_items' => 'right',
       'field_parent_community' => 'right',
