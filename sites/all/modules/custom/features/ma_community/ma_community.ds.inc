@@ -168,8 +168,13 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'teaser';
   $ds_fieldsetting->settings = array(
-    'featured_content_type' => array(
+    'mukurtu_mobile_sync' => array(
       'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_content_type' => array(
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -617,13 +622,15 @@ function ma_community_ds_layout_settings_info() {
       ),
       'right' => array(
         1 => 'title',
-        2 => 'featured_content_type',
-        3 => 'body',
+        2 => 'mukurtu_mobile_sync',
+        3 => 'featured_content_type',
+        4 => 'body',
       ),
     ),
     'fields' => array(
       'field_community_image_thumbnail' => 'left',
       'title' => 'right',
+      'mukurtu_mobile_sync' => 'right',
       'featured_content_type' => 'right',
       'body' => 'right',
     ),
