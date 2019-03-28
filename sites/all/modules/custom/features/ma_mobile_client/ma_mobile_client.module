@@ -89,12 +89,25 @@ function ma_mobile_client_generate_toggle_link($node) {
       $icon = "unsynced";
       $link_text = 'Add this ' . node_type_get_name($node) . ' to your Mukurtu Mobile synced content.';
     }
+    switch ($node->type) {
+      case 'collection':
+        $color = 'white';
+        break;
+      default:
+        switch (theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu')) {
+          case 'red-bone':
+            $color = 'red';
+            break;
+          default:
+            $color = 'blue';
+        }
+    }
     $classes = [
       'use-ajax',
       'mobile-sync-icon',
       'mobile-sync-' . $node->nid,
     ];
-    return l('<img src="/sites/all/themes/mukurtu/images/icons/mobile-' . $icon . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle', ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
+    return l('<img src="/sites/all/themes/mukurtu/images/icons/mobile-' . $icon . '-' . $color . '.png">', 'node/' . $node->nid . '/mobile-sync-toggle', ['html' => TRUE, 'attributes' => ['class' => $classes, 'title' => $link_text]]);
   }
 
 }
