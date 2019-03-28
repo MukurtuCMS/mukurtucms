@@ -78,16 +78,19 @@ function ma_mobile_client_toggle_sync_node($node, $color) {
  */
 function ma_mobile_client_generate_toggle_link($node, $color = '') {
   if (user_is_logged_in()) {
+    if (!$node->type) {
+      $node->type = $node->node_type; // when called by the My Mukurtu Mobile Content view (as opposed to the DS field)
+    }
     global $user;
     $uw = entity_metadata_wrapper('user', $user);
     $synced_nodes = $uw->field_mm_sync->raw();
     if (in_array($node->nid, $synced_nodes)) {
       $icon = "synced";
-      $link_text = 'Remove this ' . node_type_get_name($node) . ' from your Mukurtu Mobile synced content.';
+      $link_text = 'Remove this ' . node_type_get_name($node->type) . ' from your Mukurtu Mobile synced content.';
     }
     else {
       $icon = "unsynced";
-      $link_text = 'Add this ' . node_type_get_name($node) . ' to your Mukurtu Mobile synced content.';
+      $link_text = 'Add this ' . node_type_get_name($node->type) . ' to your Mukurtu Mobile synced content.';
     }
     if (!$color) {
       switch (theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu')) {
