@@ -38,6 +38,14 @@ function ma_services_default_services_endpoint() {
     ),
   );
   $endpoint->resources = array(
+    'creatable_types' => array(
+      'alias' => 'creatable-types',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'file' => array(
       'operations' => array(
         'create' => array(

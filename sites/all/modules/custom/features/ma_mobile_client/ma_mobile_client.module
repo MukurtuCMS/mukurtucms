@@ -181,6 +181,25 @@ function ma_mobile_client_services_resources() {
       ),
     ),
 
+    'creatable_types' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => "Retrieve a list of content types for which nodes of that type can be created from the Mukurtu Mobile app",
+          'callback' => '_ma_mobile_client_get_creatable_types',
+          'access callback' => 'user_is_logged_in',
+          'args' => array(
+            array(
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => array('path' => '0'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
+
   );
 
   return $api;
@@ -209,6 +228,22 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
     $synced_nids[$synced_node->type][$synced_node->nid] = $synced_node->changed;
   }
   return $synced_nids;
+}
+
+/**
+ * Retrieve a list of content types for which nodes of that type can be created from the Mukurtu Mobile app.
+ */
+function _ma_mobile_client_get_creatable_types ($fn) {
+  $creatable_types = [];
+  foreach (node_type_get_types() as $type) {
+    if (variable_get('mukurtu_mobile_create_' . $type->type)) {
+      $creatable_types[$type->type] = [
+        'label' => $type->name,
+        'description' => $type->description
+      ];
+    }
+  }
+  return $creatable_types;
 }
 
 /**
