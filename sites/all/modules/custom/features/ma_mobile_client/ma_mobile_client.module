@@ -210,3 +210,37 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
   }
   return $synced_nids;
 }
+
+/**
+ * Called from hook_update and hook_install to set to the default types that can be created by Mukurtu Mobile.
+ */
+function ma_mobile_client_set_default_creatable_types() {
+  $default_creatable_types = ['community', 'cultural_protocol_group', 'dictionary_word', 'digital_heritage', 'person', 'personal_collection', 'word_list'];
+  foreach ($default_creatable_types as $default_creatable_type) {
+    variable_set('mukurtu_mobile_create_' . $default_creatable_type, 1);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add Mukurtu Mobile configuration options per content type (edit form of the content type).
+ */
+function ma_mobile_client_form_node_type_form_alter(&$form, $form_state) {
+  if (variable_get('mukurtu_mobile_enabled')) {
+    if (isset($form['#node_type']->type)) {
+      $form['mukurtu_mobile'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Mukurtu Mobile settings'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#group' => 'additional_settings',
+      ];
+      $form['mukurtu_mobile']['mukurtu_mobile_create'] = [
+        '#type' => 'checkbox',
+        '#title' => t('Content of this type can be created from within the Mukurtu Mobile app.'),
+        '#default_value' => variable_get('mukurtu_mobile_create_' . $form['#node_type']->type),
+      ];
+    }
+  }
+}

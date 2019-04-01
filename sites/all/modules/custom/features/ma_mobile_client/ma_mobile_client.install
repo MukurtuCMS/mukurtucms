@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function ma_mobile_client_install() {
+  ma_mobile_client_set_default_creatable_types();
+}
+
+/**
+ * Set the default Mukurtu Mobile creatable content types.
+ */
+function ma_mobile_client_update_7100() {
+  ma_mobile_client_set_default_creatable_types();
+}
