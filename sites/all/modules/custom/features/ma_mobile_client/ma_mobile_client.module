@@ -141,66 +141,93 @@ function ma_mobile_client_viewing_own_profile() {
  * Implements of hook_services_resources().
  */
 function ma_mobile_client_services_resources() {
-  $api = array(
+  $api = [
 
-    'one_time_login' => array(
-      'operations' => array(
-        'retrieve' => array(
+    'one_time_login' => [
+      'operations' => [
+        'retrieve' => [
           'help' => 'Retrieve a one-time-login URL for the currently authed user, to use to auth the user in the mobile browser',
           'callback' => '_ma_mobile_client_get_one_time_login',
           'access callback' => 'user_is_logged_in',
-          'args' => array(
-            array(
+          'args' => [
+            [
               'name' => 'fn',
               'type' => 'string',
               'description' => 'Function to perform',
-              'source' => array('path' => '0'),
+              'source' => ['path' => '0'],
               'optional' => FALSE,
-            ),
-          ),
-        ),
-      ),
-    ),
+            ],
+          ],
+        ],
+      ],
+    ],
 
-    'synced_nodes' => array(
-      'operations' => array(
-        'retrieve' => array(
+    'synced_nodes' => [
+      'operations' => [
+        'retrieve' => [
           'help' => "Retrieve a structured array of a user's list of synced nodes",
           'callback' => '_ma_mobile_client_get_user_synced_nodes',
           'access callback' => 'user_is_logged_in',
-          'args' => array(
-            array(
+          'args' => [
+            [
               'name' => 'fn',
               'type' => 'string',
               'description' => 'Function to perform',
-              'source' => array('path' => '0'),
+              'source' => ['path' => '0'],
               'optional' => FALSE,
-            ),
-          ),
-        ),
-      ),
-    ),
+            ],
+          ],
+        ],
+      ],
+    ],
 
-    'creatable_types' => array(
-      'operations' => array(
-        'retrieve' => array(
+    'creatable_types' => [
+      'operations' => [
+        'retrieve' => [
           'help' => "Retrieve a list of content types for which nodes of that type can be created from the Mukurtu Mobile app",
           'callback' => '_ma_mobile_client_get_creatable_types',
           'access callback' => 'user_is_logged_in',
-          'args' => array(
-            array(
+          'args' => [
+            [
               'name' => 'fn',
               'type' => 'string',
               'description' => 'Function to perform',
-              'source' => array('path' => '0'),
+              'source' => ['path' => '0'],
               'optional' => FALSE,
-            ),
-          ),
-        ),
-      ),
-    ),
+            ],
+          ],
+        ],
+      ],
+    ],
 
-  );
+    'content_type_form' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieves a tcomb-form to use as the node form for the passed content type.",
+          'callback' => '_ma_mobile_client_get_tcomb_node_form',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'type',
+              'type' => 'string',
+              'description' => 'Content type',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+
+          ],
+        ],
+      ],
+    ],
+
+  ];
 
   return $api;
 }
@@ -208,7 +235,7 @@ function ma_mobile_client_services_resources() {
 /**
  * Provide a one-time-login link.
  */
-function _ma_mobile_client_get_one_time_login ($fn) {
+function _ma_mobile_client_get_one_time_login($fn) {
   global $user; // TODO: confirm this user is the correct one
   return array (
     'user' => $user,
@@ -231,9 +258,9 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
 }
 
 /**
- * Retrieve a list of content types for which nodes of that type can be created from the Mukurtu Mobile app.
+ * Retrieve a tcomb-form to use as the node form for the passed content type.
  */
-function _ma_mobile_client_get_creatable_types ($fn) {
+function _ma_mobile_client_get_creatable_types ($fn = NULL) {
   $creatable_types = [];
   foreach (node_type_get_types() as $type) {
     if (variable_get('mukurtu_mobile_create_' . $type->type)) {
@@ -244,6 +271,51 @@ function _ma_mobile_client_get_creatable_types ($fn) {
     }
   }
   return $creatable_types;
+}
+
+/**
+ * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
+ */
+function _ma_mobile_client_get_tcomb_node_form ($fn, $content_type) {
+
+  if (!node_type_get_type($content_type)) {
+    return 'Content type ' . $content_type . ' does not exist';
+  }
+  if (!key_exists($content_type, _ma_mobile_client_get_creatable_types())) {
+    return 'Content type ' . $content_type . ' exists, but is not a valid app-creatable type.';
+  }
+  $grouped_fields = [];
+  $fields = field_info_instances("node", $content_type);
+  foreach($fields as $field) {
+    if ($field_group = field_get_field_group($field)) {
+      $field_group_name = $field_group->group_name;
+    }
+    else {
+      $field_group_name = 'none';
+    }
+    $grouped_fields[$field_group_name][$field['field_name']] = $field;
+  }
+
+  return $grouped_fields;
+
+
+  switch ($content_type) {
+    case 'digital_heritage':
+      break;
+
+  }
+}
+
+
+
+function field_get_field_group($field) {
+  $group_info = field_group_read_groups(array('entity_type' => $field['entity_type'], 'bundle' => $field['bundle']));
+  foreach ($group_info[$field['entity_type']][$field['bundle']]['form'] as $group) {
+    if (in_array($field['field_name'], $group->children)) {
+      return $group;
+    }
+  }
+  return FALSE;
 }
 
 /**

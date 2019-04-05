@@ -38,6 +38,14 @@ function ma_services_default_services_endpoint() {
     ),
   );
   $endpoint->resources = array(
+    'content_type_form' => array(
+      'alias' => 'content-type-form',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'creatable_types' => array(
       'alias' => 'creatable-types',
       'operations' => array(
