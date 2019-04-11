@@ -175,6 +175,8 @@ projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_char
 ;;; Services
 ; Lets services get fully loaded entitities.
 projects[services][patch][] = https://www.drupal.org/files/issues/2019-03-13/2838319-7.patch
+; json encode arrays with recrusive elements.
+projects[services][patch][] = https://www.drupal.org/files/issues/2019-04-11/json_encode_arrays_with_recursive_elements-3047526-1.patch
 
 ;;; Tree (treeable)
 ; Skip treeable field formatter patch

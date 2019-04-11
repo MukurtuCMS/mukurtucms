@@ -200,11 +200,11 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
-    'content_type_form' => [
+    'node_form_fields' => [
       'operations' => [
         'retrieve' => [
-          'help' => "Retrieves a tcomb-form to use as the node form for the passed content type.",
-          'callback' => '_ma_mobile_client_get_tcomb_node_form',
+          'help' => "Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.",
+          'callback' => '_ma_mobile_client_get_node_form_fields',
           'access callback' => 'user_is_logged_in',
           'args' => [
             [
@@ -258,7 +258,7 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
 }
 
 /**
- * Retrieve a tcomb-form to use as the node form for the passed content type.
+ * Retrieve a list of content types that are creatable by the app.
  */
 function _ma_mobile_client_get_creatable_types ($fn = NULL) {
   $creatable_types = [];
@@ -274,10 +274,9 @@ function _ma_mobile_client_get_creatable_types ($fn = NULL) {
 }
 
 /**
- * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
+ * Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.
  */
-function _ma_mobile_client_get_tcomb_node_form ($fn, $content_type) {
-
+function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
 
   if (!node_type_get_type($content_type)) {
     return 'Content type ' . $content_type . ' does not exist';
@@ -286,97 +285,34 @@ function _ma_mobile_client_get_tcomb_node_form ($fn, $content_type) {
     return 'Content type ' . $content_type . ' exists, but is not a valid app-creatable type.';
   }
 
-  $fields = field_info_instances("node", $content_type);
+  // Get the node form for this user and this content type.
+  module_load_include('inc', 'node', 'node.pages');
+  global $user;
+  $node = new stdClass;
+  $node->uid = $user->uid;
+  $node->type = $content_type;
+  $node->language = LANGUAGE_NONE;
+  $node_form = drupal_get_form($content_type. '_node_form', $node);
 
-  // Remove certain fields.
+  // Build $fields_and_fieldgroups out of the node form fields (skipping the ones we don't want), body, title, and the field groups.
+  $fields_and_fieldgroups = [];
   $skip_fields = [
     'field_book_children',
     'field_book_parent',
     'field_pre_actions',
-    '',
-    '',
   ];
-
-
-  // Loop through the fields to:
-  // 1. Remove any skip fields.
-  // 2. Group the fields into the groups they are already defined in (tcomb form expects each group in its own array), so the app will replicate the desktop fieldgroups.
-
-  $grouped_fields = [];
-  foreach ($fields as $field_name => $field) {
-    if (!in_array($field_name, $skip_fields)) { // Remove any skip fields.
-      if ($field_group = field_get_field_group($field)) { // Group the fields into the groups they are already defined in (tcomb form expects each group in its own array), so the app will replicate the desktop fieldgroups.
-        $field_group_name = $field_group->label;
-      }
-      else {
-        $field_group_name = 'none';
-      }
-      // Define the return array according to tcomb form spec.
-      $grouped_fields[$field_group_name][$field['field_name']] = $field;
+  $special_fields = [
+    'title',
+    'body',
+    'ogg_group_fieldset',
+    '#groups',
+    '#group_children',
+  ];
+  foreach ($node_form as $key => $value) {
+    if (!in_array($key, $skip_fields) AND (in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
+      $fields_and_fieldgroups[$key] = $value;
     }
   }
-
-  // Build the tcomb form. See https://gcanti.github.io/resources/json-schema-to-tcomb/playground/playground.html for the spec.
-  $tcomb_form = [];
-  foreach ($grouped_fields as $field_group_name => $group_fields) {
-    $form_group = [
-      'type' => 'group',
-      'label' => $field_group_name,
-      'form' => [
-        'type' => 'object',
-      ],
-    ];
-
-    foreach ($group_fields as $field_name => $field) {
-      $field_info = field_info_field($field_name);
-
-      switch ($field_info['type']) {
-        case "entityreference":
-        case "atom_reference":
-        case "number_integer":
-        case "node_reference":
-          $tcomb_field = [
-            'type' => 'number',
-            'integer' => 1,
-          ];
-          break;
-        case "text_long":
-        case "text_with_summary":
-          $tcomb_field = [
-            'type' => 'string',
-            'integer' => 1,
-          ];
-          break;
-        case "list_text":
-          break;
-        case "list_integer":
-          break;
-        case "list_boolean":
-          break;
-        case "paragraphs":
-          break;
-        case "geofield":
-          break;
-        case "partial_date_range":
-          break;
-        case "datetime":
-          break;
-      }
-      $form_group['form']['properties'] = $tcomb_field;
-      $form_group['options']['fields'][$field_name]['label'] = $field['label'];
-      if ($field["required"]) {
-        $form_group['form']['required'][] = $field_name;
-      }
-
-    }
-
-    $tcomb_form[] = $form_group;
-  }
-
-//  $field_info["settings"]["max_length"]
-//  $field["widget"]["settings"]["size"]
-//  $field_info["settings"]["allowed_values"][0]
-
 
   // Custom handling per content type.
   switch ($content_type) {
@@ -384,21 +320,11 @@ function _ma_mobile_client_get_tcomb_node_form ($fn, $content_type) {
       break;
   }
 
-  return $tcomb_form;
+  // Return the form.
+  return $fields_and_fieldgroups;
 
 }
 
-
-
-function field_get_field_group($field) {
-  $group_info = field_group_read_groups(array('entity_type' => $field['entity_type'], 'bundle' => $field['bundle']));
-  foreach ($group_info[$field['entity_type']][$field['bundle']]['form'] as $group) {
-    if (in_array($field['field_name'], $group->children)) {
-      return $group;
-    }
-  }
-  return FALSE;
-}
 
 /**
  * Called from hook_update and hook_install to set to the default types that can be created by Mukurtu Mobile.

@@ -38,14 +38,6 @@ function ma_services_default_services_endpoint() {
     ),
   );
   $endpoint->resources = array(
-    'content_type_form' => array(
-      'alias' => 'content-type-form',
-      'operations' => array(
-        'retrieve' => array(
-          'enabled' => '1',
-        ),
-      ),
-    ),
     'creatable_types' => array(
       'alias' => 'creatable-types',
       'operations' => array(
@@ -101,6 +93,14 @@ function ma_services_default_services_endpoint() {
       ),
       'targeted_actions' => array(
         'attach_file' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'node_form_fields' => array(
+      'alias' => 'node-form-fields',
+      'operations' => array(
+        'retrieve' => array(
           'enabled' => '1',
         ),
       ),
