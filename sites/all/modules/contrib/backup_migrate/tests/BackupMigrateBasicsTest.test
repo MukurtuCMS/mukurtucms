@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Tests for different parts of the Backup Migrate system.
+ */
+
+/**
+ * Test that the front page still loads.
+ */
+class BackupMigrateBasicsTest extends BackupMigrateBase {
+
+  /**
+   * Define this test class.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Basic test',
+      'description' => 'Ensure that the site was not blown up when the Backup & Migrate module was enabled.',
+      'group' => 'backup_migrate',
+    );
+  }
+
+  /**
+   * Verify the front page still loads.
+   */
+  public function testFrontPage() {
+    $this->drupalGet('<front>');
+    $this->assertResponse(200);
+    $this->assertText(t('No front page content has been created yet.'));
+  }
+
+}

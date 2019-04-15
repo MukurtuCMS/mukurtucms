@@ -28,7 +28,7 @@ diff --git a/modules/taxonomy/taxonomy.module b/modules/taxonomy/taxonomy.module
 index 981649d2..489a8a3b 100644
 --- a/modules/taxonomy/taxonomy.module
 +++ b/modules/taxonomy/taxonomy.module
-@@ -1418,18 +1418,13 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
+@@ -1420,18 +1420,13 @@ function taxonomy_implode_tags($tags, $vid = NULL) {
      if (!isset($vid) || $tag->vid == $vid) {
        // Make sure we have a completed loaded taxonomy term.
        if (isset($tag->name)) {

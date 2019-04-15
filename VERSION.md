@@ -1,3 +1,81 @@
+## Mukurtu 2.1.0
+- A new, responsive default theme has been added
+- Collections can now have nested sub-collections
+- A new type of collection, “Personal Collections” have been added. Personal collections allow users to group content on their user page for their specific needs. They can be private or can be made public to share with others. Cultural protocols still apply as normal to contents within personal collections
+- Collections without thumbnails now use the first unrestricted image from a digital heritage item in that collection
+- Import/export now supports all Mukurtu content types
+- Community records are now indexed on the Digital Heritage browse page
+- A new browse page has been added that indexes all standard Mukurtu public content types (Digital Heritage, Collections, Dictionary Words, Word Lists, and Person Records) in a single page. Site administrators can configure the default browse page by clicking on the ‘Configure Default Browse Page’ link in the dashboard
+- Links to community records will now load that record as the active tab, rather than the first record
+- Content action buttons (Save/Preview/Delete) now show at the top of forms as well as the bottom
+- New sorting options have been added to browse pages
+- Deleted taxonomy terms will no longer appear as taxonomy IDs on browse pages
+- Text labels have been added to Scald library icons for accessibility
+- The area that can be dragged and dropped from the Scald library tray has been expanded
+- Scald atoms with restricted protocols will no longer show to non-member users (displayed as “media unavailable” previously)
+- Users will no longer appear multiple times in membership lists if they have multiple roles
+- Adding users to a cultural protocol now defaults to ‘Not an invitation’. This adds the user immediately to the group
+- jQuery now defaults to version 1.10
+- The WYSIWYG editor will now more closely use the theme CSS, so elements such as bullet points should be consistent between the editor and content views
+- Mukurtu now installs correctly on PHP 7+
+- Added the ability to zoom on colorbox images
+- Two new TK Labels have been added ([Multiple Communities and Non-Verified](http://localcontexts.org/tk-labels/))
+- File Fixity support has been added (ability to create and manage md5 and SHA-1 and SHA-256 file fixity information for files hosted on your Mukurtu CMS instance)
+- Updates to Drupal and contrib modules
+
+#### Manual Upgrade Steps
+- Please do these upgrade steps in the order written.
+- This upgrade process will set many pages/views to Mukurtu defaults. Make sure you have backups and note any changes you have made that have not been captured with Features Overrides before starting this process.
+- database update: `drush updb` Note: The conversion from date to partial date can take a very long time and will fail the first time. This is normal.
+- revert features: `drush fra`
+- revert features again: `drush fra`
+- clear all caches: `drush cc all`
+- update the search index: `drush sapi-c && drush sapi-i` Note: You must perform this step for the new search features to function correctly.
+- second database update: `drush updb`
+
+## Mukurtu 2.0.14
+- Critical security update for Drupal core to 7.63.
+
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
+## Mukurtu 2.0.13.1
+- Update Rules and Backup and Migrate modules to avoid installation errors on PHP 7.
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
+## Mukurtu 2.0.13
+- Use Honeypot for spam prevention (bot user registration) on user registration form.
+
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+- revert the Mukurtu Core feature: `drush fr ma_core -y`
+- re-clear all caches: `drush cc all`
+
+## Mukurtu 2.0.12
+- Critical security update for Drupal core from 7.59 to 7.60.
+
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
+## Mukurtu 2.0.11
+- Critical security update for Drupal core from 7.58 to 7.59.
+- Critical security update for Media module from 2.10 to 2.19.
+- Non-critical udate for File Entity module from 2.4 to 2.20, to go along with the Media module updte.
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
+## Mukurtu 2.0.10
+- Critical security update for Display Suite from 2.14 to 2.15.
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
+## Mukurtu 2.0.9
+- Upgraded Drupal core from 7.56 to 7.58. Includes two critical security updates.
+#### Manual Upgrade Steps
+- clear all caches: `drush cc all`
+
 ## Mukurtu 2.0.8
 - Added an initial beta implementation of Mukurtu Taxonomy Records, a system that provides the ability to enhance taxonomy terms with additional content
 - Added the “Person” content type, which can be used as a taxonomy record, to provide additional metadata about a specific person
@@ -68,7 +146,7 @@
 - The dictionary introduces several new content types
 - A “Dictionary Word” is a the basic dictionary content type
 - Each dictionary word can contain multiple “Word Entries” to list different sources, spellings, uses, etc
-- A “Language Community” is a dictionary specific community that controls which users can contribute dictionary words to a language's dictionary. Access to individual dictionary words is controlled by cultural protocols. 
+- A “Language Community” is a dictionary specific community that controls which users can contribute dictionary words to a language's dictionary. Access to individual dictionary words is controlled by cultural protocols.
 - A “Word List” is a collection of dictionary words
 
 #### Dictionary Quick Start
