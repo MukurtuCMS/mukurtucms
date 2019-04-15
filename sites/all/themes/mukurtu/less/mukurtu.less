@@ -88,3 +88,8 @@ form {
 		margin-bottom: 20px;
 	}
 }
+
+// Hide the honeypot field. The CSS to do this should be generated automatically by honeypot, and it is (in private files), but since it's in private files, it's access denied. The issue should have been addressed, but isn't, in https://www.drupal.org/project/honeypot/issues/2977351.
+.email-textfield {
+	display: none !important;
+}
