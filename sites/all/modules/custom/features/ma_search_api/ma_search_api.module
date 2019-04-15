@@ -274,33 +274,6 @@ function ma_search_api_search_api_query_alter($sapi_query) {
 }
 
 /**
- * Implements hook_scald_atom_access
- *
- * This hook can be used to grant or deny access for a specific atom and
- * Scald action. It has the following possible return values:
- *   SCALD_ATOM_ACCESS_ALLOW
- *   SCALD_ATOM_ACCESS_DENY
- *   SCALD_ATOM_ACCESS_IGNORE
- *
- * Respect the Cultural Protocol setting on scald atoms. This is usually left blank (in which case IGNORE), but if set, if user has access to ANY of the CPs, then they get scald view access (IGNORE, to allow other handling). DENY if groups are set but they have access to none of them.
- */
-function ma_search_api_scald_atom_access($atom, $action, $account = NULL) {
-  $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-  if (!isset($group_wrapper->field_scald_protocol)) {
-    return SCALD_ATOM_ACCESS_IGNORE;
-  }
-  if ($groups = $group_wrapper->field_scald_protocol->value()) {
-    foreach ($groups as $group) {
-      if (node_access('view', $group)) {
-        return SCALD_ATOM_ACCESS_IGNORE;
-      }
-    }
-    return SCALD_ATOM_ACCESS_DENY;
-  }
-  return SCALD_ATOM_ACCESS_IGNORE;
-}
-
-/**
  * Implements hook_menu().
  */
 function ma_search_api_menu() {

@@ -7617,6 +7617,9 @@ form.comment-form .comment-reply-post-button {
 #mukurtu-export-form #edit-download-file-top {
   margin-bottom: 20px;
 }
+.email-textfield {
+  display: none !important;
+}
 .section-shadow {
   background: linear-gradient(#E6E6E6, #FFF);
   background-repeat: no-repeat;

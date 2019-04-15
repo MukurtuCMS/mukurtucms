@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Base class for testing a module's custom tags.
+ */
+abstract class BackupMigrateBase extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  function setUp(array $modules = array()) {
+    $modules[] = 'backup_migrate';
+    parent::setUp($modules);
+  }
+  
+}

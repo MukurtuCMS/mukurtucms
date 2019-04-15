@@ -212,6 +212,13 @@ function ma_importexport_set_media_source_target($source, $entity, $target, $val
 function ma_importexport_set_partial_date_target($source, $entity, $target, $value, $mapping) {
   // Only supporting part of partial date import currently (from only, yyyy-mm-dd).
   // Full support may be added later.
+
+  // If value is blank, clear the date.
+  if ($value[0] == "") {
+    unset($entity->{$target}[LANGUAGE_NONE][0]);
+    return;
+  }
+
   $import_date = new DateTime($value[0]);
 
   if ($import_date) {
