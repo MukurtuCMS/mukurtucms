@@ -183,6 +183,126 @@ function ma_dictionary_user_default_permissions() {
     'module' => 'taxonomy',
   );
 
+  // Exported permission: 'eck add alphabetical_order_definition alphabetical_order_definition entities'.
+  $permissions['eck add alphabetical_order_definition alphabetical_order_definition entities'] = array(
+    'name' => 'eck add alphabetical_order_definition alphabetical_order_definition entities',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck add alphabetical_order_definition bundles'.
+  $permissions['eck add alphabetical_order_definition bundles'] = array(
+    'name' => 'eck add alphabetical_order_definition bundles',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck administer alphabetical_order_definition alphabetical_order_definition entities'.
+  $permissions['eck administer alphabetical_order_definition alphabetical_order_definition entities'] = array(
+    'name' => 'eck administer alphabetical_order_definition alphabetical_order_definition entities',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck administer alphabetical_order_definition bundles'.
+  $permissions['eck administer alphabetical_order_definition bundles'] = array(
+    'name' => 'eck administer alphabetical_order_definition bundles',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck delete alphabetical_order_definition alphabetical_order_definition entities'.
+  $permissions['eck delete alphabetical_order_definition alphabetical_order_definition entities'] = array(
+    'name' => 'eck delete alphabetical_order_definition alphabetical_order_definition entities',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck delete alphabetical_order_definition bundles'.
+  $permissions['eck delete alphabetical_order_definition bundles'] = array(
+    'name' => 'eck delete alphabetical_order_definition bundles',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck edit alphabetical_order_definition alphabetical_order_definition entities'.
+  $permissions['eck edit alphabetical_order_definition alphabetical_order_definition entities'] = array(
+    'name' => 'eck edit alphabetical_order_definition alphabetical_order_definition entities',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck edit alphabetical_order_definition bundles'.
+  $permissions['eck edit alphabetical_order_definition bundles'] = array(
+    'name' => 'eck edit alphabetical_order_definition bundles',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck list alphabetical_order_definition alphabetical_order_definition entities'.
+  $permissions['eck list alphabetical_order_definition alphabetical_order_definition entities'] = array(
+    'name' => 'eck list alphabetical_order_definition alphabetical_order_definition entities',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck list alphabetical_order_definition bundles'.
+  $permissions['eck list alphabetical_order_definition bundles'] = array(
+    'name' => 'eck list alphabetical_order_definition bundles',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck view alphabetical_order_definition alphabetical_order_definition entities'.
+  $permissions['eck view alphabetical_order_definition alphabetical_order_definition entities'] = array(
+    'name' => 'eck view alphabetical_order_definition alphabetical_order_definition entities',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
+  // Exported permission: 'eck view alphabetical_order_definition bundles'.
+  $permissions['eck view alphabetical_order_definition bundles'] = array(
+    'name' => 'eck view alphabetical_order_definition bundles',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
+  );
+
   // Exported permission: 'edit any dictionary_word content'.
   $permissions['edit any dictionary_word content'] = array(
     'name' => 'edit any dictionary_word content',
@@ -283,6 +403,16 @@ function ma_dictionary_user_default_permissions() {
       'administrator' => 'administrator',
     ),
     'module' => 'feeds',
+  );
+
+  // Exported permission: 'manage alphabetical_order_definition properties'.
+  $permissions['manage alphabetical_order_definition properties'] = array(
+    'name' => 'manage alphabetical_order_definition properties',
+    'roles' => array(
+      'Mukurtu Administrator' => 'Mukurtu Administrator',
+      'administrator' => 'administrator',
+    ),
+    'module' => 'eck',
   );
 
   // Exported permission: 'merge part_of_speech terms'.
