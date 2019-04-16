@@ -1,3 +1,14 @@
+## Mukurtu 2.1.1
+- Fixed bug that caused some sites to not be able to create sub-collections
+- During import, original date fields will no longer default to the current date if left empty
+- Fixed a bug where for some upgraded sites the original date field was preventing search from indexing completely
+- Scald atoms in drag and drop fields are now exported more reliably
+- Resolved an issue where language stewards could not edit dictionary words in their language community
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- update the search index: `drush sapi-r && drush sapi-i`
+
 ## Mukurtu 2.1.0
 - A new, responsive default theme has been added
 - Collections can now have nested sub-collections
