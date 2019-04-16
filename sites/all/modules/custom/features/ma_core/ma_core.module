@@ -402,36 +402,36 @@ function ma_core_can_delete_taxonomy_term($tid) {
  * Implements hook_taxonomy_term_delete().
  */
 function ma_core_taxonomy_term_delete($term) {
-    // Get nodes that reference that term
-    $referenced_nodes = taxonomy_select_nodes($term->tid);
-    if(count($referenced_nodes) > 0) {
-        // Load each node and inspect each of their fields for the term.
-        // Currently we are only inspecting taxonomy_term_reference fields, but in theory, other fields
-        // such as entityreference fields, could also contain that term. We aren't hunting down those at
-        // this time.
-        foreach($referenced_nodes as $referenced_nid) {
-            $node = node_load($referenced_nid);
-            if($node) {
-                $fields = field_info_instances('node', $node->type);
-                foreach($fields as $field) {
-                    $field_info = field_info_field($field['field_name']);
-                    if($field_info['type'] == 'taxonomy_term_reference') {
-                        $wrapper = entity_metadata_wrapper('node', $node);
-                        $term_list = $wrapper->{$field['field_name']}->value();
+  // Get nodes that reference that term.
+  $referenced_nodes = taxonomy_select_nodes($term->tid);
+  if (count($referenced_nodes) > 0) {
+    // Load each node and inspect each of their fields for the term.
+    // Currently we are only inspecting taxonomy_term_reference fields, but in theory, other fields
+    // such as entityreference fields, could also contain that term. We aren't hunting down those at
+    // this time.
+    foreach ($referenced_nodes as $referenced_nid) {
+      $node = node_load($referenced_nid);
+      if ($node) {
+        $fields = field_info_instances('node', $node->type);
+        foreach ($fields as $field) {
+          $field_info = field_info_field($field['field_name']);
+          if ($field_info['type'] == 'taxonomy_term_reference') {
+            $wrapper = entity_metadata_wrapper('node', $node);
+            $term_list = $wrapper->{$field['field_name']}->value();
 
-                        // Remove term from content
-                        foreach($term_list as $k => $t) {
-                            if($t->tid == $term->tid) {
-                                unset($term_list[$k]);
-                                $wrapper->{$field['field_name']}->set($term_list);
-                                $wrapper->save();
-                            }
-                        }
-                    }
-                }
+            // Remove term from content.
+            foreach ($term_list as $k => $t) {
+              if (isset($t->tid) && ($t->tid == $term->tid)) {
+                unset($term_list[$k]);
+                $wrapper->{$field['field_name']}->set($term_list);
+                $wrapper->save();
+              }
             }
+          }
         }
+      }
     }
+  }
 }
 
 /**
