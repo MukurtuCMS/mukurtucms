@@ -52,6 +52,7 @@ dependencies[] = link
 dependencies[] = locale
 dependencies[] = ma_dashboard
 dependencies[] = ma_file_fixity
+dependencies[] = ma_lesson_plan
 dependencies[] = ma_search_api
 dependencies[] = mail_logger
 dependencies[] = markdown

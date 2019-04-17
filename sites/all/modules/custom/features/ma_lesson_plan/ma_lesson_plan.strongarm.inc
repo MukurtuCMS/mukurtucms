@@ -1,0 +1,210 @@
+<?php
+
+/**
+ * @file
+ * ma_lesson_plan.strongarm.inc
+ */
+
+/**
+ * Implements hook_strongarm().
+ */
+function ma_lesson_plan_strongarm() {
+  $export = array();
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_anonymous_unit_plan';
+  $strongarm->value = 0;
+  $export['comment_anonymous_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_mode_unit_plan';
+  $strongarm->value = 1;
+  $export['comment_default_mode_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_default_per_page_unit_plan';
+  $strongarm->value = '50';
+  $export['comment_default_per_page_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_form_location_unit_plan';
+  $strongarm->value = 1;
+  $export['comment_form_location_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_preview_unit_plan';
+  $strongarm->value = '1';
+  $export['comment_preview_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_subject_field_unit_plan';
+  $strongarm->value = 1;
+  $export['comment_subject_field_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'comment_unit_plan';
+  $strongarm->value = '1';
+  $export['comment_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_enable_revisions_page_node_unit_plan';
+  $strongarm->value = 1;
+  $export['diff_enable_revisions_page_node_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_show_preview_changes_node_unit_plan';
+  $strongarm->value = 1;
+  $export['diff_show_preview_changes_node_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'diff_view_mode_preview_node_unit_plan';
+  $strongarm->value = 'full';
+  $export['diff_view_mode_preview_node_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_node__unit_plan';
+  $strongarm->value = array(
+    'view_modes' => array(),
+    'extra_fields' => array(
+      'form' => array(
+        'title' => array(
+          'weight' => '5',
+        ),
+        'path' => array(
+          'weight' => '8',
+        ),
+        'redirect' => array(
+          'weight' => '9',
+        ),
+      ),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_node__unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'language_content_type_unit_plan';
+  $strongarm->value = '0';
+  $export['language_content_type_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_options_unit_plan';
+  $strongarm->value = array(
+    0 => 'main-menu',
+  );
+  $export['menu_options_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'menu_parent_unit_plan';
+  $strongarm->value = 'main-menu:0';
+  $export['menu_parent_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_options_unit_plan';
+  $strongarm->value = array(
+    0 => 'status',
+  );
+  $export['node_options_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_preview_unit_plan';
+  $strongarm->value = '1';
+  $export['node_preview_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'node_submitted_unit_plan';
+  $strongarm->value = 1;
+  $export['node_submitted_unit_plan'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_unit_plan_pattern';
+  $strongarm->value = 'unit-plan/[node:title]';
+  $export['pathauto_node_unit_plan_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_subject_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_subject_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_unit_class_period_length_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_unit_class_period_length_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_unit_grade_level_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_unit_grade_level_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_unit_subject_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_unit_subject_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_unit_teacher_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_unit_teacher_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_unit_unit_length_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_unit_unit_length_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_taxonomy_term_unit_week_of_pattern';
+  $strongarm->value = '';
+  $export['pathauto_taxonomy_term_unit_week_of_pattern'] = $strongarm;
+
+  return $export;
+}
