@@ -4,6 +4,9 @@
 - Fixed a bug where for some upgraded sites the original date field was preventing search from indexing completely
 - Scald atoms in drag and drop fields are now exported more reliably
 - Resolved an issue where language stewards could not edit dictionary words in their language community
+- Added trim tamper by default to identifier fields in Mukurtu importers
+- Fixed an issue importing YouTube videos with new Mukurtu importers
+- Security updates, including contrib modules and Drupal 7.66
 
 #### Manual Upgrade Steps
 - database update: `drush updb`
