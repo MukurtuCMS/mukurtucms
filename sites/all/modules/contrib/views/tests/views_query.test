@@ -135,6 +135,23 @@ abstract class ViewsTestCase extends DrupalWebTestCase {
     $this->verbose('<pre>Executed view: ' . ((string) $view->build_info['query']) . '</pre>');
   }
 
+  /**
+   * Log in as user 1.
+   */
+  protected function loginUser1() {
+    $password = user_password();
+    // Reset the user 1 password.
+    $account = user_load(1);
+    $edit = array(
+      'pass' => $password,
+    );
+    $account = user_save($account, $edit);
+    $account->pass_raw = $password;
+
+    // Log in as user 1.
+    $this->drupalLogin($account);
+  }
+
 }
 
 /**
@@ -165,6 +182,24 @@ abstract class ViewsSqlTest extends ViewsTestCase {
     }
     $query->execute();
     $this->checkPermissions(array(), TRUE);
+  }
+
+  /**
+   * Create a term.
+   *
+   * @param int $vid
+   *   The vocabulary ID that the term is to be added to.
+   *
+   * @return object
+   *   A full term object with a random name.
+   */
+  protected function drupalCreateTerm($vid) {
+    $term = new stdClass();
+    $term->name = $this->randomName();
+    $term->description = $this->randomName();
+    $term->vid = $vid;
+    taxonomy_term_save($term);
+    return $term;
   }
 
   /**
