@@ -9,7 +9,7 @@ required = TRUE
 configure = admin/config/people
 stylesheets[all][] = user.css
 
-; Information added by Drupal.org packaging script on 2019-01-16
-version = "7.63"
+; Information added by Drupal.org packaging script on 2019-04-17
+version = "7.66"
 project = "drupal"
-datestamp = "1547681965"
+datestamp = "1555533576"

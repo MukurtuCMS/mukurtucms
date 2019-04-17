@@ -2,7 +2,7 @@ diff --git a/og.module b/og.module
 index 6f28205..32d0275 100755
 --- a/og.module
 +++ b/og.module
-@@ -545,6 +545,16 @@ function og_node_access($node, $op, $account) {
+@@ -545,6 +545,26 @@ function og_node_access($node, $op, $account) {
          ($account->uid == $node->uid && og_user_access_entity("$op own $type content", 'node', $node, $account));
      }
 
@@ -11,7 +11,17 @@ index 6f28205..32d0275 100755
 +    // Patch required because on Update (but not View), OG's NODE_ACCESS_DENY overrides mukurtu_protocol_fields NODE_ACCESS_ALLOW
 +    if ($op == 'update') {
 +      if (ma_cultural_protocol_node_type_can_have_cp($node->type)) {
-+        return mukurtu_protocol_field_update_node_in_cp_access($node);
++        // For update, dictionary words should use standard OG not cultural protocols.
++        // They are governed by language communities, not cultural protocols.
++        if ($node->type == 'dictionary_word') {
++          // However, when a CP denies a user from viewing a DW, we do want to deny update.
++          if (!node_access('view', $node)) {
++            return NODE_ACCESS_DENY;
++          }
++          // If we reach here, user can view DW, fall through and let OG handle the rest.
++        } else {
++          return mukurtu_protocol_field_update_node_in_cp_access($node);
++        }
 +      }
 +    }
 +    // end patch
@@ -19,7 +29,7 @@ index 6f28205..32d0275 100755
      if (!$access && $op == 'update' && og_is_group('node', $node)) {
        // The node is a group, so check "update group" permission.
        $access = og_user_access_entity('update group', 'node', $node, $account);
-@@ -2248,6 +2258,12 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
+@@ -2296,6 +2296,12 @@ function og_user_access_entity($perm, $entity_type, $entity, $account = NULL) {
        return TRUE;
      }
      else {

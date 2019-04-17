@@ -384,12 +384,13 @@ function _mukurtu_export_entity_get_guid($entity_type, $entity_id) {
 }
 
 /**
- *  Replace SIDs with GUIDs in embedded Scald drag and drop fields for export
+ * Replace SIDs with GUIDs in embedded Scald drag and drop fields for export.
  */
 function _mukurtu_export_encode_scald_dnd($value) {
   $referenced_entities = [];
   $files = [];
 
+  // Old 'scald=123:' style.
   $sid_pattern = "/scald=(\d+):/";
   preg_match_all($sid_pattern, $value, $matches);
 
@@ -399,6 +400,22 @@ function _mukurtu_export_encode_scald_dnd($value) {
     if ($atom_guid != "") {
       $atom_guid_token = '[MUKURTU_ATOM_GUID:' . $atom_guid . ']';
       $value = str_replace("scald=$sid:", "scald=$atom_guid_token:", $value);
+      $value = str_replace("<!--copyright=$sid", "<!--copyright=$atom_guid_token", $value);
+      $value = str_replace("<!--END copyright=$sid", "<!--END copyright=$atom_guid_token", $value);
+    }
+  }
+
+  // Newer 'data-scald-sid="123"' style. If any more format styles get added,
+  // we need to come up with a better, less copy and paste solution.
+  $sid_pattern = "/data-scald-sid=\"(\d+)\"/";
+  preg_match_all($sid_pattern, $value, $matches);
+
+  foreach ($matches[1] as $sid) {
+    $atom_guid = _mukurtu_export_entity_get_guid('scald_atom', $sid);
+    $referenced_entities['scald_atom'][$sid] = $sid;
+    if ($atom_guid != "") {
+      $atom_guid_token = '[MUKURTU_ATOM_GUID:' . $atom_guid . ']';
+      $value = str_replace("data-scald-sid=\"$sid\"", "data-scald-sid=\"$atom_guid_token\"", $value);
       $value = str_replace("<!--copyright=$sid", "<!--copyright=$atom_guid_token", $value);
       $value = str_replace("<!--END copyright=$sid", "<!--END copyright=$atom_guid_token", $value);
     }

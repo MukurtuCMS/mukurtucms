@@ -34,6 +34,10 @@ projects[color][patch][] = core/789554-show-added-palette-fields.patch
 ; Include newly added colorable elements.
 projects[color][patch][] = core/include-newly-added-colorable-elements-1236098.patch
 
+;;; Field
+; Required by treeable, which is currently used by sub-collections.
+projects[field][patch][] = core/field-schema-alter-691932-105.patch
+
 ;;; Seven (theme)
 ; Use Mukurtu logo during install.
 projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
@@ -131,7 +135,7 @@ projects[owlcarousel][patch][] = contrib/0001-Add-ID-to-handle-multiple-carousel
 
 ;;; Quicktabs
 ; Remember collaboration parent page tab on CP, so that when a child page is added, it will return to the parent tab.
-; This is from  https://www.drupal.org/files/issues/quicktabs-tab-history-1454486-35.patch with a very minor edit to the JS to only remember tab history for the CP quicktabs (otherwise it remembers tab history for Community Records as well, which we don't want).
+; This is from https://www.drupal.org/files/issues/quicktabs-tab-history-1454486-35.patch with a very minor edit to the JS to only remember tab history for the CP quicktabs (otherwise it remembers tab history for Community Records as well, which we don't want).
 projects[quicktabs][patch][] = contrib/remember_cp_collab_tab.patch
 
 ;;; Scald
