@@ -308,6 +308,7 @@ files[] = tests/views_exposed_form.test
 files[] = tests/field/views_fieldapi.test
 files[] = tests/views_glossary.test
 files[] = tests/views_groupby.test
+files[] = tests/views_handler_filter.test
 files[] = tests/views_handlers.test
 files[] = tests/views_module.test
 files[] = tests/views_pager.test
@@ -328,8 +329,8 @@ files[] = tests/views_cache.test
 files[] = tests/views_view.test
 files[] = tests/views_ui.test
 
-; Information added by Drupal.org packaging script on 2018-04-14
-version = "7.x-3.20"
+; Information added by Drupal.org packaging script on 2019-04-03
+version = "7.x-3.22"
 core = "7.x"
 project = "views"
-datestamp = "1523668093"
+datestamp = "1554307093"
