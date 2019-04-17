@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Rebuild Mukurtu Importers.
+ */
+function mukurtu_importer_generator_update_7100() {
+  features_revert_module('mukurtu_importer_generator');
+}
