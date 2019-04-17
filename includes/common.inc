@@ -1094,6 +1094,11 @@ function drupal_http_request($url, array $options = array()) {
       elseif ($options['max_redirects']) {
         // Redirect to the new location.
         $options['max_redirects']--;
+
+        // We need to unset the 'Host' header
+        // as we are redirecting to a new location.
+        unset($options['headers']['Host']);
+
         $result = drupal_http_request($location, $options);
         $result->redirect_code = $code;
       }
@@ -7651,7 +7656,7 @@ function drupal_implode_tags($tags) {
 
     $encoded_tags[] = $tag;
   }
-  return implode('; ', $encoded_tags);
+  return implode(', ', $encoded_tags);
 }
 
 /**
