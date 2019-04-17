@@ -108,6 +108,18 @@ function mukurtu_importer_generator_feeds_tamper_default() {
           // Define importer for bundle
           $importer_id = "mukurtu_import_{$entity_type}_{$bundle_name}";
 
+          // Add trim tamper to all fields.
+          $feed = feeds_source($importer_id);
+          if (isset($feed)) {
+              // We are getting the mappings from the importer rather than field_info_field because
+              // need to add trim tampers to extra fields like guid, nid, etc.
+              $mappings = $feed->importer->config['processor']['config']['mappings'];
+              foreach ($mappings as $mapping) {
+                $field_name = strpos($mapping['target'], ':') ? rtrim(strstr($mapping['target'], ':', TRUE), ':') : $mapping['target'];
+                _mukurtu_importer_generator_add_trim_tamper($export, $importer_id, $field_name, $mapping['source'], -5);
+              }
+          }
+
           // Check each field
           foreach($fields_info as $field_name => $field_value) {
               $field = field_info_field($field_name);
@@ -121,11 +133,8 @@ function mukurtu_importer_generator_feeds_tamper_default() {
               // Explode for multiple values
               if(!empty($field['cardinality'])
                  && (($field['cardinality'] > 1) || $field['cardinality'] == '-1')) {
-                  _mukurtu_importer_generator_add_explode_tamper($export, $importer_id, $field_name, $source);
+                  _mukurtu_importer_generator_add_explode_tamper($export, $importer_id, $field_name, $source, -10);
               }
-
-              // Trim everything
-              _mukurtu_importer_generator_add_trim_tamper($export, $importer_id, $field_name, $source);
 
               // Require valid node
               if($field['type'] == 'entityreference') {
