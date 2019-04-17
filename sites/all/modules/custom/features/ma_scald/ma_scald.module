@@ -701,6 +701,19 @@ function ma_scald_create_basic_atom($filepath, &$atom, $type = 'video') {
     $options_form = scald_atom_add_form_options($options_form, $form_state);
 
     if (isset($form_state['scald']['atoms'][0])) {
+        // Quick and dirty scald_youtube tags fix.
+        if ($provider == 'scald_youtube' && !empty($form_state['scald']['atoms'][0]->scald_tags[LANGUAGE_NONE])) {
+          foreach ($form_state['scald']['atoms'][0]->scald_tags[LANGUAGE_NONE] as &$tag) {
+            if (isset($tag['taxonomy_term'])) {
+              $term = ma_taxonomy_term_from_name('scald_tags', $tag['taxonomy_term']->name);
+              if ($term) {
+                $tag['tid'] = $term->tid;
+                unset($tag['taxonomy_term']);
+              }
+            }
+          }
+        }
+
         $form_state['atom'] = $form_state['scald']['atoms'][0];
         $form_state['values']['atom0'][] = $form_state['atom'];
     }
