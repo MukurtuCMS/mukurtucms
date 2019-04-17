@@ -936,3 +936,20 @@ function ma_core_admin_paths_alter(&$paths) {
   // without having to hack core (seven, the admin theme).
   $paths['batch'] = false;
 }
+
+/**
+ * Returns TRUE if node is a community record, FALSE otherwise.
+ */
+function ma_core_is_community_record($node) {
+  if ($node) {
+    $wrapper = entity_metadata_wrapper('node', $node);
+    $community_record_parent_field_name = 'field_community_record_parent';
+    if (isset($wrapper->{$community_record_parent_field_name})) {
+      $parent = $wrapper->{$community_record_parent_field_name}->value();
+      if ($parent) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}

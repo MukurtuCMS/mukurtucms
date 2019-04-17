@@ -1251,3 +1251,12 @@ function ma_digitalheritage_redirect_alter($redirect) {
     }
   }
 }
+
+/**
+ * Used in DS field community_record_title.
+ */
+function _ma_digitalheritage_ds_community_record_title($entity) {
+  if (ma_core_is_community_record($entity)) {
+    return l($entity->title, "node/$entity->nid");
+  }
+}
