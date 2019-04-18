@@ -11,6 +11,57 @@
 function ma_lesson_plan_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'node-lesson-body'.
+  $field_instances['node-lesson-body'] = array(
+    'bundle' => 'lesson',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(
+          'trim_length' => 600,
+        ),
+        'type' => 'text_summary_or_trimmed',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'body',
+    'label' => 'Lesson Description',
+    'required' => 0,
+    'settings' => array(
+      'context' => 'title',
+      'context_default' => 'sdl_editor_representation',
+      'display_summary' => 1,
+      'dnd_enabled' => 0,
+      'mee_enabled' => 0,
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 3,
+        'summary_rows' => 5,
+        'treeable' => 0,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 31,
+    ),
+  );
+
   // Exported field_instance: 'node-unit_plan-field_collection'.
   $field_instances['node-unit_plan-field_collection'] = array(
     'bundle' => 'unit_plan',
@@ -903,6 +954,7 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Conceptual');
   t('Grade Level');
   t('Language learning');
+  t('Lesson Description');
   t('Media Assets');
   t('Nature of Science­');
   t('Overarching');

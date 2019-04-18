@@ -22,6 +22,14 @@ function ma_lesson_plan_ctools_plugin_api($module = NULL, $api = NULL) {
  */
 function ma_lesson_plan_node_info() {
   $items = array(
+    'lesson' => array(
+      'name' => t('Lesson'),
+      'base' => 'node_content',
+      'description' => '',
+      'has_title' => '1',
+      'title_label' => t('Lesson Title'),
+      'help' => '',
+    ),
     'unit_plan' => array(
       'name' => t('Unit Plan'),
       'base' => 'node_content',
