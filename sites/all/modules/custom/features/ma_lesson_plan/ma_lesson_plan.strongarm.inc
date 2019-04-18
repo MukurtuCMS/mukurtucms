@@ -93,10 +93,10 @@ function ma_lesson_plan_strongarm() {
           'weight' => '5',
         ),
         'path' => array(
-          'weight' => '8',
+          'weight' => '2',
         ),
         'redirect' => array(
-          'weight' => '9',
+          'weight' => '3',
         ),
       ),
       'display' => array(),

@@ -49,6 +49,44 @@ function ma_lesson_plan_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_loa|node|unit_plan|form';
+  $field_group->group_name = 'group_loa';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'unit_plan';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Learning Outcomes and Assessments',
+    'weight' => '13',
+    'children' => array(
+      0 => 'field_unit_overarching',
+      1 => 'field_unit_conceptual',
+      2 => 'field_unit_nature_of_science',
+      3 => 'field_unit_language_learning',
+      4 => 'field_unit_technical',
+      5 => 'field_unit_assessments',
+      6 => 'field_collection',
+      7 => 'field_dictionary_word_related_dh',
+      8 => 'field_related_dictionary_words',
+      9 => 'field_word_list',
+      10 => 'field_media_asset',
+    ),
+    'format_type' => 'htab',
+    'format_settings' => array(
+      'label' => 'Learning Outcomes and Assessments',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-loa field-group-htab',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_loa|node|unit_plan|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_tabs|node|unit_plan|form';
   $field_group->group_name = 'group_tabs';
   $field_group->entity_type = 'node';
@@ -77,6 +115,7 @@ function ma_lesson_plan_field_group_info() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Base');
+  t('Learning Outcomes and Assessments');
   t('Tabs');
 
   return $field_groups;
