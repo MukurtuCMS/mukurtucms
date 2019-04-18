@@ -48,7 +48,7 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
     // DENY if groups are set but they have access to none of them.
     case 'view':
       $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-      if (!isset($group_wrapper->field_scald_protocol)) {
+      if (!isset($group_wrapper->field_scald_protocol) || empty($group_wrapper->field_scald_protocol->value())) {
         return SCALD_ATOM_ACCESS_ALLOW;
       }
       if ($groups = $group_wrapper->field_scald_protocol->value()) {
