@@ -234,13 +234,13 @@ function ma_lesson_plan_field_default_field_bases() {
     'type' => 'field_collection',
   );
 
-  // Exported field_base: 'field_lesson_reources'.
-  $field_bases['field_lesson_reources'] = array(
+  // Exported field_base: 'field_lesson_resources'.
+  $field_bases['field_lesson_resources'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_lesson_reources',
+    'field_name' => 'field_lesson_resources',
     'indexes' => array(
       'format' => array(
         0 => 'format',

@@ -474,7 +474,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_embed',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -525,8 +525,8 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-lesson-field_lesson_reources'.
-  $field_instances['node-lesson-field_lesson_reources'] = array(
+  // Exported field_instance: 'node-lesson-field_lesson_resources'.
+  $field_instances['node-lesson-field_lesson_resources'] = array(
     'bundle' => 'lesson',
     'default_value' => NULL,
     'deleted' => 0,
@@ -537,7 +537,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -548,15 +548,15 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
-    'field_name' => 'field_lesson_reources',
-    'label' => 'Reources',
+    'field_name' => 'field_lesson_resources',
+    'label' => 'Resources',
     'required' => 0,
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 1,
+      'text_processing' => 0,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -567,7 +567,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -1742,7 +1742,7 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Related Word Lists');
-  t('Reources');
+  t('Resources');
   t('Subject');
   t('Task');
   t('Teacher');
