@@ -12368,3 +12368,18 @@ body #admin-menu {
 .user-profile .field-name-personal-collections .view-footer a {
   font-size: 20px;
 }
+.node-unit_plan-form .group-lessons legend {
+  display: none;
+}
+.node-unit_plan-form .group-lessons #edit-field-unit-lessons-und-body {
+  padding: 0;
+}
+.node-unit_plan-form .group-lessons #edit-field-unit-lessons-und {
+  border: none;
+}
+.node-unit_plan-form .group-lessons .edit-field-unit-lessons-und--4 {
+  border: none;
+}
+.node-unit_plan-form .group-lessons .field-name-field-pre-actions {
+  display: none;
+}
