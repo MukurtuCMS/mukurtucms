@@ -753,7 +753,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 14,
+        'weight' => 8,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -798,10 +798,24 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'node_reference',
-        'settings' => array(),
-        'type' => 'node_reference_default',
-        'weight' => 20,
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'node_reference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 12,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -850,7 +864,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 15,
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -903,7 +917,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'title',
-        'weight' => 18,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -954,10 +968,9 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 5,
+        'type' => 'hidden',
+        'weight' => 37,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1004,7 +1017,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 16,
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1052,7 +1065,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 13,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1100,7 +1113,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 4,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1145,7 +1158,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1193,7 +1206,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 2,
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1237,7 +1250,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 11,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1285,11 +1298,12 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'links' => 1,
+          'use_content_language' => 1,
+          'view_mode' => 'default',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 19,
+        'type' => 'entityreference_entity_view',
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1358,7 +1372,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 10,
+        'weight' => 3,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1406,7 +1420,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 1,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1454,7 +1468,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 1,
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1498,7 +1512,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 0,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1542,7 +1556,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 12,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1590,7 +1604,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 3,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1634,7 +1648,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 7,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1682,7 +1696,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 17,
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1728,13 +1742,24 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 6,
+        'type' => 'textformatter_list',
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',

@@ -26,6 +26,21 @@ function ma_lesson_plan_ds_field_settings_info() {
   );
   $export['node|lesson|default'] = $ds_fieldsetting;
 
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|unit_plan|default';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'unit_plan';
+  $ds_fieldsetting->view_mode = 'default';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+  );
+  $export['node|unit_plan|default'] = $ds_fieldsetting;
+
   return $export;
 }
 
@@ -213,6 +228,185 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|lesson|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|unit_plan|default';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'unit_plan';
+  $ds_layout->view_mode = 'default';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'title',
+      ),
+      'left' => array(
+        1 => 'field_unit_overarching',
+        2 => 'field_unit_conceptual',
+        3 => 'field_unit_nature_of_science',
+        4 => 'field_unit_language_learning',
+        5 => 'field_unit_technical',
+        6 => 'field_unit_assessments',
+        7 => 'field_media_asset',
+        8 => 'field_collection',
+        9 => 'field_dictionary_word_related_dh',
+        10 => 'field_related_dictionary_words',
+        11 => 'field_word_list',
+      ),
+      'right' => array(
+        12 => 'field_community_ref',
+        13 => 'og_group_ref',
+        14 => 'field_unit_teacher',
+        15 => 'field_unit_subject',
+        16 => 'field_unit_grade_level',
+        17 => 'field_unit_week_of',
+        18 => 'field_unit_unit_length',
+        19 => 'field_unit_class_period_length',
+      ),
+      'bottom' => array(
+        20 => 'field_unit_lessons',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'top',
+      'field_unit_overarching' => 'left',
+      'field_unit_conceptual' => 'left',
+      'field_unit_nature_of_science' => 'left',
+      'field_unit_language_learning' => 'left',
+      'field_unit_technical' => 'left',
+      'field_unit_assessments' => 'left',
+      'field_media_asset' => 'left',
+      'field_collection' => 'left',
+      'field_dictionary_word_related_dh' => 'left',
+      'field_related_dictionary_words' => 'left',
+      'field_word_list' => 'left',
+      'field_community_ref' => 'right',
+      'og_group_ref' => 'right',
+      'field_unit_teacher' => 'right',
+      'field_unit_subject' => 'right',
+      'field_unit_grade_level' => 'right',
+      'field_unit_week_of' => 'right',
+      'field_unit_unit_length' => 'right',
+      'field_unit_class_period_length' => 'right',
+      'field_unit_lessons' => 'bottom',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'left' => array(
+        'unit-plan-body' => 'unit-plan-body',
+      ),
+      'right' => array(
+        'unit-plan-sidebar' => 'unit-plan-sidebar',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|unit_plan|default'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|unit_plan|form';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'unit_plan';
+  $ds_layout->view_mode = 'form';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_pre_actions',
+        1 => 'group_tabs',
+        4 => 'title',
+        5 => 'field_unit_overarching',
+        6 => 'field_unit_conceptual',
+        7 => 'field_unit_teacher',
+        8 => 'field_unit_nature_of_science',
+        9 => 'field_unit_subject',
+        10 => 'field_unit_grade_level',
+        11 => 'field_unit_language_learning',
+        12 => 'field_unit_week_of',
+        13 => 'field_unit_technical',
+        14 => 'field_unit_assessments',
+        15 => 'field_unit_unit_length',
+        16 => 'field_unit_class_period_length',
+        17 => 'field_media_asset',
+        18 => 'og_group_ref',
+        19 => 'field_collection',
+        20 => 'group_base',
+        21 => 'group_loa',
+        22 => 'field_dictionary_word_related_dh',
+        23 => 'field_related_dictionary_words',
+        24 => 'group_lessons',
+        25 => 'field_word_list',
+        26 => 'field_unit_lessons',
+      ),
+      'hidden' => array(
+        2 => 'path',
+        3 => 'redirect',
+        27 => 'field_community_ref',
+        28 => '_add_existing_field',
+      ),
+    ),
+    'fields' => array(
+      'field_pre_actions' => 'ds_content',
+      'group_tabs' => 'ds_content',
+      'path' => 'hidden',
+      'redirect' => 'hidden',
+      'title' => 'ds_content',
+      'field_unit_overarching' => 'ds_content',
+      'field_unit_conceptual' => 'ds_content',
+      'field_unit_teacher' => 'ds_content',
+      'field_unit_nature_of_science' => 'ds_content',
+      'field_unit_subject' => 'ds_content',
+      'field_unit_grade_level' => 'ds_content',
+      'field_unit_language_learning' => 'ds_content',
+      'field_unit_week_of' => 'ds_content',
+      'field_unit_technical' => 'ds_content',
+      'field_unit_assessments' => 'ds_content',
+      'field_unit_unit_length' => 'ds_content',
+      'field_unit_class_period_length' => 'ds_content',
+      'field_media_asset' => 'ds_content',
+      'og_group_ref' => 'ds_content',
+      'field_collection' => 'ds_content',
+      'group_base' => 'ds_content',
+      'group_loa' => 'ds_content',
+      'field_dictionary_word_related_dh' => 'ds_content',
+      'field_related_dictionary_words' => 'ds_content',
+      'group_lessons' => 'ds_content',
+      'field_word_list' => 'ds_content',
+      'field_unit_lessons' => 'ds_content',
+      'field_community_ref' => 'hidden',
+      '_add_existing_field' => 'hidden',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|unit_plan|form'] = $ds_layout;
 
   return $export;
 }

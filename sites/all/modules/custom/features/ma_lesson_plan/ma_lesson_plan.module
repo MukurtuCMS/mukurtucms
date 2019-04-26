@@ -18,7 +18,7 @@ function ma_lesson_plan_inline_entity_form_entity_form_alter(&$entity_form, &$fo
     // custom_add_another does not work on field collections on the initial item if field collection is set to "Hide initial item" (see https://www.drupal.org/project/custom_add_another/issues/2861382)
     // This sets our custom add more text manually for the initial item on the field collections.
     $entity_form["field_lesson_micro_tasks"]["und"]["add_more"]["#value"] = 'Add a micro-task';
-    $entity_form["field_lesson_days"]["und"]["add_more"]["#value"] = 'Add a day';
+    $entity_form["field_lesson_days"][LANGUAGE_NONE]["add_more"]["#value"] = 'Add a day';
 
   }
 }
