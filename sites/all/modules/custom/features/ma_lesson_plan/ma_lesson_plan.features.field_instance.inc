@@ -35,6 +35,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -76,6 +78,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -117,6 +121,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -158,6 +164,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -199,6 +207,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -240,6 +250,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -281,6 +293,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -322,6 +336,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -363,6 +379,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -412,6 +430,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => 1,
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -434,6 +454,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-lesson-field_lesson_days'.
   $field_instances['node-lesson-field_lesson_days'] = array(
     'bundle' => 'lesson',
+    'custom_add_another' => 'Add a day',
+    'custom_remove' => 'Remove day',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -465,6 +487,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Days',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -481,6 +505,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-lesson-field_lesson_micro_tasks'.
   $field_instances['node-lesson-field_lesson_micro_tasks'] = array(
     'bundle' => 'lesson',
+    'custom_add_another' => 'Add a micro-task',
+    'custom_remove' => 'Remove micro-task',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -512,6 +538,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Micro-Tasks',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -554,6 +582,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -600,6 +630,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -648,6 +680,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -698,6 +732,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -748,6 +784,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -789,6 +827,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Community',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -841,6 +881,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -858,6 +900,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_media_asset'.
   $field_instances['node-unit_plan-field_media_asset'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => 'Add another media asset',
+    'custom_remove' => 'Remove media asset',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -886,6 +930,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -937,6 +983,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -987,6 +1035,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1030,6 +1080,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1074,6 +1126,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Class Period Length',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1119,6 +1173,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1163,6 +1219,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Grade Level',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1207,6 +1265,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1270,6 +1330,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1324,6 +1386,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1370,6 +1434,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1414,6 +1480,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Subject',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1456,6 +1524,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Teacher',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1500,6 +1570,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1544,6 +1616,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Unit Length',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1586,6 +1660,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'label' => 'Week of',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1637,6 +1713,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1697,6 +1775,8 @@ function ma_lesson_plan_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(

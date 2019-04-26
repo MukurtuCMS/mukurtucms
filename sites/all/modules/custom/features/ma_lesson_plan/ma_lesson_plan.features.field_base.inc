@@ -199,7 +199,7 @@ function ma_lesson_plan_field_default_field_bases() {
     'module' => 'field_collection',
     'settings' => array(
       'hide_blank_items' => 1,
-      'hide_initial_item' => 0,
+      'hide_initial_item' => 1,
       'path' => '',
       'treeable' => 0,
     ),
@@ -226,7 +226,7 @@ function ma_lesson_plan_field_default_field_bases() {
     'module' => 'field_collection',
     'settings' => array(
       'hide_blank_items' => 1,
-      'hide_initial_item' => 0,
+      'hide_initial_item' => 1,
       'path' => '',
       'treeable' => 0,
     ),

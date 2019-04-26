@@ -19,6 +19,7 @@ dependencies[] = contact
 dependencies[] = context
 dependencies[] = context_condition_theme
 dependencies[] = contextual
+dependencies[] = custom_add_another
 dependencies[] = ctools
 dependencies[] = defaultcontent
 dependencies[] = delta
