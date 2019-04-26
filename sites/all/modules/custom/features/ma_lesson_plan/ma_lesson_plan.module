@@ -6,3 +6,21 @@
  */
 
 include_once 'ma_lesson_plan.features.inc';
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function ma_lesson_plan_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+  if ($entity_form["#entity"]->type == 'lesson') { // Uncomment this if we want to hide the Published status for ALL inline entity forms.
+    unset ($entity_form['status']); // Hide the Published field on the inline Lesson form (it defaults to Published)
+  }
+}
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ */
+function ma_lesson_plan_inline_entity_form_table_fields_alter(&$fields, $context) {
+  if ($context['field_name'] == 'field_unit_lessons') { // Uncomment this if we want to hide the Published status for ALL inline entity tables.
+    unset ($fields['status']); // Hide the Published field in the Lessons table
+  }
+}
