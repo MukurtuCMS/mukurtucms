@@ -12383,3 +12383,61 @@ body #admin-menu {
 .node-unit_plan-form .group-lessons .field-name-field-pre-actions {
   display: none;
 }
+.node-lesson.view-mode-full .lesson-body > .field {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .node-lesson.view-mode-full .lesson-body > .field {
+    font-size: 18px;
+  }
+}
+.node-lesson.view-mode-full .lesson-body > .field > a {
+  color: #138AAB;
+}
+.node-lesson.view-mode-full .lesson-body > .field > a:hover,
+.node-lesson.view-mode-full .lesson-body > .field > a:focus {
+  color: #E6AB49;
+  text-decoration: none;
+}
+.node-lesson.view-mode-full .lesson-body > .field > .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-lesson.view-mode-full .lesson-body > .field > .label-above {
+    font-size: 18px;
+  }
+}
+.node-lesson.view-mode-full .lesson-body > .field::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  padding-top: 30px;
+  border-bottom: 5px solid #E5E1E1;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item {
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-left: 25px;
+  border-top: 2px solid #E5E1E1;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .label-above,
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .label-inline {
+  font-weight: bold;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .row .field {
+  padding-bottom: 10px;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .row .field:last-child {
+  padding-bottom: 0;
+}

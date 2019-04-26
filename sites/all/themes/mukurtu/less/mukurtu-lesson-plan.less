@@ -19,3 +19,55 @@
 }
 
 
+.node-lesson.view-mode-full {
+
+  .lesson-body {
+    // Copied and tweaked from .digital-heritage-body
+    >.field {
+      .metadata-field-padding;
+      font-size: 16px;
+      // Desktop
+      @media (min-width: @screen-md-min) {
+        font-size: 18px;
+      }
+      > a {
+        .mukurtu-standard-link;
+      }
+      >.label-above {
+        .metadata-primary-field-label;
+      }
+    }
+    // Copied and tweaked from .digital-heritage-body
+    >.field::after {
+      content: "";
+      display: inline-block;
+      left: 0;
+      bottom: 0;
+      height: 1px;
+      width: 100%;
+      padding-top: 30px;
+      border-bottom: 5px solid @mukurtu-primary-field-divider-color;
+    }
+
+    .entity-field-collection-item {
+      .label-above, .label-inline {
+        font-weight: bold;
+      }
+      margin-top: 10px;
+      padding-top: 10px;
+      padding-left: 25px;
+
+      border-top: 2px solid @mukurtu-primary-field-divider-color;
+
+      .row {
+        .field {
+          padding-bottom: 10px;
+          &:last-child {
+            padding-bottom: 0;
+          }
+        }
+      }
+    }
+
+  }
+}
