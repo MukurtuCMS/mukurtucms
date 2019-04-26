@@ -19,7 +19,7 @@
 }
 
 
-.node-lesson.view-mode-full {
+.node-lesson.view-mode-full, .node-lesson.view-mode-default {
 
   .lesson-body {
     // Copied and tweaked from .digital-heritage-body
@@ -70,4 +70,38 @@
     }
 
   }
+}
+
+.node-unit-plan.view-mode-full {
+
+  .unit-plan-body {
+    width: 65%;
+    .digital-heritage-body;
+  }
+
+  .unit-plan-sidebar {
+    width: 33%;
+    .metadata-sidebar;
+    .metadata-wrapper;
+
+  }
+
+  .unit-plan-bottom {
+    .digital-heritage-body;
+    .field-name-field-unit-lessons {
+      .quicktabs-tabs {
+        left: 0;
+        right: 0;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .field-name-title {
+        h2 {
+          margin-top: 0;
+        }
+
+      }
+    }
+  }
+
 }

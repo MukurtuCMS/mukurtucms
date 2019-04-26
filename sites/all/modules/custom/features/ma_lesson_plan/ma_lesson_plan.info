@@ -15,6 +15,7 @@ dependencies[] = list
 dependencies[] = ma_base_theme
 dependencies[] = ma_dictionary
 dependencies[] = ma_digitalheritage
+dependencies[] = mukurtu_display_formatters_tabbed_records
 dependencies[] = node_reference
 dependencies[] = og
 dependencies[] = options
