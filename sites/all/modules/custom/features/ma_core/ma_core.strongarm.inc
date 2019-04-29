@@ -94,7 +94,11 @@ right-col-block';
   $strongarm->api_version = 1;
   $strongarm->name = 'ds_classes_regions';
   $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8';
+col-md-4 col-md-push-8
+lesson-body
+unit-plan-body
+unit-plan-sidebar
+unit-plan-bottom';
   $export['ds_classes_regions'] = $strongarm;
 
   $strongarm = new stdClass();
