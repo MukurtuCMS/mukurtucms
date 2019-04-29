@@ -92,7 +92,6 @@ function ma_base_theme_views_default_views() {
     'collection' => 'collection',
     'dictionary_word' => 'dictionary_word',
     'digital_heritage' => 'digital_heritage',
-    'lesson' => 'lesson',
     'person' => 'person',
     'unit_plan' => 'unit_plan',
     'word_list' => 'word_list',
