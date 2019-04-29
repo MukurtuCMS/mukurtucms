@@ -28,6 +28,39 @@ function ma_lesson_plan_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|lesson|search_result';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'lesson';
+  $ds_fieldsetting->view_mode = 'search_result';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'body' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|lesson|search_result'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|unit_plan|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'unit_plan';
@@ -40,6 +73,60 @@ function ma_lesson_plan_ds_field_settings_info() {
     ),
   );
   $export['node|unit_plan|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|unit_plan|search_result';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'unit_plan';
+  $ds_fieldsetting->view_mode = 'search_result';
+  $ds_fieldsetting->settings = array(
+    'featured_content_type' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'link' => '1',
+        'wrapper' => 'h2',
+        'class' => '',
+        'ft' => array(),
+      ),
+    ),
+    'field_unit_teacher' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_unit_subject' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_unit_grade_level' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+    'field_community_ref' => array(
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
+  );
+  $export['node|unit_plan|search_result'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -241,6 +328,46 @@ function ma_lesson_plan_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|lesson|search_result';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'lesson';
+  $ds_layout->view_mode = 'search_result';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'right' => array(
+        0 => 'title',
+        1 => 'featured_content_type',
+        2 => 'body',
+        3 => 'group_list_view_fields',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'right',
+      'featured_content_type' => 'right',
+      'body' => 'right',
+      'group_list_view_fields' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|lesson|search_result'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|unit_plan|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'unit_plan';
@@ -420,6 +547,56 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|unit_plan|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|unit_plan|search_result';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'unit_plan';
+  $ds_layout->view_mode = 'search_result';
+  $ds_layout->layout = 'bootstrap_4_8';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'right' => array(
+        0 => 'title',
+        2 => 'group_list_view_fields',
+        3 => 'featured_content_type',
+        4 => 'field_unit_teacher',
+        5 => 'field_unit_subject',
+        6 => 'field_unit_grade_level',
+        7 => 'field_community_ref',
+      ),
+      'left' => array(
+        1 => 'field_media_asset',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'right',
+      'field_media_asset' => 'left',
+      'group_list_view_fields' => 'right',
+      'featured_content_type' => 'right',
+      'field_unit_teacher' => 'right',
+      'field_unit_subject' => 'right',
+      'field_unit_grade_level' => 'right',
+      'field_community_ref' => 'right',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'left' => 'div',
+      'right' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|unit_plan|search_result'] = $ds_layout;
 
   return $export;
 }

@@ -43,6 +43,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Sort Method',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -84,6 +86,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -128,6 +132,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Sort Language',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -173,6 +179,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Do not pad the glossary letter filter',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -233,6 +241,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -308,6 +318,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Community',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -369,6 +381,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Language',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -433,6 +447,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -494,6 +510,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Item Sharing Settings',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -565,6 +583,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -622,6 +642,8 @@ function ma_dictionary_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -690,6 +712,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -769,6 +793,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -839,6 +865,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Keywords',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -919,6 +947,8 @@ function ma_dictionary_field_default_field_instances() {
       'bundle_weights' => array(
         'dictionary_word_bundle' => 2,
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_edit_mode' => 'open',
       'default_edit_mode_override' => 1,
       'title' => 'Paragraph',
@@ -999,6 +1029,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1077,6 +1109,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -1130,6 +1164,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Community Language',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1176,6 +1212,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Group',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -1238,6 +1276,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => TRUE,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -1309,6 +1349,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1389,6 +1431,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Image',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -1459,6 +1503,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1523,6 +1569,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -1590,6 +1638,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1649,6 +1699,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Keywords',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1723,6 +1775,8 @@ function ma_dictionary_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1801,6 +1855,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1879,6 +1935,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1972,6 +2030,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Recording',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 0,
@@ -2079,6 +2139,8 @@ function ma_dictionary_field_default_field_instances() {
     'label' => 'Part of Speech',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2154,6 +2216,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -2232,6 +2296,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -2309,6 +2375,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -2390,6 +2458,8 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 0,
