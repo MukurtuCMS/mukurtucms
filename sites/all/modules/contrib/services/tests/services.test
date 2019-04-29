@@ -2,16 +2,17 @@
 
 class ServicesWebTestCase extends DrupalWebTestCase {
 
-  public function setUp() {
-    $modules = func_get_args();
-    if (isset($modules[0]) && is_array($modules[0])) {
-      $modules = $modules[0];
-    }
-
-    // Add the required module dependencies.
-    array_unshift($modules, 'ctools', 'services', 'rest_server');
-
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    // All tests will include the main dependencies.
+    $modules[] = 'ctools';
+    $modules[] = 'services';
+    // Use the REST server for most of the tests.
+    $modules[] = 'rest_server';
     parent::setUp($modules);
+
     // Use a cookie file, so login sessions will survive, even if we
     // reinitialize Curl.
     $this->cookieFile = drupal_tempnam(variable_get('file_temporary_path'), 'services_cookiejar');
