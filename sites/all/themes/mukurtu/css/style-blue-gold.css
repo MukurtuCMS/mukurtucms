@@ -12613,6 +12613,7 @@ body #admin-menu {
   right: 0;
   margin-left: 0;
   margin-right: 0;
+  width: 100%;
 }
 .node-unit-plan.view-mode-full .unit-plan-bottom .field-name-field-unit-lessons .field-name-title h2 {
   margin-top: 0;
