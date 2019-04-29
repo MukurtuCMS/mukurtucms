@@ -351,6 +351,69 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'field_collection_item-field_lesson_micro_tasks-field_related_dh_items'.
+  $field_instances['field_collection_item-field_lesson_micro_tasks-field_related_dh_items'] = array(
+    'bundle' => 'field_lesson_micro_tasks',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_related_dh_items',
+    'label' => 'Related Digital Heritage Items',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
       'weight' => 2,
     ),
   );
@@ -394,7 +457,70 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 1,
+      'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'field_collection_item-field_lesson_micro_tasks-field_word_list'.
+  $field_instances['field_collection_item-field_lesson_micro_tasks-field_word_list'] = array(
+    'bundle' => 'field_lesson_micro_tasks',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 3,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_word_list',
+    'label' => 'Related Word Lists',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 3,
     ),
   );
 
@@ -695,12 +821,26 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => 0,
-          'link' => 1,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
         ),
-        'type' => 'entityreference_label',
+        'type' => 'textformatter_list',
         'weight' => 4,
       ),
       'teaser' => array(
@@ -747,13 +887,27 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 8,
+        'type' => 'textformatter_list',
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -785,7 +939,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 12,
+      'weight' => 15,
     ),
   );
 
@@ -845,58 +999,6 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'type' => 'node_reference_autocomplete',
       'weight' => 18,
-    ),
-  );
-
-  // Exported field_instance: 'node-unit_plan-field_dictionary_word_related_dh'.
-  $field_instances['node-unit_plan-field_dictionary_word_related_dh'] = array(
-    'bundle' => 'unit_plan',
-    'default_value' => NULL,
-    'default_value_function' => '',
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 9,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_dictionary_word_related_dh',
-    'label' => 'Related Digital Heritage Items',
-    'required' => 0,
-    'settings' => array(
-      'behaviors' => array(
-        'prepopulate' => array(
-          'status' => 0,
-        ),
-      ),
-      'custom_add_another' => '',
-      'custom_remove' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'apply_chosen' => 1,
-        'treeable' => 0,
-      ),
-      'type' => 'options_select',
-      'weight' => 13,
     ),
   );
 
@@ -1001,6 +1103,74 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-unit_plan-field_related_dh_items'.
+  $field_instances['node-unit_plan-field_related_dh_items'] = array(
+    'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_dh_items',
+    'label' => 'Related Digital Heritage Items',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+      ),
+      'type' => 'options_select',
+      'weight' => 12,
+    ),
+  );
+
   // Exported field_instance: 'node-unit_plan-field_related_dictionary_words'.
   $field_instances['node-unit_plan-field_related_dictionary_words'] = array(
     'bundle' => 'unit_plan',
@@ -1011,13 +1181,24 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 10,
+        'type' => 'textformatter_list',
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1049,7 +1230,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 14,
+      'weight' => 13,
     ),
   );
 
@@ -1686,13 +1867,27 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'textformatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
         ),
-        'type' => 'entityreference_label',
-        'weight' => 11,
+        'type' => 'textformatter_list',
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1724,7 +1919,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 14,
     ),
   );
 
