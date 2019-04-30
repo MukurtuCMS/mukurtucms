@@ -829,44 +829,61 @@ function mukurtu_taxonomy_records_form_taxonomy_form_term_alter(&$form, &$form_s
  * Implements hook_entity_update().
  */
 function mukurtu_taxonomy_records_entity_update($entity, $type) {
-    if($type == 'node') {
-        $taxonomy_fields = field_read_fields(array('type' => 'taxonomy_term_reference'));
-        $emw_node = entity_metadata_wrapper('node', $entity);
-        $emw_node_original = entity_metadata_wrapper('node', $entity->original);
-        foreach($taxonomy_fields as $taxonomy_field) {
-            if(!empty($entity->{$taxonomy_field['field_name']})) {
-                $new = array();
-                $old = array();
-                // Get the new taxonomy refs
-                if(!empty($emw_node->{$taxonomy_field['field_name']})) {
-                    foreach($emw_node->{$taxonomy_field['field_name']}->value() as $index => $ref) {
-                        if(isset($ref->tid)) {
-                            $new[] = $ref->tid;
-                        }
-                    }
-                }
+  if ($type == 'node') {
+    $taxonomy_fields = field_read_fields(array('type' => 'taxonomy_term_reference'));
+    $emw_node = entity_metadata_wrapper('node', $entity);
+    $emw_node_original = entity_metadata_wrapper('node', $entity->original);
+    foreach ($taxonomy_fields as $taxonomy_field) {
+      if (!empty($entity->{$taxonomy_field['field_name']})) {
+        $new = array();
+        $old = array();
 
-                // Get the old taxonomy refs
-                if(!empty($emw_node_original->{$taxonomy_field['field_name']})) {
-                    foreach($emw_node_original->{$taxonomy_field['field_name']}->value() as $index => $ref) {
-                        if(isset($ref->tid)) {
-                            $old[] = $ref->tid;
-                        }
-                    }
-                }
+        // Simple case, single value.
+        if ($taxonomy_field['cardinality'] == "1") {
+          $new_term = $emw_node->{$taxonomy_field['field_name']}->value();
+          if (isset($new_term->tid)) {
+            $new[] = $new_term->tid;
+          }
 
-                $new_old_diff = array_merge(array_diff($new, $old), array_diff($old, $new));
-
-                // Update the record cache of all the terms that have been changed
-                foreach($new_old_diff as $diff_tid) {
-                    $diff_term = taxonomy_term_load($diff_tid);
-                    if($diff_term) {
-                        mukurtu_taxonomy_records_update_records_cache($diff_term);
-                    }
-                }
+          if (!empty($entity->original->{$taxonomy_field['field_name']})) {
+            $old_term = $emw_node_original->{$taxonomy_field['field_name']}->value();
+            if (isset($old_term->tid)) {
+              $old[] = $old_term->tid;
             }
+          }
+        } else {
+          // Cardinality allows multiple term refs, need to loop through.
+          // Get the new taxonomy refs.
+          foreach ($emw_node->{$taxonomy_field['field_name']}->getIterator() as $index => $term_wrapper) {
+            $term_wrapper_value = $term_wrapper->value();
+            if (isset($term_wrapper_value->tid)) {
+              $new[] = $term_wrapper_value->tid;
+            }
+          }
+
+          // Get the old taxonomy refs.
+          if (!empty($entity->original->{$taxonomy_field['field_name']})) {
+            foreach ($emw_node_original->{$taxonomy_field['field_name']}->getIterator() as $index => $term_wrapper) {
+              $term_wrapper_value = $term_wrapper->value();
+              if (isset($term_wrapper_value->tid)) {
+                $old[] = $term_wrapper_value->tid;
+              }
+            }
+          }
         }
+
+        $new_old_diff = array_merge(array_diff($new, $old), array_diff($old, $new));
+
+        // Update the record cache of all the terms that have been changed.
+        foreach ($new_old_diff as $diff_tid) {
+          $diff_term = taxonomy_term_load($diff_tid);
+          if ($diff_term) {
+            mukurtu_taxonomy_records_update_records_cache($diff_term);
+          }
+        }
+      }
     }
+  }
 }
 
 

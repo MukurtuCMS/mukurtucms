@@ -18,10 +18,12 @@ class ServicesVersionTests extends ServicesWebTestCase {
   protected $endpoint = NULL;
 
   /**
-   * Implementation of setUp().
+   * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp('services_test_resource');
+  public function setUp(array $modules = array()) {
+    $modules[] = 'services_test_resource';
+    parent::setUp($modules);
+
     // Set up privileged user and login.
     $this->privileged_user = $this->drupalCreateUser(array('administer services',));
     $this->drupalLogin($this->privileged_user);
@@ -35,6 +37,9 @@ class ServicesVersionTests extends ServicesWebTestCase {
       'name'        => 'Version System',
       'description' => 'Test the Version system',
       'group'       => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 

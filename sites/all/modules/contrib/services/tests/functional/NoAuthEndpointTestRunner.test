@@ -24,6 +24,9 @@ class NoAuthEndpointTestRunner extends ServicesEndpointTests {
       'name'        => 'Services Endpoint tests, no auth',
       'description' => 'Test the endpoint functionality when no authentication is turned on',
       'group'       => 'Services',
+      // The libraries module is required by rest_service, which is used by
+      // ServicesEndpointTests.
+      'dependencies' => array('ctools', 'libraries'),
     );
   }
 

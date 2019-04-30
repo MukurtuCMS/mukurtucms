@@ -95,8 +95,18 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
+     'community_record_title' => array(
+      'weight' => '0',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Title',
+        ),
+      ),
+    ),
     'dh_related_items_teasers' => array(
-      'weight' => '13',
+      'weight' => '12',
       'label' => 'above',
       'format' => 'default',
     ),
@@ -109,12 +119,12 @@ function ma_digitalheritage_ds_field_settings_info() {
       ),
     ),
     'comments' => array(
-      'weight' => '34',
+      'weight' => '33',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'author' => array(
-      'weight' => '33',
+      'weight' => '32',
       'label' => 'above',
       'format' => 'author_linked',
     ),
@@ -198,13 +208,8 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'digital_heritage';
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
-    'mukurtu_mobile_sync' => array(
-      'weight' => '3',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'digital_heritage_page_number' => array(
-      'weight' => '5',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -214,7 +219,7 @@ function ma_digitalheritage_ds_field_settings_info() {
       'format' => 'default',
     ),
     'mukurtu_icon_actions' => array(
-      'weight' => '4',
+      'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -329,6 +334,25 @@ function ma_digitalheritage_ds_field_settings_info() {
  */
 function ma_digitalheritage_ds_custom_fields_info() {
   $export = array();
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'community_record_title';
+  $ds_field->label = 'Community Record Title';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+print _ma_digitalheritage_ds_community_record_title($entity);',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['community_record_title'] = $ds_field;
 
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
@@ -728,49 +752,50 @@ function ma_digitalheritage_ds_layout_settings_info() {
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
+      'left' => array(
+        0 => 'field_media_asset',
+        2 => 'field_summary',
+        3 => 'field_description',
+        4 => 'body',
+        5 => 'field_tk_body',
+        6 => 'field_people',
+        7 => 'group_transcription',
+        8 => 'field_coverage',
+        9 => 'field_coverage_description',
+        10 => 'field_transcription',
+        11 => 'field_related_dh_items',
+        12 => 'field_related_dictionary_words',
+      ),
       'top' => array(
         0 => 'mukurtu_mobile_sync',
         1 => 'mukurtu_icon_actions',
       ),
-      'left' => array(
-        2 => 'field_media_asset',
-        3 => 'field_summary',
-        4 => 'field_description',
-        5 => 'body',
-        6 => 'field_tk_body',
-        7 => 'field_people',
-        8 => 'group_transcription',
-        9 => 'field_coverage',
-        10 => 'field_transcription',
-        11 => 'field_coverage_description',
-        12 => 'field_related_dh_items',
-        13 => 'field_related_dictionary_words',
-      ),
       'right' => array(
-        14 => 'dh_related_items_teasers',
-        15 => 'field_community_ref',
-        16 => 'og_group_ref',
-        17 => 'field_category',
-        18 => 'field_tags',
-        19 => 'field_collection',
-        20 => 'field_original_date',
-        21 => 'field_date',
-        22 => 'field_creator',
-        23 => 'field_contributor',
-        24 => 'field_language',
-        25 => 'field_rights',
-        26 => 'field_licence_trad',
-        27 => 'field_licence_std_cc',
-        28 => 'field_source',
-        29 => 'field_publisher',
-        30 => 'field_identifier',
-        31 => 'field_subject',
-        32 => 'field_dh_type',
-        33 => 'field_format',
-        34 => 'author',
+        0 => 'community_record_title',
+        13 => 'dh_related_items_teasers',
+        14 => 'field_community_ref',
+        15 => 'og_group_ref',
+        16 => 'field_category',
+        17 => 'field_tags',
+        18 => 'field_collection',
+        19 => 'field_original_date',
+        20 => 'field_date',
+        21 => 'field_creator',
+        22 => 'field_contributor',
+        23 => 'field_language',
+        24 => 'field_rights',
+        25 => 'field_licence_trad',
+        26 => 'field_licence_std_cc',
+        27 => 'field_source',
+        28 => 'field_publisher',
+        29 => 'field_identifier',
+        30 => 'field_subject',
+        31 => 'field_dh_type',
+        32 => 'field_format',
+        33 => 'author',
       ),
       'bottom' => array(
-        35 => 'comments',
+        34 => 'comments',
       ),
     ),
     'fields' => array(
@@ -784,10 +809,11 @@ function ma_digitalheritage_ds_layout_settings_info() {
       'field_people' => 'left',
       'group_transcription' => 'left',
       'field_coverage' => 'left',
-      'field_transcription' => 'left',
       'field_coverage_description' => 'left',
+      'field_transcription' => 'left',
       'field_related_dh_items' => 'left',
       'field_related_dictionary_words' => 'left',
+      'community_record_title' => 'right',
       'dh_related_items_teasers' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',

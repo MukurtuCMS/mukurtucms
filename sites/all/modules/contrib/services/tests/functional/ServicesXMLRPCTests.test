@@ -12,15 +12,24 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
    * Implements getInfo().
    */
   public static function getInfo() {
-   return array(
-     'name'        => 'XMLRPC Server',
-     'description' => 'Test XMLRPC server.',
-     'group'       => 'Services',
-   );
+    return array(
+      'name'        => 'XMLRPC Server',
+      'description' => 'Test XMLRPC server.',
+      'group'       => 'Services',
+      'dependencies' => array('ctools'),
+    );
   }
 
-  public function setUp() {
-    parent::setUp('ctools', 'services', 'xmlrpc_server', 'services_test_resource');
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp(array $modules = array()) {
+    $modules[] = 'ctools';
+    $modules[] = 'services';
+    $modules[] = 'xmlrpc_server';
+    $modules[] = 'services_test_resource';
+    parent::setUp($modules);
+
     // Set up endpoint.
     $this->endpoint =  $this->saveNewEndpoint();
   }
@@ -32,7 +41,7 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
    */
   function testlistMethods() {
     $result = $this->servicesXMLRPC('system.listMethods', array());
-    $this->assertTrue(in_array('node.index', $result['body']), 'node.index method found.', 'XMLRPC: listMethods');
+    $this->assertFalse(in_array('node.index', $result['body']), 'Not able to find not enabled node.index method.', 'XMLRPC: listMethods');
   }
 
   /**
@@ -147,6 +156,9 @@ class ServicesXMLRPCTestCase extends DrupalWebTestCase {
             'enabled' => 1,
           ),
           'logout' => array(
+            'enabled' => 1,
+          ),
+          'token' => array(
             'enabled' => 1,
           ),
         ),

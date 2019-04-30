@@ -699,6 +699,9 @@ function _node_resource_attach_file($nid, $field_name, $attach, $field_values) {
   foreach ($file_objs as $key => $file_obj) {
     if (isset($field_values[$key])) {
       foreach ($field_values[$key] as $key => $value) {
+        if ($key == 'fid') {
+          continue;
+        }
         $file_obj->$key = $value;
       }
     }
