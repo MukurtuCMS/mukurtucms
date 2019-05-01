@@ -12374,6 +12374,256 @@ body #admin-menu {
 .user-profile .field-name-personal-collections .view-footer a {
   font-size: 20px;
 }
+.node-unit_plan-form .group-lessons legend {
+  display: none;
+}
+.node-unit_plan-form .group-lessons #edit-field-unit-lessons-und-body {
+  padding: 0;
+}
+.node-unit_plan-form .group-lessons #edit-field-unit-lessons-und {
+  border: none;
+}
+.node-unit_plan-form .group-lessons .edit-field-unit-lessons-und--4 {
+  border: none;
+}
+.node-unit_plan-form .group-lessons .field-name-field-pre-actions {
+  display: none;
+}
+.node-lesson.view-mode-full .lesson-body > .field,
+.node-lesson.view-mode-default .lesson-body > .field {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .node-lesson.view-mode-full .lesson-body > .field,
+  .node-lesson.view-mode-default .lesson-body > .field {
+    font-size: 18px;
+  }
+}
+.node-lesson.view-mode-full .lesson-body > .field > a,
+.node-lesson.view-mode-default .lesson-body > .field > a {
+  color: #AC143A;
+}
+.node-lesson.view-mode-full .lesson-body > .field > a:hover,
+.node-lesson.view-mode-default .lesson-body > .field > a:hover,
+.node-lesson.view-mode-full .lesson-body > .field > a:focus,
+.node-lesson.view-mode-default .lesson-body > .field > a:focus {
+  color: #D9D4C2;
+  text-decoration: none;
+}
+.node-lesson.view-mode-full .lesson-body > .field > .label-above,
+.node-lesson.view-mode-default .lesson-body > .field > .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-lesson.view-mode-full .lesson-body > .field > .label-above,
+  .node-lesson.view-mode-default .lesson-body > .field > .label-above {
+    font-size: 18px;
+  }
+}
+.node-lesson.view-mode-full .lesson-body > .field::after,
+.node-lesson.view-mode-default .lesson-body > .field::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  padding-top: 30px;
+  border-bottom: 5px solid #E5E1E1;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item {
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-left: 25px;
+  border-top: 2px solid #E5E1E1;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .label-above,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .label-above,
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .label-inline,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .label-inline {
+  font-weight: bold;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .row .field,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .row .field {
+  padding-bottom: 10px;
+}
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .row .field:last-child,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .row .field:last-child {
+  padding-bottom: 0;
+}
+.node-unit-plan.view-mode-full .unit-plan-body {
+  width: 65%;
+}
+.node-unit-plan.view-mode-full .unit-plan-body .field-name-field-media-asset img {
+  margin: auto;
+}
+.node-unit-plan.view-mode-full .unit-plan-body .field-name-field-media-asset .scald-atom {
+  padding-bottom: 30px;
+}
+.node-unit-plan.view-mode-full .unit-plan-body > .field {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .node-unit-plan.view-mode-full .unit-plan-body > .field {
+    font-size: 18px;
+  }
+}
+.node-unit-plan.view-mode-full .unit-plan-body > .field > a {
+  color: #AC143A;
+}
+.node-unit-plan.view-mode-full .unit-plan-body > .field > a:hover,
+.node-unit-plan.view-mode-full .unit-plan-body > .field > a:focus {
+  color: #D9D4C2;
+  text-decoration: none;
+}
+.node-unit-plan.view-mode-full .unit-plan-body > .field .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-unit-plan.view-mode-full .unit-plan-body > .field .label-above {
+    font-size: 18px;
+  }
+}
+.node-unit-plan.view-mode-full .unit-plan-body > .field::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  padding-top: 30px;
+  border-bottom: 5px solid #E5E1E1;
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar {
+  width: 33%;
+  border-top: 5px solid #D9D4C2;
+  border-radius: 0px;
+  background-color: #F0EEE9;
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .metadata-wrapper {
+  border-top: 5px solid #D9D4C2;
+  border-radius: 0px;
+  background-color: #F0EEE9;
+}
+@media (min-width: 992px) {
+  .node-unit-plan.view-mode-full .unit-plan-sidebar .metadata-wrapper {
+    margin-left: 30px;
+  }
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field .field-label,
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field .label-above {
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field a {
+  color: #AC143A;
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field a:hover,
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field a:focus {
+  color: #D9D4C2;
+  text-decoration: none;
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  border-bottom: 1px solid rgba(70, 70, 70, 0.25);
+}
+.node-unit-plan.view-mode-full .unit-plan-sidebar .field-name-field-licence-trad .popup-element {
+  width: 50%;
+}
+@media (min-width: 992px) {
+  .node-unit-plan.view-mode-full .unit-plan-sidebar {
+    margin-left: 30px;
+  }
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom .field-name-field-media-asset img {
+  margin: auto;
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom .field-name-field-media-asset .scald-atom {
+  padding-bottom: 30px;
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom > .field {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+}
+@media (min-width: 992px) {
+  .node-unit-plan.view-mode-full .unit-plan-bottom > .field {
+    font-size: 18px;
+  }
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom > .field > a {
+  color: #AC143A;
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom > .field > a:hover,
+.node-unit-plan.view-mode-full .unit-plan-bottom > .field > a:focus {
+  color: #D9D4C2;
+  text-decoration: none;
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom > .field .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-unit-plan.view-mode-full .unit-plan-bottom > .field .label-above {
+    font-size: 18px;
+  }
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom > .field::after {
+  content: "";
+  display: inline-block;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  padding-top: 30px;
+  border-bottom: 5px solid #E5E1E1;
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom .field-name-field-unit-lessons .quicktabs-tabs {
+  left: 0;
+  right: 0;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+}
+.node-unit-plan.view-mode-full .unit-plan-bottom .field-name-field-unit-lessons .field-name-title h2 {
+  margin-top: 0;
+}
 .mobile-sync-icon img {
   width: 12px;
   height: 20px;

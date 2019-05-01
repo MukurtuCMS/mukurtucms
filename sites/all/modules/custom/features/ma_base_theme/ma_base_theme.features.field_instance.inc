@@ -36,6 +36,8 @@ function ma_base_theme_field_default_field_instances() {
     'required' => 1,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -81,6 +83,8 @@ function ma_base_theme_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -123,6 +127,8 @@ function ma_base_theme_field_default_field_instances() {
     'required' => 1,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -168,6 +174,8 @@ function ma_base_theme_field_default_field_instances() {
     'settings' => array(
       'context' => 'mukurtu_scald_taxonomy_thumbnail',
       'context_default' => 'mukurtu_featured_content',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -208,6 +216,8 @@ function ma_base_theme_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
