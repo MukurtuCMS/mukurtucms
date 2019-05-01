@@ -43,8 +43,17 @@ function ma_mobile_client_menu() {
       'delivery callback' => 'ajax_deliver',
     ];
 
+  $items['mobile/login/%/%/%'] = array(
+    'title' => 'Mobile browser login',
+    'page callback' => 'ma_mobile_client_browser_login',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
+
 
 /**
  * Add or Remove a node from a user's mukurtu mobile synced nodes list (via ajax link)
@@ -123,6 +132,43 @@ function ma_mobile_client_generate_toggle_link($node, $color = '') {
   }
 
 }
+
+/**
+ * Callback to a log a user into the mobile browser using the link obtained by the app from the one-time-login endpoint.
+ * This is based on user_pass_reset().
+ */
+function ma_mobile_client_browser_login($uid, $timestamp, $hashed_pass) {
+  global $user;
+  if ($user->uid) {
+//    drupal_set_message(t('User is already logged in.'), 'error');
+    drupal_goto();
+  }
+  else {
+    $timeout = 60;
+    $current = REQUEST_TIME;
+    $users = user_load_multiple(array($uid), array('status' => '1'));
+    if ($timestamp <= $current && $account = reset($users)) {
+      if ($current - $timestamp > $timeout) {
+        drupal_set_message(t('Login link expires after ' . $timeout . 'seconds.'), 'error');
+        drupal_goto('');
+      }
+      elseif ($account->uid && $timestamp >= $account->login && $timestamp <= $current && $hashed_pass == user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid)) {
+        $user = $account;
+        user_login_finalize();
+        drupal_goto('');
+      }
+      else {
+        drupal_set_message(t('Login link already used or invalid.'), 'error');
+        drupal_goto('');
+      }
+    }
+    else {
+      drupal_access_denied();
+      drupal_exit();
+    }
+  }
+}
+
 
 /**
  * Check if viewing own profile page.
@@ -236,11 +282,9 @@ function ma_mobile_client_services_resources() {
  * Provide a one-time-login link.
  */
 function _ma_mobile_client_get_one_time_login($fn) {
-  global $user; // TODO: confirm this user is the correct one
-  return array (
-    'user' => $user,
-    'login_link' =>  user_pass_reset_url($user),
-  );
+  global $user;
+  $timestamp = REQUEST_TIME;
+  return url("mobile/login/$user->uid/$timestamp/" . user_pass_rehash($user->pass, $timestamp, $user->login, $user->uid), array('absolute' => TRUE));
 }
 
 /**
