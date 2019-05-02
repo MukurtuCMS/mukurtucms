@@ -8,8 +8,15 @@ function ma_mobile_client_install() {
 }
 
 /**
- * Set the default Mukurtu Mobile creatable content types.
+ * Update the default Mukurtu Mobile creatable content types.
  */
 function ma_mobile_client_update_7100() {
+  ma_mobile_client_set_default_creatable_types();
+}
+
+/**
+ * Update the default Mukurtu Mobile creatable content types.
+ */
+function ma_mobile_client_update_7101() {
   ma_mobile_client_set_default_creatable_types();
 }
