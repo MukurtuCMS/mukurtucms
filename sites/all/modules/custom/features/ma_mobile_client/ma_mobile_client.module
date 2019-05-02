@@ -8,40 +8,26 @@
 include_once 'ma_mobile_client.features.inc';
 
 /**
- * Called by dashboard link -- toggle Mukurtu Mobile enabled.
- */
-function ma_mobile_client_toggle_mukurtu_mobile() {
-  if (variable_get('mukurtu_mobile_enabled')) {
-    variable_set ('mukurtu_mobile_enabled', 0);
-    drupal_set_message('Mukurtu Mobile disabled.');
-  }
-  else {
-    variable_set ('mukurtu_mobile_enabled', 1);
-    drupal_set_message('Mukurtu Mobile enabled.');
-  }
-  drupal_goto ('dashboard');
-}
-
-/**
  * Implements hook_menu().
  */
 function ma_mobile_client_menu() {
   $items = [];
 
-  $items['admin/toggle-mukurtu-mobile'] = [
-    'title' => 'Toggle Mukurtu Mobile',
-    'page callback' => 'ma_mobile_client_toggle_mukurtu_mobile',
+  $items['admin/config/mukurtu-mobile'] = [
+    'title' => 'Configure Mukurtu Mobile',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_mobile_client_admin_config'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   ];
 
   $items['node/%node/mobile-sync-toggle/%'] = [
-      'page callback' => 'ma_mobile_client_toggle_sync_node',
-      'page arguments' => array(1, 3),
-      'access callback' => 'user_is_logged_in',
-      'type' => MENU_CALLBACK,
-      'delivery callback' => 'ajax_deliver',
-    ];
+    'page callback' => 'ma_mobile_client_toggle_sync_node',
+    'page arguments' => array(1, 3),
+    'access callback' => 'user_is_logged_in',
+    'type' => MENU_CALLBACK,
+    'delivery callback' => 'ajax_deliver',
+  ];
 
   $items['mobile/login/%/%/%'] = array(
     'title' => 'Mobile browser login',
@@ -52,6 +38,119 @@ function ma_mobile_client_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Mukurtu Mobile admin config form.
+ * Linked from Dashboard.
+ */
+function ma_mobile_client_admin_config($form, $form_state) {
+
+  $form['mukurtu_mobile_enabled'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Enable access to the site via the Mukurtu Mobile app.'), // TODO: link to the app here.
+    '#default_value' => variable_get ('mukurtu_mobile_enabled', 0),
+  ];
+
+  ////
+  // Content types table
+  ////
+
+  $ordered_types = variable_get('mukurtu_mobile_content_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_names();
+
+  // If a node type has been added since var mukurtu_mobile_creatable_content_types was last set
+  // (meaning it wasn't saved to the mukurtu_mobile_creatable_content_types in this form nor in a hook_update or hook_install when the type was created)
+  // then we need to ensure it gets added to this form, but at the bottom.
+  foreach ($node_types as $type => $type_name) {
+    if (!array_key_exists($type, $ordered_types)) {
+      if (!isset($highest_weight)) {
+        $highest_weight = end($ordered_types)['weight'] ? end($ordered_types)['weight'] : 0;
+      }
+      $highest_weight += 10;
+      $ordered_types[$type] = [
+        'creatable' => 0,
+        'weight' => $highest_weight,
+      ];
+    }
+  }
+
+  $form['table'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Mukurtu Mobile Content Types'),
+    'help_text' => [
+      '#markup' => 'Check the content types for which content can be created within the Mukurtu Mobile app.<br/>Use the arrows to drag the content types into the order that they will display in the Create Content page in the app.',
+    ],
+    'mukurtu_mobile_content_types' => [
+      '#tree' => TRUE,
+      '#theme' => 'node_types_table',
+    ],
+  ];
+
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+    $form['table']['mukurtu_mobile_content_types'][$node_type] = [
+      'creatable' => [
+        '#type' => 'checkbox',
+        '#default_value' => $node_type_properties['creatable'],
+      ],
+      'label' => [
+        '#type' => 'item',
+        '#markup' => $node_types[$node_type],
+      ],
+      'weight' => [
+        '#type' => 'textfield',
+        '#default_value' => $node_type_properties['weight'],
+        '#size' => 3,
+        '#attributes' => ['class' => ['item-row-weight']],
+      ],
+    ];
+  }
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ma_mobile_client_theme($existing, $type, $theme, $path) {
+  $themes = array(
+    'node_types_table' => array(
+      'render element' => 'element'
+    ),
+  );
+  return $themes;
+}
+
+/**
+ * Make the node types table rows draggable; the resulting order is used when listing the content types in the add screen in the app.
+ */
+function theme_node_types_table($vars) {
+  $element = $vars['element'];
+  drupal_add_tabledrag('node_types_table', 'order', 'sibling', 'item-row-weight');
+
+  $header = array(
+    'creatable' => t('Creatable'),
+    'label' => t('Content Type'),
+    'weight' => t('Weight'),
+  );
+
+  $rows = array();
+  foreach (element_children($element) as $key) {
+    $row = array();
+    $row['data'] = array();
+    foreach ($header as $fieldname => $title) {
+      $row['data'][] = drupal_render($element[$key][$fieldname]);
+      $row['class'] = array('draggable');
+    }
+    $rows[] = $row;
+  }
+
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => 'node_types_table'),
+  ));
 }
 
 
@@ -140,7 +239,7 @@ function ma_mobile_client_generate_toggle_link($node, $color = '') {
 function ma_mobile_client_browser_login($uid, $timestamp, $hashed_pass) {
   global $user;
   if ($user->uid) {
-//    drupal_set_message(t('User is already logged in.'), 'error');
+    //    drupal_set_message(t('User is already logged in.'), 'error');
     drupal_goto();
   }
   else {
@@ -305,12 +404,15 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
  * Retrieve a list of content types that are creatable by the app.
  */
 function _ma_mobile_client_get_creatable_types ($fn = NULL) {
+  $ordered_types = variable_get('mukurtu_mobile_content_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_types();
   $creatable_types = [];
-  foreach (node_type_get_types() as $type) {
-    if (variable_get('mukurtu_mobile_create_' . $type->type)) {
-      $creatable_types[$type->type] = [
-        'label' => $type->name,
-        'description' => $type->description
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+    if ($node_type_properties['creatable']) {
+      $creatable_types[$node_type] = [
+        'label' => $node_types[$node_type]->name,
+        'description' => $node_types[$node_type]->description
       ];
     }
   }
@@ -374,32 +476,15 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
  * Called from hook_update and hook_install to set to the default types that can be created by Mukurtu Mobile.
  */
 function ma_mobile_client_set_default_creatable_types() {
-  $default_creatable_types = ['community', 'cultural_protocol_group', 'dictionary_word', 'digital_heritage', 'person', 'personal_collection', 'word_list'];
-  foreach ($default_creatable_types as $default_creatable_type) {
-    variable_set('mukurtu_mobile_create_' . $default_creatable_type, 1);
+  $ordered_creatable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'lesson', 'community', 'cultural_protocol_group', 'person', 'personal_collection'];
+  $default_creatable_types = [];
+  $weight = 0;
+  foreach ($ordered_creatable_types as $ordered_creatable_type) {
+    $weight += 10;
+    $default_creatable_types[$ordered_creatable_type] = [
+      'creatable' => 1,
+      'weight' => $weight,
+    ];
   }
-}
-
-/**
- * Implements hook_form_FORM_ID_alter().
- *
- * Add Mukurtu Mobile configuration options per content type (edit form of the content type).
- */
-function ma_mobile_client_form_node_type_form_alter(&$form, $form_state) {
-  if (variable_get('mukurtu_mobile_enabled')) {
-    if (isset($form['#node_type']->type)) {
-      $form['mukurtu_mobile'] = [
-        '#type' => 'fieldset',
-        '#title' => t('Mukurtu Mobile settings'),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#group' => 'additional_settings',
-      ];
-      $form['mukurtu_mobile']['mukurtu_mobile_create'] = [
-        '#type' => 'checkbox',
-        '#title' => t('Content of this type can be created from within the Mukurtu Mobile app.'),
-        '#default_value' => variable_get('mukurtu_mobile_create_' . $form['#node_type']->type),
-      ];
-    }
-  }
+  variable_set('mukurtu_mobile_content_types', $default_creatable_types);
 }
