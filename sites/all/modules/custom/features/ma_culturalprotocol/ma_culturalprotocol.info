@@ -55,6 +55,7 @@ features[field_group][] = group_basic|node|cultural_protocol_group|form
 features[field_group][] = group_tabs|node|cultural_protocol_group|form
 features[field_instance][] = comment-comment_node_cultural_protocol_group-comment_body
 features[field_instance][] = node-cultural_protocol_group-body
+features[field_instance][] = node-cultural_protocol_group-field_dhan_notified_users
 features[field_instance][] = node-cultural_protocol_group-field_membership_list_options
 features[field_instance][] = node-cultural_protocol_group-field_pre_actions
 features[field_instance][] = node-cultural_protocol_group-field_protocl_signup_permissions
