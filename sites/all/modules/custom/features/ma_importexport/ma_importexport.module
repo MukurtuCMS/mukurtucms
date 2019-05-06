@@ -648,9 +648,11 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
     // This is for audio and video files import only
     $path = ScaldAtomController::getThumbnailPath($type);
     try {
-        $data = file_get_contents($entity->{'Temporary target 1'});
-        $destination = (substr($path, -1) === '/' ? $path : $path . '/') . basename(urldecode($entity->{'Temporary target 1'}));
-        $file = file_save_data($data, $destination, FILE_EXISTS_RENAME);
+      $import_file = file_uri_to_object($entity->{'Temporary target 1'});
+      $destination = (substr($path, -1) === '/' ? $path : $path . '/') . basename(urldecode($entity->{'Temporary target 1'}));
+      $file = file_copy($import_file, $destination, FILE_EXISTS_RENAME);
+      $file->status = FILE_STATUS_PERMANENT;
+      file_save($file);
     } catch (Exception $e) {
         watchdog_exception('Feeds', $e, nl2br(check_plain($e)));
     }
