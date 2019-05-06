@@ -1,0 +1,119 @@
+<?php
+/**
+ * @file
+ * Test case for multilingual fields.
+ */
+
+
+class i18nCustomAddAnotherTestCase extends Drupali18nTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('Custom add another translation'),
+      'group' => 'Custom add another',
+      'description' => t('Custom add another translation functions')
+    );
+  }
+
+  function setUp() {
+    parent::setUp('i18n_field', 'i18n_custom_add_another', 'i18n_custom_add_another_testing');
+    parent::setUpLanguages();
+    $this->translator = $this->drupalCreateUser(array('translate interface', 'translate user-defined strings'));
+
+    // Create content type, with underscores.
+    $type_name = strtolower($this->randomName(8)) . '_test';
+    $type = $this->drupalCreateContentType(array('name' => $type_name, 'type' => $type_name));
+    $this->type = $type->type;
+    // Store a valid URL name, with hyphens instead of underscores.
+    $this->hyphen_type = str_replace('_', '-', $this->type);
+  }
+
+  /**
+   * Creates a new field through the Field UI.
+   *
+   * @param $bundle_path
+   *   Admin path of the bundle that the new field is to be attached to.
+   * @param $initial_edit
+   *   $edit parameter for drupalPost() on the first step ('Manage fields'
+   *   screen).
+   * @param $field_edit
+   *   $edit parameter for drupalPost() on the second step ('Field settings'
+   *   form).
+   * @param $instance_edit
+   *   $edit parameter for drupalPost() on the third step ('Instance settings'
+   *   form).
+   */
+  function fieldUIAddNewField($bundle_path, $initial_edit, $field_edit = array(), $instance_edit = array()) {
+    // Use 'test_field' field type by default.
+    $initial_edit += array(
+      'fields[_add_new_field][type]' => 'test_field',
+      'fields[_add_new_field][widget_type]' => 'test_field_widget',
+    );
+    $label = $initial_edit['fields[_add_new_field][label]'];
+    $field_name = $initial_edit['fields[_add_new_field][field_name]'];
+
+    // First step : 'Add new field' on the 'Manage fields' page.
+    $this->drupalPost("$bundle_path/fields",  $initial_edit, t('Save'));
+    $this->assertRaw(t('These settings apply to the %label field everywhere it is used.', array('%label' => $label)), t('Field settings page was displayed.'));
+
+    // Second step : 'Field settings' form.
+    $this->drupalPost(NULL, $field_edit, t('Save field settings'));
+    $this->assertRaw(t('Updated field %label field settings.', array('%label' => $label)), t('Redirected to instance and widget settings page.'));
+
+    // Third step : 'Instance settings' form.
+    $this->drupalPost(NULL, $instance_edit, t('Save settings'));
+    $this->assertRaw(t('Saved %label configuration.', array('%label' => $label)), t('Redirected to "Manage fields" page.'));
+
+    // Check that the field appears in the overview form.
+    $this->assertFieldByXPath('//table[@id="field-overview"]//td[1]', $label, t('Field was created and appears in the overview page.'));
+  }
+
+
+  /**
+   * Test the translation of text fields.
+   */
+  function testCustomAddAnotherTranslation() {
+    $field_name = drupal_strtolower($this->randomName());
+    $label = $this->randomName();
+    $add_another_label = $this->randomName();
+    $remove_label = $this->randomName();
+
+    $bundle_path1 = 'admin/structure/types/manage/' . $this->hyphen_type;
+
+    //Create a basic text field
+    $edit = array(
+      'fields[_add_new_field][type]' => 'text',
+      'fields[_add_new_field][widget_type]' => 'i18n_caa_test_field_widget',
+      'fields[_add_new_field][label]' => $label,
+      'fields[_add_new_field][field_name]' => $field_name,
+    );
+    $instance_settings = array(
+      'instance[custom_add_another]' => $add_another_label,
+      'instance[custom_remove]' => $remove_label,
+      'field[cardinality]' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    $this->fieldUIAddNewField($bundle_path1, $edit, array(), $instance_settings);
+
+    // Refresh i18n_strings.
+    $edit = array('groups[field]' => TRUE);
+    $this->drupalPost('admin/config/regional/translate/i18n_string', $edit, t('Refresh strings'));
+
+    // Save translations for each attribute.
+    $label_translation = $this->createStringTranslation('field', $label);
+    $add_another_label_translation = $this->createStringTranslation('field', $add_another_label);
+    $remove_label_translation = $this->createStringTranslation('field', $remove_label);
+    $this->drupalLogin($this->admin_user);
+
+    // Test untranslated values in default language.
+    $this->drupalGet('node/add/' . $this->hyphen_type);
+    $this->assertText($label, 'Field label is not translated');
+    $this->assertRaw('value="'. $add_another_label, 'Custom add another is not translated');
+    $this->assertRaw('value="'. $add_another_label, 'Custom remove is not translated');
+
+    // Test translated values in secondary language.
+    $this->drupalGet($this->secondary_language . '/node/add/' . $this->hyphen_type);
+    $this->assertText($label_translation[$this->secondary_language], 'Field label is translated');
+    $this->assertRaw('value="'. $add_another_label_translation[$this->secondary_language], 'Custom add another is translated');
+    $this->assertRaw('value="'. $remove_label_translation[$this->secondary_language], 'Custom remove is translated');
+  }
+}

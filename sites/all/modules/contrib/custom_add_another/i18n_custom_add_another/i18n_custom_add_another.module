@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Custom add another i18n integration.
+ *
+ * This module gives i18n integration for
+ * Custom add another module.
+ */
+
+/**
+ * Implements hook_i18n_object_info_alter().
+ */
+function i18n_custom_add_another_i18n_object_info_alter(&$info) {
+  $info['field_instance']['string translation']['properties']['custom_add_another'] = array(
+    'title' => t('Custom add another label'),
+  );
+  $info['field_instance']['string translation']['properties']['custom_remove'] = array(
+    'title' => t('Custom remove label'),
+  );
+}

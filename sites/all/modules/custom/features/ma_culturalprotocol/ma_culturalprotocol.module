@@ -530,6 +530,7 @@ function _ma_cultural_protocol_get_node_types_in_cps() {
       'calendar',
       'discussion_space',
       'document_library',
+      'unit_plan',
     ],
     'collab_pages' => ma_culturalprotocol_collab_child_node_types(),
   ];
