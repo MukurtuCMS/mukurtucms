@@ -12394,7 +12394,9 @@ body #admin-menu {
   display: none;
 }
 .node-lesson.view-mode-full .lesson-body > .field,
-.node-lesson.view-mode-default .lesson-body > .field {
+.node-lesson.view-mode-default .lesson-body > .field,
+.node-lesson.view-mode-full .lesson-body > .field-collection-container,
+.node-lesson.view-mode-default .lesson-body > .field-collection-container {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 10px;
@@ -12403,23 +12405,33 @@ body #admin-menu {
 }
 @media (min-width: 992px) {
   .node-lesson.view-mode-full .lesson-body > .field,
-  .node-lesson.view-mode-default .lesson-body > .field {
+  .node-lesson.view-mode-default .lesson-body > .field,
+  .node-lesson.view-mode-full .lesson-body > .field-collection-container,
+  .node-lesson.view-mode-default .lesson-body > .field-collection-container {
     font-size: 18px;
   }
 }
 .node-lesson.view-mode-full .lesson-body > .field > a,
-.node-lesson.view-mode-default .lesson-body > .field > a {
+.node-lesson.view-mode-default .lesson-body > .field > a,
+.node-lesson.view-mode-full .lesson-body > .field-collection-container > a,
+.node-lesson.view-mode-default .lesson-body > .field-collection-container > a {
   color: #AC143A;
 }
 .node-lesson.view-mode-full .lesson-body > .field > a:hover,
 .node-lesson.view-mode-default .lesson-body > .field > a:hover,
+.node-lesson.view-mode-full .lesson-body > .field-collection-container > a:hover,
+.node-lesson.view-mode-default .lesson-body > .field-collection-container > a:hover,
 .node-lesson.view-mode-full .lesson-body > .field > a:focus,
-.node-lesson.view-mode-default .lesson-body > .field > a:focus {
+.node-lesson.view-mode-default .lesson-body > .field > a:focus,
+.node-lesson.view-mode-full .lesson-body > .field-collection-container > a:focus,
+.node-lesson.view-mode-default .lesson-body > .field-collection-container > a:focus {
   color: #D9D4C2;
   text-decoration: none;
 }
 .node-lesson.view-mode-full .lesson-body > .field > .label-above,
-.node-lesson.view-mode-default .lesson-body > .field > .label-above {
+.node-lesson.view-mode-default .lesson-body > .field > .label-above,
+.node-lesson.view-mode-full .lesson-body > .field-collection-container > .label-above,
+.node-lesson.view-mode-default .lesson-body > .field-collection-container > .label-above {
   font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
@@ -12428,7 +12440,9 @@ body #admin-menu {
 }
 @media (min-width: 992px) {
   .node-lesson.view-mode-full .lesson-body > .field > .label-above,
-  .node-lesson.view-mode-default .lesson-body > .field > .label-above {
+  .node-lesson.view-mode-default .lesson-body > .field > .label-above,
+  .node-lesson.view-mode-full .lesson-body > .field-collection-container > .label-above,
+  .node-lesson.view-mode-default .lesson-body > .field-collection-container > .label-above {
     font-size: 18px;
   }
 }

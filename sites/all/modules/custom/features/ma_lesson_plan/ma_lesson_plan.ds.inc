@@ -23,6 +23,16 @@ function ma_lesson_plan_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_lesson_days' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_lesson_micro_tasks' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|lesson|default'] = $ds_fieldsetting;
 

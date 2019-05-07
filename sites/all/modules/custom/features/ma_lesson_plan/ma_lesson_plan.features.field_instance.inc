@@ -565,11 +565,18 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'field_collection',
+        'module' => 'field_collection_fieldset',
         'settings' => array(
+          'add' => '',
+          'collapsed' => 1,
+          'collapsible' => 1,
+          'delete' => '',
+          'description' => 1,
+          'edit' => '',
+          'legend' => 'field_day',
           'view_mode' => 'full',
         ),
-        'type' => 'field_collection_fields',
+        'type' => 'field_collection_fieldset_view',
         'weight' => 5,
       ),
       'search_result' => array(
@@ -617,11 +624,18 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'field_collection',
+        'module' => 'field_collection_fieldset',
         'settings' => array(
+          'add' => '',
+          'collapsed' => 1,
+          'collapsible' => 1,
+          'delete' => '',
+          'description' => 1,
+          'edit' => '',
+          'legend' => 'field_task',
           'view_mode' => 'full',
         ),
-        'type' => 'field_collection_fields',
+        'type' => 'field_collection_fieldset_view',
         'weight' => 2,
       ),
       'search_result' => array(
