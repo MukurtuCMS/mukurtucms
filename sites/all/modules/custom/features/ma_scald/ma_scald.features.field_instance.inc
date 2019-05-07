@@ -32,6 +32,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Invitation',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -119,6 +121,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Contributor',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -207,6 +211,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'People',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -317,6 +323,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -426,6 +434,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -530,6 +540,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Authors',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -624,6 +636,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Tags',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -754,6 +768,8 @@ function ma_scald_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'alt_field' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_image' => 0,
       'file_directory' => 'atoms/audio/thumbnails',
       'file_extensions' => 'png gif jpg jpeg',
@@ -838,6 +854,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'People',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -928,6 +946,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1019,6 +1039,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -1104,6 +1126,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Authors',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1178,6 +1202,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'File',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'description_field' => 0,
       'file_directory' => 'atoms/file',
       'file_extensions' => 'ppt pptx xls xlsx doc docx odt pdf txt csv odg sxw ods rtf zip rar gz 7z tar',
@@ -1257,6 +1283,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Tags',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1359,6 +1387,8 @@ function ma_scald_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'alt_field' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_image' => 0,
       'file_directory' => 'thumbnails/file',
       'file_extensions' => 'png gif jpg jpeg',
@@ -1476,6 +1506,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Archival TIFF',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'description_field' => 0,
       'file_directory' => 'atoms/image/tiff',
       'file_extensions' => 'tiff tif',
@@ -1609,6 +1641,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Category',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1717,6 +1751,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Full-size JPEG',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'description_field' => 0,
       'file_directory' => 'atoms/image/full_jpeg',
       'file_extensions' => 'jpg jpeg',
@@ -1832,6 +1868,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Standard and Creative Commons Licensing',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1942,6 +1980,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Original DNG',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'description_field' => 0,
       'file_directory' => 'atoms/image/dng',
       'file_extensions' => 'dng',
@@ -1994,7 +2034,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 0,
+        'weight' => 4,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -2075,6 +2115,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'People',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -2189,6 +2231,8 @@ function ma_scald_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -2227,7 +2271,6 @@ function ma_scald_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
-          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 6,
@@ -2310,6 +2353,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Created',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'now',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -2435,6 +2480,8 @@ function ma_scald_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -2554,6 +2601,8 @@ function ma_scald_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -2670,6 +2719,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Geo Location',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'local_solr' => array(
         'enabled' => FALSE,
         'lat_field' => 'lat',
@@ -2786,6 +2837,8 @@ function ma_scald_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -2904,6 +2957,8 @@ function ma_scald_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -3020,6 +3075,8 @@ function ma_scald_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -3146,6 +3203,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3177,7 +3236,7 @@ function ma_scald_field_default_field_instances() {
         'label' => 'inline',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 1,
+        'weight' => 5,
       ),
       'ma_scald_search_results' => array(
         'label' => 'above',
@@ -3273,6 +3332,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -3406,6 +3467,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Authors',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3529,6 +3592,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Keywords',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3579,7 +3644,7 @@ function ma_scald_field_default_field_instances() {
           'colorbox_node_style_first' => '',
         ),
         'type' => 'colorbox',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'ma_dh_assets' => array(
         'label' => 'hidden',
@@ -3718,6 +3783,8 @@ function ma_scald_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'alt_field' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_image' => 0,
       'file_directory' => 'atoms/image',
       'file_extensions' => 'png gif jpg jpeg',
@@ -3795,6 +3862,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'People',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3875,6 +3944,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -3960,6 +4031,8 @@ function ma_scald_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -4039,6 +4112,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Authors',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -4108,6 +4183,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Tags',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -4184,6 +4261,8 @@ function ma_scald_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'alt_field' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_image' => 0,
       'file_directory' => 'atoms/video/thumbnails',
       'file_extensions' => 'png gif jpg jpeg',
@@ -4226,6 +4305,8 @@ function ma_scald_field_default_field_instances() {
     'label' => 'Records',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -4260,6 +4341,8 @@ function ma_scald_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'context' => '',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,

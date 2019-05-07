@@ -8807,6 +8807,10 @@ ul.pagination li.pager-ellipsis span {
 .scald-menu .view-filters .views-exposed-form .views-exposed-widgets .input-group .form-control {
   z-index: 0;
 }
+.group-480-thumbnail-and-link {
+  margin: auto;
+  width: 480px;
+}
 #breadcrumb {
   width: 100vw;
   position: relative;
@@ -12510,6 +12514,9 @@ body #admin-menu {
   width: 100%;
   padding-top: 30px;
   border-bottom: 5px solid #E5E1E1;
+}
+.node-unit-plan.view-mode-full .unit-plan-body .group-480-thumbnail-and-link {
+  margin: 0;
 }
 .node-unit-plan.view-mode-full .unit-plan-sidebar {
   width: 33%;

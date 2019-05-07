@@ -109,14 +109,9 @@ function ma_scald_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'ma_colorbox';
   $ds_fieldsetting->settings = array(
     'download_atom' => array(
-      'weight' => '1',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
-    ),
-    'field_scald_protocol' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
     ),
   );
   $export['scald_atom|image|ma_colorbox'] = $ds_fieldsetting;
@@ -524,31 +519,33 @@ function ma_scald_ds_layout_settings_info() {
     'regions' => array(
       'ds_content' => array(
         0 => 'field_scald_protocol',
-        1 => 'scald_thumbnail',
-        2 => 'download_atom',
+        1 => 'group_480_thumbnail_and_link',
+        2 => 'scald_thumbnail',
         3 => 'field_scald_identifier',
-        4 => 'field_original_dng',
-        5 => 'group_scald_atom_metadata',
-        6 => 'field_archival_tiff',
-        7 => 'field_full_size_jpeg',
-        8 => 'field_scald_created',
-        9 => 'field_scald_creator',
-        10 => 'scald_authors',
-        11 => 'field_scald_headline',
-        12 => 'field_scald_description',
-        13 => 'scald_tags',
-        14 => 'field_scald_geo_location',
-        15 => 'field_scald_location',
-        16 => 'field_rights',
-        17 => 'field_licence_std_cc',
-        18 => 'field_category',
+        4 => 'download_atom',
+        5 => 'field_original_dng',
+        6 => 'group_scald_atom_metadata',
+        7 => 'field_archival_tiff',
+        8 => 'field_full_size_jpeg',
+        9 => 'field_scald_created',
+        10 => 'field_scald_creator',
+        11 => 'scald_authors',
+        12 => 'field_scald_headline',
+        13 => 'field_scald_description',
+        14 => 'scald_tags',
+        15 => 'field_scald_geo_location',
+        16 => 'field_scald_location',
+        17 => 'field_rights',
+        18 => 'field_licence_std_cc',
+        19 => 'field_category',
       ),
     ),
     'fields' => array(
       'field_scald_protocol' => 'ds_content',
+      'group_480_thumbnail_and_link' => 'ds_content',
       'scald_thumbnail' => 'ds_content',
-      'download_atom' => 'ds_content',
       'field_scald_identifier' => 'ds_content',
+      'download_atom' => 'ds_content',
       'field_original_dng' => 'ds_content',
       'group_scald_atom_metadata' => 'ds_content',
       'field_archival_tiff' => 'ds_content',
@@ -578,6 +575,7 @@ function ma_scald_ds_layout_settings_info() {
     'layout_attributes_merge' => 1,
     'layout_link_attribute' => '',
     'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
   );
   $export['scald_atom|image|ma_colorbox'] = $ds_layout;
 
