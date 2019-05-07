@@ -453,6 +453,10 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
     'ogg_group_fieldset',
     '#groups',
     '#group_children',
+    'group_access',
+    'group_register',
+    'og_roles_permissions',
+    'og_group_ref',
   ];
   foreach ($node_form as $key => $value) {
     if (!in_array($key, $skip_fields) AND (in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
