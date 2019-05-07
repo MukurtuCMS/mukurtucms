@@ -19,7 +19,7 @@
 }
 
 
-.node-lesson.view-mode-full, .node-lesson.view-mode-default {
+.node-lesson.view-mode-full, .node-lesson.view-mode-default, .node-lesson.view-mode-teacher_view {
 
   .lesson-body {
     // Copied and tweaked from .digital-heritage-body
@@ -33,7 +33,7 @@
       > a {
         .mukurtu-standard-link;
       }
-      >.label-above {
+      >.label-above, >.field>.label-above {
         .metadata-primary-field-label;
       }
     }
@@ -72,7 +72,12 @@
   }
 }
 
-.node-unit-plan.view-mode-full {
+.node-unit-plan.view-mode-full, .node-unit-plan.view-mode-default, .node-unit-plan.view-mode-teacher_view {
+
+  .field-name-ds-switch-field {
+    float: right;
+    margin-bottom: 1em;
+  }
 
   .unit-plan-body {
     width: 65%;
@@ -86,26 +91,30 @@
     width: 33%;
     .metadata-sidebar;
     .metadata-wrapper;
-
   }
 
   .unit-plan-bottom {
     .digital-heritage-body;
     .field-name-field-unit-lessons {
-      .quicktabs-tabs {
-        left: 0;
-        right: 0;
-        margin-left: 0;
-        margin-right: 0;
-        width: 100%;
-      }
       .field-name-title {
         h2 {
           margin-top: 0;
         }
-
       }
     }
   }
+
+  .field-name-field-unit-lessons {
+    clear: both;
+  }
+  
+  .quicktabs-tabs {
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
 
 }

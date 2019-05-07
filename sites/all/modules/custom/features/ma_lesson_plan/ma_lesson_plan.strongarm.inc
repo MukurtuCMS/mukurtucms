@@ -161,7 +161,7 @@ function ma_lesson_plan_strongarm() {
         'custom_settings' => TRUE,
       ),
       'full' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'rss' => array(
         'custom_settings' => FALSE,
@@ -207,6 +207,9 @@ function ma_lesson_plan_strongarm() {
       ),
       'revision' => array(
         'custom_settings' => FALSE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => TRUE,
       ),
     ),
     'extra_fields' => array(
@@ -236,7 +239,7 @@ function ma_lesson_plan_strongarm() {
         'custom_settings' => TRUE,
       ),
       'full' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'rss' => array(
         'custom_settings' => FALSE,
@@ -282,6 +285,12 @@ function ma_lesson_plan_strongarm() {
       ),
       'revision' => array(
         'custom_settings' => FALSE,
+      ),
+      'all_fields' => array(
+        'custom_settings' => TRUE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => TRUE,
       ),
     ),
     'extra_fields' => array(
