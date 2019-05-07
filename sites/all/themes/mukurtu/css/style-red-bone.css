@@ -12516,11 +12516,6 @@ body #admin-menu {
   float: right;
   margin-bottom: 1em;
 }
-.node-unit-plan.view-mode-full .unit-plan-body,
-.node-unit-plan.view-mode-default .unit-plan-body,
-.node-unit-plan.view-mode-teacher_view .unit-plan-body {
-  width: 65%;
-}
 .node-unit-plan.view-mode-full .unit-plan-body .field-name-field-media-asset img,
 .node-unit-plan.view-mode-default .unit-plan-body .field-name-field-media-asset img,
 .node-unit-plan.view-mode-teacher_view .unit-plan-body .field-name-field-media-asset img {
@@ -12597,7 +12592,6 @@ body #admin-menu {
 .node-unit-plan.view-mode-full .unit-plan-sidebar,
 .node-unit-plan.view-mode-default .unit-plan-sidebar,
 .node-unit-plan.view-mode-teacher_view .unit-plan-sidebar {
-  width: 33%;
   border-top: 5px solid #D9D4C2;
   border-radius: 0px;
   background-color: #F0EEE9;
