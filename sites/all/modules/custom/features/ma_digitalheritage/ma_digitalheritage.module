@@ -248,23 +248,7 @@ function ma_digitalheritage_node_view($node, $view_mode) {
 
   if ($node->type == 'digital_heritage') {
 
-    if ($view_mode == 'search_result') {
-
-      // Tooltip and links on DH grid/list views
-
-      // If no media items at all on the DH item and in grid view, put a placeholder image
-      if (!$node->field_media_asset) {
-        $node->content['field_media_asset'][0]['#markup'] = '
-      <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
-        <div class="field-items">
-            <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img class="img-responsive" src = "/' . drupal_get_path('module', 'ma_digitalheritage') . '/images/no_media_available.jpg"></a>
-        </div>
-      </div>';
-      }
-
-    }
-
-    elseif ($view_mode == 'full') {
+    if ($view_mode == 'full') {
 
         // Users (especially new admins) are sometimes viewing community records independently of the parent record and getting confused
         // because they think it is a standalone record.  Add a link back to the parent record to avoid confusion.
