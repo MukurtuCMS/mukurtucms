@@ -1088,7 +1088,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'title',
+        'type' => 'ma_colorbox',
         'weight' => 7,
       ),
       'search_result' => array(
