@@ -21,6 +21,8 @@ projects[drupal][patch][] = core/mukurtu_custom_default_settings_file.patch
 ; 117661693-Stop-double-quoting-quotes-in-term-autocomplete.patch
 projects[drupal][patch][] = core/multipatch-109315810-109315810-109315810.patch
 
+; Redirect on empty database for Reclaim.
+projects[drupal][patch][] = core/install_redirect_on_empty_database-728702-17.patch
 
 
 ;;;;;;;;;;;;;;;;;;;
