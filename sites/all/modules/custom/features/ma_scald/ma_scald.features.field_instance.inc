@@ -4295,7 +4295,9 @@ function ma_scald_field_default_field_instances() {
       'default' => array(
         'label' => 'hidden',
         'module' => 'mukurtu_display_formatters_tabbed_records',
-        'settings' => array(),
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
         'type' => 'mukurtu_records_formatter',
         'weight' => 0,
       ),
