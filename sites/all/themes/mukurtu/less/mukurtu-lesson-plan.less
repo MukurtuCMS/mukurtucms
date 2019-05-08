@@ -21,6 +21,19 @@
 
 .node-lesson.view-mode-full, .node-lesson.view-mode-default, .node-lesson.view-mode-teacher_view {
 
+  .field-name-ds-switch-field {
+    float: right;
+    font-size: 16px !important;
+    padding: 0 !important;
+  }
+  .field-name-ds-switch-field::after {
+    border-style: none !important;
+  }
+
+  .field-name-body {
+    clear: both;
+  }
+
   .lesson-body {
     // Copied and tweaked from .digital-heritage-body
     >.field, >.field-collection-container {
@@ -73,6 +86,12 @@
 }
 
 .node-unit-plan.view-mode-full, .node-unit-plan.view-mode-default, .node-unit-plan.view-mode-teacher_view {
+
+  .node-lesson {
+    .field-name-ds-switch-field {
+      display: none;
+    }
+  }
 
   .field-name-ds-switch-field {
     float: right;

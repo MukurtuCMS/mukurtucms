@@ -66,8 +66,17 @@ function ma_lesson_plan_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'lesson';
   $ds_fieldsetting->view_mode = 'teacher_view';
   $ds_fieldsetting->settings = array(
-    'field_lesson_days' => array(
+    'ds_switch_field' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
       'formatter_settings' => array(
+        'vms' => array(
+          'full' => 'Switch to Student View',
+          'teaser' => '',
+          'search_result' => '',
+          'teacher_view' => '',
+        ),
         'ft' => array(),
       ),
     ),
@@ -407,12 +416,14 @@ function ma_lesson_plan_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'central' => array(
-        0 => 'body',
-        1 => 'field_lesson_micro_tasks',
-        2 => 'field_related_dictionary_words',
+        0 => 'ds_switch_field',
+        1 => 'body',
+        2 => 'field_lesson_micro_tasks',
+        3 => 'field_related_dictionary_words',
       ),
     ),
     'fields' => array(
+      'ds_switch_field' => 'central',
       'body' => 'central',
       'field_lesson_micro_tasks' => 'central',
       'field_related_dictionary_words' => 'central',
@@ -487,15 +498,17 @@ function ma_lesson_plan_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'central' => array(
-        0 => 'body',
-        1 => 'field_lesson_micro_tasks',
-        2 => 'field_lesson_tech_integration',
-        3 => 'field_related_dictionary_words',
-        4 => 'field_lesson_days',
-        5 => 'field_lesson_resources',
+        0 => 'ds_switch_field',
+        1 => 'body',
+        2 => 'field_lesson_micro_tasks',
+        3 => 'field_lesson_tech_integration',
+        4 => 'field_related_dictionary_words',
+        5 => 'field_lesson_days',
+        6 => 'field_lesson_resources',
       ),
     ),
     'fields' => array(
+      'ds_switch_field' => 'central',
       'body' => 'central',
       'field_lesson_micro_tasks' => 'central',
       'field_lesson_tech_integration' => 'central',

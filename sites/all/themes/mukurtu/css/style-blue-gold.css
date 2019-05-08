@@ -12387,6 +12387,23 @@ body #admin-menu {
 .node-unit_plan-form .group-lessons .field-name-field-pre-actions {
   display: none;
 }
+.node-lesson.view-mode-full .field-name-ds-switch-field,
+.node-lesson.view-mode-default .field-name-ds-switch-field,
+.node-lesson.view-mode-teacher_view .field-name-ds-switch-field {
+  float: right;
+  font-size: 16px !important;
+  padding: 0 !important;
+}
+.node-lesson.view-mode-full .field-name-ds-switch-field::after,
+.node-lesson.view-mode-default .field-name-ds-switch-field::after,
+.node-lesson.view-mode-teacher_view .field-name-ds-switch-field::after {
+  border-style: none !important;
+}
+.node-lesson.view-mode-full .field-name-body,
+.node-lesson.view-mode-default .field-name-body,
+.node-lesson.view-mode-teacher_view .field-name-body {
+  clear: both;
+}
 .node-lesson.view-mode-full .lesson-body > .field,
 .node-lesson.view-mode-default .lesson-body > .field,
 .node-lesson.view-mode-teacher_view .lesson-body > .field,
@@ -12503,6 +12520,11 @@ body #admin-menu {
 .node-lesson.view-mode-default .lesson-body .entity-field-collection-item .content > .field:last-child,
 .node-lesson.view-mode-teacher_view .lesson-body .entity-field-collection-item .content > .field:last-child {
   padding-bottom: 0;
+}
+.node-unit-plan.view-mode-full .node-lesson .field-name-ds-switch-field,
+.node-unit-plan.view-mode-default .node-lesson .field-name-ds-switch-field,
+.node-unit-plan.view-mode-teacher_view .node-lesson .field-name-ds-switch-field {
+  display: none;
 }
 .node-unit-plan.view-mode-full .field-name-ds-switch-field,
 .node-unit-plan.view-mode-default .field-name-ds-switch-field,

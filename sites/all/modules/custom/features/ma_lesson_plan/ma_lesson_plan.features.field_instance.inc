@@ -758,7 +758,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 22,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -919,7 +919,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 23,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -986,7 +986,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 21,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1056,7 +1056,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 24,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1066,9 +1066,10 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'teacher_view' => array(
         'label' => 'above',
+        'module' => 'list',
         'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 7,
+        'type' => 'list_default',
+        'weight' => 23,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1123,7 +1124,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'search_result' => array(
         'label' => 'above',
