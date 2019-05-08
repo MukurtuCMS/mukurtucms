@@ -729,6 +729,9 @@ function ma_lesson_plan_ds_layout_settings_info() {
       'layout_class' => array(
         '' => '',
       ),
+      'central' => array(
+        'unit-plan-bottom' => 'unit-plan-bottom',
+      ),
     ),
     'wrappers' => array(
       'central' => 'div',
