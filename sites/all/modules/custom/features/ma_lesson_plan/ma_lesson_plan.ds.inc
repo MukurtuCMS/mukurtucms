@@ -71,11 +71,6 @@ function ma_lesson_plan_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
-    'field_lesson_micro_tasks' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
   );
   $export['node|lesson|teacher_view'] = $ds_fieldsetting;
 
@@ -415,14 +410,12 @@ function ma_lesson_plan_ds_layout_settings_info() {
         0 => 'body',
         1 => 'field_lesson_micro_tasks',
         2 => 'field_related_dictionary_words',
-        3 => 'field_lesson_days',
       ),
     ),
     'fields' => array(
       'body' => 'central',
       'field_lesson_micro_tasks' => 'central',
       'field_related_dictionary_words' => 'central',
-      'field_lesson_days' => 'central',
     ),
     'classes' => array(
       'layout_class' => array(
