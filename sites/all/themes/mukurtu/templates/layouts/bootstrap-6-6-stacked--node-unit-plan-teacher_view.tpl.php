@@ -41,7 +41,7 @@
   <?php endif; ?>
   <?php if ($bottom): ?>
     <div class="row">
-      <<?php print $bottom_wrapper; ?> class="col-sm-12 <?php print $bottom_classes; ?>">
+      <<?php print $bottom_wrapper; ?> class="col-sm-12 digital-heritage-body <?php print $bottom_classes; ?>">
         <?php print $bottom; ?>
       </<?php print $bottom_wrapper; ?>>
     </div>

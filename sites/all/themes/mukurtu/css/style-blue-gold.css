@@ -12510,15 +12510,18 @@ body #admin-menu {
 .node-lesson.view-mode-default .lesson-body .entity-field-collection-item .label-inline,
 .node-lesson.view-mode-teacher_view .lesson-body .entity-field-collection-item .label-inline {
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
 }
-.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .content > .field,
-.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .content > .field,
-.node-lesson.view-mode-teacher_view .lesson-body .entity-field-collection-item .content > .field {
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .field,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .field,
+.node-lesson.view-mode-teacher_view .lesson-body .entity-field-collection-item .field {
   padding-bottom: 20px;
 }
-.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .content > .field:last-child,
-.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .content > .field:last-child,
-.node-lesson.view-mode-teacher_view .lesson-body .entity-field-collection-item .content > .field:last-child {
+.node-lesson.view-mode-full .lesson-body .entity-field-collection-item .field:last-child,
+.node-lesson.view-mode-default .lesson-body .entity-field-collection-item .field:last-child,
+.node-lesson.view-mode-teacher_view .lesson-body .entity-field-collection-item .field:last-child {
   padding-bottom: 0;
 }
 .node-unit-plan.view-mode-full .node-lesson .field-name-ds-switch-field,
@@ -12536,15 +12539,6 @@ body #admin-menu {
 .node-unit-plan.view-mode-default .unit-plan-body .group-480-thumbnail-and-link,
 .node-unit-plan.view-mode-teacher_view .unit-plan-body .group-480-thumbnail-and-link {
   margin: 0;
-}
-.node-unit-plan.view-mode-full .unit-plan-bottom .label-above,
-.node-unit-plan.view-mode-default .unit-plan-bottom .label-above,
-.node-unit-plan.view-mode-teacher_view .unit-plan-bottom .label-above {
-  font-size: 18px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  padding-bottom: 5px;
 }
 .node-unit-plan.view-mode-full .unit-plan-bottom .field-name-field-unit-lessons,
 .node-unit-plan.view-mode-default .unit-plan-bottom .field-name-field-unit-lessons,
