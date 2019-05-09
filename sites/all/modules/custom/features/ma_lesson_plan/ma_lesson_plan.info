@@ -31,6 +31,7 @@ features[ctools][] = ds:ds:1
 features[ctools][] = field_group:field_group:1
 features[ctools][] = strongarm:strongarm:1
 features[ds_field_settings][] = node|lesson|default
+features[ds_field_settings][] = node|lesson|full
 features[ds_field_settings][] = node|lesson|search_result
 features[ds_field_settings][] = node|lesson|teacher_view
 features[ds_field_settings][] = node|unit_plan|default
