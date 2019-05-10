@@ -1,0 +1,1366 @@
+<?php
+/**
+ * @file
+ * Main file for Select2 module.
+ */
+
+/**
+ * The current module version.
+ *
+ * This constant will be used for provide module version,
+ * when module installed directly from git repository
+ */
+define('SELECT2_MODULE_VERSION', '7.x-1.x-dev');
+
+define('SELECT2_MIN_PLUGIN_VERSION', '3.4.5');
+
+define('SELECT2_MIN_JQUPDATE_VERSION', '2.4');
+
+define('SELECT2_PLUGIN_PATH', 'sites/all/libraries/select2');
+define('SELECT2_MODULE_PATH', drupal_get_path('module', 'select2'));
+define('SELECT2_VALUES_SEPARATOR', '¶');
+define('SELECT2_COMMA_REPLACEMENT', '{;}');
+
+/**
+ * Implements hook_menu().
+ */
+function select2_menu() {
+
+  $items['admin/config/user-interface/select2_settings'] = array(
+    'title'            => 'Select2',
+    'description'      => 'Select2 module settings',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('select2_settings_form'),
+    'access arguments' => array('administer select2'),
+    'file'             => 'pages/select2.admin.inc',
+  );
+
+  $items['select2/ajax/get_settings'] = array(
+    'title' => 'Select2',
+    'page callback' => 'select2_get_settings_ajax',
+    'delivery callback' => 'ajax_deliver',
+    'access callback' => TRUE,
+    'description' => 'Ajax callback for getting select2 settings.',
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/ajax.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function select2_preprocess_page($vars) {
+  if (variable_get('select2_use_for_all_select_elements', FALSE)) {
+    if (!_select2_current_path_is_admin() ||
+    (_select2_current_path_is_admin() && variable_get('select2_use_for_all_select_elements_for_admin_pages', FALSE))) {
+      $variant = variable_get('select2_compression_type', 'minified');
+      libraries_load('select2', $variant);
+    }
+  }
+
+}
+
+/**
+ * Implements hook_theme().
+ */
+function select2_theme() {
+  return array(
+    'select2_hidden' => array(
+      'render element' => 'element',
+    ),
+  );
+}
+
+/**
+ * Implements hook_permission().
+ *
+ * Adds a new permission limiting which users can change Select2 integration
+ * settings.
+ */
+function select2_permission() {
+  return array(
+    'administer select2' => array(
+      'title' => t('Administer Select2 settings'),
+      'description' => t('Change where and how Select2 is included on a page.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_libraries_info().
+ *
+ * For defining external libraries.
+ */
+function select2_libraries_info() {
+
+  global $user, $language;
+
+  $libraries['select2'] = array(
+    'name' => 'select2',
+    'vendor url' => 'http://ivaynberg.github.io/select2',
+    'download url' => 'https://github.com/ivaynberg/select2/tags',
+    // 2.1.12
+    'version arguments' => array(
+      'file' => 'select2.jquery.json',
+      'pattern' => '@"version": "([0-9\.a-z\-]+)"@',
+      'lines' => 20,
+      'cols'  => 400,
+    ),
+    'files' => array(
+      'js' => array(
+        'select2.js',
+      ),
+      'css' => array(
+        'select2.css',
+      ),
+    ),
+    'variants' => array(
+      'source' => array(
+        'files' => array(
+          'js' => array('select2.js'),
+          'css' => array('select2.css'),
+        ),
+      ),
+      'minified' => array(
+        'files' => array(
+          'js' => array('select2.min.js'),
+          'css' => array('select2.css'),
+        ),
+      ),
+    ),
+    'versions' => array(
+      '3' => array(
+        'files' => array(
+          'js' => array('select2.js'),
+          'css' => array('select2.css'),
+        ),
+        'variants' => array(
+          'source' => array(
+            'files' => array(
+              'js' => array('select2.js'),
+              'css' => array('select2.css'),
+            ),
+          ),
+          'minified' => array(
+            'files' => array(
+              'js' => array('select2.min.js'),
+              'css' => array('select2.css'),
+            ),
+          ),
+        ),
+      ),
+      '4' => array(
+        'files' => array(
+          'js' => array('dist/js/select2.full.js'),
+          'css' => array('dist/css/select2.css'),
+        ),
+        'variants' => array(
+          'source' => array(
+            'files' => array(
+              'js' => array('dist/js/select2.full.js'),
+              'css' => array('dist/css/select2.css'),
+            ),
+          ),
+          'minified' => array(
+            'files' => array(
+              'js' => array('dist/js/select2.full.min.js'),
+              'css' => array('dist/css/select2.min.css'),
+            ),
+          ),
+        ),
+      ),
+    ),
+    'callbacks' => array(
+      'post-load' => array('_select2_post_load_library_callback'),
+    ),
+  );
+
+  return $libraries;
+}
+
+
+/**
+ * Implements hook_element_info().
+ */
+function select2_element_info() {
+  return array(
+    'select2_hidden' => array(
+      '#input' => TRUE,
+      '#process' => array('select2_select_element_process'),
+      '#theme' => array('select2_hidden'),
+      '#theme_wrapper' => 'form_element',
+      '#select2' => array(
+        'separator' => SELECT2_VALUES_SEPARATOR,
+      ),
+      '#value_callback' => 'select_2_hidden_value_callback',
+    ),
+  );
+}
+
+/**
+ * Returns HTML for a hidden form element for Select2 plugin.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used: #name, #value, #attributes.
+ *
+ * @ingroup themeable
+ */
+function theme_select2_hidden($variables) {
+
+  $element = $variables['element'];
+  $element['#attributes']['type'] = 'hidden';
+  element_set_attributes($element, array('name', 'value'));
+
+  $element['#attributes'] = isset($element['#attributes']) ? (is_array($element['#attributes']) ? $element['#attributes'] : array()) : array();
+
+  _form_set_class($element);
+
+  if (isset($element['#attributes']['value']) && is_array($element['#attributes']['value'])) {
+    $element['#attributes']['value'] = implode(isset($element['#select2']['separator']) ? $element['#select2']['separator'] : SELECT2_VALUES_SEPARATOR, $element['#attributes']['value']);
+  }
+
+  if (isset($element['#id']) && !isset($element['#attributes']['id'])) {
+    $element['#attributes']['id'] = $element['#id'];
+  }
+
+  $variables['element']['#children'] = '<input' . drupal_attributes($element['#attributes']) . " />\n";
+
+  return theme('form_element', $variables);
+}
+
+/**
+ * Implements hook_element_info_alter().
+ */
+function select2_element_info_alter(&$type) {
+
+  if (isset($type['select'])) {
+    $type['select']['#process'][] = 'select2_select_element_process';
+  }
+
+  if (isset($type['textfield'])) {
+    $type['textfield']['#process'][] = 'select2_process_textfield';
+  }
+
+}
+
+/**
+ * Select element process.
+ */
+function select2_select_element_process($element, &$form_state) {
+
+  if (isset($element['#options']) && is_array($element['#options'])) {
+    foreach ($element['#options'] as $key => $value) {
+      if (is_string($value)) {
+        $element['#options'][$key] = htmlspecialchars_decode($value);
+      }
+    }
+  }
+
+  if (isset($element['#select2']['alter'])) {
+
+    if (is_string($element['#select2']['alter'])) {
+      if (function_exists($element['#select2']['alter'])) {
+        $function = $element['#select2']['alter'];
+        $function($element);
+      }
+    }
+  }
+
+  $s2h_defaults = _select2_default_settings();
+
+  if ($element['#type'] == 'select2_hidden') {
+
+    if (!isset($element['#select2'])) {
+      $element['#select2'] = $s2h_defaults;
+    }
+    else {
+      $element['#select2'] = array_merge($s2h_defaults, $element['#select2']);
+    }
+
+    if ($element['#select2']['jqui_sortable']) {
+      $element['#attached']['library'][] = array('system', 'ui.sortable');
+    }
+
+  }
+
+  if (isset($element['#select2_processed'])) {
+    return $element;
+  }
+
+  if (variable_get('select2_use_for_all_select_elements', FALSE) && !isset($element['#select2'])) {
+    if (!_select2_current_path_is_admin() ||
+    (_select2_current_path_is_admin() && variable_get('select2_use_for_all_select_elements_for_admin_pages', FALSE))) {
+      $element['#select2'] = $s2h_defaults;
+    }
+  }
+
+  if (!isset($element['#select2'])) {
+    $element['#select2_processed'] = TRUE;
+    return $element;
+  }
+
+  if ((!isset($element['#required']) || !$element['#required']) && !isset($element['#select2']['allowClear'])) {
+    $element['#select2']['allowClear'] = TRUE;
+  }
+
+  if ((!isset($element['#select2']['placeholder']) || !$element['#select2']['placeholder'])) {
+    if (isset($element['#empty_option'])) {
+      $element['#select2']['placeholder'] = $element['#empty_option'];
+    }
+    elseif (isset($element['#options']['_none'])) {
+      $element['#select2']['placeholder'] = $element['#options']['_none'];
+      $element['#options'] = array('' => $element['#options']['_none']) + $element['#options'];
+      unset($element['#options']['_none']);
+    }
+  }
+
+  $element['#attributes']['class'][] = 'use-select-2';
+
+  $variant = variable_get('select2_compression_type', 'minified');
+  $element['#attached']['libraries_load'][] = array('select2', $variant);
+
+  $element_id = isset($element['#id']) ? $element['#id'] : (isset($element['#attributes']['id']) ? $element['#attributes']['id'] : drupal_clean_css_identifier($element['#name']));
+
+  if ($element['#type'] == 'select2_hidden' &&
+      isset($element['#options']) &&
+      is_array($element['#options']) &&
+      (!isset($element['#validated']) || !$element['#validated'])) {
+
+    $element['#attributes']['id'] = $element_id;
+
+    $data = array();
+
+    if (isset($element['#options'][''])) {
+      unset($element['#options']['']);
+    }
+
+    foreach ($element['#options'] as $id => $value) {
+      $data_element = new stdClass();
+
+      $data_element->id = $id;
+      $data_element->text = $value;
+
+      if (isset($element['#select2']['taxonomy_vocabulary']) && $element['#select2']['taxonomy_vocabulary']) {
+        if ($parents = taxonomy_get_parents_all($id)) {
+
+          if (count($parents) > 1) {
+
+            $parents = array_reverse($parents);
+
+            $item_hover_title = '';
+
+            foreach ($parents as $parent) {
+              if ($parent->tid == $id) {
+                continue;
+              }
+              $item_hover_title .= $parent->name . '->';
+            }
+
+            $item_hover_title .= $value;
+
+            $data_element->hover_title = $item_hover_title;
+
+          }
+        }
+      }
+
+      $data[] = $data_element;
+    }
+
+    if (isset($item_hover_title)) {
+      $element['#select2']['formatSelection'] = 'formatSelectionTaxonomyTermsItem';
+      $element['#select2']['formatResult'] = 'formatResultTaxonomyTermsItem';
+    }
+
+    $element['#select2']['data'] = $data;
+
+    unset($element['#options']);
+  }
+
+  if (isset($element['#field_name']) && $element['#field_name']) {
+    $field_info = field_info_field($element['#field_name']);
+
+    if ($field_info['cardinality'] != 1) {
+      if ($element['#type'] != 'select') {
+        $element['#select2']['multiple'] = TRUE;
+      }
+      $element['#select2']['jqui_sortable']  = TRUE;
+
+      if ($field_info['cardinality'] > 1) {
+        $element['#select2']['maximumSelectionSize']  = $field_info['cardinality'];
+      }
+    }
+
+  }
+
+  drupal_alter('select2_element', $element);
+
+  _select2_set_element_settings($element_id, $element['#select2']);
+  $element['#select2_processed'] = TRUE;
+  return $element;
+}
+
+/**
+ * Process textfield.
+ */
+function select2_process_textfield($element, &$form_state) {
+
+  if (isset($element['#field_name']) && $element['#field_name']) {
+    $field_info = field_info_field($element['#field_name']);
+
+  }
+
+  if (!variable_get('select2_use_for_ac_elements', FALSE) ||
+      !isset($element['#autocomplete_path']) ||
+      !$element['#autocomplete_path'] ||
+      (isset($element['#select_2_processed']) && $element['#select_2_processed'])) {
+
+    // Must check form field for entity field setting.
+    if (isset($field_info)
+        && (isset($element['#select2'])
+            && isset($element['#select2']['use_select2'])
+            && $element['#select2']['use_select2'])) {
+    }
+    else {
+      return $element;
+    }
+  }
+
+  $element_id = isset($element['#id']) ?
+                $element['#id'] :
+                (isset($element['#attributes']['id']) ?
+                  $element['#attributes']['id'] :
+                  drupal_clean_css_identifier($element['#name']));
+
+  if ((!isset($element['#field_info']) || !$element['#field_info'])
+      && isset($element['#field_name']) && $element['#field_name']) {
+    $field_info = field_info_field($element['#field_name']);
+    $element['#field_info'] = $field_info;
+  }
+
+  $element['#attributes']['class'][] = 'use-select-2';
+
+  if (!isset($element['#ajax_processed']) || !$element['#ajax_processed']) {
+    $element['#ajax_processed'] = TRUE;
+  }
+
+  if (!isset($element['#select2'])) {
+    $element['#select2'] = array();
+  }
+
+  $s2_ac_defaults = array(
+    'autocomplete_path'  => $element['#autocomplete_path'],
+    'minimumInputLength' => 1,
+    'formatResult'       => 'acFormatResult',
+    'formatSelection'    => 'acFielsFormatSelection',
+    'initSelection'      => 'acS2InitSelecttion',
+    'ajax'               => 'getAjaxObjectForAcElement',
+    'containerCssClass'  => 'ac-replaced-by-select2',
+  );
+
+  $element['#attributes'] += array(
+    'data-select2-ajax'     => 'ac_element_ajax',
+    'data-select2-ajaxpath' => url($element['#autocomplete_path']),
+    'data-select2-initSelection' => 'acS2InitSelecttion'
+  );
+
+  if (!isset($element['#required']) || !$element['#required']) {
+    $s2_ac_defaults['allowClear'] = TRUE;
+    $s2_ac_defaults['placeholder'] = t('Start search');
+  }
+
+  if (isset($field_info) && $field_info['type'] == 'taxonomy_term_reference') {
+    // Need to add custom properties for taxonomy term reference field.
+    $s2_ac_defaults['taxonomy_ref_ac_allowed'] = TRUE;
+
+    if ($field_info['cardinality'] != 1) {
+      $s2_ac_defaults['tokenSeparators'] = array(',');
+      $s2_ac_defaults['separator'] = ',';
+      $s2_ac_defaults['comma_replacement'] = SELECT2_COMMA_REPLACEMENT;
+
+      $s2_ac_defaults['initSelection'] = 'taxonomyTermRefAcS2InitSelecttion';
+
+      $element['#attributes']['data-select2-initSelection'] = 'taxonomyTermRefAcS2InitSelecttion';
+
+      $description_prefix = '';
+
+      if (isset($element['#description']) && $element['#description']) {
+        $description_prefix = '<br />';
+      }
+      else {
+        $element['#description'] = '';
+      }
+
+      $element['#description'] .= $description_prefix
+                                 . t('For change order of terms, you can drag and drop them into desired position.')
+                                 . '<br />'
+                                 . t('Symbol &quot;,&quot; will aumaticaly separete the inputted terms.');
+    }
+
+  }
+
+  if (isset($element['#entity_type']) &&
+      isset($element['#field_name']) &&
+      isset($element['#bundle'])) {
+
+        if (!isset($element['#field_instance']) || !$element['#field_instance']) {
+          $field_instance = field_info_instance($element['#entity_type'], $element['#field_name'], $element['#bundle']);
+
+          $element['#field_instance'] = $field_instance;
+        }
+        else {
+          $field_instance = $element['#field_instance'];
+        }
+
+        if (strstr($field_instance['widget']['type'], '_tags') !== FALSE) {
+          $s2_ac_defaults['separator'] = ',';
+          $s2_ac_defaults['tokenSeparators'] = array(',');
+          $s2_ac_defaults['initSelection'] = 'taxonomyTermRefAcS2InitSelecttion';
+
+          if ($element['#value']) {
+            $s2_ac_defaults['comma_replacement'] = SELECT2_COMMA_REPLACEMENT;
+          }
+        }
+
+  }
+
+  if (isset($field_info) && $field_info['cardinality'] != 1) {
+    $s2_ac_defaults['multiple'] = TRUE;
+    $s2_ac_defaults['jqui_sortable']  = TRUE;
+
+    if ($field_info['cardinality'] > 1) {
+      $s2_ac_defaults['maximumSelectionSize']  = $field_info['cardinality'];
+    }
+
+  }
+
+  $result_settings = (isset($element['#select2_defaults'])) ?
+                     array_merge($s2_ac_defaults, $element['#select2'], $element['#select2_defaults']) :
+                     array_merge($s2_ac_defaults, $element['#select2']);
+
+  $element['#select2'] = $result_settings;
+
+  $variant = variable_get('select2_compression_type', 'minified');
+  $element['#attached']['libraries_load'][] = array('select2', $variant);
+
+  $element['#select_2_processed'] = TRUE;
+
+  if (isset($element['#select2']['jqui_sortable']) && $element['#select2']['jqui_sortable']) {
+    $element['#attached']['library'][] = array('system', 'ui.sortable');
+  }
+
+  if ((isset($element['#select2']['allowClear']) && $element['#select2']['allowClear'])
+      && (!isset($element['#attributes']['placeholder'])
+          && (!isset($element['#select2']['placeholder']) || !$element['#select2']['placeholder']))) {
+
+    $element['#select2']['placeholder'] = t('Type text for search');
+
+  }
+
+  drupal_alter('select2_element', $element);
+
+  _select2_set_element_settings($element_id, $element['#select2']);
+
+  $element['#autocomplete_path'] = FALSE;
+
+  if (isset($element['#select2']['comma_replacement'])) {
+
+    if (!isset($element['#element_validate'])) {
+      $element['#element_validate'] = array();
+    }
+
+    array_unshift($element['#element_validate'], '_select2_comma_replacement_validate');
+  }
+
+  return $element;
+}
+
+
+function select2_field_widget_entityreference_autocomplete_base_form_alter(&$element, &$form_state, $context) {
+
+  if (isset($element['target_id'])) {
+    $target_element = &$element['target_id'];
+  }
+  else {
+    $target_element = &$element;
+  }
+
+  if (isset($target_element['#field_name']) && $target_element['#field_name']) {
+    $field_info = field_info_field($target_element['#field_name']);
+    $target_element['#field_info'] = $field_info;
+
+    $field_instance = field_info_instance($target_element['#entity_type'], $target_element['#field_name'], $target_element['#bundle']);
+
+    $target_element['#field_instance'] = $field_instance;
+
+    if (isset($field_instance['settings']['select2_integration'])
+      && $field_instance['settings']['select2_integration']) {
+
+        $select2_settings = $field_instance['settings']['select2_integration'];
+        if (isset($select2_settings['hide_id']) && $select2_settings['hide_id']) {
+          $target_element['#select2_defaults']['hideEntityIds'] = TRUE;
+        }
+      }
+  }
+}
+
+
+function select2_field_widget_entityreference_autocomplete_form_alter(&$element, &$form_state, $context) {
+
+  select2_field_widget_entityreference_autocomplete_base_form_alter($element, $form_state, $context);
+
+  $element['target_id']['#select2_defaults']['multiple'] = FALSE;
+  $element['target_id']['#select2_defaults']['initSelection'] = 'entityReferenceInitSelecttion';
+}
+
+
+function select2_field_widget_entityreference_autocomplete_tags_form_alter(&$element, &$form_state, $context) {
+
+  select2_field_widget_entityreference_autocomplete_base_form_alter($element, $form_state, $context);
+
+  $element['#select2_defaults']['initSelection'] = 'entityReferenceInitSelecttion';
+}
+
+
+/**
+ * Return the path to the Select2 plugin.
+ */
+function select2_get_plugin_path() {
+  static $library_path = NULL;
+
+  // Try to locate the library path in any possible setup.
+  if ($library_path == NULL) {
+    // First check the default location.
+    $path = variable_get('select2_plugin_path', SELECT2_PLUGIN_PATH);
+    if (is_dir($path)) {
+      $library_path = $path;
+    }
+    // Ask the libraries module as a fallback.
+    elseif ($library_path == NULL && module_exists('libraries')) {
+      if ($path = libraries_get_path('select2')) {
+        $library_path = $path;
+        variable_set('select2_plugin_path', $library_path);
+      }
+    }
+    // If no path is found suggest the default one.
+    elseif ($library_path == NULL) {
+      $library_path = SELECT2_PLUGIN_PATH;
+    }
+  }
+
+  return $library_path;
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function select2_field_widget_info_alter(&$info) {
+
+  if (!isset($info['options_select'])) {
+    return;
+  }
+
+  $info['options_select']['settings']['use_select2'] = FALSE;
+
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add a checkbox for the 'use_select2' instance settings on the 'Edit
+ * field instance' form.
+ */
+function select2_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
+
+  switch ($form['#instance']['widget']['type']) {
+    case 'options_select':
+      _select2_form_field_ui_field_options_select_edit_form_alter($form, $form_state, $form_id);
+      break;
+
+    case 'taxonomy_autocomplete':
+      _select2_form_field_ui_field_ac_edit_form_alter($form, $form_state, $form_id);
+      break;
+    case 'entityreference_autocomplete':
+      _select2_form_field_ui_field_entityreference_autocomplete_base_edit_form_alter($form, $form_state, $form_id);
+      break;
+    case 'entityreference_autocomplete_tags':
+      _select2_form_field_ui_field_entityreference_autocomplete_base_edit_form_alter($form, $form_state, $form_id);
+      break;
+  }
+
+}
+
+/**
+ * Base edit.
+ */
+function _select2_form_field_ui_field_base_edit_form_alter(&$form, &$form_state, $form_id) {
+
+  $field = $form['#field'];
+
+  $form['instance']['settings']['select2_integration'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => 'Select2 integration settings',
+    '#collapsible' => TRUE,
+    '#collapsed'   => TRUE,
+  );
+
+  $use_select2 = isset($form['#instance']['settings']['use_select2']) ? $form['#instance']['settings']['use_select2'] : (isset($form['#instance']['settings']['select2_integration']['use_select2']) ? $form['#instance']['settings']['select2_integration']['use_select2'] : FALSE);
+
+  $form['instance']['settings']['select2_integration']['use_select2'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Use Select2 plugin for this field in form'),
+    '#default_value' => $use_select2,
+    '#weight'        => -10,
+  );
+
+  $form['instance']['settings']['select2_integration']['styling'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => 'Options',
+    '#collapsible' => TRUE,
+    '#collapsed'   => TRUE,
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="instance[settings][select2_integration][use_select2]"]' => array('checked' => FALSE),
+      ),
+    ),
+  );
+
+  // Placeholder.
+  $form['instance']['settings']['select2_integration']['styling']['placeholder'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Placeholder text'),
+    '#default_value' => isset($form['#instance']['settings']['select2_integration']['styling']['placeholder']) ? $form['#instance']['settings']['select2_integration']['styling']['placeholder'] : FALSE,
+    '#weight'        => 0,
+    '#return_value' => TRUE,
+  );
+
+  $form['instance']['settings']['select2_integration']['styling']['dropdownAutoWidth'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Dropdown auto width'),
+    '#default_value' => isset($form['#instance']['settings']['select2_integration']['styling']['dropdownAutoWidth']) ? $form['#instance']['settings']['select2_integration']['styling']['dropdownAutoWidth'] : FALSE,
+    '#weight'        => 10,
+    '#return_value' => TRUE,
+  );
+
+}
+
+/**
+ * Field edit.
+ */
+function _select2_form_field_ui_field_ac_edit_form_alter(&$form, &$form_state, $form_id) {
+
+  $field = $form['#field'];
+
+  _select2_form_field_ui_field_base_edit_form_alter($form, $form_state, $form_id);
+
+}
+
+/**
+ * Options select edit.
+ */
+function _select2_form_field_ui_field_options_select_edit_form_alter(&$form, &$form_state, $form_id) {
+
+  $field = $form['#field'];
+
+  _select2_form_field_ui_field_base_edit_form_alter($form, $form_state, $form_id);
+
+  if ($field['type'] == 'taxonomy_term_reference') {
+    // For taxonomy term reference fields alow "add terms on fly" future.
+    $form['instance']['settings']['select2_integration']['allow_add_onfly'] = array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Allow add terms "on fly"'),
+      '#default_value' => isset($form['#instance']['settings']['select2_integration']['allow_add_onfly']) ? $form['#instance']['settings']['select2_integration']['allow_add_onfly'] : FALSE,
+      '#weight'        => 0,
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="instance[settings][select2_integration][use_select2]"]' => array('checked' => FALSE),
+        ),
+      ),
+    );
+
+    $form['instance']['settings']['select2_integration']['show_voc_terms_page_link'] = array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Show link to vocabulary terms list page'),
+      '#default_value' => isset($form['#instance']['settings']['select2_integration']['show_voc_terms_page_link']) ? $form['#instance']['settings']['select2_integration']['show_voc_terms_page_link'] : FALSE,
+      '#weight'        => 0,
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="instance[settings][select2_integration][use_select2]"]' => array('checked' => FALSE),
+        ),
+      ),
+    );
+  }
+
+}
+
+
+function _select2_form_field_ui_field_entityreference_autocomplete_base_edit_form_alter(&$form, &$form_state, $form_id) {
+  $field = $form['#field'];
+
+  _select2_form_field_ui_field_base_edit_form_alter($form, $form_state, $form_id);
+
+  $form['instance']['settings']['select2_integration']['hide_id'] = array(
+    '#type'          => 'checkbox',
+    '#title'         => t('Hide entity ids for selected result(s)'),
+    '#default_value' => isset($form['#instance']['settings']['select2_integration']['hide_id']) ? $form['#instance']['settings']['select2_integration']['hide_id'] : FALSE,
+    '#weight'        => 0,
+  );
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function select2_field_widget_form_alter(&$element, &$form_state, $context) {
+
+  $context['instance']['settings'] += array(
+    'select2_integration' => array(
+      'use_select2' => isset($context['instance']['settings']['use_select2']) ? $context['instance']['settings']['use_select2'] : FALSE,
+    ),
+  );
+
+  if (!$context['instance']['settings']['select2_integration']['use_select2']) {
+    return;
+  }
+
+  $settings = $context['instance']['settings']['select2_integration'];
+
+  $styling_settings = isset($settings['styling']) ? $settings['styling'] : array();
+
+  $settings = array_merge($settings, $styling_settings);
+
+  $element['#select2'] = $settings;
+
+  if (isset($element['#autocomplete_path'])) {
+    $settings['allow_add_onfly'] = FALSE;
+  }
+
+  if (isset($settings['allow_add_onfly']) && $settings['allow_add_onfly']) {
+
+    $element['#type'] = 'select2_hidden';
+
+    $element['#value_callback'] = 'select_2_hidden_value_callback';
+
+    $element['#select2']['taxonomy_vocabulary'] = $context['field']['settings']['allowed_values'][0]['vocabulary'];
+
+    $element['#select2']['minimumResultsForSearch'] = 0;
+
+    $element['#element_validate'] = array_merge(array('select2_taxonomy_term_reference_validate'), $element['#element_validate']);
+
+    $descrition = t('This element supports "Add terms on fly" function.<br />You can select terms from defined terms list, or add your new term(s), by typing name of term(s) manually, press Enter key after typing new term name, for adding it to selected items list. <br /><b>New term(s) will be saved when form will be submitted</b>.');
+
+    $terms_edit_page_link = '<br />' . l(t('Edit vocabulary terms'), 'admin/structure/taxonomy/' . $element['#select2']['taxonomy_vocabulary'], array('attributes' => array('target' => '_blank', 'class' => array('taxonomy_voc_terms_page_link'))));
+
+    if (isset($settings['show_voc_terms_page_link']) && $settings['show_voc_terms_page_link']) {
+      $descrition .= $terms_edit_page_link;
+    }
+    elseif (!isset($settings['show_voc_terms_page_link'])) {
+      $descrition .= $terms_edit_page_link;
+    }
+
+    $element['#description'] = (isset($element['#description']) ? $element['#description'] . '<br/>' : '') . $descrition;
+
+    if (isset($element['#multiple']) && $element['#multiple']) {
+      $element['#select2']['multiple'] = TRUE;
+      $element['#select2']['separator'] = SELECT2_VALUES_SEPARATOR;
+    }
+
+  }
+
+}
+
+/**
+ * Validate comma replaces.
+ */
+function _select2_comma_replacement_validate(&$element, &$form_state) {
+
+  $value = $element['#value'];
+
+  $value = str_replace('{{;}}', ',', $value);
+
+  form_set_value($element, $value, $form_state);
+
+}
+
+/**
+ * Validate term references.
+ */
+function select2_taxonomy_term_reference_validate(&$element, &$form_state) {
+
+  $values_to_set = array();
+
+  $values = is_array($element['#value']) ? $element['#value'] : array();
+
+  $v_mname = isset($element['#select2']['taxonomy_vocabulary']) ? $element['#select2']['taxonomy_vocabulary'] : '';
+
+  $terms = array();
+
+  if (isset($element['#required']) && $element['#required'] && empty($element['#value'])) {
+    $values = array();
+  }
+
+  $element_id = isset($element['#id']) ? $element['#id'] : (isset($element['#attributes']['id']) ? $element['#attributes']['id'] : drupal_clean_css_identifier($element['#name']));
+
+  $taxonomy_vocabulary = taxonomy_vocabulary_machine_name_load($v_mname);
+
+  if ($values && $taxonomy_vocabulary) {
+
+    $rebuild_options_vocs_list = select2_taxonomy_volabilaries_to_rebuild_options();
+
+    $terms = taxonomy_term_load_multiple(FALSE, array('vid' => $taxonomy_vocabulary->vid));
+
+    foreach ($values as $key => $tid) {
+
+      if (!$tid) {
+        continue;
+      }
+
+      if (is_numeric($tid) && !strpos($tid, select2_get_system_decimal_point())) {
+        // Check for valid tid.
+        $num_tid = intval($tid);
+
+        if (isset($terms[$num_tid])) {
+          $values_to_set[] = $tid;
+          continue;
+        }
+      }
+
+      if ($form_state['rebuild_info']) {
+        continue;
+      }
+
+      // Trying to add new term. Get max weight of terms in current voc for
+      // adding new term at the end of list.
+      $max_weight_select = db_select('taxonomy_term_data', 'td')
+      ->condition('vid', $taxonomy_vocabulary->vid);
+      $max_weight_select->addExpression('MAX(td.weight)');
+
+      $max_weight = $max_weight_select->execute()->fetchField();
+
+      $max_weight = $max_weight ? $max_weight + 1 : 1;
+
+      $new_term = new stdClass();
+
+      $new_term->vid = $taxonomy_vocabulary->vid;
+      $new_term->name = $tid;
+      $new_term->weight = $max_weight;
+
+      $save_result = taxonomy_term_save($new_term);
+
+      if ($save_result == SAVED_NEW) {
+        drupal_set_message(t('New taxonomy term "@term_name" saved in vocabulary "@vocabulary_name". You can edit it on <a href="@edit_term_link">this page</a>.',
+          array(
+            '@term_name' => $tid,
+            '@vocabulary_name' => $v_mname,
+            '@edit_term_link' => base_path() . 'taxonomy/term/' . $new_term->tid . '/edit')));
+        $rebuild_options_vocs_list[] = $v_mname;
+        $values_to_set[] = $new_term->tid;
+
+        $new_data_obj = new stdClass();
+        $new_data_obj->id = $new_term->tid;
+        $new_data_obj->text = $new_term->name;
+
+        $settings['data'][0] = $new_data_obj;
+
+        _select2_set_element_settings($element_id, $settings);
+
+      }
+      else {
+        drupal_set_message(t('Error while saving new term - the term skiped while subiting form.'), 'error');
+
+        unset($values[$key]);
+      }
+
+    }
+
+  }
+
+  if (count($values_to_set)) {
+    form_set_value($element, $values_to_set, $form_state);
+    $element['#value'] = $values_to_set;
+    $element['#validated'] = TRUE;
+  }
+
+}
+
+/**
+ * Get locale decimal.
+ */
+function select2_get_system_decimal_point() {
+  $dp = &drupal_static(__FUNCTION__, FALSE);
+
+  if (!$dp) {
+
+    $locale_info = localeconv();
+    $dp = $locale_info['decimal_point'];
+  }
+
+  return $dp ? $dp : '.';
+}
+
+/**
+ * Taxonomy vocab rebuild.
+ */
+function select2_taxonomy_volabilaries_to_rebuild_options() {
+
+  $rebuild_options_vocs_list = &drupal_static(__FUNCTION__, array());
+
+  return $rebuild_options_vocs_list;
+}
+
+/**
+ * Is value hidden.
+ */
+function select_2_hidden_value_callback($element, $input = FALSE, $form_state = array()) {
+
+  if ($input === FALSE) {
+
+    $value = isset($element['#default_value']) ? $element['#default_value'] : 0;
+
+    $result = is_string($value) ? explode(isset($element['#select2']['separator']) ? $element['#select2']['separator'] : SELECT2_VALUES_SEPARATOR, $value) : $value;
+  }
+  else {
+    $result = is_string($input) ? explode(isset($element['#select2']['separator']) ? $element['#select2']['separator'] : SELECT2_VALUES_SEPARATOR, $input) : $input;
+  }
+
+  return $result;
+}
+
+
+/**
+ * Sets the 'post-load callback' key.
+ *
+ * This function is used as a callback for the 'post-load' callback group.
+ *
+ * @see _libraries_test_callback()
+ */
+function _select2_post_load_library_callback(&$library, $version, $variant) {
+
+  global $language;
+
+  if ($excluded_paths = variable_get('select2_excluded_paths', '')) {
+    if (drupal_match_path($_GET['q'], $excluded_paths) ||
+      drupal_match_path(drupal_get_path_alias($_GET['q']), $excluded_paths)) {
+        return;
+    }
+  }
+
+  $branch_version = substr($library['version'], 0, 1);
+
+  drupal_add_js(SELECT2_MODULE_PATH . '/js/Drupal.select2.js', array(
+    'group' => JS_LIBRARY,
+  ));
+
+  drupal_add_css(SELECT2_MODULE_PATH . '/css/select2_integration.css');
+
+  // Load and define exclude lists.
+  $process_all_selects = FALSE;
+
+  if (variable_get('select2_use_for_all_select_elements', FALSE)) {
+
+    if (!path_is_admin(current_path()) ||
+    (path_is_admin(current_path()) && variable_get('select2_use_for_all_select_elements_for_admin_pages', FALSE))) {
+
+      $process_all_selects = TRUE;
+
+    }
+
+  }
+
+  $settings = _select2_set_exuled_for_settings();
+
+  $settings2 = array(
+    'select_2' => array(
+      'branch' => intval($branch_version),
+      'excludes' => array(
+        'by_id' => array(
+          'values' => array(),
+          'reg_exs' => array(),
+        ),
+        'by_class' => array(),
+        'by_selectors' => array(),
+      ),
+      'default_settings' => _select2_default_settings(),
+      'process_all_selects_on_page' => $process_all_selects,
+      'no_version_check' => variable_get('select2_disable_jq_version_check', FALSE) ? TRUE : FALSE,
+      'elements' => array(),
+    ),
+  );
+
+  $settinings_updated_flag = !variable_get('select2_update_settings_by_ajax', FALSE);
+
+  $settings2['select_2']['settings_updated'] = $settinings_updated_flag;
+
+  $seeting_result = array_merge_recursive($settings, $settings2);
+
+  _select2_set_js_settings($seeting_result);
+
+  $lang = '';
+
+  if (isset($user->language) && $user->language) {
+    $lang = $user->language;
+  }
+  elseif (isset($language) && isset($language->language)) {
+    $lang = $language->language;
+  }
+
+  if ($lang) {
+    $translation_file = select2_get_plugin_path() . '/select2_locale_' . $lang . '.js';
+    if (file_exists($translation_file)) {
+      drupal_add_js($translation_file);
+    }
+  }
+
+}
+
+/**
+ * Validate values are positive integers.
+ */
+function _select2_element_validate_integer_positive_or_zero($element, &$form_state) {
+  $value = $element['#value'];
+  if ($value !== '' && (!is_numeric($value) || intval($value) != $value || $value < 0)) {
+    form_error($element, t('%name must be a positive integer.', array('%name' => $element['#title'])));
+  }
+}
+
+/**
+ * Excluded settings.
+ */
+function _select2_set_exuled_for_settings() {
+
+  $select2_settings = array(
+    'select_2' => array(
+      'excludes' => array(
+      ),
+    ),
+  );
+
+  if (variable_get('select2_excluded_ids', '')) {
+
+    $ids = explode("\r\n", variable_get('select2_excluded_ids', ''));
+
+    $ids_values = array();
+
+    $ids_reg_exs = array();
+
+    foreach ($ids as $id) {
+      if (preg_match('/^\#(?<id_reg_ex>[0-9a-zA-Z-_]*)\#$/', $id, $match)) {
+        $ids_reg_exs[] = $match['id_reg_ex'];
+      }
+      else {
+        $ids_values[] = $id;
+      }
+    }
+
+    if ($ids_values) {
+      $select2_settings['select_2']['excludes']['by_id']['values'] = $ids_values;
+    }
+    if ($ids_reg_exs) {
+      $select2_settings['select_2']['excludes']['by_id']['reg_exs'] = $ids_reg_exs;
+    }
+
+  }
+
+  if (variable_get('select2_excluded_cleasses', '')) {
+    $classes = explode("\r\n", variable_get('select2_excluded_cleasses', ''));
+
+    $select2_settings['select_2']['excludes']['by_class'] = $classes;
+
+  }
+
+  if (variable_get('select2_excluded_selectors', '')) {
+    $selectors = explode("\r\n", variable_get('select2_excluded_selectors', ''));
+
+    $select2_settings['select_2']['excludes']['by_selectors'] = $selectors;
+
+  }
+
+//   if ($select2_settings['select_2']['excludes']) {
+
+//     $js = drupal_add_js($select2_settings, 'setting');
+
+//   }
+
+  return $select2_settings;
+}
+
+/**
+ * Default settings.
+ *
+ * @return array
+ *   Default settings.
+ */
+function _select2_default_settings() {
+  return array(
+    'separator'               => SELECT2_VALUES_SEPARATOR,
+    'jqui_sortable'           => FALSE,
+    'dropdownAutoWidth'       => TRUE,
+    'width'                   => variable_get('select2_default_width', 'element'),
+    'containerCssClass'       => '',
+    'minimumResultsForSearch' => variable_get('select2_min_options_count_for_search', 15),
+  );
+}
+
+/**
+ * Element settings.
+ *
+ * @param string $element_id
+ *   Element id
+ *
+ * @param array $settings
+ *   Settings
+ */
+function _select2_set_element_settings($element_id, $settings) {
+  $js = &drupal_static('drupal_add_js', array());
+
+  if (!isset($js['settings']) || !isset($js['settings']['data'])) {
+    drupal_add_js(
+      array(
+        'select_2' => array(
+          'elements' => array(
+            $element_id => $settings,
+          ),
+        ),
+      ), 'setting');
+
+    return;
+  }
+
+  $js_setting_key = &drupal_static('select2_js_setting_key', -1);
+
+  if ($js_setting_key == -1) {
+    foreach ($js['settings']['data'] as $key => $data) {
+      foreach ($data as $scope_name => $scope_data) {
+        if ($scope_name == 'select_2') {
+          $js_setting_key = $key;
+        }
+      }
+    }
+  }
+
+  if ($js_setting_key == -1) {
+    drupal_add_js(array('select_2' => array(
+      'elements' => array(
+        $element_id => $settings,
+      ),
+    )),
+    'setting');
+
+    return;
+  }
+
+  if (!isset($js['settings']['data'][$js_setting_key]['select_2']['elements'][$element_id])) {
+    $js['settings']['data'][$js_setting_key]['select_2']['elements'][$element_id] = $settings;
+  }
+  else {
+    $js['settings']['data'][$js_setting_key]['select_2']['elements'][$element_id] = array_replace_recursive($js['settings']['data'][$js_setting_key]['select_2']['elements'][$element_id], $settings);
+  }
+
+}
+
+function _select2_set_js_settings($settings) {
+  $js = &drupal_static('drupal_add_js', array());
+
+  if (!isset($js['settings']) || !isset($js['settings']['data'])) {
+    drupal_add_js(
+    array(
+      'select_2' => $settings['select_2'],
+    ),
+    'setting');
+
+    return;
+  }
+
+  $js_setting_key = &drupal_static('select2_js_setting_key', -1);
+
+  if ($js_setting_key == -1) {
+    foreach ($js['settings']['data'] as $key => $data) {
+      foreach ($data as $scope_name => $scope_data) {
+        if ($scope_name == 'select_2') {
+          $js_setting_key = $key;
+        }
+      }
+    }
+  }
+
+  if ($js_setting_key == -1) {
+    drupal_add_js(
+    array(
+      'select_2' => $settings['select_2'],
+    ),
+    'setting');
+
+    return;
+  }
+
+  if (!isset($js['settings']['data'][$js_setting_key]['select_2'])) {
+    $js['settings']['data'][$js_setting_key]['select_2'] = $settings['select_2'];
+  }
+  else {
+    $js['settings']['data'][$js_setting_key]['select_2'] = array_replace_recursive($js['settings']['data'][$js_setting_key]['select_2'], $settings['select_2']);
+  }
+
+}
+
+/**
+ * Determines whether a current path is in the administrative section of the site.
+ *
+ * By default, paths are considered to be non-administrative. If a path does
+ * not match any of the patterns in path_get_admin_paths(), or if it matches
+ * both administrative and non-administrative patterns, it is considered
+ * non-administrative.
+ *
+ * @return
+ *   TRUE if the path is administrative, FALSE otherwise.
+ *
+ * @see path_get_admin_paths()
+ * @see hook_admin_paths()
+ * @see hook_admin_paths_alter()
+ */
+function _select2_current_path_is_admin() {
+
+  $result = &drupal_static(__FUNCTION__, NULL);
+
+  if ($result !== NULL){
+    return $result;
+  }
+
+  if (path_is_admin(current_path())) {
+    $result = TRUE;
+    return TRUE;
+  }
+
+  // AJAX check
+  if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+      && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+      && !empty($_SERVER['HTTP_REFERER'])) {
+
+    // Need to check request refferer url for admin path
+
+    $referrer_url = $_SERVER['HTTP_REFERER'];
+
+    $site_url_prefix = url(NULL, array('absolute' => TRUE)) . (variable_get('clean_url', 0) ? '' : '?q=');
+
+    $prefix_pos = strpos($referrer_url, $site_url_prefix);
+
+    if ($prefix_pos === FALSE || $prefix_pos > 0) {
+      $result = FALSE;
+      return FALSE;
+    }
+
+    $referrer_url_path = str_replace($site_url_prefix, '', $referrer_url);
+
+    if (path_is_admin($referrer_url_path)) {
+      $result = TRUE;
+      return TRUE;
+    }
+
+  }
+
+  $result = FALSE;
+  return FALSE;
+}
