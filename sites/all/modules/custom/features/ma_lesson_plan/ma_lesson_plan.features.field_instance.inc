@@ -1909,7 +1909,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
