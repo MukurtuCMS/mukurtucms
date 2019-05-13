@@ -274,7 +274,7 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
     '#required' => TRUE,
   );
 
-  // Category chosen select.
+  // Category select2.
   $vocabulary = taxonomy_vocabulary_machine_name_load('Category');
   $categories = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
   $options = [];
@@ -283,30 +283,30 @@ function ma_importexport_dc_import_form_options($form, $form_state) {
   }
   $form['category'] = array(
     '#type' => 'select',
-    '#chosen' => TRUE,
+    '#select2' => [],
     '#multiple' => TRUE,
     '#title' => 'Category',
     '#options' => $options,
     // '#required' => TRUE, // Should this be required?
   );
 
-  // Traditional Knowledge Labels chosen select.
+  // Traditional Knowledge Labels select2.
   $field = field_info_field('field_licence_trad');
   $options = list_allowed_values($field);
   $form['tk_label'] = array(
     '#type' => 'select',
-    '#chosen' => TRUE,
+    '#select2' => [],
     '#multiple' => TRUE,
     '#title' => 'Traditional Knowledge Labels',
     '#options' => $options,
   );
 
-  // Licensing Option chosen select (single val).
+  // Licensing Option select2 (single val).
   $field = field_info_field('field_licence_std_cc');
   $options = array_merge(['_none' => '- None -'], list_allowed_values($field));
   $form['licensing'] = array(
     '#type' => 'select',
-    '#chosen' => TRUE,
+    '#select2' => [],
     '#title' => 'Licensing Options',
     '#options' => $options,
   );
