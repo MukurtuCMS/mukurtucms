@@ -348,7 +348,7 @@ function ma_dictionary_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',

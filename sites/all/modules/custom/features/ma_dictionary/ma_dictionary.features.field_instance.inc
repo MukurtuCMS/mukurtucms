@@ -2114,6 +2114,8 @@ function ma_dictionary_field_default_field_instances() {
   // 'paragraphs_item-dictionary_word_bundle-field_part_of_speech'.
   $field_instances['paragraphs_item-dictionary_word_bundle-field_part_of_speech'] = array(
     'bundle' => 'dictionary_word_bundle',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Choose one or more parts of speech that best matches your word entry. This field can be used for content browsing. Separate multiple entries with a semi-colon.',
@@ -2200,16 +2202,26 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 15,
     ),
   );
