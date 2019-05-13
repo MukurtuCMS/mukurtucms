@@ -437,6 +437,8 @@ function ma_community_field_default_field_instances() {
   // Exported field_instance: 'node-community-field_dhan_notified_users'.
   $field_instances['node-community-field_dhan_notified_users'] = array(
     'bundle' => 'community',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -491,13 +493,20 @@ function ma_community_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -875,7 +884,9 @@ Strict - Your community page is invisible to all site users who are not members 
   // Exported field_instance: 'node-community-og_group_ref'.
   $field_instances['node-community-og_group_ref'] = array(
     'bundle' => 'community',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
@@ -930,6 +941,13 @@ Strict - Your community page is invisible to all site users who are not members 
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -948,7 +966,8 @@ Strict - Your community page is invisible to all site users who are not members 
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
+        'treeable' => 0,
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
