@@ -108,6 +108,8 @@ function ma_dictionary_field_default_field_instances() {
   // 'alphabetical_order_definition-alphabetical_order_definition-field_aod_language'.
   $field_instances['alphabetical_order_definition-alphabetical_order_definition-field_aod_language'] = array(
     'bundle' => 'alphabetical_order_definition',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -134,13 +136,21 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
+        'treeable' => 0,
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',

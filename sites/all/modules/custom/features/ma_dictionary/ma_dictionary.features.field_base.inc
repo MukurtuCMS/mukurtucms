@@ -119,7 +119,7 @@ function ma_dictionary_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(),
       'allowed_values_function' => 'ma_dictionary_collation_locale_options',
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'list_text',
