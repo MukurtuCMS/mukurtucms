@@ -392,7 +392,7 @@ function ma_scald_strongarm() {
             'visible' => FALSE,
           ),
           'ma_colorbox' => array(
-            'weight' => '5',
+            'weight' => '6',
             'visible' => FALSE,
           ),
           'ma_scald_search_results' => array(

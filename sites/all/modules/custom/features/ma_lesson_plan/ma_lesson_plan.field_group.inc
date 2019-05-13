@@ -21,21 +21,21 @@ function ma_lesson_plan_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
-    'label' => 'Base',
+    'label' => 'Core',
     'weight' => '12',
     'children' => array(
-      0 => 'field_unit_teacher',
-      1 => 'field_unit_subject',
-      2 => 'field_unit_grade_level',
-      3 => 'field_unit_unit_length',
-      4 => 'field_unit_class_period_length',
-      5 => 'og_group_ref',
-      6 => 'field_unit_week_of',
+      0 => 'field_unit_class_period_length',
+      1 => 'field_unit_grade_level',
+      2 => 'field_unit_subject',
+      3 => 'field_unit_teacher',
+      4 => 'field_unit_unit_length',
+      5 => 'field_unit_week_of',
+      6 => 'og_group_ref',
       7 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
-      'label' => 'Base',
+      'label' => 'Core',
       'instance_settings' => array(
         'required_fields' => 1,
         'classes' => 'group-base field-group-htab',
@@ -158,17 +158,17 @@ function ma_lesson_plan_field_group_info() {
     'label' => 'Learning Outcomes and Assessments',
     'weight' => '13',
     'children' => array(
-      0 => 'field_unit_overarching',
-      1 => 'field_unit_conceptual',
-      2 => 'field_unit_nature_of_science',
-      3 => 'field_unit_language_learning',
-      4 => 'field_unit_technical',
-      5 => 'field_unit_assessments',
-      6 => 'field_collection',
-      7 => 'field_related_dictionary_words',
-      8 => 'field_word_list',
-      9 => 'field_media_asset',
-      10 => 'field_related_dh_items',
+      0 => 'field_collection',
+      1 => 'field_media_asset',
+      2 => 'field_related_dh_items',
+      3 => 'field_related_dictionary_words',
+      4 => 'field_unit_assessments',
+      5 => 'field_unit_conceptual',
+      6 => 'field_unit_language_learning',
+      7 => 'field_unit_nature_of_science',
+      8 => 'field_unit_overarching',
+      9 => 'field_unit_technical',
+      10 => 'field_word_list',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -213,7 +213,7 @@ function ma_lesson_plan_field_group_info() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Base');
+  t('Core');
   t('Learning Outcomes and Assessments');
   t('Lessons');
   t('List View Fields');

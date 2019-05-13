@@ -14,6 +14,39 @@ function ma_scald_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_480_thumbnail_and_link|scald_atom|image|ma_colorbox';
+  $field_group->group_name = 'group_480_thumbnail_and_link';
+  $field_group->entity_type = 'scald_atom';
+  $field_group->bundle = 'image';
+  $field_group->mode = 'ma_colorbox';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => '480 thumbnail and link',
+    'weight' => '0',
+    'children' => array(
+      0 => 'scald_thumbnail',
+      1 => 'download_atom',
+    ),
+    'format_type' => 'div',
+    'format_settings' => array(
+      'label' => '480 thumbnail and link',
+      'instance_settings' => array(
+        'id' => '',
+        'classes' => 'group-480-thumbnail-and-link field-group-div',
+        'description' => '',
+        'show_label' => '0',
+        'label_element' => 'h3',
+        'effect' => 'none',
+        'speed' => 'fast',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_480_thumbnail_and_link|scald_atom|image|ma_colorbox'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_scald_accordion|scald_atom|audio|form';
   $field_group->group_name = 'group_scald_accordion';
   $field_group->entity_type = 'scald_atom';
@@ -338,10 +371,10 @@ function ma_scald_field_group_info() {
       9 => 'field_scald_headline',
       10 => 'field_scald_identifier',
       11 => 'field_scald_location',
-      12 => 'field_category',
-      13 => 'field_licence_std_cc',
-      14 => 'field_rights',
-      15 => 'field_scald_protocol',
+      12 => 'field_scald_protocol',
+      13 => 'field_category',
+      14 => 'field_licence_std_cc',
+      15 => 'field_rights',
     ),
     'format_type' => 'div',
     'format_settings' => array(
@@ -394,6 +427,7 @@ function ma_scald_field_group_info() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('480 thumbnail and link');
   t('Additional Fields');
   t('Metadata');
 

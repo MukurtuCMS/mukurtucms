@@ -28,6 +28,30 @@ function ma_lesson_plan_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|lesson|full';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'lesson';
+  $ds_fieldsetting->view_mode = 'full';
+  $ds_fieldsetting->settings = array(
+    'ds_switch_field' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'vms' => array(
+          'full' => '',
+          'teaser' => '',
+          'search_result' => '',
+          'teacher_view' => 'Switch to Teacher View',
+        ),
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|lesson|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|lesson|search_result';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'lesson';
@@ -61,11 +85,43 @@ function ma_lesson_plan_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|lesson|teacher_view';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'lesson';
+  $ds_fieldsetting->view_mode = 'teacher_view';
+  $ds_fieldsetting->settings = array(
+    'ds_switch_field' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'vms' => array(
+          'full' => 'Switch to Student View',
+          'teaser' => '',
+          'search_result' => '',
+          'teacher_view' => '',
+        ),
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|lesson|teacher_view'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|unit_plan|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'unit_plan';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'ds_switch_field' => array(
+      'weight' => '1',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
     'title' => array(
       'weight' => '0',
       'label' => 'hidden',
@@ -73,6 +129,30 @@ function ma_lesson_plan_ds_field_settings_info() {
     ),
   );
   $export['node|unit_plan|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|unit_plan|full';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'unit_plan';
+  $ds_fieldsetting->view_mode = 'full';
+  $ds_fieldsetting->settings = array(
+    'ds_switch_field' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'vms' => array(
+          'full' => '',
+          'teaser' => '',
+          'search_result' => '',
+          'teacher_view' => 'Switch to Teacher View',
+        ),
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|unit_plan|full'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -127,6 +207,30 @@ function ma_lesson_plan_ds_field_settings_info() {
     ),
   );
   $export['node|unit_plan|search_result'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|unit_plan|teacher_view';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'unit_plan';
+  $ds_fieldsetting->view_mode = 'teacher_view';
+  $ds_fieldsetting->settings = array(
+    'ds_switch_field' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'vms' => array(
+          'full' => 'Switch to Student View',
+          'teaser' => '',
+          'search_result' => '',
+          'teacher_view' => '',
+        ),
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|unit_plan|teacher_view'] = $ds_fieldsetting;
 
   return $export;
 }
@@ -328,6 +432,48 @@ function ma_lesson_plan_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|lesson|full';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'lesson';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'ds_switch_field',
+        1 => 'body',
+        2 => 'field_lesson_micro_tasks',
+        3 => 'field_related_dictionary_words',
+      ),
+    ),
+    'fields' => array(
+      'ds_switch_field' => 'central',
+      'body' => 'central',
+      'field_lesson_micro_tasks' => 'central',
+      'field_related_dictionary_words' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'central' => array(
+        'lesson-body' => 'lesson-body',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|lesson|full'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|lesson|search_result';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'lesson';
@@ -368,6 +514,54 @@ function ma_lesson_plan_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|lesson|teacher_view';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'lesson';
+  $ds_layout->view_mode = 'teacher_view';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'ds_switch_field',
+        1 => 'body',
+        2 => 'field_lesson_micro_tasks',
+        3 => 'field_lesson_tech_integration',
+        4 => 'field_related_dictionary_words',
+        5 => 'field_lesson_days',
+        6 => 'field_lesson_resources',
+      ),
+    ),
+    'fields' => array(
+      'ds_switch_field' => 'central',
+      'body' => 'central',
+      'field_lesson_micro_tasks' => 'central',
+      'field_lesson_tech_integration' => 'central',
+      'field_related_dictionary_words' => 'central',
+      'field_lesson_days' => 'central',
+      'field_lesson_resources' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'central' => array(
+        'lesson-body' => 'lesson-body',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|lesson|teacher_view'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|unit_plan|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'unit_plan';
@@ -377,36 +571,38 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'regions' => array(
       'top' => array(
         0 => 'title',
+        1 => 'ds_switch_field',
       ),
       'left' => array(
-        1 => 'field_unit_overarching',
-        2 => 'field_unit_conceptual',
-        3 => 'field_unit_nature_of_science',
-        4 => 'field_unit_language_learning',
-        5 => 'field_unit_technical',
-        6 => 'field_unit_assessments',
-        7 => 'field_media_asset',
-        8 => 'field_related_dh_items',
-        9 => 'field_related_dictionary_words',
-        10 => 'field_word_list',
-        11 => 'field_collection',
+        2 => 'field_unit_overarching',
+        3 => 'field_unit_conceptual',
+        4 => 'field_unit_nature_of_science',
+        5 => 'field_unit_language_learning',
+        6 => 'field_unit_technical',
+        7 => 'field_unit_assessments',
+        8 => 'field_media_asset',
+        9 => 'field_related_dh_items',
+        10 => 'field_related_dictionary_words',
+        11 => 'field_word_list',
+        12 => 'field_collection',
       ),
       'right' => array(
-        12 => 'field_unit_teacher',
-        13 => 'field_unit_subject',
-        14 => 'field_unit_grade_level',
-        15 => 'field_unit_week_of',
-        16 => 'field_unit_unit_length',
-        17 => 'field_unit_class_period_length',
-        18 => 'field_community_ref',
-        19 => 'og_group_ref',
+        13 => 'field_unit_teacher',
+        14 => 'field_unit_subject',
+        15 => 'field_unit_grade_level',
+        16 => 'field_unit_week_of',
+        17 => 'field_unit_unit_length',
+        18 => 'field_unit_class_period_length',
+        19 => 'field_community_ref',
+        20 => 'og_group_ref',
       ),
       'bottom' => array(
-        20 => 'field_unit_lessons',
+        21 => 'field_unit_lessons',
       ),
     ),
     'fields' => array(
       'title' => 'top',
+      'ds_switch_field' => 'top',
       'field_unit_overarching' => 'left',
       'field_unit_conceptual' => 'left',
       'field_unit_nature_of_science' => 'left',
@@ -471,20 +667,20 @@ function ma_lesson_plan_ds_layout_settings_info() {
         1 => 'group_tabs',
         4 => 'title',
         5 => 'field_unit_overarching',
-        6 => 'field_unit_conceptual',
-        7 => 'field_unit_teacher',
-        8 => 'field_unit_nature_of_science',
-        9 => 'field_unit_subject',
-        10 => 'field_unit_grade_level',
-        11 => 'field_unit_language_learning',
-        12 => 'field_unit_week_of',
-        13 => 'field_unit_technical',
+        6 => 'field_unit_teacher',
+        7 => 'field_unit_conceptual',
+        8 => 'field_unit_subject',
+        9 => 'field_unit_nature_of_science',
+        10 => 'field_unit_language_learning',
+        11 => 'field_unit_grade_level',
+        12 => 'field_unit_technical',
+        13 => 'field_unit_week_of',
         14 => 'field_unit_assessments',
         15 => 'field_unit_unit_length',
         16 => 'field_unit_class_period_length',
         17 => 'field_media_asset',
-        18 => 'og_group_ref',
-        19 => 'group_base',
+        18 => 'group_base',
+        19 => 'og_group_ref',
         20 => 'field_related_dh_items',
         21 => 'group_loa',
         22 => 'field_related_dictionary_words',
@@ -507,20 +703,20 @@ function ma_lesson_plan_ds_layout_settings_info() {
       'redirect' => 'hidden',
       'title' => 'ds_content',
       'field_unit_overarching' => 'ds_content',
-      'field_unit_conceptual' => 'ds_content',
       'field_unit_teacher' => 'ds_content',
-      'field_unit_nature_of_science' => 'ds_content',
+      'field_unit_conceptual' => 'ds_content',
       'field_unit_subject' => 'ds_content',
-      'field_unit_grade_level' => 'ds_content',
+      'field_unit_nature_of_science' => 'ds_content',
       'field_unit_language_learning' => 'ds_content',
-      'field_unit_week_of' => 'ds_content',
+      'field_unit_grade_level' => 'ds_content',
       'field_unit_technical' => 'ds_content',
+      'field_unit_week_of' => 'ds_content',
       'field_unit_assessments' => 'ds_content',
       'field_unit_unit_length' => 'ds_content',
       'field_unit_class_period_length' => 'ds_content',
       'field_media_asset' => 'ds_content',
-      'og_group_ref' => 'ds_content',
       'group_base' => 'ds_content',
+      'og_group_ref' => 'ds_content',
       'field_related_dh_items' => 'ds_content',
       'group_loa' => 'ds_content',
       'field_related_dictionary_words' => 'ds_content',
@@ -547,6 +743,44 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|unit_plan|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|unit_plan|full';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'unit_plan';
+  $ds_layout->view_mode = 'full';
+  $ds_layout->layout = 'bootstrap_12';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'central' => array(
+        0 => 'ds_switch_field',
+        1 => 'field_unit_lessons',
+      ),
+    ),
+    'fields' => array(
+      'ds_switch_field' => 'central',
+      'field_unit_lessons' => 'central',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'central' => array(
+        'unit-plan-bottom' => 'unit-plan-bottom',
+      ),
+    ),
+    'wrappers' => array(
+      'central' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|unit_plan|full'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -597,6 +831,116 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|unit_plan|search_result'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|unit_plan|teacher_view';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'unit_plan';
+  $ds_layout->view_mode = 'teacher_view';
+  $ds_layout->layout = 'bootstrap_6_6_stacked';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'top' => array(
+        0 => 'ds_switch_field',
+      ),
+      'left' => array(
+        1 => 'field_unit_overarching',
+        2 => 'field_unit_conceptual',
+        3 => 'field_unit_nature_of_science',
+        4 => 'field_unit_language_learning',
+        5 => 'field_unit_technical',
+        6 => 'field_unit_assessments',
+        7 => 'field_media_asset',
+        8 => 'field_related_dh_items',
+        9 => 'field_related_dictionary_words',
+        10 => 'field_word_list',
+        11 => 'field_collection',
+      ),
+      'right' => array(
+        12 => 'field_unit_teacher',
+        13 => 'field_unit_subject',
+        14 => 'field_unit_grade_level',
+        15 => 'field_unit_week_of',
+        16 => 'field_unit_unit_length',
+        17 => 'field_unit_class_period_length',
+        18 => 'field_community_ref',
+        19 => 'og_group_ref',
+      ),
+      'bottom' => array(
+        20 => 'field_unit_lessons',
+      ),
+    ),
+    'fields' => array(
+      'ds_switch_field' => 'top',
+      'field_unit_overarching' => 'left',
+      'field_unit_conceptual' => 'left',
+      'field_unit_nature_of_science' => 'left',
+      'field_unit_language_learning' => 'left',
+      'field_unit_technical' => 'left',
+      'field_unit_assessments' => 'left',
+      'field_media_asset' => 'left',
+      'field_related_dh_items' => 'left',
+      'field_related_dictionary_words' => 'left',
+      'field_word_list' => 'left',
+      'field_collection' => 'left',
+      'field_unit_teacher' => 'right',
+      'field_unit_subject' => 'right',
+      'field_unit_grade_level' => 'right',
+      'field_unit_week_of' => 'right',
+      'field_unit_unit_length' => 'right',
+      'field_unit_class_period_length' => 'right',
+      'field_community_ref' => 'right',
+      'og_group_ref' => 'right',
+      'field_unit_lessons' => 'bottom',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+      'left' => array(
+        'unit-plan-body' => 'unit-plan-body',
+      ),
+      'right' => array(
+        'unit-plan-sidebar' => 'unit-plan-sidebar',
+      ),
+      'bottom' => array(
+        'unit-plan-bottom' => 'unit-plan-bottom',
+      ),
+    ),
+    'wrappers' => array(
+      'top' => 'div',
+      'left' => 'div',
+      'right' => 'div',
+      'bottom' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|unit_plan|teacher_view'] = $ds_layout;
+
+  return $export;
+}
+
+/**
+ * Implements hook_ds_view_modes_info().
+ */
+function ma_lesson_plan_ds_view_modes_info() {
+  $export = array();
+
+  $ds_view_mode = new stdClass();
+  $ds_view_mode->api_version = 1;
+  $ds_view_mode->view_mode = 'teacher_view';
+  $ds_view_mode->label = 'Teacher View';
+  $ds_view_mode->entities = array(
+    'field_collection_item' => 'field_collection_item',
+    'node' => 'node',
+  );
+  $export['teacher_view'] = $ds_view_mode;
 
   return $export;
 }

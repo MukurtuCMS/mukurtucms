@@ -93,6 +93,7 @@ features[field_base][] = scald_authors
 features[field_base][] = scald_file
 features[field_base][] = scald_tags
 features[field_base][] = scald_thumbnail
+features[field_group][] = group_480_thumbnail_and_link|scald_atom|image|ma_colorbox
 features[field_group][] = group_scald_accordion|scald_atom|audio|form
 features[field_group][] = group_scald_accordion|scald_atom|file|form
 features[field_group][] = group_scald_accordion|scald_atom|image|form
