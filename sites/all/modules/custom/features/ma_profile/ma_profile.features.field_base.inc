@@ -121,6 +121,9 @@ function ma_profile_field_default_field_bases() {
           'og_behavior' => array(
             'status' => TRUE,
           ),
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
           'views-select-list' => array(
             'status' => 0,
           ),
@@ -135,7 +138,7 @@ function ma_profile_field_default_field_bases() {
       ),
       'handler_submit' => 'Change handler',
       'target_type' => 'node',
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'entityreference',

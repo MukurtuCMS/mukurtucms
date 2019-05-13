@@ -137,7 +137,9 @@ function ma_profile_field_default_field_instances() {
   // Exported field_instance: 'user-user-og_user_node'.
   $field_instances['user-user-og_user_node'] = array(
     'bundle' => 'user',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
@@ -167,6 +169,13 @@ function ma_profile_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => 1,
     ),
     'view modes' => array(
@@ -185,7 +194,8 @@ function ma_profile_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
+        'treeable' => 0,
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
