@@ -8039,6 +8039,10 @@ footer header {
 .page-node-edit #edit-oggroup-fieldset-body .form-item .input-group {
   display: none;
 }
+.page-node-add .select2-container,
+.page-node-edit .select2-container {
+  display: block;
+}
 .bean-hero-image-one-column .content {
   position: relative;
   width: 100%;
@@ -10610,10 +10614,6 @@ body #admin-menu {
 }
 .modal-add-to-collection .modal-header {
   display: none;
-}
-.modal-add-to-collection .modal-body,
-.modal-add-to-collection .chosen-container {
-  overflow: visible;
 }
 .modal-add-to-collection .loading-spinner {
   display: none;
