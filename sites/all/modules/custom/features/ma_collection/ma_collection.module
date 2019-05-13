@@ -542,7 +542,7 @@ function ma_collection_add_to_collection_form($form, $form_state) {
     '#title' => t('Add Item to Collection'),
     '#type' => 'select',
     '#options' => $colls,
-    '#chosen' => TRUE,
+    '#select2' => [],
   ];
   $form['actions'] = [
     'submit' => [
@@ -613,7 +613,7 @@ function ma_collection_add_to_personal_collection_form($form, $form_state) {
     '#title' => t('Add Item to Personal Collection'),
     '#type' => 'select',
     '#options' => $personal_colls,
-    '#chosen' => TRUE,
+    '#select2' => [],
   ];
   $form['actions'] = [
     'submit' => [
