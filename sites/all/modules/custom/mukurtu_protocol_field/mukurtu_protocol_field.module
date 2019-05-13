@@ -188,6 +188,7 @@ function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $im
     // Community dropdown
     $form['oggroup_fieldset'][$i]['dropdown_first'] = array(
       '#type' => 'select',
+      '#select2' => [],
       '#title' => 'Community',
       '#options' => $options_first,
       '#default_value' => $selected,
@@ -199,7 +200,6 @@ function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $im
         'event' => 'change',
         'wrapper' => 'dropdown-second-replace-'.$i,
       ),
-      '#attributes' => array ('class' => array('chosen-enable')),
     );
 
 
@@ -222,6 +222,7 @@ function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $im
     // Protocol dropdown
     $form['oggroup_fieldset'][$i]['dropdown_second'] = array(
       '#type' => 'select',
+      '#select2' => [],
       '#title' => t('Protocol'),
       // The entire enclosing div created here gets replaced when dropdown_first
       // is changed.
@@ -232,7 +233,6 @@ function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $im
       '#options' => _ajax_get_protocol_by_community_dropdown_options($selected, $protocol_defaults, $import_form),
       '#default_value' => $protocol_defaults,
       '#multiple' => TRUE,
-      '#attributes' => array ('class' => array('chosen-enable')),
     );
     if ($i == 0 && ma_cultural_protocol_node_type_must_have_cp($node_type)) {
       $form['oggroup_fieldset'][$i]['dropdown_second']['#required'] = TRUE;
