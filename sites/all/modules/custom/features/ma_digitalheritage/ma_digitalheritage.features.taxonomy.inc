@@ -244,7 +244,7 @@ function ma_digitalheritage_taxonomy_default_vocabularies() {
       'name' => 'Tags',
       'machine_name' => 'tags',
       'description' => 'Lists input from the "Keywords" field in the Digital Heritage content creation form.',
-      'hierarchy' => 0,
+      'hierarchy' => 1,
       'module' => 'taxonomy',
       'weight' => -9,
       'rdf_mapping' => array(

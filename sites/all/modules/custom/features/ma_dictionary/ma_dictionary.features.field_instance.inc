@@ -141,6 +141,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 1,
@@ -400,6 +401,8 @@ function ma_dictionary_field_default_field_instances() {
   // 'node-dictionary_word-field_dictionary_word_related_dh'.
   $field_instances['node-dictionary_word-field_dictionary_word_related_dh'] = array(
     'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -449,13 +452,22 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 14,
@@ -731,6 +743,8 @@ function ma_dictionary_field_default_field_instances() {
   // 'node-dictionary_word-field_related_dictionary_words'.
   $field_instances['node-dictionary_word-field_related_dictionary_words'] = array(
     'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -795,13 +809,22 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 13,
@@ -811,6 +834,8 @@ function ma_dictionary_field_default_field_instances() {
   // Exported field_instance: 'node-dictionary_word-field_tags'.
   $field_instances['node-dictionary_word-field_tags'] = array(
     'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content. Separate multiple keywords with semicolons.',
@@ -867,16 +892,26 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 0,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 27,
     ),
   );
@@ -967,6 +1002,8 @@ function ma_dictionary_field_default_field_instances() {
   // Exported field_instance: 'node-dictionary_word-field_word_list'.
   $field_instances['node-dictionary_word-field_word_list'] = array(
     'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -1031,13 +1068,22 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 15,
@@ -1130,6 +1176,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 16,
@@ -1173,6 +1220,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 1,
@@ -1656,6 +1704,8 @@ function ma_dictionary_field_default_field_instances() {
   // Exported field_instance: 'node-word_list-field_tags'.
   $field_instances['node-word_list-field_tags'] = array(
     'bundle' => 'word_list',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
@@ -1701,17 +1751,26 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );

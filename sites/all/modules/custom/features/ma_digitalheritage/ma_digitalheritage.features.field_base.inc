@@ -70,6 +70,9 @@ function ma_digitalheritage_field_default_field_bases() {
       'handler' => 'base',
       'handler_settings' => array(
         'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
           'views-select-list' => array(
             'status' => 0,
           ),
@@ -82,7 +85,7 @@ function ma_digitalheritage_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -122,7 +125,7 @@ function ma_digitalheritage_field_default_field_bases() {
         ),
       ),
       'target_type' => 'node',
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'entityreference',
@@ -437,7 +440,7 @@ function ma_digitalheritage_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',

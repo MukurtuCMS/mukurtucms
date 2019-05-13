@@ -99,6 +99,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Date Born',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -213,6 +215,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Date Died',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -305,6 +309,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Deceased',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -396,6 +402,8 @@ function ma_person_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -403,6 +411,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 6,
@@ -501,6 +510,8 @@ function ma_person_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -591,6 +602,8 @@ function ma_person_field_default_field_instances() {
           'status' => TRUE,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -607,6 +620,8 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_node_aggregate'.
   $field_instances['node-person-field_node_aggregate'] = array(
     'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -678,6 +693,15 @@ function ma_person_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -685,6 +709,8 @@ function ma_person_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 2,
@@ -751,6 +777,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -839,6 +867,8 @@ function ma_person_field_default_field_instances() {
         'dictionary_word_bundle' => 2,
         'person_relationship_bundle' => 3,
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_edit_mode' => 'open',
       'title' => 'Related Person',
       'title_multiple' => 'Related People',
@@ -932,6 +962,8 @@ function ma_person_field_default_field_instances() {
         'person_relationship_bundle' => 3,
         'text_section' => 4,
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_edit_mode' => 'open',
       'title' => 'Section',
       'title_multiple' => 'Sections',
@@ -949,6 +981,8 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_tags'.
   $field_instances['node-person-field_tags'] = array(
     'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
@@ -1021,17 +1055,28 @@ function ma_person_field_default_field_instances() {
     'label' => 'Keywords',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );
@@ -1108,6 +1153,8 @@ function ma_person_field_default_field_instances() {
           'status' => TRUE,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -1168,6 +1215,8 @@ function ma_person_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1228,6 +1277,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Relationship Type',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1273,6 +1324,8 @@ function ma_person_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -1323,6 +1376,8 @@ function ma_person_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -1372,6 +1427,8 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -1419,6 +1476,8 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,

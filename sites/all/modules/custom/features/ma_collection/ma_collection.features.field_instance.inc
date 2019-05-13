@@ -345,6 +345,8 @@ function ma_collection_field_default_field_instances() {
   // Exported field_instance: 'node-collection-field_collections_parent_coll'.
   $field_instances['node-collection-field_collections_parent_coll'] = array(
     'bundle' => 'collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -395,6 +397,13 @@ function ma_collection_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 0,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -403,6 +412,7 @@ function ma_collection_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 8,
@@ -601,6 +611,8 @@ function ma_collection_field_default_field_instances() {
   // Exported field_instance: 'node-collection-field_digital_heritage_items'.
   $field_instances['node-collection-field_digital_heritage_items'] = array(
     'bundle' => 'collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -653,13 +665,21 @@ function ma_collection_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'hide_id' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 0,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -799,6 +819,8 @@ function ma_collection_field_default_field_instances() {
   // Exported field_instance: 'node-collection-field_tags'.
   $field_instances['node-collection-field_tags'] = array(
     'bundle' => 'collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
@@ -843,17 +865,26 @@ function ma_collection_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'allow_add_onfly' => 1,
+        'show_voc_terms_page_link' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 0,
-      'module' => 'taxonomy',
+      'active' => 1,
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_path' => 'taxonomy/autocomplete',
-        'size' => 60,
+        'apply_chosen' => 0,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 8,
     ),
   );
@@ -930,6 +961,7 @@ function ma_collection_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 5,
@@ -1164,6 +1196,8 @@ function ma_collection_field_default_field_instances() {
   // 'node-personal_collection-field_digital_heritage_items'.
   $field_instances['node-personal_collection-field_digital_heritage_items'] = array(
     'bundle' => 'personal_collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -1204,19 +1238,24 @@ function ma_collection_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 5,
     ),
   );

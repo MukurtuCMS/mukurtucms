@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_dashboard.features.inc
@@ -132,17 +133,6 @@ function ma_dashboard_homebox() {
         'closable' => 1,
         'title' => '',
         'weight' => -39,
-      ),
-      'mukurtu_splash_manage_taxonomy' => array(
-        'module' => 'mukurtu_splash',
-        'delta' => 'manage_taxonomy',
-        'region' => 2,
-        'movable' => 1,
-        'status' => 1,
-        'open' => 1,
-        'closable' => 1,
-        'title' => '',
-        'weight' => -40,
       ),
       'mukurtu_splash_manage_taxonomy' => array(
         'module' => 'mukurtu_splash',

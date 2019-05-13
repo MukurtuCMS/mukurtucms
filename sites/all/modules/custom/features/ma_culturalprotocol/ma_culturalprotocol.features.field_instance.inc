@@ -33,6 +33,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'required' => TRUE,
     'settings' => array(
       'context' => '',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -100,6 +102,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -161,6 +165,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'label' => 'Membership List Options',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -168,6 +174,7 @@ function ma_culturalprotocol_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 48,
@@ -216,6 +223,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -272,6 +281,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'label' => 'Signup Permissions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -279,6 +290,7 @@ function ma_culturalprotocol_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 2,
@@ -327,6 +339,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'label' => 'Automatically add new users to this protocol',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -383,6 +397,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'label' => 'Banner Image',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -450,6 +466,8 @@ function ma_culturalprotocol_field_default_field_instances() {
     'label' => 'Thumbnail Image',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -513,6 +531,8 @@ Strict - This cultural protocol and the items within it are shared with, visible
     'label' => 'Sharing Protocol',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -584,6 +604,8 @@ Strict - This cultural protocol and the items within it are shared with, visible
     'label' => 'Group type',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -658,6 +680,8 @@ Strict - This cultural protocol and the items within it are shared with, visible
     'label' => 'Group register',
     'required' => TRUE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -682,6 +706,8 @@ Strict - This cultural protocol and the items within it are shared with, visible
   // Exported field_instance: 'node-cultural_protocol_group-og_group_ref'.
   $field_instances['node-cultural_protocol_group-og_group_ref'] = array(
     'bundle' => 'cultural_protocol_group',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => array(),
     'default_value_function' => 'entityreference_prepopulate_field_default_value',
     'deleted' => 0,
@@ -753,6 +779,15 @@ Strict - This cultural protocol and the items within it are shared with, visible
           'status' => 1,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -771,7 +806,9 @@ Strict - This cultural protocol and the items within it are shared with, visible
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 4,
@@ -826,6 +863,8 @@ Strict - This cultural protocol and the items within it are shared with, visible
     'label' => 'Group roles and permissions',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(

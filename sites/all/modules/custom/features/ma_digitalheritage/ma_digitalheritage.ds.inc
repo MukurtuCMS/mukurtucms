@@ -95,7 +95,7 @@ function ma_digitalheritage_ds_field_settings_info() {
         'ft' => array(),
       ),
     ),
-     'community_record_title' => array(
+    'community_record_title' => array(
       'weight' => '0',
       'label' => 'above',
       'format' => 'default',

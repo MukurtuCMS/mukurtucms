@@ -32,6 +32,8 @@ function ma_community_field_default_field_instances() {
     'required' => TRUE,
     'settings' => array(
       'context' => '',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -105,6 +107,8 @@ function ma_community_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -126,6 +130,8 @@ function ma_community_field_default_field_instances() {
   // Exported field_instance: 'node-community-field_child_communities'.
   $field_instances['node-community-field_child_communities'] = array(
     'bundle' => 'community',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -188,13 +194,24 @@ function ma_community_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 5,
@@ -251,6 +268,8 @@ function ma_community_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -316,6 +335,8 @@ function ma_community_field_default_field_instances() {
     'label' => 'Banner Image',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -392,6 +413,8 @@ function ma_community_field_default_field_instances() {
     'label' => 'Thumbnail Image',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 0,
         'file' => 0,
@@ -466,6 +489,8 @@ function ma_community_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -474,6 +499,7 @@ function ma_community_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 7,
@@ -528,6 +554,8 @@ function ma_community_field_default_field_instances() {
     'label' => 'Membership List Options',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -535,6 +563,7 @@ function ma_community_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 6,
@@ -544,6 +573,8 @@ function ma_community_field_default_field_instances() {
   // Exported field_instance: 'node-community-field_parent_community'.
   $field_instances['node-community-field_parent_community'] = array(
     'bundle' => 'community',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -606,13 +637,24 @@ function ma_community_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 4,
@@ -667,6 +709,8 @@ function ma_community_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -734,6 +778,8 @@ Strict - Your community page is invisible to all site users who are not members 
     'label' => 'Sharing protocol',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -801,6 +847,8 @@ Strict - Your community page is invisible to all site users who are not members 
     'label' => 'Group type',
     'required' => TRUE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -880,6 +928,8 @@ Strict - Your community page is invisible to all site users who are not members 
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -899,6 +949,7 @@ Strict - Your community page is invisible to all site users who are not members 
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 5,

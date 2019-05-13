@@ -76,6 +76,8 @@ function ma_profile_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => 0,
     ),
     'widget' => array(
@@ -184,6 +186,7 @@ function ma_profile_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 6,
