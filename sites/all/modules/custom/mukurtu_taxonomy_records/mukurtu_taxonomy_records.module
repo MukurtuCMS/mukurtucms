@@ -192,7 +192,6 @@ function mukurtu_taxonomy_records_manage_record_form($form, $form_state, $node) 
         '#multiple' => TRUE,
         '#options' => $options,
         '#default_value' => $mukurtu_term_refs,
-        '#chosen' => TRUE,
     );
 
     $form['submit_button'] = array(

@@ -2,7 +2,7 @@
 /**
  * @file
  * General structure is drop down of all communities hierarchy the user has permission to which then populates a list of sub-protocols in a second drop down
- * theme the drop down in chosen
+ * theme the drop down in select2
  *
  */
 
