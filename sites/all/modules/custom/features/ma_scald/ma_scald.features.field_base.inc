@@ -293,6 +293,9 @@ function ma_scald_field_default_field_bases() {
       'handler' => 'base',
       'handler_settings' => array(
         'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
           'views-select-list' => array(
             'status' => 0,
           ),
@@ -383,7 +386,7 @@ function ma_scald_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'title' => 'Authors',
     'translatable' => 0,
