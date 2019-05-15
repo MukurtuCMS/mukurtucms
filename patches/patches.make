@@ -177,6 +177,10 @@ projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-reg
 ; 1. Index display and sort ALL characters. 2. Option to skip padding
 projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_characters_and_option_to_skip_padding.patch
 
+;;; Select2
+; Allow drag and drop reordering on select2 fields even if they do not have "add terms on fly"
+projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even-if-no-add-terms-on-fly.patch
+
 ;;; Services
 ; Fix services issue with multivals
 ; see https://www.drupal.org/project/services/issues/2224803

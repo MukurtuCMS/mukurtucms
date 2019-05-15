@@ -1,0 +1,37 @@
+diff --git a/select2.module b/select2.module
+index 3fc4909..f56f151 100644
+--- a/select2.module
++++ b/select2.module
+@@ -841,10 +841,6 @@ function select2_field_widget_form_alter(&$element, &$form_state, $context) {
+ 
+   if (isset($settings['allow_add_onfly']) && $settings['allow_add_onfly']) {
+ 
+-    $element['#type'] = 'select2_hidden';
+-
+-    $element['#value_callback'] = 'select_2_hidden_value_callback';
+-
+     $element['#select2']['taxonomy_vocabulary'] = $context['field']['settings']['allowed_values'][0]['vocabulary'];
+ 
+     $element['#select2']['minimumResultsForSearch'] = 0;
+@@ -863,12 +859,16 @@ function select2_field_widget_form_alter(&$element, &$form_state, $context) {
+     }
+ 
+     $element['#description'] = (isset($element['#description']) ? $element['#description'] . '<br/>' : '') . $descrition;
++    
++  }
+ 
+-    if (isset($element['#multiple']) && $element['#multiple']) {
+-      $element['#select2']['multiple'] = TRUE;
+-      $element['#select2']['separator'] = SELECT2_VALUES_SEPARATOR;
+-    }
+-
++  // Mukurtu patch to allow drag and drop reordering on select2 fields even if they do not have "add terms on fly"
++  // Simply moving these lines from within the allow_add_onfly condition above to here, so that it applies to all elements.
++  $element['#type'] = 'select2_hidden';
++  $element['#value_callback'] = 'select_2_hidden_value_callback';
++  if (isset($element['#multiple']) && $element['#multiple']) {
++    $element['#select2']['multiple'] = TRUE;
++    $element['#select2']['separator'] = SELECT2_VALUES_SEPARATOR;
+   }
+ 
+ }
