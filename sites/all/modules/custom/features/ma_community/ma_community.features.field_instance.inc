@@ -221,10 +221,12 @@ function ma_community_field_default_field_instances() {
   // Exported field_instance: 'node-community-field_community_featured_colls'.
   $field_instances['node-community-field_community_featured_colls'] = array(
     'bundle' => 'community',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'Use the arrows to change the order of Featured Collections.',
+    'description' => 'The display order of the Featured Collections can be changed by dragging and dropping them into the preferred order.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -257,6 +259,7 @@ function ma_community_field_default_field_instances() {
         'weight' => 24,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_featured_colls',
@@ -270,19 +273,23 @@ function ma_community_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'apply_chosen' => '',
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );
@@ -993,11 +1000,11 @@ Strict - Your community page is invisible to all site users who are not members 
   t('Parent Community');
   t('Pre-Actions');
   t('Sharing protocol');
+  t('The display order of the Featured Collections can be changed by dragging and dropping them into the preferred order.');
   t('These options set the membership list visibility for visitors and community members. The full membership list will always be visible to community managers.');
   t('This image is used in the Community listings page. Use a 1:1 width to height ratio.
 ');
   t('Thumbnail Image');
-  t('Use the arrows to change the order of Featured Collections.');
   t('Use this field with caution! If you assign the current Community to a Parent Community, all members of the current Community will be added as members on the Parent Community. If you subsequently unassign the current Community from the Parent Community, the members will remain added to the Parent Community.');
   t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
 

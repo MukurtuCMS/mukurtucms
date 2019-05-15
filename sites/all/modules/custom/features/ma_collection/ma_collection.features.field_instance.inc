@@ -336,6 +336,7 @@ function ma_collection_field_default_field_instances() {
         'path' => '',
         'size' => 60,
         'treeable' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'entityreference_autocomplete',
       'weight' => 10,
@@ -422,6 +423,8 @@ function ma_collection_field_default_field_instances() {
   // Exported field_instance: 'node-collection-field_community_ref'.
   $field_instances['node-collection-field_community_ref'] = array(
     'bundle' => 'collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -457,6 +460,7 @@ function ma_collection_field_default_field_instances() {
         'weight' => 19,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -465,18 +469,23 @@ function ma_collection_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 4,
     ),
   );
@@ -652,6 +661,7 @@ function ma_collection_field_default_field_instances() {
         'weight' => 17,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_digital_heritage_items',
@@ -666,26 +676,22 @@ function ma_collection_field_default_field_instances() {
       'custom_add_another' => '',
       'custom_remove' => '',
       'select2_integration' => array(
-        'hide_id' => 0,
         'styling' => array(
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
         ),
-        'use_select2' => 0,
+        'use_select2' => 1,
       ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 0,
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 4,
     ),
   );

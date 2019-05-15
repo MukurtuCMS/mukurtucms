@@ -433,6 +433,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-calendar-field_community_ref'.
   $field_instances['node-calendar-field_community_ref'] = array(
     'bundle' => 'calendar',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -479,6 +481,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 12,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -487,18 +490,23 @@ function ma_collaboration_tools_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );
@@ -792,6 +800,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-discussion_space-field_community_ref'.
   $field_instances['node-discussion_space-field_community_ref'] = array(
     'bundle' => 'discussion_space',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -831,6 +841,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -839,18 +850,23 @@ function ma_collaboration_tools_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );
@@ -1127,6 +1143,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-discussion_topic-field_community_ref'.
   $field_instances['node-discussion_topic-field_community_ref'] = array(
     'bundle' => 'discussion_topic',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -1156,6 +1174,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -1164,18 +1183,23 @@ function ma_collaboration_tools_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 9,
     ),
   );
@@ -2021,6 +2045,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-document_library-field_community_ref'.
   $field_instances['node-document_library-field_community_ref'] = array(
     'bundle' => 'document_library',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2060,6 +2086,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -2068,18 +2095,23 @@ function ma_collaboration_tools_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );
@@ -2350,6 +2382,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-document_page-field_community_ref'.
   $field_instances['node-document_page-field_community_ref'] = array(
     'bundle' => 'document_page',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2373,6 +2407,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -2381,18 +2416,23 @@ function ma_collaboration_tools_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 11,
     ),
   );
@@ -3132,6 +3172,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-event-field_community_ref'.
   $field_instances['node-event-field_community_ref'] = array(
     'bundle' => 'event',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -3162,6 +3204,7 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -3170,18 +3213,23 @@ function ma_collaboration_tools_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 13,
     ),
   );

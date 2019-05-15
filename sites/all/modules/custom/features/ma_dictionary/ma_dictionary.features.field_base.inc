@@ -497,6 +497,9 @@ function ma_dictionary_field_default_field_bases() {
       'handler' => 'views',
       'handler_settings' => array(
         'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
           'views-select-list' => array(
             'status' => 0,
           ),

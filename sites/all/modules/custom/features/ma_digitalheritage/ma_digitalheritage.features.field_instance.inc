@@ -167,6 +167,8 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_book_children'.
   $field_instances['node-digital_heritage-field_book_children'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -251,18 +253,23 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 57,
     ),
   );
@@ -649,6 +656,8 @@ function ma_digitalheritage_field_default_field_instances() {
   // 'node-digital_heritage-field_community_record_children'.
   $field_instances['node-digital_heritage-field_community_record_children'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -733,18 +742,23 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 56,
     ),
   );
@@ -856,6 +870,8 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_community_ref'.
   $field_instances['node-digital_heritage-field_community_ref'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -983,6 +999,8 @@ function ma_digitalheritage_field_default_field_instances() {
         'weight' => 3,
       ),
     ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
     'label' => 'Community',
@@ -990,17 +1008,23 @@ function ma_digitalheritage_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 4,
     ),
   );
@@ -1463,7 +1487,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'bundle' => 'digital_heritage',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'A Creator can be a person or people; a clan, tribe, or cultural group; or an organization that is primarily responsible for providing the essential knowledge or labor that goes into making a Digital Heritage Item or Media Asset. For example, the Creator field could list who designed or made a basket; the knowledge holders who provided the information for a book or the book’s author or illustrator; the singers, songwriters, dancers, or performers who bring to life cultural materials. ',
     'display' => array(
@@ -2641,7 +2665,6 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),

@@ -273,6 +273,8 @@ function ma_dictionary_field_default_field_instances() {
   // Exported field_instance: 'node-dictionary_word-field_community_ref'.
   $field_instances['node-dictionary_word-field_community_ref'] = array(
     'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -323,6 +325,7 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 24,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -331,17 +334,23 @@ function ma_dictionary_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 5,
     ),
   );
@@ -1788,10 +1797,12 @@ function ma_dictionary_field_default_field_instances() {
   // Exported field_instance: 'node-word_list-field_words'.
   $field_instances['node-word_list-field_words'] = array(
     'bundle' => 'word_list',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => ' The display order of the Words can be changed by dragging and dropping them into the preferred order.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1833,6 +1844,7 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 15,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_words',
@@ -1846,17 +1858,23 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 6,
     ),
   );
@@ -2559,6 +2577,7 @@ function ma_dictionary_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t(' The display order of the Words can be changed by dragging and dropping them into the preferred order.');
   t('A dictionary word must be associated with a single language on the site.');
   t('A reference to one or many related dictionary words.');
   t('A reference to one or many related digital heritage items.');

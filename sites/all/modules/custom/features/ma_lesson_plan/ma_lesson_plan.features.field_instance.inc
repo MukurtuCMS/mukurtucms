@@ -1295,6 +1295,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_community_ref'.
   $field_instances['node-unit_plan-field_community_ref'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -1396,6 +1398,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_community_ref',
@@ -1404,18 +1407,23 @@ function ma_lesson_plan_field_default_field_instances() {
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'node_reference',
+      'module' => 'options',
       'settings' => array(
-        'autocomplete_match' => 'contains',
-        'autocomplete_path' => 'node_reference/autocomplete',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'node_reference_autocomplete',
+      'type' => 'options_select',
       'weight' => 18,
     ),
   );
