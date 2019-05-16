@@ -12372,6 +12372,20 @@ body #admin-menu {
 .user-profile .field-name-personal-collections .view-footer a {
   font-size: 20px;
 }
+.view-dhan .chosen-container {
+  padding: 0;
+  border: 0;
+}
+.view-dhan .form-item-date-value .form-control {
+  height: 25px;
+}
+.view-dhan #ma-dhan-dhan-frequency label {
+  float: left;
+  margin-right: 0.5em;
+}
+.view-dhan #ma-dhan-dhan-frequency #edit-dhan-frequency {
+  width: auto;
+}
 .node-unit_plan-form .group-lessons legend {
   display: none;
 }

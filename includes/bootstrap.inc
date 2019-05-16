@@ -8,7 +8,7 @@
 /**
  * The current system version.
  */
-define('VERSION', '7.66');
+define('VERSION', '7.67');
 
 /**
  * Core API compatibility.
@@ -1189,7 +1189,15 @@ function variable_initialize($conf = array()) {
     $variables = $cached->data;
   }
   else {
-    // Cache miss. Avoid a stampede.
+    // The variable cache was not available. It might mean that we are running
+    // on an empty database. In that case, just redirect the user to install.php,
+    // unless we've already been there.
+    if (!db_table_exists('variable') && !drupal_installation_attempted()) {
+      include_once DRUPAL_ROOT . '/includes/install.inc';
+      install_goto('install.php');
+    }
+
+    // Avoid a stampede.
     $name = 'variable_init';
     if (!lock_acquire($name, 1)) {
       // Another request is building the variable cache.

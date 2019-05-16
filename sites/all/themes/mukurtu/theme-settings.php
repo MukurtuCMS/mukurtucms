@@ -4,6 +4,11 @@
  * Implements hook_form_FORM_ID_alter().
  */
 function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id = NULL) {
+  $theme = NULL;
+  if (isset($form_state['build_info']['args'][0])) {
+    $theme = $form_state['build_info']['args'][0];
+  }
+
   // Mukurtu.
   $form['mukurtu'] = array(
     '#type' => 'fieldset',
@@ -23,8 +28,9 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   $form['mukurtu']['colors']['mukurtu_theme_color_scheme'] = array(
     '#type' => 'radios',
     '#title' => t('Select default color scheme for the Mukurtu theme'),
-    '#default_value' => theme_get_setting('mukurtu_theme_color_scheme', 'mukurtu'),
-    '#options' => array('blue-gold' => 'Blue & Gold', 'red-bone' => 'Red & Bone')
+    '#default_value' => theme_get_setting('mukurtu_theme_color_scheme', $theme),
+    '#options' => array('blue-gold' => 'Blue & Gold', 'red-bone' => 'Red & Bone', 'none' => 'No Mukurtu theme CSS'),
+    '#description' => t("Select 'No Mukurtu theme CSS' if you are using a sub-theme that recompiles the less files from scratch or you are specifying CSS files in your theme.info file."),
   );
 
   //// Default Images
@@ -58,7 +64,7 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   $form['mukurtu']['footer']['mukurtu_theme_email_us_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Email us text'),
-    '#default_value' => theme_get_setting('mukurtu_theme_email_us_message', 'mukurtu'),
+    '#default_value' => theme_get_setting('mukurtu_theme_email_us_message', $theme),
     '#description'   => t("Leave empty to omit from display."),
   );
 
@@ -66,7 +72,7 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   $form['mukurtu']['footer']['mukurtu_theme_contact_email'] = array(
     '#type' => 'textfield',
     '#title' => t('Contact email address'),
-    '#default_value' => theme_get_setting('mukurtu_theme_contact_email', 'mukurtu'),
+    '#default_value' => theme_get_setting('mukurtu_theme_contact_email', $theme),
     '#description'   => t("Leave empty to omit from display."),
   );
 
@@ -74,21 +80,21 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   $form['mukurtu']['footer']['mukurtu_theme_twitter_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Twitter message text'),
-    '#default_value' => theme_get_setting('mukurtu_theme_twitter_message', 'mukurtu'),
+    '#default_value' => theme_get_setting('mukurtu_theme_twitter_message', $theme),
     '#description'   => t("Leave empty to omit from display."),
   );
 
   $form['mukurtu']['footer']['mukurtu_theme_twitter1'] = array(
     '#type' => 'textfield',
     '#title' => t('First Twitter account'),
-    '#default_value' => theme_get_setting('mukurtu_theme_twitter1', 'mukurtu'),
+    '#default_value' => theme_get_setting('mukurtu_theme_twitter1', $theme),
     '#description'   => t("Leave empty to omit from display."),
   );
 
   $form['mukurtu']['footer']['mukurtu_theme_twitter2'] = array(
     '#type' => 'textfield',
     '#title' => t('Second Twitter account'),
-    '#default_value' => theme_get_setting('mukurtu_theme_twitter2', 'mukurtu'),
+    '#default_value' => theme_get_setting('mukurtu_theme_twitter2', $theme),
     '#description'   => t("Leave empty to omit from display."),
   );
 
@@ -96,7 +102,7 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   $form['mukurtu']['footer']['mukurtu_theme_copyright'] = array(
     '#type' => 'textfield',
     '#title' => t('Footer Copyright Message'),
-    '#default_value' => theme_get_setting('mukurtu_theme_copyright', 'mukurtu'),
+    '#default_value' => theme_get_setting('mukurtu_theme_copyright', $theme),
     '#description'   => t("Use replacement token [year] for the current year."),
   );
 
@@ -112,8 +118,8 @@ function mukurtu_form_system_theme_settings_alter(&$form, $form_state, $form_id 
   $form['mukurtu']['frontpage']['mukurtu_theme_frontpage_layout'] = array(
     '#type' => 'radios',
     '#title' => t('Frontpage Layout'),
-    '#default_value' => theme_get_setting('mukurtu_theme_frontpage_layout', 'mukurtu'),
-    '#options' => array('large-hero' => 'Large hero image', 'side-by-side' => 'Smaller hero image with welcome message')
+    '#default_value' => theme_get_setting('mukurtu_theme_frontpage_layout', $theme),
+    '#options' => array('large-hero' => 'Large hero image', 'side-by-side' => 'Smaller hero image with welcome message'),
   );
 
   // Hero Image

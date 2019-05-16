@@ -135,14 +135,14 @@ function ma_community_views_default_views() {
   $handler->display->display_options['footer']['area']['empty'] = TRUE;
   $handler->display->display_options['footer']['area']['content'] = '<div class="add-manage-members-links">
 <div class="add-members-link btn btn-default btn-sm">
-<a href="/group/node/!1/admin/people/add-user">Add Members</a>
+<?php print l(t(\'Add Members\'), "group/node/!1/admin/people/add-user");?>
 </div>
 <div class="manage-members-link btn btn-default btn-sm">
-<a href="/group/node/!1/admin/people">Manage Members</a>
+<?php print l(t(\'Manage Members\'), "group/node/!1/admin/people");?>
 </div>
 </div>
 ';
-  $handler->display->display_options['footer']['area']['format'] = 'full_html';
+  $handler->display->display_options['footer']['area']['format'] = 'ds_code';
   $handler->display->display_options['footer']['area']['tokenize'] = TRUE;
   /* Relationship: OG membership: OG membership from User */
   $handler->display->display_options['relationships']['og_membership_rel']['id'] = 'og_membership_rel';
@@ -244,10 +244,10 @@ function ma_community_views_default_views() {
     t('last »'),
     t('<div class="add-manage-members-links">
 <div class="add-members-link btn btn-default btn-sm">
-<a href="/group/node/!1/admin/people/add-user">Add Members</a>
+<?php print l(t(\'Add Members\'), "group/node/!1/admin/people/add-user");?>
 </div>
 <div class="manage-members-link btn btn-default btn-sm">
-<a href="/group/node/!1/admin/people">Manage Members</a>
+<?php print l(t(\'Manage Members\'), "group/node/!1/admin/people");?>
 </div>
 </div>
 '),
