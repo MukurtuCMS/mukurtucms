@@ -610,6 +610,45 @@ function ma_base_theme_field_default_field_bases() {
     'type' => 'taxonomy_term_reference',
   );
 
+  // Exported field_base: 'field_related_content'.
+  $field_bases['field_related_content'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_related_content',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'duplicates' => 1,
+      'handler' => 'views',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'view' => array(
+          'args' => array(),
+          'display_name' => 'entityreference_1',
+          'view_name' => 'nodes_available_to_related_content_field',
+        ),
+      ),
+      'target_type' => 'node',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
+  );
+
   // Exported field_base: 'field_rights'.
   $field_bases['field_rights'] = array(
     'active' => 1,
