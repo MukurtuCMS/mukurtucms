@@ -8039,6 +8039,9 @@ footer header {
 .page-node-edit #edit-oggroup-fieldset-body .form-item .input-group {
   display: none;
 }
+.select2-container {
+  display: block;
+}
 .bean-hero-image-one-column .content {
   position: relative;
   width: 100%;
