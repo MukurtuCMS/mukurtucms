@@ -630,6 +630,13 @@ unit-plan-bottom';
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'select2_update_settings_by_ajax';
+  $strongarm->value = 0;
+  $export['select2_update_settings_by_ajax'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'site_frontpage';
   $strongarm->value = 'home';
   $export['site_frontpage'] = $strongarm;
