@@ -267,7 +267,7 @@ function mukurtu_export_action_info() {
     'mukurtu_export_action' => [
       'type' => 'entity',
       'label' => t('Mukurtu CSV Export'),
-      'behavior' => [],
+      'behavior' => ['views_property'],
       'configurable' => FALSE,
       'vbo_configurable' => TRUE,
       'triggers' => ['any'],
