@@ -13,8 +13,8 @@ define('MUKURTU_PRERELEASE_FUNCTIONALITY', 'mukurtu_prerelease_functionality');
  */
 function ma_core_init() {
 
-  // Add the JS for jquery_ui_tooltips. Simply use the class "jquery_ui_tooltip" on any title attribute to use this
-  drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/jquery_ui_tooltips.js');
+  // Fix for bootstrap help tooltip not working on select widgets.
+  drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/bootstrap_tooltips_over_select2_widget.js');
 
   // Suppress status messages during profile installation
   if ($_GET['profile'] == 'mukurtu') {
