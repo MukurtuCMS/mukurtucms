@@ -626,7 +626,7 @@ function ma_base_theme_field_default_field_bases() {
     'module' => 'entityreference',
     'settings' => array(
       'duplicates' => 1,
-      'handler' => 'views',
+      'handler' => 'base',
       'handler_settings' => array(
         'behaviors' => array(
           'treeable_behavior' => array(
@@ -636,10 +636,17 @@ function ma_base_theme_field_default_field_bases() {
             'status' => 0,
           ),
         ),
-        'view' => array(
-          'args' => array(),
-          'display_name' => 'entityreference_1',
-          'view_name' => 'nodes_available_to_related_content_field',
+        'sort' => array(
+          'direction' => 'ASC',
+          'property' => 'type',
+          'type' => 'property',
+        ),
+        'target_bundles' => array(
+          'collection' => 'collection',
+          'dictionary_word' => 'dictionary_word',
+          'digital_heritage' => 'digital_heritage',
+          'person' => 'person',
+          'word_list' => 'word_list',
         ),
       ),
       'target_type' => 'node',
