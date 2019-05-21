@@ -364,4 +364,47 @@ function _ma_base_theme_set_default_browse($page = 'digital-heritage') {
   variable_set('mukurtu_default_browse_page', $option);
 }
 
+/**
+ * Copy the entity references in the old related content fields to the new Related Content field.
+ */
+function ma_base_theme_copy_related_content() {
+  $fields = [
+    'field_collection',
+    'field_related_dictionary_words',
+    'field_related_dh_items',
+    'field_digital_heritage_items',
+//    'field_community_featured_colls', // waiting to hear from Alex
+    'field_dictionary_word_related_dh',
+    'field_related_dictionary_words',
+    'field_word_list',
+//    'field_related_person', // field within field_related_people paragraph field in person type. waiting to hear from Alex (first question)
+  ];
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $results = $query->execute();
+  foreach (array_keys($results['node']) as $nid) {
+    print  ' ' . $nid;
+    $merged_refs = [];
+    $nw = entity_metadata_wrapper('node', $nid);
+    foreach ($fields as $field) {
+      if (isset($nw->{$field})) {
+        $merged_refs = array_merge($merged_refs, $nw->{$field}->raw());
+      }
+    }
+    if (count($merged_refs)) {
+      if (isset($nw->field_related_content)) {
+        $merged_refs = array_merge($nw->field_related_content->raw(), $merged_refs); // This prevents overwriting any refs which may have been set on the new field by user before this script gets run, which shouldn't happen, but just in case.
+        $merged_refs = array_unique($merged_refs);
+        $nw->field_related_content->set($merged_refs);
+        $nw->save();
+        print "!";
+      }
+      else {
+        print "X";
+      }
+    }
+  }
+}
+
 
