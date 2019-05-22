@@ -1393,7 +1393,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 16,
+      'weight' => 2,
     ),
   );
 
@@ -1521,7 +1521,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -1846,7 +1846,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -1928,7 +1928,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -2983,7 +2983,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
