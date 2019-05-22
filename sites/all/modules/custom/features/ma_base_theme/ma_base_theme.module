@@ -30,6 +30,7 @@ function ma_base_theme_form_alter(&$form, &$form_state, $form_id) {
  *    which is how we are setting the entity ref field in order for it to be sortable)
  * 2) Prefix each option with the content type so that the already-selected options show which content type it is.
  *    This also means that we see the content type for the non-selected options, despite the content type top-level having been flattened out.
+ * 3) Remove the node the user is already on, so that the node cannot self-reference.
  */
 function ma_base_theme_field_widget_form_alter(&$element, &$form_state, $context) {
   if ($context["field"]["field_name"] == 'field_related_content') {
@@ -37,7 +38,9 @@ function ma_base_theme_field_widget_form_alter(&$element, &$form_state, $context
     unset($element['#options']['_none']);
     foreach ($element['#options'] as $content_type => $nodes) {
       foreach ($nodes as $nid => $node_title) {
-        $new_options[$nid] = $content_type . ': ' . $node_title;
+        if ($nid <> $context["form"]["nid"]["#value"]) {
+          $new_options[$nid] = $content_type . ': ' . $node_title;
+        }
       }
     }
     $element['#options'] = $new_options;
