@@ -467,6 +467,63 @@ function ma_lesson_plan_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'field_collection_item-field_lesson_micro_tasks-field_related_content'.
+  $field_instances['field_collection_item-field_lesson_micro_tasks-field_related_content'] = array(
+    'bundle' => 'field_lesson_micro_tasks',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 4,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'field_collection_item-field_lesson_micro_tasks-field_related_dh_items'.
   $field_instances['field_collection_item-field_lesson_micro_tasks-field_related_dh_items'] = array(
     'bundle' => 'field_lesson_micro_tasks',
@@ -526,9 +583,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -649,9 +707,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -806,7 +865,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_embed',
-      'weight' => 8,
+      'weight' => 7,
     ),
   );
 
@@ -964,7 +1023,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
@@ -1100,6 +1159,86 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-lesson-field_related_content'.
+  $field_instances['node-lesson-field_related_content'] = array(
+    'bundle' => 'lesson',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 8,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teacher_view' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
+    ),
+  );
+
   // Exported field_instance: 'node-lesson-field_related_dictionary_words'.
   $field_instances['node-lesson-field_related_dictionary_words'] = array(
     'bundle' => 'lesson',
@@ -1169,9 +1308,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 9,
     ),
   );
 
@@ -1250,9 +1390,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -1380,7 +1521,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 18,
+      'weight' => 7,
     ),
   );
 
@@ -1545,6 +1686,86 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-unit_plan-field_related_content'.
+  $field_instances['node-unit_plan-field_related_content'] = array(
+    'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 39,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teacher_view' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 12,
+    ),
+  );
+
   // Exported field_instance: 'node-unit_plan-field_related_dh_items'.
   $field_instances['node-unit_plan-field_related_dh_items'] = array(
     'bundle' => 'unit_plan',
@@ -1622,9 +1843,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 12,
+      'weight' => 4,
     ),
   );
 
@@ -1703,9 +1925,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 13,
+      'weight' => 3,
     ),
   );
 
@@ -2757,9 +2980,10 @@ function ma_lesson_plan_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => 1,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 14,
+      'weight' => 2,
     ),
   );
 
@@ -2918,6 +3142,7 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Overarching');
   t('Pre-Actions');
   t('Protocol');
+  t('Related Content');
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Related Word Lists');

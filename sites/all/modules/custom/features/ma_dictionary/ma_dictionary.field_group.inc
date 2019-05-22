@@ -89,11 +89,9 @@ function ma_dictionary_field_group_info() {
     'label' => 'Relations',
     'weight' => '16',
     'children' => array(
-      0 => 'field_dictionary_word_related_dh',
-      1 => 'field_item_privacy_setting',
-      2 => 'field_related_dictionary_words',
-      3 => 'field_word_list',
-      4 => 'og_group_ref',
+      0 => 'field_item_privacy_setting',
+      1 => 'og_group_ref',
+      2 => 'field_related_content',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

@@ -299,10 +299,10 @@ function ma_lesson_plan_strongarm() {
           'weight' => '5',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '5',
         ),
         'redirect' => array(
-          'weight' => '3',
+          'weight' => '6',
         ),
       ),
       'display' => array(),

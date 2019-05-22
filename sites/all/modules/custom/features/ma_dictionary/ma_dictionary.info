@@ -187,6 +187,7 @@ features[field_instance][] = node-dictionary_word-field_item_privacy_setting
 features[field_instance][] = node-dictionary_word-field_language_community
 features[field_instance][] = node-dictionary_word-field_media_asset
 features[field_instance][] = node-dictionary_word-field_pre_actions
+features[field_instance][] = node-dictionary_word-field_related_content
 features[field_instance][] = node-dictionary_word-field_related_dictionary_words
 features[field_instance][] = node-dictionary_word-field_tags
 features[field_instance][] = node-dictionary_word-field_word_entry

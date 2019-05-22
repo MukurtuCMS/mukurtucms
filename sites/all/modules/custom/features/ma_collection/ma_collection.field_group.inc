@@ -59,8 +59,8 @@ function ma_collection_field_group_info() {
     'children' => array(
       0 => 'field_collection_image',
       1 => 'field_collection_summary',
-      2 => 'field_description',
-      3 => 'field_personal_coll_privacy',
+      2 => 'field_personal_coll_privacy',
+      3 => 'field_description',
       4 => 'title',
     ),
     'format_type' => 'htab',
@@ -146,9 +146,9 @@ function ma_collection_field_group_info() {
     'label' => 'Relations',
     'weight' => '2',
     'children' => array(
-      0 => 'field_digital_heritage_items',
-      1 => 'field_item_privacy_setting',
-      2 => 'og_group_ref',
+      0 => 'field_item_privacy_setting',
+      1 => 'og_group_ref',
+      2 => 'field_related_content',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -164,7 +164,7 @@ function ma_collection_field_group_info() {
   $field_groups['group_items|node|collection|form'] = $field_group;
 
   $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->disabled = TRUE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
   $field_group->identifier = 'group_items|node|personal_collection|form';
   $field_group->group_name = 'group_items';
@@ -229,6 +229,34 @@ function ma_collection_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_relations|node|personal_collection|form';
+  $field_group->group_name = 'group_relations';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'personal_collection';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Relations',
+    'weight' => '15',
+    'children' => array(
+      0 => 'field_related_content',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-relations field-group-fieldset',
+        'required_fields' => 1,
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_relations|node|personal_collection|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_tabs|node|collection|form';
   $field_group->group_name = 'group_tabs';
   $field_group->entity_type = 'node';
@@ -266,8 +294,8 @@ function ma_collection_field_group_info() {
     'label' => 'Tabs',
     'weight' => '1',
     'children' => array(
-      0 => 'group_basic',
-      1 => 'group_items',
+      0 => 'group_relations',
+      1 => 'group_basic',
     ),
     'format_type' => 'htabs',
     'format_settings' => array(

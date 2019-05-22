@@ -141,6 +141,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 1,
@@ -331,7 +332,7 @@ function ma_dictionary_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 5,
+      'weight' => 8,
     ),
   );
 
@@ -456,9 +457,10 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 14,
+      'weight' => 5,
     ),
   );
 
@@ -519,7 +521,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => 17,
+      'weight' => 35,
     ),
   );
 
@@ -592,7 +594,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'og',
       'settings' => array(),
       'type' => 'og_complex',
-      'weight' => 4,
+      'weight' => 7,
     ),
   );
 
@@ -660,7 +662,7 @@ function ma_dictionary_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 6,
+      'weight' => 9,
     ),
   );
 
@@ -724,6 +726,86 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'type' => 'options_onoff',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'node-dictionary_word-field_related_content'.
+  $field_instances['node-dictionary_word-field_related_content'] = array(
+    'bundle' => 'dictionary_word',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 27,
+      ),
+      'dictionary_word_summary' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 30,
     ),
   );
 
@@ -802,9 +884,10 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 13,
+      'weight' => 6,
     ),
   );
 
@@ -1038,9 +1121,10 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => 1,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 4,
     ),
   );
 
@@ -1130,9 +1214,10 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 16,
+      'weight' => 34,
     ),
   );
 
@@ -1173,6 +1258,7 @@ function ma_dictionary_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 1,
@@ -2514,6 +2600,7 @@ function ma_dictionary_field_default_field_instances() {
   t('Protocol');
   t('Recording');
   t('Reference to a resource from which the dictionary entry is derived, for example if the entry comes from specific reference material, a regional dialect, etc.');
+  t('Related Content');
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Sample Sentences');

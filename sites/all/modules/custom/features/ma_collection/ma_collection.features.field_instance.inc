@@ -403,6 +403,7 @@ function ma_collection_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 8,
@@ -467,7 +468,7 @@ function ma_collection_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -594,7 +595,7 @@ function ma_collection_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -729,7 +730,7 @@ function ma_collection_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 6,
+      'weight' => 15,
     ),
   );
 
@@ -793,6 +794,86 @@ function ma_collection_field_default_field_instances() {
       ),
       'type' => 'options_onoff',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'node-collection-field_related_content'.
+  $field_instances['node-collection-field_related_content'] = array(
+    'bundle' => 'collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'collections_browse' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 30,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 12,
     ),
   );
 
@@ -930,9 +1011,10 @@ function ma_collection_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 14,
     ),
   );
 
@@ -1156,7 +1238,7 @@ function ma_collection_field_default_field_instances() {
       'module' => 'number',
       'settings' => array(),
       'type' => 'number',
-      'weight' => 4,
+      'weight' => 6,
     ),
   );
 
@@ -1217,7 +1299,7 @@ function ma_collection_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 5,
+      'weight' => 4,
     ),
   );
 
@@ -1316,6 +1398,68 @@ function ma_collection_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-personal_collection-field_related_content'.
+  $field_instances['node-personal_collection-field_related_content'] = array(
+    'bundle' => 'personal_collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 25,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 8,
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('<p>Collections added here become <i>sub-collections</i>. Collections with sub-collections in them are called <i>top-level collections</i>. You may add here any collection that is not already a sub-collection of a different top-level collection, or is itself a top-level collection.</p>
@@ -1338,6 +1482,7 @@ function ma_collection_field_default_field_instances() {
   t('Pre-Actions');
   t('Privacy');
   t('Protocol');
+  t('Related Content');
   t('Sub-collections');
   t('Summary');
   t('This collection is a sub-collection of the top-level collection shown here. To remove this sub-collection from the top-level collection, or to move its position within the collections tree, edit the top-level collection.
