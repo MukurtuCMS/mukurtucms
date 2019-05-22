@@ -395,6 +395,7 @@ function ma_base_theme_copy_related_content() {
         $merged_refs = array_merge($merged_refs, $nw->{$field}->raw());
       }
     }
+    unset ($merged_refs[$nid]); // Prevent self-referencing, which causes a fatal error when node is viewed due to something in
     if (count($merged_refs)) {
       if (isset($nw->field_related_content)) {
         $merged_refs = array_merge($nw->field_related_content->raw(), $merged_refs); // This prevents overwriting any refs which may have been set on the new field by user before this script gets run, which shouldn't happen, but just in case.
