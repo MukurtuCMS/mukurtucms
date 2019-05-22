@@ -57,7 +57,7 @@ function ma_collection_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
     'collections_tree' => array(
-      'weight' => '8',
+      'weight' => '7',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -71,13 +71,6 @@ function ma_collection_ds_field_settings_info() {
       'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
-    ),
-    'field_digital_heritage_items' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb-col' => TRUE,
-        ),
-      ),
     ),
   );
   $export['node|collection|default'] = $ds_fieldsetting;
@@ -383,7 +376,7 @@ function ma_collection_ds_layout_settings_info() {
         4 => 'field_description',
       ),
       'left' => array(
-        5 => 'field_digital_heritage_items',
+        5 => 'field_related_content',
       ),
       'right' => array(
         6 => 'collections_tree',
@@ -395,7 +388,7 @@ function ma_collection_ds_layout_settings_info() {
       'field_collection_summary' => 'top',
       'field_collection_credit' => 'top',
       'field_description' => 'top',
-      'field_digital_heritage_items' => 'left',
+      'field_related_content' => 'left',
       'collections_tree' => 'right',
     ),
     'classes' => array(

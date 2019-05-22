@@ -291,7 +291,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 28,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -361,7 +361,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 31,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -427,7 +427,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 26,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -556,7 +556,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 29,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -615,11 +615,8 @@ function ma_collection_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 24,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 5,
       ),
       'featured_content' => array(
@@ -692,7 +689,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 32,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -755,7 +752,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 30,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -815,13 +812,12 @@ function ma_collection_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'items_per_page' => 5,
         ),
-        'type' => 'entityreference_label',
-        'weight' => 30,
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 6,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -894,7 +890,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 33,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -957,7 +953,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 27,
       ),
       'featured_content' => array(
         'label' => 'above',
