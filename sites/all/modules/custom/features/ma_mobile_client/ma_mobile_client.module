@@ -399,7 +399,9 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
   foreach ($synced_nodes as $synced_node) {
 
     // Add the node.
-    $synced_nids[$synced_node->type][$synced_node->nid] = $synced_node->changed;
+    if (node_access('view', $synced_node)) { // Check to make sure the user can view the node. This might not be the case if the CP on the node was changed after the user had set it to be synced.
+      $synced_nids[$synced_node->type][$synced_node->nid] = $synced_node->changed;
+    }
 
     // For all the entity and node refs in the node, add those nodes to be synced as well.
     // We are going one-level deep, so entity ref'ed nodes get synced, but entity ref'ed nodes of entity ref'ed nodes do not get synced.
@@ -410,11 +412,14 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
       if (isset($snw->{$ref_field}) && count($snw->{$ref_field}->raw())) {
         foreach ($snw->{$ref_field}->raw() as $reffed_nid) {
           $reffed_node = node_load ($reffed_nid);
-          $synced_nids[$reffed_node->type][$reffed_node->nid] = $reffed_node->changed;
+          if (node_access('view', $reffed_node)) { // Check to make sure the user can view the reffed node.
+            $synced_nids[$reffed_node->type][$reffed_node->nid] = $reffed_node->changed;
+          }
         }
       }
     }
   }
+
   return $synced_nids;
 }
 
