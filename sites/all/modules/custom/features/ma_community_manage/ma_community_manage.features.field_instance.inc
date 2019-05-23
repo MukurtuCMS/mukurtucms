@@ -41,6 +41,13 @@ function ma_community_manage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 30,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 22,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -59,6 +66,8 @@ function ma_community_manage_field_default_field_instances() {
     'label' => 'Group register',
     'required' => TRUE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -115,6 +124,12 @@ function ma_community_manage_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 35,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -133,6 +148,8 @@ function ma_community_manage_field_default_field_instances() {
     'label' => 'Group roles and permissions',
     'required' => TRUE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -151,6 +168,7 @@ function ma_community_manage_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 4,

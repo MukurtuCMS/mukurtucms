@@ -1235,6 +1235,15 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 12,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 12,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1347,6 +1356,27 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 19,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'node_reference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
         'weight' => 19,
       ),
       'search_result' => array(
@@ -1463,6 +1493,16 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 8,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 8,
+      ),
       'search_result' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -1548,6 +1588,12 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 38,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 38,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1621,6 +1667,15 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 9,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 9,
       ),
       'search_result' => array(
@@ -1714,6 +1769,15 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 10,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 10,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1798,6 +1862,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 7,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1872,6 +1943,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 18,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 18,
       ),
       'search_result' => array(
@@ -1953,6 +2031,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 3,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2027,6 +2112,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 15,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 15,
       ),
       'search_result' => array(
@@ -2109,6 +2201,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 5,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2184,6 +2283,15 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'full' => array(
         'label' => 'hidden',
+        'module' => 'mukurtu_display_formatters_tabbed_records',
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
+        'type' => 'mukurtu_records_formatter',
+        'weight' => 21,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
         'module' => 'mukurtu_display_formatters_tabbed_records',
         'settings' => array(
           'view_mode' => 'full',
@@ -2288,6 +2396,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 4,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2360,6 +2475,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 2,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
         'weight' => 2,
       ),
       'search_result' => array(
@@ -2436,6 +2558,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 14,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 14,
       ),
       'search_result' => array(
@@ -2520,6 +2649,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 13,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 13,
+      ),
       'search_result' => array(
         'label' => 'inline',
         'module' => 'taxonomy',
@@ -2600,6 +2736,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 6,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 6,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2674,6 +2817,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 17,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 17,
       ),
       'search_result' => array(
@@ -2755,6 +2905,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 16,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 16,
       ),
       'search_result' => array(
@@ -2841,6 +2998,15 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 11,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 11,
       ),
       'search_result' => array(
@@ -2954,6 +3120,27 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
+        'weight' => 20,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
         'weight' => 20,
       ),
       'search_result' => array(

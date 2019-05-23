@@ -84,6 +84,13 @@ function ma_culturalprotocol_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 1,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -152,6 +159,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 22,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -210,6 +223,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 23,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -267,6 +286,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 24,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -327,6 +352,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 27,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -383,6 +414,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         ),
         'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -448,6 +485,12 @@ function ma_culturalprotocol_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 25,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'hidden',
@@ -518,6 +561,12 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 28,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -591,6 +640,12 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 30,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -667,6 +722,13 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 26,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -752,6 +814,12 @@ Strict - This cultural protocol and the items within it are shared with, visible
         ),
         'type' => 'textformatter_list',
         'weight' => 5,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -850,6 +918,12 @@ Strict - This cultural protocol and the items within it are shared with, visible
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 29,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
       ),
       'teaser' => array(
         'label' => 'above',

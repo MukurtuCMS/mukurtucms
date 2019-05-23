@@ -75,6 +75,13 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 5,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'inline',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'search_result' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -143,6 +150,16 @@ function ma_collection_field_default_field_instances() {
         'weight' => 1,
       ),
       'featured_content' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
@@ -228,6 +245,13 @@ function ma_collection_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 4,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
       'search_result' => array(
         'label' => 'above',
         'module' => 'text',
@@ -298,6 +322,12 @@ function ma_collection_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 23,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 27,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -371,6 +401,12 @@ function ma_collection_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 26,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -447,6 +483,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 21,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -516,6 +558,13 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 6,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -582,6 +631,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 24,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 28,
+      ),
       'search_result' => array(
         'label' => 'hidden',
         'settings' => array(),
@@ -647,6 +702,15 @@ function ma_collection_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 7,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 24,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 6,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -725,6 +789,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 27,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -788,6 +858,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 25,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -848,6 +924,12 @@ function ma_collection_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -921,6 +1003,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 22,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -982,6 +1070,16 @@ function ma_collection_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'mukurtu_featured_content',
+        'weight' => 1,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
@@ -1054,6 +1152,13 @@ function ma_collection_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 4,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 4,
+      ),
       'search_result' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -1102,6 +1207,13 @@ function ma_collection_field_default_field_instances() {
     'description' => 'You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 5,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
@@ -1163,6 +1275,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 25,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
+      ),
       'search_result' => array(
         'label' => 'hidden',
         'settings' => array(),
@@ -1210,6 +1328,15 @@ function ma_collection_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 10,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 6,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
@@ -1281,6 +1408,13 @@ function ma_collection_field_default_field_instances() {
         'type' => 'list_default',
         'weight' => 3,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'inline',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'list',
@@ -1322,6 +1456,12 @@ function ma_collection_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',

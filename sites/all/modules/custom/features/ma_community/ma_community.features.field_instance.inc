@@ -83,6 +83,13 @@ function ma_community_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 3,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -170,6 +177,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 9,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 21,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -245,6 +258,12 @@ function ma_community_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 32,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -323,6 +342,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'mukurtu_scald_banner_image',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 18,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -393,6 +418,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 36,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 19,
+      ),
       'teaser' => array(
         'label' => 'hidden',
         'module' => 'atom_reference',
@@ -453,12 +484,8 @@ function ma_community_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 26,
       ),
       'featured_content' => array(
@@ -472,6 +499,12 @@ function ma_community_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 28,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 26,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -551,6 +584,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 29,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 23,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -629,6 +668,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 8,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 20,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -706,6 +751,12 @@ function ma_community_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 31,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 24,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -776,6 +827,12 @@ Strict - Your community page is invisible to all site users who are not members 
         'type' => 'hidden',
         'weight' => 34,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 15,
+      ),
       'teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -844,6 +901,13 @@ Strict - Your community page is invisible to all site users who are not members 
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 33,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -921,6 +985,12 @@ Strict - Your community page is invisible to all site users who are not members 
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 37,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',

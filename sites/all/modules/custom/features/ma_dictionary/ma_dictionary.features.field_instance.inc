@@ -231,6 +231,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 23,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 9,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -312,6 +319,27 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 19,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'node_reference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 5,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -382,6 +410,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 17,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 2,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -444,6 +479,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 24,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 29,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -522,6 +563,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 25,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 30,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -579,6 +626,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 26,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 31,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -652,6 +705,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 33,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -723,6 +782,12 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 27,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 32,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -801,6 +866,27 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 18,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'ul',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 4,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -890,6 +976,25 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 21,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 7,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -968,6 +1073,15 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'paragraphs_view',
         'weight' => 3,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'paragraphs',
+        'settings' => array(
+          'view_mode' => 'full',
+        ),
+        'type' => 'paragraphs_view',
+        'weight' => 1,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1061,6 +1175,27 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 22,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 8,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1149,6 +1284,27 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 20,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => 1,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 6,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1394,6 +1550,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 4,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1469,6 +1632,16 @@ function ma_dictionary_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'mukurtu_featured_content',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
         'weight' => 0,
       ),
       'search_result' => array(
@@ -1547,6 +1720,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 3,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 1,
+      ),
       'search_result' => array(
         'label' => 'inline',
         'module' => 'text',
@@ -1614,6 +1794,13 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'text_default',
         'weight' => 5,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1686,6 +1873,13 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 26,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 5,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1747,6 +1941,13 @@ function ma_dictionary_field_default_field_instances() {
         'settings' => array(),
         'type' => 'hidden',
         'weight' => 9,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 6,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1830,6 +2031,17 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'mukurtu_paged_node_formatter',
         'weight' => 6,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'links' => 1,
+          'use_content_language' => TRUE,
+          'view_mode' => 'teaser',
+        ),
+        'type' => 'entityreference_entity_view',
+        'weight' => 4,
       ),
       'search_result' => array(
         'label' => 'above',

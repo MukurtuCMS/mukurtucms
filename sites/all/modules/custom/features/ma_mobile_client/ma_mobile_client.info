@@ -14,6 +14,7 @@ features[ctools][] = views:views_default:3.0
 features[ds_fields][] = mm_sync_content_view_field
 features[ds_fields][] = mukurtu_mobile_sync
 features[ds_fields][] = mukurtu_mobile_sync_white
+features[ds_view_modes][] = mukurtu_mobile
 features[features_api][] = api:2
 features[views_view][] = mm_synced_content
 project path = sites/all/modules/custom/features

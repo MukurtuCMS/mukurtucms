@@ -148,6 +148,12 @@ function ma_person_strongarm() {
       'ical' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

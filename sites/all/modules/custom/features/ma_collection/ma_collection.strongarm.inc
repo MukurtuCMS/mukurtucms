@@ -211,6 +211,12 @@ function ma_collection_strongarm() {
       'ical' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -284,6 +290,15 @@ function ma_collection_strongarm() {
         'custom_settings' => FALSE,
       ),
       'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teacher_view' => array(
         'custom_settings' => FALSE,
       ),
     ),

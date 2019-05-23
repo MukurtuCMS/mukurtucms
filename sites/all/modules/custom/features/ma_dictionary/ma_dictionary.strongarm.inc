@@ -225,6 +225,12 @@ function ma_dictionary_strongarm() {
       'ical' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -256,6 +262,10 @@ function ma_dictionary_strongarm() {
             'weight' => '23',
             'visible' => FALSE,
           ),
+          'mukurtu_mobile' => array(
+            'weight' => '23',
+            'visible' => FALSE,
+          ),
         ),
         'dictionary_word_navigation' => array(
           'default' => array(
@@ -271,6 +281,10 @@ function ma_dictionary_strongarm() {
             'visible' => FALSE,
           ),
           'featured_content' => array(
+            'weight' => '18',
+            'visible' => FALSE,
+          ),
+          'mukurtu_mobile' => array(
             'weight' => '18',
             'visible' => FALSE,
           ),
@@ -361,6 +375,12 @@ function ma_dictionary_strongarm() {
         'custom_settings' => FALSE,
       ),
       'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'teacher_view' => array(
         'custom_settings' => FALSE,
       ),
     ),
