@@ -475,7 +475,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Micro-Task.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1159,7 +1159,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Lesson.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1676,7 +1676,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Unit Plan.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -3120,6 +3120,9 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Technology Integration');
   t('Unit Length');
   t('Week of');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Lesson.');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Micro-Task.');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Unit Plan.');
 
   return $field_instances;
 }

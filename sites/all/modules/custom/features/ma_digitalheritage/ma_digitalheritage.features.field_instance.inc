@@ -3337,7 +3337,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Digital Heritage item.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -4700,6 +4700,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   t('Transcription is a plain text field used to provide a text transcription of an audio or video recording, or of text in an image or document. Including a transcription allows the text to be discoverable when searching for Digital Heritage Items.');
   t('Type');
   t('Type is the nature, genre, or function of the Media Asset or Digital Heritage Item. Examples include Image, Text, Sound, Video. Separate multiple Types with semicolons.');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Digital Heritage item.');
 
   return $field_instances;
 }
