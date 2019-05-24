@@ -13,7 +13,7 @@ include_once 'ma_mobile_client.features.inc';
 function ma_mobile_client_menu() {
   $items = [];
 
-  $items['admin/config/mukurtu-mobile'] = [
+  $items['mukurtu-mobile'] = [
     'title' => 'Configure Mukurtu Mobile',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ma_mobile_client_admin_config'),
@@ -53,15 +53,75 @@ function ma_mobile_client_admin_config($form, $form_state) {
   ];
 
   ////
-  // Content types table
+  // Viewable content types table
   ////
 
-  $ordered_types = variable_get('mukurtu_mobile_content_types', []);
+  $ordered_types = variable_get('mm_viewable_types', []);
   uasort($ordered_types, 'drupal_sort_weight');
   $node_types = node_type_get_names();
 
-  // If a node type has been added since var mukurtu_mobile_creatable_content_types was last set
-  // (meaning it wasn't saved to the mukurtu_mobile_creatable_content_types in this form nor in a hook_update or hook_install when the type was created)
+  // If a node type has been added since var mm_viewable_types was last set
+  // (meaning it wasn't saved to the mm_viewable_types var in this form nor in a hook_update or hook_install when the type was created)
+  // then we need to ensure it gets added to this form, but at the bottom.
+  foreach ($node_types as $type => $type_name) {
+    if (!array_key_exists($type, $ordered_types)) {
+      if (!isset($highest_weight)) {
+        $highest_weight = end($ordered_types)['weight'] ? end($ordered_types)['weight'] : 0;
+      }
+      $highest_weight += 10;
+      $ordered_types[$type] = [
+        'viewable' => 0,
+        'weight' => $highest_weight,
+      ];
+    }
+  }
+
+  $form['viewable'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Viewable Content Types'),
+    'help_text' => [
+      // TODO change "View Content" text to what it actually is in the app.
+      '#markup' => 'Check the content types which can be viewed within the Mukurtu Mobile app.<br/>Content types in <span class="linethrough">strikethrough</span> need to have a Mukurtu Mobile view mode defined before they will work.<br/>Use the arrows to drag the content types into the order that they will display in the View Content page in the app.',
+    ],
+    'mm_viewable_types' => [
+      '#tree' => TRUE,
+      '#theme' => 'mm_viewable_types_table',
+    ],
+  ];
+
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+
+    $view_modes = field_view_mode_settings('node', $node_type);
+
+    $form['viewable']['mm_viewable_types'][$node_type] = [
+      'viewable' => [
+        '#type' => 'checkbox',
+        '#default_value' => $node_type_properties['viewable'],
+        '#available' => (isset($view_modes["mukurtu_mobile"]) ? TRUE : FALSE), // If the view mode isn't set for the content type, mark it with strikethrough.
+      ],
+      'label' => [
+        '#type' => 'item',
+        '#markup' => $node_types[$node_type],
+      ],
+      'weight' => [
+        '#type' => 'textfield',
+        '#default_value' => $node_type_properties['weight'],
+        '#size' => 3,
+        '#attributes' => ['class' => ['item-row-weight']],
+      ],
+    ];
+  }
+
+  ////
+  // Creatable content types table
+  ////
+
+  $ordered_types = variable_get('mm_creatable_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_names();
+
+  // If a node type has been added since var mm_creatable_types was last set
+  // (meaning it wasn't saved to the mm_creatable_types var in this form nor in a hook_update or hook_install when the type was created)
   // then we need to ensure it gets added to this form, but at the bottom.
   foreach ($node_types as $type => $type_name) {
     if (!array_key_exists($type, $ordered_types)) {
@@ -76,20 +136,21 @@ function ma_mobile_client_admin_config($form, $form_state) {
     }
   }
 
-  $form['table'] = [
+  $form['creatable'] = [
     '#type' => 'fieldset',
-    '#title' => t('Mukurtu Mobile Content Types'),
+    '#title' => t('Creatable Content Types'),
     'help_text' => [
-      '#markup' => 'Check the content types for which content can be created within the Mukurtu Mobile app.<br/>Use the arrows to drag the content types into the order that they will display in the Create Content page in the app.',
+      // TODO: change "Create Content" text to what it actually is in the app.
+      '#markup' => 'Check the content types which can be created within the Mukurtu Mobile app.<br/>Use the arrows to drag the content types into the order that they will display in the Create Content page in the app.',
     ],
-    'mukurtu_mobile_content_types' => [
+    'mm_creatable_types' => [
       '#tree' => TRUE,
-      '#theme' => 'node_types_table',
+      '#theme' => 'mm_creatable_types_table',
     ],
   ];
 
   foreach ($ordered_types as $node_type => $node_type_properties) {
-    $form['table']['mukurtu_mobile_content_types'][$node_type] = [
+    $form['creatable']['mm_creatable_types'][$node_type] = [
       'creatable' => [
         '#type' => 'checkbox',
         '#default_value' => $node_type_properties['creatable'],
@@ -115,7 +176,10 @@ function ma_mobile_client_admin_config($form, $form_state) {
  */
 function ma_mobile_client_theme($existing, $type, $theme, $path) {
   $themes = array(
-    'node_types_table' => array(
+    'mm_viewable_types_table' => array(
+      'render element' => 'element'
+    ),
+    'mm_creatable_types_table' => array(
       'render element' => 'element'
     ),
   );
@@ -123,11 +187,46 @@ function ma_mobile_client_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Make the node types table rows draggable; the resulting order is used when listing the content types in the add screen in the app.
+ * Make the node types table rows draggable; the resulting order is used when listing the content types in the app.
  */
-function theme_node_types_table($vars) {
+function theme_mm_viewable_types_table($vars) {
   $element = $vars['element'];
-  drupal_add_tabledrag('node_types_table', 'order', 'sibling', 'item-row-weight');
+  drupal_add_tabledrag('mm_viewable_types_table', 'order', 'sibling', 'item-row-weight');
+
+  $header = array(
+    'viewable' => t('Viewable'),
+    'label' => t('Content Type'),
+    'weight' => t('Weight'),
+  );
+
+  $rows = array();
+  foreach (element_children($element) as $key) {
+    $row = array();
+    $row['data'] = array();
+    foreach ($header as $fieldname => $title) {
+      $row['data'][] = drupal_render($element[$key][$fieldname]);
+      $classes = ['draggable'];
+      if (!$element[$key]["viewable"]["#available"]) {
+        $classes[] = 'linethrough';
+      }
+      $row['class'] = $classes;
+    }
+    $rows[] = $row;
+  }
+
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('id' => 'mm_viewable_types_table'),
+  ));
+}
+
+/**
+ * Make the node types table rows draggable; the resulting order is used when listing the content types in the app.
+ */
+function theme_mm_creatable_types_table($vars) {
+  $element = $vars['element'];
+  drupal_add_tabledrag('mm_creatable_types_table', 'order', 'sibling', 'item-row-weight');
 
   $header = array(
     'creatable' => t('Creatable'),
@@ -149,7 +248,7 @@ function theme_node_types_table($vars) {
   return theme('table', array(
     'header' => $header,
     'rows' => $rows,
-    'attributes' => array('id' => 'node_types_table'),
+    'attributes' => array('id' => 'mm_creatable_types_table'),
   ));
 }
 
@@ -372,6 +471,25 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
+    'viewable_types' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieve a list of content types for which nodes of that type can be viewed from the Mukurtu Mobile app",
+          'callback' => '_ma_mobile_client_get_viewable_types',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
   ];
 
   return $api;
@@ -427,7 +545,7 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
  * Retrieve a list of content types that are creatable by the app.
  */
 function _ma_mobile_client_get_creatable_types ($fn = NULL) {
-  $ordered_types = variable_get('mukurtu_mobile_content_types', []);
+  $ordered_types = variable_get('mm_creatable_types', []);
   uasort($ordered_types, 'drupal_sort_weight');
   $node_types = node_type_get_types();
   $creatable_types = [];
@@ -500,9 +618,22 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
 
 
 /**
- * Called from hook_update and hook_install to set to the default types that can be created by Mukurtu Mobile.
+ * Called from hook_update and hook_install to set to the default Mukurtu Mobile types
  */
-function ma_mobile_client_set_default_creatable_types() {
+function ma_mobile_client_set_default_types() {
+
+  $ordered_viewable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'unit_plan', 'community', 'cultural_protocol_group', 'person', 'personal_collection', 'collection'];
+  $default_viewable_types = [];
+  $weight = 0;
+  foreach ($ordered_viewable_types as $ordered_viewable_type) {
+    $weight += 10;
+    $default_viewable_types[$ordered_viewable_type] = [
+      'viewable' => 1,
+      'weight' => $weight,
+    ];
+  }
+  variable_set('mm_viewable_types', $default_viewable_types);
+  
   $ordered_creatable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'lesson', 'community', 'cultural_protocol_group', 'person', 'personal_collection'];
   $default_creatable_types = [];
   $weight = 0;
@@ -513,5 +644,6 @@ function ma_mobile_client_set_default_creatable_types() {
       'weight' => $weight,
     ];
   }
-  variable_set('mukurtu_mobile_content_types', $default_creatable_types);
+  variable_set('mm_creatable_types', $default_creatable_types);
+  
 }

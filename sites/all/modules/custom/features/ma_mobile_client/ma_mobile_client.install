@@ -4,19 +4,12 @@
  * Implements hook_install().
  */
 function ma_mobile_client_install() {
-  ma_mobile_client_set_default_creatable_types();
+  ma_mobile_client_set_default_types();
 }
 
 /**
- * Update the default Mukurtu Mobile creatable content types.
+ * Update the default Mukurtu Mobile content types.
  */
-function ma_mobile_client_update_7100() {
-  ma_mobile_client_set_default_creatable_types();
-}
-
-/**
- * Update the default Mukurtu Mobile creatable content types.
- */
-function ma_mobile_client_update_7101() {
-  ma_mobile_client_set_default_creatable_types();
+function ma_mobile_client_update_7102() {
+  ma_mobile_client_set_default_types();
 }

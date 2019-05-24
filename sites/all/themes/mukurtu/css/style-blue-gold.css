@@ -12640,3 +12640,6 @@ body #admin-menu {
   float: right;
   margin-right: 25px;
 }
+.linethrough {
+  text-decoration: line-through;
+}
