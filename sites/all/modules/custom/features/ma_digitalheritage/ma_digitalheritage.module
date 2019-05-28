@@ -596,7 +596,7 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
   }
 
   // Grab Book Page parent on node edit and set page title
-  if ($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value']) {
+  if (isset($form['field_book_parent'][LANGUAGE_NONE][0]['target_id']['#default_value'])) {
     $book_child_page = 1;
 
     // Set the page title
