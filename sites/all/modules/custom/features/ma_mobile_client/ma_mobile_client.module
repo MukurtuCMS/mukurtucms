@@ -587,11 +587,11 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
     'field_book_children',
     'field_book_parent',
     'field_pre_actions',
+    'oggroup_fieldset',
   ];
   $special_fields = [
     'title',
     'body',
-    'ogg_group_fieldset',
     '#groups',
     '#group_children',
     'group_access',
@@ -601,7 +601,28 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
   ];
   foreach ($node_form as $key => $value) {
     if (!in_array($key, $skip_fields) AND (in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
+
+      // Custom handling per field.
+      switch ($key) {
+
+        case "og_group_ref":
+          $options = [];
+          $communities = _ajax_get_community_dropdown_options([], FALSE);
+          foreach ($communities as $community_nid => $community_name) {
+            if ($community_nid) {
+              $options [$community_name] = _ajax_get_protocol_by_community_dropdown_options($community_nid, [], FALSE);
+            }
+          }
+          $value[LANGUAGE_NONE]["#options"] = $options;
+          $value[LANGUAGE_NONE]["#required"] = ma_cultural_protocol_node_type_must_have_cp($content_type);
+
+          break;
+
+      }
+
+      // Set the field.
       $fields_and_fieldgroups[$key] = $value;
+
     }
   }
 
