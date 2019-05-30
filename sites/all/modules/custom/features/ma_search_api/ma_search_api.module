@@ -6,13 +6,22 @@
 
 include_once 'ma_search_api.features.inc';
 
-//// REINDEX RELATED NODES
+/// 1) REINDEX RELATED NODES
+/// 2) UPDATE RELATED CONTENT NODES' OWN RELATED CONTENT FIELD (CUSTOM CER)
 
 function ma_search_api_node_insert ($node) {
   ma_search_api_node_update ($node);
 }
 
-function ma_search_api_node_update($node) {
+function ma_search_api_node_update($node) {;
+
+  // Only process a node once.
+  static $processed_nids;
+  if (in_array($node->nid, $processed_nids)) {
+    return;
+  }
+  $processed_nids[] = $node->nid;
+  //dpm ($node->nid, 'processing');
 
   $relations = [
     'digital_heritage' => [
@@ -86,6 +95,8 @@ function ma_search_api_node_update($node) {
     }
 
     // Look for changes in any of the reference fields.
+    $items_to_update_cers = [];
+
     if (isset($content_type_properties['relationships'])) {
       foreach ($content_type_properties['relationships'] as $relationship) {
 
@@ -108,6 +119,34 @@ function ma_search_api_node_update($node) {
           $refs_deleted = array_diff($old_refs, $new_refs);
           $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
           # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+        }
+
+        if ($relationship == 'field_related_content') {
+          $items_to_update_cers = array_merge($items_to_update_cers, $refs_added, $refs_deleted);
+
+        }
+      }
+    }
+
+    // Do the custom cer updating.
+    // TODO: maintain ordering when re-setting.
+    if (count($items_to_update_cers)) {
+      foreach ($items_to_update_cers as $items_to_update_cer) {
+        $query = new EntityFieldQueryExtraFields();
+        $query->entityCondition('entity_type', 'node')
+          ->fieldCondition('field_related_content', 'target_id', [$items_to_update_cer]);
+        $result = $query->execute();
+        $refs_to_node = isset($result['node']) ? array_keys($result['node']) : [];
+        $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
+        if (isset($nuw->field_related_content)) {
+          $existing_refs = $nuw->field_related_content->raw();
+          if ($existing_refs <> $refs_to_node) {
+            $nuw->field_related_content->set($refs_to_node);
+            $nuw->save();
+          }
+        }
+        else {
+          drupal_set_message('issue'); // TODO: investigate this if error occurs.
         }
       }
     }
