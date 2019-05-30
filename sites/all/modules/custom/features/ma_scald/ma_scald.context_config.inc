@@ -164,7 +164,7 @@ function ma_scald_default_scald_context_config() {
       '*' => 'passthrough',
     ),
     'image' => array(
-      '*' => 'style-medium',
+      '*' => 'style-large',
     ),
     'video' => array(
       '*' => 'passthrough',
@@ -198,8 +198,8 @@ function ma_scald_default_scald_context_config() {
     ),
   );
   $context_config->data = array(
-    'width' => '220px',
-    'height' => '220px',
+    'width' => '480px',
+    'height' => '480px',
   );
   $export['ma_scald_search_results'] = $context_config;
 
