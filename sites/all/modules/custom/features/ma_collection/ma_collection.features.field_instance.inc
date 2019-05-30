@@ -814,7 +814,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'items_per_page' => 5,
+          'items_per_page' => 24,
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 6,
@@ -1193,6 +1193,8 @@ function ma_collection_field_default_field_instances() {
   // 'node-personal_collection-field_digital_heritage_count'.
   $field_instances['node-personal_collection-field_digital_heritage_count'] = array(
     'bundle' => 'personal_collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -1201,7 +1203,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 26,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1216,9 +1218,10 @@ function ma_collection_field_default_field_instances() {
         'weight' => 20,
       ),
     ),
+    'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_digital_heritage_count',
-    'label' => 'Digital Heritage Count',
+    'label' => 'Collection Count',
     'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
@@ -1232,7 +1235,9 @@ function ma_collection_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'number',
-      'settings' => array(),
+      'settings' => array(
+        'treeable' => 0,
+      ),
       'type' => 'number',
       'weight' => 6,
     ),
@@ -1249,11 +1254,8 @@ function ma_collection_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'hidden',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 10,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 5,
       ),
       'search_result' => array(
@@ -1358,7 +1360,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 27,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1406,13 +1408,12 @@ function ma_collection_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'items_per_page' => 10,
         ),
-        'type' => 'entityreference_label',
-        'weight' => 25,
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1464,6 +1465,7 @@ function ma_collection_field_default_field_instances() {
 
 
 ');
+  t('Collection Count');
   t('Comment');
   t('Community');
   t('Credit');

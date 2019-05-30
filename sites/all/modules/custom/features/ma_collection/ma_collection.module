@@ -112,7 +112,7 @@ function ma_collection_node_presave($node) {
   // - Contained item published/unpublished -> ma_collection_node_postupdate saves the collection, which triggers this hook.
   if ($node->type == 'collection' or $node->type == 'personal_collection') {
     $collection_emw = entity_metadata_wrapper('node', $node);
-    $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_digital_heritage_items->value());
+    $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_related_content->value());
     $collection_emw->field_digital_heritage_count->set($contained_item_count);
   }
 }
@@ -145,24 +145,21 @@ function ma_collection_node_postupdate($node) {
   if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
     // Did it have a status change?
     // All other recount cases handled by ma_collection_node_presave.
-    // Check all potential collection fields for collections we should trigger updates for.
-    foreach (array('field_collection', 'field_personal_collections') as $collection_field) {
-      if (!empty($node->{$collection_field}[LANGUAGE_NONE])) {
-        foreach ($node->{$collection_field}[LANGUAGE_NONE] as $collection_ref) {
-          // Load and save the collection node. We don't need to change the count here.
-          // We only need to trigger ma_collection_node_presave, which will do the recount.
-          $collection = node_load($collection_ref['target_id']);
-          $collection_emw = entity_metadata_wrapper('node', $collection);
-          $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_digital_heritage_items->value());
-          $old_item_count = (int) $collection_emw->field_digital_heritage_count->value();
-          // Only save if the counts are different.
-          if ($old_item_count != $contained_item_count) {
-            node_save($collection);
-          }
-        }
+    // Check all Related Content values for collections we should trigger updates for.
+    foreach ($node->field_related_content[LANGUAGE_NONE] as $collection_ref) {
+      // Load and save the collection node. We don't need to change the count here.
+      // We only need to trigger ma_collection_node_presave, which will do the recount.
+      $collection = node_load($collection_ref['target_id']);
+      $collection_emw = entity_metadata_wrapper('node', $collection);
+      $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_related_content->value());
+      $old_item_count = (int) $collection_emw->field_digital_heritage_count->value();
+      // Only save if the counts are different.
+      if ($old_item_count != $contained_item_count) {
+        node_save($collection);
       }
     }
   }
+
 }
 
 
@@ -260,14 +257,13 @@ function ma_collection_form_alter(&$form, $form_state, $form_id) {
     // Creating a new Collection or Personal Collection
     if (!isset($node->nid)) {
 
-      // Prepopulate any "Add To Collection" / "Add to Personal Collectin" nodes in the entity refs.
+      // Prepopulate any "Add To Collection" / "Add to Personal Collection" nodes in the entity refs.
       $query = drupal_get_query_parameters();
       if (isset($query['add'])) {
         $add = explode('-', $query['add']);
-        $entity_ref_field = array_search($add[0], ma_collection_get_valid_node_types_for_collection());
-        if (isset($entity_ref_field) && is_numeric($add[1])) {
+        if (is_numeric($add[1])) {
           $node_to_add = node_load($add[1]);
-          $form[$entity_ref_field][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
+          $form['field_related_content'][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
         }
       }
 
@@ -296,7 +292,7 @@ function ma_collection_collections_title_with_count_and_tree_popup ($entity) {
   // Get the item count
   $item_count = 0;
   $coll_wrapper = entity_metadata_wrapper('node', $entity);
-  $items = $coll_wrapper->field_digital_heritage_items->value();
+  $items = $coll_wrapper->field_related_content->value();
   if (count($items)) {
     if (user_access('bypass content access control')) {
       $item_count = count($items);
@@ -349,7 +345,7 @@ function ma_collection_get_item_count($entity) {
   }
 
   $coll_wrapper = entity_metadata_wrapper('node', $entity);
-  $items = $coll_wrapper->field_digital_heritage_items->value();
+  $items = $coll_wrapper->field_related_content->value();
   if (!empty($items)) {
     if ($item->status && user_access('bypass content access control')) {
       $item_count += count($items);
@@ -504,11 +500,11 @@ function ma_collection_add_to_collection_form($form, $form_state) {
   // First get collections that already have this node in it, so we can exclude them later.
   $colls_to_exclude = array();
   $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
-  foreach ($valid_collection_types as $entity_reference_field => $node_type) {
+  foreach ($valid_collection_types as $node_type) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
       ->entityCondition('bundle', 'collection')
-      ->fieldCondition($entity_reference_field, 'target_id', $nid_to_add);
+      ->fieldCondition('field_related_content', 'target_id', $nid_to_add);
     $result = $query->execute();
     if (isset($result['node'])) {
       $colls_to_exclude = array_keys($result['node']);
@@ -648,7 +644,7 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $pers
     $nid_to_add = $form_state['nid_to_add'];
     $node_to_add = node_load ($nid_to_add);
 
-    if ($entity_ref_field = array_search($node_to_add->type, ma_collection_get_valid_node_types_for_collection())) {
+    if (in_array($node_to_add->type, ma_collection_get_valid_node_types_for_collection())) {
 
       // Create a new Collection
       if ($coll_nid == 'create_new_collection') {
@@ -675,7 +671,7 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $pers
 
         // Add the item to the Collection node.
         $cw = entity_metadata_wrapper('node', $coll_node);
-        $cw->{$entity_ref_field}[] = $nid_to_add;
+        $cw->field_related_content[] = $nid_to_add;
         $cw->save(); // comment this line while debugging.
 
         // Display confirmation message.
@@ -751,14 +747,11 @@ function ma_collection_add_node_to_personal_collection_access($node) {
 }
 
 /**
- * Helper function to return types of content that can be added to a collection, and the collection entity reference field for that type.
- *
- * Currently just DH, but more will be added here later.
+ * Helper function to return types of content that can be added to a collection.
  */
 function ma_collection_get_valid_node_types_for_collection() {
-  return [
-    'field_digital_heritage_items' => 'digital_heritage',
-  ];
+  $related_content_field_info = field_info_field('field_related_content');
+  return $related_content_field_info['bundles']['node'];
 }
 
 /**
@@ -977,7 +970,7 @@ function ma_collection_get_default_atom($node) {
     $collection_emw = entity_metadata_wrapper('node', $node);
 
     // Search through collection items
-    foreach ($collection_emw->field_digital_heritage_items->value() as $collection_item) {
+    foreach ($collection_emw->field_related_content->value() as $collection_item) {
         $collection_item_emw = entity_metadata_wrapper('node', $collection_item);
 
         // Find the first item that has a media asset set.
@@ -1008,21 +1001,16 @@ function ma_collection_find_node_in_personal_collection($nid, $account = NULL) {
     $account = $user;
   }
 
-  $collections = array();
-  $collection_fields = ma_collection_get_valid_node_types_for_collection();
-  foreach ($collection_fields as $entity_reference_field => $node_type) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'personal_collection')
-      ->fieldCondition($entity_reference_field, 'target_id', $nid)
-      ->propertyCondition('uid', $account->uid);
-    $result = $query->execute();
-    if (isset($result['node'])) {
-      $collections = array_keys($result['node']);
-    }
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'personal_collection')
+    ->fieldCondition('field_related_content', 'target_id', $nid)
+    ->propertyCondition('uid', $account->uid);
+  $result = $query->execute();
+  if (isset($result['node'])) {
+    return array_keys($result['node']);
   }
-
-  return $collections;
+  return [];
 }
 
 /**

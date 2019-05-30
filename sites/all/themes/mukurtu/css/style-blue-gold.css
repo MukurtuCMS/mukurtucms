@@ -8031,8 +8031,8 @@ footer header {
 .page-node-edit .table-responsive {
   overflow: visible;
 }
-.page-node-add.node-type-collection .field-name-field-digital-heritage-items,
-.page-node-edit.node-type-collection .field-name-field-digital-heritage-items {
+.page-node-add.node-type-collection .field-name-field-related-content,
+.page-node-edit.node-type-collection .field-name-field-related-content {
   height: auto !important;
 }
 .page-node-add #edit-oggroup-fieldset-body .form-item .input-group,
@@ -10408,9 +10408,9 @@ body #admin-menu {
 .node-collection.view-mode-full > div:nth-of-type(2) > div:first-of-type {
   padding-bottom: 50px;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .label-above,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .label-above,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
+.node-personal-collection.view-mode-full .field-name-field-related-content .label-above,
+.node-word-list.view-mode-full .field-name-field-related-content .label-above,
+.node-collection.view-mode-full .field-name-field-related-content .label-above {
   position: absolute;
   top: -20px;
   left: 0;
@@ -10420,15 +10420,15 @@ body #admin-menu {
   letter-spacing: 1.2px;
 }
 @media (min-width: 992px) {
-  .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .label-above,
-  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .label-above,
-  .node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
+  .node-personal-collection.view-mode-full .field-name-field-related-content .label-above,
+  .node-word-list.view-mode-full .field-name-field-related-content .label-above,
+  .node-collection.view-mode-full .field-name-field-related-content .label-above {
     font-size: 18px;
   }
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result {
   width: 100% !important;
   float: left;
   padding-top: 0px !important;
@@ -10436,62 +10436,62 @@ body #admin-menu {
   border-bottom: 5px solid #EEEAEA;
 }
 @media (min-width: 768px) {
-  .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-  .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+  .node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result,
+  .node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result,
+  .node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result {
     width: 45% !important;
   }
 }
 @media (min-width: 992px) {
-  .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-  .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+  .node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result,
+  .node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result,
+  .node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result {
     width: 30% !important;
   }
 }
 @media (min-width: 1600px) {
-  .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-  .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result,
-  .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result {
+  .node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result,
+  .node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result,
+  .node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result {
     width: 20% !important;
   }
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result.views-row-first,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result.views-row-first,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result.views-row-first {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result.views-row-first,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result.views-row-first,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result.views-row-first {
   border-top: none !important;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field {
   display: none;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title,
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail {
   display: block;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2,
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2 {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset h2,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset h2,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset h2,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2 {
   font-size: 16px;
   font-weight: bold;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2 {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2 {
   background-image: url(../images/icons/chevronright.svg);
   background-repeat: no-repeat;
   background-position: 95% 0%;
@@ -10499,42 +10499,42 @@ body #admin-menu {
   min-height: 20px;
   padding-right: 25px;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a {
   color: #138AAB;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:hover,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:hover,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:hover,
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:focus,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:focus,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title a:focus {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a:hover,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a:hover,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a:hover,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a:focus,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a:focus,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title a:focus {
   color: #E6AB49;
   text-decoration: none;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset {
   padding-top: 10px;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-4,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-4,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-4,
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-8,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-8,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .col-xs-8 {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .col-xs-4,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .col-xs-4,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .col-xs-4,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .col-xs-8,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .col-xs-8,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .col-xs-8 {
   width: 100%;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .row {
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .row,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .row,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .row {
   padding-top: 30px;
   padding-bottom: 30px;
 }
-.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .text-center,
-.node-word-list.view-mode-full .field-name-field-digital-heritage-items .text-center,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .text-center {
+.node-personal-collection.view-mode-full .field-name-field-related-content .text-center,
+.node-word-list.view-mode-full .field-name-field-related-content .text-center,
+.node-collection.view-mode-full .field-name-field-related-content .text-center {
   position: absolute;
   bottom: -80px;
   left: 0;

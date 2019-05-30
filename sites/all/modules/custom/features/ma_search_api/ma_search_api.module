@@ -14,50 +14,40 @@ function ma_search_api_node_insert ($node) {
 
 function ma_search_api_node_update($node) {
 
-  $relations = array(
-    'collection' => array(
-      'relationships' => array(
-        'field_digital_heritage_items' => 'dh',
-      ),
-      'triggers' => array(),
-    ),
-    'dictionary_word' => array(
-      'relationships' => array(
-        'field_related_dictionary_words' => 'not dh',
-        'field_dictionary_word_related_dh' => 'dh',
-      ),
-      'triggers' => array(),
-    ),
-    'digital_heritage' => array(
-      'relationships' => array(
-        'field_collection' => 'not dh',
-        'field_related_dh_items' => 'dh',
-        'og_group_ref' => 'not dh',
-        'field_related_dictionary_words' => 'not dh',
-      ),
-      'triggers' => array(
+  $relations = [
+    'digital_heritage' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'field_item_privacy_setting' => 'regular',
         'og_group_ref' => 'array values comparison',
-      ),
-    ),
-    'community' => array(
-      'relationships' => array(
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+      ],
+    ],
+    'community' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'og_group_ref' => 'array values comparison',
-      ),
-    ),
-    'cultural_protocol_group' => array(
-      'relationships' => array(
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+      ],
+    ],
+    'cultural_protocol_group' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'group_access' => 'regular',
         'og_roles_permissions' => 'regular',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
+
+  // Add the Related Content field to $relations.
+  $collectionable_types = ma_collection_get_valid_node_types_for_collection();
+  foreach ($collectionable_types as $collectionable_type) {
+    $relations[$collectionable_type]['relationships'][] = 'field_related_content';
+  }
 
   if (isset($relations[$node->type])) {
 
@@ -73,49 +63,52 @@ function ma_search_api_node_update($node) {
 
     // Look for changes in any of the trigger fields. If any, ALL related nodes get reindexed.
     $reindex_all_relations = 0;
-    foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
-      # dpm ($trigger, 'trigger');
-      $trigger_old_val = "";
-      if (isset($node->original)) {
-        $trigger_old_val = $wrapper_old->{$trigger}->value();
-      }
-      $trigger_new_val = $wrapper_new->{$trigger}->value();
-      if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
-        $trigger_new_val = array_values ($trigger_new_val);
-        $trigger_old_val = empty($trigger_old_val) ? NULL : array_values ($trigger_old_val);
-      }
-      if ($trigger_old_val <> $trigger_new_val) {
-        # dpm ($trigger_old_val, 'trigger old val');
-        # dpm($trigger_new_val, 'trigger new val');
-        $reindex_all_relations = 1;
-        # dpm ('Trigger field changed. Reindexing ALL relations');
-        continue;
+    if (isset($content_type_properties['triggers'])) {
+      foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
+        # dpm ($trigger, 'trigger');
+        $trigger_old_val = "";
+        if (isset($node->original)) {
+          $trigger_old_val = $wrapper_old->{$trigger}->value();
+        }
+        $trigger_new_val = $wrapper_new->{$trigger}->value();
+        if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
+          $trigger_new_val = array_values($trigger_new_val);
+          $trigger_old_val = empty($trigger_old_val) ? NULL : array_values($trigger_old_val);
+        }
+        if ($trigger_old_val <> $trigger_new_val) {
+          # dpm ($trigger_old_val, 'trigger old val');
+          # dpm($trigger_new_val, 'trigger new val');
+          $reindex_all_relations = 1;
+          # dpm ('Trigger field changed. Reindexing ALL relations');
+          continue;
+        }
       }
     }
 
     // Look for changes in any of the reference fields.
-    foreach ($content_type_properties['relationships'] as $relationship => $relationship_node_type) {
-      # dpm ($relationship, 'relationship (' . $relationship_node_type . ')');
+    if (isset($content_type_properties['relationships'])) {
+      foreach ($content_type_properties['relationships'] as $relationship) {
 
-      $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+        $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
 
-      $old_refs = array();
-      if (isset($node->original)) {
-        $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
-      }
+        $old_refs = [];
+        if (isset($node->original)) {
+          $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
+        }
 
-      // A trigger field was changed, so reindex all related values, both new and old.
-      if ($reindex_all_relations) {
-        $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
-        # dpm($items_to_reindex, 'items to reindex after a trigger');
-      }
+        // A trigger field was changed, so reindex all related values, both new and old.
+        if ($reindex_all_relations) {
+          $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
+          # dpm($items_to_reindex, 'items to reindex after a trigger');
+        }
 
-      // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
-      elseif ($old_refs <> $new_refs) {
-        $refs_added = array_diff($new_refs, $old_refs);
-        $refs_deleted = array_diff($old_refs, $new_refs);
-        $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
-        # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+        // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
+        elseif ($old_refs <> $new_refs) {
+          $refs_added = array_diff($new_refs, $old_refs);
+          $refs_deleted = array_diff($old_refs, $new_refs);
+          $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
+          # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+        }
       }
     }
 
@@ -316,6 +309,7 @@ function ma_search_api_list_of_indexed_fields() {
   #dpm ($indexed_fields_field_name_only);
   $fields_to_skip = array (
     'field_media_asset',
+    'field_related_content',
     'field_digital_heritage_count',
     'field_digital_heritage_items',
   );

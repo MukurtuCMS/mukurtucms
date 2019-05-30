@@ -1620,9 +1620,9 @@ function ma_importexport_node_field_export($node, $field_name, $mapping = array(
       }
     }
     break;
-  case 'field_digital_heritage_items:etid':
-  case 'field_digital_heritage_items':
-    foreach($node->field_digital_heritage_items[LANGUAGE_NONE] as $field_value) {
+  case 'field_related_content:etid':
+  case 'field_related_content':
+    foreach($node->field_related_content[LANGUAGE_NONE] as $field_value) {
       if($use_guid) {
           $result[] = ma_importexport_make_node_guid($field_value['target_id']);
       } else {
