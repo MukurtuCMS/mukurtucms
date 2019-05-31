@@ -129,19 +129,41 @@ function ma_search_api_node_update($node) {;
     }
 
     // Do the custom cer updating.
-    // TODO: maintain ordering when re-setting.
     if (count($items_to_update_cers)) {
       foreach ($items_to_update_cers as $items_to_update_cer) {
         $query = new EntityFieldQueryExtraFields();
         $query->entityCondition('entity_type', 'node')
           ->fieldCondition('field_related_content', 'target_id', [$items_to_update_cer]);
         $result = $query->execute();
-        $refs_to_node = isset($result['node']) ? array_keys($result['node']) : [];
+        $new_refs = isset($result['node']) ? array_keys($result['node']) : [];
+        foreach ($new_refs as $key => $new_ref) {
+          $new_refs[$key] = (string) $new_refs[$key]; // convert $new_refs to string values to match $old_refs format.
+        }
+        $new_refs_numerically_sorted = $new_refs;
         $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
         if (isset($nuw->field_related_content)) {
-          $existing_refs = $nuw->field_related_content->raw();
-          if ($existing_refs <> $refs_to_node) {
-            $nuw->field_related_content->set($refs_to_node);
+          $old_refs_numerically_sorted = $old_refs = $nuw->field_related_content->raw();
+          sort ($old_refs_numerically_sorted);
+          if ($old_refs_numerically_sorted != $new_refs_numerically_sorted) {
+
+            // Maintain the old ref ordering, adding any new refs to the bottom.
+            $new_refs_ordered = [];
+            if (count($old_refs)) {
+              foreach ($old_refs as $old_ref) {
+                if (in_array($old_ref, $new_refs)) {
+                  $new_refs_ordered[] = $old_ref;
+                  // https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+                  foreach (array_keys($new_refs, $old_ref, true) as $key) {
+                    unset($new_refs[$key]);
+                  }
+                }
+              }
+            }
+            if (count($new_refs)) {
+              $new_refs_ordered = array_merge($new_refs_ordered, $new_refs);
+            }
+            
+            $nuw->field_related_content->set($new_refs_ordered);
             $nuw->save();
           }
         }
