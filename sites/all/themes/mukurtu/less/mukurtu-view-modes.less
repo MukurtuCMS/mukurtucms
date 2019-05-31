@@ -78,13 +78,21 @@
     // Type
     .field-name-featured-content-type {
         font-weight: bold;
-        font-size: 11px;
-        letter-spacing: @mukurtu-expanded-letter-spacing;
-        text-transform: uppercase;
 
         // Desktop
         @media (min-width: @screen-md-min) {
             font-size: 13px;
+        }
+    }
+}
+
+.list-view {
+    .view-mode-search_result,
+    .view-mode-teaser {
+        // Type
+        .field-name-featured-content-type {
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            text-transform: uppercase;
         }
     }
 }

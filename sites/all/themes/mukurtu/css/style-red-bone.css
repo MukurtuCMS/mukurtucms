@@ -7885,12 +7885,14 @@ form.comment-form .comment-reply-post-button {
 }
 .item-grid-view .field-name-title,
 .item-grid-view .field-name-field-media-asset,
-.item-grid-view .field-name-scald-thumbnail {
+.item-grid-view .field-name-scald-thumbnail,
+.item-grid-view .field-name-featured-content-type {
   display: block;
 }
 .item-grid-view .field-name-title h2,
 .item-grid-view .field-name-field-media-asset h2,
-.item-grid-view .field-name-scald-thumbnail h2 {
+.item-grid-view .field-name-scald-thumbnail h2,
+.item-grid-view .field-name-featured-content-type h2 {
   font-size: 16px;
   font-weight: bold;
 }
@@ -9479,15 +9481,17 @@ body #admin-menu {
 .view-mode-search_result .field-name-featured-content-type,
 .view-mode-teaser .field-name-featured-content-type {
   font-weight: bold;
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
 }
 @media (min-width: 992px) {
   .view-mode-search_result .field-name-featured-content-type,
   .view-mode-teaser .field-name-featured-content-type {
     font-size: 13px;
   }
+}
+.list-view .view-mode-search_result .field-name-featured-content-type,
+.list-view .view-mode-teaser .field-name-featured-content-type {
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 .view-mode-teaser {
   border-bottom: 5px solid #EEEAEA;
@@ -9563,12 +9567,14 @@ body #admin-menu {
 }
 .grid-view .view-mode-search_result .field-name-title,
 .grid-view .view-mode-search_result .field-name-field-media-asset,
-.grid-view .view-mode-search_result .field-name-scald-thumbnail {
+.grid-view .view-mode-search_result .field-name-scald-thumbnail,
+.grid-view .view-mode-search_result .field-name-featured-content-type {
   display: block;
 }
 .grid-view .view-mode-search_result .field-name-title h2,
 .grid-view .view-mode-search_result .field-name-field-media-asset h2,
-.grid-view .view-mode-search_result .field-name-scald-thumbnail h2 {
+.grid-view .view-mode-search_result .field-name-scald-thumbnail h2,
+.grid-view .view-mode-search_result .field-name-featured-content-type h2 {
   font-size: 16px;
   font-weight: bold;
 }
@@ -10477,7 +10483,10 @@ body #admin-menu {
 .node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset,
 .node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail,
 .node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail,
-.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail {
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-featured-content-type,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-featured-content-type,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-featured-content-type {
   display: block;
 }
 .node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-title h2,
@@ -10488,7 +10497,10 @@ body #admin-menu {
 .node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-field-media-asset h2,
 .node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2,
 .node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2,
-.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2 {
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-scald-thumbnail h2,
+.node-personal-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-featured-content-type h2,
+.node-word-list.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-featured-content-type h2,
+.node-collection.view-mode-full .field-name-field-related-content .view-mode-search_result .field-name-featured-content-type h2 {
   font-size: 16px;
   font-weight: bold;
 }
