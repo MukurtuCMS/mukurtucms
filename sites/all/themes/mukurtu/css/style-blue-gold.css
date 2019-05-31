@@ -9491,6 +9491,14 @@ body #admin-menu {
   letter-spacing: 1.2px;
   text-transform: uppercase;
 }
+.view-digital-heritage-grid-list .view-mode-search_result .field-name-featured-content-type,
+.view-collections-grid-list .view-mode-search_result .field-name-featured-content-type,
+.view-dictionary-words .view-mode-search_result .field-name-featured-content-type,
+.view-digital-heritage-grid-list .view-mode-teaser .field-name-featured-content-type,
+.view-collections-grid-list .view-mode-teaser .field-name-featured-content-type,
+.view-dictionary-words .view-mode-teaser .field-name-featured-content-type {
+  display: none !important;
+}
 .view-mode-teaser {
   border-bottom: 5px solid #EEEAEA;
   padding: 20px 0px;
