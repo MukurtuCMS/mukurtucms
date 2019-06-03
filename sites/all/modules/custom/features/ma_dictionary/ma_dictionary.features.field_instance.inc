@@ -207,7 +207,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 9,
+        'weight' => 10,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -410,7 +410,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 33,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -479,7 +479,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 34,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -537,7 +537,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 35,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -609,7 +609,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 37,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -681,7 +681,7 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 36,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -741,13 +741,12 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'entityreference',
+        'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'items_per_page' => 5,
         ),
-        'type' => 'entityreference_label',
-        'weight' => 27,
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 11,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',
@@ -820,23 +819,8 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'textformatter',
-        'settings' => array(
-          'textformatter_class' => 'textformatter-list',
-          'textformatter_comma_and' => 0,
-          'textformatter_comma_full_stop' => 0,
-          'textformatter_comma_override' => 0,
-          'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(
-            'entityreference_link' => 1,
-          ),
-          'textformatter_separator_custom' => '',
-          'textformatter_separator_custom_class' => 'textformatter-separator',
-          'textformatter_separator_custom_tag' => 'span',
-          'textformatter_term_plain' => 0,
-          'textformatter_type' => 'ul',
-        ),
-        'type' => 'textformatter_list',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 3,
       ),
       'dictionary_word_summary' => array(
@@ -1057,24 +1041,9 @@ function ma_dictionary_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'textformatter',
-        'settings' => array(
-          'textformatter_class' => 'textformatter-list',
-          'textformatter_comma_and' => 0,
-          'textformatter_comma_full_stop' => 0,
-          'textformatter_comma_override' => 0,
-          'textformatter_comma_tag' => 'div',
-          'textformatter_contrib' => array(
-            'entityreference_link' => 1,
-          ),
-          'textformatter_separator_custom' => '',
-          'textformatter_separator_custom_class' => 'textformatter-separator',
-          'textformatter_separator_custom_tag' => 'span',
-          'textformatter_term_plain' => 0,
-          'textformatter_type' => 'comma',
-        ),
-        'type' => 'textformatter_list',
-        'weight' => 8,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 9,
       ),
       'dictionary_word_summary' => array(
         'label' => 'above',

@@ -25,6 +25,7 @@ dependencies[] = ma_collection
 dependencies[] = ma_core
 dependencies[] = menu
 dependencies[] = mukurtu_display_formatters_paged_node
+dependencies[] = mukurtu_related_items_formatter
 dependencies[] = node
 dependencies[] = node_reference
 dependencies[] = og

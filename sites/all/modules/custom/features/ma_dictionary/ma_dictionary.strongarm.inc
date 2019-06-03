@@ -225,6 +225,9 @@ function ma_dictionary_strongarm() {
       'ical' => array(
         'custom_settings' => FALSE,
       ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

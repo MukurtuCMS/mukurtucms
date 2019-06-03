@@ -18,13 +18,33 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'dictionary_word';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
-    'dictionary_word_related_dh_tease' => array(
+    'extracted_dh_from_relationships' => array(
       'weight' => '2',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
         'ft' => array(
           'lb' => 'Related Digital Heritage Items',
+        ),
+      ),
+    ),
+    'extracted_dw_from_relationships' => array(
+      'weight' => '4',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Related Dictionary Words',
+        ),
+      ),
+    ),
+    'extracted_wl_from_relationships' => array(
+      'weight' => '8',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb' => 'Word List',
         ),
       ),
     ),
@@ -35,14 +55,14 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
-    'field_community_ref' => array(
+    'og_group_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
         ),
       ),
     ),
-    'og_group_ref' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
@@ -474,27 +494,29 @@ function ma_dictionary_ds_layout_settings_info() {
       ),
       'right' => array(
         1 => 'field_dictionary_word_language',
-        2 => 'dictionary_word_related_dh_tease',
-        3 => 'field_related_dictionary_words',
+        2 => 'extracted_dh_from_relationships',
+        3 => 'extracted_dw_from_relationships',
         4 => 'field_community_ref',
         5 => 'og_group_ref',
         6 => 'field_tags',
-        7 => 'field_word_list',
+        7 => 'extracted_wl_from_relationships',
       ),
       'bottom' => array(
         8 => 'field_additional_media',
+        9 => 'field_related_content',
       ),
     ),
     'fields' => array(
       'field_word_entry' => 'left',
       'field_dictionary_word_language' => 'right',
-      'dictionary_word_related_dh_tease' => 'right',
-      'field_related_dictionary_words' => 'right',
+      'extracted_dh_from_relationships' => 'right',
+      'extracted_dw_from_relationships' => 'right',
       'field_community_ref' => 'right',
       'og_group_ref' => 'right',
       'field_tags' => 'right',
-      'field_word_list' => 'right',
+      'extracted_wl_from_relationships' => 'right',
       'field_additional_media' => 'bottom',
+      'field_related_content' => 'bottom',
     ),
     'classes' => array(
       'layout_class' => array(
