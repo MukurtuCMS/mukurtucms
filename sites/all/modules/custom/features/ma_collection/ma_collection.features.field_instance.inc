@@ -1095,11 +1095,11 @@ function ma_collection_field_default_field_instances() {
         'weight' => 3,
       ),
       'search_result' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -1316,6 +1316,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'list_default',
         'weight' => 2,
       ),
+      'search_result' => array(
+        'label' => 'inline',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 2,
+      ),
       'teaser' => array(
         'label' => 'inline',
         'module' => 'list',
@@ -1413,6 +1419,12 @@ function ma_collection_field_default_field_instances() {
           'items_per_page' => 10,
         ),
         'type' => 'mukurtu_related_items_formatter',
+        'weight' => 6,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 6,
       ),
       'teaser' => array(
