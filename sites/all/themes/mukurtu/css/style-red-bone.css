@@ -11400,6 +11400,20 @@ body #admin-menu {
   font-weight: 300;
   font-size: 22px;
 }
+.node-person.view-mode-full .col-sm-8 .field .label-above,
+.node-person.view-mode-full .col-sm-12 .field .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-person.view-mode-full .col-sm-8 .field .label-above,
+  .node-person.view-mode-full .col-sm-12 .field .label-above {
+    font-size: 18px;
+  }
+}
 .node-person.view-mode-related_person_teaser .col-xs-3,
 .node-person.view-mode-related_person_teaser .col-xs-9,
 .node-person.view-mode-related_person_teaser .field {

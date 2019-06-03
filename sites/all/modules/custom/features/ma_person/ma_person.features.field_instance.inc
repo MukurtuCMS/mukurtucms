@@ -99,6 +99,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Date Born',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -213,6 +215,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Date Died',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -254,7 +258,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 29,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -305,6 +309,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Deceased',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -335,7 +341,7 @@ function ma_person_field_default_field_instances() {
           'view_mode' => 'default',
         ),
         'type' => 'entityreference_entity_view',
-        'weight' => 8,
+        'weight' => 9,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -396,6 +402,8 @@ function ma_person_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -403,6 +411,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 6,
@@ -501,6 +510,8 @@ function ma_person_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -532,7 +543,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 31,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -591,6 +602,8 @@ function ma_person_field_default_field_instances() {
           'status' => TRUE,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -678,6 +691,8 @@ function ma_person_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -685,6 +700,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 2,
@@ -706,7 +722,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 32,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -751,6 +767,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Pre-Actions',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -761,6 +779,97 @@ function ma_person_field_default_field_instances() {
       ),
       'type' => 'options_onoff',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_related_content'.
+  $field_instances['node-person-field_related_content'] = array(
+    'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 8,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'related_person_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'taxonomy_record_teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 13,
     ),
   );
 
@@ -839,6 +948,8 @@ function ma_person_field_default_field_instances() {
         'dictionary_word_bundle' => 2,
         'person_relationship_bundle' => 3,
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_edit_mode' => 'open',
       'title' => 'Related Person',
       'title_multiple' => 'Related People',
@@ -932,6 +1043,8 @@ function ma_person_field_default_field_instances() {
         'person_relationship_bundle' => 3,
         'text_section' => 4,
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_edit_mode' => 'open',
       'title' => 'Section',
       'title_multiple' => 'Sections',
@@ -1021,6 +1134,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Keywords',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1047,7 +1162,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 30,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -1108,6 +1223,8 @@ function ma_person_field_default_field_instances() {
           'status' => TRUE,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'view modes' => array(
@@ -1168,6 +1285,8 @@ function ma_person_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1228,6 +1347,8 @@ function ma_person_field_default_field_instances() {
     'label' => 'Relationship Type',
     'required' => 1,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -1273,6 +1394,8 @@ function ma_person_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -1323,6 +1446,8 @@ function ma_person_field_default_field_instances() {
     'required' => 0,
     'settings' => array(
       'allow_override' => 0,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 'file',
@@ -1372,6 +1497,8 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
       'text_processing' => 1,
@@ -1419,6 +1546,8 @@ function ma_person_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -1448,6 +1577,7 @@ function ma_person_field_default_field_instances() {
   t('Media Assets');
   t('Mukurtu Terms');
   t('Pre-Actions');
+  t('Related Content');
   t('Related People');
   t('Related Person');
   t('Relationship Type');

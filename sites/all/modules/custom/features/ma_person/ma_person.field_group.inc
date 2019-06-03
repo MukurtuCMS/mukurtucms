@@ -186,6 +186,7 @@ function ma_person_field_group_info() {
     'weight' => '14',
     'children' => array(
       0 => 'field_related_people',
+      1 => 'field_related_content',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
