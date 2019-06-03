@@ -572,11 +572,11 @@ function ma_collection_add_to_personal_collection_form($form, $form_state) {
   // First get collections that already have this node in it, so we can exclude them later.
   $colls_to_exclude = array();
   $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
-  foreach ($valid_collection_types as $entity_reference_field => $node_type) {
+  foreach ($valid_collection_types as $node_type) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'personal_collection')
-      ->fieldCondition($entity_reference_field, 'target_id', $nid_to_add);
+      ->entityCondition('bundle', 'collection')
+      ->fieldCondition('field_related_content', 'target_id', $nid_to_add);
     $result = $query->execute();
     if (isset($result['node'])) {
       $colls_to_exclude = array_keys($result['node']);
