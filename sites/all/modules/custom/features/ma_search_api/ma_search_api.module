@@ -68,7 +68,7 @@ function ma_search_api_node_update($node) {;
       $wrapper_old = entity_metadata_wrapper('node', $node->original);
     }
 
-    $items_to_reindex = array();
+    $items_to_reindex = [];
 
     // Look for changes in any of the trigger fields. If any, ALL related nodes get reindexed.
     $reindex_all_relations = 0;
@@ -123,14 +123,20 @@ function ma_search_api_node_update($node) {;
 
         if ($relationship == 'field_related_content') {
           $items_to_update_cers = array_merge($items_to_update_cers, $refs_added, $refs_deleted);
-
         }
       }
     }
 
     // Do the custom cer updating.
+    static $original_node_being_updated;
+    if (is_null($original_node_being_updated)) {
+      $original_node_being_updated = $node->nid;
+    }
     if (count($items_to_update_cers)) {
       foreach ($items_to_update_cers as $items_to_update_cer) {
+        if ($items_to_update_cer == $original_node_being_updated) {
+          continue; // Do not update the original node being updated.
+        }
         $query = new EntityFieldQueryExtraFields();
         $query->entityCondition('entity_type', 'node')
           ->fieldCondition('field_related_content', 'target_id', [$items_to_update_cer]);
@@ -143,7 +149,7 @@ function ma_search_api_node_update($node) {;
         $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
         if (isset($nuw->field_related_content)) {
           $old_refs_numerically_sorted = $old_refs = $nuw->field_related_content->raw();
-          sort ($old_refs_numerically_sorted);
+          sort($old_refs_numerically_sorted);
           if ($old_refs_numerically_sorted != $new_refs_numerically_sorted) {
 
             // Maintain the old ref ordering, adding any new refs to the bottom.
@@ -153,7 +159,7 @@ function ma_search_api_node_update($node) {;
                 if (in_array($old_ref, $new_refs)) {
                   $new_refs_ordered[] = $old_ref;
                   // https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
-                  foreach (array_keys($new_refs, $old_ref, true) as $key) {
+                  foreach (array_keys($new_refs, $old_ref, TRUE) as $key) {
                     unset($new_refs[$key]);
                   }
                 }
@@ -162,7 +168,7 @@ function ma_search_api_node_update($node) {;
             if (count($new_refs)) {
               $new_refs_ordered = array_merge($new_refs_ordered, $new_refs);
             }
-            
+
             $nuw->field_related_content->set($new_refs_ordered);
             $nuw->save();
           }
