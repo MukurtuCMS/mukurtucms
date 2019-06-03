@@ -561,6 +561,25 @@ function _ma_mobile_client_get_creatable_types ($fn = NULL) {
 }
 
 /**
+ * Retrieve a list of content types that are viewable by the app.
+ */
+function _ma_mobile_client_get_viewable_types ($fn = NULL) {
+  $ordered_types = variable_get('mm_viewable_types', []);
+  uasort($ordered_types, 'drupal_sort_weight');
+  $node_types = node_type_get_types();
+  $viewable_types = [];
+  foreach ($ordered_types as $node_type => $node_type_properties) {
+    if ($node_type_properties['viewable']) {
+      $viewable_types[$node_type] = [
+        'label' => $node_types[$node_type]->name,
+        'description' => $node_types[$node_type]->description
+      ];
+    }
+  }
+  return $viewable_types;
+}
+
+/**
  * Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.
  */
 function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
