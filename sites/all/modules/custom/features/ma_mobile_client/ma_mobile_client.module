@@ -508,11 +508,10 @@ function _ma_mobile_client_get_one_time_login($fn) {
  * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
  */
 function _ma_mobile_client_get_user_synced_nodes ($fn) {
-  global $user; // TODO: confirm this user is the correct one
+  global $user;
   $uw = entity_metadata_wrapper('user', $user);
   $synced_nodes = $uw->field_mm_sync->value();
   $synced_nids = [];
-  $ref_fields = array_merge(field_read_fields(array('type' => 'node_reference')), field_read_fields(array('type' => 'entityreference')));
   $viewable_types = _ma_mobile_client_get_viewable_types();
 
   foreach ($synced_nodes as $synced_node) {
@@ -527,22 +526,39 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
     }
 
     // For all the entity and node refs in the node, add those nodes to be synced as well.
-    // We are going one-level deep, so entity ref'ed nodes get synced, but entity ref'ed nodes of entity ref'ed nodes do not get synced.
-    // Entity-ref'ed nodes are *not* marked as synced to the user, or else their own entity refs would then get synced; this is just
-    // so that when viewing the parent node, the user can see its immediate children in the ref fields.
-    $snw = entity_metadata_wrapper('node', $synced_node);
-    foreach ($ref_fields as $ref_field => $ref_field_properties) {
-      if (isset($snw->{$ref_field}) && count($snw->{$ref_field}->raw())) {
-        foreach ($snw->{$ref_field}->raw() as $reffed_nid) {
-          $reffed_node = node_load ($reffed_nid);
-          if (node_access('view', $reffed_node)) { // Check to make sure the user can view the reffed node.
-            $synced_nids[$reffed_node->type][$reffed_node->nid] = $reffed_node->changed;
+    $synced_nids = _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_nids);
+  }
+
+  return $synced_nids;
+}
+
+/**
+ * For all the entity and node refs in the node, add those nodes to be synced as well.
+ * We are going one-level deep*, so entity ref'ed nodes get synced, but entity ref'ed nodes of entity ref'ed nodes do not get synced.
+ * Entity-ref'ed nodes are *not* marked as synced to the user, or else their own entity refs would then get synced; this is just
+ * so that when viewing the parent node, the user can see its immediate children in the ref fields.
+ *
+ * * except for entity refs that are in $go_one_level_deeper. For these, the children get their own entity refs synced too.
+ */
+function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_nids) {
+  static $ref_fields;
+  $ref_fields = array_merge(field_read_fields(array('type' => 'node_reference')), field_read_fields(array('type' => 'entityreference')));
+  static $go_one_level_deeper;
+  $go_one_level_deeper = ['field_unit_lessons'];
+  $snw = entity_metadata_wrapper('node', $synced_node);
+  foreach ($ref_fields as $ref_field => $ref_field_properties) {
+    if (isset($snw->{$ref_field}) && count($snw->{$ref_field}->raw())) {
+      foreach ($snw->{$ref_field}->raw() as $reffed_nid) {
+        $reffed_node = node_load ($reffed_nid);
+        if (node_access('view', $reffed_node)) { // Check to make sure the user can view the reffed node.
+          $synced_nids[$reffed_node->type][$reffed_node->nid] = $reffed_node->changed;
+          if (in_array($ref_field, $go_one_level_deeper)) {
+            $synced_nids = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_node->nid, $synced_nids);
           }
         }
       }
     }
   }
-
   return $synced_nids;
 }
 
