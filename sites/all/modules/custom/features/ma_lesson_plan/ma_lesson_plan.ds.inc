@@ -138,7 +138,7 @@ function ma_lesson_plan_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
     'ds_switch_field' => array(
-      'weight' => '0',
+      'weight' => '1',
       'label' => 'hidden',
       'format' => 'default',
       'formatter_settings' => array(
@@ -150,6 +150,11 @@ function ma_lesson_plan_ds_field_settings_info() {
         ),
         'ft' => array(),
       ),
+    ),
+    'mukurtu_mobile_sync' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
     ),
   );
   $export['node|unit_plan|full'] = $ds_fieldsetting;
@@ -754,11 +759,13 @@ function ma_lesson_plan_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'central' => array(
-        0 => 'ds_switch_field',
-        1 => 'field_unit_lessons',
+        0 => 'mukurtu_mobile_sync',
+        1 => 'ds_switch_field',
+        2 => 'field_unit_lessons',
       ),
     ),
     'fields' => array(
+      'mukurtu_mobile_sync' => 'central',
       'ds_switch_field' => 'central',
       'field_unit_lessons' => 'central',
     ),

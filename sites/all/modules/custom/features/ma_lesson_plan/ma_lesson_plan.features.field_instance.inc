@@ -1233,7 +1233,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 12,
+        'weight' => 39,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1356,7 +1356,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 19,
+        'weight' => 46,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1491,7 +1491,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 8,
+        'weight' => 35,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1586,7 +1586,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 48,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1667,7 +1667,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 9,
+        'weight' => 36,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1767,7 +1767,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 10,
+        'weight' => 37,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1860,7 +1860,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 34,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1943,7 +1943,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 18,
+        'weight' => 45,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2029,7 +2029,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 3,
+        'weight' => 30,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2112,7 +2112,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 15,
+        'weight' => 42,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2199,7 +2199,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 5,
+        'weight' => 32,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2288,7 +2288,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'mukurtu_records_formatter',
-        'weight' => 21,
+        'weight' => 2,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2394,7 +2394,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 31,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2475,7 +2475,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 2,
+        'weight' => 29,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2558,7 +2558,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 14,
+        'weight' => 41,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2647,7 +2647,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 13,
+        'weight' => 40,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2734,7 +2734,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 6,
+        'weight' => 33,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2817,7 +2817,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 17,
+        'weight' => 44,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2905,7 +2905,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 16,
+        'weight' => 43,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -2998,7 +2998,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 11,
+        'weight' => 38,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -3120,7 +3120,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 20,
+        'weight' => 47,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',

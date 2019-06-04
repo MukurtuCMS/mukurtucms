@@ -12575,12 +12575,16 @@ body #admin-menu {
 .node-dictionary-word.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync,
 .node-community.node-teaser .field-name-mukurtu-mobile-sync,
+.node-unit-plan.view-mode-full .field-name-mukurtu-mobile-sync,
+.node-person.view-mode-full .field-name-mukurtu-mobile-sync,
 .node-digital-heritage.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-community.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-cultural-protocol-group.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-dictionary-word.view-mode-full .field-name-mukurtu-mobile-sync-white,
 .node-personal-collection.node-teaser .field-name-mukurtu-mobile-sync-white,
-.node-community.node-teaser .field-name-mukurtu-mobile-sync-white {
+.node-community.node-teaser .field-name-mukurtu-mobile-sync-white,
+.node-unit-plan.view-mode-full .field-name-mukurtu-mobile-sync-white,
+.node-person.view-mode-full .field-name-mukurtu-mobile-sync-white {
   float: right;
   margin-top: -25px;
   margin-right: 25px;

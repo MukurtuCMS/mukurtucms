@@ -18,6 +18,11 @@ function ma_person_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'person';
   $ds_fieldsetting->view_mode = 'default';
   $ds_fieldsetting->settings = array(
+    'mukurtu_mobile_sync' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'table_of_contents' => array(
       'weight' => '1',
       'label' => 'hidden',
@@ -337,23 +342,27 @@ function ma_person_ds_layout_settings_info() {
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
+      'top' => array(
+        0 => 'mukurtu_mobile_sync',
+      ),
       'left' => array(
-        0 => 'field_media_asset',
+        1 => 'field_media_asset',
       ),
       'right' => array(
-        1 => 'table_of_contents',
-        2 => 'field_date_born',
-        3 => 'field_date_died',
-        4 => 'field_tags',
-        5 => 'field_related_people',
+        2 => 'table_of_contents',
+        3 => 'field_date_born',
+        4 => 'field_date_died',
+        5 => 'field_tags',
+        6 => 'field_related_people',
       ),
       'bottom' => array(
-        6 => 'field_sections',
-        7 => 'field_node_aggregate',
-        8 => 'field_media_aggregate',
+        7 => 'field_sections',
+        8 => 'field_node_aggregate',
+        9 => 'field_media_aggregate',
       ),
     ),
     'fields' => array(
+      'mukurtu_mobile_sync' => 'top',
       'field_media_asset' => 'left',
       'table_of_contents' => 'right',
       'field_date_born' => 'right',
