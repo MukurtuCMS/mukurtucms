@@ -504,7 +504,7 @@ function _node_resource_index($page, $fields, $parameters, $page_size, $options 
 
   $results = services_resource_execute_index_query($node_select);
 
-  return services_resource_build_index_list($results, 'node', 'nid', $options);
+  return services_resource_build_index_list($results, 'node', 'nid');
 }
 
 /**

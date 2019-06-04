@@ -117,7 +117,7 @@ class RESTServer {
   protected function resolveControllerApplyVersion($resource, $resource_name) {
     $apply_version_method = '';
     $controller = $this->resolveController($resource, $apply_version_method);
-    services_request_apply_version($controller, array('method' => $apply_version_method, 'resource' => $resource_name));
+    services_request_apply_version($controller, array('method' => $apply_version_method, 'resource' => $resource['key']));
 
     return $controller;
   }

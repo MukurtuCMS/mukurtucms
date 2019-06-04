@@ -209,18 +209,38 @@ function _file_resource_create($file) {
  */
 function _file_resource_create_raw() {
   $files = array();
+
+  if (!isset($_FILES['files']['name'])) {
+    return services_error(t("Missing data, the file upload cannot be uploaded."), 500);
+  }
+
+  // Convert a typical html file input payload to what we need down the line,
+  // that way this resource is more developer friendly.
+  if (!is_array($_FILES['files']['name'])) {
+    $_FILES['files']['name'] = array($_FILES['files']['name']);
+    $_FILES['files']['type'] = array($_FILES['files']['type']);
+    $_FILES['files']['tmp_name'] = array($_FILES['files']['tmp_name']);
+    $_FILES['files']['error'] = array($_FILES['files']['error']);
+    $_FILES['files']['size'] = array($_FILES['files']['size']);
+  }
+
   foreach ($_FILES['files']['name'] as $field_name => $file_name) {
-    // Sanitize the user-input file name before saving to the file system.
+
+    // Sanitize the user-input file name before saving to the file system. Note,
+    // if the file extensions isn't valid here, the file's extension will have
+    // been converted to a .txt, which means the file will be successfully
+    // uploaded with a .txt extension instead (if it passes the $validators
+    // below.
     $_FILES['files']['name'][$field_name] = _services_file_check_name_extension($file_name);
 
     // file_save_upload() validates the file extension and name's length. File
     // size is limited by the upload_max_filesize directive in php.ini.
     $scheme = file_default_scheme();
+
     // Set file validators: allowed extension
     $validators = array();
-    if ($extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS)) {
-      $validators['file_validate_extensions'] = $extensions;
-    }
+    $extensions = variable_get('services_allowed_extensions', SERVICES_ALLOWED_EXTENSIONS);
+    $validators['file_validate_extensions'] = array($extensions);
     $file = file_save_upload($field_name, $validators, "$scheme://");
 
     if (!empty($file->fid)) {
@@ -237,7 +257,7 @@ function _file_resource_create_raw() {
       );
     }
     else {
-      return services_error(t('An unknown error occured'), 500);
+      return services_error(t('Failed to save the file.'), 500);
     }
   }
   return $files;

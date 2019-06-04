@@ -988,16 +988,10 @@ function services_str_getcsv($input, $delimiter = ',', $enclosure = '"', $escape
  *   String type of index that is being processed.
  * @param $field
  *   String field to use for looking up uri.
- * @param $options
- *   Additional query options.
  */
-function services_resource_build_index_list($results, $type, $field, $options = array()) {
-  // Put together array of matching items to return and set aside the entity ids
-  // in case we need to do a full enity load. In case we do fully load the
-  // entities, wrap them in an array to be consistent with the default index
-  // result items.
+function services_resource_build_index_list($results, $type, $field) {
+  // Put together array of matching items to return.
   $items = array();
-  $entity_ids = array();
   foreach ($results as $result) {
     if ($uri = services_resource_uri(array($type, $result->{$field}))) {
       $result->uri = $uri;
@@ -1006,13 +1000,8 @@ function services_resource_build_index_list($results, $type, $field, $options = 
       }
     }
     $items[] = $result;
-    $entity_ids[] = $result->{$field};
   }
-  if (isset($options['entity_load']) && $options['entity_load'] && !empty($entity_ids)) {
-    $items = array();
-    $entities = entity_load($type, $entity_ids);
-    foreach ($entities as $entity_id => $entity) { $items[] = $entity; }
-  }
+
   return $items;
 }
 

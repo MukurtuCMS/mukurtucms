@@ -56,6 +56,11 @@ class ServicesAliasTests extends ServicesWebTestCase {
         'actions' => array(
           'login' => array(
             'enabled' => 1,
+            'settings' => array(
+              'services' => array(
+                'resource_api_version' => '1.1'
+              ),
+            ),
           ),
         ),
       ),
@@ -100,7 +105,7 @@ class ServicesAliasTests extends ServicesWebTestCase {
     $this->drupalLogout();
 
     // Try to login using alias.
-    $response = $this->servicesPost($this->endpoint->path . '/user-alias/login', array('username' => $account->name, 'password' => $account->pass_raw));
+    $response = $this->servicesPost($this->endpoint->path . '/user-alias/login', array('name' => $account->name, 'pass' => $account->pass_raw));
 
     $response_data = $response['body'];
 
