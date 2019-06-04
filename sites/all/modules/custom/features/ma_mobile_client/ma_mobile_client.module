@@ -381,6 +381,7 @@ function ma_mobile_client_viewing_own_profile() {
   }
 }
 
+
 /**
  * Implements of hook_services_resources().
  */
@@ -490,10 +491,38 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
+    'node_view_fields' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.",
+          'callback' => '_ma_mobile_client_get_node_view_fields',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'type',
+              'type' => 'string',
+              'description' => 'Content type',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+
+          ],
+        ],
+      ],
+    ],
+
   ];
 
   return $api;
 }
+
 
 /**
  * Provide a one-time-login link.
@@ -503,6 +532,7 @@ function _ma_mobile_client_get_one_time_login($fn) {
   $timestamp = REQUEST_TIME;
   return url("mobile/login/$user->uid/$timestamp/" . user_pass_rehash($user->pass, $timestamp, $user->login, $user->uid), array('absolute' => TRUE));
 }
+
 
 /**
  * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
@@ -532,6 +562,7 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
 
   return $synced_nids;
 }
+
 
 /**
  * For all the entity and node refs in the node, add those nodes to be synced as well.
@@ -565,6 +596,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_ni
   return $synced_nids;
 }
 
+
 /**
  * Retrieve a list of content types that are creatable by the app.
  */
@@ -584,6 +616,7 @@ function _ma_mobile_client_get_creatable_types ($fn = NULL) {
   return $creatable_types;
 }
 
+
 /**
  * Retrieve a list of content types that are viewable by the app.
  */
@@ -602,6 +635,7 @@ function _ma_mobile_client_get_viewable_types ($fn = NULL) {
   }
   return $viewable_types;
 }
+
 
 /**
  * Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.
@@ -678,6 +712,66 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
   // Return the form.
   return $fields_and_fieldgroups;
 
+}
+
+
+/**
+ * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.
+ */
+function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
+
+  if (!node_type_get_type($content_type)) {
+    return 'Content type ' . $content_type . ' does not exist';
+  }
+  if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
+    return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
+  }
+
+  $view_mode = 'mukurtu_mobile';
+  $structured_view = [];
+
+  // Add fieldgroups to the structured view.
+  $field_groups = field_group_info_groups('node', $content_type, $view_mode);
+  $all_field_group_fields = [];
+  foreach ($field_groups as $field_group => $field_group_properties) {
+    $structured_view[$field_group] = ['type' => 'fieldgroup', 'label' => $field_group_properties->label, 'weight' => $field_group_properties->weight];
+    if (count($field_group_properties->children)) {
+      foreach ($field_group_properties->children as $child) {
+        $all_field_group_fields[$child] = $field_group;
+      }
+    }
+  }
+
+  // Add fields to the structured view.
+  $field_info = field_info_instances('node',$content_type);
+  foreach ($field_info as $field => $field_properties) {
+    $view_mode_properties = $field_properties['display'][$view_mode];
+    unset ($field_properties['display']);
+    $field_array =  [
+      'type' => 'field',
+      'label' => $field_properties['label'],
+      'weight' => $view_mode_properties['weight'],
+      'view_mode_properties' => $view_mode_properties,
+      'other_properties' => $field_properties
+    ];
+    if (array_key_exists($field, $all_field_group_fields)) {
+      $structured_view[$all_field_group_fields[$field]]['fields'][$field] = $field_array;
+    }
+    else {
+      $structured_view[$field] = $field_array;
+    }
+  }
+
+  // Sort the fields and fieldgroups, and the fields within fieldgroups, according to their weight.
+  uasort($structured_view, 'drupal_sort_weight');
+  foreach ($structured_view as $name => $properties) {
+    if (isset($properties['fields'])) {
+      uasort ($structured_view[$name]['fields'], 'drupal_sort_weight');
+    }
+  }
+
+  // Return the structured view.
+  return $structured_view;
 }
 
 

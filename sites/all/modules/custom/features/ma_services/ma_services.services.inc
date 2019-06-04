@@ -105,6 +105,14 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'node_view_fields' => array(
+      'alias' => 'node-view-fields',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'one_time_login' => array(
       'alias' => 'one-time-login',
       'operations' => array(
