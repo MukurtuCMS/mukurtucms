@@ -516,13 +516,14 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
 
   foreach ($synced_nodes as $synced_node) {
 
-    // Add the node.
-    if (node_access('view', $synced_node)) { // Check to make sure the user can view the node. This might not be the case if the CP on the node was changed after the user had set it to be synced.
-      $synced_nids[$synced_node->type][$synced_node->nid] = $synced_node->changed;
+    if (!array_key_exists($synced_node->type, $viewable_types)) {
+      continue; // Just in case user hacked to the form submission to get an invalid node as one to sync, or if an admin changed the valid vieawwable types subsequent to it being added.
     }
 
-    if (!array_key_exists($synced_node->type, $viewable_types)) {
-      continue; // Just in case user hacked to the form submission to get an invalid node as one to sync, or if an admin changed the valid vieawable types subsequent to it being added.
+    // Add the node.
+    if (node_access('view', $synced_node)) { // Check to make sure the user can view the node. This might not be the case if the CP on the node was changed after the user had set it to be synced.
+      $synced_nids[$synced_node->type][$synced_node->nid]['last_updated'] = $synced_node->changed;
+      $synced_nids[$synced_node->type][$synced_node->nid]['editable'] = node_access('update', $synced_node) ? TRUE: FALSE;
     }
 
     // For all the entity and node refs in the node, add those nodes to be synced as well.
@@ -551,7 +552,9 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_ni
       foreach ($snw->{$ref_field}->raw() as $reffed_nid) {
         $reffed_node = node_load ($reffed_nid);
         if (node_access('view', $reffed_node)) { // Check to make sure the user can view the reffed node.
-          $synced_nids[$reffed_node->type][$reffed_node->nid] = $reffed_node->changed;
+          $synced_nids[$reffed_node->type][$reffed_node->nid]['last_updated'] = $reffed_node->changed;
+          $synced_nids[$reffed_node->type][$reffed_node->nid]['editable'] = node_access('update', $reffed_node) ? TRUE: FALSE;
+          // Go deeper for certain entity refs.
           if (in_array($ref_field, $go_one_level_deeper)) {
             $synced_nids = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_node->nid, $synced_nids);
           }
