@@ -100,6 +100,26 @@ function ma_dictionary_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_dictionary_word_related_dh' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_related_dictionary_words' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_word_list' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'og_group_ref' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|dictionary_word|mukurtu_mobile'] = $ds_fieldsetting;
 

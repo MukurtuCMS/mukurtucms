@@ -107,7 +107,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 9,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'inline',
@@ -466,7 +466,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 17,
+        'weight' => 12,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -615,11 +615,11 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 19,
+        'weight' => 21,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -737,11 +737,11 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 15,
+        'weight' => 5,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -856,11 +856,11 @@ function ma_digitalheritage_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 14,
+        'weight' => 4,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -998,7 +998,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'module' => 'node_reference',
         'settings' => array(),
         'type' => 'node_reference_default',
-        'weight' => 13,
+        'weight' => 1,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1406,7 +1406,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'geofield_map_zoom' => 8,
         ),
         'type' => 'geofield_map_map',
-        'weight' => 9,
+        'weight' => 17,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1529,7 +1529,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 10,
+        'weight' => 18,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1801,7 +1801,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 21,
+        'weight' => 14,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -1920,7 +1920,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 8,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'hidden',
@@ -2173,13 +2173,9 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'links' => TRUE,
-          'use_content_language' => TRUE,
-          'view_mode' => 'default',
-        ),
-        'type' => 'entityreference_entity_view',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
         'weight' => 33,
       ),
       'related_items_teaser_map_popup' => array(
@@ -2931,7 +2927,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 2,
+        'weight' => 6,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'hidden',
@@ -3138,7 +3134,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
           'use_override' => 'none',
         ),
         'type' => 'partial_date_default',
-        'weight' => 20,
+        'weight' => 13,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -3300,7 +3296,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 7,
+        'weight' => 15,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -3756,11 +3752,11 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 11,
+        'weight' => 19,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -3884,11 +3880,11 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
         'type' => 'entityreference_label',
-        'weight' => 12,
+        'weight' => 20,
       ),
       'search_index' => array(
         'label' => 'above',
@@ -4376,7 +4372,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 7,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4505,7 +4501,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 18,
+        'weight' => 11,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4629,7 +4625,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 10,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4735,7 +4731,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 8,
+        'weight' => 16,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
@@ -4879,10 +4875,13 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'og_ui',
-        'settings' => array(),
-        'type' => 'og_list_default',
-        'weight' => 16,
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 2,
       ),
       'related_items_teaser_map_popup' => array(
         'label' => 'above',
