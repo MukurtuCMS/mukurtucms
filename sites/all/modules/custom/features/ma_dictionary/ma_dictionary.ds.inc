@@ -90,6 +90,21 @@ function ma_dictionary_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|dictionary_word|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'dictionary_word';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+  );
+  $export['node|dictionary_word|mukurtu_mobile'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|dictionary_word|search_result';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'dictionary_word';
@@ -351,6 +366,21 @@ function ma_dictionary_ds_field_settings_info() {
     ),
   );
   $export['paragraphs_item|dictionary_word_bundle|default'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'paragraphs_item|dictionary_word_bundle|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'paragraphs_item';
+  $ds_fieldsetting->bundle = 'dictionary_word_bundle';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'field_alternate_spelling' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['paragraphs_item|dictionary_word_bundle|mukurtu_mobile'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -676,6 +706,57 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|dictionary_word|form'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|dictionary_word|mukurtu_mobile';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'dictionary_word';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_word_entry',
+        2 => 'field_dictionary_word_language',
+        3 => 'field_dictionary_word_related_dh',
+        4 => 'field_related_dictionary_words',
+        5 => 'field_community_ref',
+        6 => 'og_group_ref',
+        7 => 'field_tags',
+        8 => 'field_word_list',
+        9 => 'field_additional_media',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'field_word_entry' => 'ds_content',
+      'field_dictionary_word_language' => 'ds_content',
+      'field_dictionary_word_related_dh' => 'ds_content',
+      'field_related_dictionary_words' => 'ds_content',
+      'field_community_ref' => 'ds_content',
+      'og_group_ref' => 'ds_content',
+      'field_tags' => 'ds_content',
+      'field_word_list' => 'ds_content',
+      'field_additional_media' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|dictionary_word|mukurtu_mobile'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -1041,6 +1122,53 @@ function ma_dictionary_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['paragraphs_item|dictionary_word_bundle|featured_content'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'paragraphs_item|dictionary_word_bundle|mukurtu_mobile';
+  $ds_layout->entity_type = 'paragraphs_item';
+  $ds_layout->bundle = 'dictionary_word_bundle';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_alternate_spelling',
+        1 => 'field_translation',
+        2 => 'field_pronunciation',
+        3 => 'field_part_of_speech',
+        4 => 'field_definition',
+        5 => 'field_dictionary_word_recording',
+        6 => 'field_sample_sentence',
+        7 => 'field_source',
+      ),
+    ),
+    'fields' => array(
+      'field_alternate_spelling' => 'ds_content',
+      'field_translation' => 'ds_content',
+      'field_pronunciation' => 'ds_content',
+      'field_part_of_speech' => 'ds_content',
+      'field_definition' => 'ds_content',
+      'field_dictionary_word_recording' => 'ds_content',
+      'field_sample_sentence' => 'ds_content',
+      'field_source' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['paragraphs_item|dictionary_word_bundle|mukurtu_mobile'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;

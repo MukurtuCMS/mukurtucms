@@ -437,6 +437,9 @@ function ma_dictionary_strongarm() {
       'ical' => array(
         'custom_settings' => FALSE,
       ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(

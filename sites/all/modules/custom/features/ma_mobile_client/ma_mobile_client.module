@@ -717,6 +717,11 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
 
 /**
  * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.
+ *
+ * TODO: this works with fields within fieldgroups, and with paragraphs within fieldsgroups.
+ * But handling would need to be added for any of the following scenarios, if they arise in a new content type:
+ * - fieldgroups within fieldgroups
+ * - fieldsgroups within paragraphs
  */
 function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
 
@@ -727,11 +732,10 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
     return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
   }
 
-  $view_mode = 'mukurtu_mobile';
   $structured_view = [];
 
   // Add fieldgroups to the structured view.
-  $field_groups = field_group_info_groups('node', $content_type, $view_mode);
+  $field_groups = field_group_info_groups('node', $content_type, 'mukurtu_mobile');
   $all_field_group_fields = [];
   foreach ($field_groups as $field_group => $field_group_properties) {
     $structured_view[$field_group] = ['type' => 'fieldgroup', 'label' => $field_group_properties->label, 'weight' => $field_group_properties->weight];
@@ -745,18 +749,26 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
   // Add fields to the structured view.
   $field_info = field_info_instances('node',$content_type);
   foreach ($field_info as $field => $field_properties) {
-    $view_mode_properties = $field_properties['display'][$view_mode];
-    unset ($field_properties['display']);
-    $field_array =  [
-      'type' => 'field',
-      'label' => $field_properties['label'],
-      'weight' => $view_mode_properties['weight'],
-      'view_mode_properties' => $view_mode_properties,
-      'other_properties' => $field_properties
-    ];
+    $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties);
+
+    // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
+    if (isset($field_properties['display']['mukurtu_mobile']["module"]) AND $field_properties['display']['mukurtu_mobile']["module"] == 'paragraphs') {
+      $allowed_bundles = array_keys($field_properties["settings"]["allowed_bundles"]);
+      if (count($allowed_bundles) > 1) {
+        return 'Error: ' . $field . ' has more than 1 allowed bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
+      }
+      $paragraph_fields = field_info_instances('paragraphs_item', $allowed_bundles[0]);
+      foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
+        $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
+        $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+      }
+    }
+
+    // Fields within fieldgroups get added here.
     if (array_key_exists($field, $all_field_group_fields)) {
       $structured_view[$all_field_group_fields[$field]]['fields'][$field] = $field_array;
     }
+    // Fields not within fieldgroups get added here.
     else {
       $structured_view[$field] = $field_array;
     }
@@ -772,6 +784,22 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
 
   // Return the structured view.
   return $structured_view;
+}
+
+/**
+ * Called from _ma_mobile_client_get_node_view_fields().
+ * Broken out into a separate function because it can be called within a nested loop.
+ */
+function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties) {
+  $view_mode_properties = $field_properties['display']['mukurtu_mobile'];
+  unset ($field_properties['display']);
+  return[
+    'type' => 'field',
+    'label' => $field_properties['label'],
+    'weight' => $field_properties['display']['mukurtu_mobile']['weight'],
+    'view_mode_properties' => $view_mode_properties,
+    'other_properties' => $field_properties
+  ];
 }
 
 
