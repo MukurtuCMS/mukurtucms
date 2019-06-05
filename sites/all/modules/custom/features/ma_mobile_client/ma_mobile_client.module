@@ -815,7 +815,7 @@ function _ma_mobile_client_build_field_arrays_from_field_properties($field_prope
   return[
     'type' => 'field',
     'label' => $field_properties['label'],
-    'weight' => $field_properties['display']['mukurtu_mobile']['weight'],
+    'weight' => $view_mode_properties['weight'],
     'view_mode_properties' => $view_mode_properties,
     'other_properties' => $field_properties
   ];
