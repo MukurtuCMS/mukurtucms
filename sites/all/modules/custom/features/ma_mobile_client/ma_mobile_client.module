@@ -81,7 +81,7 @@ function ma_mobile_client_admin_config($form, $form_state) {
     '#title' => t('Viewable Content Types'),
     'help_text' => [
       // TODO change "View Content" text to what it actually is in the app.
-      '#markup' => 'Check the content types which can be viewed within the Mukurtu Mobile app.<br/>Content types in <span class="linethrough">strikethrough</span> need to have a Mukurtu Mobile view mode defined before they will work.<br/>Use the arrows to drag the content types into the order that they will display in the View Content page in the app.',
+      '#markup' => 'Check the content types which can be viewed within the Mukurtu Mobile app.<br/>Content types in <span class="linethrough">strikethrough</span> either need a Mukurtu Mobile view mode, or have paragraph fields which need a Mukurtu Mobile view mode, before they will work.<br/>Use the arrows to drag the content types into the order that they will display in the View Content page in the app.',
     ],
     'mm_viewable_types' => [
       '#tree' => TRUE,
@@ -91,13 +91,32 @@ function ma_mobile_client_admin_config($form, $form_state) {
 
   foreach ($ordered_types as $node_type => $node_type_properties) {
 
+    // Determine if a content type has a Mukurtu Mobile view mode.
     $view_modes = field_view_mode_settings('node', $node_type);
+    $available = isset($view_modes["mukurtu_mobile"]) ? TRUE : FALSE;
+    $fields = field_info_instances('node', $node_type);
+    if ($available) {
+      // Also need to make sure any of its Paragraph fields have a Mukurtu Mobile view mode as well.
+      foreach ($fields as $field) {
+        if (isset($field["display"]["mukurtu_mobile"]["module"]) && $field["display"]["mukurtu_mobile"]["module"] == 'paragraphs') {
+          $allowed_bundles = array_keys($field["settings"]["allowed_bundles"]);
+          if (count($allowed_bundles) > 1) {
+            // TODO: handle this if it ever arises.
+          }
+          $paragraph_view_modes = field_view_mode_settings('paragraphs_item', $allowed_bundles[0]);
+          if (is_null($paragraph_view_modes["mukurtu_mobile"])) {
+            $available = FALSE;
+            break;
+          }
+        }
+      }
+    }
 
     $form['viewable']['mm_viewable_types'][$node_type] = [
       'viewable' => [
         '#type' => 'checkbox',
         '#default_value' => $node_type_properties['viewable'],
-        '#available' => (isset($view_modes["mukurtu_mobile"]) ? TRUE : FALSE), // If the view mode isn't set for the content type, mark it with strikethrough.
+        '#available' => $available, // Items that are not available will get a linethrough during render.
       ],
       'label' => [
         '#type' => 'item',
@@ -747,7 +766,7 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
   }
 
   // Add fields to the structured view.
-  $field_info = field_info_instances('node',$content_type);
+  $field_info = field_info_instances('node', $content_type);
   foreach ($field_info as $field => $field_properties) {
     $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties);
 
