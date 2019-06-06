@@ -537,7 +537,7 @@ function ma_community_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'title',
+        'type' => 'ma_colorbox',
         'weight' => 1,
       ),
       'teaser' => array(
