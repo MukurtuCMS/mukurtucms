@@ -616,6 +616,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_en
           if ($ref_field_properties["type"] == 'taxonomy_term_reference') {
             $synced_entities['terms'][$reffed_entity->tid] = [
               'last_updated' => $reffed_entity->changed,
+              'term_name' => $reffed_entity->name,
             ];
           }
 
