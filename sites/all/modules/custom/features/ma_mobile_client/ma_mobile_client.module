@@ -794,6 +794,9 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
   $field_info = field_info_instances('node', $content_type);
   foreach ($field_info as $field => $field_properties) {
     $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties);
+    if (!$field_array) {
+      continue;
+    }
 
     // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
     if (isset($field_properties['display']['mukurtu_mobile']["module"]) AND $field_properties['display']['mukurtu_mobile']["module"] == 'paragraphs') {
@@ -804,6 +807,9 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
       $paragraph_fields = field_info_instances('paragraphs_item', $allowed_bundles[0]);
       foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
         $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
+        if (!$paragraph_field_array) {
+          continue;
+        }
         $field_array['fields'][$paragraph_field] = $paragraph_field_array;
       }
     }
@@ -836,6 +842,9 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
  */
 function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties) {
   $view_mode_properties = $field_properties['display']['mukurtu_mobile'];
+  if ($field_properties["display"]["mukurtu_mobile"]["type"] == 'hidden') {
+    return;
+  }
   unset ($field_properties['display']);
   return[
     'type' => 'field',
