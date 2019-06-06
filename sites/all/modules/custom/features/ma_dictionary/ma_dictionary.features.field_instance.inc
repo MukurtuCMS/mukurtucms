@@ -1580,14 +1580,14 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 0,
       ),
       'mukurtu_mobile' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 0,
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1670,7 +1670,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 1,
+        'weight' => 2,
       ),
       'search_result' => array(
         'label' => 'inline',
@@ -1745,7 +1745,7 @@ function ma_dictionary_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 2,
+        'weight' => 4,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1820,10 +1820,9 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 5,
+        'type' => 'hidden',
+        'weight' => 7,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1889,9 +1888,8 @@ function ma_dictionary_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'taxonomy',
         'settings' => array(),
-        'type' => 'taxonomy_term_reference_link',
+        'type' => 'hidden',
         'weight' => 6,
       ),
       'search_result' => array(
@@ -1981,12 +1979,11 @@ function ma_dictionary_field_default_field_instances() {
         'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'links' => 1,
-          'use_content_language' => TRUE,
-          'view_mode' => 'teaser',
+          'bypass_access' => 0,
+          'link' => 1,
         ),
-        'type' => 'entityreference_entity_view',
-        'weight' => 4,
+        'type' => 'entityreference_label',
+        'weight' => 5,
       ),
       'search_result' => array(
         'label' => 'above',
