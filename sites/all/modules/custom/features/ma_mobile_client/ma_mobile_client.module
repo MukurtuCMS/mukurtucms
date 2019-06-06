@@ -846,6 +846,10 @@ function _ma_mobile_client_build_field_arrays_from_field_properties($field_prope
     return;
   }
   unset ($field_properties['display']);
+  $ds_layout = ds_get_layout('node', $field_properties["bundle"], 'mukurtu_mobile', FALSE);
+  if (isset($ds_layout["settings"]["limit"][$field_properties["field_name"]])) {
+    $view_mode_properties['limit'] = $ds_layout["settings"]["limit"][$field_properties["field_name"]];
+  }
   return[
     'type' => 'field',
     'label' => $field_properties['label'],
