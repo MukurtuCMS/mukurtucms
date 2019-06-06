@@ -80,7 +80,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'search_result' => array(
         'label' => 'inline',
@@ -166,7 +166,7 @@ function ma_collection_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'mukurtu_featured_content',
+        'type' => 'ma_colorbox',
         'weight' => 1,
       ),
       'search_result' => array(
@@ -250,7 +250,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 2,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -327,7 +327,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 35,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -406,7 +406,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 38,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -487,7 +487,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 33,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -563,7 +563,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -635,7 +635,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 36,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -705,12 +705,13 @@ function ma_collection_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
+        'module' => 'entityreference',
         'settings' => array(
-          'items_per_page' => 24,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 6,
+        'type' => 'entityreference_label',
+        'weight' => 5,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -793,7 +794,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 39,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -862,7 +863,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 37,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -929,7 +930,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 40,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1007,7 +1008,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 34,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1086,7 +1087,7 @@ function ma_collection_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'mukurtu_featured_content',
+        'type' => 'full',
         'weight' => 1,
       ),
       'search_result' => array(
@@ -1157,7 +1158,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 3,
       ),
       'search_result' => array(
         'label' => 'inline',
@@ -1218,7 +1219,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 5,
+        'weight' => 4,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1279,7 +1280,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 33,
       ),
       'search_result' => array(
         'label' => 'hidden',
@@ -1338,12 +1339,13 @@ function ma_collection_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'hidden',
-        'module' => 'mukurtu_related_items_formatter',
+        'module' => 'entityreference',
         'settings' => array(
-          'items_per_page' => 10,
+          'bypass_access' => 0,
+          'link' => 1,
         ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 6,
+        'type' => 'entityreference_label',
+        'weight' => 5,
       ),
       'search_result' => array(
         'label' => 'above',
@@ -1410,10 +1412,9 @@ function ma_collection_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'inline',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 3,
+        'type' => 'hidden',
+        'weight' => 2,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -1465,7 +1466,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 34,
       ),
       'search_result' => array(
         'label' => 'above',
