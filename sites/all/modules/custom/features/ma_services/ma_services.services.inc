@@ -145,6 +145,7 @@ function ma_services_default_services_endpoint() {
       ),
     ),
     'taxonomy_term' => array(
+      'alias' => 'tax-term',
       'operations' => array(
         'retrieve' => array(
           'enabled' => '1',
