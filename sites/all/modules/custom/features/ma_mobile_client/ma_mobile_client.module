@@ -426,11 +426,11 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
-    'synced_nodes' => [
+    'synced_entities' => [
       'operations' => [
         'retrieve' => [
-          'help' => "Retrieve a structured array of a user's list of synced nodes",
-          'callback' => '_ma_mobile_client_get_user_synced_nodes',
+          'help' => "Retrieve a structured array of a user's list of synced entities",
+          'callback' => '_ma_mobile_client_get_user_synced_entities',
           'access callback' => 'user_is_logged_in',
           'args' => [
             [
@@ -556,11 +556,11 @@ function _ma_mobile_client_get_one_time_login($fn) {
 /**
  * Retrieve a NID list of a user's synced nodes, w/ last updated time, so that we don't try to sync unchanged nodes.
  */
-function _ma_mobile_client_get_user_synced_nodes ($fn) {
+function _ma_mobile_client_get_user_synced_entities ($fn) {
   global $user;
   $uw = entity_metadata_wrapper('user', $user);
   $synced_nodes = $uw->field_mm_sync->value();
-  $synced_nids = [];
+  $synced_entities = [];
   $viewable_types = _ma_mobile_client_get_viewable_types();
 
   foreach ($synced_nodes as $synced_node) {
@@ -571,48 +571,72 @@ function _ma_mobile_client_get_user_synced_nodes ($fn) {
 
     // Add the node.
     if (node_access('view', $synced_node)) { // Check to make sure the user can view the node. This might not be the case if the CP on the node was changed after the user had set it to be synced.
-      $synced_nids[$synced_node->type][$synced_node->nid]['last_updated'] = $synced_node->changed;
-      $synced_nids[$synced_node->type][$synced_node->nid]['editable'] = node_access('update', $synced_node) ? TRUE: FALSE;
+      $synced_entities['nodes'][$synced_node->type][$synced_node->nid] = [
+        'last_updated' => $synced_node->changed,
+        'editable' => node_access('update', $synced_node) ? TRUE: FALSE,
+      ];
     }
 
-    // For all the entity and node refs in the node, add those nodes to be synced as well.
-    $synced_nids = _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_nids);
+    // For all the entity refs, node refs, and term refs in the node, add those entities to be synced as well.
+    $synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_entities);
   }
 
-  return $synced_nids;
+  return $synced_entities;
 }
 
 
 /**
- * For all the entity and node refs in the node, add those nodes to be synced as well.
+ * For all the entity refs, node refs, and term refs in the node, add those entities to be synced as well.
  * We are going one-level deep*, so entity ref'ed nodes get synced, but entity ref'ed nodes of entity ref'ed nodes do not get synced.
  * Entity-ref'ed nodes are *not* marked as synced to the user, or else their own entity refs would then get synced; this is just
  * so that when viewing the parent node, the user can see its immediate children in the ref fields.
  *
  * * except for entity refs that are in $go_one_level_deeper. For these, the children get their own entity refs synced too.
  */
-function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_nids) {
+function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_entities) {
+
   static $ref_fields;
-  $ref_fields = array_merge(field_read_fields(array('type' => 'node_reference')), field_read_fields(array('type' => 'entityreference')));
+  $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference']));
+
   static $go_one_level_deeper;
   $go_one_level_deeper = ['field_unit_lessons'];
+
   $snw = entity_metadata_wrapper('node', $synced_node);
   foreach ($ref_fields as $ref_field => $ref_field_properties) {
-    if (isset($snw->{$ref_field}) && count($snw->{$ref_field}->raw())) {
-      foreach ($snw->{$ref_field}->raw() as $reffed_nid) {
-        $reffed_node = node_load ($reffed_nid);
-        if (node_access('view', $reffed_node)) { // Check to make sure the user can view the reffed node.
-          $synced_nids[$reffed_node->type][$reffed_node->nid]['last_updated'] = $reffed_node->changed;
-          $synced_nids[$reffed_node->type][$reffed_node->nid]['editable'] = node_access('update', $reffed_node) ? TRUE: FALSE;
-          // Go deeper for certain entity refs.
-          if (in_array($ref_field, $go_one_level_deeper)) {
-            $synced_nids = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_node->nid, $synced_nids);
+    if (isset($snw->{$ref_field})) {
+      $ref_field_values = $snw->{$ref_field}->value();
+      if (isset($ref_field_values)) {
+        if (is_object(($ref_field_values))) {
+          $ref_field_values = [$ref_field_values]; // convert single value term ref fields (single value entity ref fields too?) from single object to single value array with object as first value
+        }
+        // dpm ($ref_field_values, $ref_field_properties["type"] . ': ' . $ref_field . ' count: ' . count($ref_field_values) );
+        foreach ($ref_field_values as $reffed_entity) {
+
+          // Term references
+          if ($ref_field_properties["type"] == 'taxonomy_term_reference') {
+            $synced_entities['terms'][$reffed_entity->tid] = [
+              'last_updated' => $reffed_entity->changed,
+            ];
           }
+
+          // Entity / node references.
+          elseif (node_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
+            $synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
+              'last_updated' => $reffed_entity->changed,
+              'editable' => node_access('update', $reffed_entity) ? TRUE : FALSE,
+            ];
+
+            // Go deeper for certain entity refs.
+            if (in_array($ref_field, $go_one_level_deeper)) {
+              $synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $synced_entities);
+            }
+          }
+
         }
       }
     }
   }
-  return $synced_nids;
+  return $synced_entities;
 }
 
 

@@ -96,6 +96,7 @@ dependencies[] = stringoverrides
 dependencies[] = strongarm
 dependencies[] = system
 dependencies[] = taxonomy
+dependencies[] = taxonomy_changed
 dependencies[] = term_merge
 dependencies[] = text
 dependencies[] = textformatter

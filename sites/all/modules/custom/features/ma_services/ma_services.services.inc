@@ -129,8 +129,8 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
-    'synced_nodes' => array(
-      'alias' => 'synced-nodes',
+    'synced_entities' => array(
+      'alias' => 'synced-entities',
       'operations' => array(
         'retrieve' => array(
           'enabled' => '1',
