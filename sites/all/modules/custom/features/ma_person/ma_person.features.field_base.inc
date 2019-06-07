@@ -404,7 +404,7 @@ function ma_person_field_default_field_bases() {
     'locked' => 0,
     'module' => 'paragraphs',
     'settings' => array(
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'paragraphs',

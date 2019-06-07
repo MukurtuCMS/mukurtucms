@@ -122,13 +122,6 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_node_aggregate' => array(
-      'formatter_settings' => array(
-        'ft' => array(
-          'lb' => 'Referenced Content',
-        ),
-      ),
-    ),
   );
   $export['node|person|mukurtu_mobile'] = $ds_fieldsetting;
 
@@ -579,7 +572,6 @@ function ma_person_ds_layout_settings_info() {
         4 => 'field_tags',
         5 => 'field_related_people',
         6 => 'field_sections',
-        7 => 'field_node_aggregate',
       ),
     ),
     'fields' => array(
@@ -590,7 +582,6 @@ function ma_person_ds_layout_settings_info() {
       'field_tags' => 'ds_content',
       'field_related_people' => 'ds_content',
       'field_sections' => 'ds_content',
-      'field_node_aggregate' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(

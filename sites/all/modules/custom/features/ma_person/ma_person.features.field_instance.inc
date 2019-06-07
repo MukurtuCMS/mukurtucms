@@ -398,7 +398,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 8,
+        'weight' => 34,
       ),
       'person_teaser' => array(
         'label' => 'hidden',
@@ -709,9 +709,8 @@ function ma_person_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'mukurtu_display_formatters_referenced_content_view',
         'settings' => array(),
-        'type' => 'mukurtu_referenced_content_formatter',
+        'type' => 'hidden',
         'weight' => 7,
       ),
       'person_teaser' => array(
@@ -864,6 +863,8 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_related_people'.
   $field_instances['node-person-field_related_people'] = array(
     'bundle' => 'person',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -930,6 +931,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_related_people',
@@ -940,10 +942,12 @@ function ma_person_field_default_field_instances() {
       'allowed_bundles' => array(
         'dictionary_word_bundle' => -1,
         'person_relationship_bundle' => 'person_relationship_bundle',
+        'text_section' => -1,
       ),
       'bundle_weights' => array(
         'dictionary_word_bundle' => 2,
         'person_relationship_bundle' => 3,
+        'text_section' => -6,
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -955,7 +959,9 @@ function ma_person_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'paragraphs',
-      'settings' => array(),
+      'settings' => array(
+        'treeable' => 0,
+      ),
       'type' => 'paragraphs_embed',
       'weight' => 12,
     ),
@@ -964,7 +970,9 @@ function ma_person_field_default_field_instances() {
   // Exported field_instance: 'node-person-field_sections'.
   $field_instances['node-person-field_sections'] = array(
     'bundle' => 'person',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1032,6 +1040,7 @@ function ma_person_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_sections',
@@ -1059,7 +1068,9 @@ function ma_person_field_default_field_instances() {
     'widget' => array(
       'active' => 0,
       'module' => 'paragraphs',
-      'settings' => array(),
+      'settings' => array(
+        'treeable' => 0,
+      ),
       'type' => 'paragraphs_embed',
       'weight' => 21,
     ),
