@@ -768,18 +768,24 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
 /**
  * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.
  *
- * TODO: this works with fields within fieldgroups, and with paragraphs within fieldsgroups.
- * But handling would need to be added for any of the following scenarios, if they arise in a new content type:
- * - fieldgroups within fieldgroups
- * - fieldsgroups within paragraphs
+ * Works for:
+ *  - fields at top-level and within fieldgroups
+ *  - paragraphs at top-level and within fieldgroups
+ *  - rendered entity fields at top-level (tested) and within fielgroups (not yet tested)
+ *
+ * Does not work for (currently not needed):
+ *  - fieldgroups within fieldgroups
+ *  - fieldgroups within paragraphs
  */
-function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
+function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_validation = FALSE) {
 
-  if (!node_type_get_type($content_type)) {
-    return 'Content type ' . $content_type . ' does not exist';
-  }
-  if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
-    return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
+  if (!$skip_type_validation) {
+    if (!node_type_get_type($content_type)) {
+      return 'Content type ' . $content_type . ' does not exist';
+    }
+    if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
+      return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
+    }
   }
 
   $structured_view = [];
@@ -804,26 +810,41 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
       continue;
     }
 
-    // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
-    if (isset($field_properties['display']['mukurtu_mobile']["module"]) AND $field_properties['display']['mukurtu_mobile']["module"] == 'paragraphs') {
-      $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
-      $select_bundles = [];
-      foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
-        if ($allowed_bundle_key === $allowed_bundle_value) {
-          $select_bundles[] = $allowed_bundle_value;
+    switch ($field_array["view_mode_properties"]["type"]) {
+
+      // For rendered entity fields (eg. Lesson nodes with Unit Plan),
+      // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
+      case 'entityreference_entity_view':
+
+        $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
+        if (count($target_bundles) > 1) {
+          return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
         }
-      }
-      if (count($select_bundles) > 1) {
-        return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
-      }
-      $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
-      foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
-        $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
-        if (!$paragraph_field_array) {
-          continue;
+        $field_array['fields'] = _ma_mobile_client_get_node_view_fields('retrieve', reset($target_bundles), TRUE);
+        break;
+
+      // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
+      case 'paragraphs_view':
+        $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
+        $select_bundles = [];
+        foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+          if ($allowed_bundle_key === $allowed_bundle_value) {
+            $select_bundles[] = $allowed_bundle_value;
+          }
         }
-        $field_array['fields'][$paragraph_field] = $paragraph_field_array;
-      }
+        if (count($select_bundles) > 1) {
+          return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
+        }
+        $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
+        foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
+          $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
+          if (!$paragraph_field_array) {
+            continue;
+          }
+          $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+        }
+        break;
+
     }
 
     // Fields within fieldgroups get added here.
@@ -867,7 +888,8 @@ function _ma_mobile_client_build_field_arrays_from_field_properties($field_prope
     'label' => $field_properties['label'],
     'weight' => $view_mode_properties['weight'],
     'view_mode_properties' => $view_mode_properties,
-    'other_properties' => $field_properties
+    'other_properties' => $field_properties,
+    'base_field_properties' => field_info_field($field_properties["field_name"]),
   ];
 }
 
