@@ -94,8 +94,8 @@ function ma_community_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'community';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
-    'community_browse_all_dh_link' => array(
-      'weight' => '11',
+    'create_content_block_ds_field' => array(
+      'weight' => '10',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -104,8 +104,23 @@ function ma_community_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'community_membership_status' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'featured_collections' => array(
+      'weight' => '10',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'community_browse_all_dh_link' => array(
+      'weight' => '8',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'community_dh_items' => array(
-      'weight' => '4',
+      'weight' => '3',
       'label' => 'above',
       'format' => 'default',
       'formatter_settings' => array(
@@ -114,33 +129,13 @@ function ma_community_ds_field_settings_info() {
         ),
       ),
     ),
-    'community_membership_status' => array(
-      'weight' => '6',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
     'community_protocol_items' => array(
-      'weight' => '8',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'featured_collections' => array(
-      'weight' => '12',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'group_management_links' => array(
-      'weight' => '2',
+      'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'group_members' => array(
-      'weight' => '7',
-      'label' => 'hidden',
-      'format' => 'default',
-    ),
-    'create_content_block_ds_field' => array(
-      'weight' => '13',
+      'weight' => '4',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -514,7 +509,7 @@ function ma_community_ds_layout_settings_info() {
         20 => 'group_custom_tk_label_text',
       ),
       'hidden' => array(
-        12 => 'group_group',
+        13 => 'group_group',
         16 => 'og_group_ref',
         19 => 'field_dhan_notified_users',
         21 => 'field_comm_protocols',

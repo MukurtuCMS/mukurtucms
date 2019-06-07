@@ -104,6 +104,16 @@ function ma_culturalprotocol_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'dhan_notify' => array(
+      'weight' => '6',
+      'label' => 'above',
+      'format' => 'default',
+      'formatter_settings' => array(
+        'ft' => array(
+          'lb-col' => TRUE,
+        ),
+      ),
+    ),
     'group_management_links' => array(
       'weight' => '2',
       'label' => 'hidden',
@@ -375,6 +385,10 @@ function ma_culturalprotocol_ds_layout_settings_info() {
         5 => 'group_members',
         6 => 'og_group_ref',
         7 => 'create_content_block_ds_field',
+        4 => 'group_members',
+        5 => 'og_group_ref',
+        6 => 'dhan_notify',
+        7 => 'create_content_block_ds_field',
       ),
     ),
     'fields' => array(
@@ -385,6 +399,7 @@ function ma_culturalprotocol_ds_layout_settings_info() {
       'protocol_dh_items' => 'left',
       'group_members' => 'right',
       'og_group_ref' => 'right',
+      'dhan_notify' => 'right',
       'create_content_block_ds_field' => 'right',
     ),
     'classes' => array(

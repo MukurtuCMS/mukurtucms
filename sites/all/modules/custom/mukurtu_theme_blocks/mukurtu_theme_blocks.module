@@ -81,7 +81,7 @@ function mukurtu_theme_blocks_block_save($delta = '', $edit = array()) {
     case 'mukurtu_theme_frontpage_hero':
         // Layout
         variable_set('mukurtu_theme_block_frontpage_layout', $edit['mukurtu_theme_block_frontpage_layout']);
-        
+
         // Image
         $block = block_load('mukurtu_theme_blocks', $delta);
 
@@ -91,7 +91,7 @@ function mukurtu_theme_blocks_block_save($delta = '', $edit = array()) {
         if($file) {
             file_usage_delete($file, 'mukurtu_theme_blocks', 'block', $block->bid);
         }
-        
+
         if($edit['mukurtu_theme_block_frontpage_hero_image'] != 0) {
             // Add reference to new file
             $file = file_load($edit['mukurtu_theme_block_frontpage_hero_image']);
@@ -119,8 +119,8 @@ function _mukurtu_theme_blocks_footer() {
     $block['content'] = '<div class="contact">';
 
     // Email contact
-    $email_us_text = t(theme_get_setting('mukurtu_theme_email_us_message', 'mukurtu'));
-    $email_contact_address = theme_get_setting('mukurtu_theme_contact_email', 'mukurtu');
+    $email_us_text = t(theme_get_setting('mukurtu_theme_email_us_message'));
+    $email_contact_address = theme_get_setting('mukurtu_theme_contact_email');
     if($email_contact_address != '') {
         $email_contact_address = l($email_contact_address, 'mailto:' . $email_contact_address);
         if($email_us_text != '') {
@@ -129,11 +129,11 @@ function _mukurtu_theme_blocks_footer() {
     }
 
     // Twitter
-    $twitter_message = theme_get_setting('mukurtu_theme_twitter_message', 'mukurtu');
-    $twitter1 = theme_get_setting('mukurtu_theme_twitter1', 'mukurtu');
-    $twitter2 = theme_get_setting('mukurtu_theme_twitter2', 'mukurtu');
+    $twitter_message = theme_get_setting('mukurtu_theme_twitter_message');
+    $twitter1 = theme_get_setting('mukurtu_theme_twitter1');
+    $twitter2 = theme_get_setting('mukurtu_theme_twitter2');
     $twitter_url = 'https://twitter.com/';
-    
+
     $first_twitter = TRUE;
     foreach(array($twitter1, $twitter2) as $twitter) {
         if($twitter != '') {
@@ -160,8 +160,8 @@ function _mukurtu_theme_blocks_footer() {
     $block['content'] .= "</div>";
 
     // Copyright
-    $year = date("Y");   
-    $copyright = str_replace('[year]', $year, theme_get_setting('mukurtu_theme_copyright', 'mukurtu'));
+    $year = date("Y");
+    $copyright = str_replace('[year]', $year, theme_get_setting('mukurtu_theme_copyright'));
     if($copyright != '') {
         $block['content'] .= "<div class='copyright col-md-pull-8 col-md-4 col-xs-12'>$copyright</div>";
     }
@@ -198,7 +198,7 @@ function _mukurtu_theme_blocks_hero() {
         'alt' => t('Front Page Hero Image'),
         'attributes' => array('class' => array('img-responsive')),
     ));
-  
+
     $hero_image = array(
         '#prefix' => '<div class="hero-image">',
         '#suffix' => '</div>',
@@ -207,7 +207,7 @@ function _mukurtu_theme_blocks_hero() {
             '#markup' => $image_markup
         ),
     );
-        
+
     $hero_title = array(
         '#prefix' => '<div class="hero-text">',
         '#suffix' => '</div>',
@@ -223,13 +223,13 @@ function _mukurtu_theme_blocks_hero() {
     );
 
     $block = array();
-   
+
     switch($layout) {
     case 'hero-side-by-side':
         $block['content'] = array(
             '#prefix' => '<div class="' . $layout . '">',
             '#suffix' => '</div>',
-        );        
+        );
         $block['content']['left'] = array(
             '#prefix' => '<div class="hero-left col-sm-6">',
             '#suffix' => '</div>',
@@ -253,6 +253,6 @@ function _mukurtu_theme_blocks_hero() {
 
         break;
     }
-    
+
     return $block;
 }

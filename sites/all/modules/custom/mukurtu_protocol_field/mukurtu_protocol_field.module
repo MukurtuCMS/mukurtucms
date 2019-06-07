@@ -90,11 +90,13 @@ function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $im
     foreach ($cps as $cp) {
       $cp_nid = $cp['target_id'];
       $cp_wrapper = entity_metadata_wrapper('node', $cp_nid);
-      $community_nodes = $cp_wrapper->og_group_ref->value();
-      $community_node = $community_nodes[0];
-      $community_nid = $community_node->nid;
-      $structure[$community_nid][] = $cp_nid;
-      $community_defaults_with_titles[$community_nid] = $community_node->title;
+      if (isset($cp_wrapper->og_group_ref)) {
+        $community_nodes = $cp_wrapper->og_group_ref->value();
+        $community_node = $community_nodes[0];
+        $community_nid = $community_node->nid;
+        $structure[$community_nid][] = $cp_nid;
+        $community_defaults_with_titles[$community_nid] = $community_node->title;
+      }
     }
   }
 

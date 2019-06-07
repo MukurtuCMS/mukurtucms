@@ -1625,9 +1625,11 @@ function mukurtu_splash_block_wizard() {
  * access control system (e.g., doesn't not enable/disable features).
  */
 function ma_splash_prerelease_functionality_enabled($feature) {
-  $enabled = variable_get(MUKURTU_PRERELEASE_FUNCTIONALITY);
-  if (isset($enabled[$feature])) {
-    return $enabled[$feature];
+  if (defined('MUKURTU_PRERELEASE_FUNCTIONALITY')) {
+    $enabled = variable_get(MUKURTU_PRERELEASE_FUNCTIONALITY);
+    if (isset($enabled[$feature])) {
+      return $enabled[$feature];
+    }
   }
   return FALSE;
 }
