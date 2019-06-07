@@ -99,11 +99,17 @@ function ma_mobile_client_admin_config($form, $form_state) {
       // Also need to make sure any of its Paragraph fields have a Mukurtu Mobile view mode as well.
       foreach ($fields as $field) {
         if (isset($field["display"]["mukurtu_mobile"]["module"]) && $field["display"]["mukurtu_mobile"]["module"] == 'paragraphs') {
-          $allowed_bundles = array_keys($field["settings"]["allowed_bundles"]);
-          if (count($allowed_bundles) > 1) {
-            // TODO: handle this if it ever arises.
+          $allowed_bundles = $field["settings"]["allowed_bundles"];
+          $select_bundles = [];
+          foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+            if ($allowed_bundle_key === $allowed_bundle_value) {
+              $select_bundles[] = $allowed_bundle_value;
+            }
           }
-          $paragraph_view_modes = field_view_mode_settings('paragraphs_item', $allowed_bundles[0]);
+          if (count($select_bundles) > 1) {
+            drupal_set_message($field['field_name'] . ' has more than 1 selected bundle. ma_mobile_client_admin_config() needs to be updated for this.', 'error');
+          }
+          $paragraph_view_modes = field_view_mode_settings('paragraphs_item', $select_bundles[0]);
           if (is_null($paragraph_view_modes["mukurtu_mobile"])) {
             $available = FALSE;
             break;
@@ -800,11 +806,17 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type) {
 
     // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
     if (isset($field_properties['display']['mukurtu_mobile']["module"]) AND $field_properties['display']['mukurtu_mobile']["module"] == 'paragraphs') {
-      $allowed_bundles = array_keys($field_properties["settings"]["allowed_bundles"]);
-      if (count($allowed_bundles) > 1) {
-        return 'Error: ' . $field . ' has more than 1 allowed bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
+      $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
+      $select_bundles = [];
+      foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+        if ($allowed_bundle_key === $allowed_bundle_value) {
+          $select_bundles[] = $allowed_bundle_value;
+        }
       }
-      $paragraph_fields = field_info_instances('paragraphs_item', $allowed_bundles[0]);
+      if (count($select_bundles) > 1) {
+        return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
+      }
+      $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
       foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
         $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
         if (!$paragraph_field_array) {
