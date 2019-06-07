@@ -13,6 +13,26 @@ function ma_lesson_plan_ds_field_settings_info() {
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'field_collection_item|field_lesson_micro_tasks|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'field_collection_item';
+  $ds_fieldsetting->bundle = 'field_lesson_micro_tasks';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'field_related_dh_items' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_word_list' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['field_collection_item|field_lesson_micro_tasks|mukurtu_mobile'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
   $ds_fieldsetting->id = 'node|lesson|default';
   $ds_fieldsetting->entity_type = 'node';
   $ds_fieldsetting->bundle = 'lesson';
@@ -49,6 +69,31 @@ function ma_lesson_plan_ds_field_settings_info() {
     ),
   );
   $export['node|lesson|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|lesson|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'lesson';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_lesson_micro_tasks' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_related_dictionary_words' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|lesson|mukurtu_mobile'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -158,6 +203,26 @@ function ma_lesson_plan_ds_field_settings_info() {
     ),
   );
   $export['node|unit_plan|full'] = $ds_fieldsetting;
+
+  $ds_fieldsetting = new stdClass();
+  $ds_fieldsetting->api_version = 1;
+  $ds_fieldsetting->id = 'node|unit_plan|mukurtu_mobile';
+  $ds_fieldsetting->entity_type = 'node';
+  $ds_fieldsetting->bundle = 'unit_plan';
+  $ds_fieldsetting->view_mode = 'mukurtu_mobile';
+  $ds_fieldsetting->settings = array(
+    'title' => array(
+      'weight' => '2',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'field_unit_lessons' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+  );
+  $export['node|unit_plan|mukurtu_mobile'] = $ds_fieldsetting;
 
   $ds_fieldsetting = new stdClass();
   $ds_fieldsetting->api_version = 1;
@@ -332,6 +397,45 @@ function ma_lesson_plan_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'field_collection_item|field_lesson_micro_tasks|mukurtu_mobile';
+  $ds_layout->entity_type = 'field_collection_item';
+  $ds_layout->bundle = 'field_lesson_micro_tasks';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_task',
+        1 => 'field_key_student_outcomes',
+        2 => 'field_related_dh_items',
+        3 => 'field_word_list',
+      ),
+    ),
+    'fields' => array(
+      'field_task' => 'ds_content',
+      'field_key_student_outcomes' => 'ds_content',
+      'field_related_dh_items' => 'ds_content',
+      'field_word_list' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['field_collection_item|field_lesson_micro_tasks|mukurtu_mobile'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|lesson|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'lesson';
@@ -476,6 +580,45 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|lesson|full'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|lesson|mukurtu_mobile';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'lesson';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'body',
+        2 => 'field_lesson_micro_tasks',
+        3 => 'field_related_dictionary_words',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'body' => 'ds_content',
+      'field_lesson_micro_tasks' => 'ds_content',
+      'field_related_dictionary_words' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|lesson|mukurtu_mobile'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
@@ -788,6 +931,41 @@ function ma_lesson_plan_ds_layout_settings_info() {
     'layout_disable_css' => FALSE,
   );
   $export['node|unit_plan|full'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
+  $ds_layout->id = 'node|unit_plan|mukurtu_mobile';
+  $ds_layout->entity_type = 'node';
+  $ds_layout->bundle = 'unit_plan';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'title',
+        1 => 'field_unit_lessons',
+      ),
+    ),
+    'fields' => array(
+      'title' => 'ds_content',
+      'field_unit_lessons' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['node|unit_plan|mukurtu_mobile'] = $ds_layout;
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
