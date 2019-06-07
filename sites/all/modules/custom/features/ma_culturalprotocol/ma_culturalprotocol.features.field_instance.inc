@@ -130,70 +130,6 @@ function ma_culturalprotocol_field_default_field_instances() {
   );
 
   // Exported field_instance:
-  // 'node-cultural_protocol_group-field_dhan_notified_users'.
-  $field_instances['node-cultural_protocol_group-field_dhan_notified_users'] = array(
-    'bundle' => 'cultural_protocol_group',
-    'default_value' => NULL,
-    'default_value_function' => '',
-    'deleted' => 0,
-    'description' => 'Protocol Stewards that are notified of insertions, changes, and deletions of Digital Heritage nodes in this Protocol.',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'bypass_access' => FALSE,
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 22,
-      ),
-      'featured_content' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-      'full' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 7,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'display_label' => '',
-    'ds_extras_field_template' => '',
-    'entity_type' => 'node',
-    'field_name' => 'field_dhan_notified_users',
-    'label' => 'Notified Protocol Stewards',
-    'required' => 0,
-    'settings' => array(
-      'behaviors' => array(
-        'prepopulate' => array(
-          'status' => 0,
-        ),
-      ),
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'options',
-      'settings' => array(
-        'apply_chosen' => 1,
-        'treeable' => 0,
-      ),
-      'type' => 'options_select',
-      'weight' => 7,
-    ),
-  );
-
-  // Exported field_instance:
   // 'node-cultural_protocol_group-field_comm_dh_items'.
   $field_instances['node-cultural_protocol_group-field_comm_dh_items'] = array(
     'bundle' => 'cultural_protocol_group',
@@ -275,6 +211,79 @@ function ma_culturalprotocol_field_default_field_instances() {
       ),
       'type' => 'options_select',
       'weight' => 50,
+    ),
+  );
+
+  // Exported field_instance:
+  // 'node-cultural_protocol_group-field_dhan_notified_users'.
+  $field_instances['node-cultural_protocol_group-field_dhan_notified_users'] = array(
+    'bundle' => 'cultural_protocol_group',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Protocol Stewards that are notified of insertions, changes, and deletions of Digital Heritage nodes in this Protocol.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => FALSE,
+          'link' => FALSE,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 22,
+      ),
+      'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 7,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_dhan_notified_users',
+    'label' => 'Notified Protocol Stewards',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => 1,
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 7,
     ),
   );
 

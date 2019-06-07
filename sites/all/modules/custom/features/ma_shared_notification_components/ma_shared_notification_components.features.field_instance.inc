@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_shared_notification_components.features.field_instance.inc
@@ -14,7 +15,9 @@ function ma_shared_notification_components_field_default_field_instances() {
   // 'field_collection_item-field_notification_email-field_notification_action'.
   $field_instances['field_collection_item-field_notification_email-field_notification_action'] = array(
     'bundle' => 'field_notification_email',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -33,13 +36,15 @@ function ma_shared_notification_components_field_default_field_instances() {
     'label' => 'Action',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
@@ -51,20 +56,22 @@ function ma_shared_notification_components_field_default_field_instances() {
   // 'field_collection_item-field_notification_email-field_notification_author'.
   $field_instances['field_collection_item-field_notification_email-field_notification_author'] = array(
     'bundle' => 'field_notification_email',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'inline',
+        'label' => 'above',
         'module' => 'entityreference',
         'settings' => array(
-          'bypass_access' => 0,
-          'link' => 1,
+          'bypass_access' => FALSE,
+          'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 1,
+        'weight' => 4,
       ),
       'full' => array(
         'label' => 'inline',
@@ -89,14 +96,24 @@ function ma_shared_notification_components_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 1,
@@ -116,7 +133,7 @@ function ma_shared_notification_components_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 2,
       ),
       'full' => array(
         'label' => 'above',
@@ -135,6 +152,8 @@ function ma_shared_notification_components_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -148,7 +167,7 @@ function ma_shared_notification_components_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 5,
+      'weight' => 4,
     ),
   );
 
@@ -156,6 +175,8 @@ function ma_shared_notification_components_field_default_field_instances() {
   // 'field_collection_item-field_notification_email-field_notification_comment'.
   $field_instances['field_collection_item-field_notification_email-field_notification_comment'] = array(
     'bundle' => 'field_notification_email',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -169,7 +190,7 @@ function ma_shared_notification_components_field_default_field_instances() {
           'link' => FALSE,
         ),
         'type' => 'entityreference_label',
-        'weight' => 5,
+        'weight' => 3,
       ),
       'full' => array(
         'label' => 'inline',
@@ -194,17 +215,27 @@ function ma_shared_notification_components_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 2,
     ),
   );
 
@@ -226,6 +257,7 @@ function ma_shared_notification_components_field_default_field_instances() {
           'multiple_number' => '',
           'multiple_to' => '',
           'show_remaining_days' => FALSE,
+          'show_repeat_rule' => 'show',
         ),
         'type' => 'date_default',
         'weight' => 0,
@@ -253,6 +285,8 @@ function ma_shared_notification_components_field_default_field_instances() {
     'label' => 'Date Generated',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_value' => 'now',
       'default_value2' => 'same',
       'default_value_code' => '',
@@ -265,6 +299,7 @@ function ma_shared_notification_components_field_default_field_instances() {
       'settings' => array(
         'apply_chosen' => '',
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
       'type' => 'options_select',
       'weight' => 0,
@@ -284,7 +319,7 @@ function ma_shared_notification_components_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 1,
       ),
       'full' => array(
         'label' => 'inline',
@@ -303,6 +338,8 @@ function ma_shared_notification_components_field_default_field_instances() {
     'settings' => array(
       'context' => 'title',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -316,7 +353,7 @@ function ma_shared_notification_components_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textfield',
-      'weight' => 4,
+      'weight' => 3,
     ),
   );
 

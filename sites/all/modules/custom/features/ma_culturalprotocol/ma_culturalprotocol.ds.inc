@@ -382,13 +382,10 @@ function ma_culturalprotocol_ds_layout_settings_info() {
         4 => 'protocol_dh_items',
       ),
       'right' => array(
-        5 => 'group_members',
-        6 => 'og_group_ref',
-        7 => 'create_content_block_ds_field',
-        4 => 'group_members',
         5 => 'og_group_ref',
         6 => 'dhan_notify',
         7 => 'create_content_block_ds_field',
+        4 => 'group_members',
       ),
     ),
     'fields' => array(
