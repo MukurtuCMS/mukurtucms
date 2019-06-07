@@ -158,7 +158,7 @@ function ma_person_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '1',
+          'weight' => '15',
         ),
         'path' => array(
           'weight' => '5',

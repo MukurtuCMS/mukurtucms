@@ -137,7 +137,7 @@ function ma_person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 3,
+      'weight' => 17,
     ),
   );
 
@@ -267,7 +267,7 @@ function ma_person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 4,
+      'weight' => 18,
     ),
   );
 
@@ -304,7 +304,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 34,
+        'weight' => 35,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -354,7 +354,7 @@ function ma_person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 5,
+      'weight' => 19,
     ),
   );
 
@@ -396,13 +396,8 @@ function ma_person_field_default_field_instances() {
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'links' => TRUE,
-          'use_content_language' => TRUE,
-          'view_mode' => 'default',
-        ),
-        'type' => 'entityreference_entity_view',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 8,
       ),
       'person_teaser' => array(
@@ -505,7 +500,7 @@ function ma_person_field_default_field_instances() {
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
-        'weight' => 0,
+        'weight' => 1,
       ),
       'person_teaser' => array(
         'label' => 'hidden',
@@ -582,7 +577,7 @@ function ma_person_field_default_field_instances() {
         'context' => 'sdl_editor_representation',
       ),
       'type' => 'atom_reference_textfield',
-      'weight' => 2,
+      'weight' => 16,
     ),
   );
 
@@ -616,7 +611,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 36,
+        'weight' => 37,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -812,7 +807,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 38,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1066,7 +1061,7 @@ function ma_person_field_default_field_instances() {
       'module' => 'paragraphs',
       'settings' => array(),
       'type' => 'paragraphs_embed',
-      'weight' => 7,
+      'weight' => 21,
     ),
   );
 
@@ -1193,7 +1188,7 @@ function ma_person_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 6,
+      'weight' => 20,
     ),
   );
 
@@ -1226,7 +1221,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 35,
+        'weight' => 36,
       ),
       'person_teaser' => array(
         'label' => 'above',
@@ -1321,6 +1316,16 @@ function ma_person_field_default_field_instances() {
         'type' => 'entityreference_entity_view',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'entityreference',
+        'settings' => array(
+          'bypass_access' => 0,
+          'link' => 1,
+        ),
+        'type' => 'entityreference_label',
+        'weight' => 0,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1374,6 +1379,30 @@ function ma_person_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'textformatter',
+        'settings' => array(
+          'textformatter_class' => 'textformatter-list',
+          'textformatter_comma_and' => 0,
+          'textformatter_comma_full_stop' => 0,
+          'textformatter_comma_override' => 0,
+          'textformatter_comma_tag' => 'div',
+          'textformatter_contrib' => array(
+            'entityreference_link' => TRUE,
+            'field_collection_view_mode' => 'full',
+            'link_field_display_type' => 'link_default',
+            'node_reference_link' => TRUE,
+          ),
+          'textformatter_separator_custom' => '',
+          'textformatter_separator_custom_class' => 'textformatter-separator',
+          'textformatter_separator_custom_tag' => 'span',
+          'textformatter_term_plain' => 0,
+          'textformatter_type' => 'comma',
+        ),
+        'type' => 'textformatter_list',
+        'weight' => 1,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'textformatter',
         'settings' => array(
@@ -1453,6 +1482,16 @@ function ma_person_field_default_field_instances() {
         'type' => 'ma_colorbox',
         'weight' => 1,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 1,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1500,6 +1539,16 @@ function ma_person_field_default_field_instances() {
         'module' => 'atom_reference',
         'settings' => array(
           'link' => 1,
+          'override' => 0,
+        ),
+        'type' => 'ma_colorbox',
+        'weight' => 3,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'atom_reference',
+        'settings' => array(
+          'link' => 0,
           'override' => 0,
         ),
         'type' => 'ma_colorbox',
@@ -1554,6 +1603,13 @@ function ma_person_field_default_field_instances() {
         'type' => 'text_default',
         'weight' => 2,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 2,
+      ),
       'paragraphs_editor_preview' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1598,6 +1654,13 @@ function ma_person_field_default_field_instances() {
     'description' => '',
     'display' => array(
       'default' => array(
+        'label' => 'hidden',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'hidden',
         'module' => 'text',
         'settings' => array(),
