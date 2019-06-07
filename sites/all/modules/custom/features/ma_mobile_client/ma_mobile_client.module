@@ -771,11 +771,13 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
  * Works for:
  *  - fields at top-level and within fieldgroups
  *  - paragraphs at top-level and within fieldgroups
- *  - rendered entity fields at top-level (tested) and within fielgroups (not yet tested)
+ *  - field collections at top-level (tested) and within fieldgroups (not tested)
+ *  - rendered entity fields at top-level (tested) and within fieldgroups (not yet tested) and within field collections (not tested)
  *
  * Does not work for (currently not needed):
  *  - fieldgroups within fieldgroups
  *  - fieldgroups within paragraphs
+ *  - fieldgroups within field collections
  */
 function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_validation = FALSE) {
 
@@ -842,6 +844,18 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_
             continue;
           }
           $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+        }
+        break;
+
+      // For field collections, loop through its fields and add them as fields on the field collection field.
+      case 'field_collection_view':
+        $fc_fields = field_info_instances('field_collection_item', $field);
+        foreach ($fc_fields as $fc_field => $fc_field_properties) {
+          $fc_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($fc_field_properties);
+          if (!$fc_field_array) {
+            continue;
+          }
+          $field_array['fields'][$fc_field] = $fc_field_array;
         }
         break;
 
