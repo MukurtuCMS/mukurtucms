@@ -938,3 +938,40 @@ function ma_mobile_client_set_default_types() {
   variable_set('mm_creatable_types', $default_creatable_types);
   
 }
+
+
+/**
+ * Implements hook_node_postsave().
+ *
+ * Services does not work with multival paragraphs (even with the multival patch),
+ * so we set paragraphs in the JSON with a custom key "paragraphs" and this postsave hook
+ * takes care of creating the paragraphs and attaching it to the parent node.
+ */
+function ma_mobile_client_node_postsave($node, $op) {
+  if (isset($node->paragraphs)) {
+    foreach ($node->paragraphs as $parent_field_name => $parent_instances) {
+      foreach ($parent_instances[LANGUAGE_NONE] as $parent_instance_index => $parent_instance) {
+        $paragraph = new ParagraphsItemEntity([
+          'field_name' => $parent_field_name,
+          'bundle' => 'dictionary_word_bundle'
+        ]);
+        $paragraph->is_new = TRUE;
+        $paragraph->setHostEntity('node', $node);
+        foreach ($parent_instance as $paragraph_field => $paragraph_field_values) {
+          $paragraph->{$paragraph_field} = $paragraph_field_values;
+        }
+        if ($paragraph->save(TRUE)) {
+          $node->{$parent_field_name}[LANGUAGE_NONE][$parent_instance_index] = [
+            'value' => $paragraph->item_id,
+            'revision_id' => $paragraph->revision_id
+          ];
+        }
+        else {
+          drupal_set_message(t('Unable to save paragraph field ' . $paragraph_field));
+        }
+      }
+    }
+    unset ($node->paragraphs);
+    node_save($node);
+  }
+}
