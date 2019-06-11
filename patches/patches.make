@@ -181,6 +181,10 @@ projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_char
 ; Allow drag and drop reordering on select2 fields even if they do not have "add terms on fly"
 projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even-if-no-add-terms-on-fly.patch
 
+;;; Services
+; Fix for submitting multi-value fields.
+projects[services][patch][] = https://www.drupal.org/files/issues/2019-05-09/services-multivalue_fields_fix-2224803-78.patch
+
 ;;; Tree (treeable)
 ; Skip treeable field formatter patch
 projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
