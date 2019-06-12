@@ -949,11 +949,17 @@ function ma_mobile_client_set_default_types() {
  */
 function ma_mobile_client_node_postsave($node, $op) {
   if (isset($node->paragraphs)) {
+    $fields = field_info_instances('node', $node->type);
     foreach ($node->paragraphs as $parent_field_name => $parent_instances) {
+      if (!$field_info = field_info_field($parent_field_name)) {
+        // TODO: add error message
+        continue;
+      }
+      $paragraph_bundle = reset($fields["field_word_entry"]["settings"]["allowed_bundles"]);
       foreach ($parent_instances[LANGUAGE_NONE] as $parent_instance_index => $parent_instance) {
         $paragraph = new ParagraphsItemEntity([
           'field_name' => $parent_field_name,
-          'bundle' => 'dictionary_word_bundle'
+          'bundle' => $paragraph_bundle,
         ]);
         $paragraph->is_new = TRUE;
         $paragraph->setHostEntity('node', $node);
@@ -967,7 +973,7 @@ function ma_mobile_client_node_postsave($node, $op) {
           ];
         }
         else {
-          drupal_set_message(t('Unable to save paragraph field ' . $paragraph_field));
+          // TODO: add error message
         }
       }
     }
