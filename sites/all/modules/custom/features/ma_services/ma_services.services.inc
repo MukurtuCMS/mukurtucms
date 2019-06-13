@@ -64,6 +64,14 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'list_view_fields' => array(
+      'alias' => 'list-view-fields',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'node' => array(
       'alias' => 'node',
       'operations' => array(

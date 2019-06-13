@@ -543,6 +543,33 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
+    'list_view_fields' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => "Retrieves the fields and their properties to be used by the app in constructing the list view in React.",
+          'callback' => '_ma_mobile_client_get_list_view_fields',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'type',
+              'type' => 'string',
+              'description' => 'Content type',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+
+          ],
+        ],
+      ],
+    ],
+
   ];
 
   return $api;
@@ -883,17 +910,91 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_
   return $structured_view;
 }
 
+
+
 /**
- * Called from _ma_mobile_client_get_node_view_fields().
+ * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the list view of a node in React.
+ */
+function _ma_mobile_client_get_list_view_fields ($fn, $content_type, $skip_type_validation = FALSE) {
+
+  if (!$skip_type_validation) {
+    if (!node_type_get_type($content_type)) {
+      return 'Content type ' . $content_type . ' does not exist';
+    }
+    // TODO: do we want this to be defined server side or client side? For now client-side.
+//    if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
+//      return 'Content type ' . $content_type . ' exists, but is not a valid app-viewable type.';
+//    }
+  }
+
+  $structured_view = [];
+
+  // Add fields to the structured view.
+
+  $field_info = field_info_instances('node', $content_type);
+
+  // Not using this as at least dictionary does not have a List View Fields fieldgroup.
+  //  $field_groups = field_group_info_groups('node', $content_type, 'search_result');
+  //  if (!$valid_list_view_fields = $field_groups["group_list_view_fields"]->children) {
+  //    return 'Error: the content type needs a "List View Fields" fieldgroup.';
+  //  }
+  // array_unshift($valid_list_view_fields, 'field_media_asset');
+
+
+  foreach ($field_info as $field => $field_properties) {
+    $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties, 'search_result');
+    if (!$field_array) {
+      continue;
+    }
+
+    // TODO: enable this and make work, if we have to show fields of entity ref nodes in the list view.
+    //    switch ($field_array["view_mode_properties"]["type"]) {
+    //
+    //      // For rendered entity fields (eg. Lesson nodes with Unit Plan),
+    //      // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
+    //      case 'entityreference_entity_view':
+    //
+    //        $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
+    //        if (count($target_bundles) > 1) {
+    //          return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
+    //        }
+    //        $field_array['fields'] = _ma_mobile_client_get_node_view_fields('retrieve', reset($target_bundles), TRUE);
+    //        break;
+    //
+    //    }
+
+//    if (in_array($field, $valid_list_view_fields)) {
+    $structured_view[$field] = $field_array;
+//    }
+
+  }
+
+  // Sort the fields according to their weight.
+  uasort($structured_view, 'drupal_sort_weight');
+  foreach ($structured_view as $name => $properties) {
+    if (isset($properties['fields'])) {
+      uasort ($structured_view[$name]['fields'], 'drupal_sort_weight');
+    }
+  }
+
+  // Return the structured view.
+  return $structured_view;
+}
+
+
+/**
+ * Called from _ma_mobile_client_get_node_view_fields() and _ma_mobile_client_get_list_view_fields().
  * Broken out into a separate function because it can be called within a nested loop.
  */
-function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties) {
-  $view_mode_properties = $field_properties['display']['mukurtu_mobile'];
-  if ($field_properties["display"]["mukurtu_mobile"]["type"] == 'hidden') {
+function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties, $view_mode = 'mukurtu_mobile') {
+  if (!$view_mode_properties = $field_properties['display'][$view_mode]) {
+    return;
+  }
+  if ($field_properties["display"][$view_mode]["type"] == 'hidden') {
     return;
   }
   unset ($field_properties['display']);
-  $ds_layout = ds_get_layout('node', $field_properties["bundle"], 'mukurtu_mobile', FALSE);
+  $ds_layout = ds_get_layout('node', $field_properties["bundle"], $view_mode, FALSE);
   if (isset($ds_layout["settings"]["limit"][$field_properties["field_name"]])) {
     $view_mode_properties['limit'] = $ds_layout["settings"]["limit"][$field_properties["field_name"]];
   }
