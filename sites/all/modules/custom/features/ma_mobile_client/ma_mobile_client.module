@@ -947,21 +947,58 @@ function _ma_mobile_client_get_list_view_fields ($fn, $content_type, $skip_type_
       continue;
     }
 
-    // TODO: enable this and make work, if we have to show fields of entity ref nodes in the list view.
-    //    switch ($field_array["view_mode_properties"]["type"]) {
-    //
-    //      // For rendered entity fields (eg. Lesson nodes with Unit Plan),
-    //      // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
-    //      case 'entityreference_entity_view':
-    //
-    //        $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
-    //        if (count($target_bundles) > 1) {
-    //          return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
-    //        }
-    //        $field_array['fields'] = _ma_mobile_client_get_node_view_fields('retrieve', reset($target_bundles), TRUE);
-    //        break;
-    //
-    //    }
+    switch ($field_array["view_mode_properties"]["type"]) {
+
+      // For rendered entity fields (eg. Lesson nodes with Unit Plan),
+      // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
+      case 'entityreference_entity_view':
+
+        // TODO: If we do have any instances of this, test this and make work. May just work as is.
+        return "Error: rendered entity within a list view content type not yet set up in _ma_mobile_client_get_list_view_fields(). Field: " . $field;
+
+        $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
+        if (count($target_bundles) > 1) {
+          return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
+        }
+        $field_array['fields'] = _ma_mobile_client_get_list_view_fields('retrieve', reset($target_bundles), TRUE);
+        break;
+
+      // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
+      case 'paragraphs_view':
+        $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
+        $select_bundles = [];
+        foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+          if ($allowed_bundle_key === $allowed_bundle_value) {
+            $select_bundles[] = $allowed_bundle_value;
+          }
+        }
+        if (count($select_bundles) > 1) {
+          return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_list_view_fields() needs to be updated for this.';
+        }
+        $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
+        foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
+          $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties, $field_array["view_mode_properties"]["settings"]["view_mode"]);
+          if (!$paragraph_field_array) {
+            continue;
+          }
+          $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+        }
+        break;
+
+      // For field collections, loop through its fields and add them as fields on the field collection field.
+      case 'field_collection_view':
+        $fc_fields = field_info_instances('field_collection_item', $field);
+        foreach ($fc_fields as $fc_field => $fc_field_properties) {
+          $fc_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($fc_field_properties, $field_array["view_mode_properties"]["settings"]["view_mode"]);
+          if (!$fc_field_array) {
+            continue;
+          }
+          $field_array['fields'][$fc_field] = $fc_field_array;
+        }
+        break;
+
+    }
+
 
 //    if (in_array($field, $valid_list_view_fields)) {
     $structured_view[$field] = $field_array;
