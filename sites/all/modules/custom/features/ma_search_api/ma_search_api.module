@@ -7,7 +7,7 @@
 include_once 'ma_search_api.features.inc';
 
 /// 1) REINDEX RELATED NODES
-/// 2) UPDATE RELATED CONTENT NODES' OWN RELATED CONTENT FIELD (CUSTOM CER)
+/// 2) UPDATE CUSTOM CERS
 
 function ma_search_api_node_insert ($node) {
   ma_search_api_node_update ($node);
@@ -17,7 +17,7 @@ function ma_search_api_node_update($node) {;
 
   // Only process a node once.
   static $processed_nids;
-  if (in_array($node->nid, $processed_nids)) {
+  if (isset($processed_nids) && in_array($node->nid, $processed_nids)) {
     return;
   }
   $processed_nids[] = $node->nid;
@@ -52,10 +52,26 @@ function ma_search_api_node_update($node) {;
     ],
   ];
 
-  // Add the Related Content field to $relations.
+  $custom_cer_fields = [
+    'field_related_content' => 'field_related_content',
+    'field_digital_heritage_items' => 'field_collection',
+    'field_collection' => 'field_digital_heritage_items',
+  ];
+
+  // Add the custom CER fields to $relations.
+  $related_content_field_info = field_info_field('field_related_content');
+  $relateable_types = $related_content_field_info["settings"]["handler_settings"]["target_bundles"];
+  foreach ($relateable_types as $collectionable_type) {
+    $relations[$collectionable_type]['relationships'][] = 'field_related_content';
+  }
   $collectionable_types = ma_collection_get_valid_node_types_for_collection();
   foreach ($collectionable_types as $collectionable_type) {
-    $relations[$collectionable_type]['relationships'][] = 'field_related_content';
+    $relations[$collectionable_type]['relationships'][] = 'field_collection';
+  }
+  $collection_items_field = field_info_field('field_digital_heritage_items');
+  $collection_types = $collection_items_field["bundles"]["node"];
+  foreach ($collection_types as $collection_type) {
+    $relations[$collection_type]['relationships'][] = 'field_digital_heritage_items';
   }
 
   if (isset($relations[$node->type])) {
@@ -95,12 +111,14 @@ function ma_search_api_node_update($node) {;
     }
 
     // Look for changes in any of the reference fields.
-    $items_to_update_cers = [];
 
     if (isset($content_type_properties['relationships'])) {
       foreach ($content_type_properties['relationships'] as $relationship) {
+        $items_to_update_cers[$relationship] = [];
 
         $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+        $refs_added = [];
+        $refs_deleted = [];
 
         $old_refs = [];
         if (isset($node->original)) {
@@ -121,8 +139,8 @@ function ma_search_api_node_update($node) {;
           # dpm($items_to_reindex, 'items to reindex after a changed relationship');
         }
 
-        if ($relationship == 'field_related_content') {
-          $items_to_update_cers = array_merge($items_to_update_cers, $refs_added, $refs_deleted);
+        if (in_array($relationship, $custom_cer_fields)) {
+          $items_to_update_cers[$relationship] = array_merge($items_to_update_cers[$relationship], $refs_added, $refs_deleted);
         }
       }
     }
@@ -132,51 +150,57 @@ function ma_search_api_node_update($node) {;
     if (is_null($original_node_being_updated)) {
       $original_node_being_updated = $node->nid;
     }
-    if (count($items_to_update_cers)) {
-      foreach ($items_to_update_cers as $items_to_update_cer) {
-        if ($items_to_update_cer == $original_node_being_updated) {
-          continue; // Do not update the original node being updated.
-        }
-        $query = new EntityFieldQueryExtraFields();
-        $query->entityCondition('entity_type', 'node')
-          ->fieldCondition('field_related_content', 'target_id', [$items_to_update_cer]);
-        $result = $query->execute();
-        $new_refs = isset($result['node']) ? array_keys($result['node']) : [];
-        foreach ($new_refs as $key => $new_ref) {
-          $new_refs[$key] = (string) $new_refs[$key]; // convert $new_refs to string values to match $old_refs format.
-        }
-        $new_refs_numerically_sorted = $new_refs;
-        $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
-        if (isset($nuw->field_related_content)) {
-          $old_refs_numerically_sorted = $old_refs = $nuw->field_related_content->raw();
-          sort($old_refs_numerically_sorted);
-          if ($old_refs_numerically_sorted != $new_refs_numerically_sorted) {
+    $nids_to_resave = [];
+    foreach ($items_to_update_cers as $custom_cer_field => $items_to_update_cers_nids) {
+      if (count($items_to_update_cers_nids)) {
+        foreach ($items_to_update_cers_nids as $items_to_update_cer) {
+          if ($items_to_update_cer == $original_node_being_updated) {
+            continue; // Do not update the original node being updated.
+          }
+          $query = new EntityFieldQueryExtraFields();
+          $query->entityCondition('entity_type', 'node')
+            ->fieldCondition($custom_cer_field, 'target_id', [$items_to_update_cer]);
+          $result = $query->execute();
+          $new_refs = isset($result['node']) ? array_keys($result['node']) : [];
+          foreach ($new_refs as $key => $new_ref) {
+            $new_refs[$key] = (string) $new_refs[$key]; // convert $new_refs to string values to match $old_refs format.
+          }
+          $new_refs_numerically_sorted = $new_refs;
+          $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
+          $target_field = $custom_cer_fields[$custom_cer_field];
+          if (isset($nuw->{$target_field})) {
+            $old_refs_numerically_sorted = $old_refs = $nuw->{$target_field}->raw();
+            sort($old_refs_numerically_sorted);
+            if ($old_refs_numerically_sorted != $new_refs_numerically_sorted) {
 
-            // Maintain the old ref ordering, adding any new refs to the bottom.
-            $new_refs_ordered = [];
-            if (count($old_refs)) {
-              foreach ($old_refs as $old_ref) {
-                if (in_array($old_ref, $new_refs)) {
-                  $new_refs_ordered[] = $old_ref;
-                  // https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
-                  foreach (array_keys($new_refs, $old_ref, TRUE) as $key) {
-                    unset($new_refs[$key]);
+              // Maintain the old ref ordering, adding any new refs to the bottom.
+              $new_refs_ordered = [];
+              if (count($old_refs)) {
+                foreach ($old_refs as $old_ref) {
+                  if (in_array($old_ref, $new_refs)) {
+                    $new_refs_ordered[] = $old_ref;
+                    // https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+                    foreach (array_keys($new_refs, $old_ref, TRUE) as $key) {
+                      unset($new_refs[$key]);
+                    }
                   }
                 }
               }
+              if (count($new_refs)) {
+                $new_refs_ordered = array_merge($new_refs_ordered, $new_refs);
+              }
+              $nuw->{$target_field}->set($new_refs_ordered);
+              $wrappers_to_resave[] = $nuw;
             }
-            if (count($new_refs)) {
-              $new_refs_ordered = array_merge($new_refs_ordered, $new_refs);
-            }
-
-            $nuw->field_related_content->set($new_refs_ordered);
-            $nuw->save();
+          }
+          else {
+            drupal_set_message('issue'); // TODO: investigate this if error occurs.
           }
         }
-        else {
-          drupal_set_message('issue'); // TODO: investigate this if error occurs.
-        }
       }
+    }
+    foreach ($wrappers_to_resave as $wrapper_to_resave) {
+      $wrapper_to_resave->save();
     }
 
     // Do the reindexing

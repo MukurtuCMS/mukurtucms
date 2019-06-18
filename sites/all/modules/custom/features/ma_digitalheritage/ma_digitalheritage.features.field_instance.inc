@@ -263,7 +263,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 65,
+      'weight' => 64,
     ),
   );
 
@@ -364,7 +364,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 66,
+      'weight' => 65,
     ),
   );
 
@@ -524,10 +524,12 @@ function ma_digitalheritage_field_default_field_instances() {
   // Exported field_instance: 'node-digital_heritage-field_collection'.
   $field_instances['node-digital_heritage-field_collection'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'Collections are curated, narrated groups of Digital Heritage Items within a site. Collections can contain Digital Heritage Items from more than one Community, and each Digital Heritage Item can be displayed in multiple Collections. Select existing Collections from the dropdown menu, or begin typing the name of a Collection and use the autocomplete tool to select the desired Collection.',
+    'description' => 'Collections are curated, narrated groups of content within a site. Collections can contain content from more than one Community, and content can belong to multiple Collections. You can search for Collections by typing in this text box, then selecting the Collection. You can drag the Collections within this text box to change the order in which they will appear when viewing this Digital Heritage item.',
     'display' => array(
       'community_record' => array(
         'label' => 'above',
@@ -612,13 +614,20 @@ function ma_digitalheritage_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -727,7 +736,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'entityreference_autocomplete',
-      'weight' => 64,
+      'weight' => 63,
     ),
   );
 
@@ -3036,6 +3045,8 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   // 'node-digital_heritage-field_personal_collections'.
   $field_instances['node-digital_heritage-field_personal_collections'] = array(
     'bundle' => 'digital_heritage',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
@@ -3113,18 +3124,25 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 67,
+      'weight' => 62,
     ),
   );
 
@@ -4634,7 +4652,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
   t('Categories are high-level descriptive terms that group Digital Heritage Items together and help users browse and discover Digital Heritage Items. Categories are unique to each site and reflect the scope of the items included. One set of Categories is used to describe all Digital Heritage Items within the site. Each Digital Heritage Item must belong to at least one Category. Check the box beside each relevant Category. ');
   t('Category');
   t('Collections');
-  t('Collections are curated, narrated groups of Digital Heritage Items within a site. Collections can contain Digital Heritage Items from more than one Community, and each Digital Heritage Item can be displayed in multiple Collections. Select existing Collections from the dropdown menu, or begin typing the name of a Collection and use the autocomplete tool to select the desired Collection.');
+  t('Collections are curated, narrated groups of content within a site. Collections can contain content from more than one Community, and content can belong to multiple Collections. You can search for Collections by typing in this text box, then selecting the Collection. You can drag the Collections within this text box to change the order in which they will appear when viewing this Digital Heritage item.');
   t('Comment');
   t('Communities represent groups of contributors. Communities can be large or small. Contributions could be media assets, complete Digital Heritage Items, knowledge, metadata, or other contributions. Cultural Protocols are how Communities provide users specific types of access to Digital heritage Items. Each Cultural Protocol is created by and managed within a Community. Digital Heritage Items must belong to at least one Community and one Cultural Protocol within that Community. First select a Community from the dropdown menu, and then select the appropriate Cultural Protocol within that Community. Multiple Communities, and multiple Cultural Protocols within each Community can be selected.');
   t('Community');

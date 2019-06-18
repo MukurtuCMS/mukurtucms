@@ -314,9 +314,10 @@ function ma_digitalheritage_field_group_info() {
     'children' => array(
       0 => 'field_book_children',
       1 => 'field_book_parent',
-      2 => 'field_community_record_children',
-      3 => 'field_personal_collections',
-      4 => 'field_related_content',
+      2 => 'field_collection',
+      3 => 'field_community_record_children',
+      4 => 'field_personal_collections',
+      5 => 'field_related_content',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

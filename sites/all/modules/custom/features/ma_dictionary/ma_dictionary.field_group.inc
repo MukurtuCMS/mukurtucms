@@ -92,6 +92,8 @@ function ma_dictionary_field_group_info() {
       0 => 'field_item_privacy_setting',
       1 => 'og_group_ref',
       2 => 'field_related_content',
+      3 => 'field_collection',
+      4 => 'field_personal_collections',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -176,8 +178,9 @@ function ma_dictionary_field_group_info() {
     'label' => 'Tabs',
     'weight' => '1',
     'children' => array(
-      0 => 'group_basic',
-      1 => 'group_words',
+      0 => 'group_word_list_relations',
+      1 => 'group_basic',
+      2 => 'group_words',
     ),
     'format_type' => 'htabs',
     'format_settings' => array(
@@ -288,6 +291,36 @@ function ma_dictionary_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_word_list_relations|node|word_list|form';
+  $field_group->group_name = 'group_word_list_relations';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'word_list';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_tabs';
+  $field_group->data = array(
+    'label' => 'Relations',
+    'weight' => '8',
+    'children' => array(
+      0 => 'field_related_content',
+      1 => 'field_collection',
+      2 => 'field_personal_collections',
+    ),
+    'format_type' => 'htab',
+    'format_settings' => array(
+      'label' => 'Relations',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-word-list-relations field-group-htab',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $field_groups['group_word_list_relations|node|word_list|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_word_teasers|paragraphs_item|dictionary_word_bundle|word_entry_in_word_list';
   $field_group->group_name = 'group_word_teasers';
   $field_group->entity_type = 'paragraphs_item';
@@ -324,7 +357,7 @@ function ma_dictionary_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Words',
-    'weight' => '8',
+    'weight' => '7',
     'children' => array(
       0 => 'field_words',
     ),
