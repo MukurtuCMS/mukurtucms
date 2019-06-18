@@ -291,7 +291,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 28,
+        'weight' => 31,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -361,7 +361,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 31,
+        'weight' => 34,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -427,7 +427,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 26,
+        'weight' => 29,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -556,7 +556,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 29,
+        'weight' => 32,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -602,10 +602,12 @@ function ma_collection_field_default_field_instances() {
   // Exported field_instance: 'node-collection-field_digital_heritage_items'.
   $field_instances['node-collection-field_digital_heritage_items'] = array(
     'bundle' => 'collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Collection.',
     'display' => array(
       'collections_browse' => array(
         'label' => 'above',
@@ -615,8 +617,11 @@ function ma_collection_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 24,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 5,
       ),
       'featured_content' => array(
@@ -641,7 +646,7 @@ function ma_collection_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_digital_heritage_items',
-    'label' => 'Digital Heritage Items',
+    'label' => 'Items in Collection',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -651,19 +656,24 @@ function ma_collection_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
-        'apply_chosen' => 1,
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
+        'apply_chosen' => 0,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 4,
     ),
   );
@@ -689,7 +699,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 32,
+        'weight' => 35,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -727,7 +737,7 @@ function ma_collection_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 15,
+      'weight' => 7,
     ),
   );
 
@@ -752,7 +762,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 30,
+        'weight' => 33,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -814,7 +824,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'items_per_page' => 24,
+          'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 6,
@@ -869,7 +879,7 @@ function ma_collection_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 12,
+      'weight' => 5,
     ),
   );
 
@@ -890,7 +900,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 33,
+        'weight' => 36,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -953,7 +963,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 27,
+        'weight' => 30,
       ),
       'featured_content' => array(
         'label' => 'above',
@@ -1010,7 +1020,7 @@ function ma_collection_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 14,
+      'weight' => 6,
     ),
   );
 
@@ -1486,6 +1496,7 @@ function ma_collection_field_default_field_instances() {
   t('Digital Heritage Items');
   t('Image');
   t('Item Sharing Settings');
+  t('Items in Collection');
   t('Keywords');
   t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.');
   t('Personal Collections are listed on your <a href=\'/user\'>user profile page</a>. Private Personal Collections are only listed when viewing your own profile page. Public Personal Collections are listed for anyone viewing your profile page. Logged in users have permission to view your profile page. Non-logged in users can also view your Public Personal Collection if you provide them a direct link. Note that regardless of this setting the items within the Personal Collection have their own permissions, which further restricts what people can see based on their own roles and Cultural Protocol memberships.');

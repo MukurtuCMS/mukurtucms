@@ -146,9 +146,10 @@ function ma_collection_field_group_info() {
     'label' => 'Relations',
     'weight' => '2',
     'children' => array(
-      0 => 'field_item_privacy_setting',
-      1 => 'og_group_ref',
-      2 => 'field_related_content',
+      0 => 'field_digital_heritage_items',
+      1 => 'field_item_privacy_setting',
+      2 => 'og_group_ref',
+      3 => 'field_related_content',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

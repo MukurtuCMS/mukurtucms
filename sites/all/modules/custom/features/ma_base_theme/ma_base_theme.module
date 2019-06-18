@@ -375,7 +375,6 @@ function ma_base_theme_copy_related_content() {
     'field_collection',
     'field_related_dictionary_words',
     'field_related_dh_items',
-    'field_digital_heritage_items',
     'field_dictionary_word_related_dh',
     'field_related_dictionary_words',
     'field_word_list',
