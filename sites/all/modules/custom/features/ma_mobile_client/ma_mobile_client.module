@@ -800,6 +800,7 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
  *  - paragraphs at top-level and within fieldgroups
  *  - field collections at top-level (tested) and within fieldgroups (not tested)
  *  - rendered entity fields at top-level (tested) and within fieldgroups (not yet tested) and within field collections (not tested)
+ *  - scald fields (and its metadata fields)_ at the top-level (tested) and within fieldgroups (not tested)
  *
  * Does not work for (currently not needed):
  *  - fieldgroups within fieldgroups
@@ -888,6 +889,36 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_
 
     }
 
+    // For scald fields, add its metadata fields, keyed by scald type.
+    if ($field_array["view_mode_properties"]["module"] == 'atom_reference') {
+      $referencable_types = $field_array["other_properties"]["settings"]["referencable_types"];
+      $referenced_types = [];
+      foreach ($referencable_types as $referencable_type_key => $referencable_type_value) {
+        if ($referencable_type_key === $referencable_type_value) {
+          $referenced_types[] = $referencable_type_value;
+        }
+      }
+      if (count($referenced_types == 0)) {
+        $referenced_types = array_keys($referencable_types); // If none are selected in the field formatter, it actually means all are options.
+      }
+      foreach ($referenced_types as $referenced_type) {
+        $referenced_type_field_groups = field_group_info_groups('scald_atom', $referenced_type, $field_array["view_mode_properties"]["type"]);
+        if (!$scald_metadata_fields = $referenced_type_field_groups["group_scald_atom_metadata"]->children) {
+          return 'Error: the content type has a scald field with a scald view mode that needs a "Metadata" fieldgroup.';
+        }
+        $atom_fields_per_type = field_info_instances('scald_atom', $referenced_type);
+        foreach ($atom_fields_per_type as $atom_field => $atom_field_properties) {
+          if (in_array($atom_field, $scald_metadata_fields)) {
+            $atom_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($atom_field_properties, $field_array["view_mode_properties"]["type"], 'scald_atom');
+            if (!$atom_field_array) {
+              continue;
+            }
+            $field_array['atom_metadata_fields'][$referenced_type][$atom_field] = $atom_field_array;
+          }
+        }
+      }
+    }
+
     // Fields within fieldgroups get added here.
     if (array_key_exists($field, $all_field_group_fields)) {
       $structured_view[$all_field_group_fields[$field]]['fields'][$field] = $field_array;
@@ -903,6 +934,13 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_
   foreach ($structured_view as $name => $properties) {
     if (isset($properties['fields'])) {
       uasort ($structured_view[$name]['fields'], 'drupal_sort_weight');
+    }
+    else {
+      if (isset($properties['atom_metadata_fields'])) {
+        foreach ($properties['atom_metadata_fields'] as $referenced_type => $referenced_type_fields) {
+          uasort($structured_view[$name]['atom_metadata_fields'][$referenced_type], 'drupal_sort_weight');
+        }
+      }
     }
   }
 
@@ -1023,7 +1061,7 @@ function _ma_mobile_client_get_list_view_fields ($fn, $content_type, $skip_type_
  * Called from _ma_mobile_client_get_node_view_fields() and _ma_mobile_client_get_list_view_fields().
  * Broken out into a separate function because it can be called within a nested loop.
  */
-function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties, $view_mode = 'mukurtu_mobile') {
+function _ma_mobile_client_build_field_arrays_from_field_properties($field_properties, $view_mode = 'mukurtu_mobile', $entity_type = 'node' ) {
   if (!$view_mode_properties = $field_properties['display'][$view_mode]) {
     return;
   }
@@ -1031,7 +1069,7 @@ function _ma_mobile_client_build_field_arrays_from_field_properties($field_prope
     return;
   }
   unset ($field_properties['display']);
-  $ds_layout = ds_get_layout('node', $field_properties["bundle"], $view_mode, FALSE);
+  $ds_layout = ds_get_layout($entity_type, $field_properties["bundle"], $view_mode, FALSE);
   if (isset($ds_layout["settings"]["limit"][$field_properties["field_name"]])) {
     $view_mode_properties['limit'] = $ds_layout["settings"]["limit"][$field_properties["field_name"]];
   }
