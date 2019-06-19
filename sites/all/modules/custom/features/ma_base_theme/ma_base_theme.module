@@ -372,7 +372,6 @@ function _ma_base_theme_set_default_browse($page = 'digital-heritage') {
  */
 function ma_base_theme_copy_related_content() {
   $fields = [
-    'field_collection',
     'field_related_dictionary_words',
     'field_related_dh_items',
     'field_dictionary_word_related_dh',
