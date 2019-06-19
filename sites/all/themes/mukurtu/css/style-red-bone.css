@@ -10592,6 +10592,11 @@ body #admin-menu {
   margin-left: auto;
   margin-right: auto;
 }
+.node-personal-collection.view-mode-full .field-name-field-related-content,
+.node-word-list.view-mode-full .field-name-field-related-content,
+.node-collection.view-mode-full .field-name-field-related-content {
+  clear: both;
+}
 .node-personal-collection.view-mode-full .field-name-collections-tree,
 .node-word-list.view-mode-full .field-name-collections-tree,
 .node-collection.view-mode-full .field-name-collections-tree {

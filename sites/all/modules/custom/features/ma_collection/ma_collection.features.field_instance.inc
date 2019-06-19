@@ -1257,15 +1257,20 @@ function ma_collection_field_default_field_instances() {
   // 'node-personal_collection-field_digital_heritage_items'.
   $field_instances['node-personal_collection-field_digital_heritage_items'] = array(
     'bundle' => 'personal_collection',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',
     'display' => array(
       'default' => array(
-        'label' => 'hidden',
-        'settings' => array(),
-        'type' => 'hidden',
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 24,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
         'weight' => 5,
       ),
       'search_result' => array(
@@ -1284,7 +1289,7 @@ function ma_collection_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_digital_heritage_items',
-    'label' => 'Digital Heritage Items',
+    'label' => 'Items In Personal Collection',
     'required' => 0,
     'settings' => array(
       'behaviors' => array(
@@ -1294,13 +1299,21 @@ function ma_collection_field_default_field_instances() {
       ),
       'custom_add_another' => '',
       'custom_remove' => '',
+      'select2_integration' => array(
+        'hide_id' => 0,
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
       'module' => 'entityreference',
       'settings' => array(
-        'apply_chosen' => 1,
+        'apply_chosen' => 0,
         'match_operator' => 'CONTAINS',
         'path' => '',
         'size' => 60,
@@ -1426,7 +1439,7 @@ function ma_collection_field_default_field_instances() {
         'label' => 'above',
         'module' => 'mukurtu_related_items_formatter',
         'settings' => array(
-          'items_per_page' => 10,
+          'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 6,
@@ -1493,9 +1506,9 @@ function ma_collection_field_default_field_instances() {
   t('Credit');
   t('Description');
   t('Digital Heritage Count');
-  t('Digital Heritage Items');
   t('Image');
   t('Item Sharing Settings');
+  t('Items In Personal Collection');
   t('Items in Collection');
   t('Keywords');
   t('Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.');

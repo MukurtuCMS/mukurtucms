@@ -204,6 +204,16 @@ function ma_collection_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_digital_heritage_items' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_related_content' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|personal_collection|default'] = $ds_fieldsetting;
 
@@ -674,7 +684,8 @@ function ma_collection_ds_layout_settings_info() {
         4 => 'field_description',
       ),
       'bottom' => array(
-        5 => 'field_related_content',
+        5 => 'field_digital_heritage_items',
+        6 => 'field_related_content',
       ),
     ),
     'fields' => array(
@@ -683,6 +694,7 @@ function ma_collection_ds_layout_settings_info() {
       'field_personal_coll_privacy' => 'top',
       'field_collection_summary' => 'top',
       'field_description' => 'top',
+      'field_digital_heritage_items' => 'bottom',
       'field_related_content' => 'bottom',
     ),
     'classes' => array(
