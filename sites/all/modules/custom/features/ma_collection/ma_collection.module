@@ -484,17 +484,21 @@ function ma_collection_contextual_links_view_alter(&$element, $items) {
 }
 
 /**
- * "Add to Collection" form.
+ * "Add to Collection" and "Add to Personal Collection" forms.
  */
-function ma_collection_add_to_collection_form($form, $form_state) {
+function ma_collection_add_to_collection_form($form, $form_state, $type = 'collection') {
 
   $nid_to_add = $form_state['nid_to_add'];
 
   // Build an array of collections.
 
   // First option is to create a new collection.
+  $type_name = [
+    'collection' => 'Collection',
+    'personal_collection' => 'Personal Collection',
+  ];
   $colls = [
-    'create_new_collection' => 'Create a new Collection'
+    'create_new_collection' => 'Create a new ' . $type_name[$type]
   ];
 
   // First get collections that already have this node in it, so we can exclude them later.
@@ -503,7 +507,7 @@ function ma_collection_add_to_collection_form($form, $form_state) {
   foreach ($valid_collection_types as $node_type) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'collection')
+      ->entityCondition('bundle', $type)
       ->fieldCondition('field_digital_heritage_items', 'target_id', $nid_to_add);
     $result = $query->execute();
     if (isset($result['node'])) {
@@ -514,7 +518,7 @@ function ma_collection_add_to_collection_form($form, $form_state) {
   // Get the collections.
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'collection')
+    ->entityCondition('bundle', $type)
     ->propertyCondition('status', NODE_PUBLISHED);
   $result = $query->execute();
   if (isset($result['node'])) {
@@ -535,7 +539,7 @@ function ma_collection_add_to_collection_form($form, $form_state) {
 
   // Build the form.
   $form['collection'] = [
-    '#title' => t('Add Item to Collection'),
+    '#title' => t('Add Item to ' . $type_name[$type]),
     '#type' => 'select',
     '#options' => $colls,
     '#chosen' => TRUE,
@@ -559,74 +563,11 @@ function ma_collection_add_to_collection_form($form, $form_state) {
  * "Add to Personal Collection" form.
  */
 function ma_collection_add_to_personal_collection_form($form, $form_state) {
-
-  $nid_to_add = $form_state['nid_to_add'];
-
-  // Build an array of personal collections.
-
-  // First option is to create a new collection.
-  $personal_colls = [
-    'create_new_collection' => 'Create a new Personal Collection'
-  ];
-
-  // First get collections that already have this node in it, so we can exclude them later.
-  $colls_to_exclude = array();
-  $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
-  foreach ($valid_collection_types as $node_type) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'collection')
-      ->fieldCondition('field_digital_heritage_items', 'target_id', $nid_to_add);
-    $result = $query->execute();
-    if (isset($result['node'])) {
-      $colls_to_exclude = array_keys($result['node']);
-    }
-  }
-
-  // Get the collections.
-  global $user;
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'personal_collection')
-    ->propertyCondition('status', NODE_PUBLISHED)
-    ->propertyCondition('uid', $user->uid);
-
-  $result = $query->execute();
-  if (isset($result['node'])) {
-    $coll_nids = array_keys($result['node']);
-    foreach ($coll_nids as $coll_nid) {
-      if (in_array($coll_nid, $colls_to_exclude)) {
-        continue;
-      }
-      $coll_node = node_load($coll_nid);
-      $personal_colls[$coll_nid] = $coll_node->title;
-    }
-  }
-
-  // Build the form.
-
-  $form['collection'] = [
-    '#title' => t('Add Item to Personal Collection'),
-    '#type' => 'select',
-    '#options' => $personal_colls,
-    '#chosen' => TRUE,
-  ];
-  $form['actions'] = [
-    'submit' => [
-      '#type' => 'submit',
-      '#value' => t('Add'),
-    ],
-    'cancel' => [
-      '#type' => 'submit',
-      '#value' => t('Cancel'),
-    ],
-  ];
-
-  return $form;
+  return ma_collection_add_to_collection_form ($form, $form_state, 'personal_collection');
 }
 
 /**
- * Add to Collection form submit handler.
+ * Add to Collection / Personal Collection form submit handler.
  */
 function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $personal = 0) {
 
