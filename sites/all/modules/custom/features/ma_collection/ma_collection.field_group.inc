@@ -274,7 +274,8 @@ function ma_collection_field_group_info() {
     'label' => 'Relations',
     'weight' => '15',
     'children' => array(
-      0 => 'field_related_content',
+      0 => 'field_digital_heritage_items',
+      1 => 'field_related_content',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

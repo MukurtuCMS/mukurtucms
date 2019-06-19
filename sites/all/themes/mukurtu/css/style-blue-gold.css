@@ -8034,7 +8034,9 @@ footer header {
   overflow: visible;
 }
 .page-node-add.node-type-collection .field-name-field-digital-heritage-items,
-.page-node-edit.node-type-collection .field-name-field-digital-heritage-items {
+.page-node-edit.node-type-collection .field-name-field-digital-heritage-items,
+.page-node-add.node-type-personal-collection .field-name-field-digital-heritage-items,
+.page-node-edit.node-type-personal-collection .field-name-field-digital-heritage-items {
   height: auto !important;
 }
 .page-node-add #edit-oggroup-fieldset-body .form-item .input-group,

@@ -607,7 +607,7 @@ function ma_collection_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Collection.',
+    'description' => 'You can search for content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Collection.',
     'display' => array(
       'collections_browse' => array(
         'label' => 'above',
@@ -1262,7 +1262,7 @@ function ma_collection_field_default_field_instances() {
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => '',
+    'description' => 'You can search for content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Personal Collection.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1300,7 +1300,6 @@ function ma_collection_field_default_field_instances() {
       'custom_add_another' => '',
       'custom_remove' => '',
       'select2_integration' => array(
-        'hide_id' => 0,
         'styling' => array(
           'dropdownAutoWidth' => 0,
           'placeholder' => '',
@@ -1311,15 +1310,13 @@ function ma_collection_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'entityreference',
+      'module' => 'options',
       'settings' => array(
         'apply_chosen' => 0,
-        'match_operator' => 'CONTAINS',
-        'path' => '',
-        'size' => 60,
         'treeable' => 0,
+        'use_select2' => FALSE,
       ),
-      'type' => 'entityreference_autocomplete',
+      'type' => 'options_select',
       'weight' => 4,
     ),
   );
@@ -1488,7 +1485,7 @@ function ma_collection_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 5,
     ),
   );
 
@@ -1523,6 +1520,8 @@ function ma_collection_field_default_field_instances() {
 ');
   t('Top-level collection');
   t('You are allowed to drag items from the media library into this field. For this to work, there must be some content below where you place the item (even just a blank line). The media item will be inserted, along with a line of text showing its title and author (which you may choose to remove). Note, certain media types (eg. audio, Youtube video) do not render well or at all within the edit box, but show correctly within the content view. If you wish to visualize or adjust the placement of such media items, try switching to the plain text editor.');
+  t('You can search for content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Collection.');
+  t('You can search for content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Personal Collection.');
   t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Collection.');
   t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Personal Collection.');
 
