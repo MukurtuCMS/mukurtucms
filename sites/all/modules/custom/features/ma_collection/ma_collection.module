@@ -617,16 +617,21 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $pers
 
         // Display confirmation message.
         // EntityDrupalWrapper::save throws an exception if it fails, so if we get here, we know it worked.
-        $collection_type = "Collection";
         if ($personal) {
-          $collection_type = "Personal Collection";
+          $output = '<p><i>' . $node_to_add->title . '</i> has been added to Personal Collection <i>' . $coll_node->title . '</i>.</p>';
+          $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
+          $ctools_output[] = ajax_command_invoke("#star-{$nid_to_add}", 'mukurtuToggleStarOn');
+          $ctools_output[] = ctools_modal_command_display('Success', $output);
+          print ajax_render($ctools_output);
+          exit;
         }
-        $output = '<p><i>' . $node_to_add->title . '</i> has been added to ' . $collection_type . ' <i>' . $coll_node->title . '</i>.</p>';
-        $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
-        $ctools_output[] = ajax_command_invoke("#star-{$nid_to_add}", 'mukurtuToggleStarOn');
-        $ctools_output[] = ctools_modal_command_display('Success', $output);
-        print ajax_render($ctools_output);
-        exit;
+        else {
+          // For nodes added to a Collection, we reload the whole node because the Collections field will have a new entry in it and we want the node view to reflect that.
+          drupal_set_message('<i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.');
+          $commands[] = ctools_ajax_command_redirect('/node/' . $nid_to_add);
+          print ajax_render($commands);
+          exit;
+        }
 
       }
     }
