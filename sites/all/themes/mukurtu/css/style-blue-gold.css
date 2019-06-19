@@ -9655,6 +9655,10 @@ body #admin-menu {
 .view-mode-mukurtu_scald_related_items img {
   margin: auto;
 }
+.view-mode-full .field-name-mukurtu-icon-actions {
+  float: right;
+  margin-top: -25px;
+}
 .view-mukurtu-frontpage-browse-by-community {
   padding-bottom: 30px;
 }
@@ -9993,10 +9997,6 @@ body #admin-menu {
 #views-exposed-form-browse-all-content-all .views-submit-button button,
 #views-exposed-form-digital-heritage-grid-list-all .views-submit-button button {
   margin-top: 0px;
-}
-.node-digital-heritage.view-mode-full .field-name-mukurtu-icon-actions {
-  float: right;
-  margin-top: -25px;
 }
 .large-teaser-image,
 .large-teaser-box {

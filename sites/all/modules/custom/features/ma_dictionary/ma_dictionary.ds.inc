@@ -48,6 +48,11 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
+    'mukurtu_icon_actions' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'field_additional_media' => array(
       'formatter_settings' => array(
         'ft' => array(
@@ -67,11 +72,6 @@ function ma_dictionary_ds_field_settings_info() {
         'ft' => array(
           'func' => 'theme_field',
         ),
-      ),
-    ),
-    'field_collection' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
       ),
     ),
   );
@@ -213,13 +213,18 @@ function ma_dictionary_ds_field_settings_info() {
   $ds_fieldsetting->bundle = 'word_list';
   $ds_fieldsetting->view_mode = 'full';
   $ds_fieldsetting->settings = array(
+    'mukurtu_icon_actions' => array(
+      'weight' => '0',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
     'title' => array(
-      'weight' => '1',
+      'weight' => '2',
       'label' => 'hidden',
       'format' => 'default',
     ),
     'comments' => array(
-      'weight' => '8',
+      'weight' => '9',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -494,25 +499,29 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->layout = 'bootstrap_6_6_stacked';
   $ds_layout->settings = array(
     'regions' => array(
+      'top' => array(
+        0 => 'mukurtu_icon_actions',
+      ),
       'left' => array(
-        0 => 'field_word_entry',
+        1 => 'field_word_entry',
       ),
       'right' => array(
-        1 => 'field_dictionary_word_language',
-        2 => 'extracted_dh_from_relationships',
-        3 => 'extracted_dw_from_relationships',
-        4 => 'field_community_ref',
-        5 => 'og_group_ref',
-        6 => 'field_tags',
-        7 => 'field_collection',
-        8 => 'extracted_wl_from_relationships',
+        2 => 'field_dictionary_word_language',
+        3 => 'extracted_dh_from_relationships',
+        4 => 'extracted_dw_from_relationships',
+        5 => 'field_community_ref',
+        6 => 'og_group_ref',
+        7 => 'field_tags',
+        8 => 'field_collection',
+        9 => 'extracted_wl_from_relationships',
       ),
       'bottom' => array(
-        9 => 'field_additional_media',
-        10 => 'field_related_content',
+        10 => 'field_additional_media',
+        11 => 'field_related_content',
       ),
     ),
     'fields' => array(
+      'mukurtu_icon_actions' => 'top',
       'field_word_entry' => 'left',
       'field_dictionary_word_language' => 'right',
       'extracted_dh_from_relationships' => 'right',
@@ -826,20 +835,22 @@ function ma_dictionary_ds_layout_settings_info() {
   $ds_layout->settings = array(
     'regions' => array(
       'top' => array(
-        0 => 'field_collection_image',
-        1 => 'title',
-        2 => 'field_collection_summary',
-        3 => 'field_collection_credit',
-        4 => 'field_description',
-        5 => 'field_collection',
+        0 => 'mukurtu_icon_actions',
+        1 => 'field_collection_image',
+        2 => 'title',
+        3 => 'field_collection_summary',
+        4 => 'field_collection_credit',
+        5 => 'field_description',
+        6 => 'field_collection',
       ),
       'bottom' => array(
-        6 => 'field_words',
-        7 => 'field_related_content',
-        8 => 'comments',
+        7 => 'field_words',
+        8 => 'field_related_content',
+        9 => 'comments',
       ),
     ),
     'fields' => array(
+      'mukurtu_icon_actions' => 'top',
       'field_collection_image' => 'top',
       'title' => 'top',
       'field_collection_summary' => 'top',

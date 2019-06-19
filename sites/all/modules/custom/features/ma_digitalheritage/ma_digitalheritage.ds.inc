@@ -435,12 +435,12 @@ if(isset($info[\'bundles\'][$type])) {
   $ds_field = new stdClass();
   $ds_field->api_version = 1;
   $ds_field->field = 'mukurtu_icon_actions';
-  $ds_field->label = 'Mukurtu Icon Actions';
+  $ds_field->label = 'Add to Personal Collection';
   $ds_field->field_type = 5;
   $ds_field->entities = array(
     'node' => 'node',
   );
-  $ds_field->ui_limit = 'digital_heritage|*';
+  $ds_field->ui_limit = '';
   $ds_field->properties = array(
     'code' => array(
       'value' => '<?php
