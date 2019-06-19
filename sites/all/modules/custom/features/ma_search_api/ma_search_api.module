@@ -547,3 +547,25 @@ function ma_search_api_sort_form_submit($form, $form_state){
     $_SESSION[arg(0) . '_custom_sort_order'] = $form_state['values']['sort'];
   }
 }
+
+
+/**
+ * Delete the CERs that are replaced with Custom CERs.
+ *
+ * This is called from ma_base_theme's hook_update.
+ */
+function ma_search_api_delete_deprecated_cers() {
+  $presets_to_delete = [
+    'node:collection:field_digital_heritage_items*node:digital_heritage:field_collection',
+    'node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections',
+    'node:dictionary_word:field_related_dictionary_words*node:dictionary_word:field_related_dictionary_words',
+    'node:dictionary_word:field_word_list*node:word_list:field_words',
+    'node:digital_heritage:field_related_dictionary_words*node:dictionary_word:field_dictionary_word_related_dh',
+    'node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items',
+  ];
+  foreach (entity_load('cer', FALSE) as $preset) {
+    if (in_array($preset->identifier, $presets_to_delete)) {
+      entity_delete('cer', $preset->pid);
+    }
+  }
+}
