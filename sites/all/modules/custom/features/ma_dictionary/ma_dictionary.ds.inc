@@ -69,6 +69,11 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
+    'field_collection' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|dictionary_word|default'] = $ds_fieldsetting;
 

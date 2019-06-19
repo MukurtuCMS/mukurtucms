@@ -821,7 +821,7 @@ return FALSE;';
   $handler->display->display_options['fields']['field_dictionary_word_language']['id'] = 'field_dictionary_word_language';
   $handler->display->display_options['fields']['field_dictionary_word_language']['table'] = 'field_data_field_dictionary_word_language';
   $handler->display->display_options['fields']['field_dictionary_word_language']['field'] = 'field_dictionary_word_language';
-  /* Field: Field: Tags */
+  /* Field: Field: Keywords */
   $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
   $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
   $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
@@ -928,7 +928,7 @@ return FALSE;';
     t('Dictionary'),
     t('Export Dictionary Words'),
     t('Language'),
-    t('Tags'),
+    t('Keywords'),
   );
   $export['export_digital_heritage'] = $view;
 
