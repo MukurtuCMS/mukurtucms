@@ -54,7 +54,10 @@ function ma_search_api_node_update($node) {;
 
   $custom_cer_fields = [
     'field_related_content' => 'field_related_content',
-    'field_digital_heritage_items' => 'field_collection',
+    'field_digital_heritage_items' => [
+      'collection' => 'field_collection',
+      'personal_collection' => 'field_personal_collections',
+    ],
     'field_collection' => 'field_digital_heritage_items',
   ];
 
@@ -67,6 +70,7 @@ function ma_search_api_node_update($node) {;
   $collectionable_types = ma_collection_get_valid_node_types_for_collection();
   foreach ($collectionable_types as $collectionable_type) {
     $relations[$collectionable_type]['relationships'][] = 'field_collection';
+    $relations[$collectionable_type]['relationships'][] = 'field_personal_collections';
   }
   $collection_items_field = field_info_field('field_digital_heritage_items');
   $collection_types = $collection_items_field["bundles"]["node"];
@@ -139,7 +143,7 @@ function ma_search_api_node_update($node) {;
           # dpm($items_to_reindex, 'items to reindex after a changed relationship');
         }
 
-        if (in_array($relationship, $custom_cer_fields)) {
+        if (in_array_r($relationship, $custom_cer_fields)) {
           $items_to_update_cers[$relationship] = array_merge($items_to_update_cers[$relationship], $refs_added, $refs_deleted);
         }
       }
@@ -168,6 +172,9 @@ function ma_search_api_node_update($node) {;
           $new_refs_numerically_sorted = $new_refs;
           $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
           $target_field = $custom_cer_fields[$custom_cer_field];
+          if (is_array($target_field)) {
+            $target_field = $target_field[$node->type];
+          }
           if (isset($nuw->{$target_field})) {
             $old_refs_numerically_sorted = $old_refs = $nuw->{$target_field}->raw();
             sort($old_refs_numerically_sorted);
@@ -211,6 +218,20 @@ function ma_search_api_node_update($node) {;
     }
 
   }
+}
+
+/**
+ * Recursive in_array helper.
+ * https://stackoverflow.com/questions/4128323/in-array-and-multidimensional-array
+ */
+function in_array_r($needle, $haystack, $strict = false) {
+  foreach ($haystack as $item) {
+    if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
