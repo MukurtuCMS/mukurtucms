@@ -493,6 +493,12 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 2,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
     ),
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
@@ -1359,6 +1365,12 @@ function ma_lesson_plan_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 3,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1839,6 +1851,12 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 9,
       ),
       'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',

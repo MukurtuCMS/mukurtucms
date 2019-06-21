@@ -320,6 +320,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -863,6 +869,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1006,6 +1018,12 @@ function ma_dictionary_field_default_field_instances() {
         'weight' => 0,
       ),
       'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
@@ -1731,6 +1749,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'textformatter_list',
         'weight' => 6,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2131,6 +2155,12 @@ function ma_dictionary_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 32,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -2283,6 +2313,12 @@ function ma_dictionary_field_default_field_instances() {
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 8,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
       ),
       'search_result' => array(
         'label' => 'above',

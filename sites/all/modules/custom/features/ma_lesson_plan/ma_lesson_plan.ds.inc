@@ -440,6 +440,45 @@ function ma_lesson_plan_ds_layout_settings_info() {
 
   $ds_layout = new stdClass();
   $ds_layout->api_version = 1;
+  $ds_layout->id = 'field_collection_item|field_lesson_micro_tasks|mukurtu_mobile';
+  $ds_layout->entity_type = 'field_collection_item';
+  $ds_layout->bundle = 'field_lesson_micro_tasks';
+  $ds_layout->view_mode = 'mukurtu_mobile';
+  $ds_layout->layout = 'ds_1col';
+  $ds_layout->settings = array(
+    'regions' => array(
+      'ds_content' => array(
+        0 => 'field_task',
+        1 => 'field_key_student_outcomes',
+        2 => 'field_related_dh_items',
+        3 => 'field_word_list',
+      ),
+    ),
+    'fields' => array(
+      'field_task' => 'ds_content',
+      'field_key_student_outcomes' => 'ds_content',
+      'field_related_dh_items' => 'ds_content',
+      'field_word_list' => 'ds_content',
+    ),
+    'classes' => array(
+      'layout_class' => array(
+        '' => '',
+      ),
+    ),
+    'wrappers' => array(
+      'ds_content' => 'div',
+    ),
+    'layout_wrapper' => 'div',
+    'layout_attributes' => '',
+    'layout_attributes_merge' => 1,
+    'layout_link_attribute' => '',
+    'layout_link_custom' => '',
+    'layout_disable_css' => FALSE,
+  );
+  $export['field_collection_item|field_lesson_micro_tasks|mukurtu_mobile'] = $ds_layout;
+
+  $ds_layout = new stdClass();
+  $ds_layout->api_version = 1;
   $ds_layout->id = 'node|lesson|default';
   $ds_layout->entity_type = 'node';
   $ds_layout->bundle = 'lesson';

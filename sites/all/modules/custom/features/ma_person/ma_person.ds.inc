@@ -542,7 +542,7 @@ function ma_person_ds_layout_settings_info() {
       'field_tags' => 'ds_content',
       'field_media_aggregate' => 'hidden',
       'field_mukurtu_terms' => 'ds_content',
-      '_add_existing_field' => 'hidden',
+      '_add_existing_field' => 'ds_content',
       'field_related_people' => 'ds_content',
       'group_biographic' => 'ds_content',
       'field_related_content' => 'ds_content',
@@ -550,7 +550,6 @@ function ma_person_ds_layout_settings_info() {
       'field_collection' => 'ds_content',
       'field_personal_collections' => 'ds_content',
       'group_record_connections' => 'ds_content',
-      '_add_existing_field' => 'ds_content',
     ),
     'classes' => array(
       'layout_class' => array(

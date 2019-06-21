@@ -821,7 +821,6 @@ function ma_digitalheritage_ds_layout_settings_info() {
         10 => 'field_coverage_description',
         11 => 'field_related_content',
         12 => 'field_transcription',
-
       ),
       'top' => array(
         0 => 'mukurtu_mobile_sync',

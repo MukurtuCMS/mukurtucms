@@ -3759,6 +3759,12 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),

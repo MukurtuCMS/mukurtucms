@@ -48,6 +48,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -904,6 +910,12 @@ function ma_person_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'person_teaser' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1071,6 +1083,12 @@ function ma_person_field_default_field_instances() {
         'weight' => 9,
       ),
       'featured_content' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'mukurtu_mobile' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',

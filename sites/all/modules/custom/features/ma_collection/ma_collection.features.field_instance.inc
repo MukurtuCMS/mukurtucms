@@ -930,6 +930,12 @@ function ma_collection_field_default_field_instances() {
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_result' => array(
         'label' => 'above',
         'settings' => array(),
@@ -1610,6 +1616,12 @@ function ma_collection_field_default_field_instances() {
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 6,
+      ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
       ),
       'search_result' => array(
         'label' => 'above',
