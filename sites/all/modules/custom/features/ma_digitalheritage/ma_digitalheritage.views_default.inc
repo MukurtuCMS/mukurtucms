@@ -139,10 +139,10 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
   /* Relationship: Entity Reference: Referencing entity */
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['id'] = 'reverse_field_related_dh_items_node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['table'] = 'node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['field'] = 'reverse_field_related_dh_items_node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['required'] = TRUE;
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['id'] = 'reverse_field_related_content_node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['table'] = 'node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['field'] = 'reverse_field_related_content_node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['required'] = TRUE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -167,7 +167,7 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['arguments']['nid']['id'] = 'nid';
   $handler->display->display_options['arguments']['nid']['table'] = 'node';
   $handler->display->display_options['arguments']['nid']['field'] = 'nid';
-  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_related_dh_items_node';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_related_content_node';
   $handler->display->display_options['arguments']['nid']['default_action'] = 'default';
   $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'node';
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
@@ -206,7 +206,7 @@ function ma_digitalheritage_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('Content referencing Content from field_related_dh_items'),
+    t('Content referencing Content from field_related_content'),
     t('All'),
     t('Block'),
   );

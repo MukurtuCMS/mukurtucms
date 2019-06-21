@@ -311,10 +311,10 @@ function ma_lesson_plan_strongarm() {
           'weight' => '5',
         ),
         'path' => array(
-          'weight' => '2',
+          'weight' => '6',
         ),
         'redirect' => array(
-          'weight' => '3',
+          'weight' => '7',
         ),
       ),
       'display' => array(),

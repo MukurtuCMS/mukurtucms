@@ -93,3 +93,17 @@ function ma_base_theme_update_7003(&$sandbox) {
 //  );
 //  theme_disable ($themes_to_disable);
 //}
+
+/**
+ * Copy the entity references in the old related content fields to the new Related Content field.
+ */
+function ma_base_theme_update_7004() {
+  ma_base_theme_copy_related_content();
+}
+
+/**
+ * Delete the CERs that are replaced with Custom CERs
+ */
+function ma_base_theme_update_7005() {
+  ma_search_api_delete_deprecated_cers();
+}

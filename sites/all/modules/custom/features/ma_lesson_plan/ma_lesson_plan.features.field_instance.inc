@@ -474,6 +474,62 @@ function ma_lesson_plan_field_default_field_instances() {
   );
 
   // Exported field_instance:
+  // 'field_collection_item-field_lesson_micro_tasks-field_related_content'.
+  $field_instances['field_collection_item-field_lesson_micro_tasks-field_related_content'] = array(
+    'bundle' => 'field_lesson_micro_tasks',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Micro-Task.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 2,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'field_collection_item',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 2,
+    ),
+  );
+
+  // Exported field_instance:
   // 'field_collection_item-field_lesson_micro_tasks-field_related_dh_items'.
   $field_instances['field_collection_item-field_lesson_micro_tasks-field_related_dh_items'] = array(
     'bundle' => 'field_lesson_micro_tasks',
@@ -486,12 +542,9 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 2,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
       ),
       'full' => array(
         'label' => 'above',
@@ -553,7 +606,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -634,11 +687,8 @@ function ma_lesson_plan_field_default_field_instances() {
     'display' => array(
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
+        'settings' => array(),
+        'type' => 'hidden',
         'weight' => 3,
       ),
       'full' => array(
@@ -701,7 +751,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -809,13 +859,13 @@ function ma_lesson_plan_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'field_collection_fieldset_view',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 22,
+        'weight' => 24,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -843,7 +893,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'field_collection_fieldset_view',
-        'weight' => 5,
+        'weight' => 6,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -869,7 +919,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_embed',
-      'weight' => 8,
+      'weight' => 7,
     ),
   );
 
@@ -990,13 +1040,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 23,
+        'weight' => 25,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1015,7 +1065,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 6,
+        'weight' => 7,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1047,7 +1097,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 7,
+      'weight' => 6,
     ),
   );
 
@@ -1069,7 +1119,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 21,
+        'weight' => 23,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1139,13 +1189,13 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 7,
+        'weight' => 26,
       ),
       'full' => array(
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 24,
+        'weight' => 26,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1161,10 +1211,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'teacher_view' => array(
         'label' => 'above',
-        'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
-        'weight' => 23,
+        'type' => 'hidden',
+        'weight' => 25,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1195,15 +1244,15 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-lesson-field_related_dictionary_words'.
-  $field_instances['node-lesson-field_related_dictionary_words'] = array(
+  // Exported field_instance: 'node-lesson-field_related_content'.
+  $field_instances['node-lesson-field_related_content'] = array(
     'bundle' => 'lesson',
     'custom_add_another' => '',
     'custom_remove' => '',
     'default_value' => NULL,
     'default_value_function' => '',
     'deleted' => 0,
-    'description' => 'Key Terms, Phrases, Sentences',
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Lesson.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -1212,7 +1261,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'full' => array(
         'label' => 'above',
@@ -1221,7 +1270,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'items_per_page' => 5,
         ),
         'type' => 'mukurtu_related_items_formatter',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'mukurtu_mobile' => array(
         'label' => 'above',
@@ -1237,7 +1286,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 4,
+        'weight' => 0,
       ),
       'teacher_view' => array(
         'label' => 'above',
@@ -1247,6 +1296,80 @@ function ma_lesson_plan_field_default_field_instances() {
         ),
         'type' => 'mukurtu_related_items_formatter',
         'weight' => 4,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 5,
+    ),
+  );
+
+  // Exported field_instance: 'node-lesson-field_related_dictionary_words'.
+  $field_instances['node-lesson-field_related_dictionary_words'] = array(
+    'bundle' => 'lesson',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'Key Terms, Phrases, Sentences',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 3,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 4,
+      ),
+      'teacher_view' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1286,7 +1409,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 9,
     ),
   );
 
@@ -1311,12 +1434,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 12,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 13,
       ),
       'full' => array(
         'label' => 'above',
@@ -1338,12 +1458,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'teacher_view' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 11,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1383,7 +1500,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 15,
+      'weight' => 2,
     ),
   );
 
@@ -1436,7 +1553,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 19,
+        'weight' => 20,
       ),
       'full' => array(
         'label' => 'above',
@@ -1490,7 +1607,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1647,7 +1764,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 38,
+        'weight' => 40,
       ),
       'full' => array(
         'label' => 'above',
@@ -1671,7 +1788,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'label' => 'above',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 37,
+        'weight' => 39,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1702,6 +1819,88 @@ function ma_lesson_plan_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-unit_plan-field_related_content'.
+  $field_instances['node-unit_plan-field_related_content'] = array(
+    'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'default_value_function' => '',
+    'deleted' => 0,
+    'description' => 'You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Unit Plan.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 9,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teacher_view' => array(
+        'label' => 'above',
+        'module' => 'mukurtu_related_items_formatter',
+        'settings' => array(
+          'items_per_page' => 5,
+        ),
+        'type' => 'mukurtu_related_items_formatter',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'ds_extras_field_template' => '',
+    'entity_type' => 'node',
+    'field_name' => 'field_related_content',
+    'label' => 'Related Content',
+    'required' => 0,
+    'settings' => array(
+      'behaviors' => array(
+        'prepopulate' => array(
+          'status' => 0,
+        ),
+      ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'select2_integration' => array(
+        'styling' => array(
+          'dropdownAutoWidth' => 0,
+          'placeholder' => '',
+        ),
+        'use_select2' => 1,
+      ),
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'apply_chosen' => '',
+        'treeable' => 0,
+        'use_select2' => FALSE,
+      ),
+      'type' => 'options_select',
+      'weight' => 12,
+    ),
+  );
+
   // Exported field_instance: 'node-unit_plan-field_related_dh_items'.
   $field_instances['node-unit_plan-field_related_dh_items'] = array(
     'bundle' => 'unit_plan',
@@ -1723,12 +1922,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 9,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 10,
       ),
       'full' => array(
         'label' => 'above',
@@ -1750,12 +1946,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'teacher_view' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 8,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 9,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1795,7 +1988,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 12,
+      'weight' => 5,
     ),
   );
 
@@ -1820,12 +2013,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 10,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
       ),
       'full' => array(
         'label' => 'above',
@@ -1847,12 +2037,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'teacher_view' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 9,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 10,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -1892,7 +2079,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 13,
+      'weight' => 4,
     ),
   );
 
@@ -1997,7 +2184,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 18,
+        'weight' => 19,
       ),
       'full' => array(
         'label' => 'above',
@@ -2022,7 +2209,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2164,7 +2351,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'full' => array(
         'label' => 'above',
@@ -2190,7 +2377,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 14,
+        'weight' => 15,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2335,7 +2522,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'view_mode' => 'full',
         ),
         'type' => 'mukurtu_records_formatter',
-        'weight' => 21,
+        'weight' => 22,
       ),
       'full' => array(
         'label' => 'hidden',
@@ -2370,7 +2557,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'view_mode' => 'teacher_view',
         ),
         'type' => 'mukurtu_records_formatter',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2608,7 +2795,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 14,
+        'weight' => 15,
       ),
       'full' => array(
         'label' => 'above',
@@ -2634,7 +2821,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 13,
+        'weight' => 14,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2696,7 +2883,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 13,
+        'weight' => 14,
       ),
       'full' => array(
         'label' => 'above',
@@ -2722,7 +2909,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 12,
+        'weight' => 13,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2864,7 +3051,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 17,
+        'weight' => 18,
       ),
       'full' => array(
         'label' => 'above',
@@ -2889,7 +3076,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -2951,7 +3138,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 16,
+        'weight' => 17,
       ),
       'full' => array(
         'label' => 'above',
@@ -2976,7 +3163,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'module' => 'taxonomy',
         'settings' => array(),
         'type' => 'taxonomy_term_reference_link',
-        'weight' => 15,
+        'weight' => 16,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3038,12 +3225,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'default' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 11,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 12,
       ),
       'full' => array(
         'label' => 'above',
@@ -3065,12 +3249,9 @@ function ma_lesson_plan_field_default_field_instances() {
       ),
       'teacher_view' => array(
         'label' => 'above',
-        'module' => 'mukurtu_related_items_formatter',
-        'settings' => array(
-          'items_per_page' => 5,
-        ),
-        'type' => 'mukurtu_related_items_formatter',
-        'weight' => 10,
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 11,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3110,7 +3291,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 14,
+      'weight' => 3,
     ),
   );
 
@@ -3162,7 +3343,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 20,
+        'weight' => 21,
       ),
       'full' => array(
         'label' => 'above',
@@ -3201,7 +3382,7 @@ function ma_lesson_plan_field_default_field_instances() {
           'textformatter_type' => 'comma',
         ),
         'type' => 'textformatter_list',
-        'weight' => 19,
+        'weight' => 20,
       ),
       'teaser' => array(
         'label' => 'above',
@@ -3275,6 +3456,7 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Overarching');
   t('Pre-Actions');
   t('Protocol');
+  t('Related Content');
   t('Related Dictionary Words');
   t('Related Digital Heritage Items');
   t('Related Word Lists');
@@ -3286,6 +3468,9 @@ function ma_lesson_plan_field_default_field_instances() {
   t('Technology Integration');
   t('Unit Length');
   t('Week of');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Lesson.');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Micro-Task.');
+  t('You can search for related content by typing in this text box, then selecting the content. You can drag the selected content within this text box to change the order in which they will appear when viewing this Unit Plan.');
 
   return $field_instances;
 }

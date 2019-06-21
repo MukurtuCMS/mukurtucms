@@ -78,9 +78,6 @@
     // Type
     .field-name-featured-content-type {
         font-weight: bold;
-        font-size: 11px;
-        letter-spacing: @mukurtu-expanded-letter-spacing;
-        text-transform: uppercase;
 
         // Desktop
         @media (min-width: @screen-md-min) {
@@ -88,6 +85,31 @@
         }
     }
 }
+
+.list-view {
+    .view-mode-search_result,
+    .view-mode-teaser {
+        // Type
+        .field-name-featured-content-type {
+            letter-spacing: @mukurtu-expanded-letter-spacing;
+            text-transform: uppercase;
+        }
+    }
+}
+
+// For the search result teaser, do not show the content type if we are in a content-type specific view.
+.view-digital-heritage-grid-list,
+.view-collections-grid-list,
+.view-dictionary-words {
+    .view-mode-search_result,
+    .view-mode-teaser {
+        // Type
+        .field-name-featured-content-type {
+            display: none !important;
+        }
+    }
+}
+
 
 // Teaser specific
 .view-mode-teaser {
@@ -176,3 +198,12 @@
         margin: auto;
     }
 }
+
+
+.view-mode-full {
+    .field-name-mukurtu-icon-actions {
+        float: right;
+        margin-top: -25px;
+    }
+}
+

@@ -7885,12 +7885,14 @@ form.comment-form .comment-reply-post-button {
 }
 .item-grid-view .field-name-title,
 .item-grid-view .field-name-field-media-asset,
-.item-grid-view .field-name-scald-thumbnail {
+.item-grid-view .field-name-scald-thumbnail,
+.item-grid-view .field-name-featured-content-type {
   display: block;
 }
 .item-grid-view .field-name-title h2,
 .item-grid-view .field-name-field-media-asset h2,
-.item-grid-view .field-name-scald-thumbnail h2 {
+.item-grid-view .field-name-scald-thumbnail h2,
+.item-grid-view .field-name-featured-content-type h2 {
   font-size: 16px;
   font-weight: bold;
 }
@@ -8034,7 +8036,9 @@ footer header {
   overflow: visible;
 }
 .page-node-add.node-type-collection .field-name-field-digital-heritage-items,
-.page-node-edit.node-type-collection .field-name-field-digital-heritage-items {
+.page-node-edit.node-type-collection .field-name-field-digital-heritage-items,
+.page-node-add.node-type-personal-collection .field-name-field-digital-heritage-items,
+.page-node-edit.node-type-personal-collection .field-name-field-digital-heritage-items {
   height: auto !important;
 }
 .page-node-add #edit-oggroup-fieldset-body .form-item .input-group,
@@ -8043,6 +8047,9 @@ footer header {
 }
 .page-node-add .select2-container,
 .page-node-edit .select2-container {
+  display: block;
+}
+.select2-container {
   display: block;
 }
 .bean-hero-image-one-column .content {
@@ -9480,15 +9487,25 @@ body #admin-menu {
 .view-mode-search_result .field-name-featured-content-type,
 .view-mode-teaser .field-name-featured-content-type {
   font-weight: bold;
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
 }
 @media (min-width: 992px) {
   .view-mode-search_result .field-name-featured-content-type,
   .view-mode-teaser .field-name-featured-content-type {
     font-size: 13px;
   }
+}
+.list-view .view-mode-search_result .field-name-featured-content-type,
+.list-view .view-mode-teaser .field-name-featured-content-type {
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.view-digital-heritage-grid-list .view-mode-search_result .field-name-featured-content-type,
+.view-collections-grid-list .view-mode-search_result .field-name-featured-content-type,
+.view-dictionary-words .view-mode-search_result .field-name-featured-content-type,
+.view-digital-heritage-grid-list .view-mode-teaser .field-name-featured-content-type,
+.view-collections-grid-list .view-mode-teaser .field-name-featured-content-type,
+.view-dictionary-words .view-mode-teaser .field-name-featured-content-type {
+  display: none !important;
 }
 .view-mode-teaser {
   border-bottom: 5px solid #EEEAEA;
@@ -9564,12 +9581,14 @@ body #admin-menu {
 }
 .grid-view .view-mode-search_result .field-name-title,
 .grid-view .view-mode-search_result .field-name-field-media-asset,
-.grid-view .view-mode-search_result .field-name-scald-thumbnail {
+.grid-view .view-mode-search_result .field-name-scald-thumbnail,
+.grid-view .view-mode-search_result .field-name-featured-content-type {
   display: block;
 }
 .grid-view .view-mode-search_result .field-name-title h2,
 .grid-view .view-mode-search_result .field-name-field-media-asset h2,
-.grid-view .view-mode-search_result .field-name-scald-thumbnail h2 {
+.grid-view .view-mode-search_result .field-name-scald-thumbnail h2,
+.grid-view .view-mode-search_result .field-name-featured-content-type h2 {
   font-size: 16px;
   font-weight: bold;
 }
@@ -9641,6 +9660,10 @@ body #admin-menu {
 }
 .view-mode-mukurtu_scald_related_items img {
   margin: auto;
+}
+.view-mode-full .field-name-mukurtu-icon-actions {
+  float: right;
+  margin-top: -25px;
 }
 .view-mukurtu-frontpage-browse-by-community {
   padding-bottom: 30px;
@@ -9981,10 +10004,6 @@ body #admin-menu {
 #views-exposed-form-browse-all-content-all .views-submit-button button,
 #views-exposed-form-digital-heritage-grid-list-all .views-submit-button button {
   margin-top: 0px;
-}
-.node-digital-heritage.view-mode-full .field-name-mukurtu-icon-actions {
-  float: right;
-  margin-top: -25px;
 }
 .large-teaser-image,
 .large-teaser-box {
@@ -10412,6 +10431,33 @@ body #admin-menu {
 .node-collection.view-mode-full > div:nth-of-type(2) > div:first-of-type {
   padding-bottom: 50px;
 }
+.node-personal-collection.view-mode-full .col-sm-8 .field .label-above,
+.node-word-list.view-mode-full .col-sm-8 .field .label-above,
+.node-collection.view-mode-full .col-sm-8 .field .label-above,
+.node-personal-collection.view-mode-full .col-sm-12 .field .label-above,
+.node-word-list.view-mode-full .col-sm-12 .field .label-above,
+.node-collection.view-mode-full .col-sm-12 .field .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-personal-collection.view-mode-full .col-sm-8 .field .label-above,
+  .node-word-list.view-mode-full .col-sm-8 .field .label-above,
+  .node-collection.view-mode-full .col-sm-8 .field .label-above,
+  .node-personal-collection.view-mode-full .col-sm-12 .field .label-above,
+  .node-word-list.view-mode-full .col-sm-12 .field .label-above,
+  .node-collection.view-mode-full .col-sm-12 .field .label-above {
+    font-size: 18px;
+  }
+}
+.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items {
+  margin-bottom: 2em;
+}
 .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .label-above,
 .node-word-list.view-mode-full .field-name-field-digital-heritage-items .label-above,
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .label-above {
@@ -10478,7 +10524,10 @@ body #admin-menu {
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset,
 .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail,
 .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail {
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail,
+.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-featured-content-type,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-featured-content-type,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-featured-content-type {
   display: block;
 }
 .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-title h2,
@@ -10489,7 +10538,10 @@ body #admin-menu {
 .node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-field-media-asset h2,
 .node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2,
 .node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2,
-.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2 {
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-scald-thumbnail h2,
+.node-personal-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-featured-content-type h2,
+.node-word-list.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-featured-content-type h2,
+.node-collection.view-mode-full .field-name-field-digital-heritage-items .view-mode-search_result .field-name-featured-content-type h2 {
   font-size: 16px;
   font-weight: bold;
 }
@@ -10545,6 +10597,11 @@ body #admin-menu {
   right: 0;
   margin-left: auto;
   margin-right: auto;
+}
+.node-personal-collection.view-mode-full .field-name-field-related-content,
+.node-word-list.view-mode-full .field-name-field-related-content,
+.node-collection.view-mode-full .field-name-field-related-content {
+  clear: both;
 }
 .node-personal-collection.view-mode-full .field-name-collections-tree,
 .node-word-list.view-mode-full .field-name-collections-tree,
@@ -10956,6 +11013,20 @@ body #admin-menu {
 }
 @media (min-width: 992px) {
   .paragraphs-item-dictionary-word-bundle.view-mode-full .sample-sentence {
+    font-size: 18px;
+  }
+}
+.node-dictionary-word.view-mode-full .col-sm-8 .field .label-above,
+.node-dictionary-word.view-mode-full .col-sm-12 .field .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-dictionary-word.view-mode-full .col-sm-8 .field .label-above,
+  .node-dictionary-word.view-mode-full .col-sm-12 .field .label-above {
     font-size: 18px;
   }
 }
@@ -11376,6 +11447,20 @@ body #admin-menu {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
   font-size: 22px;
+}
+.node-person.view-mode-full .col-sm-8 .field .label-above,
+.node-person.view-mode-full .col-sm-12 .field .label-above {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding-bottom: 5px;
+}
+@media (min-width: 992px) {
+  .node-person.view-mode-full .col-sm-8 .field .label-above,
+  .node-person.view-mode-full .col-sm-12 .field .label-above {
+    font-size: 18px;
+  }
 }
 .node-person.view-mode-related_person_teaser .col-xs-3,
 .node-person.view-mode-related_person_teaser .col-xs-9,

@@ -28,15 +28,6 @@ function ma_digitalheritage_default_cer() {
     "identifier" : "node:digital_heritage:field_community_record_parent*node:digital_heritage:field_community_record_children",
     "rdf_mapping" : []
   }');
-  $items['node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items'] = entity_import('cer', '{
-    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
-    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:digital_heritage:field_related_dh_items" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_related_dh_items" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "identifier" : "node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items",
-    "rdf_mapping" : []
-  }');
   return $items;
 }
 

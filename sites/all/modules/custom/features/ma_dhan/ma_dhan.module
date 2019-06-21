@@ -99,7 +99,8 @@ function ma_dhan_node_update($node) {
       // 'field_item_privacy_setting',
       'field_related_dh_items', // It’s a 2-way relationship and if a DH node A adds DH node B as a related item, we don’t want a notification on DH node B.
       'field_related_dictionary_words', // It’s a 2-way relationship and if a Dictionary node adds DH node as a related item, we don’t want a notification on the DH node.
-      'field_personal_collections', // It’s a 2-way relationship.
+      'field_related_content', // It's a 2-way relationship.
+      'field_personal_collections', // We don't want DHAN notifications for items being added to personal collections.
       'field_book_children', // If you add a page to a book, the admin will already be notified of the new page, no need to notify them separately that the parent page was changed (where its only change is the fact that a new page was added)
       'field_book_parent', // This should never happen as a book child page cannot be moved to new book, but leaving here for good measure.
       'field_community_record_children', // If you add a community record to a parent DH node, the admin will already be notified of the new child, no need to notify them separately of this.

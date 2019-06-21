@@ -390,10 +390,10 @@ function ma_dictionary_strongarm() {
           'weight' => '1',
         ),
         'path' => array(
-          'weight' => '3',
+          'weight' => '4',
         ),
         'redirect' => array(
-          'weight' => '2',
+          'weight' => '3',
         ),
       ),
       'display' => array(),
