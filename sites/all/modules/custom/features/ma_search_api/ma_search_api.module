@@ -206,8 +206,10 @@ function ma_search_api_node_update($node) {;
         }
       }
     }
-    foreach ($wrappers_to_resave as $wrapper_to_resave) {
-      $wrapper_to_resave->save();
+    if (count($wrappers_to_resave)) {
+      foreach ($wrappers_to_resave as $wrapper_to_resave) {
+        $wrapper_to_resave->save();
+      }
     }
 
     // Do the reindexing
