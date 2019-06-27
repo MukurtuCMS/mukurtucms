@@ -154,7 +154,7 @@ function ma_search_api_node_update($node) {;
     if (is_null($original_node_being_updated)) {
       $original_node_being_updated = $node->nid;
     }
-    $nids_to_resave = [];
+    $wrappers_to_resave = [];
     foreach ($items_to_update_cers as $custom_cer_field => $items_to_update_cers_nids) {
       if (count($items_to_update_cers_nids)) {
         foreach ($items_to_update_cers_nids as $items_to_update_cer) {
