@@ -904,6 +904,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-lesson-field_lesson_resources'.
   $field_instances['node-lesson-field_lesson_resources'] = array(
     'bundle' => 'lesson',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Archival, PPWP, manipulative',
@@ -953,7 +955,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
