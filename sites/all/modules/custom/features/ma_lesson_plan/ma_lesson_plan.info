@@ -105,6 +105,7 @@ features[field_instance][] = node-lesson-field_pre_actions
 features[field_instance][] = node-lesson-field_related_dictionary_words
 features[field_instance][] = node-unit_plan-field_collection
 features[field_instance][] = node-unit_plan-field_community_ref
+features[field_instance][] = node-unit_plan-field_item_privacy_setting
 features[field_instance][] = node-unit_plan-field_media_asset
 features[field_instance][] = node-unit_plan-field_pre_actions
 features[field_instance][] = node-unit_plan-field_related_dh_items

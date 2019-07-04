@@ -31,7 +31,8 @@ function ma_lesson_plan_field_group_info() {
       4 => 'field_unit_unit_length',
       5 => 'field_unit_week_of',
       6 => 'og_group_ref',
-      7 => 'title',
+      7 => 'field_item_privacy_setting',
+      8 => 'title',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
