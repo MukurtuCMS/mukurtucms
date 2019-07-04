@@ -31,3 +31,76 @@ function ma_lesson_plan_inline_entity_form_table_fields_alter(&$fields, $context
     unset ($fields['status']); // Hide the Published field in the Lessons table.
   }
 }
+
+/**
+ * Implements hook_menu().
+ */
+function ma_lesson_plan_menu() {
+  $items = array();
+
+  // "Duplicate Item" button for DH node
+  $items['node/%node/duplicate-unit-plan'] = array(
+    'title' => 'Duplicate Unit Plan',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ma_lesson_plan_clone_up_form', 1),
+    'access callback' => 'ma_lesson_plan_clone_unit_plan_button_check',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  );
+
+  return $items;
+}
+
+function ma_lesson_plan_clone_unit_plan_button_check($node) {
+  if ($node->type == 'unit_plan') {
+    $up_emw = entity_metadata_wrapper('node', $node);
+    foreach ($up_emw->og_group_ref->value() as $protocol) {
+      if (isset ($protocol)) {
+        $p_emw = entity_metadata_wrapper('node', $protocol);
+        $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+        if (array_intersect(array('protocol steward'), $roles_for_user_in_group)) {
+          return TRUE;
+        }
+      }
+    }
+  }
+}
+
+function ma_lesson_plan_clone_up_form($form, $form_state, $node) {
+  $question = "<i>Duplicate Lesson Plan</i> " . $node->title;
+  $description = "<div>Are you sure you want to duplicate <i>$node->title</i>?</div>";
+  return confirm_form($form, $question, 'node/' . $node->nid, $description);
+}
+
+function ma_lesson_plan_clone_up_form_submit($form, $form_state) {
+
+  // Clone the node with a new title
+  $original_nid = arg(1);
+  $cloned = replicate_clone_entity_by_id ('node', $original_nid);
+  $cloned->title = $cloned->title . ' - copy';
+  
+  node_save ($cloned);
+
+  // Unset any CPs that the cloning protocol steward is not a contributor or protocol steward for
+  $protocols_to_set = array();
+  $up_emw = entity_metadata_wrapper('node', $cloned);
+  foreach ($up_emw->og_group_ref->value() as $protocol) {
+    $p_emw = entity_metadata_wrapper('node', $protocol);
+    $roles_for_user_in_group = og_get_user_roles('node', $p_emw->getIdentifier());
+    if (array_intersect(array('protocol steward', 'contributor'), $roles_for_user_in_group)) {
+      $protocols_to_set[] = $protocol;
+    }
+  }
+  $up_emw->og_group_ref->set ($protocols_to_set);
+
+  // Make a relationship to the original node
+  // TODO: update this for the Related Content field, once that is merged in.
+
+  // Save our changes
+  $up_emw->save();
+
+  // Go to the cloned node
+  drupal_set_message(t("Successfully duplicated Unit Plan"));
+  drupal_goto ('node/' . $cloned->nid);
+}
