@@ -1786,7 +1786,9 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_class_period_length'.
   $field_instances['node-unit_plan-field_unit_class_period_length'] = array(
     'bundle' => 'unit_plan',
-    'default_value' => array(),
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1834,14 +1836,14 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_class_period_length',
     'label' => 'Class Period Length',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
-      'active' => 1,
+      'active' => 0,
       'module' => 'taxonomy',
       'settings' => array(
         'apply_chosen' => 1,
@@ -1931,6 +1933,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_grade_level'.
   $field_instances['node-unit_plan-field_unit_grade_level'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -1980,7 +1984,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_grade_level',
     'label' => 'Grade Level',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -2329,6 +2333,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_subject'.
   $field_instances['node-unit_plan-field_unit_subject'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2378,7 +2384,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_subject',
     'label' => 'Subject',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -2400,6 +2406,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_teacher'.
   $field_instances['node-unit_plan-field_unit_teacher'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2449,7 +2457,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_teacher',
     'label' => 'Teacher',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -2545,6 +2553,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_unit_length'.
   $field_instances['node-unit_plan-field_unit_unit_length'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2593,7 +2603,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_unit_length',
     'label' => 'Unit Length',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
@@ -2615,6 +2625,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-unit_plan-field_unit_week_of'.
   $field_instances['node-unit_plan-field_unit_week_of'] = array(
     'bundle' => 'unit_plan',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -2663,7 +2675,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'entity_type' => 'node',
     'field_name' => 'field_unit_week_of',
     'label' => 'Week of',
-    'required' => 1,
+    'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
       'custom_remove' => '',
