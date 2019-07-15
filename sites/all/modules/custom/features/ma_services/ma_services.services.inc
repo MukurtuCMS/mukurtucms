@@ -135,6 +135,9 @@ function ma_services_default_services_endpoint() {
         'create' => array(
           'enabled' => '1',
         ),
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
       ),
     ),
     'synced_entities' => array(
