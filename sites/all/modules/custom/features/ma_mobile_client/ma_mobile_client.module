@@ -801,12 +801,31 @@ function _ma_mobile_client_get_viewable_types ($fn = NULL) {
   uasort($ordered_types, 'drupal_sort_weight');
   $node_types = node_type_get_types();
   $viewable_types = [];
+  $view_filters = [
+//    'all' => same as digital_heritage
+    'digital_heritage' => [
+      'field_community_ref' => 'Community',
+      'field_collection' => 'Collections',
+      'field_category' => 'Category',
+      'field_media_asset:type' => 'Media Type',
+      'field_tags' => 'Keywords',
+    ],
+    'dictionary_word' => [
+      'field_dictionary_word_language' => 'Language',
+      'field_tags' => 'Keywords',
+      'field_word_entry:field_part_of_speech' => 'Word Entry',
+      'field_word_list' => 'Word List',
+    ],
+  ];
   foreach ($ordered_types as $node_type => $node_type_properties) {
     if ($node_type_properties['viewable']) {
       $viewable_types[$node_type] = [
         'label' => $node_types[$node_type]->name,
         'description' => $node_types[$node_type]->description
       ];
+      if (isset ($view_filters[$node_type])) {
+        $viewable_types[$node_type]['list view filters'] = $view_filters[$node_type];
+      }
     }
   }
   return $viewable_types;
@@ -1056,7 +1075,7 @@ function _ma_mobile_client_get_list_view_fields ($fn, $content_type, $skip_type_
 
   if (!$skip_type_validation) {
     if (!node_type_get_type($content_type)) {
-      return 'Content type ' . $content_type . ' does not exist';
+      return t('Content type @content_type does not exist', ['@content_type' => $content_type]);
     }
     // TODO: do we want this to be defined server side or client side? For now client-side.
 //    if (!key_exists($content_type, _ma_mobile_client_get_viewable_types())) {
