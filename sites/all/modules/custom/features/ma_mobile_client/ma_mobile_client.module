@@ -724,10 +724,6 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
  * so that when viewing the parent node, the user can see its immediate children in the ref fields.
  *
  * * except for entity refs that are in $go_one_level_deeper. For these, the children get their own entity refs synced too.
- *
- * TODO: if $synced_entity_type == 'atom', the entity metadata wrapper does not work, so none of its own references will be synced
- * this just means that when viewing an atom's metadata (which isn't even built yet client side) we won't see something like its own custom protocols.
- * To fix this, will have to load $ref_field_values for atoms manually from the the atom $synced_entity.
  */
 function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node') {
 
@@ -748,6 +744,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
         break;
 
       case 'field_collection':
+      case 'atom':
         if (isset($synced_entity->{$ref_field}) && count($synced_entity->$ref_field)) {
           foreach ($synced_entity->{$ref_field}[LANGUAGE_NONE] as $ref_field_value) {
             $ref_field_values[] = node_load($ref_field_value['target_id']);
@@ -778,7 +775,6 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
                 'last_updated' => $reffed_entity->changed,
                 'editable' => scald_atom_access('edit', $reffed_entity) ? TRUE : FALSE,
               ];
-              // This is not yet working. See TODO at top of this function.
               $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'atom');
             }
             break;
