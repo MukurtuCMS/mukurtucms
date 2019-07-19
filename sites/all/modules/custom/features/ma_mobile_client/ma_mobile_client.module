@@ -692,7 +692,7 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
   global $user;
   $uw = entity_metadata_wrapper('user', $user);
   $synced_nodes = $uw->field_mm_sync->value();
-  $synced_entities = [];
+  $all_synced_entities = [];
   $viewable_types = _ma_mobile_client_get_viewable_types();
 
   foreach ($synced_nodes as $synced_node) {
@@ -703,37 +703,36 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
 
     // Add the node.
     if (node_access('view', $synced_node)) { // Check to make sure the user can view the node. This might not be the case if the CP on the node was changed after the user had set it to be synced.
-      $synced_entities['nodes'][$synced_node->type][$synced_node->nid] = [
+      $all_synced_entities['nodes'][$synced_node->type][$synced_node->nid] = [
         'last_updated' => $synced_node->changed,
         'editable' => node_access('update', $synced_node) ? TRUE: FALSE,
       ];
     }
 
     // For all the entity refs, node refs, and term refs in the node, add those entities to be synced as well.
-    $synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_entities);
+    $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $all_synced_entities);
   }
 
-  return $synced_entities;
+  return $all_synced_entities;
 }
 
 
 /**
- * For all the entity refs, node refs, and term refs in the node, add those entities to be synced as well.
+ * For all the entity refs, node refs, term refs, atom refs in the node, add those entities to be synced as well.
  * We are going one-level deep*, so entity ref'ed nodes get synced, but entity ref'ed nodes of entity ref'ed nodes do not get synced.
  * Entity-ref'ed nodes are *not* marked as synced to the user, or else their own entity refs would then get synced; this is just
  * so that when viewing the parent node, the user can see its immediate children in the ref fields.
  *
  * * except for entity refs that are in $go_one_level_deeper. For these, the children get their own entity refs synced too.
+ *
+ * TODO: if $synced_entity_type == 'atom', the entity metadata wrapper does not work, so none of its own references will be synced
+ * this just means that when viewing an atom's metadata (which isn't even built yet client side) we won't see something like its own custom protocols.
+ * To fix this, will have to load $ref_field_values for atoms manually from the the atom $synced_entity.
  */
-function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_entities) {
+function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node') {
 
-  static $ref_fields;
-  $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference']));
-
-  static $go_one_level_deeper;
-  $go_one_level_deeper = ['field_unit_lessons'];
-
-  $snw = entity_metadata_wrapper('node', $synced_node);
+  $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference', 'atom_reference']));
+  $snw = entity_metadata_wrapper($synced_entity_type, $synced_entity);
   foreach ($ref_fields as $ref_field => $ref_field_properties) {
     if (isset($snw->{$ref_field})) {
       $ref_field_values = $snw->{$ref_field}->value();
@@ -741,35 +740,52 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_node, $synced_en
         if (is_object(($ref_field_values))) {
           $ref_field_values = [$ref_field_values]; // convert single value term ref fields (single value entity ref fields too?) from single object to single value array with object as first value
         }
-        // dpm ($ref_field_values, $ref_field_properties["type"] . ': ' . $ref_field . ' count: ' . count($ref_field_values) );
+//        dpm ($ref_field_values, $ref_field_properties["type"] . ': ' . $ref_field . ' count: ' . count($ref_field_values) );
         foreach ($ref_field_values as $reffed_entity) {
+          switch ($ref_field_properties["type"]) {
 
-          // Term references
-          if ($ref_field_properties["type"] == 'taxonomy_term_reference') {
-            $synced_entities['terms'][$reffed_entity->tid] = [
-              'last_updated' => $reffed_entity->changed,
-              'term_name' => $reffed_entity->name,
-            ];
-          }
+            // Term references
+            case 'taxonomy_term_reference':
+              $all_synced_entities['terms'][$reffed_entity->tid] = [
+                'last_updated' => $reffed_entity->changed,
+                'term_name' => $reffed_entity->name
+              ];
+              break;
 
-          // Entity / node references.
-          elseif (node_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
-            $synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
-              'last_updated' => $reffed_entity->changed,
-              'editable' => node_access('update', $reffed_entity) ? TRUE : FALSE,
-            ];
+            // Atom references
+            case 'atom_reference':
+              if (scald_atom_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
+                $all_synced_entities['atoms'][$reffed_entity->sid] = [
+                  'last_updated' => $reffed_entity->changed,
+                  'editable' => scald_atom_access('edit', $reffed_entity) ? TRUE : FALSE,
+                ];
+                // This is not yet working. See TODO at top of this function.
+                $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'atom');
+              }
+              break;
 
-            // Go deeper for certain entity refs.
-            if (in_array($ref_field, $go_one_level_deeper)) {
-              $synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $synced_entities);
+            // Entity / node references.
+            default:
+            if (node_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
+              $all_synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
+                'last_updated' => $reffed_entity->changed,
+                'editable' => node_access('update', $reffed_entity) ? TRUE : FALSE,
+              ];
+
+              // Go deeper for certain entity refs.
+              $go_one_level_deeper = ['field_unit_lessons'];
+              if (in_array($ref_field, $go_one_level_deeper)) {
+                $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities);
+              }
             }
-          }
+            break;
 
+          }
         }
       }
     }
   }
-  return $synced_entities;
+  return $all_synced_entities;
 }
 
 
