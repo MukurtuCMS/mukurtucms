@@ -727,7 +727,7 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
  */
 function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node') {
 
-  $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference', 'atom_reference', 'field_collection']));
+  $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference', 'atom_reference', 'field_collection', 'paragraphs']));
   $snw = entity_metadata_wrapper($synced_entity_type, $synced_entity);
   foreach ($ref_fields as $ref_field => $ref_field_properties) {
     $ref_field_values = [];
@@ -785,6 +785,14 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
               'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to FC entities.
             ];
             $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'field_collection');
+            break;
+
+          // Field_collections
+          case 'paragraphs':
+            $all_synced_entities['paragraphs'][$reffed_entity->item_id] = [
+              'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to paragraph entities.
+            ];
+            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'paragraphs');
             break;
 
           // Entity / node references.
