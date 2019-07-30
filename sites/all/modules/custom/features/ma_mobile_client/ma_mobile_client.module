@@ -841,6 +841,7 @@ function _ma_mobile_client_get_creatable_types ($fn = NULL) {
 
 /**
  * Retrieve a list of content types that are viewable by the app.
+ * Also some other properties (list view filters, whether type can be added to a Personal Collection)
  */
 function _ma_mobile_client_get_viewable_types ($fn = NULL) {
   $ordered_types = variable_get('mm_viewable_types', []);
@@ -872,6 +873,9 @@ function _ma_mobile_client_get_viewable_types ($fn = NULL) {
       if (isset ($view_filters[$node_type])) {
         $viewable_types[$node_type]['list view filters'] = $view_filters[$node_type];
       }
+      // Personal Collection-able?
+      $ds_layout = ds_get_layout('node', $node_type, 'full', TRUE);
+      $viewable_types[$node_type]['valid type for personal collection'] = isset($ds_layout["settings"]["fields"]["mukurtu_icon_actions"]) ? 1 : 0;
     }
   }
   return $viewable_types;
