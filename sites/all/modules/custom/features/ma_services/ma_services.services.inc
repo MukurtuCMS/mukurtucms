@@ -46,6 +46,14 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'field_collection' => array(
+      'alias' => 'field-collection',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'file' => array(
       'operations' => array(
         'create' => array(
