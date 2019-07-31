@@ -137,6 +137,14 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
+    'paragraph' => array(
+      'alias' => 'paragraph',
+      'operations' => array(
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'scald' => array(
       'alias' => 'scald',
       'operations' => array(

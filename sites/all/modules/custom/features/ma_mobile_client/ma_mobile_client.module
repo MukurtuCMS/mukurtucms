@@ -590,7 +590,34 @@ function ma_mobile_client_services_resources() {
         ],
       ],
     ],
-    
+
+    'paragraph' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => 'Retrieves a paragraph',
+          'callback' => '_ma_mobile_client_retrieve_paragraph',
+          'access callback' => 'user_access',
+          'access arguments' => ['view content'],
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'pid',
+              'type' => 'string',
+              'description' => 'Paragraph ID',
+              'source' => ['path' => '1'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
     'scald' => [
       'operations' => [
 
@@ -1297,6 +1324,18 @@ function _ma_mobile_client_build_field_arrays_from_field_properties($field_prope
     'other_properties' => $field_properties,
     'base_field_properties' => field_info_field($field_properties["field_name"]),
   ];
+}
+
+
+/**
+ * Retrieve a paragraph.
+ */
+function _ma_mobile_client_retrieve_paragraph($fn, $pid) {
+  $paragraph = entity_load('paragraphs_item', array($pid));
+  if (!$paragraph) {
+    return t('There is no paragraph with the ID of @pid.', ['@pid' => $pid]);
+  }
+  return $paragraph;
 }
 
 
