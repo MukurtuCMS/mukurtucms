@@ -448,6 +448,27 @@ function ma_mobile_client_services_resources() {
             ],
           ],
         ],
+        'create' => [
+          'help' => "Submit an array of NIDs to add to a user's list of synced entities (for when the node was created in the app)",
+          'callback' => '_ma_mobile_client_submit_user_synced_entities',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+            [
+              'name' => 'nodes',
+              'optional' => FALSE,
+              'source' => 'data',
+              'description' => 'Array of NIDs to add as synced',
+              'type' => 'array',
+            ],
+          ],
+        ],
       ],
     ],
 
@@ -816,6 +837,33 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
     }
   }
   return $all_synced_entities;
+}
+
+
+/**
+ * Submit an array of NIDs to add to a user's list of synced entities (for when the node was created in the app)
+ */
+function _ma_mobile_client_submit_user_synced_entities ($fn, $nids) {
+  $nids = _services_arg_value($nids, 'entities');
+  $confirmed_nids = [];
+  foreach ($nids as $nid) {
+    if (is_int($nid) && node_load($nid)) {
+      $confirmed_nids[] = $nid;
+    }
+  }
+  global $user;
+  $uw = entity_metadata_wrapper('user', $user);
+  $synced_nids = $uw->field_mm_sync->raw();
+  $new_nids = array_diff ($confirmed_nids, $synced_nids);
+  if (count($new_nids)) {
+    $all_nids = array_merge($synced_nids, $new_nids);
+    $uw->field_mm_sync->set($all_nids);
+    $uw->save();
+    return "The following NIDs were added to be synced: " . implode(', ', $new_nids);
+  }
+  else {
+    return "No new NIDs were added to be synced.";
+  }
 }
 
 
