@@ -91,8 +91,7 @@ function ma_mobile_client_admin_config($form, $form_state) {
     '#type' => 'fieldset',
     '#title' => t('Viewable Content Types'),
     'help_text' => [
-      // TODO change "View Content" text to what it actually is in the app.
-      '#markup' => 'Check the content types which can be viewed within the Mukurtu Mobile app.<br/>Content types in <span class="linethrough">strikethrough</span> either need a Mukurtu Mobile view mode, or have paragraph fields which need a Mukurtu Mobile view mode, before they will work.<br/>Use the arrows to drag the content types into the order that they will display in the View Content page in the app.',
+      '#markup' => 'Check the content types which can be viewed within the Mukurtu Mobile app.<br/>Content types in <span class="linethrough">strikethrough</span> either need a Mukurtu Mobile view mode, or have paragraph fields which need a Mukurtu Mobile view mode, before they will work.<br/>Use the arrows to drag the content types into the order that they will display in the <i>View Content</i> page in the app.',
     ],
     'mm_viewable_types' => [
       '#tree' => TRUE,
@@ -176,8 +175,7 @@ function ma_mobile_client_admin_config($form, $form_state) {
     '#type' => 'fieldset',
     '#title' => t('Creatable Content Types'),
     'help_text' => [
-      // TODO: change "Create Content" text to what it actually is in the app.
-      '#markup' => 'Check the content types which can be created within the Mukurtu Mobile app.<br/>Use the arrows to drag the content types into the order that they will display in the Create Content page in the app.',
+      '#markup' => 'Check the content types which can be created within the Mukurtu Mobile app.<br/>Use the arrows to drag the content types into the order that they will display in the <i>Create Content</i> page in the app.',
     ],
     'mm_creatable_types' => [
       '#tree' => TRUE,

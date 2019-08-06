@@ -12743,6 +12743,13 @@ body #admin-menu {
   float: right;
   margin-right: 25px;
 }
-.linethrough {
+#ma-mobile-client-admin-config .linethrough {
   text-decoration: line-through;
+}
+#ma-mobile-client-admin-config .form-item-mukurtu-mobile-enabled {
+  margin-bottom: 30px;
+}
+#ma-mobile-client-admin-config #edit-viewable {
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
