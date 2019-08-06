@@ -52,6 +52,17 @@ function ma_mobile_client_admin_config($form, $form_state) {
     '#default_value' => variable_get ('mukurtu_mobile_enabled', 0),
   ];
 
+  $logo_options = [
+    'logo'=> '<img src="' . theme_get_setting('favicon') . '" height="26"> (site logo)',
+    'favicon' => '<img src="' . theme_get_setting('logo') . '" height="26"> (site favicon)',
+  ];
+  $form['mm_logo'] = [
+    '#type' => 'radios',
+    '#title' => t('Logo to use in the Mukurtu Mobile app'),
+    '#default_value' => variable_get ('mm_logo', 'logo'),
+    '#options' => $logo_options,
+  ];
+
   ////
   // Viewable content types table
   ////
@@ -432,6 +443,25 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
+    'logo' => [
+      'operations' => [
+        'retrieve' => [
+          'help' => 'Retrieve the logo to use in the Mukurtu Mobile app',
+          'callback' => '_ma_mobile_client_get_logo',
+          'access callback' => 'user_is_logged_in',
+          'args' => [
+            [
+              'name' => 'fn',
+              'type' => 'string',
+              'description' => 'Function to perform',
+              'source' => ['path' => '0'],
+              'optional' => FALSE,
+            ],
+          ],
+        ],
+      ],
+    ],
+
     'synced_entities' => [
       'operations' => [
         'retrieve' => [
@@ -730,6 +760,14 @@ function _ma_mobile_client_get_one_time_login($fn) {
   global $user;
   $timestamp = REQUEST_TIME;
   return url("mobile/login/$user->uid/$timestamp/" . user_pass_rehash($user->pass, $timestamp, $user->login, $user->uid), array('absolute' => TRUE));
+}
+
+/**
+ * Return the logo.
+ */
+function _ma_mobile_client_get_logo($fn) {
+  $logo = file_get_contents(theme_get_setting(variable_get ('mm_logo', 'logo')));
+  return base64_encode($logo);
 }
 
 
@@ -1636,7 +1674,7 @@ function ma_mobile_client_set_default_types() {
     ];
   }
   variable_set('mm_viewable_types', $default_viewable_types);
-  
+
   $ordered_creatable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'community', 'cultural_protocol_group', 'person', 'personal_collection'];
   $default_creatable_types = [];
   $weight = 0;
@@ -1648,7 +1686,7 @@ function ma_mobile_client_set_default_types() {
     ];
   }
   variable_set('mm_creatable_types', $default_creatable_types);
-  
+
 }
 
 
