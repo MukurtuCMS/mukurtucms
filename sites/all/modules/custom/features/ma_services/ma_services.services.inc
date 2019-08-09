@@ -80,14 +80,6 @@ function ma_services_default_services_endpoint() {
         ),
       ),
     ),
-    'logo' => array(
-      'alias' => 'logo',
-      'operations' => array(
-        'retrieve' => array(
-          'enabled' => '1',
-        ),
-      ),
-    ),
     'node' => array(
       'alias' => 'node',
       'operations' => array(
@@ -159,6 +151,14 @@ function ma_services_default_services_endpoint() {
         'create' => array(
           'enabled' => '1',
         ),
+        'retrieve' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
+    'site_info' => array(
+      'alias' => 'site-info',
+      'operations' => array(
         'retrieve' => array(
           'enabled' => '1',
         ),

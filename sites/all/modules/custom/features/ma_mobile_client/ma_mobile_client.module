@@ -441,11 +441,11 @@ function ma_mobile_client_services_resources() {
       ],
     ],
 
-    'logo' => [
+    'site_info' => [
       'operations' => [
         'retrieve' => [
-          'help' => 'Retrieve the logo to use in the Mukurtu Mobile app',
-          'callback' => '_ma_mobile_client_get_logo',
+          'help' => 'Retrieve basic site info to use in the Mukurtu Mobile app',
+          'callback' => '_ma_mobile_client_get_site_info',
           'access callback' => 'user_is_logged_in',
           'args' => [
             [
@@ -763,9 +763,13 @@ function _ma_mobile_client_get_one_time_login($fn) {
 /**
  * Return the logo.
  */
-function _ma_mobile_client_get_logo($fn) {
+function _ma_mobile_client_get_site_info($fn) {
   $logo = file_get_contents(theme_get_setting(variable_get ('mm_logo', 'logo')));
-  return base64_encode($logo);
+  $site_name = variable_get('site_name', 'Mukurtu');
+  return [
+    'site_name' => $site_name,
+    'logo' => base64_encode($logo),
+  ];
 }
 
 
