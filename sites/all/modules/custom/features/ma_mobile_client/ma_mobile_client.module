@@ -703,8 +703,7 @@ function ma_mobile_client_services_resources() {
         'retrieve' => [
           'help' => 'Retrieves a scald atom',
           'callback' => '_ma_mobile_client_retrieve_atom',
-          'access callback' => 'user_access',
-          'access arguments' => ['fetch any atom'],
+          'access callback' => 'user_is_logged_in',
           'args' => [
             [
               'name' => 'fn',
@@ -1626,6 +1625,8 @@ function _ma_mobile_client_retrieve_atom ($fn, $sid) {
   if (!$atom) {
     return t('There is no atom with the scald ID of @sid.', ['@sid' => $sid]);
   }
+  $atom->file_url = file_create_url($atom->file_source);
+  $atom->thumbnail_url = file_create_url($atom->thumbnail_source);
   return $atom;
 }
 
