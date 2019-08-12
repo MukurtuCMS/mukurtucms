@@ -1625,8 +1625,29 @@ function _ma_mobile_client_retrieve_atom ($fn, $sid) {
   if (!$atom) {
     return t('There is no atom with the scald ID of @sid.', ['@sid' => $sid]);
   }
-  $atom->file_url = file_create_url($atom->file_source);
+
+  // URL to retrieve atom thumbnail.
   $atom->thumbnail_url = file_create_url($atom->thumbnail_source);
+
+  // URL to retrieve atom main media.
+  switch ($atom->provider) {
+    case 'scald_youtube':
+      $atom->file_url = 'www.youtube.com/watch?v=' . $atom->base_id;
+      break;
+    case 'scald_vimeo':
+      $atom->file_url = 'https://vimeo.com/' . $atom->base_id;
+      break;
+    case 'scald_dailymotion':
+      $atom->file_url = 'https://dailymotion.com/video/' . $atom->base_id;
+      break;
+    case 'scald_soundcloud':
+      $atom->file_url = $atom->data["permalink_url"];
+      break;
+    default:
+      $atom->file_url = file_create_url($atom->file_source);
+      break;
+  }
+
   return $atom;
 }
 
