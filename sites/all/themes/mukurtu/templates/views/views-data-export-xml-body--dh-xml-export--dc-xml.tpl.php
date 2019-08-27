@@ -6,14 +6,14 @@
 ?>
 <?php foreach ($themed_rows as $count => $row): ?>
   <<?php
-  global $base_url;
-  $path = url('node/' . $rows[$count]->nid);
-  $item_node_attribute = ' about="' . $base_url . $path . '"';
-  print $item_node . $item_node_attribute; ?>>
-  <?php foreach ($row as $field => $values): ?>
-    <?php foreach ($values as $value): ?>
-      <<?php print $xml_tag[$field]; ?>><?php print $value; ?></<?php print $xml_tag[$field]; ?>>
-    <?php endforeach; ?>
-  <?php endforeach; ?>
+global $base_url;
+$path = url('node/' . $rows[$count]->nid);
+$item_node_attribute = ' about="' . $base_url . $path . '"';
+print $item_node . $item_node_attribute; ?>>
+<?php foreach ($row as $field => $values): ?>
+<?php foreach ($values as $value): ?>
+    <<?php print $xml_tag[$field]; ?>><?php print $value; ?></<?php print $xml_tag[$field]; ?>>
+<?php endforeach; ?>
+<?php endforeach; ?>
   </<?php print $item_node; ?>>
 <?php endforeach; ?>
