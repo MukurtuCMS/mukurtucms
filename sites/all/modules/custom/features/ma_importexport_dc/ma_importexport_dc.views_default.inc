@@ -111,6 +111,10 @@ function ma_importexport_dc_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_community_record_parent_target_id']['id'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['relationships']['field_community_record_parent_target_id']['table'] = 'field_data_field_community_record_parent';
+  $handler->display->display_options['relationships']['field_community_record_parent_target_id']['field'] = 'field_community_record_parent_target_id';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -422,6 +426,33 @@ function ma_importexport_dc_views_default_views() {
   );
   $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_media_asset']['separator'] = ';;;';
+  /* Field: Global: Base url */
+  $handler->display->display_options['fields']['base_url']['id'] = 'base_url';
+  $handler->display->display_options['fields']['base_url']['table'] = 'views';
+  $handler->display->display_options['fields']['base_url']['field'] = 'base_url';
+  $handler->display->display_options['fields']['base_url']['label'] = 'hidden';
+  $handler->display->display_options['fields']['base_url']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['base_url']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['base_url']['show_link'] = 0;
+  $handler->display->display_options['fields']['base_url']['show_link_options'] = array(
+    'link_path' => '',
+    'link_text' => '',
+    'link_class' => '',
+    'link_title' => '',
+    'link_rel' => '',
+    'link_fragment' => '',
+    'link_query' => '',
+    'link_target' => '',
+  );
+  /* Field: Content: Path */
+  $handler->display->display_options['fields']['path']['id'] = 'path';
+  $handler->display->display_options['fields']['path']['table'] = 'node';
+  $handler->display->display_options['fields']['path']['field'] = 'path';
+  $handler->display->display_options['fields']['path']['relationship'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['fields']['path']['label'] = 'dcterms:relation';
+  $handler->display->display_options['fields']['path']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['path']['alter']['text'] = '[base_url][path]';
+  $handler->display->display_options['fields']['path']['hide_empty'] = TRUE;
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -763,6 +794,7 @@ function ma_importexport_dc_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('Content entity referenced from field_community_record_parent'),
     t('dc:title'),
     t('dc:creator'),
     t('dc:subject'),
@@ -784,6 +816,9 @@ function ma_importexport_dc_views_default_views() {
     t('dcterms:spatial'),
     t('dc:rights'),
     t('dc:hasformat'),
+    t('hidden'),
+    t('dcterms:relation'),
+    t('[base_url][path]'),
     t('Title'),
     t('Community'),
     t('Category'),
