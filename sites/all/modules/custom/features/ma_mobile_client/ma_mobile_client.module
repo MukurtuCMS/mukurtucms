@@ -763,9 +763,11 @@ function _ma_mobile_client_get_one_time_login($fn) {
  * Return the logo.
  */
 function _ma_mobile_client_get_site_info($fn) {
+  $mm_enabled = variable_get ('mukurtu_mobile_enabled', 0);
   $logo = file_get_contents(theme_get_setting(variable_get ('mm_logo', 'logo')));
   $site_name = variable_get('site_name', 'Mukurtu');
   return [
+    'mukurtu_mobile_enabled' => $mm_enabled,
     'site_name' => $site_name,
     'logo' => base64_encode($logo),
   ];
