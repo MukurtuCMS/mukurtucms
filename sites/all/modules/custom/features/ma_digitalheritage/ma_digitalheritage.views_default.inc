@@ -480,10 +480,15 @@ return FALSE;';
   $handler->display->display_options['style_options']['columns'] = array(
     'views_bulk_operations' => 'views_bulk_operations',
     'title' => 'title',
-    'field_dictionary_word_language' => 'field_dictionary_word_language',
-    'field_tags' => 'field_tags',
+    'field_media_asset' => 'field_media_asset',
     'changed' => 'changed',
+    'field_summary' => 'field_summary',
+    'field_community_ref' => 'field_community_ref',
+    'field_category' => 'field_category',
+    'field_creator' => 'field_creator',
+    'field_contributor' => 'field_contributor',
     'field_date' => 'field_date',
+    'field_collection' => 'field_collection',
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
@@ -499,24 +504,44 @@ return FALSE;';
       'separator' => '',
       'empty_column' => 0,
     ),
-    'field_dictionary_word_language' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'field_tags' => array(
+    'field_media_asset' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
     ),
     'changed' => array(
       'sortable' => 1,
-      'default_sort_order' => 'asc',
+      'default_sort_order' => 'desc',
       'align' => '',
       'separator' => '',
       'empty_column' => 1,
+    ),
+    'field_summary' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_community_ref' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_category' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_creator' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_contributor' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
     ),
     'field_date' => array(
       'sortable' => 1,
@@ -524,6 +549,11 @@ return FALSE;';
       'align' => '',
       'separator' => '',
       'empty_column' => 1,
+    ),
+    'field_collection' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
     ),
   );
   /* Field: Bulk operations: Content */
@@ -613,11 +643,6 @@ return FALSE;';
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_collection']['delta_offset'] = '0';
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
   /* Filter criterion: Content: Published */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';

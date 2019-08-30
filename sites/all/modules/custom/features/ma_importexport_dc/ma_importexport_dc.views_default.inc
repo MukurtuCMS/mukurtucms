@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_importexport_dc.views_default.inc
@@ -110,6 +111,10 @@ function ma_importexport_dc_views_default_views() {
       'empty_column' => 0,
     ),
   );
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_community_record_parent_target_id']['id'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['relationships']['field_community_record_parent_target_id']['table'] = 'field_data_field_community_record_parent';
+  $handler->display->display_options['relationships']['field_community_record_parent_target_id']['field'] = 'field_community_record_parent_target_id';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -137,13 +142,62 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_subject']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_subject']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_subject']['separator'] = ';;;';
+  /* Field: Content: Description */
+  $handler->display->display_options['fields']['field_description']['id'] = 'field_description';
+  $handler->display->display_options['fields']['field_description']['table'] = 'field_data_field_description';
+  $handler->display->display_options['fields']['field_description']['field'] = 'field_description';
+  $handler->display->display_options['fields']['field_description']['label'] = 'dc:description';
+  $handler->display->display_options['fields']['field_description']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_description']['type'] = 'text_plain';
   /* Field: Content: Body */
   $handler->display->display_options['fields']['body']['id'] = 'body';
   $handler->display->display_options['fields']['body']['table'] = 'field_data_body';
   $handler->display->display_options['fields']['body']['field'] = 'body';
   $handler->display->display_options['fields']['body']['label'] = 'dc:description';
+  $handler->display->display_options['fields']['body']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['body']['alter']['text'] = 'Cultural Narrative: [body]';
   $handler->display->display_options['fields']['body']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['body']['type'] = 'text_plain';
+  /* Field: Content: Traditional Knowledge */
+  $handler->display->display_options['fields']['field_tk_body']['id'] = 'field_tk_body';
+  $handler->display->display_options['fields']['field_tk_body']['table'] = 'field_data_field_tk_body';
+  $handler->display->display_options['fields']['field_tk_body']['field'] = 'field_tk_body';
+  $handler->display->display_options['fields']['field_tk_body']['label'] = 'dc:description';
+  $handler->display->display_options['fields']['field_tk_body']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_tk_body']['alter']['text'] = 'Traditional Knowledge: [field_tk_body] ';
+  $handler->display->display_options['fields']['field_tk_body']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_tk_body']['type'] = 'text_plain';
+  /* Field: Content: Transcription */
+  $handler->display->display_options['fields']['field_transcription']['id'] = 'field_transcription';
+  $handler->display->display_options['fields']['field_transcription']['table'] = 'field_data_field_transcription';
+  $handler->display->display_options['fields']['field_transcription']['field'] = 'field_transcription';
+  $handler->display->display_options['fields']['field_transcription']['label'] = 'dc:description';
+  $handler->display->display_options['fields']['field_transcription']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_transcription']['alter']['text'] = 'Transcription: [field_transcription]';
+  $handler->display->display_options['fields']['field_transcription']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_transcription']['type'] = 'text_plain';
+  /* Field: Field: People */
+  $handler->display->display_options['fields']['field_people']['id'] = 'field_people';
+  $handler->display->display_options['fields']['field_people']['table'] = 'field_data_field_people';
+  $handler->display->display_options['fields']['field_people']['field'] = 'field_people';
+  $handler->display->display_options['fields']['field_people']['label'] = 'dc:description';
+  $handler->display->display_options['fields']['field_people']['alter']['alter_text'] = TRUE;
+  $handler->display->display_options['fields']['field_people']['alter']['text'] = 'Person: [field_people]';
+  $handler->display->display_options['fields']['field_people']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_people']['type'] = 'taxonomy_term_reference_plain';
+  $handler->display->display_options['fields']['field_people']['settings'] = array(
+    'textformatter_type' => 'comma',
+    'textformatter_comma_and' => 0,
+    'textformatter_comma_full_stop' => 0,
+    'textformatter_comma_override' => 0,
+    'textformatter_separator_custom' => '',
+    'textformatter_separator_custom_tag' => 'span',
+    'textformatter_separator_custom_class' => 'textformatter-separator',
+    'textformatter_comma_tag' => 'div',
+    'textformatter_class' => 'textformatter-list',
+    'textformatter_term_plain' => 0,
+  );
+  $handler->display->display_options['fields']['field_people']['delta_offset'] = '0';
   /* Field: Content: Publisher */
   $handler->display->display_options['fields']['field_publisher']['id'] = 'field_publisher';
   $handler->display->display_options['fields']['field_publisher']['table'] = 'field_data_field_publisher';
@@ -162,11 +216,95 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_contributor']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_contributor']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_contributor']['separator'] = ';;;';
+  /* Field: Content: Original Date */
+  $handler->display->display_options['fields']['field_original_date']['id'] = 'field_original_date';
+  $handler->display->display_options['fields']['field_original_date']['table'] = 'field_data_field_original_date';
+  $handler->display->display_options['fields']['field_original_date']['field'] = 'field_original_date';
+  $handler->display->display_options['fields']['field_original_date']['label'] = 'dc:date';
+  $handler->display->display_options['fields']['field_original_date']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_original_date']['click_sort_column'] = 'timestamp';
+  $handler->display->display_options['fields']['field_original_date']['settings'] = array(
+    'use_override' => 'none',
+    'format' => 'custom',
+    'component_settings' => array(
+      'meridiem' => 'a',
+      'year_designation' => 'ce',
+      'display' => array(
+        'year' => 'estimate_label',
+        'month' => 'estimate_label',
+        'day' => 'estimate_label',
+        'hour' => 'none',
+        'minute' => 'none',
+        'second' => 'none',
+        'timezone' => 'none',
+      ),
+      'separator' => array(
+        'date' => '-',
+        'time' => ':',
+        'datetime' => ' ',
+        'other' => ' ',
+        'range' => '',
+      ),
+      'components' => array(
+        'year' => array(
+          'format' => 'Y',
+          'empty' => '',
+          'weight' => '0',
+        ),
+        'month' => array(
+          'format' => 'm',
+          'empty' => '',
+          'weight' => '1',
+        ),
+        'day' => array(
+          'format' => 'd',
+          'empty' => '',
+          'weight' => '2',
+        ),
+        'hour' => array(
+          'format' => 'h',
+          'empty' => '',
+          'weight' => '3',
+        ),
+        'minute' => array(
+          'format' => 'i',
+          'empty' => '',
+          'weight' => '4',
+        ),
+        'second' => array(
+          'format' => 's',
+          'empty' => '',
+          'weight' => '5',
+        ),
+        'timezone' => array(
+          'format' => 'T',
+          'empty' => '',
+          'weight' => '6',
+        ),
+        'c1' => array(
+          'value' => '',
+          'weight' => '7',
+        ),
+        'c2' => array(
+          'value' => '',
+          'weight' => '8',
+        ),
+        'c3' => array(
+          'value' => '',
+          'weight' => '9',
+        ),
+        'approx' => array(
+          'value' => '',
+          'weight' => '-1',
+        ),
+      ),
+    ),
+  );
   /* Field: Content: Original Date Description */
   $handler->display->display_options['fields']['field_date']['id'] = 'field_date';
   $handler->display->display_options['fields']['field_date']['table'] = 'field_data_field_date';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
-  $handler->display->display_options['fields']['field_date']['label'] = 'dc:date';
+  $handler->display->display_options['fields']['field_date']['label'] = 'dcterms:temporal';
   $handler->display->display_options['fields']['field_date']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_date']['type'] = 'text_plain';
   /* Field: Content: Type */
@@ -210,11 +348,25 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_language']['type'] = 'taxonomy_term_reference_plain';
   $handler->display->display_options['fields']['field_language']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_language']['separator'] = ';;;';
+  /* Field: Content: Location */
+  $handler->display->display_options['fields']['field_coverage']['id'] = 'field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['table'] = 'field_data_field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['field'] = 'field_coverage';
+  $handler->display->display_options['fields']['field_coverage']['label'] = 'dc:location';
+  $handler->display->display_options['fields']['field_coverage']['alter']['strip_tags'] = TRUE;
+  $handler->display->display_options['fields']['field_coverage']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_coverage']['click_sort_column'] = 'geom';
+  $handler->display->display_options['fields']['field_coverage']['type'] = 'geofield_latlon';
+  $handler->display->display_options['fields']['field_coverage']['settings'] = array(
+    'data' => 'full',
+    'format' => 'decimal_degrees',
+    'labels' => 1,
+  );
   /* Field: Content: Location Description */
   $handler->display->display_options['fields']['field_coverage_description']['id'] = 'field_coverage_description';
   $handler->display->display_options['fields']['field_coverage_description']['table'] = 'field_data_field_coverage_description';
   $handler->display->display_options['fields']['field_coverage_description']['field'] = 'field_coverage_description';
-  $handler->display->display_options['fields']['field_coverage_description']['label'] = 'dc:coverage';
+  $handler->display->display_options['fields']['field_coverage_description']['label'] = 'dcterms:spatial';
   $handler->display->display_options['fields']['field_coverage_description']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_coverage_description']['type'] = 'text_plain';
   /* Field: Field: Rights */
@@ -224,6 +376,43 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['fields']['field_rights']['label'] = 'dc:rights';
   $handler->display->display_options['fields']['field_rights']['hide_empty'] = TRUE;
   $handler->display->display_options['fields']['field_rights']['type'] = 'text_plain';
+  /* Field: Content: Traditional Knowledge Labels */
+  $handler->display->display_options['fields']['field_licence_trad']['id'] = 'field_licence_trad';
+  $handler->display->display_options['fields']['field_licence_trad']['table'] = 'field_data_field_licence_trad';
+  $handler->display->display_options['fields']['field_licence_trad']['field'] = 'field_licence_trad';
+  $handler->display->display_options['fields']['field_licence_trad']['label'] = 'dc:rights';
+  $handler->display->display_options['fields']['field_licence_trad']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_licence_trad']['type'] = 'textformatter_list';
+  $handler->display->display_options['fields']['field_licence_trad']['settings'] = array(
+    'textformatter_type' => 'comma',
+    'textformatter_comma_and' => 0,
+    'textformatter_comma_full_stop' => 0,
+    'textformatter_comma_override' => 0,
+    'textformatter_separator_custom' => '',
+    'textformatter_separator_custom_tag' => '0',
+    'textformatter_separator_custom_class' => '',
+    'textformatter_comma_tag' => '0',
+    'textformatter_class' => '',
+  );
+  $handler->display->display_options['fields']['field_licence_trad']['delta_offset'] = '0';
+  /* Field: Field: Standard and Creative Commons Licensing */
+  $handler->display->display_options['fields']['field_licence_std_cc']['id'] = 'field_licence_std_cc';
+  $handler->display->display_options['fields']['field_licence_std_cc']['table'] = 'field_data_field_licence_std_cc';
+  $handler->display->display_options['fields']['field_licence_std_cc']['field'] = 'field_licence_std_cc';
+  $handler->display->display_options['fields']['field_licence_std_cc']['label'] = 'dc:rights';
+  $handler->display->display_options['fields']['field_licence_std_cc']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['field_licence_std_cc']['type'] = 'textformatter_list';
+  $handler->display->display_options['fields']['field_licence_std_cc']['settings'] = array(
+    'textformatter_type' => 'comma',
+    'textformatter_comma_and' => 0,
+    'textformatter_comma_full_stop' => 0,
+    'textformatter_comma_override' => 0,
+    'textformatter_separator_custom' => '',
+    'textformatter_separator_custom_tag' => '0',
+    'textformatter_separator_custom_class' => '',
+    'textformatter_comma_tag' => '0',
+    'textformatter_class' => '',
+  );
   /* Field: Content: Media Assets */
   $handler->display->display_options['fields']['field_media_asset']['id'] = 'field_media_asset';
   $handler->display->display_options['fields']['field_media_asset']['table'] = 'field_data_field_media_asset';
@@ -237,6 +426,29 @@ function ma_importexport_dc_views_default_views() {
   );
   $handler->display->display_options['fields']['field_media_asset']['delta_offset'] = '0';
   $handler->display->display_options['fields']['field_media_asset']['separator'] = ';;;';
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
+  $handler->display->display_options['fields']['nid']['relationship'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['fields']['nid']['label'] = 'hidden';
+  $handler->display->display_options['fields']['nid']['exclude'] = TRUE;
+  /* Field: Global: PHP */
+  $handler->display->display_options['fields']['php']['id'] = 'php';
+  $handler->display->display_options['fields']['php']['table'] = 'views';
+  $handler->display->display_options['fields']['php']['field'] = 'php';
+  $handler->display->display_options['fields']['php']['label'] = 'dcterms:relation';
+  $handler->display->display_options['fields']['php']['hide_empty'] = TRUE;
+  $handler->display->display_options['fields']['php']['use_php_setup'] = 0;
+  $handler->display->display_options['fields']['php']['php_output'] = '<?php
+if (isset($row->nid)) {
+  global $base_url;
+  print $base_url . \'/\' . drupal_get_path_alias(\'node/\' . $row->nid);
+}
+?>
+';
+  $handler->display->display_options['fields']['php']['use_php_click_sortable'] = '0';
+  $handler->display->display_options['fields']['php']['php_click_sortable'] = '';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -348,6 +560,26 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['is_grouped'] = TRUE;
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['label'] = 'Is Community Record';
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['identifier'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['group_items'] = array(
+    1 => array(
+      'title' => 'Yes',
+      'operator' => 'not empty',
+      'value' => array(
+        'value' => 'fillter',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+    2 => array(
+      'title' => 'No',
+      'operator' => 'empty',
+      'value' => array(
+        'value' => 'filler',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+  );
   /* Filter criterion: Content: Book Parent (field_book_parent) */
   $handler->display->display_options['filters']['field_book_parent_target_id']['id'] = 'field_book_parent_target_id';
   $handler->display->display_options['filters']['field_book_parent_target_id']['table'] = 'field_data_field_book_parent';
@@ -363,28 +595,19 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['identifier'] = 'field_book_parent_target_id';
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['group_items'] = array(
     1 => array(
-      'title' => '',
-      'operator' => '=',
+      'title' => 'Show first page only',
+      'operator' => 'empty',
       'value' => array(
-        'value' => '',
+        'value' => 'filler',
         'min' => '',
         'max' => '',
       ),
     ),
     2 => array(
-      'title' => '',
-      'operator' => '=',
+      'title' => 'Show all pages',
+      'operator' => 'not empty',
       'value' => array(
-        'value' => '',
-        'min' => '',
-        'max' => '',
-      ),
-    ),
-    3 => array(
-      'title' => '',
-      'operator' => '=',
-      'value' => array(
-        'value' => '',
+        'value' => 'filler',
         'min' => '',
         'max' => '',
       ),
@@ -578,21 +801,30 @@ function ma_importexport_dc_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
+    t('Content entity referenced from field_community_record_parent'),
     t('dc:title'),
     t('dc:creator'),
     t('dc:subject'),
     t('dc:description'),
+    t('Cultural Narrative: [body]'),
+    t('Traditional Knowledge: [field_tk_body] '),
+    t('Transcription: [field_transcription]'),
+    t('Person: [field_people]'),
     t('dc:publisher'),
     t('dc:contributor'),
     t('dc:date'),
+    t('dcterms:temporal'),
     t('dc:type'),
     t('dc:format'),
     t('dc:identifier'),
     t('dc:source'),
     t('dc:language'),
-    t('dc:coverage'),
+    t('dc:location'),
+    t('dcterms:spatial'),
     t('dc:rights'),
     t('dc:hasformat'),
+    t('hidden'),
+    t('dcterms:relation'),
     t('Title'),
     t('Community'),
     t('Category'),
