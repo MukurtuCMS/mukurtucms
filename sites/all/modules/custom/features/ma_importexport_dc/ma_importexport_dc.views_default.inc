@@ -564,6 +564,26 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['is_grouped'] = TRUE;
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['label'] = 'Is Community Record';
   $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['identifier'] = 'field_community_record_parent_target_id';
+  $handler->display->display_options['filters']['field_community_record_parent_target_id']['group_info']['group_items'] = array(
+    1 => array(
+      'title' => 'Yes',
+      'operator' => 'not empty',
+      'value' => array(
+        'value' => 'fillter',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+    2 => array(
+      'title' => 'No',
+      'operator' => 'empty',
+      'value' => array(
+        'value' => 'filler',
+        'min' => '',
+        'max' => '',
+      ),
+    ),
+  );
   /* Filter criterion: Content: Book Parent (field_book_parent) */
   $handler->display->display_options['filters']['field_book_parent_target_id']['id'] = 'field_book_parent_target_id';
   $handler->display->display_options['filters']['field_book_parent_target_id']['table'] = 'field_data_field_book_parent';
@@ -579,28 +599,19 @@ function ma_importexport_dc_views_default_views() {
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['identifier'] = 'field_book_parent_target_id';
   $handler->display->display_options['filters']['field_book_parent_target_id']['group_info']['group_items'] = array(
     1 => array(
-      'title' => '',
-      'operator' => '=',
+      'title' => 'Show first page only',
+      'operator' => 'empty',
       'value' => array(
-        'value' => '',
+        'value' => 'filler',
         'min' => '',
         'max' => '',
       ),
     ),
     2 => array(
-      'title' => '',
-      'operator' => '=',
+      'title' => 'Show all pages',
+      'operator' => 'not empty',
       'value' => array(
-        'value' => '',
-        'min' => '',
-        'max' => '',
-      ),
-    ),
-    3 => array(
-      'title' => '',
-      'operator' => '=',
-      'value' => array(
-        'value' => '',
+        'value' => 'filler',
         'min' => '',
         'max' => '',
       ),
