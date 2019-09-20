@@ -226,12 +226,35 @@ function ma_importexport_set_partial_date_target($source, $entity, $target, $val
     return;
   }
 
-  $import_date = new DateTime($value[0]);
+  $count = substr_count($value[0], '-');
+
+  if ($count == 2) {
+    $import_date = DateTime::createFromFormat("Y-m-d", $value[0]);
+  }
+
+  if ($count == 1) {
+    $import_date = DateTime::createFromFormat("Y-m", $value[0]);
+  }
+
+  if ($count == 0) {
+    $import_date = DateTime::createFromFormat("Y", $value[0]);
+  }
 
   if ($import_date) {
+    // Clear old date.
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['year'] = "";
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['month'] = "";
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['day'] = "";
+
+    // Get new date.
     $entity->{$target}[LANGUAGE_NONE][0]['from']['year'] = $import_date->format('Y');
-    $entity->{$target}[LANGUAGE_NONE][0]['from']['month'] = $import_date->format('m');
-    $entity->{$target}[LANGUAGE_NONE][0]['from']['day'] = $import_date->format('d');
+
+    if ($count > 0) {
+      $entity->{$target}[LANGUAGE_NONE][0]['from']['month'] = $import_date->format('m');
+      if ($count > 1) {
+        $entity->{$target}[LANGUAGE_NONE][0]['from']['day'] = $import_date->format('d');
+      }
+    }
   }
 }
 
