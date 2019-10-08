@@ -1627,6 +1627,10 @@ function _ma_mobile_client_retrieve_atom ($fn, $sid) {
     return t('There is no atom with the scald ID of @sid.', ['@sid' => $sid]);
   }
 
+  if (ma_scald_scald_atom_access($sid, 'view') === false) {
+    return t('You do not have permission to view the atom with the scald ID of @sid.', ['@sid' => $sid]);
+  }
+
   // URL to retrieve atom thumbnail.
   $atom->thumbnail_url = file_create_url($atom->thumbnail_source);
 
