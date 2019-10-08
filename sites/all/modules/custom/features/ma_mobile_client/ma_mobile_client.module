@@ -624,8 +624,7 @@ function ma_mobile_client_services_resources() {
         'retrieve' => [
           'help' => 'Retrieves a paragraph',
           'callback' => '_ma_mobile_client_retrieve_paragraph',
-          'access callback' => 'user_access',
-          'access arguments' => ['view content'],
+          'access callback' => 'user_is_logged_in',
           'args' => [
             [
               'name' => 'fn',
