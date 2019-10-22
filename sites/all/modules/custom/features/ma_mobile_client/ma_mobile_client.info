@@ -4,6 +4,7 @@ core = 7.x
 package = Features
 dependencies[] = ctools
 dependencies[] = ds
+dependencies[] = hook_post_action
 dependencies[] = ma_services
 dependencies[] = strongarm
 dependencies[] = views
