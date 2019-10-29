@@ -175,6 +175,88 @@ function ma_person_strongarm() {
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_paragraphs_item__person_relationship_bundle';
+  $strongarm->value = array(
+    'view_modes' => array(
+      'paragraphs_editor_preview' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'word_entry_search_results' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => FALSE,
+      ),
+    ),
+    'extra_fields' => array(
+      'form' => array(),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_paragraphs_item__person_relationship_bundle'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'field_bundle_settings_paragraphs_item__text_section';
+  $strongarm->value = array(
+    'view_modes' => array(
+      'paragraphs_editor_preview' => array(
+        'custom_settings' => TRUE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'word_entry_search_results' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => FALSE,
+      ),
+    ),
+    'extra_fields' => array(
+      'form' => array(),
+      'display' => array(),
+    ),
+  );
+  $export['field_bundle_settings_paragraphs_item__text_section'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
   $strongarm->name = 'language_content_type_person';
   $strongarm->value = '0';
   $export['language_content_type_person'] = $strongarm;
