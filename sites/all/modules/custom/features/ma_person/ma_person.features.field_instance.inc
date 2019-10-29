@@ -1195,7 +1195,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'paragraphs',
         'settings' => array(
-          'view_mode' => 'full',
+          'view_mode' => 'mukurtu_mobile',
         ),
         'type' => 'paragraphs_view',
         'weight' => 5,
@@ -1304,7 +1304,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'hidden',
         'module' => 'paragraphs',
         'settings' => array(
-          'view_mode' => 'full',
+          'view_mode' => 'mukurtu_mobile',
         ),
         'type' => 'paragraphs_view',
         'weight' => 6,

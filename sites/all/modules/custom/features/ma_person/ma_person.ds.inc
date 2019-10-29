@@ -127,6 +127,16 @@ function ma_person_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
+    'field_related_people' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'field_sections' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
   );
   $export['node|person|mukurtu_mobile'] = $ds_fieldsetting;
 
