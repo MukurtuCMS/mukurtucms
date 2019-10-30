@@ -259,11 +259,6 @@ function ma_collection_ds_field_settings_info() {
       'label' => 'hidden',
       'format' => 'default',
     ),
-    'field_digital_heritage_items' => array(
-      'formatter_settings' => array(
-        'ft' => array(),
-      ),
-    ),
   );
   $export['node|personal_collection|mukurtu_mobile'] = $ds_fieldsetting;
 

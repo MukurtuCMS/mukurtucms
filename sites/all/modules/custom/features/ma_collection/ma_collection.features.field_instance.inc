@@ -1172,7 +1172,7 @@ function ma_collection_field_default_field_instances() {
           'link' => 0,
           'override' => 0,
         ),
-        'type' => 'full',
+        'type' => 'ma_colorbox',
         'weight' => 1,
       ),
       'search_result' => array(
