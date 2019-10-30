@@ -6,6 +6,7 @@ dependencies[] = ctools
 dependencies[] = ds
 dependencies[] = hook_post_action
 dependencies[] = ma_services
+dependencies[] = services_field_collection
 dependencies[] = strongarm
 dependencies[] = views
 dependencies[] = views_php
