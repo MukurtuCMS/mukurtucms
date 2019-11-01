@@ -1000,23 +1000,34 @@ function _ma_mobile_client_get_viewable_types ($fn = NULL) {
 /**
  * Retrieves the fields and their properties, and fieldgroups, of the passed content type for the current user, to be used by the app in constructing the form in React.
  */
-function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
+function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
 
-  if (!node_type_get_type($content_type)) {
-    return 'Content type ' . $content_type . ' does not exist';
-  }
-  if (!key_exists($content_type, _ma_mobile_client_get_creatable_types())) {
-    return 'Content type ' . $content_type . ' exists, but is not a valid app-creatable type.';
+  // Build node form
+  if (!$fc) {
+    if (!node_type_get_type($bundle)) {
+      return 'Content type ' . $bundle . ' does not exist';
+    }
+    if (!key_exists($bundle, _ma_mobile_client_get_creatable_types())) {
+      return 'Content type ' . $bundle . ' exists, but is not a valid app-creatable type.';
+    }
+
+    // Get the node form for this user and this content type.
+    module_load_include('inc', 'node', 'node.pages');
+    global $user;
+    $node = new stdClass;
+    $node->uid = $user->uid;
+    $node->type = $bundle;
+    $node->language = LANGUAGE_NONE;
+    $form = drupal_get_form($bundle . '_node_form', $node);
   }
 
-  // Get the node form for this user and this content type.
-  module_load_include('inc', 'node', 'node.pages');
-  global $user;
-  $node = new stdClass;
-  $node->uid = $user->uid;
-  $node->type = $content_type;
-  $node->language = LANGUAGE_NONE;
-  $node_form = drupal_get_form($content_type. '_node_form', $node);
+  // Build field collection form which gets embedded into the node form.
+  else {
+    $field_collection_item = entity_create('field_collection_item', array('field_name' => $bundle));
+    $form_state = [];
+    $form = [];
+    field_attach_form('field_collection_item', $field_collection_item, $form, $form_state, LANGUAGE_NONE);
+  }
 
   // Build $fields_and_fieldgroups out of the node form fields (skipping the ones we don't want), body, title, and the field groups.
   $fields_and_fieldgroups = [];
@@ -1036,37 +1047,44 @@ function _ma_mobile_client_get_node_form_fields ($fn, $content_type) {
     'og_roles_permissions',
     'og_group_ref',
   ];
-  foreach ($node_form as $key => $value) {
+  foreach ($form as $key => $value) {
     if (!in_array($key, $skip_fields) AND (in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
 
-      // Custom handling per field.
-      switch ($key) {
+      $field_info = field_info_field($key);
 
-        case "og_group_ref":
-          $options = [];
-          $communities = _ajax_get_community_dropdown_options([], FALSE);
-          foreach ($communities as $community_nid => $community_name) {
-            if ($community_nid) {
-              $options [$community_name] = _ajax_get_protocol_by_community_dropdown_options($community_nid, [], FALSE);
-            }
-          }
-          $value[LANGUAGE_NONE]["#options"] = $options;
-          $value[LANGUAGE_NONE]["#required"] = ma_cultural_protocol_node_type_must_have_cp($content_type);
-
-          break;
-
+      // For field collection fields, call this own function to add the FC's subfields within the FC field.
+      // For paragraphs, this is not necessary -- the form API builds the paragraph subfields already. For FC we have to manually add them.
+      if ($field_info["module"] == 'field_collection') {
+        $fc_subfields = _ma_mobile_client_get_node_form_fields(NULL, $key, TRUE);
+        $value['field_collection_subfields'] = $fc_subfields;
       }
+
+      // Non-FC fields.
+      else {
+
+        // Custom handling per field.
+        switch ($key) {
+
+          case "og_group_ref":
+            $options = [];
+            $communities = _ajax_get_community_dropdown_options([], FALSE);
+            foreach ($communities as $community_nid => $community_name) {
+              if ($community_nid) {
+                $options [$community_name] = _ajax_get_protocol_by_community_dropdown_options($community_nid, [], FALSE);
+              }
+            }
+            $value[LANGUAGE_NONE]["#options"] = $options;
+            $value[LANGUAGE_NONE]["#required"] = ma_cultural_protocol_node_type_must_have_cp($bundle);
+            break;
+
+        }
+      }
+
 
       // Set the field.
       $fields_and_fieldgroups[$key] = $value;
 
     }
-  }
-
-  // Custom handling per content type.
-  switch ($content_type) {
-    case 'digital_heritage':
-      break;
   }
 
   // Return the form.
