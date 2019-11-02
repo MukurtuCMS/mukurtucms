@@ -16,11 +16,14 @@ function _services_fc_retrieve($fcid) {
 
 // Adds backwards compatibility with regression fixed in #1083242
 function _services_fc_create($field_collection) {
-  $field_collection=_services_arg_value($field_collection, 'field_collection');
-  $field_collection=(object) $field_collection;
-  entity_save('field_collection_item', $field_collection);
-
-  return $field_collection;
+  // Mukurtu patch.
+  if ($node = node_load ($field_collection['host_nid'])) {
+    $entity = entity_create('field_collection_item', $field_collection['field_collection']);
+    $entity->setHostEntity('node', $node);
+    $entity->save();
+    node_save($node);
+    return $entity;
+  }
 }
 
 // Adds backwards compatibility with regression fixed in #1083242

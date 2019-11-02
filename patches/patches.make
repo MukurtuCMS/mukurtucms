@@ -185,6 +185,10 @@ projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even
 ; Fix for submitting multi-value fields.
 projects[services][patch][] = https://www.drupal.org/files/issues/2019-05-09/services-multivalue_fields_fix-2224803-78.patch
 
+;;; Services Field Collection
+; Fix the sandbox project services_field_collection so that field collections can be created.
+projects[services_field_collection][patch][] = contrib/fix_services_field_collection_create.patch
+
 ;;; Tree (treeable)
 ; Skip treeable field formatter patch
 projects[tree][patch][] = contrib/skip_treeable_field_formatter.patch
