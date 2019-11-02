@@ -52,6 +52,9 @@ function ma_services_default_services_endpoint() {
         'retrieve' => array(
           'enabled' => '1',
         ),
+        'create' => array(
+          'enabled' => '1',
+        ),
       ),
     ),
     'file' => array(
