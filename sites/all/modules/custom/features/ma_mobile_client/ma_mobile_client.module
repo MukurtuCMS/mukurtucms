@@ -1400,7 +1400,7 @@ function _ma_mobile_client_retrieve_paragraph($fn, $pid) {
 /**
  * Create a scald atom.
  */
-function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $category) {
+function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $category) {
 
   $resave_atom = 0;
 
@@ -1413,7 +1413,7 @@ function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $c
         // The following code is taken from scald_youtube_scald_add_form_fill / scald_vimeo_scald_add_form_fill with two changes: 1. the merging of the two. 2. dropping of the tags and author taxonomy fills (produce entity errors in this context)
 
         if ($external == 'vimeo') {
-          $identifier = scald_vimeo_parse_id($id, TRUE);
+          $identifier = scald_vimeo_parse_id($fid, TRUE);
           if ($identifier == FALSE) {
             return services_error('invalid Vimeo ID', 406);
           };
@@ -1427,7 +1427,7 @@ function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $c
         }
 
         elseif ($external == 'youtube') {
-          $identifier = scald_youtube_parse_id($id, TRUE);
+          $identifier = scald_youtube_parse_id($fid, TRUE);
           if ($identifier == FALSE) {
             return services_error('invalid Youtube ID', 406);
           };
@@ -1443,7 +1443,7 @@ function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $c
         // Atom does not exist, needs to be created.
         $atom = new ScaldAtom('video', 'scald_' . $external);
 
-        $atom->base_id = $id;
+        $atom->base_id = $fid;
         if (!isset($atom->data)) {
           $atom->data = array();
         }
@@ -1494,8 +1494,8 @@ function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $c
 
   // Regular file upload
   else {
-    $id = intval($id);
-    if (!$file = file_load($id)) {
+    $fid = intval($fid);
+    if (!$file = file_load($fid)) {
       return services_error('id does not match a file ID', 406);
     }
 
@@ -1506,6 +1506,7 @@ function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $c
     }
 
     $type = _scald_feeds_get_provider_by_mime_type($file->filemime);
+    $provider = 'scald_' . $type;
 
     // Search for a previously imported matching scald atom and use that if found (slight adaptation from scald_feeds_fetch_matching_atom)
 
@@ -1544,7 +1545,11 @@ function _ma_mobile_client_create_atom ($fn, $id, $external, $title, $author, $c
     }
 
     // Atom does not exist already, needs to be created
-    if ($sid = _scald_feeds_save_atom($file->uri, $type, $title)) {
+    $atom = new ScaldAtom($type, $provider);
+    $atom->base_id = $fid;
+    $atom->title = $title;
+    $sid = scald_atom_save($atom);
+    if ($sid) {
 
       $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
 
