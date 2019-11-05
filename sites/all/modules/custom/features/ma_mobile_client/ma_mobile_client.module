@@ -1549,14 +1549,23 @@ function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $
     $atom->base_id = $fid;
     $atom->title = $title;
     $sid = scald_atom_save($atom);
-    if ($sid) {
+    if (!$sid) {
+      return services_error('unable to create atom', 406);
+    }
+    else {
 
-      $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
 
       // For images, populate metadata from exif/xmp/iptc fields
       if ($type == 'image') {
 
         $resave_atom = 1;
+
+        // Thumbnail
+        $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
+        scald_atom_save($atom);
+
+        // Reload the atom as a wrapper
+        $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
 
         // Identifier
         $atom_wrapper->field_scald_identifier = $title;
@@ -1600,12 +1609,7 @@ function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $
           $atom_wrapper->scald_tags = array($term->tid);
 
         }
-
       }
-
-    }
-    else {
-      return services_error('unable to create atom', 406);
     }
   }
 
@@ -1623,7 +1627,7 @@ function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $
       $term = ma_core_get_create_tax_term($category, 'category');
       // Cannot set this field with an entity wrapper, so setting directly on the atom instead
       $atom = scald_atom_load($sid);
-      $atom->field_category['en'][0]['tid'] = $term->tid;
+      $atom->field_category[LANGUAGE_NONE][0]['tid'] = $term->tid;
       scald_atom_save($atom);
     }
     if ($resave_atom) {
