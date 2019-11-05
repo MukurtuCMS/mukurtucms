@@ -66,6 +66,11 @@ function ma_services_default_services_endpoint() {
           'enabled' => '1',
         ),
       ),
+      'actions' => array(
+        'create_raw' => array(
+          'enabled' => '1',
+        ),
+      ),
     ),
     'groups' => array(
       'alias' => 'groups',
