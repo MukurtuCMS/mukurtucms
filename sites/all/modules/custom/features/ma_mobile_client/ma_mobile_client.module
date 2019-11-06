@@ -1554,61 +1554,72 @@ function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $
     }
     else {
 
+      switch ($type) {
 
-      // For images, populate metadata from exif/xmp/iptc fields
-      if ($type == 'image') {
+        case 'video':
+          $atom->file_source = $file->uri;
+          $atom->data['video_file'] = $file->uri;
+          $atom->data['video_id'] = $file->fid;
+          scald_atom_save($atom);
+          break;
 
+        case 'image':
+
+        // Populate metadata from exif/xmp/iptc fields
         $resave_atom = 1;
 
-        // Thumbnail
-        $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
-        scald_atom_save($atom);
+          // Thumbnail
+          $atom->scald_thumbnail[LANGUAGE_NONE][] = (array) $file;
+          scald_atom_save($atom);
 
-        // Reload the atom as a wrapper
-        $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
+          // Reload the atom as a wrapper
+          $atom_wrapper = entity_metadata_wrapper('scald_atom', $sid);
 
-        // Identifier
-        $atom_wrapper->field_scald_identifier = $title;
+          // Identifier
+          $atom_wrapper->field_scald_identifier = $title;
 
-        // Direct metadata population
-        $field_assocs = array(
-          'field_media_description' => 'field_scald_description',
-          'field_iptc_headline' => 'field_scald_headline',
-          'field_iptc_copyright' => 'field_licence_std_cc',
-          'field_xmp_rights' => 'field_rights',
-          'field_iptc_sublocation' => 'field_scald_location',
-          'field_xmp_creator' => 'field_scald_creator',
-        );
+          // Direct metadata population
+          $field_assocs = array(
+            'field_media_description' => 'field_scald_description',
+            'field_iptc_headline' => 'field_scald_headline',
+            'field_iptc_copyright' => 'field_licence_std_cc',
+            'field_xmp_rights' => 'field_rights',
+            'field_iptc_sublocation' => 'field_scald_location',
+            'field_xmp_creator' => 'field_scald_creator',
+          );
 
-        foreach ($field_assocs as $exif_field => $scald_field) {
-          if (isset($file->{$exif_field}[LANGUAGE_NONE][0]['value'])) {
-            $atom_wrapper->$scald_field = $file->{$exif_field}[LANGUAGE_NONE][0]['value'];
+          foreach ($field_assocs as $exif_field => $scald_field) {
+            if (isset($file->{$exif_field}[LANGUAGE_NONE][0]['value'])) {
+              $atom_wrapper->$scald_field = $file->{$exif_field}[LANGUAGE_NONE][0]['value'];
+            }
           }
-        }
 
-        /// Non-direct metadata population
+          /// Non-direct metadata population
 
-        // Created date
-        if (isset($file->field_exif_datetime[LANGUAGE_NONE][0]['value'])) {
-          $atom_wrapper->field_scald_created->set(strtotime($file->field_exif_datetime[LANGUAGE_NONE][0]['value']));
-        }
+          // Created date
+          if (isset($file->field_exif_datetime[LANGUAGE_NONE][0]['value'])) {
+            $atom_wrapper->field_scald_created->set(strtotime($file->field_exif_datetime[LANGUAGE_NONE][0]['value']));
+          }
 
-        // Geolocation
-        if (isset($file->field_gps_latitude[LANGUAGE_NONE][0]['value']) && isset($file->field_gps_longitude[LANGUAGE_NONE][0]['value'])) {
-          $atom_wrapper->field_scald_geo_location->set(array(
-            'lat' => $file->field_gps_latitude[LANGUAGE_NONE][0]['value'],
-            'lon' => $file->field_gps_longitude[LANGUAGE_NONE][0]['value']
-          ));
-        }
+          // Geolocation
+          if (isset($file->field_gps_latitude[LANGUAGE_NONE][0]['value']) && isset($file->field_gps_longitude[LANGUAGE_NONE][0]['value'])) {
+            $atom_wrapper->field_scald_geo_location->set(array(
+              'lat' => $file->field_gps_latitude[LANGUAGE_NONE][0]['value'],
+              'lon' => $file->field_gps_longitude[LANGUAGE_NONE][0]['value']
+            ));
+          }
 
-        // Keywords (Scald tags)
-        // TODO: exif is currently only extracting the first keyword. Make it extract multiple keywords.
-        if (isset($file->field_iptc_keywords[LANGUAGE_NONE][0]['value'])) {
-          $keyword = $file->field_iptc_keywords[LANGUAGE_NONE][0]['value'];
-          $term = ma_core_get_create_tax_term($keyword, 'scald_tags');
-          $atom_wrapper->scald_tags = array($term->tid);
+          // Keywords (Scald tags)
+          // TODO: exif is currently only extracting the first keyword. Make it extract multiple keywords.
+          if (isset($file->field_iptc_keywords[LANGUAGE_NONE][0]['value'])) {
+            $keyword = $file->field_iptc_keywords[LANGUAGE_NONE][0]['value'];
+            $term = ma_core_get_create_tax_term($keyword, 'scald_tags');
+            $atom_wrapper->scald_tags = array($term->tid);
 
-        }
+          }
+
+          break;
+
       }
     }
   }
