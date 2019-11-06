@@ -1676,7 +1676,11 @@ function _ma_mobile_client_retrieve_atom ($fn, $sid) {
       $atom->file_url = $atom->data["permalink_url"];
       break;
     default:
-      $atom->file_url = file_create_url($atom->file_source);
+      if (!$uri = $atom->file_source) {
+        $file = file_load ($atom->base_id);
+        $uri = $file->uri;
+      }
+      $atom->file_url = file_create_url($uri);
       break;
   }
 
