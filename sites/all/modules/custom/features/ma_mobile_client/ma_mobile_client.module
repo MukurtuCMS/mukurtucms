@@ -1563,6 +1563,13 @@ function _ma_mobile_client_create_atom ($fn, $fid, $external, $title, $author, $
           scald_atom_save($atom);
           break;
 
+        case 'audio':
+          $atom->data['audio_file'] = $file->uri;
+          $atom->data['audio_id'] = $file->fid;
+          $atom->file_source = $file->uri;
+          scald_atom_save($atom);
+          break;
+
         case 'image':
 
         // Populate metadata from exif/xmp/iptc fields
