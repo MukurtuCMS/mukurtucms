@@ -236,7 +236,7 @@ function ma_core_menu() {
 
   // 403 page.
   $items['mukurtu/access-denied'] = array(
-    'title' => t('Access denied'),
+    'title' => t('Incorrect Permissions'),
     'description' => 'Mukurtu Access Denied (403 error)',
     'page callback' => 'ma_core_access_denied_page',
     'access callback' => TRUE,
