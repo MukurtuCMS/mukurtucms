@@ -555,7 +555,7 @@ function ma_search_api_sort_form($form, &$form_state) {
 
   $form['sort'] = array(
     '#type' => 'select',
-    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'changed',
+    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'relevance',
     '#options' => $sort_options,
     '#attributes' => array('onchange' => 'this.form.submit();'),
   );
