@@ -192,6 +192,22 @@ class HoneypotFormTestCase extends DrupalWebTestCase {
     $this->assertNoRaw('There was a problem with your form submission. Please wait 6 seconds and try again.');
     $this->assertFalse($form_errors, 'The were no validation errors when submitting the form.');
   }
+
+  /**
+   * Test that any (not-strict-empty) value triggers protection.
+   */
+  public function testStrictEmptinessOnHoneypotField() {
+    // Initialise the form values.
+    $edit['name'] = $this->randomName();
+    $edit['mail'] = $edit['name'] . '@example.com';
+
+    // Any value that is not strictly empty should trigger Honeypot.
+    foreach (['0', ' '] as $value) {
+      $edit['url'] = $value;
+      $this->drupalPost('user/register', $edit, t('Create new account'));
+      $this->assertText(t('There was a problem with your form submission. Please refresh the page and try again.'), "Honeypot protection is triggered when the honeypot field contains '{$value}'.");
+    }
+  }
 }
 
 /**

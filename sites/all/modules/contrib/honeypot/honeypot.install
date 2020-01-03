@@ -69,6 +69,7 @@ function honeypot_uninstall() {
   }
 
   // Delete 'honeypot' directory from files directory.
+  drupal_load('module', 'honeypot');
   file_unmanaged_delete_recursive(honeypot_file_default_scheme() . '://honeypot');
 }
 
