@@ -44,20 +44,22 @@ function theme_owlcarousel($variables) {
   $output = array(
     '#output' => array(
       'settings' => $settings,
-      'items' => $items
+      'items' => $items,
     ),
     '#pre_render' => array('owlcarousel_pre_render_cache'),
   );
 
   $debug = variable_get('owlcarousel_debug_mode', TRUE);
-  if (!$debug) {
+  // Views (and other callers) can disable caching if it's unwanted:
+  $cache_disable = !empty($variables['settings']['cache_disable']);
+  if (!$debug && !$cache_disable) {
     $output += array(
       '#cache' => array(
         'keys' => array('owlcarousel', $instance),
         'bin' => 'cache',
         'expire' => time() + variable_get('owlcarousel_cache_interval', 3600),
-        'granularity' => DRUPAL_CACHE_GLOBAL
-      )
+        'granularity' => DRUPAL_CACHE_GLOBAL,
+      ),
     );
   }
 
@@ -74,7 +76,7 @@ function owlcarousel_pre_render_cache($element) {
   $output = array(
     '#theme' => 'owlcarousel_list',
     '#items' => $element['#output']['items'],
-    '#settings' => $element['#output']['settings']
+    '#settings' => $element['#output']['settings'],
   );
 
   // Element output /w attached.
@@ -89,20 +91,22 @@ function owlcarousel_pre_render_cache($element) {
       array(
         'data' => drupal_get_path('module', 'owlcarousel') . '/includes/js/owlcarousel.settings.js',
         'type' => 'file',
-        'scope' => 'footer'
+        'scope' => 'footer',
       ),
       array(
-        'data' => array('owlcarousel' => array(
-          $instance => owlcarousel_settings($instance, $settings)
-        )),
-        'type' => 'setting'
-      )
+        'data' => array(
+          'owlcarousel' => array(
+            $instance => owlcarousel_settings($instance, $settings),
+          ),
+        ),
+        'type' => 'setting',
+      ),
     ),
     'library' => array(
       array(
         'owlcarousel',
-        'owlcarousel'
-      )
+        'owlcarousel',
+      ),
     ),
   );
 
