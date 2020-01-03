@@ -49,6 +49,23 @@ interface FacetapiQueryTypeInterface {
   static public function getType();
 
   /**
+   * Adds additional information to the array active items.
+   *
+   * Active facet items are stored in the FacetapiAdapter::activeItems property
+   * as associative arrays. See the docblock for the structure. Queries such as
+   * ranges can add additional info such as the "start" and "end" values for
+   * more efficient processing of facet data.
+   *
+   * @param array $item
+   *   The active item. See FacetapiAdapter::activeItems for the structure of
+   *   the active item array.
+   *
+   * @return array
+   *   An associative array addition information to add to the active item.
+   */
+  public function extract(array $item);
+
+  /**
    * Alters the backend's native query object to execute the facet query.
    *
    * As an example, modules that integrate with Apache Solr will set the
@@ -125,26 +142,14 @@ class FacetapiQueryType {
   }
 
   /**
-   * Adds additional information to the array active items.
-   *
-   * Active facet items are stored in the FacetapiAdapter::activeItems property
-   * as associative arrays. See the docblock for the structure. Queries such as
-   * ranges can add additional info such as the "start" and "end" values for
-   * more efficient processing of facet data.
-   *
-   * @param array $item
-   *   The active item. See FacetapiAdapter::activeItems for the structure of
-   *   the active item array.
-   *
-   * @return array
-   *   An associative array addition information to add to the active item.
+   * Implements FacetapiQueryTypeInterface::extract().
    */
   public function extract(array $item) {
     return array();
   }
 
   /**
-   * Convenience method to get the facet's global and per relam settings.
+   * Convenience method to get the facet's global and per realm settings.
    *
    * @param string|array $realm
    *   The machine readable name of the realm or an array containing the realm

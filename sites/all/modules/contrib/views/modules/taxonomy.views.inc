@@ -17,7 +17,7 @@ function taxonomy_views_data() {
   // 'taxonomy_vocabulary' table.
   $data['vocabulary']['moved to'] = 'taxonomy_vocabulary';
   $data['taxonomy_vocabulary']['table']['group']  = t('Taxonomy vocabulary');
-
+  $data['taxonomy_vocabulary']['table']['entity type'] = 'taxonomy_vocabulary';
   $data['taxonomy_vocabulary']['table']['join'] = array(
     // Vocabulary links to taxonomy_term_data directly via vid.
     'taxonomy_term_data' => array(

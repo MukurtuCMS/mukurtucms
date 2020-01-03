@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Provide diff field functions for the Field collection module.
+ * Provide diff field functions for the Field Collection.
  */
 
 /**
- * Diff field callback for parsing Field collection fields comparative values.
+ * Diff field callback for parsing Field Collection fields comparative values.
  */
 function field_collection_field_diff_view($items, $context) {
   $diff_items = array();
@@ -25,7 +25,7 @@ function field_collection_field_render_revision($item, $context) {
   $view_mode = $context['view_mode'];
   $entity = entity_revision_load($entity_type, $item['revision_id']);
 
-  if(empty($entity)) {
+  if (empty($entity)) {
     return array();
   }
 
@@ -40,7 +40,7 @@ function field_collection_field_render_revision($item, $context) {
     $field_context['custom_settings'] = FALSE;
   }
   $view_mode_settings = field_view_mode_settings($entity_type, $bundle_name);
-  $actual_mode = (!empty($view_mode_settings[$view_mode]['custom_settings'])) ? $view_mode : 'default';
+  $actual_mode = !empty($view_mode_settings[$view_mode]['custom_settings']) ? $view_mode : 'default';
   if (!isset($field_context['custom_settings'])) {
     $field_context['custom_settings'] = $actual_mode && $actual_mode == $view_mode;
   }
@@ -50,7 +50,8 @@ function field_collection_field_render_revision($item, $context) {
 
   $result = array();
   foreach ($instances as $instance) {
-    // Any view mode is supported in relation to hiding fields, but only if selected.
+    // Any view mode is supported in relation to hiding fields, but only if
+    // selected.
     if ($actual_mode && $instance['display'][$actual_mode]['type'] == 'hidden') {
       continue;
     }
@@ -67,19 +68,30 @@ function field_collection_field_render_revision($item, $context) {
       $field_context['settings'] = diff_get_field_settings($field_context);
       $field_context['display'] = $instance['display'][$actual_mode];
 
+      $old_items = array();
+      $new_items = array();
+      if (!empty($entity->{$field_name}[$langcode])) {
+        $new_items = $entity->{$field_name}[$langcode];
+      }
+
+      $func = $field['module'] . '_field_diff_view_prepare';
+      if (function_exists($func)) {
+        $func($old_items, $new_items, $field_context);
+      }
+
       $func = $field['module'] . '_field_diff_view';
       if (!function_exists($func)) {
         $func = 'diff_field_diff_view';
       }
 
-      if (!empty($entity->{$field_name}[$langcode])) {
-        $raw_values = $func($entity->{$field_name}[$langcode], $field_context);
+      if (!empty($new_items)) {
+        $raw_values = $func($new_items, $field_context);
         $values = array();
         foreach ($raw_values as $raw_value) {
-          $values[] = is_array($raw_value) ? implode(", ", $raw_value) : $raw_value;
+          $values[] = is_array($raw_value) ? implode(', ', $raw_value) : $raw_value;
         }
 
-        $result[] = check_plain($instance['label'] . ': ' . implode(", ", $values));
+        $result[] = check_plain($instance['label'] . ': ' . implode(', ', $values));
       }
     }
   }

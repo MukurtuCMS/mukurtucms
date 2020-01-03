@@ -57,6 +57,17 @@ function field_collection_field_views_data($field) {
       'base' => $entity_info['base table'],
       'base field' => $entity_info['entity keys']['id'],
       'label' => t('!field_name', array('!field_name' => $field['field_name'])),
+      'join_extra' => array(
+        0 => array(
+          'field' => 'entity_type',
+          'value' => $entity_type,
+        ),
+        1 => array(
+          'field' => 'deleted',
+          'value' => 0,
+          'numeric' => TRUE,
+        ),
+      ),
     );
   }
 

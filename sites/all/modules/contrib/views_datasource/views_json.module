@@ -134,6 +134,7 @@ function _views_json_render_multiple_field($field, $values) {
  */
 function _views_json_render_fields($view, $row) {
   $field_ids = array_keys($view->field);
+  $fields_info = $view->display_handler->get_option('fields');
   $rendered_fields = array();
   foreach ($field_ids as $id) {
     $field = $view->field[$id];
@@ -158,7 +159,7 @@ function _views_json_render_fields($view, $row) {
       // Check if this is field is the entity's label.
       if (empty($field->base_table)) {
         $entity_info = entity_get_info($field->table);
-        if (isset($entity_info['entity keys'])) {
+        if (isset($entity_info['entity keys']['label'])) {
           $label_field = $entity_info['entity keys']['label'];
           if ($field->real_field == $label_field) {
             // Decode html entities in label field as views does this by default for those fields.
@@ -178,9 +179,13 @@ function _views_json_render_fields($view, $row) {
             if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match)) {
               $field_output[$i]['src'] = $src_match[2];
               $field_output[$i]['alt'] = '';
+              $field_output[$i]['title'] = '';
 
               if (preg_match('/(alt)="([^"]*)"/i', $img_match[0], $alt_match)) {
                 $field_output[$i]['alt'] = $alt_match[2];
+              }
+              if (preg_match('/(title)="([^"]*)"/i', $img_match[0], $alt_match)) {
+                $field_output[$i]['title'] = $alt_match[2];
               }
             }
           }
@@ -198,9 +203,13 @@ function _views_json_render_fields($view, $row) {
                 if (preg_match('/(src)="([^"]*)"/i', $img_match, $src_match)) {
                   $field_output[$i]['src'] = $src_match[2];
                   $field_output[$i]['alt'] = '';
+                  $field_output[$i]['title'] = '';
 
                   if (preg_match('/(alt)="([^"]*)"/i', $img_match, $alt_match)) {
                     $field_output[$i]['alt'] = $alt_match[2];
+                  }
+                  if (preg_match('/(title)="([^"]*)"/i', $img_match, $alt_match)) {
+                    $field_output[$i]['title'] = $alt_match[2];
                   }
                 }
               }
@@ -209,9 +218,13 @@ function _views_json_render_fields($view, $row) {
               if (preg_match('/(src)="([^"]*)"/i', $img_matches[0][0], $src_match)) {
                 $field_output['src'] = $src_match[2];
                 $field_output['alt'] = '';
+                $field_output['title'] = '';
 
                 if (preg_match('/(alt)="([^"]*)"/i', $img_matches[0][0], $alt_match)) {
                   $field_output['alt'] = $alt_match[2];
+                }
+                if (preg_match('/(title)="([^"]*)"/i', $img_matches[0][0], $alt_match)) {
+                  $field_output['title'] = $alt_match[2];
                 }
               }
             }
@@ -233,7 +246,18 @@ function _views_json_render_fields($view, $row) {
         }
         $object->raw = $field_raw;
         $object->class = drupal_clean_css_identifier(strtolower($id));//views_css_safe($id);
-        $object->label = check_plain($view->field[$id]->label());
+
+        if (isset($view->style_options['translate_labels']) && $view->style_options['translate_labels']) {
+          $label = $view->field[$id]->label();
+        }
+        elseif (isset($fields_info) && isset($fields_info[$id]['label'])) {
+          $label = $fields_info[$id]['label'];
+        }
+        else {
+          $label = $field->label();
+        }
+        $object->label = check_plain($label);
+
         $object->is_multiple = $field_is_multiple;
         $rendered_fields[$id] = $object;
       }

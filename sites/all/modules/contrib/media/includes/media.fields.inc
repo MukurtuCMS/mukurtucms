@@ -2,8 +2,7 @@
 
 /**
  * @file
- * Provide the media selector widget and media field formatters to the Fields
- * API.
+ * Provide media selector widget and media field formatters to the fields API.
  */
 
 /**
@@ -137,10 +136,11 @@ function media_field_widget_form(&$form, &$form_state, $field, $instance, $langc
   elseif (module_exists('translation') && $element['#entity_type'] == 'node' && translation_supported_type($element['#entity']->type)) {
     $element['#media_parent_entity_form_langcode'] = $element['#entity']->language;
     $element['#media_parent_entity_source_langcode'] = $element['#entity']->language;
-  } elseif ($element['#entity_type'] == 'field_collection_item' && !empty($form['#entity']) && property_exists($form['#entity'], 'language')) {
+  }
+  elseif ($element['#entity_type'] == 'field_collection_item' && !empty($form['#entity']) && property_exists($form['#entity'], 'language')) {
     $element['#media_parent_entity_form_langcode'] = $form['#entity']->language;
   }
-  else if ($element['#entity_type'] == 'paragraphs_item' && !empty($form['#entity'])) {
+  elseif ($element['#entity_type'] == 'paragraphs_item' && !empty($form['#entity'])) {
     $host = $element['#entity']->hostEntity();
     if (isset($host->language)) {
       $element['#media_parent_entity_form_langcode'] = $host->language;
@@ -271,6 +271,32 @@ function media_field_widget_process($element, &$form_state, $form) {
     );
   }
 
+  // Add the alt field if enabled.
+  if (!empty($instance['settings']['alt_field']) && $item['fid']) {
+    $element['alt'] = array(
+      '#title' => t('Alternate text'),
+      '#type' => 'textfield',
+      '#default_value' => isset($item['alt']) ? $item['alt'] : '',
+      '#description' => t('This text will be used by screen readers, search engines, or when the image cannot be loaded.<br />
+<em>(Notice: this field is not fetched on -all- formatters yet. For example: If the Rendered file formatter will be used, this field is not available at the moment.)</em>'),
+      '#maxlength' => variable_get('image_alt_length', 100),
+      '#weight' => 1,
+    );
+  }
+
+  // Add the title field if enabled.
+  if (!empty($instance['settings']['title_field']) && $item['fid']) {
+    $element['title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Title'),
+      '#default_value' => isset($item['title']) ? $item['title'] : '',
+      '#description' => t('The title is used as a tool tip when the user hovers the mouse over the image.<br />
+<em>(Notice: this field is not fetched on -all- formatters yet. For example: If the Rendered file formatter will be used, this field is not available at the moment.)</em>'),
+      '#maxlength' => variable_get('image_title_length', 500),
+      '#weight' => 2,
+    );
+  }
+
   // Adjust the Ajax settings so that on upload and remove of any individual
   // file, the entire group of file fields is updated together.
   if ($field['cardinality'] != 1) {
@@ -306,7 +332,7 @@ function media_field_widget_process($element, &$form_state, $form) {
  * wrapper around the entire group so it can be replaced all at once.
  */
 function media_field_widget_process_multiple($element, &$form_state, $form) {
-    // In order to support multiple selection, we need to reconstruct the _POST
+  // In order to support multiple selection, we need to reconstruct the _POST
   // data that is checked in media_attach_file(). We need to reconstruct the
   // field's _POST key name, for example: field_mediafield_und_0.
   $upload_name_prefix = implode('_', $element['#parents']) . '_';
@@ -314,7 +340,7 @@ function media_field_widget_process_multiple($element, &$form_state, $form) {
   if (!empty($_POST['media'][$upload_name])) {
     $files = explode(',', $_POST['media'][$upload_name]);
     $count = count($files);
-    // Supposing #file_upload_delta is always the last delta this will work
+    // Supposing #file_upload_delta is always the last delta this will work.
     for ($i = 0; $i < $count; $i++) {
       // For each file selected, increment the field key to be processed.
       // field_mediafield_und_0 becomes field_mediafield_und_1, etc.
@@ -366,7 +392,7 @@ function media_field_widget_process_multiple($element, &$form_state, $form) {
  *
  * This helper function is used by media_field_widget_process_multiple().
  *
- * @param $element
+ * @param array $element
  *   The element being processed.
  *
  * @return
@@ -386,7 +412,7 @@ function _media_field_get_description_from_element($element) {
 }
 
 /**
- * Form submission handler for attach/remove button of media_field_widget_form().
+ * Form submit handler for attach/remove button of media_field_widget_form().
  *
  * This runs in addition to and after media_field_widget_submit().
  *
@@ -434,7 +460,7 @@ function media_field_widget_submit($form, &$form_state) {
 /**
  * Returns HTML for an individual media widget.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: A render element representing the widget.
  *
@@ -467,7 +493,7 @@ function theme_media_widget($variables) {
 /**
  * Returns HTML for a group of media widgets.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: A render element representing the widgets.
  *
@@ -561,7 +587,11 @@ function theme_media_widget_multiple($variables) {
     );
   }
 
-  $table = array('header' => $headers, 'rows' => $rows, 'attributes' => array('id' => $table_id));
+  $table = array(
+    'header' => $headers,
+    'rows' => $rows,
+    'attributes' => array('id' => $table_id)
+  );
 
   drupal_alter('media_widget_multiple', $table, $element);
 
@@ -623,6 +653,7 @@ function media_field_formatter_info() {
  * Implements hook_field_formatter_settings_form().
  *
  * Legacy support for the "Large filetype icon" file field formatter.
+ *
  * @see media_field_formatter_info()
  */
 function media_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
@@ -645,6 +676,7 @@ function media_field_formatter_settings_form($field, $instance, $view_mode, $for
  * Implements hook_field_formatter_settings_summary().
  *
  * Legacy support for the "Large filetype icon" file field formatter.
+ *
  * @see media_field_formatter_info()
  */
 function media_field_formatter_settings_summary($field, $instance, $view_mode) {
@@ -672,6 +704,7 @@ function media_field_formatter_settings_summary($field, $instance, $view_mode) {
  * Implements hook_field_formatter_view().
  *
  * Legacy support for the "Large filetype icon" file field formatter.
+ *
  * @see media_field_formatter_info()
  */
 function media_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {

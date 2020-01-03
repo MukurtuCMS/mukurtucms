@@ -8,6 +8,9 @@
 /**
  * A handler to provide proper displays for dates.
  *
+ * This may be used on table fields that hold either UNIX timestamps or SQL
+ * datetime strings.
+ *
  * @ingroup views_field_handlers
  */
 class views_handler_field_date extends views_handler_field {
@@ -138,6 +141,12 @@ class views_handler_field_date extends views_handler_field {
    */
   public function render($values) {
     $value = $this->get_value($values);
+
+    if (!is_numeric($value)) {
+      // If the value isn't numeric, assume it's an SQL DATETIME.
+      $value = strtotime($value);
+    }
+
     $format = $this->options['date_format'];
     if (in_array($format, $this->supported_date_types())) {
       $custom_format = $this->options['custom_date_format'];

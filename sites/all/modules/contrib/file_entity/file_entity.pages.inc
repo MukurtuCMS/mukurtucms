@@ -56,6 +56,10 @@ function file_entity_download_page($file) {
     // For local files, transfer the file and do not reveal the actual URL.
     file_transfer($file->uri, $headers);
   }
+  else if (file_uri_scheme($file->uri) == 's3') {
+    $url = file_create_url($file->uri);
+    drupal_goto($url);
+  }
   else {
     // For remote files, just redirect the user to that file's actual URL.
     $headers['Location'] = file_create_url($file->uri);
@@ -282,8 +286,26 @@ function file_entity_usage_page($file) {
         $entity_uri = empty($entities[$entity_id]) ? NULL : entity_uri($entity_type, $entities[$entity_id]);
 
         // Link the label to the URI when possible.
-        if (!empty($entity_uri['path'])) {
+        if (!empty($entity_uri['path']) && $entity_type != 'paragraphs_item') {
           $entity_label = l($label, $entity_uri['path']);
+        }
+        // For paragraphs items, we are searching for usages in nodes.
+        elseif ($entity_type == 'paragraphs_item') {
+          $paragraph_fields = field_read_fields(array('type' => 'paragraphs'));
+          foreach ($paragraph_fields as $paragraph_field) {
+            $field_name = $paragraph_field['field_name'];
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node')
+              ->fieldCondition($field_name, 'value', $entity_id, '=');
+            $nid = $query->execute();
+            if (!empty($nid)) {
+              $nid = implode(array_keys($nid['node']));
+              if ($nid) {
+                $node = node_load($nid);
+                $entity_label = l($node->title, 'node/' . $nid);
+              }
+            }
+          }
         }
         else {
           $entity_label = check_plain($label);
@@ -522,7 +544,7 @@ function file_entity_upload_destination_uri(array $params, array $data = array()
   $destination = trim($params['file_directory'], '/');
 
   // Replace tokens.
-  $destination = token_replace($destination, $data);
+  $destination = decode_entities(token_replace($destination, $data));
 
   return $params['uri_scheme'] . '://' . $destination;
 }
@@ -654,12 +676,15 @@ function file_entity_edit($form, &$form_state, $file) {
   // Add a 'replace this file' upload field if the file is writeable.
   if (file_entity_file_is_writeable($file)) {
     // Set up replacement file validation.
-    $replacement_options = array();
+    $replacement_options = !empty($form_state['#upload_options']) ? $form_state['#upload_options'] : array();
 
     // The replacement file must have an extension valid for the original type.
     $file_extensions = array();
     $file_type_name = isset($file->type) ? $file->type : file_get_type($file);
-    if ($file_type_name && ($file_type = file_type_load($file_type_name))) {
+    if (!empty($replacement_options['file_extensions'])) {
+      $file_extensions = explode(' ', $replacement_options['file_extensions']);
+    }
+    elseif ($file_type_name && ($file_type = file_type_load($file_type_name))) {
       $file_extensions = file_type_get_valid_extensions($file_type);
     }
 
@@ -1183,23 +1208,66 @@ function file_entity_upload_archive_form_submit($form, &$form_state) {
   if ($archive = file_load($form_state['values']['upload'])) {
     if ($archiver = archiver_get_archiver($archive->uri)) {
       $files = $archiver->listContents();
+      $destination = pathinfo($archive->filename, PATHINFO_FILENAME);
 
-      $extract_dir = file_default_scheme() . '://' . pathinfo($archive->filename, PATHINFO_FILENAME);
-      $extract_dir = file_destination($extract_dir, FILE_EXISTS_RENAME);
-      if (!file_prepare_directory($extract_dir, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY)) {
-        throw new Exception(t('Unable to prepar, e directory %dir for extraction.', array('%dir' => $extract_dir)));
+      // Prepare a temporary directory to extract the archive to before saving
+      // it is content.
+      $extract_location = 'temporary://' . $destination;
+      $extract_location = file_destination($extract_location, FILE_EXISTS_RENAME);
+      if (!file_prepare_directory($extract_location, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY)) {
+        throw new Exception(t('Unable to prepar, a temporary directory %dir for extraction.', array('%dir' => $extract_location)));
       }
 
-      $archiver->extract($extract_dir);
+      // Prepare target directory where files are going to be saved.
+      $target_dir = file_default_scheme() . '://' . $destination;
+      $target_dir = file_destination($target_dir, FILE_EXISTS_RENAME);
+      if (!file_prepare_directory($target_dir, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY)) {
+        throw new Exception(t('Unable to prepar, a directory %dir for extraction.', array('%dir' => $target_dir)));
+      }
+
+      $archiver->extract($extract_location);
       $pattern = '/' . $form_state['values']['pattern'] . '/';
-      if ($files = file_scan_directory($extract_dir, $pattern)) {
-        foreach ($files as $file) {
+      if ($extracted_files = file_scan_directory($extract_location, $pattern)) {
+        foreach ($extracted_files as $extracted_file) {
+          $file = new stdClass();
+          $file->fid = NULL;
+           $file->uid = $archive->uid;
+          $file->filename = $extracted_file->filename;
+          $file->origname = $extracted_file->filename;
           $file->status = FILE_STATUS_PERMANENT;
-          $file->uid = $archive->uid;
+          $file->filemime = file_get_mimetype($extracted_file->filename);
+
+          // destination uri should match the current file directory hierarchy.
+          $file->uri = $target_dir . str_replace($extract_location, '', $extracted_file->uri);
+
+          // Rename potentially executable files, to help prevent exploits (i.e. will
+          // rename filename.php.foo and filename.php to filename.php.foo.txt and
+          // filename.php.txt, respectively). Don't rename if 'allow_insecure_uploads'
+          // evaluates to TRUE.
+          if (!variable_get('allow_insecure_uploads', 0) && preg_match('/\.(php|pl|py|cgi|asp|js)(\.|$)/i', $file->filename) && (substr($file->filename, -4) != '.txt')) {
+            $file->filemime = 'text/plain';
+            $file->uri .= '.txt';
+            $file->filename .= '.txt';
+          }
+
+          // prepare destination path for the extracted file while keeping the
+          // directory hierarchy of the file.
+          $destination = pathinfo($file->uri, PATHINFO_DIRNAME);
+          if (!file_prepare_directory($destination, FILE_MODIFY_PERMISSIONS | FILE_CREATE_DIRECTORY)) {
+            throw new Exception(t('Unable to prepar, a directory %dir for extraction.', array('%dir' => $destination)));
+          }
+
+          if (!file_unmanaged_move($extracted_file->uri, $file->uri)) {
+            throw new Exception(t('Could not move uploaded file %file to destination %destination.', array('%file' => $extracted_file->filename, '%destination' => $file->uri)));
+            return FALSE;
+          }
+
           file_save($file);
           $form_state['files'][$file->fid] = $file;
         }
       }
+      // Delete extract location
+      file_unmanaged_delete_recursive($extract_location);
       drupal_set_message(t('Extracted %file and added @count new files.', array('%file' => $archive->filename, '@count' => count($files))));
     }
     else {

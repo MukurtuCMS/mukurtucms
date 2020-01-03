@@ -128,7 +128,7 @@ class views_plugin_exposed_form extends views_plugin {
     $form['autosubmit_hide'] = array(
       '#type' => 'checkbox',
       '#title' => t('Hide submit button'),
-      '#description' => t('Hide submit button if javascript is enabled.'),
+      '#description' => t('Hide submit button if JavaScript is enabled.'),
       '#default_value' => $this->options['autosubmit_hide'],
       '#dependency' => array(
         'edit-exposed-form-options-autosubmit' => array(1),

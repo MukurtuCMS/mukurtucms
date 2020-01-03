@@ -19,7 +19,7 @@ function media_wysiwyg_entity_insert($entity, $entity_type) {
 /**
  * Implements hook_field_attach_update().
  *
- * @see media_field_attach_insert().
+ * @see media_field_attach_insert()
  */
 function media_wysiwyg_entity_update($entity, $entity_type) {
   _media_wysiwyg_filter_add_file_usage_from_fields($entity_type, $entity);
@@ -41,7 +41,7 @@ function _media_wysiwyg_filter_add_file_usage_from_fields($entity_type, $entity)
   // id. This code may assume some things about entities that are only true for
   // node objects. This should be reviewed.
   // @TODO this conditional can probably be condensed
-  if (empty($entity->revision) && empty($entity->old_vid) && empty($entity->is_new) && ! empty($entity->original)) {
+  if (empty($entity->revision) && empty($entity->old_vid) && empty($entity->is_new) && !empty($entity->original)) {
     $old_files = media_wysiwyg_entity_field_count_files($entity_type, $entity->original);
     foreach ($old_files as $fid => $old_file_count) {
       // Were there more files on the node just prior to saving?
@@ -50,15 +50,15 @@ function _media_wysiwyg_filter_add_file_usage_from_fields($entity_type, $entity)
       }
       if ($old_file_count > $entity_files[$fid]) {
         $deprecate = $old_file_count - $entity_files[$fid];
-        // Now deprecate this usage
+        // Now deprecate this usage.
         $file = file_load($fid);
         if ($file) {
           file_usage_delete($file, 'media', $entity_type, $entity_id, $deprecate);
         }
-        // Usage is deleted, nothing more to do with this file
+        // Usage is deleted, nothing more to do with this file.
         unset($entity_files[$fid]);
       }
-      // There are the same number of files, nothing to do
+      // There are the same number of files, nothing to do.
       elseif ($entity_files[$fid] == $old_file_count) {
         unset($entity_files[$fid]);
       }
@@ -84,7 +84,7 @@ function _media_wysiwyg_filter_add_file_usage_from_fields($entity_type, $entity)
 }
 
 /**
- * Parse file references from an entity's text fields and return them as an array.
+ * Parse file references from an entity's text fields and return as an array.
  */
 function media_wysiwyg_filter_parse_from_fields($entity_type, $entity) {
   $file_references = array();

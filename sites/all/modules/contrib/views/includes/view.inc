@@ -843,7 +843,11 @@ class view extends views_db_object {
 
       $argument->set_relationship();
 
-      $arg = isset($this->args[$position]) ? $this->args[$position] : NULL;
+      $arg = NULL;
+      if (isset($this->args[$position]) && $this->args[$position] !== '') {
+        $arg = $this->args[$position];
+      }
+
       $argument->position = $position;
 
       if (isset($arg) || $argument->has_default_argument()) {
@@ -1575,7 +1579,7 @@ class view extends views_db_object {
   /**
    * Override the view's current title.
    *
-   * The tokens in the title get's replaced before rendering.
+   * The tokens in the title get replaced before rendering.
    */
   public function set_title($title) {
     $this->build_info['title'] = $title;
@@ -2008,7 +2012,7 @@ class view extends views_db_object {
   public function clone_view() {
     $clone = clone $this;
 
-    $keys = array('current_display', 'display_handler', 'build_info', 'built', 'executed', 'attachment_before', 'attachment_after', 'field', 'argument', 'filter', 'sort', 'relationship', 'header', 'footer', 'empty', 'query', 'inited', 'style_plugin', 'plugin_name', 'exposed_data', 'exposed_input', 'exposed_widgets', 'many_to_one_tables', 'feed_icon');
+    $keys = array('current_display', 'display_handler', 'build_info', 'built', 'executed', 'attachment_before', 'attachment_after', 'field', 'argument', 'filter', 'sort', 'relationship', 'header', 'footer', 'empty', 'query', 'inited', 'style_plugin', 'plugin_name', 'exposed_data', 'exposed_input', 'exposed_widgets', 'many_to_one_aliases', 'many_to_one_tables', 'feed_icon');
     foreach ($keys as $key) {
       if (isset($clone->{$key})) {
         unset($clone->{$key});

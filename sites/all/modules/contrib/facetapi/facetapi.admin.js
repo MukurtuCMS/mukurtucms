@@ -10,13 +10,8 @@ Drupal.behaviors.facetapi = {
 
     // Ensures ALL nofollow checkboxes are updated.
     // @see http://drupal.org/node/735528
-    $('input[name="nofollow"]').change(function() {
-      if ($(this).attr('checked')) {
-        $('input[name="nofollow"]').attr('checked', 'checked');
-      }
-      else {
-        $('input[name="nofollow"]').removeAttr('checked');
-      }
+    $('select[name="nofollow"]').change(function() {
+      $('select[name="nofollow"]').val($(this).val());
     });
 
     // Ensures ALL show expanded checkboxes are updated.

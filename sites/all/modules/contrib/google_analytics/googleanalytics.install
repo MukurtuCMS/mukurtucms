@@ -104,7 +104,7 @@ function googleanalytics_update_6001() {
   variable_set('googleanalytics_visibility', 0);
 
   // Remove tracking from all administrative pages, see:
-  // http://drupal.org/node/34970.
+  // https://drupal.org/node/34970.
   $pages = array(
     'admin*',
     'user*',
@@ -237,7 +237,7 @@ function googleanalytics_update_6006() {
  *
  * This is a data protection and privacy law change. For more information see
  * Google Analytics terms of use section 8.1:
- * http://www.google.com/analytics/en-GB/tos.html
+ * https://www.google.com/analytics/en-GB/tos.html
  */
 function googleanalytics_update_6007() {
   $profile_fields = variable_get('googleanalytics_segmentation', array());

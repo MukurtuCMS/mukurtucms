@@ -280,11 +280,10 @@ function services_views_field_formatter_info() {
  * Implements hook_field_formatter_info_alter().
  */
 function services_views_field_formatter_info_alter(&$formatters) {
-  $field_types = array();
-  foreach ($formatters as $formatter) {
-    $field_types = array_merge($field_types, $formatter['field types']);
+  $field_types = field_info_field_types();
+  if (!empty($field_types)) {
+    $formatters['services']['field types'] = array_keys($field_types);
   }
-  $formatters['services']['field types'] = array_unique($field_types);
 }
 
 /**

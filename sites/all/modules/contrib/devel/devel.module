@@ -356,6 +356,21 @@ function devel_menu_need_destination() {
 }
 
 /**
+ * Returns list of paths which need CSRF token protection.
+ *
+ * @return array
+ *   An associative array in which every item is composed in the following way:
+ *   - key: path which need token protection.
+ *   - value: additional value used for generate the token.
+ */
+function devel_menu_need_token_protection() {
+  return array(
+    'devel/cache/clear' => 'devel-cache-clear',
+    'devel/run-cron' => 'run-cron',
+  );
+}
+
+/**
  * Implements hook_menu_link_alter().
  *
  * Flag this link as needing alter at display time.
@@ -364,7 +379,7 @@ function devel_menu_need_destination() {
  * @see devel_translated_menu_link_alter()
  */
 function devel_menu_link_alter(&$item) {
-  if (in_array($item['link_path'], devel_menu_need_destination()) || $item['link_path'] == 'devel/menu/item') {
+  if (in_array($item['link_path'], devel_menu_need_destination()) || array_key_exists($item['link_path'], devel_menu_need_token_protection()) || $item['link_path'] == 'devel/menu/item') {
     $item['options']['alter'] = TRUE;
   }
 }
@@ -372,11 +387,22 @@ function devel_menu_link_alter(&$item) {
 /**
  * Implements hook_translated_menu_item_alter().
  *
- * Append dynamic querystring 'destination' to several of our own menu items.
+ * Append dynamic querystring 'destination' or 'token' (csfr protection) to
+ * several of our own menu items.
  */
 function devel_translated_menu_link_alter(&$item) {
-  if (in_array($item['href'], devel_menu_need_destination())) {
-    $item['localized_options']['query'] = drupal_get_destination();
+  $need_destination = in_array($item['href'], devel_menu_need_destination());
+
+  $token_protection = devel_menu_need_token_protection();
+  $need_token = array_key_exists($item['href'], $token_protection);
+
+  if ($need_destination || $need_token) {
+    if ($need_destination) {
+      $item['localized_options']['query'] = drupal_get_destination();
+    }
+    if ($need_token) {
+      $item['localized_options']['query']['token'] = drupal_get_token($token_protection[$item['href']]);
+    }
   }
   elseif ($item['href'] == 'devel/menu/item') {
     $item['localized_options']['query'] = array('path' => $_GET['q']);

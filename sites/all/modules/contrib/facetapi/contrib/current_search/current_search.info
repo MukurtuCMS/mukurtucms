@@ -10,9 +10,8 @@ files[] = plugins/current_search/item_text.inc
 files[] = tests/current_search.test
 configure = admin/config/search/current_search
 
-; Information added by Drupal.org packaging script on 2014-07-18
-version = "7.x-1.5"
+; Information added by Drupal.org packaging script on 2019-09-19
+version = "7.x-1.6"
 core = "7.x"
 project = "facetapi"
-datestamp = "1405685332"
-
+datestamp = "1568909915"

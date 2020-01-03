@@ -112,7 +112,7 @@ abstract class FacetapiWidget {
   /**
    * Initializes the build, must be invoked prior to executing this widget.
    *
-   * This method is called automatically by FacetapiFacet::build() and shoud
+   * This method is called automatically by FacetapiFacet::build() and should
    * rarely be invoked outside of that context. It is responsible for getting
    * the base render array stored in the FacetapiFacet object and appending it
    * to the container that will be returned, sorting the facets, and adding some
@@ -126,9 +126,19 @@ abstract class FacetapiWidget {
     // Capture searcher for code readability.
     $searcher = $this->facet->getAdapter()->getSearcher();
 
+    // Prepare the title
+    $title = $this->facet['label'];
+    $title_override = isset($this->settings->settings['title_override']) && !empty($this->settings->settings['title_override']);
+    if ($title_override) {
+      $title = $this->settings->settings['title'];
+      if (module_exists('i18n_string')) {
+        $title = facetapi_i18n_string_translate('facetapi:title_text:' . $title . ':text', $title);
+      }
+    }
+
     // Initialize the render array.
     $this->build = array(
-      '#title' => $this->facet['label'],
+      '#title' => $title,
       '#description' => $this->facet['description'],
       '#weight' => $this->facet['weight'],
       '#adapter' => $this->facet->getAdapter(),
@@ -151,6 +161,17 @@ abstract class FacetapiWidget {
     // Apply sorting algorithms to the render array.
     $this->sortFacet($this->build);
 
+    // Translate the "Show more/fewer" links if the String Translation module is
+    // enabled.
+    $show_more_text = $this->settings->settings['facet_more_text'];
+    $show_fewer_text = $this->settings->settings['facet_fewer_text'];
+
+    if (module_exists('i18n_string')) {
+      $show_more_text = facetapi_i18n_string_translate('facetapi:link_text:' . $show_more_text . ':text', $show_more_text);
+      $show_fewer_text = facetapi_i18n_string_translate('facetapi:link_text:' . $show_fewer_text . ':text', $show_fewer_text);
+    }
+
+
     // Initialize JavaScript settings for this facet build.
     $this->jsSettings += array(
       'id' => $this->build['#attributes']['id'],
@@ -159,8 +180,8 @@ abstract class FacetapiWidget {
       'facetName' => $this->facet['name'],
       'queryType' => $this->facet['query type'],
       'widget' => $this->settings->settings['widget'],
-      'showMoreText' => $this->settings->settings['facet_more_text'],
-      'showFewerText' => $this->settings->settings['facet_fewer_text'],
+      'showMoreText' => $show_more_text,
+      'showFewerText' => $show_fewer_text,
     );
 
     return $this;
@@ -366,10 +387,7 @@ function facetapi_sort_count(array $a, array $b) {
 function facetapi_sort_indexed(array $a, array $b) {
   $a_value = (isset($a['#indexed_value'])) ? $a['#indexed_value'] : '';
   $b_value = (isset($b['#indexed_value'])) ? $b['#indexed_value'] : '';
-  if ($a_value == $b_value) {
-    return 0;
-  }
-  return ($a_value < $b_value) ? -1 : 1;
+  return strnatcasecmp($a_value, $b_value);
 }
 
 /**
@@ -378,7 +396,14 @@ function facetapi_sort_indexed(array $a, array $b) {
  * @see uasort()
  */
 function facetapi_sort_display(array $a, array $b) {
-  $a_count = (isset($a['#markup'])) ? $a['#markup'] : '';
-  $b_count = (isset($b['#markup'])) ? $b['#markup'] : '';
-  return strcasecmp($a['#markup'], $b['#markup']);
+  $a_value = (isset($a['#markup'])) ? $a['#markup'] : '';
+  $b_value = (isset($b['#markup'])) ? $b['#markup'] : '';
+  $a_value = _facetapi_removeAccents($a_value);
+  $b_value = _facetapi_removeAccents($b_value);
+  return strnatcasecmp($a_value, $b_value);
 }
+
+function _facetapi_removeAccents($string) {
+  return strtolower(trim(preg_replace('~[^0-9a-z]+~i', '-', preg_replace('~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i', '$1', htmlentities($string, ENT_QUOTES, 'UTF-8'))), ' '));
+}
+

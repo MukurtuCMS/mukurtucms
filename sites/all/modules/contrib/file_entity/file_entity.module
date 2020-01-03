@@ -914,6 +914,7 @@ function file_entity_theme() {
           'remote_playback' => 'remote_playback',
         ),
         'autoplay' => FALSE,
+        'playsinline' => FALSE,
         'loop' => FALSE,
         'muted' => FALSE,
         'width' => NULL,

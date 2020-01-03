@@ -397,6 +397,11 @@ class CommerceProductInlineEntityFormController extends EntityInlineEntityFormCo
       }
     }
 
-    entity_delete_multiple('commerce_product', array_keys($products));
+    // When the parent entity is being removed, we don't want to trigger the
+    // products deletion right away, otherwise the magic that happens in
+    // commerce_product_reference_commerce_product_delete() will ultimately
+    // trigger an entity_save() on the parent entity that is about to be
+    // deleted from the database.
+    drupal_register_shutdown_function('commerce_product_delete_multiple', array_keys($products));
   }
 }

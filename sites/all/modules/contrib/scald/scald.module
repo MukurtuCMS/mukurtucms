@@ -802,9 +802,6 @@ function scald_search($query = array(), $fuzzy = FALSE, $singular = FALSE) {
       case 'actions':
         $efq->propertyCondition($field, $value);
         break;
-
-      default:
-        continue;
     }
   }
 
@@ -966,14 +963,22 @@ function scald_rendered_to_sas($string, $render_language = 'XHTML') {
 
   return preg_replace_callback(
     SCALD_RENDERED_MATCH_PATTERN,
-    create_function(
-      '$matches',
-      '
-        return \'[scald=\' . $matches[1] . (!empty($matches[2]) ? \':\' . $matches[2] : \'\') . (!empty($matches[3]) ? \' \' . $matches[3] : \'\') . \']\';
-      '
-    ),
+    '_scald_rendered_to_sas_callback',
     $string
   );
+}
+
+/**
+ * Callback for the scald_rendered_to_sas.
+ *
+ * @param array $matches
+ *   Matches found by preg_match using SCALD_RENDERED_MATCH_PATTERN.
+ *
+ * @return string
+ *   Scald SAS representation.
+ */
+function _scald_rendered_to_sas_callback($matches) {
+  return '[scald=' . $matches[1] . (!empty($matches[2]) ? ':' . $matches[2] : '') . (!empty($matches[3]) ? ' ' . $matches[3] : '') . ']';
 }
 
 /*******************************************************************************

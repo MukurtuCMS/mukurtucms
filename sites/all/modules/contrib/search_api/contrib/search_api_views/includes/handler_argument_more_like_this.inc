@@ -16,8 +16,6 @@ class SearchApiViewsHandlerArgumentMoreLikeThis extends SearchApiViewsHandlerArg
    */
   public function option_definition() {
     $options = parent::option_definition();
-    unset($options['break_phrase']);
-    unset($options['not']);
     $options['entity_type'] = array('default' => FALSE);
     $options['fields'] = array('default' => array());
     return $options;

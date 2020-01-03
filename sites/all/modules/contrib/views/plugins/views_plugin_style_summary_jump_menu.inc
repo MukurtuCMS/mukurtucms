@@ -66,7 +66,7 @@ class views_plugin_style_summary_jump_menu extends views_plugin_style {
       '#type' => 'checkbox',
       '#title' => t('Hide the "Go" button'),
       '#default_value' => !empty($this->options['hide']),
-      '#description' => t('If hidden, this button will only be hidden for users with javascript and the page will automatically jump when the select is changed.'),
+      '#description' => t('If hidden, this button will only be hidden for users with JavaScript and the page will automatically jump when the select is changed.'),
     );
 
     $form['text'] = array(

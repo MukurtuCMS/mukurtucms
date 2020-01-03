@@ -1095,3 +1095,26 @@ function file_entity_update_7216() {
   // database. It has been removed due to reported problems and is better
   // addressed by adding support for ctools default content to features.
 }
+
+/**
+ * Remove deprecated views_plugin_access_menu plugin.
+ */
+function file_entity_update_7227() {
+  $result = db_query("SELECT vid, id, display_options FROM {views_display}");
+  foreach ($result as $record) {
+    $options = unserialize($record->display_options);
+    if (isset($options['access']) && is_array($options['access']) && isset($options['access']['type']) && $options['access']['type'] === 'menu') {
+      $options['access'] = array(
+        'type' => 'perm',
+        'perm' => 'access administration pages',
+      );
+
+      db_query("UPDATE {views_display} SET display_options = :options WHERE vid = :vid AND id = :id", array(
+        'vid' => $record->vid,
+        'id' => $record->id,
+        'options' => serialize($options),
+      ));
+    }
+  }
+}
+

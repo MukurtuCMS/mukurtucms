@@ -303,7 +303,7 @@ function og_invite_generate_hash(OgMembership $og_membership) {
 }
 
 /**
- * Helper to get the OgMembership corresponding ot a hash.
+ * Helper to get the OgMembership corresponding to a hash.
  */
 function og_invite_get_membership_from_hash($hash) {
   global $user;
@@ -330,7 +330,7 @@ function og_invite_get_membership_from_hash($hash) {
  */
 function og_invite_answer_path_by_membership(OgMembership $og_membership, $op = 'answer') {
   $hash = og_invite_generate_hash($og_membership);
-  return og_invite_answer_url_by_hash($og_membership->group_type, $og_membership->gid, $hash, $op);
+  return og_invite_answer_path_by_hash($og_membership->group_type, $og_membership->gid, $hash, $op);
 }
 
 /**
@@ -346,7 +346,7 @@ function og_invite_answer_path_by_hash($group_type, $gid, $hash, $op = 'answer')
 }
 
 /**
- * Check if an OgMembership item is a invitation.
+ * Check if an OgMembership item is an invitation.
  *
  * @param OgMembership $ogm
  *   The OgMembership item.
