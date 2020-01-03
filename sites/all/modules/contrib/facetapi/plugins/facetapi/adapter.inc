@@ -167,7 +167,7 @@ abstract class FacetapiAdapter {
   abstract public function searchExecuted();
 
   /**
-   * Returns a boolean flagging whether facets in a realm shoud be displayed.
+   * Returns a boolean flagging whether facets in a realm should be displayed.
    *
    * Useful, for example, for suppressing sidebar blocks in some cases. Apache
    * Solr Search Integration used this method to prevent blocks from being
@@ -309,8 +309,8 @@ abstract class FacetapiAdapter {
       // Perform basic parsing of the filter.
       $parts = explode(':', $filter, 2);
       $field_alias = rawurldecode($parts[0]);
-      $filter = $field_alias . ':' . $parts[1]; // @see https://www.drupal.org/node/1884152
       if (isset($parts[1]) && isset($enabled_aliases[$field_alias])) {
+        $filter = $field_alias . ':' . $parts[1]; // @see https://www.drupal.org/node/1884152
 
         // Store basic information about the active item. For details on how
         // this array is structured, refer to the FacetapiAdapter::activeItems
@@ -344,7 +344,7 @@ abstract class FacetapiAdapter {
    *
    * @return array
    *   An associative array keyed by facet name to FacetapiQueryTypeInterface
-   *   object, FALSE if the query type is not supported bu this searcher.
+   *   object, FALSE if the query type is not supported by this searcher.
    *
    * @see FacetapiAdapter::processActiveItems()
    */
@@ -417,9 +417,8 @@ abstract class FacetapiAdapter {
   /**
    * Returns a facet's active items.
    *
-   * @param array|string $facet
-   *   Either the facet definition as returned by facetapi_facet_load() or the
-   *   machine readable name of the facet.
+   * @param array $facet
+   *   The facet definition as returned by facetapi_facet_load().
    *
    * @return array
    *   An associative array containing (but not limited to):
@@ -726,6 +725,7 @@ abstract class FacetapiAdapter {
       $settings->realm = (string) $realm_name;
       $settings->facet = $facet_name;
       $settings->enabled = 0;
+      $settings->hash = facetapi_hash_delta($name);
       $settings->settings = array();
     }
     else {
@@ -779,8 +779,11 @@ abstract class FacetapiAdapter {
         'sort_weight' => array(),
         'sort_order' => array(),
         'empty_behavior' => 'none',
+        'display_count' => TRUE,
         'facet_more_text' => 'Show more',
         'facet_fewer_text' => 'Show fewer',
+        'title_override' => 0,
+        'title' => $facet['label'],
       );
 
       // Apply default sort info only if the configuration is "new".
@@ -978,7 +981,7 @@ abstract class FacetapiAdapter {
    *   An integer flagging whether the item is active or not.
    *
    * @return array
-   *   The query string vriables.
+   *   The query string variables.
    *
    * @see FacetapiUrlProcessor::getQueryString()
    */
@@ -1058,7 +1061,7 @@ abstract class FacetapiAdapter {
       return array();
     }
 
-    // Make sure facet builds are initialized and breakcrumb trail is set.
+    // Make sure facet builds are initialized and breadcrumb trail is set.
     $this->processFacets();
 
     // Add JavaScript, initializes the realm specific render array.
@@ -1118,7 +1121,7 @@ abstract class FacetapiAdapter {
 /**
  * Wrapper around the facet definition with methods that build render arrays.
  *
- * Thic class contain methods that assist in render array generation and stores
+ * This class contain methods that assist in render array generation and stores
  * additional context about how and what generated the render arrays for
  * consumption by the widget plugins. Objects can also be used as if they are
  * the facet definitions returned by facetapi_facet_load().
@@ -1304,8 +1307,14 @@ class FacetapiFacet implements ArrayAccess {
     else {
       // Instantiate the empty behavior plugin.
       $id = $settings->settings['empty_behavior'];
-      $class = ctools_plugin_load_class('facetapi', 'empty_behaviors', $id, 'handler');
-      $empty_plugin = new $class($settings);
+      if ($class = ctools_plugin_load_class('facetapi', 'empty_behaviors', $id, 'handler')) {
+        $empty_plugin = new $class($settings);
+      }
+      // Fallback for the case when empty_behavior plugin is not available.
+      else {
+        $class = ctools_plugin_load_class('facetapi', 'empty_behaviors', 'none', 'handler');
+        $empty_plugin = new $class($settings);
+      }
       // Execute the empty behavior plugin.
       $build = $widget_plugin->getBuild();
       $build[$this['field alias']] = $empty_plugin->execute();
@@ -1318,7 +1327,10 @@ class FacetapiFacet implements ArrayAccess {
 
     // Add JavaScript settings by merging with the others already set.
     $merge_settings['facetapi']['facets'][] = $widget_plugin->getJavaScriptSettings();
-    drupal_add_js($merge_settings, 'setting');
+    $build[$this['field alias']]['#attached']['js'][] = array(
+      'data' => $merge_settings,
+      'type' => 'setting',
+    );
 
     // Return render array keyed by the FacetapiWidget::$key property.
     return array($widget_plugin->getKey() => $build);
@@ -1421,7 +1433,7 @@ class FacetapiFacetProcessor {
    *   The index value of the item.
    *
    * @return array
-   *   The active item's childen.
+   *   The active item's children.
    */
   public function getActiveChildren($value) {
     return (isset($this->activeChildren[$value])) ? $this->activeChildren[$value] : array();
@@ -1521,6 +1533,10 @@ class FacetapiFacetProcessor {
         $this->map = call_user_func($this->facet['map callback'], $values, $this->facet['map options']);
         // Normalize all mapped values to a two element array.
         foreach ($this->map as $key => $value) {
+          if ($value === NULL) {
+            unset($build[$key]);
+            continue;
+          }
           if (!is_array($value)) {
             $this->map[$key] = array();
             $this->map[$key]['#markup'] = $value;

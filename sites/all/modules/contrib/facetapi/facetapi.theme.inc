@@ -43,28 +43,39 @@ function theme_facetapi_title($variables) {
  * @ingroup themeable
  */
 function theme_facetapi_link_inactive($variables) {
-  // Builds accessible markup.
-  // @see http://drupal.org/node/1316580
-  $accessible_vars = array(
-    'text' => $variables['text'],
-    'active' => FALSE,
-  );
-  $accessible_markup = theme('facetapi_accessible_markup', $accessible_vars);
-
   // Sanitizes the link text if necessary.
   $sanitize = empty($variables['options']['html']);
-  $variables['text'] = ($sanitize) ? check_plain($variables['text']) : $variables['text'];
-
+  $text = ($sanitize) ? check_plain($variables['text']) : $variables['text'];
   // Adds count to link if one was passed.
   if (isset($variables['count'])) {
-    $variables['text'] .= ' ' . theme('facetapi_count', $variables);
+    $text .= ' ' . theme('facetapi_count', $variables);
   }
 
-  // Resets link text, sets to options to HTML since we already sanitized the
-  // link text and are providing additional markup for accessibility.
-  $variables['text'] .= $accessible_markup;
-  $variables['options']['html'] = TRUE;
-  return theme_link($variables);
+  // Zero elements. Make non-clickable element.
+  if (isset($variables['count']) && $variables['count'] == 0) {
+    $variables['element'] = array(
+      '#value' => $text,
+      '#tag' => 'span',
+      '#attributes' => $variables['options']['attributes'],
+    );
+    return theme('html_tag', $variables);
+  }
+  // More than zero elements.
+  else {
+    // Builds accessible markup.
+    // @see http://drupal.org/node/1316580
+    $accessible_vars = array(
+      'text' => $variables['text'],
+      'active' => FALSE,
+    );
+    $accessible_markup = theme('facetapi_accessible_markup', $accessible_vars);
+
+    // Resets link text, sets to options to HTML since we already sanitized the
+    // link text and are providing additional markup for accessibility.
+    $variables['text'] = $text . $accessible_markup;
+    $variables['options']['html'] = TRUE;
+    return l($variables['text'], $variables['path'], $variables['options']);
+  }
 }
 
 /**
@@ -112,7 +123,8 @@ function theme_facetapi_link_active($variables) {
   );
   $variables['text'] = t('!facetapi_deactivate_widget !facetapi_accessible_markup', $replacements);
   $variables['options']['html'] = TRUE;
-  return theme_link($variables) . $link_text;
+  $variables['options']['attributes']['class'][] = 'active';
+  return l($variables['text'], $variables['path'], $variables['options']) . $link_text;
 }
 
 /**
