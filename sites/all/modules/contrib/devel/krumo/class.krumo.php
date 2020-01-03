@@ -1036,7 +1036,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
       <div class="krumo-element"
         onMouseOver="krumo.over(this);"
         onMouseOut="krumo.out(this);">
-          <a class="krumo-name"><big>&#8734;</big></a>
+          <a class="krumo-name"><span class="krumo-big">&#8734;</span></a>
           (<em class="krumo-type">Recursion</em>)
       </div>
 

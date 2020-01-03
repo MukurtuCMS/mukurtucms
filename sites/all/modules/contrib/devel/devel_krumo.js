@@ -31,7 +31,7 @@ Drupal.behaviors.devel = {
 
     $('.krumo-child > div:first-child', context).once('krumo_path',
     function() {
-      $('.krumo-child > div:first-child', context).dblclick(
+      $(this).dblclick(
       function(e) {
         if ($(this).find('> .krumo-php-path').length > 0) {
           // Remove path if shown.
