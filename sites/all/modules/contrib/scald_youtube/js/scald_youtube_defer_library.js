@@ -67,3 +67,8 @@ function scaldYoutubeReadCookie(name) {
   }
   return null;
 }
+
+if (typeof window.loadYoutubeWysiwyg === 'function') {
+  loadYoutubeWysiwyg();
+}
+

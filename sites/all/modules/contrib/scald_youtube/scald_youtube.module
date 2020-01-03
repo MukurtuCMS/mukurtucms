@@ -229,6 +229,20 @@ function scald_youtube_form_scald_atom_add_form_options_alter(&$form, &$form_sta
         '#tree' => TRUE,
         '#parents' => array($key, 'scald_youtube_autoplay'),
       );
+
+      $scald_youtube_mute = FALSE;
+      if (isset($scald['atoms'][$index]->data['youtube_mute'])) {
+        $scald_youtube_mute = $scald['atoms'][$index]->data['youtube_mute'];
+      }
+      $form[$key]['scald_youtube_mute'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $scald_youtube_mute,
+        '#title' => t('Mute the video'),
+        '#description' => t('If checked, the video will be muted.'),
+        '#weight' => $form[$key]['scald_thumbnail']['#weight'] + .8,
+        '#tree' => TRUE,
+        '#parents' => array($key, 'scald_youtube_mute'),
+      );
     }
   }
 
@@ -244,6 +258,7 @@ function scald_youtube_extra_options_save_handler(&$form, &$form_state) {
       $index = intval(substr($key, 4));
       $form_state['scald']['atoms'][$index]->data['show_related'] = $form_state['values'][$key]['scald_youtube_show_related'];
       $form_state['scald']['atoms'][$index]->data['youtube_autoplay'] = $form_state['values'][$key]['scald_youtube_autoplay'];
+      $form_state['scald']['atoms'][$index]->data['youtube_mute'] = $form_state['values'][$key]['scald_youtube_mute'];
     }
   }
 }
@@ -284,6 +299,9 @@ function scald_youtube_scald_prerender($atom, $context, $options, $mode) {
     // Don't apply the autoplay on admin page.
     if (isset($atom->data['youtube_autoplay']) && !empty($atom->data['youtube_autoplay']) && !path_is_admin(current_path())) {
       $query['autoplay'] = '1';
+    }
+    if (isset($atom->data['youtube_mute']) && !empty($atom->data['youtube_mute'])) {
+      $query['mute'] = '1';
     }
 
     $youtube_domain = SCALD_YOUTUBE_EMBED;
@@ -780,7 +798,7 @@ function scald_youtube_add_defer_video_plugin_js($element) {
   $element['#attached']['js'][] = array(
     'type' => 'setting',
     'data' => array(
-      'defer_youtube_video_js' => $base_url . $base_path . drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer_library.js',
+      'defer_youtube_video_js_library' => $base_url . $base_path . drupal_get_path('module', 'scald_youtube') . '/js/scald_youtube_defer_library.js',
     ),
   );
 
