@@ -176,6 +176,7 @@ The @sitename team.', $body_params);
  *
  * Remove invitations from the group members admin view.
  */
+/*
 function og_invite_views_pre_view(&$view, &$display_id, &$args) {
   list($view_name, $display) = explode(':', variable_get('og_ui_admin_people_view', 'og_members_admin:default'));
   if ($view->name == $view_name && $view->current_display == $display) {
@@ -192,6 +193,7 @@ function og_invite_views_pre_view(&$view, &$display_id, &$args) {
     ));
   }
 }
+*/
 
 /**
  * Implements hook_form_FORM_ID_alter().
