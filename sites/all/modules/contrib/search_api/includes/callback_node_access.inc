@@ -47,19 +47,16 @@ class SearchApiAlterNodeAccess extends SearchApiAbstractAlterCallback {
 
     foreach ($items as $id => $item) {
       $node = $this->getNode($item);
-      // Check whether all users have access to the node.
-      if (!node_access('view', $node, $account)) {
-        // Get node access grants.
-        $result = db_query('SELECT * FROM {node_access} WHERE (nid = 0 OR nid = :nid) AND grant_view = 1', array(':nid' => $node->nid));
 
-        // Store all grants together with their realms in the item.
-        foreach ($result as $grant) {
-          $items[$id]->search_api_access_node[] = "node_access_{$grant->realm}:{$grant->gid}";
-        }
+      // Get node access grants.
+      $result = db_query('SELECT * FROM {node_access} WHERE (nid = 0 OR nid = :nid) AND grant_view = 1', array(':nid' => $node->nid));
+
+      // Store all grants together with their realms in the item.
+      foreach ($result as $grant) {
+        $items[$id]->search_api_access_node[] = "node_access_{$grant->realm}:{$grant->gid}";
       }
-      else {
-        // Add the generic view grant if we are not using node access or the
-        // node is viewable by anonymous users.
+      if (!isset($items[$id]->search_api_access_node) || empty($items[$id]->search_api_access_node)) {
+        // Add the generic view grant if we are not using node access.
         $items[$id]->search_api_access_node = array('node_access__all');
       }
     }
