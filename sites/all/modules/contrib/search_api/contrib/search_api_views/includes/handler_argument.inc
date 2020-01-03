@@ -79,8 +79,8 @@ class SearchApiViewsHandlerArgument extends views_handler_argument {
   public function option_definition() {
     $options = parent::option_definition();
 
-    $options['break_phrase'] = array('default' => FALSE);
-    $options['not'] = array('default' => FALSE);
+    $options['break_phrase'] = array('default' => FALSE, 'bool' => TRUE);
+    $options['not'] = array('default' => FALSE, 'bool' => TRUE);
 
     return $options;
   }
