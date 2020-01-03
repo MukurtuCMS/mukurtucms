@@ -65,6 +65,7 @@ function views_json_views_formats() {
 function views_json_views_json_formats() {
   $formats = array(
     'simple' => t('Simple'),
+    'simple_object' => t('Single Simple Object with key value properties'),
     'exhibit' => t('MIT Simile/Exhibit'),
     'jqgrid' => t('To be consumed by jqGrid'),
   );

@@ -106,6 +106,50 @@ function template_preprocess_views_views_json_style_simple(&$vars) {
 
   // check if user wants nested arrays
   $vars["rows"] = strlen($root_object) != 0 ? array($root_object => $objects) : $objects;
+
+  // For pagination, output the total number of pages, the current page, the
+  // total result count, and the limit per page.
+  global $pager_total, $pager_page_array, $pager_total_items, $pager_limits;
+  if (isset($pager_total[0])) {
+    $pager_object = array(
+      'pages' => $pager_total[0],
+      'page' => $pager_page_array[0],
+      'count' => intval($pager_total_items[0]),
+      'limit' => intval($pager_limits[0]),
+    );
+    $vars["rows"]["pager"] = $pager_object;
+  }
+}
+
+/**
+ * Theme preprocess for "single simple object" format.
+ *
+ * Set only one row as view rows as object with properties.
+ */
+function template_preprocess_views_views_json_style_simple_object(&$vars) {
+  $rows = &$vars['rows'];
+  $options = $vars["options"];
+  $root_object = $options["root_object"];
+  $top_child_object = $options["top_child_object"];
+  $size = count($rows);
+
+  if ($size < 1) {
+    $rows = new stdClass();
+    return;
+  }
+
+  // We need just only one element.
+  $rows = $size < 1 ? $rows : array_slice($rows, 0, 1);
+
+  template_preprocess_views_views_json_style_simple($vars);
+
+  $row = empty($root_object) ? $rows[0] : $rows[$root_object][0];
+
+  if (array_key_exists($top_child_object, $row)) {
+    $row = $row[$top_child_object];
+  }
+
+  $rows = (object) $row;
 }
 
 function template_preprocess_views_views_json_style_exhibit(&$vars) {
