@@ -8,7 +8,7 @@
 // TODO: fix being embedded in a host with revisions.
 
 /**
- * Field collection item view page.
+ * Field Collection item view page.
  */
 function field_collection_item_page_view($field_collection_item) {
   // @todo: Set breadcrumb including the host.
@@ -86,7 +86,7 @@ function field_collection_item_delete_confirm($form, &$form_state, $field_collec
  */
 function field_collection_item_delete_confirm_submit($form, &$form_state) {
   $field_collection_item = $form_state['field_collection_item'];
-  $field_collection_item->deleteRevision();
+  entity_delete('field_collection_item',$field_collection_item->item_id);
   drupal_set_message(t('%label has been deleted.', array('%label' => drupal_ucfirst($field_collection_item->label()))));
   $form_state['redirect'] = '<front>';
 }

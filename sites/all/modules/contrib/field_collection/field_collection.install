@@ -63,6 +63,12 @@ function field_collection_schema() {
       ),
     ),
   );
+
+  if (module_exists('entitycache')) {
+    $schema['cache_entity_field_collection_item'] = drupal_get_schema_unprocessed('system', 'cache');
+    $schema['cache_entity_field_collection_item']['description'] = 'Cache table used to store field_collection_item entity records.';
+  }
+  
   return $schema;
 }
 
@@ -228,7 +234,7 @@ function field_collection_update_7002() {
       ->condition('archived', 0);
     $select->leftJoin('field_data_' . $field_name, 'field', "field.{$field_name}_value = fci.item_id ");
     $select->isNull('field.entity_id');
-    $ids = $select->execute()->fetchCol(0);
+    $ids = $select->execute()->fetchCol();
 
     entity_delete_multiple('field_collection_item', $ids);
     drupal_set_message(t('Deleted @count orphaned field collection items.', array('@count' => count($ids))));
@@ -368,7 +374,7 @@ function field_collection_update_7008() {
         ->fieldLanguageCondition($f_name, LANGUAGE_NONE);
       $query_result = $query->execute();
       if (isset($query_result['field_collection_item'])) {
-        $results = $results + $query_result['field_collection_item'];
+        $results += $query_result['field_collection_item'];
       }
     }
   }
@@ -392,4 +398,177 @@ function field_collection_update_7008() {
       drupal_set_message("Deleted $count orphaned field collection items.");
     }
   }
+}
+
+/**
+ * Update revisions created before revision support was implemented.
+ */
+function field_collection_update_7009(&$sandbox) {
+  $items_per_pass = 10;
+  $field_collection_fields = field_read_fields(array('type' => 'field_collection'));
+
+  // If you don't have any field_collecton fields then skip this update.
+  if (empty($field_collection_fields)) {
+    return;
+  }
+
+  if (!isset($sandbox['current_field'])) {
+    $sandbox['field_collection_fields'] = array_keys($field_collection_fields);
+    $sandbox['current_field'] = 0;
+    $sandbox['current_field_collection_item'] = 0;
+    $sandbox['field_name'] = $sandbox['field_collection_fields'][$sandbox['current_field']];
+    $sandbox['inner_fields'] = field_read_instances(array('entity_type' => 'field_collection_item', 'bundle' => $sandbox['field_name']));
+  }
+
+  // Find field collection items with duplicate revision ids.
+  $query = db_select("field_revision_{$sandbox['field_name']}", 't')
+    ->fields('t', array("{$sandbox['field_name']}_revision_id"))
+    ->range($sandbox['current_field_collection_item'], $items_per_pass)
+    ->groupBy("t.{$sandbox['field_name']}_revision_id");
+  $query->addExpression("COUNT(t.{$sandbox['field_name']}_revision_id)", 'vidcount');
+  $query->havingCondition('vidcount', 2, '>=');
+  $vids = $query->execute()->fetchCol();
+
+  // Each revision ID that occurs more than once.
+  foreach ($vids as $field_collection_duplicated_revision_id) {
+    // Find every instance of this revision ID.
+    $copies = db_select("field_revision_{$sandbox['field_name']}", 't')
+      ->fields('t')
+      ->condition("{$sandbox['field_name']}_revision_id", $field_collection_duplicated_revision_id)
+      ->execute()
+      ->fetchAllAssoc('revision_id');
+
+    $first_copy = reset($copies);
+    $field_collection_item_id = $first_copy->{"{$sandbox['field_name']}_value"};
+
+    // Find the currently used revision of this field collection item.
+    $field_collection_item_current_revision = db_select('field_collection_item', 'fci')
+      ->fields('fci', array('revision_id'))
+      ->condition('item_id', $field_collection_item_id)
+      ->execute()
+      ->fetchField();
+
+    // Find new revisions of this field collection item that were made after
+    // revisions were enabled in update_7003.
+    $modern_revisions = db_select("field_revision_{$sandbox['field_name']}", 't')
+      ->fields('t')
+      ->condition("{$sandbox['field_name']}_revision_id", $field_collection_duplicated_revision_id, '<>')
+      ->condition("{$sandbox['field_name']}_value", $field_collection_item_id)
+      ->orderBy('revision_id')
+      ->execute()
+      ->fetchAllAssoc('revision_id');
+
+    // Intentionally skip the first instance as it doesn't need to be modified.
+    while (FALSE !== ($row_to_replace = next($copies))) {
+      $new_revision_id = _field_collection_update_7009_new_revision($field_collection_item_id, $row_to_replace, $sandbox['inner_fields'], $sandbox['field_name']);
+
+      // Create copies of inner fields with new revision number.
+      foreach ($sandbox['inner_fields'] as $field) {
+        // Get the data to copy.
+        $data_rows = db_select("field_revision_{$field['field_name']}", 't')
+          ->fields('t')
+          ->condition('entity_type', 'field_collection_item')
+          ->condition('revision_id', $field_collection_duplicated_revision_id)
+          ->execute();
+
+        // Add new copy of data with new revision id.
+        while ($each_row = $data_rows->fetchAssoc()) {
+          $each_row['revision_id'] = $new_revision_id;
+          db_insert("field_revision_{$field['field_name']}")
+            ->fields(array_keys($each_row), array_values($each_row))
+            ->execute();
+        }
+      }
+
+      // Update the host's field data with new revision number.
+      db_update("field_revision_{$sandbox['field_name']}")
+        ->fields(array("{$sandbox['field_name']}_revision_id" => $new_revision_id))
+        ->condition('entity_type', $row_to_replace->entity_type)
+        ->condition('revision_id', $row_to_replace->revision_id)
+        ->condition('delta', $row_to_replace->delta)
+        ->condition('language', $row_to_replace->language)
+        ->execute();
+    }
+
+    if ($field_collection_item_current_revision == $field_collection_duplicated_revision_id) {
+      _field_collection_update_7009_update_data($new_revision_id, $field_collection_duplicated_revision_id);
+
+      // Update the current field collection item data in its host.
+      db_update("field_data_{$sandbox['field_name']}")
+        ->fields(array('revision_id' => $new_revision))
+        ->condition('revision_id', $old_revision)
+        ->condition('entity_type', $row_to_replace->entity_type)
+        ->execute();
+    }
+
+    foreach ($modern_revisions as $each_modern_revision) {
+      $new_revision_id = _field_collection_update_7009_new_revision($field_collection_item_id, $each_modern_revision, $sandbox['inner_fields'], $sandbox['field_name']);
+
+      // Update inner fields with new revision number.
+      foreach ($sandbox['inner_fields'] as $field) {
+        db_update("field_revision_{$field['field_name']}")
+          ->fields(array('revision_id' => $new_revision_id))
+          ->condition('revision_id', $each_modern_revision->{$sandbox['field_name'] . '_revision_id'})
+          ->condition('entity_type', 'field_collection_item')
+          ->execute();
+      }
+
+      // Update the host's field data with new revision number.
+      db_update("field_revision_{$sandbox['field_name']}")
+        ->fields(array("{$sandbox['field_name']}_revision_id" => $new_revision_id))
+        ->condition('entity_type', $each_modern_revision->entity_type)
+        ->condition('revision_id', $each_modern_revision->revision_id)
+        ->condition('delta', $each_modern_revision->delta)
+        ->condition('language', $each_modern_revision->language)
+        ->execute();
+
+      if ($field_collection_item_current_revision == $each_modern_revision->{"{$sandbox['field_name']}_revision_id"}) {
+        _field_collection_update_7009_update_data($new_revision_id, $each_modern_revision->{"{$sandbox['field_name']}_revision_id"});
+
+        // Update the current field collection item data in its host.
+        db_update("field_data_{$sandbox['field_name']}")
+          ->fields(array('revision_id' => $new_revision))
+          ->condition('revision_id', $old_revision)
+          ->condition('entity_type', $each_modern_revision->entity_type)
+          ->execute();
+      }
+
+      // Remove old copy of revision.
+      db_delete('field_collection_item_revision')
+        ->condition('revision_id', $each_modern_revision->revision_id)
+        ->execute();
+    }
+
+    $sandbox['current_field_collection_item']++;
+  }
+
+  $sandbox['#finished'] = 0;
+
+  if (count($vids) < $items_per_pass) {
+    $sandbox['current_field']++;
+    if ($sandbox['current_field'] == count($sandbox['field_collection_fields'])) {
+      $sandbox['#finished'] = 1;
+      return;
+    }
+    $sandbox['current_field_collection_item'] = 0;
+    $sandbox['field_name'] = $sandbox['field_collection_fields'][$sandbox['current_field']];
+    $sandbox['inner_fields'] = field_read_instances(array('entity_type' => 'field_collection_item', 'bundle' => $sandbox['field_name']));
+  }
+}
+
+function _field_collection_update_7009_new_revision($field_collection_item_id, $row_to_replace, $inner_fields, $field_name) {
+  // Add to field_collection_item_revision table.
+  $new_revision_id = db_insert('field_collection_item_revision')
+    ->fields(array('item_id'), array($field_collection_item_id))
+    ->execute();
+
+  return $new_revision_id;
+}
+
+function _field_collection_update_7009_update_data($new_revision, $old_revision) {
+  // Update the current field collection item.
+  db_update('field_collection_item')
+    ->fields(array('revision_id' => $new_revision))
+    ->condition('revision_id', $old_revision)
+    ->execute();
 }
