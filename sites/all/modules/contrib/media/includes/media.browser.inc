@@ -117,8 +117,8 @@ function media_browser($selected = NULL) {
       $settings['media']['browser'][$key] = $plugin_output[$key]['#settings'];
     }
 
-    // If this is a "ajax" style tab, add the href, otherwise an id. jQuery UI
-    // will use an href value to load content from that url
+    // If this is a "ajax" style tab, add the href, otherwise an id. jQuery UI.
+    // Will use an href value to load content from that url.
     $tabid = 'media-tab-' . check_plain($key);
     if (!empty($plugin_output[$key]['#callback'])) {
       $href = $plugin_output[$key]['#callback'];
@@ -131,7 +131,7 @@ function media_browser($selected = NULL) {
       );
       // Create a div for each tab's content.
       $plugin_output[$key] += array(
-        '#prefix' => '<div '. drupal_attributes($attributes) . ">\n",
+        '#prefix' => '<div ' . drupal_attributes($attributes) . ">\n",
         '#suffix' => "</div>\n",
       );
     }

@@ -113,7 +113,7 @@ function media_wysiwyg_pre_render_text_format($element) {
     'field' => $field['#id'],
   );
 
-  if (!isset($field['#value'])) {
+  if (!isset($field['#value']) && $field['#value'] != '') {
     return $element;
   }
 

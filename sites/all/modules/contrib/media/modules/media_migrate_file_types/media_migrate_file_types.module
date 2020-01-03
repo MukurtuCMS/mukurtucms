@@ -5,8 +5,8 @@
  * Primarily Drupal hooks.
  */
 
-/*
- * Implements hook_system_info_alter()
+/**
+ * Implements hook_system_info_alter().
  */
 function media_migrate_file_types_system_info_alter(&$info, $file, $type) {
   if ($type == 'module' && $file->name == 'media_migrate_file_types') {
@@ -52,8 +52,7 @@ function media_migrate_file_types_help($path, $arg) {
 }
 
 /**
- * Checks if there are any files that belong to disabled or deleted file
- * types.
+ * Checks if there are any files that belong to disabled or deleted file types.
  *
  * @return Array of file types (machine names) that are candidates for
  *   migration.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Media Theming
+ * Media Theming.
  *
  * Theming functions for the Media module.
  */
@@ -14,7 +14,7 @@ function theme_media_thumbnail($variables) {
   $label = '';
   $element = $variables['element'];
 
- // Wrappers to go around the thumbnail.
+  // Wrappers to go around the thumbnail.
   $attributes = array(
     'title' => $element['#name'],
     'class' => 'media-item',
