@@ -55,7 +55,9 @@ class views_plugin_display_services extends views_plugin_display {
     }
 
     // Render the fields.
-    $this->view->style_plugin->render_fields($this->view->result);
+    if (isset($this->view->style_plugin)) {
+      $this->view->style_plugin->render_fields($this->view->result);
+    }
 
     // Map fields.
     $result = array();
