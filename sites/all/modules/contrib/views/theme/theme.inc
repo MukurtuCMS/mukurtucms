@@ -379,8 +379,10 @@ function template_preprocess_views_view_summary(&$vars) {
   $active_urls = drupal_map_assoc(array(
     // Force system path.
     url($_GET['q'], array('alias' => TRUE)),
+    url($_GET['q'], $url_options + array('alias' => TRUE)),
     // Could be an alias.
     url($_GET['q']),
+    url($_GET['q'], $url_options),
   ));
 
   // Collect all arguments foreach row, to be able to alter them for example by
@@ -430,8 +432,10 @@ function template_preprocess_views_view_summary_unformatted(&$vars) {
   $active_urls = drupal_map_assoc(array(
     // Force system path.
     url($_GET['q'], array('alias' => TRUE)),
+    url($_GET['q'], $url_options + array('alias' => TRUE)),
     // Could be an alias.
     url($_GET['q']),
+    url($_GET['q'], $url_options),
   ));
 
   // Collect all arguments foreach row, to be able to alter them for example by
@@ -479,9 +483,24 @@ function template_preprocess_views_view_table(&$vars) {
   $vars['rows'] = array();
   $vars['field_classes'] = array();
   $vars['header'] = array();
+  $vars['classes_array'] = array();
 
   $options  = $view->style_plugin->options;
   $handler  = $view->style_plugin;
+  
+  if (!empty($handler->options['class'])) {
+    $classes = explode(' ', $handler->options['class']);
+    $classes = array_map('views_clean_css_identifier', $classes);
+
+    if (!empty($classes)) {
+      // Trim empty class entries.
+      foreach ($classes as $key => $class) {
+        if (!empty($class)) {
+          $vars['classes_array'][] = $class;
+        }
+      }
+    }
+  }
 
   $default_row_class = isset($options['default_row_class']) ? $options['default_row_class'] : TRUE;
   $row_class_special = isset($options['row_class_special']) ? $options['row_class_special'] : TRUE;
@@ -647,7 +666,7 @@ function template_preprocess_views_view_table(&$vars) {
     $vars['row_classes'][count($vars['row_classes']) - 1][] = 'views-row-last';
   }
 
-  $vars['classes_array'] = array('views-table');
+  $vars['classes_array'][] = 'views-table';
   if (empty($vars['rows']) && !empty($options['empty_table'])) {
     $vars['rows'][0][0] = $view->display_handler->render_area('empty');
     // Calculate the amounts of rows with output.
@@ -710,7 +729,7 @@ function template_preprocess_views_view_grid(&$vars) {
     }
     if ($row) {
       // Fill up the last line only if it's configured, but this is default.
-      if (!empty($handler->options['fill_single_line']) && count($rows)) {
+      if (!empty($handler->options['fill_single_line'])) {
         for ($i = 0; $i < ($columns - $col_count); $i++) {
           $row[] = '';
         }
@@ -739,8 +758,15 @@ function template_preprocess_views_view_grid(&$vars) {
         $remainders--;
       }
     }
-    for ($i = 0; $i < count($rows[0]); $i++) {
-      // This should be string so that's okay :)
+
+    // Fill out the row with empty values, if needed.
+    if (!empty($handler->options['fill_single_line'])) {
+      $column_fill = $columns;
+    }
+    else {
+      $column_fill = count($rows[0]);
+    }
+    for ($i = 0; $i < $column_fill; $i++) {
       if (!isset($rows[count($rows) - 1][$i])) {
         $rows[count($rows) - 1][$i] = '';
       }

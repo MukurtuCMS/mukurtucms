@@ -753,6 +753,65 @@ function views_block_info() {
 }
 
 /**
+ * Implements hook_block_configure().
+ */
+function views_block_configure($delta = '') {
+  // If there's no Views UI module there's nothing to link to.
+  if (!module_exists('views_ui')) {
+    return array();
+  }
+
+  // If the user doesn't have access to edit the view then don't bother with
+  // anything else.
+  if (!user_access('administer views')) {
+    return array();
+  }
+
+  // If this is 32, this should be an md5 hash.
+  if (strlen($delta) == 32) {
+    $hashes = variable_get('views_block_hashes', array());
+    if (!empty($hashes[$delta])) {
+      $delta = $hashes[$delta];
+    }
+  }
+
+  // Some added precaution in case the delta is missing values.
+  list($view_name, $display_id) = explode('-', $delta, 2) + array('', '');
+
+  // If the view name or display ID can't be found, there's something wrong.
+  if ($view_name === '' || $display_id === '') {
+    return array();
+  }
+
+  $view = views_get_view($view_name);
+  if (empty($view)) {
+    return array();
+  }
+
+  if (!isset($view->display[$display_id])) {
+    return array();
+  }
+
+  /** @var \views_display $display */
+  $display = $view->display[$display_id];
+
+  $view_label = $view->get_human_name();
+  $display_label = $display->display_title;
+
+  $path = "admin/structure/views/view/$view_name/edit/$display_id";
+
+  return array(
+    'fieldset' => array(
+      '#type' => 'fieldset',
+      '#title' => t('Configure this views display'),
+      'content' => array(
+        '#markup' => l($view_label . ' - ' . $display_label, $path),
+      ),
+    ),
+  );
+}
+
+/**
  * Implements hook_block_view().
  */
 function views_block_view($delta) {
@@ -1231,7 +1290,7 @@ function views_add_css($file) {
  * Include views .js files.
  */
 function views_add_js($file) {
-  // If javascript has been disabled by the user, never add js files.
+  // If JavaScript has been disabled by the user, never add js files.
   if (variable_get('views_no_javascript', FALSE)) {
     return;
   }
@@ -2584,6 +2643,17 @@ function views_views_api() {
     'api' => views_api_version(),
     'path' => drupal_get_path('module', 'views') . '/modules',
   );
+}
+
+/**
+ * Implements hook_admin_menu_cache_info().
+ */
+function views_admin_menu_cache_info() {
+  $caches['views'] = array(
+    'title' => t('Views'),
+    'callback' => 'views_invalidate_cache',
+  );
+  return $caches;
 }
 
 if (!function_exists('aggregator_views_api')) {

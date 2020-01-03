@@ -752,7 +752,7 @@ function hook_views_plugin_option_definition_alter(&$options, $plugin) {
  * Alter existing handler option definitions.
  *
  * This can be used to edit default or add new option definitions to existing
- * handers. The reason for doing this is that only overriding the relevent form
+ * handlers. The reason for doing this is that only overriding the relevent form
  * with hook_form_alter() is insufficent because submitted form values will be
  * ignored if they haven't been declared as an available option.
  *
@@ -787,7 +787,7 @@ function hook_views_handler_option_definition_alter(&$options, $handler) {
  *   - api: (required) The version of the Views API the module implements.
  *   - path: (optional) If includes are stored somewhere other than within the
  *     root module directory, specify its path here.
- *   - template path: (optional) A path where the module has stored it's views
+ *   - template path: (optional) A path where the module has stored its views
  *     template files. When you have specified this key views automatically
  *     uses the template files for the views. You can use the same naming
  *     conventions like for normal views template files.

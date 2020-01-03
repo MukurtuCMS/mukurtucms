@@ -314,6 +314,38 @@ class ViewsHandlerFilterNumericTest extends ViewsSqlTest {
     $this->assertIdenticalResultset($view, $resultset, $this->column_map);
   }
 
+  /**
+   * Tests the limit operators functionality.
+   */
+  public function testFilterNumericExposedLimitOperators() {
+    $filters = $this->getGroupedExposedFilters();
+    $view = $this->getBasicView();
+
+    $available_operators = array('<', '>', 'between');
+
+    $filters['age']['expose'] += array(
+      'limit_operators' => TRUE,
+      'available_operators' => drupal_map_assoc($available_operators),
+    );
+
+    $view->display['default']->handler->override_option('filters', $filters);
+
+
+    $this->executeView($view);
+
+    $form = array();
+    $form_state = array();
+    $view->filter['age']->operator_form($form, $form_state);
+
+    $operator = $form['operator'];
+
+    $this->assertTrue(in_array($operator['#default_value'], $available_operators), 'Default value operator found in list of available operators.');
+
+    foreach ($available_operators as $available_operator) {
+      $this->assertTrue($operator['#options'][$available_operator], format_string('@operator found in options', array('@operator' => $available_operator)));
+    }
+  }
+
 
   public function testAllowEmpty() {
     $view = $this->getBasicView();
