@@ -6,9 +6,8 @@ core = 7.x
 version = 7.x-0.1
 
 
-; Information added by Drupal.org packaging script on 2015-04-13
-version = "7.x-3.0+12-dev"
+; Information added by Drupal.org packaging script on 2019-04-12
+version = "7.x-3.1+0-dev"
 core = "7.x"
 project = "panels_bootstrap_layouts"
-datestamp = "1428934685"
-
+datestamp = "1555099685"
