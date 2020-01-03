@@ -1,6 +1,6 @@
 
 Module: Google Analytics
-Author: Alexander Hass <http://drupal.org/user/85918>
+Author: Alexander Hass <https://drupal.org/user/85918>
 
 
 Description
@@ -53,15 +53,15 @@ user with 'Administer Google Analytics' permission.
 Like the blocks visibility settings in Drupal core, there is a choice for
 "Add if the following PHP code returns TRUE." Sample PHP snippets that can be
 used in this textarea can be found on the handbook page "Overview-approach to
-block visibility" at http://drupal.org/node/64135.
+block visibility" at https://drupal.org/node/64135.
 
 Custom dimensions and metrics
 =============================
 One example for custom dimensions tracking is the "User roles" tracking.
 
-1. In the Google Analytics Management Interface (http://www.google.com/analytics/)
-   you need to setup Dimension #1 with name e.g. "User roles". This step is
-   required. Do not miss it, please.
+1. In the Google Analytics (https://marketingplatform.google.com/about/analytics/)
+   Management Interface you need to setup Dimension #1 with name 
+   e.g. "User roles". This step is required. Do not miss it, please.
 
 2. Enter the below configuration data into the Drupal custom dimensions settings
    form under admin/config/system/googleanalytics. You can also choose another
@@ -77,7 +77,7 @@ Advanced Settings
 =================
 You can include additional JavaScript snippets in the custom javascript
 code textarea. These can be found on the official Google Analytics pages
-and a few examples at http://drupal.org/node/248699. Support is not
+and a few examples at https://drupal.org/node/248699. Support is not
 provided for any customisations you include.
 
 To speed up page loading you may also cache the Google Analytics "analytics.js"
@@ -97,7 +97,7 @@ Body:
   <li><a href="mailto:foo@example.com">Mailto</a></li>
   <li><a href="/files/test.txt">Download file</a></li>
   <li><a class="colorbox" href="#">Open colorbox</a></li>
-  <li><a href="http://example.com/">External link</a></li>
+  <li><a href="https://example.com/">External link</a></li>
   <li><a href="/go/test">Go link</a></li>
 </ul>
 
