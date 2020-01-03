@@ -15,9 +15,8 @@ files[] = includes/commerce_line_item.inline_entity_form.inc
 files[] = tests/inline_entity_form_test_base.test
 files[] = tests/multiple_values_widget.test
 
-; Information added by Drupal.org packaging script on 2016-04-16
-version = "7.x-1.8"
+; Information added by Drupal.org packaging script on 2019-09-10
+version = "7.x-1.9"
 core = "7.x"
 project = "inline_entity_form"
-datestamp = "1460849408"
-
+datestamp = "1568130787"
