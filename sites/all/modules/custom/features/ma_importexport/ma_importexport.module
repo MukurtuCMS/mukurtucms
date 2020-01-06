@@ -346,10 +346,14 @@ function ma_importexport_feeds_after_save(FeedsSource $source, $entity, $item, $
 
         // The feeds importer supports setting the DH community record parent field on the community record
         // In this case, we need to lookup the parent and set the community record children field
-        if(!empty($entity->field_community_record_parent)) {
+        if (!empty($entity->field_community_record_parent)) {
             // only a single community record parent is allowed
-            $parent_record = node_load($entity->field_community_record_parent[LANGUAGE_NONE][0]['target_id']);
-            if($parent_record) {
+            $parent_record = NULL;
+            if (isset($entity->field_community_record_parent[LANGUAGE_NONE][0]['target_id'])) {
+              $parent_record = node_load($entity->field_community_record_parent[LANGUAGE_NONE][0]['target_id']);
+            }
+
+            if ($parent_record) {
                 // A DH item can have multiple CRs, check and make sure this reference doesn't already exist
                 $child_reference_exists = FALSE;
                 foreach($parent_record->field_community_record_children[LANGUAGE_NONE] as $child) {
