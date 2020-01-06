@@ -16,9 +16,10 @@ function ma_core_init() {
   // Fix for bootstrap help tooltip not working on select widgets.
   drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/bootstrap_tooltips_over_select2_widget.js');
 
-  // Suppress status messages during profile installation
-  if ($_GET['profile'] == 'mukurtu') {
-     drupal_get_messages(); // clears the message queue by default
+  // Suppress status messages during profile installation.
+  if (isset($_GET['profile']) && $_GET['profile'] == 'mukurtu') {
+    // Clears the message queue by default.
+    drupal_get_messages();
   }
 
 }
