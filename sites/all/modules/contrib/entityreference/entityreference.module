@@ -848,6 +848,14 @@ function entityreference_options_list($field, $instance = NULL, $entity_type = N
     $return[$bundle_label] = $entity_ids;
   }
 
+  // Mukurtu specific patch.
+  // By default Entity Reference does not include the entity type if there is only a single type.
+  // ma_base_theme_field_widget_form_alter requires the entity type for field_related_content.
+  if (isset($field['field_name']) && $field['field_name'] == 'field_related_content') {
+    // Return options with entity type always for field_related_content.
+    return $return;
+  }
+
   return count($return) == 1 ? reset($return) : $return;
 }
 
