@@ -1,0 +1,31 @@
+From 7e6e8b5f6230cafc46fe3b8e721504a04b1aec31 Mon Sep 17 00:00:00 2001
+From: Steve Taylor <steve_taylor@wsu.edu>
+Date: Mon, 6 Jan 2020 15:44:45 -0800
+Subject: [PATCH] Fix for related content field for single type
+
+---
+ .../contrib/entityreference/entityreference.module        | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/sites/all/modules/contrib/entityreference/entityreference.module b/sites/all/modules/contrib/entityreference/entityreference.module
+index 53814b9a..4acea881 100644
+--- a/entityreference.module
++++ b/entityreference.module
+@@ -848,6 +848,14 @@ function entityreference_options_list($field, $instance = NULL, $entity_type = N
+     $return[$bundle_label] = $entity_ids;
+   }
+
++  // Mukurtu specific patch.
++  // By default Entity Reference does not include the entity type if there is only a single type.
++  // ma_base_theme_field_widget_form_alter requires the entity type for field_related_content.
++  if (isset($field['field_name']) && $field['field_name'] == 'field_related_content') {
++    // Return options with entity type always for field_related_content.
++    return $return;
++  }
++
+   return count($return) == 1 ? reset($return) : $return;
+ }
+
+--
+2.19.0.windows.1
+
