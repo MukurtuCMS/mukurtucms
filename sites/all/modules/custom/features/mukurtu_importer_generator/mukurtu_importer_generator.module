@@ -173,6 +173,10 @@ function mukurtu_importer_generator_get_default_documentation($field_mapping, $e
       case 'geofield':
         break;
 
+      case 'link_field':
+        $value_type = "Values must be formatted as URL||Title||Attributes.";
+        break;
+
       case 'audio':
       case 'file':
       case 'image':
