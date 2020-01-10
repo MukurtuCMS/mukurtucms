@@ -219,12 +219,25 @@ function ma_importexport_set_partial_date_target($source, $entity, $target, $val
     return;
   }
 
+  $month = FALSE;
+  $day = FALSE;
+
+  // Do we have both the month and year?
+  $date_components = substr_count($value[0], '-');
+  if ($date_components >= 1) {
+    $month = TRUE;
+  }
+
+  if ($date_components == 2) {
+    $day = TRUE;
+  }
+
   $import_date = new DateTime($value[0]);
 
   if ($import_date) {
     $entity->{$target}[LANGUAGE_NONE][0]['from']['year'] = $import_date->format('Y');
-    $entity->{$target}[LANGUAGE_NONE][0]['from']['month'] = $import_date->format('m');
-    $entity->{$target}[LANGUAGE_NONE][0]['from']['day'] = $import_date->format('d');
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['month'] = $month ? $import_date->format('m') : "";
+    $entity->{$target}[LANGUAGE_NONE][0]['from']['day'] = $day ? $import_date->format('d') : "";
   }
 }
 
