@@ -296,7 +296,13 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
     // Order the fields according to their weight
     $ordered_fields = array();
     foreach ($element as $field_name => $field) {
-      $ordered_fields[$field['#weight']] = $field_name;
+      if (is_null($field)) {
+        continue;
+      }
+
+      if (isset($field['#weight'])) {
+        $ordered_fields[$field['#weight']] = $field_name;
+      }
     }
     ksort ($ordered_fields);
 
