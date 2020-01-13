@@ -679,6 +679,16 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_digitalheritage_form_comment_node_digital_heritage_form_alter(&$form, &$form_state) {
+  // Change text of DH comment submit button.
+  if (isset($form['actions']['submit'])) {
+    $form['actions']['submit']['#value'] = t('Save Comment');
+  }
+}
+
+/**
  * After-build changes to the DH node form.
  */
 function ma_digitalheritage_dh_form_after_build($form, &$form_state) {
