@@ -383,28 +383,35 @@ function ma_base_theme_copy_related_content() {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node');
   $results = $query->execute();
-  foreach (array_keys($results['node']) as $nid) {
-    print  ' ' . $nid;
-    $merged_refs = [];
-    $nw = entity_metadata_wrapper('node', $nid);
-    foreach ($fields as $field) {
-      if (isset($nw->{$field})) {
-        $merged_refs = array_merge($merged_refs, $nw->{$field}->raw());
+  $success = 0;
+  $no_refs = 0;
+
+  if (!empty($results['node'])) {
+    $total = count($results['node']);
+
+    foreach (array_keys($results['node']) as $nid) {
+      $merged_refs = [];
+      $nw = entity_metadata_wrapper('node', $nid);
+
+      foreach ($fields as $field) {
+        if (isset($nw->{$field})) {
+          $merged_refs = array_merge($merged_refs, $nw->{$field}->raw());
+        }
       }
-    }
-    unset ($merged_refs[$nid]); // Prevent self-referencing, which causes a fatal error when node is viewed due to something in
-    if (count($merged_refs)) {
-      if (isset($nw->field_related_content)) {
+      unset($merged_refs[$nid]); // Prevent self-referencing, which causes a fatal error when node is viewed due to something in
+
+      if (count($merged_refs) && isset($nw->field_related_content)) {
         $merged_refs = array_merge($nw->field_related_content->raw(), $merged_refs); // This prevents overwriting any refs which may have been set on the new field by user before this script gets run, which shouldn't happen, but just in case.
         $merged_refs = array_unique($merged_refs);
         $nw->field_related_content->set($merged_refs);
         $nw->save();
-        print "!";
-      }
-      else {
-        print "X";
+        $success++;
+        watchdog('mukurtu_update', 'Migrated related content for nid %nid', array('%nid' => $nid));
+      } else {
+        $no_refs++;
       }
     }
+    watchdog('mukurtu_update', 'Migrated related content for %success out of %total nodes. There were %noref nodes with no references.', array('%success' => $success, '%total' => $total, '%noref' => $no_refs));
   }
 }
 
