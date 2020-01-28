@@ -722,7 +722,7 @@ function ma_mobile_client_services_resources() {
         ],
       ],
     ],
-    
+
     'groups' => [
       'operations' => [
         'index' => [
@@ -742,7 +742,7 @@ function ma_mobile_client_services_resources() {
         ],
       ],
     ],
-    
+
   ];
 
   return $api;
@@ -1753,7 +1753,7 @@ function ma_mobile_client_set_default_types() {
   }
   variable_set('mm_viewable_types', $default_viewable_types);
 
-  $ordered_creatable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'community', 'cultural_protocol_group', 'person', 'personal_collection'];
+  $ordered_creatable_types = ['digital_heritage', 'dictionary_word', 'word_list', 'community', 'cultural_protocol_group', 'person', 'personal_collection', 'lesson'];
   $default_creatable_types = [];
   $weight = 0;
   foreach ($ordered_creatable_types as $ordered_creatable_type) {
