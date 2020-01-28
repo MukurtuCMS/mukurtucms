@@ -1,3 +1,11 @@
+## Mukurtu 2.1.2
+- Fixed a bug that caused the import of some audio/video files to fail
+- Adjusted the default Mukurtu theme to make sub-theming easier
+- Security: Update to Drupal 7.67
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.1.1
 - Fixed bug that caused some sites to not be able to create sub-collections
 - During import, original date fields will no longer default to the current date if left empty
