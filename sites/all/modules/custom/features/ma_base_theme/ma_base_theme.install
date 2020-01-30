@@ -111,7 +111,7 @@ function ma_base_theme_update_7004() {
 
   foreach ($features_to_revert as $feature_name) {
     if (module_exists($feature_name)) {
-      features_revert($feature_name);
+      features_revert_module($feature_name);
     }
   }
 
