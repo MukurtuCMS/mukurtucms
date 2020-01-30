@@ -528,6 +528,7 @@ function ma_base_theme_field_default_field_bases() {
         'http://localcontexts.org/tk/cs/1.0' => 'TK Culturally Sensitive (TK CS)',
         'http://localcontexts.org/tk/v/1.0' => 'TK Verified Label (TK V)',
         'http://localcontexts.org/tk/nv/1.0' => 'TK Non-Verified (TK NV)',
+        'http://localcontexts.org/tk/cl/1.0' => 'TK Clan (TK CL)',
       ),
       'allowed_values_function' => '',
       'treeable' => FALSE,
