@@ -818,6 +818,15 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
   $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference', 'atom_reference', 'field_collection', 'paragraphs']));
   $snw = entity_metadata_wrapper($synced_entity_type, $synced_entity);
   foreach ($ref_fields as $ref_field => $ref_field_properties) {
+
+    // Define entity reference term fields (where a view is used to populate the values in the form) as tax term references, for the purpose of this function.
+    $entity_reference_term_fields = [
+      'field_mukurtu_terms'
+    ];
+    if (in_array($ref_field, $entity_reference_term_fields)) {
+      $ref_field_properties['type'] = 'taxonomy_term_reference';
+    }
+
     $ref_field_values = [];
 
     // Get $ref_field_values
@@ -835,7 +844,12 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
       case 'atom':
         if (isset($synced_entity->{$ref_field}) && count($synced_entity->$ref_field)) {
           foreach ($synced_entity->{$ref_field}[LANGUAGE_NONE] as $ref_field_value) {
-            $ref_field_values[] = node_load($ref_field_value['target_id']);
+            if (isset($ref_field_value['target_id'])) {
+              $ref_field_values[] = node_load($ref_field_value['target_id']);
+            }
+            elseif (isset($ref_field_value['tid'])) {
+              $ref_field_values[] = taxonomy_term_load($ref_field_value['tid']);
+            }
           }
         }
         break;
