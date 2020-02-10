@@ -298,6 +298,9 @@ function mukurtu_create_default_content() {
 
   // Set default browse mode.
   _ma_base_theme_set_default_browse('digital-heritage');
+
+  // Disable lesson/unit plan menu items by default.
+  ma_base_theme_update_7006();
 }
 
 //function mukurtu_client_form() {
