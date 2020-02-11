@@ -124,17 +124,3 @@ function ma_base_theme_update_7004() {
 function ma_base_theme_update_7005() {
   ma_search_api_delete_deprecated_cers();
 }
-
-/**
- * Disable unit/lesson plan links by default.
- */
-function ma_base_theme_update_7006() {
-  $routes = array("node/add/lesson", "node/add/unit-plan");
-  foreach ($routes as $route) {
-    $link = menu_link_get_preferred($route, 'main-menu');
-    if ($link) {
-      $link['hidden'] = TRUE;
-      menu_link_save($link);
-    }
-  }
-}
