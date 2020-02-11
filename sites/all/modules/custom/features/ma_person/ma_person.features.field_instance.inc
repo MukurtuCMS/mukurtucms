@@ -246,7 +246,7 @@ function ma_person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 17,
+      'weight' => 19,
     ),
   );
 
@@ -376,7 +376,7 @@ function ma_person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 18,
+      'weight' => 20,
     ),
   );
 
@@ -463,7 +463,7 @@ function ma_person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 19,
+      'weight' => 21,
     ),
   );
 
@@ -1372,7 +1372,7 @@ function ma_person_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'paragraphs_embed',
-      'weight' => 21,
+      'weight' => 18,
     ),
   );
 
@@ -1499,7 +1499,7 @@ function ma_person_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 20,
+      'weight' => 17,
     ),
   );
 
@@ -1685,7 +1685,7 @@ function ma_person_field_default_field_instances() {
     'bundle' => 'person_relationship_bundle',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
