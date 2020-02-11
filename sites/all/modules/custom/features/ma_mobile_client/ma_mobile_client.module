@@ -1106,6 +1106,35 @@ function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
 
 }
 
+/**
+ * Implements hook_node_prepare().
+ *
+ * When hitting the node-form-fields endpoint for the person paragraphs form definition,
+ * we need to create one instance of the field.
+ *
+ * Theoretically these should be open already because the paragraph parent fields are set to open, but for some reason that is not working.
+ * This is already being done for field_word_entry in ma_dictionary_node_prepare(), so this function is for any remaining
+ * paragraph fields.
+ *
+ * TODO: abstract this function so that it works with all paragraph fields automatically, including future ones. Otherwise they need to be manually added here.
+ */
+function ma_mobile_client_node_prepare($node) {
+  if($node->type == 'person') {
+    if (arg(1) == 'node-form-fields') {
+      if (empty($node->field_related_people)) {
+        $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_related_people', 'bundle' => 'person_relationship_bundle'));
+        $paragraph->is_new = TRUE;
+        $paragraph->setHostEntity('node', $node);
+      }
+      if (empty($node->field_sections)) {
+        $paragraph = new ParagraphsItemEntity(array('field_name' => 'field_sections', 'bundle' => 'text_section'));
+        $paragraph->is_new = TRUE;
+        $paragraph->setHostEntity('node', $node);
+      }
+    }
+  }
+}
+
 
 /**
  * Retrieves the fields and their properties, and fieldgroups, to be used by the app in constructing the node view in React.
@@ -1823,3 +1852,4 @@ function ma_mobile_client_node_postsave($node, $op) {
     node_save($node);
   }
 }
+
