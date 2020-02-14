@@ -1826,7 +1826,14 @@ function ma_mobile_client_node_postsave($node, $op) {
         // TODO: add error message
         continue;
       }
-      $paragraph_bundle = reset($fields["field_word_entry"]["settings"]["allowed_bundles"]);
+      // TODO: this will only work if there is only one allowed bundle for the field.
+      // Once we have a field that can target multiple bundles, this will need to change.
+      $allowed_bundles = $fields[$parent_field_name]["settings"]["allowed_bundles"];
+      foreach ($allowed_bundles as $allowed_bundle) {
+        if (is_string($allowed_bundle)) {
+          $paragraph_bundle = $allowed_bundle;
+        }
+      }
       foreach ($parent_instances[LANGUAGE_NONE] as $parent_instance_index => $parent_instance) {
         $paragraph = new ParagraphsItemEntity([
           'field_name' => $parent_field_name,
