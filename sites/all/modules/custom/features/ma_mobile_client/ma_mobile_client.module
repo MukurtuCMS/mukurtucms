@@ -1833,7 +1833,7 @@ function ma_mobile_client_node_postsave($node, $op) {
           'bundle' => $paragraph_bundle,
         ]);
         $paragraph->is_new = TRUE;
-        $paragraph->setHostEntity('node', $node);
+        $paragraph->setHostEntity('node', $node, LANGUAGE_NONE, FALSE);
         foreach ($parent_instance as $paragraph_field => $paragraph_field_values) {
           $paragraph->{$paragraph_field} = $paragraph_field_values;
         }
