@@ -817,7 +817,6 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
 function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node') {
 
   $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference', 'atom_reference', 'field_collection', 'paragraphs']));
-  $snw = entity_metadata_wrapper($synced_entity_type, $synced_entity);
   foreach ($ref_fields as $ref_field => $ref_field_properties) {
 
     // Define entity reference term fields (where a view is used to populate the values in the form) as tax term references, for the purpose of this function.
@@ -828,34 +827,33 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
       $ref_field_properties['type'] = 'taxonomy_term_reference';
     }
 
+
+    /////
+    // Get $ref_field_values
     $ref_field_values = [];
 
-    // Get $ref_field_values
-    switch ($synced_entity_type) {
-      case 'node':
-        if (isset($snw->{$ref_field})) {
-          $ref_field_values = $snw->{$ref_field}->value();
-          if (is_object(($ref_field_values))) {
-            $ref_field_values = [$ref_field_values]; // convert single value term ref fields (single value entity ref fields too?) from single object to single value array with object as first value
+    // Unfortunately, no metadata wrapper methods for atoms, so need to load manually.
+    if ($synced_entity_type == 'atom') {
+      if (isset($synced_entity->{$ref_field}) && count($synced_entity->{$ref_field})) {
+        foreach ($synced_entity->{$ref_field}[LANGUAGE_NONE] as $ref_field_value) {
+          if (isset($ref_field_value['tid'])) {
+            $ref_field_values[] = taxonomy_term_load($ref_field_value['tid']);
+          }
+          else {
+            // Currently, term refs are the only kind of refs in atoms, but if there are others in the future, we'll need to add handling for them here.
+            drupal_set_message ("Error in _ma_mobile_client_add_ref_fields_to_sync_nodes() (atoms). Contact developer.", 'error');
           }
         }
-        break;
-
-      case 'paragraphs':
-      case 'field_collection':
-      case 'atom':
-        if (isset($synced_entity->{$ref_field}) && count($synced_entity->$ref_field)) {
-          foreach ($synced_entity->{$ref_field}[LANGUAGE_NONE] as $ref_field_value) {
-            if (isset($ref_field_value['target_id'])) {
-              $ref_field_values[] = node_load($ref_field_value['target_id']);
-            }
-            elseif (isset($ref_field_value['tid'])) {
-              $ref_field_values[] = taxonomy_term_load($ref_field_value['tid']);
-            }
-          }
+      }
+    }
+    else {
+      $sew = entity_metadata_wrapper($synced_entity_type, $synced_entity);
+      if (isset($sew->{$ref_field})) {
+        $ref_field_values = $sew->{$ref_field}->value();
+        if (is_object(($ref_field_values))) {
+          $ref_field_values = [$ref_field_values]; // convert single value term ref fields (single value entity ref fields too?) from single object to single value array with object as first value
         }
-        break;
-
+      }
     }
 
     if (count($ref_field_values)) {
@@ -888,7 +886,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
             $all_synced_entities['field_collections'][$reffed_entity->item_id] = [
               'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to FC entities.
             ];
-            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'field_collection');
+            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'field_collection_item');
             break;
 
           // Paragraphs
@@ -896,7 +894,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
             $all_synced_entities['paragraphs'][$reffed_entity->item_id] = [
               'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to paragraph entities.
             ];
-            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'paragraphs');
+            $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'paragraphs_item');
             break;
 
           // Entity / node references.
