@@ -840,6 +840,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
         }
         break;
 
+      case 'paragraphs':
       case 'field_collection':
       case 'atom':
         if (isset($synced_entity->{$ref_field}) && count($synced_entity->$ref_field)) {
@@ -889,7 +890,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
             $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'field_collection');
             break;
 
-          // Field_collections
+          // Paragraphs
           case 'paragraphs':
             $all_synced_entities['paragraphs'][$reffed_entity->item_id] = [
               'last_updated' => 0, // reffed_entity->changed, // TODO: if these get unwieildy on the sync, will need to add this property to paragraph entities.
