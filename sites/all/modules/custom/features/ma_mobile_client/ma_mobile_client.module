@@ -900,7 +900,7 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
           // Entity / node references.
           default:
           if (node_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
-            if (!$ref_field_properties["settings"]["target_type"] == 'user') { // skip when the referring field is field_dhan_notified_users, or any other entity ref fields to users
+            if ($ref_field_properties["settings"]["target_type"] != 'user') { // skip when the referring field is field_dhan_notified_users, or any other entity ref fields to users
               $all_synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
                 'last_updated' => $reffed_entity->changed,
                 'editable' => node_access('update', $reffed_entity) ? TRUE : FALSE,
