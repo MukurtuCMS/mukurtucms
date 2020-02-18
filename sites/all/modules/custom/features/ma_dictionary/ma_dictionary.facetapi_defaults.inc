@@ -19,6 +19,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_dictionary_word_language';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -50,6 +51,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_dictionary_word_related_dh';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -79,6 +81,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_related_dictionary_words';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -108,6 +111,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_translation';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -137,6 +141,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_word_list';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -166,6 +171,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_words';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -195,6 +201,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'title_az_glossary';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'or',
     'hard_limit' => '-1',
@@ -242,6 +249,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_dictionary_word_language';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -290,6 +298,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_dictionary_word_related_dh';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -338,6 +347,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_related_dictionary_words';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -386,6 +396,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_translation';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -429,6 +440,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_word_entry:field_part_of_speech';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -477,6 +489,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_word_list';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -525,6 +538,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_words';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -573,6 +587,7 @@ function ma_dictionary_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'title_az_glossary';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'search_api_glossary',

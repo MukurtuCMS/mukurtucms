@@ -60,14 +60,19 @@ function ma_dictionary_ds_field_settings_info() {
         ),
       ),
     ),
-    'og_group_ref' => array(
+    'field_community_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
         ),
       ),
     ),
-    'field_community_ref' => array(
+    'field_word_list' => array(
+      'formatter_settings' => array(
+        'ft' => array(),
+      ),
+    ),
+    'og_group_ref' => array(
       'formatter_settings' => array(
         'ft' => array(
           'func' => 'theme_field',
@@ -514,6 +519,7 @@ function ma_dictionary_ds_layout_settings_info() {
         7 => 'field_tags',
         8 => 'field_collection',
         9 => 'extracted_wl_from_relationships',
+        12 => 'field_word_list',
       ),
       'bottom' => array(
         10 => 'field_additional_media',
@@ -533,6 +539,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'extracted_wl_from_relationships' => 'right',
       'field_additional_media' => 'bottom',
       'field_related_content' => 'bottom',
+      'field_word_list' => 'right',
     ),
     'classes' => array(
       'layout_class' => array(
@@ -640,26 +647,26 @@ function ma_dictionary_ds_layout_settings_info() {
         1 => 'group_tabs',
         2 => 'redirect',
         3 => 'path',
-        10 => 'group_dictionary_word_basic',
-        11 => 'group_dictionary_word_relations',
-        12 => 'title',
-        13 => 'field_dictionary_word_language',
-        14 => 'field_word_entry',
-        15 => 'field_tags',
-        16 => 'field_additional_media',
-        17 => 'field_related_content',
+        9 => 'group_dictionary_word_basic',
+        10 => 'group_dictionary_word_relations',
+        11 => 'title',
+        12 => 'field_dictionary_word_language',
+        13 => 'field_word_entry',
+        14 => 'field_tags',
+        15 => 'field_additional_media',
+        16 => 'field_related_content',
+        17 => 'field_word_list',
         18 => 'field_collection',
         19 => 'field_personal_collections',
         20 => 'og_group_ref',
         21 => 'field_item_privacy_setting',
       ),
       'hidden' => array(
-        4 => 'field_word_list',
-        5 => 'field_dictionary_word_related_dh',
-        6 => 'field_related_dictionary_words',
-        7 => 'field_language_community',
-        8 => 'field_community_ref',
-        9 => 'field_media_asset',
+        4 => 'field_dictionary_word_related_dh',
+        5 => 'field_related_dictionary_words',
+        6 => 'field_language_community',
+        7 => 'field_community_ref',
+        8 => 'field_media_asset',
         22 => '_add_existing_field',
       ),
     ),
@@ -668,7 +675,6 @@ function ma_dictionary_ds_layout_settings_info() {
       'group_tabs' => 'ds_content',
       'redirect' => 'ds_content',
       'path' => 'ds_content',
-      'field_word_list' => 'hidden',
       'field_dictionary_word_related_dh' => 'hidden',
       'field_related_dictionary_words' => 'hidden',
       'field_language_community' => 'hidden',
@@ -682,6 +688,7 @@ function ma_dictionary_ds_layout_settings_info() {
       'field_tags' => 'ds_content',
       'field_additional_media' => 'ds_content',
       'field_related_content' => 'ds_content',
+      'field_word_list' => 'ds_content',
       'field_collection' => 'ds_content',
       'field_personal_collections' => 'ds_content',
       'og_group_ref' => 'ds_content',
