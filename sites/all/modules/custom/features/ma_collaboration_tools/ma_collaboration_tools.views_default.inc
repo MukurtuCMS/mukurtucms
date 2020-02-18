@@ -159,6 +159,8 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['exposed_form']['options']['submit_button'] = 'Search';
+  $handler->display->display_options['exposed_form']['options']['reset_button'] = TRUE;
   $handler->display->display_options['pager']['type'] = 'full';
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
@@ -167,7 +169,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['empty']['area']['table'] = 'views';
   $handler->display->display_options['empty']['area']['field'] = 'area';
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area']['content'] = 'There are no documents in this library yet.';
+  $handler->display->display_options['empty']['area']['content'] = 'No documents.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   /* Field: Indexed Node: Node ID */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
@@ -268,7 +270,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['filters']['search_api_views_fulltext']['exposed'] = TRUE;
   $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['operator_id'] = 'search_api_views_fulltext_op';
   $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['operator'] = 'search_api_views_fulltext_op';
-  $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['identifier'] = 'search_api_views_fulltext';
+  $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['identifier'] = 'search';
   $handler->display->display_options['filters']['search_api_views_fulltext']['expose']['remember_roles'] = array(
     2 => '2',
   );
@@ -283,6 +285,7 @@ function ma_collaboration_tools_views_default_views() {
 
   /* Display: Content pane */
   $handler = $view->new_display('panel_pane', 'Content pane', 'panel_pane_1');
+  $handler->display->display_options['exposed_block'] = TRUE;
   $handler->display->display_options['argument_input'] = array(
     'field_document_doc_lib_section' => array(
       'type' => 'user',
@@ -293,10 +296,11 @@ function ma_collaboration_tools_views_default_views() {
       'label' => 'Indexed Node: Document Library',
     ),
   );
+  $handler->display->display_options['inherit_panels_path'] = '1';
   $translatables['documents_search'] = array(
     t('Master'),
     t('more'),
-    t('Apply'),
+    t('Search'),
     t('Reset'),
     t('Sort by'),
     t('Asc'),
@@ -308,7 +312,7 @@ function ma_collaboration_tools_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('There are no documents in this library yet.'),
+    t('No documents.'),
     t('Node ID'),
     t('.'),
     t('By [author] on [created]'),

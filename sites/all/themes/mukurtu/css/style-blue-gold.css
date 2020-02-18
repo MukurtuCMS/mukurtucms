@@ -12550,6 +12550,20 @@ body #admin-menu {
 .node-document-page.view-mode-full .view-documents-search .views-field-body {
   padding-top: 10px;
 }
+.node-discussion-space.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .btn,
+.node-discussion-topic.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .btn,
+.node-calendar.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .btn,
+.node-event.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .btn,
+.node-document-library.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .btn,
+.node-document-page.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .btn,
+.node-discussion-space.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .form-submit,
+.node-discussion-topic.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .form-submit,
+.node-calendar.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .form-submit,
+.node-event.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .form-submit,
+.node-document-library.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .form-submit,
+.node-document-page.view-mode-full #views-exposed-form-documents-search-panel-pane-1 .views-exposed-form .views-exposed-widget .form-submit {
+  margin-top: 0;
+}
 .user-profile .field-name-og-user-node .label-above,
 .user-profile .field-name-personal-collections .label-above {
   border-bottom: 5px solid #E6AB49;

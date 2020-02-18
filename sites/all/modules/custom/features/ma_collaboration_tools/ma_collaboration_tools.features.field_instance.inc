@@ -1775,10 +1775,10 @@ function ma_collaboration_tools_field_default_field_instances() {
         'weight' => 13,
       ),
       'full' => array(
-        'label' => 'above',
+        'label' => 'hidden',
         'settings' => array(),
         'type' => 'hidden',
-        'weight' => 25,
+        'weight' => 34,
       ),
       'teaser' => array(
         'label' => 'above',
