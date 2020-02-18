@@ -29,6 +29,7 @@ function ma_search_api_default_search_api_index() {
     "server" : "search_api_db_server",
     "item_type" : "node",
     "options" : {
+      "datasource" : { "bundles" : [] },
       "index_directly" : 1,
       "cron_limit" : "50",
       "data_alter_callbacks" : {
@@ -401,7 +402,8 @@ function ma_search_api_default_search_api_server() {
       "database" : "default:default",
       "min_chars" : "3",
       "partial_matches" : 0,
-      "indexes" : { "default_node_index" : {
+      "indexes" : {
+        "default_node_index" : {
           "type" : {
             "table" : "search_api_db_default_node_index",
             "column" : "type",
@@ -1062,6 +1064,84 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_related_content",
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          }
+        },
+        "document_pages" : {
+          "nid" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "nid_1",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "title" : {
+            "table" : "search_api_db_document_pages_text_1",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "created" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "created_1",
+            "type" : "date",
+            "boost" : "1.0"
+          },
+          "changed" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "changed_1",
+            "type" : "date",
+            "boost" : "1.0"
+          },
+          "author" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "author_1",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "title_az_glossary" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "title_az_glossary_1",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "field_document_doc_lib_section" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "field_document_doc_lib_section_1",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "search_api_language" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "search_api_language_1",
+            "type" : "string",
+            "boost" : "1.0"
+          },
+          "status" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "status_1",
+            "type" : "boolean",
+            "boost" : "1.0"
+          },
+          "search_api_access_node" : {
+            "table" : "search_api_db_document_pages_search_api_access_node_1",
+            "column" : "value",
+            "type" : "list\\u003Cstring\\u003E",
+            "boost" : "1.0"
+          },
+          "body:value" : {
+            "table" : "search_api_db_document_pages_text_1",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_oa_media:file" : {
+            "table" : "search_api_db_document_pages_field_oa_media_file_1",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_document_doc_lib_section:nid" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "field_document_doc_lib_section_nid",
+            "type" : "integer",
             "boost" : "1.0"
           }
         }

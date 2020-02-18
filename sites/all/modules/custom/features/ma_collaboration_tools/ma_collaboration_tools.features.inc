@@ -128,6 +128,7 @@ function ma_collaboration_tools_default_search_api_index() {
         "changed" : { "type" : "date" },
         "created" : { "type" : "date" },
         "field_document_doc_lib_section" : { "type" : "integer", "entity_type" : "node" },
+        "field_document_doc_lib_section:nid" : { "type" : "integer" },
         "field_oa_media:file" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "file" },
         "nid" : { "type" : "integer" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },

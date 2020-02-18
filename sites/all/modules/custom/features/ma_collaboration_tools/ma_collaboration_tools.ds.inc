@@ -152,7 +152,7 @@ function ma_collaboration_tools_ds_field_settings_info() {
       'formatter_settings' => array(
         'show_title' => 0,
         'title_wrapper' => '',
-        'ctools' => 'a:3:{s:4:"conf";a:1:{s:9:"arguments";a:1:{s:3:"nid";s:9:"%node:nid";}}s:4:"type";s:11:"views_panes";s:7:"subtype";s:14:"documents-full";}',
+        'ctools' => 'a:3:{s:4:"conf";a:1:{s:9:"arguments";a:1:{s:30:"field_document_doc_lib_section";s:9:"%node:nid";}}s:4:"type";s:11:"views_panes";s:7:"subtype";s:29:"documents_search-panel_pane_1";}',
         'load_terms' => 0,
         'ft' => array(
           'lb' => 'Documents',
