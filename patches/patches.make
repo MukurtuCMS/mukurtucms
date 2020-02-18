@@ -48,6 +48,10 @@ projects[seven][patch][] = core/use_mukurtu_logo_during_install.patch
 ;; Contrib ;;
 ;;;;;;;;;;;;;
 
+;;; Argfilters (sandbox module)
+; Do not throw PHP warnings and infos (on Document Library page, probably other places too)
+projects[argfilters][patch][] = contrib/do_not_throw_warnings.patch
+
 ;;; Bootstrap (theme)
 ; Add First and Last Classes to Lists
 projects[bootstrap][patch][] = contrib/150281138-add-first-last-classes-to-lists.patch
