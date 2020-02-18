@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collaboration_tools.field_group.inc

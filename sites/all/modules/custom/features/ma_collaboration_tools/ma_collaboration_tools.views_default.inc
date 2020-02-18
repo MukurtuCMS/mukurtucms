@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collaboration_tools.views_default.inc
@@ -50,7 +51,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'There are no documents in this library yet.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
-  /* Relationship: Content: Author */
+  /* Relationship: Content: Content author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
@@ -96,7 +97,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -260,6 +261,130 @@ function ma_collaboration_tools_views_default_views() {
   $export['documents'] = $view;
 
   $view = new view();
+  $view->name = 'documents_search';
+  $view->description = 'Search API view of Documents Pages, shown on a Document Library node.';
+  $view->tag = 'default';
+  $view->base_table = 'search_api_index_document_pages';
+  $view->human_name = 'Documents Search';
+  $view->core = 7;
+  $view->api_version = '3.0';
+  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+  /* Display: Master */
+  $handler = $view->new_display('default', 'Master', 'default');
+  $handler->display->display_options['use_more_always'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['row_plugin'] = 'fields';
+  /* No results behavior: Global: Text area */
+  $handler->display->display_options['empty']['area']['id'] = 'area';
+  $handler->display->display_options['empty']['area']['table'] = 'views';
+  $handler->display->display_options['empty']['area']['field'] = 'area';
+  $handler->display->display_options['empty']['area']['empty'] = TRUE;
+  $handler->display->display_options['empty']['area']['content'] = 'There are no documents in this library yet.';
+  $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
+  /* Relationship: Indexed Node: Document Library */
+  $handler->display->display_options['relationships']['field_document_doc_lib_section']['id'] = 'field_document_doc_lib_section';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section']['field'] = 'field_document_doc_lib_section';
+  /* Field: Indexed Node: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['label'] = '';
+  $handler->display->display_options['fields']['title']['element_type'] = 'h3';
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['title']['link_to_entity'] = 1;
+  /* Field: Indexed Node: Author */
+  $handler->display->display_options['fields']['author']['id'] = 'author';
+  $handler->display->display_options['fields']['author']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['fields']['author']['field'] = 'author';
+  $handler->display->display_options['fields']['author']['label'] = '';
+  $handler->display->display_options['fields']['author']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['author']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['author']['link_to_entity'] = 1;
+  $handler->display->display_options['fields']['author']['view_mode'] = 'full';
+  $handler->display->display_options['fields']['author']['bypass_access'] = 0;
+  /* Field: Indexed Node: Date created */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['label'] = '';
+  $handler->display->display_options['fields']['created']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['created']['date_format'] = 'custom';
+  $handler->display->display_options['fields']['created']['custom_date_format'] = 'F j, Y';
+  $handler->display->display_options['fields']['created']['second_date_format'] = 'exif';
+  $handler->display->display_options['fields']['created']['link_to_entity'] = 0;
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = '';
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'By [author] on [created]';
+  $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
+  /* Field: Indexed Node: Attachments */
+  $handler->display->display_options['fields']['field_oa_media']['id'] = 'field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['fields']['field_oa_media']['field'] = 'field_oa_media';
+  $handler->display->display_options['fields']['field_oa_media']['label'] = '';
+  $handler->display->display_options['fields']['field_oa_media']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_oa_media']['click_sort_column'] = 'fid';
+  $handler->display->display_options['fields']['field_oa_media']['delta_offset'] = '0';
+  /* Field: Indexed Node: The main body text */
+  $handler->display->display_options['fields']['body']['id'] = 'body';
+  $handler->display->display_options['fields']['body']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['fields']['body']['field'] = 'body';
+  $handler->display->display_options['fields']['body']['label'] = '';
+  $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
+  /* Contextual filter: Indexed Node: Node ID */
+  $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['table'] = 'search_api_index_document_pages';
+  $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+
+  /* Display: Content pane */
+  $handler = $view->new_display('panel_pane', 'Content pane', 'panel_pane_1');
+  $handler->display->display_options['argument_input'] = array(
+    'nid' => array(
+      'type' => 'user',
+      'context' => 'entity:alphabetical_order_definition.cer',
+      'context_optional' => 0,
+      'panel' => '0',
+      'fixed' => '',
+      'label' => 'Indexed Node: Node ID',
+    ),
+  );
+  $translatables['documents_search'] = array(
+    t('Master'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('There are no documents in this library yet.'),
+    t('Document Library'),
+    t('By [author] on [created]'),
+    t('All'),
+    t('Content pane'),
+    t('View panes'),
+  );
+  $export['documents_search'] = $view;
+
+  $view = new view();
   $view->name = 'event_list';
   $view->description = '';
   $view->tag = 'OA';
@@ -359,7 +484,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -659,7 +784,7 @@ print ma_collaboration_tools_generate_notication_frequency_form($view, $data);
   $handler->display->display_options['sorts']['changed']['table'] = 'node';
   $handler->display->display_options['sorts']['changed']['field'] = 'changed';
   $handler->display->display_options['sorts']['changed']['order'] = 'DESC';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -777,7 +902,7 @@ print ma_collaboration_tools_generate_notication_frequency_form($view, $data);
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
