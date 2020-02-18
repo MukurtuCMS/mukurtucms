@@ -6,6 +6,23 @@
  */
 
 /**
+ * Implements hook_default_cer().
+ */
+function ma_dictionary_default_cer() {
+  $items = array();
+  $items['node:dictionary_word:field_word_list*node:word_list:field_words'] = entity_import('cer', '{
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:dictionary_word:field_word_list" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:word_list:field_words" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:dictionary_word:field_word_list*node:word_list:field_words",
+    "rdf_mapping" : []
+  }');
+  return $items;
+}
+
+/**
  * Implements hook_ctools_plugin_api().
  */
 function ma_dictionary_ctools_plugin_api($module = NULL, $api = NULL) {
