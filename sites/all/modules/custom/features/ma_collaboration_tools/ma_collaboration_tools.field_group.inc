@@ -169,7 +169,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Visibility',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'field_community_ref',
       1 => 'field_item_privacy_setting',
@@ -255,7 +255,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Actions',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'add_content_to_collab_sect_link',
       1 => 'edit_collab_section_link',
@@ -284,7 +284,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Documents',
-    'weight' => '5',
+    'weight' => '6',
     'children' => array(
       0 => 'generic_dynamic_field_2',
     ),

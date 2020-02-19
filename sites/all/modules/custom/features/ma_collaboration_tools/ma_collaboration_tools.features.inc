@@ -132,9 +132,10 @@ function ma_collaboration_tools_default_search_api_index() {
         "field_oa_media:file" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "file" },
         "nid" : { "type" : "integer" },
         "search_api_access_node" : { "type" : "list\\u003Cstring\\u003E" },
+        "search_api_aggregation_1" : { "type" : "text", "boost" : "5.0" },
         "search_api_language" : { "type" : "string" },
         "status" : { "type" : "boolean" },
-        "title" : { "type" : "text" },
+        "title" : { "type" : "string", "boost" : "5.0" },
         "title_az_glossary" : { "type" : "string" }
       },
       "data_alter_callbacks" : {
@@ -144,7 +145,19 @@ function ma_collaboration_tools_default_search_api_index() {
           "settings" : { "default" : "1", "bundles" : [] }
         },
         "search_api_alter_add_url" : { "status" : 0, "weight" : "0", "settings" : [] },
-        "search_api_alter_add_aggregation" : { "status" : 0, "weight" : "0", "settings" : [] },
+        "search_api_alter_add_aggregation" : {
+          "status" : 1,
+          "weight" : "0",
+          "settings" : { "fields" : { "search_api_aggregation_1" : {
+                "name" : "Title as fulltext",
+                "type" : "fulltext",
+                "separator" : "\\n\\n",
+                "fields" : [ "title" ],
+                "description" : "A Fulltext aggregation of the following fields: Title."
+              }
+            }
+          }
+        },
         "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
         "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
         "search_api_alter_node_access" : { "status" : 1, "weight" : "0", "settings" : [] },
@@ -169,11 +182,7 @@ function ma_collaboration_tools_default_search_api_index() {
         "search_api_tokenizer" : {
           "status" : 1,
           "weight" : "20",
-          "settings" : {
-            "fields" : { "title" : true },
-            "spaces" : "[^[:alnum:]]",
-            "ignorable" : "[\\u0027]"
-          }
+          "settings" : { "fields" : [], "spaces" : "[^[:alnum:]]", "ignorable" : "[\\u0027]" }
         },
         "search_api_stopwords" : {
           "status" : 0,

@@ -1417,3 +1417,114 @@ function ma_collaboration_tools_views_post_build(&$view) {
 
 }
 
+/**
+ * Implementation of hook_block_info().
+ */
+function ma_collaboration_tools_block_info() {
+  $blocks['ma_collab_documents_custom_sorts'] = array(
+    'info' => t('Custom sorts for the Documents Pages view in a Documents Library node'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_ctools_block_info().
+ *
+ * This is so we can insert the block into the DS pane, same as search_api_sorts_ctools_block_info().
+ */
+function ma_collaboration_tools_ctools_block_info($module, $delta, &$info) {
+  // Give the Search API Sorts block it's own category.
+  $info['category'] = t('Mukurtu Collaboration Tools Sorts');
+  // Allow blocks to be used before the search results in Panels.
+  $info['render last'] = TRUE;
+}
+
+/**
+ * Implementation of hook_block_view().
+ */
+function ma_collaboration_tools_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+
+    case 'ma_collab_documents_custom_sorts':
+      $block['subject'] = 'Sort';
+      $search_form = drupal_get_form('ma_collaboration_tools_documents_sort_form');
+      $block['content'] = drupal_render($search_form);
+      break;
+  }
+
+  return $block;
+
+}
+
+/**
+ * Returns the render array for the form.
+ */
+function ma_collaboration_tools_documents_sort_form($form, &$form_state) {
+  $sort_options = array(
+    'relevance' => t('Search Relevance'),
+    'changed' => t('Date Changed'),
+    'added' => t('Date Added'),
+    'alphabetical' => t('Alphabetical'),
+  );
+
+  $form['sort'] = array(
+    '#type' => 'select',
+    '#default_value' => isset($_SESSION['documents_custom_sort_order']) ? $_SESSION['documents_custom_sort_order'] : 'relevance',
+    '#options' => $sort_options,
+    '#attributes' => array('onchange' => 'this.form.submit();'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#attributes' => array('class' => array('element-invisible')),
+  );
+  return $form;
+}
+function ma_collaboration_tools_documents_sort_form_submit($form, $form_state){
+  if (isset ($form_state['values']['sort'])) {
+    $_SESSION['documents_custom_sort_order'] = $form_state['values']['sort'];
+  }
+}
+
+/**
+ * Implements hook_search_api_query_alter().
+ * Exclude user defined nodes from search index
+ * @param type $query
+ */
+function ma_collaboration_tools_search_api_query_alter($sapi_query) {
+
+  // Custom sorts
+
+  // Sort according to the session var, otherwise fallback to default
+  if (isset($_SESSION['documents_custom_sort_order'])) {
+
+    $custom_sort = $_SESSION['documents_custom_sort_order'];
+
+    // Unset existing sorts
+    $sort =& $sapi_query->getSort();
+    $sort = array();
+
+    // Sort map
+    $sort_map = array(
+      'alphabetical' => array(
+        'sort' => 'title',
+        'direction' => 'ASC'
+      ),
+      'changed' => array(
+        'sort' => 'changed',
+        'direction' => 'DESC'
+      ),
+      'added' => array(
+        'sort' => 'created',
+        'direction' => 'DESC'
+      ),
+      'relevance' => array(
+        'sort' => 'search_api_relevance',
+        'direction' => 'DESC'
+      ),
+    );
+    $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_map[$custom_sort]['direction']);
+
+  }
+}

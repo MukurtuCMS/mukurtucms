@@ -251,10 +251,6 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['fields']['body']['alter']['trim'] = TRUE;
   $handler->display->display_options['fields']['body']['alter']['html'] = TRUE;
   $handler->display->display_options['fields']['body']['element_label_colon'] = FALSE;
-  /* Sort criterion: Search: Relevance */
-  $handler->display->display_options['sorts']['search_api_relevance']['id'] = 'search_api_relevance';
-  $handler->display->display_options['sorts']['search_api_relevance']['table'] = 'search_api_index_document_pages';
-  $handler->display->display_options['sorts']['search_api_relevance']['field'] = 'search_api_relevance';
   /* Contextual filter: Indexed Node: Document Library */
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['id'] = 'field_document_doc_lib_section';
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['table'] = 'search_api_index_document_pages';

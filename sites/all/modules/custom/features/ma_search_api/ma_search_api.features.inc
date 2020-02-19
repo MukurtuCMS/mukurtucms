@@ -1075,9 +1075,10 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0"
           },
           "title" : {
-            "table" : "search_api_db_document_pages_text_1",
-            "type" : "text",
-            "boost" : "1.0"
+            "table" : "search_api_db_document_pages",
+            "column" : "title_1",
+            "type" : "string",
+            "boost" : "5.0"
           },
           "created" : {
             "table" : "search_api_db_document_pages",
@@ -1143,6 +1144,11 @@ function ma_search_api_default_search_api_server() {
             "column" : "field_document_doc_lib_section_nid",
             "type" : "integer",
             "boost" : "1.0"
+          },
+          "search_api_aggregation_1" : {
+            "table" : "search_api_db_document_pages_text_1",
+            "type" : "text",
+            "boost" : "5.0"
           }
         }
       }
