@@ -1495,36 +1495,38 @@ function ma_collaboration_tools_documents_sort_form_submit($form, $form_state){
 function ma_collaboration_tools_search_api_query_alter($sapi_query) {
 
   // Custom sorts
+  if ($sapi_query->getIndex()->machine_name == 'document_pages') {
 
-  // Sort according to the session var, otherwise fallback to default
-  if (isset($_SESSION['documents_custom_sort_order'])) {
+    // Sort according to the session var, otherwise fallback to default
+    if (isset($_SESSION['documents_custom_sort_order'])) {
 
-    $custom_sort = $_SESSION['documents_custom_sort_order'];
+      $custom_sort = $_SESSION['documents_custom_sort_order'];
 
-    // Unset existing sorts
-    $sort =& $sapi_query->getSort();
-    $sort = array();
+      // Unset existing sorts
+      $sort =& $sapi_query->getSort();
+      $sort = array();
 
-    // Sort map
-    $sort_map = array(
-      'alphabetical' => array(
-        'sort' => 'title',
-        'direction' => 'ASC'
-      ),
-      'changed' => array(
-        'sort' => 'changed',
-        'direction' => 'DESC'
-      ),
-      'added' => array(
-        'sort' => 'created',
-        'direction' => 'DESC'
-      ),
-      'relevance' => array(
-        'sort' => 'search_api_relevance',
-        'direction' => 'DESC'
-      ),
-    );
-    $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_map[$custom_sort]['direction']);
+      // Sort map
+      $sort_map = array(
+        'alphabetical' => array(
+          'sort' => 'title',
+          'direction' => 'ASC'
+        ),
+        'changed' => array(
+          'sort' => 'changed',
+          'direction' => 'DESC'
+        ),
+        'added' => array(
+          'sort' => 'created',
+          'direction' => 'DESC'
+        ),
+        'relevance' => array(
+          'sort' => 'search_api_relevance',
+          'direction' => 'DESC'
+        ),
+      );
+      $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_map[$custom_sort]['direction']);
 
+    }
   }
 }

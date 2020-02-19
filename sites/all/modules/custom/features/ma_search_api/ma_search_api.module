@@ -326,56 +326,58 @@ function ma_search_api_search_api_query_alter($sapi_query) {
     }
   }
 
+  if ($sapi_query->getIndex()->machine_name == 'default_node_index') {
 
-  // Custom sorts
-  $sort_pages = array('browse', 'collections', 'digital-heritage');
-  if (in_array($current_page, $sort_pages)) { // Add Dictionary here later.
+    // Custom sorts
+    $sort_pages = array('browse', 'collections', 'digital-heritage');
+    if (in_array($current_page, $sort_pages)) { // Add Dictionary here later.
 
-    // Sort according to the session var, otherwise fallback to default
-    if (isset($_SESSION[$current_page . '_custom_sort_order'])) {
+      // Sort according to the session var, otherwise fallback to default
+      if (isset($_SESSION[$current_page . '_custom_sort_order'])) {
 
-      $custom_sort = $_SESSION[$current_page . '_custom_sort_order'];
+        $custom_sort = $_SESSION[$current_page . '_custom_sort_order'];
 
-      // Unset existing sorts
-      $sort =& $sapi_query->getSort();
-      $sort = array();
+        // Unset existing sorts
+        $sort =& $sapi_query->getSort();
+        $sort = array();
 
-      // Sort map
-      $sort_map = array(
-        'alphabetical' => array(
-          'sort' => 'search_api_aggregation_2',
-        ),
-        'changed' => array(
-          'sort' => 'changed',
-          'reverse' => TRUE,
-        ),
-        'added' => array(
-          'sort' => 'created',
-          'reverse' => TRUE,
-        ),
-        'oldest' => array(
-          'sort' => 'field_original_date:timestamp',
-        ),
-        'newest' => array(
-          'sort' => 'field_original_date:timestamp',
-          'reverse' => TRUE,
-        ),
-        'relevance' => array(
-          'sort' => 'search_api_aggregation_4',
-        ),
-      );
-      $sort_direction = 'ASC';
-      if (isset($sort_map[$custom_sort]['reverse']) AND $sort_map[$custom_sort]['reverse']) {
-        $sort_direction = 'DESC';
+        // Sort map
+        $sort_map = array(
+          'alphabetical' => array(
+            'sort' => 'search_api_aggregation_2',
+          ),
+          'changed' => array(
+            'sort' => 'changed',
+            'reverse' => TRUE,
+          ),
+          'added' => array(
+            'sort' => 'created',
+            'reverse' => TRUE,
+          ),
+          'oldest' => array(
+            'sort' => 'field_original_date:timestamp',
+          ),
+          'newest' => array(
+            'sort' => 'field_original_date:timestamp',
+            'reverse' => TRUE,
+          ),
+          'relevance' => array(
+            'sort' => 'search_api_aggregation_4',
+          ),
+        );
+        $sort_direction = 'ASC';
+        if (isset($sort_map[$custom_sort]['reverse']) AND $sort_map[$custom_sort]['reverse']) {
+          $sort_direction = 'DESC';
+        }
+        $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_direction);
+
+
+        // When sorting by oldest or newest, filter out DH nodes that do not have an original date set.
+        if ($custom_sort == 'oldest' OR $custom_sort == 'newest') {
+          $sapi_query->condition('field_original_date:timestamp', NULL, '<>');
+        }
+
       }
-      $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_direction);
-
-
-      // When sorting by oldest or newest, filter out DH nodes that do not have an original date set.
-      if ($custom_sort == 'oldest' OR $custom_sort == 'newest') {
-        $sapi_query->condition('field_original_date:timestamp', NULL, '<>');
-      }
-
     }
   }
 }
