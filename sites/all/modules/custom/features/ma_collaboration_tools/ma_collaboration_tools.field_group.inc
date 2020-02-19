@@ -169,7 +169,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Visibility',
-    'weight' => '8',
+    'weight' => '9',
     'children' => array(
       0 => 'field_community_ref',
       1 => 'field_item_privacy_setting',
@@ -255,7 +255,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Actions',
-    'weight' => '7',
+    'weight' => '8',
     'children' => array(
       0 => 'add_content_to_collab_sect_link',
       1 => 'edit_collab_section_link',
@@ -276,6 +276,33 @@ function ma_collaboration_tools_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_date_created|node|document_library|full';
+  $field_group->group_name = 'group_date_created';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'document_library';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Date Created',
+    'weight' => '4',
+    'children' => array(
+      0 => 'generic_dynamic_field_5',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-date-created field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_date_created|node|document_library|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_documents|node|document_library|full';
   $field_group->group_name = 'group_documents';
   $field_group->entity_type = 'node';
@@ -284,7 +311,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Documents',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'generic_dynamic_field_2',
     ),
@@ -552,13 +579,70 @@ function ma_collaboration_tools_field_group_info() {
   );
   $field_groups['group_following|node|event|full'] = $field_group;
 
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_search|node|document_library|full';
+  $field_group->group_name = 'group_search';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'document_library';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Search',
+    'weight' => '3',
+    'children' => array(
+      0 => 'generic_dynamic_field_3',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-search field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_search|node|document_library|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_sort|node|document_library|full';
+  $field_group->group_name = 'group_sort';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'document_library';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Sort',
+    'weight' => '6',
+    'children' => array(
+      0 => 'generic_dynamic_field_4',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-sort field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_sort|node|document_library|full'] = $field_group;
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Access');
   t('Actions');
+  t('Date Created');
   t('Documents');
   t('Event Details');
   t('Following');
+  t('Search');
+  t('Sort');
   t('Visibility');
 
   return $field_groups;

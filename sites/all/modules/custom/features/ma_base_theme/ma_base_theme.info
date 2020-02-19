@@ -70,6 +70,7 @@ features[ds_fields][] = generic_dynamic_field
 features[ds_fields][] = generic_dynamic_field_2
 features[ds_fields][] = generic_dynamic_field_3
 features[ds_fields][] = generic_dynamic_field_4
+features[ds_fields][] = generic_dynamic_field_5
 features[ds_layout_settings][] = bean|front_page_hero_image|default
 features[ds_layout_settings][] = bean|front_page_hero_image|form
 features[ds_layout_settings][] = bean|hero_image_one_column|form

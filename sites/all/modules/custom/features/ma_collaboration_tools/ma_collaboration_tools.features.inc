@@ -12,6 +12,9 @@ function ma_collaboration_tools_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "ds" && $api == "ds") {
     return array("version" => "1");
   }
+  if ($module == "facetapi" && $api == "facetapi_defaults") {
+    return array("version" => "1");
+  }
   if ($module == "feeds" && $api == "feeds_importer_default") {
     return array("version" => "1");
   }

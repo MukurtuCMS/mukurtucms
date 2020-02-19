@@ -1,0 +1,17 @@
+name = Date Facets
+description = Provides date range facets that are similar to implementations in major search engines.
+dependencies[] = facetapi
+package = Search Toolkit
+core = 7.x
+files[] = lib/Drupal/Apachesolr/Facetapi/QueryType/DateRangeQueryType.php
+files[] = lib/Drupal/Facetapi/Widget/DateRangeWidget.php
+files[] = lib/Drupal/Facetapi/Widget/DateRangeCheckBoxesWidget.php
+files[] = lib/Drupal/Search/Facetapi/QueryType/DateRangeQueryType.php
+files[] = lib/Drupal/SearchApi/Facetapi/QueryType/DateRangeQueryType.php
+
+; Information added by Drupal.org packaging script on 2016-12-04
+version = "7.x-1.0+5-dev"
+core = "7.x"
+project = "date_facets"
+datestamp = "1480856886"
+

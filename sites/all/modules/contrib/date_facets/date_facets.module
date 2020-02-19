@@ -1,0 +1,295 @@
+<?php
+/**
+ * @file
+ * Provides date range facets that are similar to implementations in major search engines.
+ */
+
+define('DATE_RANGE_UNIT_HOUR', 60 * 60);
+define('DATE_RANGE_UNIT_DAY', 60 * 60 * 24);
+define('DATE_RANGE_UNIT_MONTH', 60 * 60 * 24 * 30);
+define('DATE_RANGE_UNIT_YEAR', 60 * 60 * 24 * 365);
+define('DATE_FACETS_DATE_RANGE_QUERY_TYPE', 'date_range');
+
+require_once __DIR__ . '/date_facets.admin.inc';
+
+/**
+ * Implements hook_facetapi_facet_info_alter().
+ *
+ * @see date_facets_add_widget()
+ */
+function date_facets_facetapi_facet_info_alter(array &$facet_info, array $searcher_info) {
+  switch ($searcher_info['adapter']) {
+    case 'apachesolr':
+    case 'search':
+    case 'search_api':
+      date_facets_associate_widget($facet_info);
+      break;
+  }
+}
+
+/**
+ * Associates all date fields with the "date_range" query type.
+ *
+ * @param array &$facet_info
+ *   The facet definitions passed to hook_facetapi_facet_info_alter().
+ */
+function date_facets_associate_widget(array &$facet_info) {
+  foreach ($facet_info as $name => $info) {
+    $query_types = array_flip($info['query types']);
+
+    // The check on "field type" is specific to Search Api.
+    $field_type = empty($info['field type']) ? '' : $info['field type'];
+
+    // @todo check if there is a beter way to do this.
+    if (isset($query_types['date']) || 'list<date>' == $field_type) {
+      // Add the date_range to the query types
+      $facet_info[$name]['query types'][] = DATE_FACETS_DATE_RANGE_QUERY_TYPE;
+      // This widget needs a different way to set labels
+      // so we add our own callback.
+      $facet_info[$name]['map options']['value callback'] = '_date_facets_api_facet_create_label';
+    }
+  }
+}
+
+/**
+ * Value callback for labels with the date range type.
+ *
+ * Just added a basic functionality.
+ * Might need to be expanded for more functionality.
+ */
+function _date_facets_api_facet_create_label(array $values, array $options) {
+  $map = array();
+
+  $ranges = date_facets_get_ranges($options['field']['key'], $options['index id']);
+
+  // Default ranges.
+  if (empty($ranges)) {
+    $ranges = date_facets_get_ranges_render_arrays(date_facets_default_ranges());
+  }
+
+  // Loop through all the values to create a map.
+  // Pull the correct display value from the range definitions.
+  foreach ($values as $value) {
+    $map[$value] = $ranges[$value]['#markup'];
+  }
+
+  return $map;
+}
+
+/**
+ * Returns configured ranges or default range if none are configured.
+ */
+function date_facets_get_ranges($facet_name, $index_id) {
+  $ranges = array();
+  $searchers = facetapi_get_active_searchers();
+  if (!empty($index_id)) {
+    foreach ($searchers as $searcher) {
+      // Get current searcher.
+      if (strpos($searcher, '@' . $index_id) !== FALSE) {
+        $adapter = facetapi_adapter_load($searcher);
+        $settings = $adapter->getFacetSettings(facetapi_facet_load($facet_name, $searcher), facetapi_realm_load('block'));
+        // Get the configured date ranges, or the default ranges if none have been
+        // set up already.
+        $ranges = (isset($settings->settings['ranges']) ? $settings->settings['ranges'] : date_facets_default_ranges());
+        // Sort ranges.
+        $ranges = date_facets_get_ranges_render_arrays($ranges);
+      }
+    }
+  }
+
+  return $ranges;
+}
+
+/**
+ * Returns render arrays for all date ranges.
+ *
+ * @return array
+ *   An associative array of date ranges.
+ */
+function date_facets_get_ranges_render_arrays($ranges) {
+  $build = array();
+
+  uasort($ranges, 'drupal_sort_weight');
+  foreach ($ranges as $range_data) {
+    $markup = $range_data['label'];
+    // Translate through i18n if it's possible.
+    if (function_exists('i18n_string_translate')) {
+      $markup = i18n_string_translate(
+        array('date_facets', 'facet_label', $range_data['machine_name'], 'label'),
+        $markup
+      );
+    }
+
+    $build[$range_data['machine_name']] = $range_data + array(
+      '#count' => NULL,
+      '#markup' => $markup,
+    );
+  }
+
+  return $build;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function date_facets_theme() {
+  return array(
+    'date_facets_tabledrag_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+/**
+ * Add a tabledrag table for date ranges on the given date facet.
+ */
+function theme_date_facets_tabledrag_form($variables) {
+  $form = $variables['form'];
+  if (is_array($form['widget']['widget_settings']['ranges'])) {
+    $header = array(
+      array('data' => t('Name !required', array('!required' => '<span class="form-required" title="' . t('This field is required.') . '">*</span>'))),
+      array('data' => t('Date Range !required', array('!required' => '<span class="form-required" title="' . t('This field is required.') . '">*</span>')), 'colspan' => 2),
+      array('data' => t('Weight')),
+      array('data' => t('Delete'))
+    );
+    drupal_add_tabledrag('facetapi-date-range-query-date-ranges', 'order', 'self', 'date-range-weight');
+    $rows = array();
+    foreach (element_children($form['widget']['widget_settings']['ranges']) as $range_key) {
+      $row = array();
+      // We remove the #titles from each of the fields because the titles are
+      // already in the table's header row.
+      unset($form['widget']['widget_settings']['ranges'][$range_key]['label']['#title']);
+      // We want the label and machine name fields in the same cell.
+      $row[] = drupal_render($form['widget']['widget_settings']['ranges'][$range_key]['label'])
+        . drupal_render($form['widget']['widget_settings']['ranges'][$range_key]['machine_name']);
+      foreach (array('date_range_start', 'date_range_end') as $element) {
+        $temp_row = '';
+        // We want the op, amount, and unit fields in the same cell for both
+        // start and end date ranges.
+        foreach (array('op', 'amount', 'unit') as $item) {
+          unset($form['widget']['widget_settings']['ranges'][$range_key][$element . '_' . $item]['#title']);
+          $temp_row .= drupal_render($form['widget']['widget_settings']['ranges'][$range_key][$element . '_' . $item]);
+        }
+        $row[] = $temp_row;
+      }
+      // Add the weight and delete checkbox fields.
+      foreach (array('weight', 'delete') as $element) {
+        unset($form['widget']['widget_settings']['ranges'][$range_key][$element]['#title']);
+        $row[] = drupal_render($form['widget']['widget_settings']['ranges'][$range_key][$element]);
+      }
+      $rows[] = array(
+        'data' => $row,
+        'class' => array('draggable'),
+      );
+    }
+    $output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'facetapi-date-range-query-date-ranges')));
+    $form['widget']['widget_settings']['date_ranges']['ranges'] = array(
+      '#type' => 'markup',
+      '#markup' => $output,
+      '#weight' => 0,
+    );
+  }
+  return drupal_render_children($form);
+}
+
+/**
+ * Date range machine name existence check.
+ * @TODO: Make this actually work.
+ */
+function date_facets_date_range_exists($label) {
+  return FALSE;
+}
+
+/**
+ * Provides the default date ranges.
+ */
+function date_facets_default_ranges() {
+  return array(
+    'past_hour' => array(
+      'machine_name' => 'past_hour',
+      'label' => t('Past hour'),
+      'date_range_start_op' => '-',
+      'date_range_start_amount' => '1',
+      'date_range_start_unit' => 'HOUR',
+      'date_range_end_op' => 'NOW',
+      'date_range_end_amount' => '',
+      'date_range_end_unit' => '',
+      'weight' => 0,
+    ),
+    'past_24_hours' => array(
+      'machine_name' => 'past_24_hours',
+      'label' => t('Past 24 hours'),
+      'date_range_start_op' => '-',
+      'date_range_start_amount' => '24',
+      'date_range_start_unit' => 'HOUR',
+      'date_range_end_op' => 'NOW',
+      'date_range_end_amount' => '',
+      'date_range_end_unit' => '',
+      'weight' => 1,
+    ),
+    'past_week' => array(
+      'machine_name' => 'past_week',
+      'label' => t('Past week'),
+      'date_range_start_op' => '-',
+      'date_range_start_amount' => '7',
+      'date_range_start_unit' => 'DAY',
+      'date_range_end_op' => 'NOW',
+      'date_range_end_amount' => '',
+      'date_range_end_unit' => '',
+      'weight' => 2,
+    ),
+    'past_month' => array(
+      'machine_name' => 'past_month',
+      'label' => t('Past month'),
+      'date_range_start_op' => '-',
+      'date_range_start_amount' => '1',
+      'date_range_start_unit' => 'MONTH',
+      'date_range_end_op' => 'NOW',
+      'date_range_end_amount' => '',
+      'date_range_end_unit' => '',
+      'weight' => 3,
+    ),
+    'past_year' => array(
+      'machine_name' => 'past_year',
+      'label' => t('Past year'),
+      'date_range_start_op' => '-',
+      'date_range_start_amount' => '1',
+      'date_range_start_unit' => 'YEAR',
+      'date_range_end_op' => 'NOW',
+      'date_range_end_amount' => '',
+      'date_range_end_unit' => '',
+      'weight' => 4,
+    ),
+  );
+}
+
+/**
+ * Implements hook_i18n_string_info().
+ */
+function date_facets_i18n_string_info() {
+  $groups['date_facets'] = array(
+    'title' => t('Date facets'),
+    'description' => t('Translatable date facets: label.'),
+    // This group doesn't have strings with format.
+    'format' => FALSE,
+    // This group can list all strings.
+    'list' => TRUE,
+  );
+  return $groups;
+}
+
+/**
+ * Returns list of widgets which support "date_ranges".
+ */
+function date_facets_get_supported_widgets() {
+  $supported_widgets = array();
+  $all_widgets = module_invoke_all('facetapi_widgets');
+  foreach ($all_widgets as $widget_name => $widget) {
+    if (!empty($widget['handler']['query types'])) {
+      if (array_search(DATE_FACETS_DATE_RANGE_QUERY_TYPE, $widget['handler']['query types']) !== FALSE) {
+        $supported_widgets[] = $widget_name;
+      }
+    }
+  }
+  return $supported_widgets;
+}
