@@ -1,7 +1,7 @@
-name = Search views
+name = Search Views
 description = Integrates the Search API with Views, enabling users to create views with searches as filters or arguments.
-dependencies[] = search_api
-dependencies[] = views
+dependencies[] = search_api:search_api
+dependencies[] = views:views
 core = 7.x
 package = Search
 
@@ -29,8 +29,8 @@ files[] = includes/plugin_cache.inc
 files[] = includes/plugin_content_cache.inc
 files[] = includes/query.inc
 
-; Information added by Drupal.org packaging script on 2018-09-17
-version = "7.x-1.25"
+; Information added by Drupal.org packaging script on 2019-03-11
+version = "7.x-1.26"
 core = "7.x"
 project = "search_api"
-datestamp = "1537171099"
+datestamp = "1552334832"

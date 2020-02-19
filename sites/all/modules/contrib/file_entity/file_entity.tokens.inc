@@ -185,7 +185,9 @@ function file_entity_tokens($type, $tokens, array $data = array(), array $option
             }
           }
           else {
-            $replacements[$original] = $return;
+            if (!is_null($return)) {
+              $replacements[$original] = $return;
+            }
           }
         }
 
@@ -317,8 +319,8 @@ function _file_entity_tokens_get_property($files, $property, $array_handler = 'f
       }
 
       // If file type is video
-      elseif ($file['type'] == 'video') {
-        list($provider, $filename) = explode('://v/', $file['uri']);
+      elseif ($file['type'] == 'video' && strpos($file['uri'], '://v')) {
+        list($provider, $filename) = preg_split('!://v.*/!', $file['uri']);
         $imageuri = "public://file_entity-$provider/$filename.jpg";
       }
 

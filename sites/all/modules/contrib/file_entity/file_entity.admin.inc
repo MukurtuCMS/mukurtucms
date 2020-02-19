@@ -362,7 +362,7 @@ function file_entity_admin_files() {
       $count_query = db_select('file_usage', 'fu')
         ->fields('fu', array('fid', 'count'))
         ->condition('fu.fid', $file_result->fid, '=');
-      $count_query->addExpression('SUM(fu.count)', 'total_count');
+      $count_query->addExpression('fu.count', 'total_count');
       $count_result = $count_query->execute()->fetchAll();
 
       if (!empty($count_result[0]->total_count)) {

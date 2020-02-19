@@ -190,6 +190,9 @@ function ma_collection_strongarm() {
       'ical' => array(
         'custom_settings' => FALSE,
       ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
     'extra_fields' => array(
       'form' => array(
@@ -227,7 +230,7 @@ function ma_collection_strongarm() {
         'custom_settings' => FALSE,
       ),
       'search_result' => array(
-        'custom_settings' => FALSE,
+        'custom_settings' => TRUE,
       ),
       'diff_standard' => array(
         'custom_settings' => FALSE,
@@ -263,6 +266,9 @@ function ma_collection_strongarm() {
         'custom_settings' => FALSE,
       ),
       'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teacher_view' => array(
         'custom_settings' => FALSE,
       ),
     ),

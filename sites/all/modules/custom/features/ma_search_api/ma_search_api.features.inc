@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_search_api.features.inc
@@ -284,10 +285,28 @@ function ma_search_api_default_search_api_index() {
         "field_dictionary_word_language" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_dictionary_word_related_dh" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_digital_heritage_count" : { "type" : "integer" },
-        "field_digital_heritage_items" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_format:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_day" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_elaborate" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_elders" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_engage" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_evaluate" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_explain" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_explore_environment" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_micro_tasks:field_key_student_outcomes" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_micro_tasks:field_related_dh_items" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "node"
+        },
+        "field_lesson_micro_tasks:field_task" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_micro_tasks:field_word_list" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "node"
+        },
+        "field_lesson_resources" : { "type" : "text" },
+        "field_lesson_tech_integration:value" : { "type" : "text" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_mukurtu_terms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
         "field_mukurtu_terms:field_mukurtu_records" : {
@@ -312,6 +331,7 @@ function ma_search_api_default_search_api_index() {
         },
         "field_people:field_mukurtu_records:field_people:name" : { "type" : "list\\u003Clist\\u003Clist\\u003Ctext\\u003E\\u003E\\u003E" },
         "field_people:name" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_related_content" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_related_dictionary_words" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
         "field_source" : { "type" : "text" },
         "field_subject:name" : { "type" : "list\\u003Ctext\\u003E" },
@@ -320,6 +340,19 @@ function ma_search_api_default_search_api_index() {
         "field_tags:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_tk_body:value" : { "type" : "text" },
         "field_transcription" : { "type" : "text" },
+        "field_unit_assessments" : { "type" : "text" },
+        "field_unit_class_period_length" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_unit_conceptual" : { "type" : "text" },
+        "field_unit_grade_level" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_unit_language_learning" : { "type" : "text" },
+        "field_unit_lessons" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "node" },
+        "field_unit_nature_of_science" : { "type" : "text" },
+        "field_unit_overarching" : { "type" : "text" },
+        "field_unit_subject" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_unit_teacher" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_unit_technical" : { "type" : "text" },
+        "field_unit_unit_length" : { "type" : "integer", "entity_type" : "taxonomy_term" },
+        "field_unit_week_of" : { "type" : "integer", "entity_type" : "taxonomy_term" },
         "field_word_entry:field_alternate_spelling" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_definition" : { "type" : "list\\u003Ctext\\u003E" },
         "field_word_entry:field_part_of_speech" : {
@@ -457,12 +490,6 @@ function ma_search_api_default_search_api_server() {
           "field_collection_credit" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "text",
-            "boost" : "1.0"
-          },
-          "field_digital_heritage_items" : {
-            "table" : "search_api_db_default_node_index_field_digital_heritage_items",
-            "column" : "value",
-            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           },
           "field_collection_summary" : {
@@ -890,6 +917,151 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index",
             "column" : "search_api_aggregation_4",
             "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_teacher" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_unit_teacher",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_subject" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_unit_subject",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_grade_level" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_unit_grade_level",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_unit_length" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_unit_unit_length",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_class_period_length" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_unit_class_period_length",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_week_of" : {
+            "table" : "search_api_db_default_node_index",
+            "column" : "field_unit_week_of",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
+          "field_unit_overarching" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_unit_conceptual" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_unit_nature_of_science" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_unit_language_learning" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_unit_technical" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_unit_assessments" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_unit_lessons" : {
+            "table" : "search_api_db_default_node_index_field_unit_lessons",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_resources" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_related_dh_items" : {
+            "table" : "search_api_db_default_node_index_field_lesson_micro_tasks_fiel",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_word_list" : {
+            "table" : "search_api_db_default_node_index_field_lesson_micro_tasks_fi_1",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_task" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_key_student_outcomes" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_day" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_engage" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_explore_environment" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_elders" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_explain" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_elaborate" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_evaluate" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_tech_integration:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_related_content" : {
+            "table" : "search_api_db_default_node_index_field_related_content",
+            "column" : "value",
+            "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           }
         }

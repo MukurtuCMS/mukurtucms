@@ -362,10 +362,7 @@ function media_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
     $form['instance']['settings']['file_extensions']['#required'] = FALSE;
   }
 
-  // On image fields using the media widget we remove the alt/title fields.
   if ($form['#field']['type'] == 'image' && $form['instance']['widget']['type']['#value'] == 'media_generic') {
-    $form['instance']['settings']['alt_field']['#access'] = FALSE;
-    $form['instance']['settings']['title_field']['#access'] = FALSE;
     $form['instance']['settings']['file_extensions']['#title'] = t('Allowed file extensions for uploaded files');
     // Do not increase maxlength of file extensions for image fields, since
     // presumably they will not need a long list of extensions.
@@ -497,24 +494,23 @@ function media_library() {
       ))
     ),
     'styleSelectorUrl' => url('media/-media_id-/format-form', array(
-      'query' => array(
-        'render' => 'media-popup'
-      ))
+        'query' => array('render' => 'media-popup')
+      )
     ),
     'dialogOptions' => array(
       'dialogclass' => variable_get('media_dialogclass', 'media-wrapper'),
-      'modal' => (boolean)variable_get('media_modal', TRUE),
-      'draggable' => (boolean)variable_get('media_draggable', FALSE),
-      'resizable' => (boolean)variable_get('media_resizable', FALSE),
-      'minwidth' => (int)variable_get('media_minwidth', 500),
-      'width' => (int)variable_get('media_width', 670),
-      'height' => (int)variable_get('media_height', 280),
+      'modal' => (boolean) variable_get('media_modal', TRUE),
+      'draggable' => (boolean) variable_get('media_draggable', FALSE),
+      'resizable' => (boolean) variable_get('media_resizable', FALSE),
+      'minwidth' => (int) variable_get('media_minwidth', 500),
+      'width' => (int) variable_get('media_width', 670),
+      'height' => (int) variable_get('media_height', 280),
       'position' => variable_get('media_position', 'center'),
       'overlay' => array(
         'backgroundcolor' => variable_get('media_backgroundcolor', '#000000'),
-        'opacity' => (float)variable_get('media_opacity', 0.4),
+        'opacity' => (float) variable_get('media_opacity', 0.4),
       ),
-      'zindex' => (int)variable_get('media_zindex', 10000),
+      'zindex' => (int) variable_get('media_zindex', 10000),
     ),
   );
 
@@ -626,9 +622,9 @@ function media_parse_to_file($url, $params = array()) {
   if (isset($uri)) {
     // Attempt to load an existing file from the unique URI.
     $select = db_select('file_managed', 'f')
-    ->extend('PagerDefault')
-    ->fields('f', array('fid'))
-    ->condition('uri', $uri);
+      ->extend('PagerDefault')
+      ->fields('f', array('fid'))
+      ->condition('uri', $uri);
 
     $fid = $select->execute()->fetchCol();
     if (!empty($fid)) {
@@ -649,10 +645,9 @@ function media_parse_to_file($url, $params = array()) {
     $source_uri = file_stream_wrapper_uri_normalize('temporary://' . basename($url));
     if (!@copy(@$url, $source_uri)) {
       throw new Exception('Unable to add file ' . $url);
-      return;
     }
     $source_file = file_uri_to_object($source_uri);
-    if(isset($params['to_directory'])){
+    if (isset($params['to_directory'])) {
       $scheme = variable_get('file_default_scheme', 'public') . '://' . $params['to_directory'] . '/';
     }
     else{

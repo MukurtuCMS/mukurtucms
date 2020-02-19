@@ -118,6 +118,7 @@ function media_wysiwyg_format_form($form, &$form_state, $file) {
         '#type' => 'textfield',
         '#title' => t('Link Image'),
         '#description' => t('Enter a URL to turn the image into a link.'),
+        '#maxlength' => 2048,
         '#default_value' => $external_url,
       );
     }

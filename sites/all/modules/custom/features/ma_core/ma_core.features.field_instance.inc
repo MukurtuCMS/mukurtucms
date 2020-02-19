@@ -41,6 +41,8 @@ function ma_core_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'context' => '',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => TRUE,
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
@@ -85,6 +87,8 @@ function ma_core_field_default_field_instances() {
     'label' => 'Tags',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -131,6 +135,8 @@ function ma_core_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'alt_field' => TRUE,
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'default_image' => 0,
       'file_directory' => 'field/image',
       'file_extensions' => 'png gif jpg jpeg',
@@ -178,6 +184,8 @@ function ma_core_field_default_field_instances() {
     'label' => 'Tags',
     'required' => FALSE,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -219,6 +227,8 @@ function ma_core_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 1,
       'mee_enabled' => 1,
       'text_processing' => 0,
@@ -274,6 +284,8 @@ function ma_core_field_default_field_instances() {
     'settings' => array(
       'context' => 'debug',
       'context_default' => 'sdl_editor_representation',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'display_summary' => 0,
       'dnd_enabled' => 1,
       'mee_enabled' => 0,
@@ -328,6 +340,8 @@ function ma_core_field_default_field_instances() {
     'label' => 'Media Asset',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'referencable_types' => array(
         'audio' => 'audio',
         'file' => 0,

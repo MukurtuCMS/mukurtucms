@@ -6,58 +6,77 @@
 
 include_once 'ma_search_api.features.inc';
 
-//// REINDEX RELATED NODES
+/// 1) REINDEX RELATED NODES
+/// 2) UPDATE CUSTOM CERS
 
 function ma_search_api_node_insert ($node) {
   ma_search_api_node_update ($node);
 }
 
-function ma_search_api_node_update($node) {
+function ma_search_api_node_update($node) {;
 
-  $relations = array(
-    'collection' => array(
-      'relationships' => array(
-        'field_digital_heritage_items' => 'dh',
-      ),
-      'triggers' => array(),
-    ),
-    'dictionary_word' => array(
-      'relationships' => array(
-        'field_related_dictionary_words' => 'not dh',
-        'field_dictionary_word_related_dh' => 'dh',
-      ),
-      'triggers' => array(),
-    ),
-    'digital_heritage' => array(
-      'relationships' => array(
-        'field_collection' => 'not dh',
-        'field_related_dh_items' => 'dh',
-        'og_group_ref' => 'not dh',
-        'field_related_dictionary_words' => 'not dh',
-      ),
-      'triggers' => array(
+  // Only process a node once.
+  static $processed_nids;
+  if (isset($processed_nids) && in_array($node->nid, $processed_nids)) {
+    return;
+  }
+  $processed_nids[] = $node->nid;
+  //dpm ($node->nid, 'processing');
+
+  $relations = [
+    'digital_heritage' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'field_item_privacy_setting' => 'regular',
         'og_group_ref' => 'array values comparison',
-      ),
-    ),
-    'community' => array(
-      'relationships' => array(
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+      ],
+    ],
+    'community' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'og_group_ref' => 'array values comparison',
-      ),
-    ),
-    'cultural_protocol_group' => array(
-      'relationships' => array(
-        'og_group_ref' => 'not dh',
-      ),
-      'triggers' => array(
+      ],
+    ],
+    'cultural_protocol_group' => [
+      'relationships' => [
+        'og_group_ref',
+      ],
+      'triggers' => [
         'group_access' => 'regular',
         'og_roles_permissions' => 'regular',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
+
+  $custom_cer_fields = [
+    'field_related_content' => 'field_related_content',
+    'field_digital_heritage_items' => [
+      'collection' => 'field_collection',
+      'personal_collection' => 'field_personal_collections',
+    ],
+    'field_collection' => 'field_digital_heritage_items',
+  ];
+
+  // Add the custom CER fields to $relations.
+  $related_content_field_info = field_info_field('field_related_content');
+  $relateable_types = $related_content_field_info["settings"]["handler_settings"]["target_bundles"];
+  foreach ($relateable_types as $collectionable_type) {
+    $relations[$collectionable_type]['relationships'][] = 'field_related_content';
+  }
+  $collectionable_types = ma_collection_get_valid_node_types_for_collection();
+  foreach ($collectionable_types as $collectionable_type) {
+    $relations[$collectionable_type]['relationships'][] = 'field_collection';
+    $relations[$collectionable_type]['relationships'][] = 'field_personal_collections';
+  }
+  $collection_items_field = field_info_field('field_digital_heritage_items');
+  $collection_types = $collection_items_field["bundles"]["node"];
+  foreach ($collection_types as $collection_type) {
+    $relations[$collection_type]['relationships'][] = 'field_digital_heritage_items';
+  }
 
   if (isset($relations[$node->type])) {
 
@@ -69,53 +88,127 @@ function ma_search_api_node_update($node) {
       $wrapper_old = entity_metadata_wrapper('node', $node->original);
     }
 
-    $items_to_reindex = array();
+    $items_to_reindex = [];
 
     // Look for changes in any of the trigger fields. If any, ALL related nodes get reindexed.
     $reindex_all_relations = 0;
-    foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
-      # dpm ($trigger, 'trigger');
-      $trigger_old_val = "";
-      if (isset($node->original)) {
-        $trigger_old_val = $wrapper_old->{$trigger}->value();
-      }
-      $trigger_new_val = $wrapper_new->{$trigger}->value();
-      if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
-        $trigger_new_val = array_values ($trigger_new_val);
-        $trigger_old_val = empty($trigger_old_val) ? NULL : array_values ($trigger_old_val);
-      }
-      if ($trigger_old_val <> $trigger_new_val) {
-        # dpm ($trigger_old_val, 'trigger old val');
-        # dpm($trigger_new_val, 'trigger new val');
-        $reindex_all_relations = 1;
-        # dpm ('Trigger field changed. Reindexing ALL relations');
-        continue;
+    if (isset($content_type_properties['triggers'])) {
+      foreach ($content_type_properties['triggers'] as $trigger => $trigger_comparison_type) {
+        # dpm ($trigger, 'trigger');
+        $trigger_old_val = "";
+        if (isset($node->original)) {
+          $trigger_old_val = $wrapper_old->{$trigger}->value();
+        }
+        $trigger_new_val = $wrapper_new->{$trigger}->value();
+        if ($trigger_comparison_type == 'array values comparison') { // Some fields get their array keys changed as pulled by EMW even if they are not changed, so for these fields compare EMW array values to avoid false positives.
+          $trigger_new_val = array_values($trigger_new_val);
+          $trigger_old_val = empty($trigger_old_val) ? NULL : array_values($trigger_old_val);
+        }
+        if ($trigger_old_val <> $trigger_new_val) {
+          # dpm ($trigger_old_val, 'trigger old val');
+          # dpm($trigger_new_val, 'trigger new val');
+          $reindex_all_relations = 1;
+          # dpm ('Trigger field changed. Reindexing ALL relations');
+          continue;
+        }
       }
     }
 
     // Look for changes in any of the reference fields.
-    foreach ($content_type_properties['relationships'] as $relationship => $relationship_node_type) {
-      # dpm ($relationship, 'relationship (' . $relationship_node_type . ')');
 
-      $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+    if (isset($content_type_properties['relationships'])) {
+      foreach ($content_type_properties['relationships'] as $relationship) {
+        $items_to_update_cers[$relationship] = [];
 
-      $old_refs = array();
-      if (isset($node->original)) {
-        $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
+        $new_refs = ma_core_get_nids_from_array_of_nodes($wrapper_new->{$relationship}->value());
+        $refs_added = [];
+        $refs_deleted = [];
+
+        $old_refs = [];
+        if (isset($node->original)) {
+          $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
+        }
+
+        // A trigger field was changed, so reindex all related values, both new and old.
+        if ($reindex_all_relations) {
+          $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
+          # dpm($items_to_reindex, 'items to reindex after a trigger');
+        }
+
+        // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
+        elseif ($old_refs <> $new_refs) {
+          $refs_added = array_diff($new_refs, $old_refs);
+          $refs_deleted = array_diff($old_refs, $new_refs);
+          $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
+          # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+        }
+
+        if (in_array_r($relationship, $custom_cer_fields)) {
+          $items_to_update_cers[$relationship] = array_merge($items_to_update_cers[$relationship], $refs_added, $refs_deleted);
+        }
       }
+    }
 
-      // A trigger field was changed, so reindex all related values, both new and old.
-      if ($reindex_all_relations) {
-        $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);
-        # dpm($items_to_reindex, 'items to reindex after a trigger');
+    // Do the custom cer updating.
+    static $original_node_being_updated;
+    if (is_null($original_node_being_updated)) {
+      $original_node_being_updated = $node->nid;
+    }
+    $wrappers_to_resave = [];
+    foreach ($items_to_update_cers as $custom_cer_field => $items_to_update_cers_nids) {
+      if (count($items_to_update_cers_nids)) {
+        foreach ($items_to_update_cers_nids as $items_to_update_cer) {
+          if ($items_to_update_cer == $original_node_being_updated) {
+            continue; // Do not update the original node being updated.
+          }
+          $query = new EntityFieldQueryExtraFields();
+          $query->entityCondition('entity_type', 'node')
+            ->fieldCondition($custom_cer_field, 'target_id', [$items_to_update_cer]);
+          $result = $query->execute();
+          $new_refs = isset($result['node']) ? array_keys($result['node']) : [];
+          foreach ($new_refs as $key => $new_ref) {
+            $new_refs[$key] = (string) $new_refs[$key]; // convert $new_refs to string values to match $old_refs format.
+          }
+          $new_refs_numerically_sorted = $new_refs;
+          $nuw = entity_metadata_wrapper('node', $items_to_update_cer);
+          $target_field = $custom_cer_fields[$custom_cer_field];
+          if (is_array($target_field)) {
+            $target_field = $target_field[$node->type];
+          }
+          if (isset($nuw->{$target_field})) {
+            $old_refs_numerically_sorted = $old_refs = $nuw->{$target_field}->raw();
+            sort($old_refs_numerically_sorted);
+            if ($old_refs_numerically_sorted != $new_refs_numerically_sorted) {
+
+              // Maintain the old ref ordering, adding any new refs to the bottom.
+              $new_refs_ordered = [];
+              if (count($old_refs)) {
+                foreach ($old_refs as $old_ref) {
+                  if (in_array($old_ref, $new_refs)) {
+                    $new_refs_ordered[] = $old_ref;
+                    // https://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+                    foreach (array_keys($new_refs, $old_ref, TRUE) as $key) {
+                      unset($new_refs[$key]);
+                    }
+                  }
+                }
+              }
+              if (count($new_refs)) {
+                $new_refs_ordered = array_merge($new_refs_ordered, $new_refs);
+              }
+              $nuw->{$target_field}->set($new_refs_ordered);
+              $wrappers_to_resave[] = $nuw;
+            }
+          }
+          else {
+            drupal_set_message('issue'); // TODO: investigate this if error occurs.
+          }
+        }
       }
-
-      // A trigger field was not changed, so if there were any changed related values, reindex whatever was changed.
-      elseif ($old_refs <> $new_refs) {
-        $refs_added = array_diff($new_refs, $old_refs);
-        $refs_deleted = array_diff($old_refs, $new_refs);
-        $items_to_reindex = array_merge($items_to_reindex, $refs_added, $refs_deleted);
-        # dpm($items_to_reindex, 'items to reindex after a changed relationship');
+    }
+    if (count($wrappers_to_resave)) {
+      foreach ($wrappers_to_resave as $wrapper_to_resave) {
+        $wrapper_to_resave->save();
       }
     }
 
@@ -127,6 +220,20 @@ function ma_search_api_node_update($node) {
     }
 
   }
+}
+
+/**
+ * Recursive in_array helper.
+ * https://stackoverflow.com/questions/4128323/in-array-and-multidimensional-array
+ */
+function in_array_r($needle, $haystack, $strict = false) {
+  foreach ($haystack as $item) {
+    if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -316,6 +423,7 @@ function ma_search_api_list_of_indexed_fields() {
   #dpm ($indexed_fields_field_name_only);
   $fields_to_skip = array (
     'field_media_asset',
+    'field_related_content',
     'field_digital_heritage_count',
     'field_digital_heritage_items',
   );
@@ -447,7 +555,7 @@ function ma_search_api_sort_form($form, &$form_state) {
 
   $form['sort'] = array(
     '#type' => 'select',
-    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'changed',
+    '#default_value' => isset($_SESSION[$current_page . '_custom_sort_order']) ? $_SESSION[$current_page . '_custom_sort_order'] : 'relevance',
     '#options' => $sort_options,
     '#attributes' => array('onchange' => 'this.form.submit();'),
   );
@@ -460,5 +568,27 @@ function ma_search_api_sort_form($form, &$form_state) {
 function ma_search_api_sort_form_submit($form, $form_state){
   if (isset ($form_state['values']['sort'])) {
     $_SESSION[arg(0) . '_custom_sort_order'] = $form_state['values']['sort'];
+  }
+}
+
+
+/**
+ * Delete the CERs that are replaced with Custom CERs.
+ *
+ * This is called from ma_base_theme's hook_update.
+ */
+function ma_search_api_delete_deprecated_cers() {
+  $presets_to_delete = [
+    'node:collection:field_digital_heritage_items*node:digital_heritage:field_collection',
+    'node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections',
+    'node:dictionary_word:field_related_dictionary_words*node:dictionary_word:field_related_dictionary_words',
+    'node:dictionary_word:field_word_list*node:word_list:field_words',
+    'node:digital_heritage:field_related_dictionary_words*node:dictionary_word:field_dictionary_word_related_dh',
+    'node:digital_heritage:field_related_dh_items*node:digital_heritage:field_related_dh_items',
+  ];
+  foreach (entity_load('cer', FALSE) as $preset) {
+    if (in_array($preset->identifier, $presets_to_delete)) {
+      entity_delete('cer', $preset->pid);
+    }
   }
 }

@@ -13,12 +13,13 @@ define('MUKURTU_PRERELEASE_FUNCTIONALITY', 'mukurtu_prerelease_functionality');
  */
 function ma_core_init() {
 
-  // Add the JS for jquery_ui_tooltips. Simply use the class "jquery_ui_tooltip" on any title attribute to use this
-  drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/jquery_ui_tooltips.js');
+  // Fix for bootstrap help tooltip not working on select widgets.
+  drupal_add_js(drupal_get_path('module', 'ma_core') . '/js/bootstrap_tooltips_over_select2_widget.js');
 
-  // Suppress status messages during profile installation
-  if ($_GET['profile'] == 'mukurtu') {
-     drupal_get_messages(); // clears the message queue by default
+  // Suppress status messages during profile installation.
+  if (isset($_GET['profile']) && $_GET['profile'] == 'mukurtu') {
+    // Clears the message queue by default.
+    drupal_get_messages();
   }
 
 }
@@ -236,7 +237,7 @@ function ma_core_menu() {
 
   // 403 page.
   $items['mukurtu/access-denied'] = array(
-    'title' => t('Access denied'),
+    'title' => t('Incorrect Permissions'),
     'description' => 'Mukurtu Access Denied (403 error)',
     'page callback' => 'ma_core_access_denied_page',
     'access callback' => TRUE,

@@ -298,6 +298,7 @@ function mukurtu_create_default_content() {
 
   // Set default browse mode.
   _ma_base_theme_set_default_browse('digital-heritage');
+
 }
 
 //function mukurtu_client_form() {

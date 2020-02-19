@@ -22,6 +22,31 @@ function ma_base_theme_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Implements hook_field_widget_form_alter().
+ *
+ * Related Content field:
+ * 1) Flatten the options (select2 widget works with nested options but not when it is a hidden select field,
+ *    which is how we are setting the entity ref field in order for it to be sortable)
+ * 2) Prefix each option with the content type so that the already-selected options show which content type it is.
+ *    This also means that we see the content type for the non-selected options, despite the content type top-level having been flattened out.
+ * 3) Remove the node the user is already on, so that the node cannot self-reference. Aside from being better UI, self-referencing actually causes a fatal error somewhere in mukurtu_related_items_formatter_field_formatter_view().
+ */
+function ma_base_theme_field_widget_form_alter(&$element, &$form_state, $context) {
+  if ($context["field"]["field_name"] == 'field_related_content') {
+    $new_options = [];
+    unset($element['#options']['_none']);
+    foreach ($element['#options'] as $content_type => $nodes) {
+      foreach ($nodes as $nid => $node_title) {
+        if ($nid <> $context["form"]["nid"]["#value"]) {
+          $new_options[$nid] = $content_type . ': ' . $node_title;
+        }
+      }
+    }
+    $element['#options'] = $new_options;
+  }
+}
+
 function ma_base_theme_css_alter(&$css) {
 /*
   $colors = $css['sites/all/themes/mukurtu_theme/css/colors.css'];
@@ -340,4 +365,70 @@ function _ma_base_theme_set_default_browse($page = 'digital-heritage') {
   }
 
   variable_set('mukurtu_default_browse_page', $option);
+}
+
+/**
+ * Copy the entity references in the old related content fields to the new Related Content field.
+ */
+function ma_base_theme_copy_related_content() {
+  $fields = [
+    'field_related_dictionary_words',
+    'field_related_dh_items',
+    'field_dictionary_word_related_dh',
+    'field_related_dictionary_words',
+    'field_word_list',
+//    'field_related_person', // field within field_related_people paragraph field. This is a separate concept and should not be mixed in.
+  ];
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $results = $query->execute();
+  $success = 0;
+  $no_refs = 0;
+
+  if (!empty($results['node'])) {
+    $total = count($results['node']);
+
+    foreach (array_keys($results['node']) as $nid) {
+      $merged_refs = [];
+      $nw = entity_metadata_wrapper('node', $nid);
+
+      foreach ($fields as $field) {
+        if (isset($nw->{$field})) {
+          $merged_refs = array_merge($merged_refs, $nw->{$field}->raw());
+        }
+      }
+      unset($merged_refs[$nid]); // Prevent self-referencing, which causes a fatal error when node is viewed due to something in
+
+      if (count($merged_refs) && isset($nw->field_related_content)) {
+        $merged_refs = array_merge($nw->field_related_content->raw(), $merged_refs); // This prevents overwriting any refs which may have been set on the new field by user before this script gets run, which shouldn't happen, but just in case.
+        $merged_refs = array_unique($merged_refs);
+        $nw->field_related_content->set($merged_refs);
+        $nw->save();
+        $success++;
+        watchdog('mukurtu_update', 'Migrated related content for nid %nid', array('%nid' => $nid));
+      } else {
+        $no_refs++;
+      }
+    }
+    watchdog('mukurtu_update', 'Migrated related content for %success out of %total nodes. There were %noref nodes with no references.', array('%success' => $success, '%total' => $total, '%noref' => $no_refs));
+  }
+}
+
+/**
+ * Custom DS field used to replicate the Related Content field as a content type-specific field as comma-separate list, with links to target nodes.
+ */
+function ma_base_theme_extracted_relationship_custom_ds_field($entity, $type) {
+  if (count($entity->field_related_content[LANGUAGE_NONE])) {
+    $links = [];
+    foreach ($entity->field_related_content[LANGUAGE_NONE] as $related_content) {
+      $related_node = node_load($related_content['target_id']);
+      if ($related_node->type == $type) {
+        $links[] = l($related_node->title, '/node/' . $related_node->nid);
+      }
+    }
+    if (count($links)) {
+      return (implode(', ', $links));
+    }
+  }
 }

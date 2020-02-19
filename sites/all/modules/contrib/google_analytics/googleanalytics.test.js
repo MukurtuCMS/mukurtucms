@@ -77,7 +77,7 @@ $(document).ready(function() {
   Drupal.googleanalytics.test.assertTrue(Drupal.googleanalytics.isInternal(base_url + Drupal.settings.basePath + 'node/1?foo=bar'), "Link '" + base_url + Drupal.settings.basePath + "node/1?foo=bar' has been detected as internal link.");
   Drupal.googleanalytics.test.assertTrue(Drupal.googleanalytics.isInternal(base_url + Drupal.settings.basePath + 'node/1?foo=bar#foo'), "Link '" + base_url + Drupal.settings.basePath + "node/1?foo=bar#foo' has been detected as internal link.");
   Drupal.googleanalytics.test.assertTrue(Drupal.googleanalytics.isInternal(base_url + Drupal.settings.basePath + 'go/foo'), "Link '" + base_url + Drupal.settings.basePath + "go/foo' has been detected as internal link.");
-  Drupal.googleanalytics.test.assertFalse(Drupal.googleanalytics.isInternal('http://example.com/node/3'), "Link 'http://example.com/node/3' has been detected as external link.");
+  Drupal.googleanalytics.test.assertFalse(Drupal.googleanalytics.isInternal('https://example.com/node/3'), "Link 'https://example.com/node/3' has been detected as external link.");
   console.groupEnd();
 
   console.group("Test 'isInternalSpecial':");
@@ -90,7 +90,7 @@ $(document).ready(function() {
   Drupal.google_analytics.test.assertSame(base_path, Drupal.google_analytics.getPageUrl(base_path), "Absolute internal URL '" + base_path + "' has been extracted from absolute url '" + base_path + "'.");
   //Drupal.googleanalytics.test.assertSame(base_path, Drupal.googleanalytics.getPageUrl(base_url + Drupal.settings.basePath + 'node/1'), "Absolute internal URL '" +  Drupal.settings.basePath + "node/1' has been extracted from full qualified url '" + base_url + base_path + "'.");
   //Drupal.googleanalytics.test.assertSame(base_path, Drupal.googleanalytics.getPageUrl(Drupal.settings.basePath + 'node/1'), "Absolute internal URL '" +  Drupal.settings.basePath + "node/1' has been extracted from absolute url '" +  base_path + "'.");
-  Drupal.googleanalytics.test.assertSame('http://example.com/node/2', Drupal.googleanalytics.getPageUrl('http://example.com/node/2'), "Full qualified external url 'http://example.com/node/2' has been extracted.");
+  Drupal.googleanalytics.test.assertSame('https://example.com/node/2', Drupal.googleanalytics.getPageUrl('https://example.com/node/2'), "Full qualified external url 'https://example.com/node/2' has been extracted.");
   Drupal.googleanalytics.test.assertSame('//example.com/node/2', Drupal.googleanalytics.getPageUrl('//example.com/node/2'), "Full qualified external url '//example.com/node/2' has been extracted.");
   console.groupEnd();
 

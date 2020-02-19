@@ -11,7 +11,7 @@
         overflow: visible;
     }
 
-    &.node-type-collection {
+    &.node-type-collection, &.node-type-personal-collection {
         .field-name-field-digital-heritage-items {
             height: auto !important;
         }
@@ -26,3 +26,9 @@
         }
     }
 }
+
+
+// Select2 formats its widgets as inline blocks by default. This removes that.
+.select2-container {
+    display: block;
+};

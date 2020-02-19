@@ -68,7 +68,7 @@ class views_handler_field extends views_handler {
 
   /**
    * @var array
-   * Stores additional fields which get's added to the query.
+   * Stores additional fields which get added to the query.
    * The generated aliases are stored in $aliases.
    */
   public $additional_fields = array();
@@ -424,6 +424,7 @@ class views_handler_field extends views_handler {
         'absolute' => array('default' => FALSE, 'bool' => TRUE),
         'external' => array('default' => FALSE, 'bool' => TRUE),
         'replace_spaces' => array('default' => FALSE, 'bool' => TRUE),
+        'unwanted_characters' => array('default' => ''),
         'path_case' => array('default' => 'none', 'translatable' => FALSE),
         'trim_whitespace' => array('default' => FALSE, 'bool' => TRUE),
         'alt' => array('default' => '', 'translatable' => TRUE),
@@ -744,6 +745,16 @@ class views_handler_field extends views_handler {
           'edit-options-alter-make-link' => array(1),
         ),
       );
+      $form['alter']['unwanted_characters'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Remove unwanted characters'),
+        '#description' => t('Space-separated list of characters to remove from the URL path'),
+        '#default_value' => $this->options['alter']['unwanted_characters'],
+        '#dependency' => array(
+          'edit-options-alter-make-link' => array(1)
+        ),
+        '#maxlength' => 255,
+      );
       $form['alter']['path_case'] = array(
         '#type' => 'select',
         '#title' => t('Transform the case'),
@@ -782,7 +793,7 @@ class views_handler_field extends views_handler {
         '#title' => t('Rel Text'),
         '#type' => 'textfield',
         '#default_value' => $this->options['alter']['rel'],
-        '#description' => t('Include Rel attribute for use in lightbox2 or other javascript utility.'),
+        '#description' => t('Include Rel attribute for use in lightbox2 or other JavaScript utility.'),
         '#dependency' => array(
           'edit-options-alter-make-link' => array(1),
         ),
@@ -1234,8 +1245,9 @@ If you would like to have the characters \'[\' and \']\' please use the html ent
    * Render this field as altered text, from a fieldset set by the user.
    */
   public function render_altered($alter, $tokens) {
-    // Filter this right away as our substitutions are already sanitized.
-    $value = filter_xss_admin($alter['text']);
+    // We trust admins so we allow any tag content. This is important for
+    // displays such as XML where we should not mess with tags.
+    $value = $alter['text'];
     $value = strtr($value, $tokens);
 
     return $value;
@@ -1286,6 +1298,12 @@ If you would like to have the characters \'[\' and \']\' please use the html ent
 
       if (!empty($alter['replace_spaces'])) {
         $path = str_replace(' ', '-', $path);
+      }
+
+      if (!empty($alter['unwanted_characters'])) {
+        foreach (explode(' ', $alter['unwanted_characters']) as $unwanted) {
+          $path = str_replace($unwanted, '', $path);
+        }
       }
     }
 

@@ -93,3 +93,34 @@ function ma_base_theme_update_7003(&$sandbox) {
 //  );
 //  theme_disable ($themes_to_disable);
 //}
+
+/**
+ * Copy the entity references in the old related content fields to the new Related Content field.
+ */
+function ma_base_theme_update_7004() {
+  $features_to_revert = array(
+    'ma_base_theme',
+    'ma_digitalheritage',
+    'ma_collection',
+    'ma_lesson_plan',
+    'ma_person',
+    'ma_dictionary',
+    'ma_search_api',
+    'mukurtu_importer_generator',
+  );
+
+  foreach ($features_to_revert as $feature_name) {
+    if (module_exists($feature_name)) {
+      features_revert_module($feature_name);
+    }
+  }
+
+  ma_base_theme_copy_related_content();
+}
+
+/**
+ * Delete the CERs that are replaced with Custom CERs.
+ */
+function ma_base_theme_update_7005() {
+  ma_search_api_delete_deprecated_cers();
+}

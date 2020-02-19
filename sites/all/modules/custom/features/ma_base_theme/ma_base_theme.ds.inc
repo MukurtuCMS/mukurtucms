@@ -90,6 +90,66 @@ function ma_base_theme_ds_custom_fields_info() {
   );
   $export['component_media_items'] = $ds_field;
 
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'extracted_dh_from_relationships';
+  $ds_field->label = 'Extracted DH from relationships';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+return ma_base_theme_extracted_relationship_custom_ds_field ($entity, \'digital_heritage\');
+?> ',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['extracted_dh_from_relationships'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'extracted_dw_from_relationships';
+  $ds_field->label = 'Extracted DW from relationships';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+return ma_base_theme_extracted_relationship_custom_ds_field ($entity, \'dictionary_word\');
+?> ',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['extracted_dw_from_relationships'] = $ds_field;
+
+  $ds_field = new stdClass();
+  $ds_field->api_version = 1;
+  $ds_field->field = 'extracted_wl_from_relationships';
+  $ds_field->label = 'Extracted WL from relationships';
+  $ds_field->field_type = 5;
+  $ds_field->entities = array(
+    'node' => 'node',
+  );
+  $ds_field->ui_limit = '';
+  $ds_field->properties = array(
+    'code' => array(
+      'value' => '<?php
+return ma_base_theme_extracted_relationship_custom_ds_field ($entity, \'word_list\');
+?> ',
+      'format' => 'ds_code',
+    ),
+    'use_token' => 0,
+  );
+  $export['extracted_wl_from_relationships'] = $ds_field;
+
   return $export;
 }
 

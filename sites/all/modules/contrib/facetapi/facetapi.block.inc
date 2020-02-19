@@ -84,7 +84,7 @@ function facetapi_ctools_block_info($module, $delta, &$info) {
  *   The machine readable name of the realm.
  *
  * @return int
- *   The constands defined in includes/common.inc, defaults to DRUPAL_NO_CACHE.
+ *   The constants defined in includes/common.inc, defaults to DRUPAL_NO_CACHE.
  *
  * @see includes/common.inc
  */
@@ -238,7 +238,7 @@ function facetapi_get_delta_map() {
  *   A string containing the raw delta.
  */
 function facetapi_build_delta($searcher, $realm_name, $facet_name) {
-  return $searcher . ':' . $realm_name . ':' . urlencode($facet_name);
+  return $searcher . ':' . $realm_name . ':' . rawurlencode($facet_name);
 }
 
 /**

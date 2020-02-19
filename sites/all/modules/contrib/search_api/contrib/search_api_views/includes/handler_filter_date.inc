@@ -122,6 +122,8 @@ class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilterNumeric
    * Add this filter to the query.
    */
   public function query() {
+    $this->normalizeValue();
+
     if ($this->operator === 'empty') {
       $this->query->condition($this->real_field, NULL, '=', $this->options['group']);
     }
@@ -129,11 +131,11 @@ class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilterNumeric
       $this->query->condition($this->real_field, NULL, '<>', $this->options['group']);
     }
     elseif (in_array($this->operator, array('between', 'not between'), TRUE)) {
-      $min = isset($this->value[0]['min']) ? $this->value[0]['min'] : '';
+      $min = $this->value['min'];
       if ($min !== '') {
         $min = is_numeric($min) ? $min : strtotime($min, REQUEST_TIME);
       }
-      $max = isset($this->value[0]['max']) ? $this->value[0]['max'] : '';
+      $max = $this->value['max'];
       if ($max !== '') {
         $max = is_numeric($max) ? $max : strtotime($max, REQUEST_TIME);
       }
@@ -151,8 +153,7 @@ class SearchApiViewsHandlerFilterDate extends SearchApiViewsHandlerFilterNumeric
       }
     }
     else {
-      $value = isset($this->value[0]) ? $this->value[0]['value'] : $this->value['value'];
-      $v = is_numeric($value) ? $value : strtotime($value, REQUEST_TIME);
+      $v = is_numeric($this->value['value']) ? $this->value['value'] : strtotime($this->value['value'], REQUEST_TIME);
       if ($v !== FALSE) {
         $this->query->condition($this->real_field, $v, $this->operator, $this->options['group']);
       }

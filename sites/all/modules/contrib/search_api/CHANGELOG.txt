@@ -1,3 +1,18 @@
+Search API 1.26 (2019-03-11):
+-----------------------------
+- #2324023 by drumm, drunken monkey: Changed Views field definition for to
+  float.
+- #3008849 by pamatt, drunken monkey: Fixed non-exposed numeric and date
+  filters in Views.
+- #3009744 by evgeny.chernyavskiy, drunken monkey: Fixed wrong "continue" in
+  search_api_server_tasks_check().
+- #3003742 by Jelle_S, drunken monkey: Fixed problems with Views date filters.
+- #3002043 by alonaoneill, drunken monkey: Fixed module name capitalization and
+  dependency namespacing in .info files.
+- #2990940 by drunken monkey: Fixed multi-byte handling of Highlight processor.
+- #3001424 by drunken monkey: Fixed notice when configuring the More Like This
+  contextual filter.
+
 Search API 1.25 (2018-09-17):
 -----------------------------
 - #2408727 by swim, drunken monkey: Added a batch operation for executing

@@ -528,6 +528,7 @@ function ma_base_theme_field_default_field_bases() {
         'http://localcontexts.org/tk/cs/1.0' => 'TK Culturally Sensitive (TK CS)',
         'http://localcontexts.org/tk/v/1.0' => 'TK Verified Label (TK V)',
         'http://localcontexts.org/tk/nv/1.0' => 'TK Non-Verified (TK NV)',
+        'http://localcontexts.org/tk/cl/1.0' => 'TK Clan (TK CL)',
       ),
       'allowed_values_function' => '',
       'treeable' => FALSE,
@@ -551,7 +552,7 @@ function ma_base_theme_field_default_field_bases() {
     'locked' => 0,
     'module' => 'atom_reference',
     'settings' => array(
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'atom_reference',
@@ -577,7 +578,7 @@ function ma_base_theme_field_default_field_bases() {
         1 => '',
       ),
       'allowed_values_function' => '',
-      'treeable' => FALSE,
+      'treeable' => 0,
     ),
     'translatable' => 0,
     'type' => 'list_boolean',
@@ -608,6 +609,52 @@ function ma_base_theme_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
+  );
+
+  // Exported field_base: 'field_related_content'.
+  $field_bases['field_related_content'] = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_related_content',
+    'indexes' => array(
+      'target_id' => array(
+        0 => 'target_id',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'entityreference',
+    'settings' => array(
+      'duplicates' => 1,
+      'handler' => 'base',
+      'handler_settings' => array(
+        'behaviors' => array(
+          'treeable_behavior' => array(
+            'status' => 0,
+          ),
+          'views-select-list' => array(
+            'status' => 0,
+          ),
+        ),
+        'sort' => array(
+          'direction' => 'ASC',
+          'property' => 'type',
+          'type' => 'property',
+        ),
+        'target_bundles' => array(
+          'collection' => 'collection',
+          'dictionary_word' => 'dictionary_word',
+          'digital_heritage' => 'digital_heritage',
+          'person' => 'person',
+          'word_list' => 'word_list',
+        ),
+      ),
+      'target_type' => 'node',
+      'treeable' => 0,
+    ),
+    'translatable' => 0,
+    'type' => 'entityreference',
   );
 
   // Exported field_base: 'field_rights'.

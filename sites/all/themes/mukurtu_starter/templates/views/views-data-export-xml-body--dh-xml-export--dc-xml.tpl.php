@@ -8,7 +8,7 @@
   <<?php
   global $base_url;
   $path = url('node/' . $rows[$count]->nid);
-  $item_node_attribute = ' about="' . $base_url . $path . '"';
+  $item_node_attribute = ' rdf:about="' . $base_url . $path . '"';
   print $item_node . $item_node_attribute; ?>>
   <?php foreach ($row as $field => $values): ?>
     <?php foreach ($values as $value): ?>

@@ -66,14 +66,14 @@ a.krumo-name {
   font: bold 13px courier new;
   line-height:12px;
   }
-a.krumo-name big {
+a.krumo-name span.krumo-big {
   font: bold 16pt Georgia;
   line-height: 10px;
   position:relative;
   top:2px;
   left:-2px;
   }
-* html a.krumo-name big {
+* html a.krumo-name span.krumo-big {
   font: bold 15pt Georgia;
   float:left;
   top: -5px;

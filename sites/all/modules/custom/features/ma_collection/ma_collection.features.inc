@@ -19,24 +19,6 @@ function ma_collection_default_cer() {
     "identifier" : "node:collection:field_collections_parent_coll*node:collection:field_collections_child_coll",
     "rdf_mapping" : []
   }');
-  $items['node:collection:field_digital_heritage_items*node:digital_heritage:field_collection'] = entity_import('cer', '{
-    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
-    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:collection:field_digital_heritage_items" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_collection" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "identifier" : "node:collection:field_digital_heritage_items*node:digital_heritage:field_collection",
-    "rdf_mapping" : []
-  }');
-  $items['node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections'] = entity_import('cer', '{
-    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
-    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:personal_collection:field_digital_heritage_items" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_personal_collections" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "identifier" : "node:personal_collection:field_digital_heritage_items*node:digital_heritage:field_personal_collections",
-    "rdf_mapping" : []
-  }');
   return $items;
 }
 

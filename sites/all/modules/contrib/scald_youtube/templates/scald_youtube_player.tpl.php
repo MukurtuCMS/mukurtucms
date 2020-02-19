@@ -13,7 +13,7 @@
       <?php endif; ?>
     </div>
   <?php endif; ?>
-  <iframe class="scald-youtube js-scald-youtube" title="<?php print $vars['title'] ?>" width="<?php print $vars['video_width'] ?>" height="<?php print $vars['video_height'] ?>" src="about:blank" data-src="<?php print $vars['video_url'] ?>" allowfullscreen></iframe>
+  <iframe class="scald-youtube js-scald-youtube" title="<?php print $vars['title'] ?>" width="<?php print $vars['video_width'] ?>" height="<?php print $vars['video_height'] ?>" src="about:blank" data-src="<?php print $vars['video_url'] ?>" allow="autoplay; fullscreen" allowfullscreen></iframe>
 <?php else: ?>
-  <iframe class="scald-youtube" title="<?php print $vars['title'] ?>" width="<?php print $vars['video_width'] ?>" height="<?php print $vars['video_height'] ?>" src="<?php print $vars['video_url'] ?>" allowfullscreen></iframe>
+  <iframe class="scald-youtube" title="<?php print $vars['title'] ?>" width="<?php print $vars['video_width'] ?>" height="<?php print $vars['video_height'] ?>" src="<?php print $vars['video_url'] ?>" allow="autoplay; fullscreen" allowfullscreen></iframe>
 <?php endif; ?>

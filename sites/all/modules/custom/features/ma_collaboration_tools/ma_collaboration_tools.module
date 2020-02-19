@@ -349,7 +349,7 @@ function ma_collaboration_tools_node_insert($node) {
 
     // Update field_all_users_notified
     $notification_w = entity_metadata_wrapper('node',  $notification_w->getIdentifier()); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
-    ma_collaboration_tools_update_field_all_users_notified($notification_w);
+    ma_shared_notification_components_update_field_all_users_notified($notification_w);
 
   }
 
@@ -409,44 +409,12 @@ function ma_collaboration_tools_node_update($node) {
       }
       $old_value = $entity_old->{$field_name}->raw();
       $new_value = $entity_new->{$field_name}->raw();
-      // If both are empty - ignore
-      if(empty($old_value) && empty($new_value)) {
-        continue;
-      }
-      // If one of the value is not empty compared to the other
-      if( (empty($old_value) && !empty($new_value) ) || (empty($new_value) && !empty($old_value))){
-        // You can use field_get_items() to get the changed value.
+      if (ma_shared_notification_components_check_for_field_value_change($old_value, $new_value, $properties_within_fields_to_ignore)) {
         if (in_array($field_name, $following_fields)) {
           $following_diff_list[$field_name] = $data[$field_name]['label'];
         }
         else {
           $diff_list[$field_name] = $data[$field_name]['label'];
-        }
-        continue;
-      }
-      if(!is_array($new_value) && $new_value != $old_value) {
-        if (in_array($field_name, $following_fields)) {
-          $following_diff_list[$field_name] = $data[$field_name]['label'];
-        }
-        else {
-          $diff_list[$field_name] = $data[$field_name]['label'];
-        }
-        continue;
-      }
-      if(is_array($new_value) && is_array($old_value)) {
-        foreach ($properties_within_fields_to_ignore as $property_to_ignore) {
-          recursive_unset($new_value, $property_to_ignore);
-          recursive_unset($old_value, $property_to_ignore);
-        }
-        $diff1 = array_diff_assoc_recursive($new_value, $old_value);
-        $diff2 = array_diff_assoc_recursive($old_value, $new_value);
-        if($diff1 or $diff2) {
-          if (in_array($field_name, $following_fields)) {
-            $following_diff_list[$field_name] = $data[$field_name]['label'];
-          }
-          else {
-            $diff_list[$field_name] = $data[$field_name]['label'];
-          }
         }
       }
     }
@@ -474,7 +442,7 @@ function ma_collaboration_tools_node_update($node) {
     // Update field_all_users_notified
     if (count($following_diff_list) OR count ($diff_list)) {
       $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper, since it may have been updated in ma_collaboration_tools_field_collection_item_insert (as fired from ma_collaboration_tools_set_notification_email_fc)
-      ma_collaboration_tools_update_field_all_users_notified($notification_w);
+      ma_shared_notification_components_update_field_all_users_notified($notification_w);
     }
 
   }
@@ -503,24 +471,8 @@ function ma_collaboration_tools_comment_insert($comment) {
     $notification_w->save();
     ma_collaboration_tools_set_notification_email_fc($notification_w, $node, 'commented on', $comment);
     $notification_w = entity_metadata_wrapper('node', $following_nid); // reload the notification wrapper
-    ma_collaboration_tools_update_field_all_users_notified($notification_w);
+    ma_shared_notification_components_update_field_all_users_notified($notification_w);
   }
-}
-
-// Update field_all_users_notified
-function ma_collaboration_tools_update_field_all_users_notified($notification_w) {
-  $all_users_to_notify = $notification_w->field_notify_all->raw();
-  $already_notified = $notification_w->field_users_notified->raw();
-  $all_users_notified = 1;
-  if (count(array_diff($all_users_to_notify, $already_notified))) {
-    $all_users_notified = 0;
-  }
-  if ($all_users_notified <>  $notification_w->field_all_users_notified->value()) {
-    $notification_w->field_all_users_notified->set($all_users_notified);
-    $notification_w->save();
-  }
-  // dpm ("all users notified set to: " . $all_users_notified);
-
 }
 
 // Set the notification lists on a Following node wrapper (to be saved by calling function).
@@ -590,6 +542,9 @@ function ma_collaboration_tools_set_notification_email_fc($notification_w, $chil
   // Set the time
   $fce_w->field_notification_date_gene->set(time());
 
+  // Set the action
+  $fce_w->field_notification_action->set($op);
+
   // Set the subject
   $fce_w->field_notification_subject->set('"' . $child_node->title . '" has been ' . $op . '.');
 
@@ -623,95 +578,6 @@ function ma_collaboration_tools_set_notification_email_fc($notification_w, $chil
 
   // Save the field collection.
   $fce_w->save();
-}
-
-/**
- * Implements hook_field_collection_item_insert()
- *
- * After creating a new Following notification email FC, send out notifications for the "immediately" users and update the Following notification users notified field.
- */
-function ma_collaboration_tools_field_collection_item_insert($fc_item){
-  if ($fc_item->field_name == 'field_notification_email') {
-    $notification_w = entity_metadata_wrapper('node', $fc_item->hostEntity());
-    $notify_users = array_diff($notification_w->field_notify_immediately->raw(), $notification_w->field_users_notified->raw());
-
-    // Send notifications.
-    $notification_author = $fc_item->field_notification_author[LANGUAGE_NONE][0]['target_id'];;
-    if (count($notify_users)) {
-      foreach ($notify_users as $uid) {
-        // Do not notify users of their *own* node creations / node edits / or comments.
-        if ($uid == $notification_author) {
-          $successful_sends[] = $uid;
-          continue;
-        }
-        $params = [
-          'subject' => $fc_item->field_notification_subject[LANGUAGE_NONE][0]['value'],
-          'body' => $fc_item->field_notification_body[LANGUAGE_NONE][0]['value'] .  "\n\nManage your notifications: " . $GLOBALS['base_url'] . "/user/" . $uid . "/following",
-
-        ];
-        if (isset($fc_item->field_notification_comment[LANGUAGE_NONE][0]['target_id'])) {
-          $params['comment_id'] = $fc_item->field_notification_comment[LANGUAGE_NONE][0]['target_id'];
-          $params['uid'] = $uid;
-        }
-        $user = user_load($uid);
-        $result = drupal_mail('ma_collaboration_tools', 'collab_notification', $user->mail, language_default(), $params);
-        if ($result['result']) { // This doesn't guarantee much but it's better than nothing.
-          $successful_sends[] = $uid;
-        }
-      }
-
-      // Update the notified users field.
-      if (count($successful_sends)) {
-        $notification_w->field_users_notified->set($successful_sends); // This saves automatically, because the FC already exists. Saving the wrapper separately creates a duplicate error.
-      }
-
-    }
-  }
-}
-
-/**
- * Implements hook_mail().
- */
-function ma_collaboration_tools_mail($key, &$message, $params) {
-
-  if ($key == 'collab_notification') {
-
-    // For comments on immediate-send notications
-    if (isset($message['params']['comment_id'])) {
-      $comment = comment_load($message['params']['comment_id']);
-
-      // Embed the comment in the email body. This requires rebuilding the email body from its
-      // standard format (that of how non-comment notifications, and comment notifications in digests appear).
-      $body_prefix = variable_get('mailcomment_reply_text');
-      $split_body = preg_split("/.\n\nView the comment: /", $params['body']);
-      $comment_body = '| ' . drupal_html_to_text(wordwrap($comment->subject, 75, "\n| ", true)); // limit each line to 77 chars, including a "| " at the start of each line to denote quoted text.
-      $body_suffix = 'You may reply directly to this comment via email, or go to the comment at: ';
-      $params['body'] = $body_prefix . "\n\n" . $split_body[0] . ":\n\n" . $comment_body . "\n" . $body_suffix . $split_body[1];
-//      $messageid_params['uid'] = $params['uid'];
-//      $message['body'][0] .= 'View original post: ' . url('mailcomment/redirect/' . mailcomment_build_messageid($messageid_params), ['absolute' => TRUE]);
-
-      // Add ability to reply to the comment via email, using an auth code in the Message-ID header.
-      // This is taken from mailcomment_message_notify_mail_alter().
-      $messageid_params = [];
-      $messageid_params['uid'] = $comment->uid;
-      $messageid_params['cid'] = $comment->cid;
-      $messageid_params['nid'] = $comment->nid;
-      $messageid_params['time'] = $comment->created;
-      $reply = variable_get('mailcomment_mailbox', variable_get('site_mail', ''));
-      $message['headers']['Reply-To'] = $reply;
-      $message['headers']['Message-ID'] = mailcomment_build_messageid($messageid_params);
-      $ancestor_msg_id = mailcomment_mail_comment_ancestor_message_id($messageid_params['nid'], $messageid_params['cid']);
-      if (isset($ancestor_msg_id)) { // TODO: test if this is necessary
-        $message['headers']['In-Reply-To'] = $ancestor_msg_id;
-      }
-
-    };
-
-    // All notifications (not just comments) need the body and subject set here.
-    $message['subject'] = $params['subject'];
-    $message['body'][] = $params['body'];
-
-  }
 }
 
 /**
@@ -1470,7 +1336,7 @@ function ma_collaboration_tools_send_scheduled_notifications($schedule) {
       $users_notified = array_unique(array_merge($notification_w->field_users_notified->raw(), $users_emailed));
       $notification_w->field_users_notified->set($users_notified);
       $notification_w->save();
-      ma_collaboration_tools_update_field_all_users_notified($notification_w);
+      ma_shared_notification_components_update_field_all_users_notified($notification_w);
     }
 
   }

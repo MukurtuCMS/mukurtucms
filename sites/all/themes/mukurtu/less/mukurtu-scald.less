@@ -1,5 +1,6 @@
 .scald-atom {
-    .field-name-download-atom {
+    .field-name-download-atom,
+    div > div.popup-element {
         text-align: center;
         padding-top: 30px;
 
@@ -22,6 +23,17 @@
     .scald_video + .field-name-download-atom {
         padding-top: 50px;
     }
+
+    // Metadata.
+    div > div.popup-element {
+        padding-top: 20px;
+        text-align: center;
+        display: block;
+
+        a {
+            padding: 8px 14px;
+        }
+    }
 }
 
 .scald-menu {
@@ -36,4 +48,10 @@
             }
         }
     }
+}
+
+.node-lesson .group-480-thumbnail-and-link,
+.node-unit-plan .group-480-thumbnail-and-link {
+    margin: auto;
+    width: 480px;
 }

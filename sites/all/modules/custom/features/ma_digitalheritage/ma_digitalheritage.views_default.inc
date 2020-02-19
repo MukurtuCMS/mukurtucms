@@ -59,7 +59,7 @@ function ma_digitalheritage_views_default_views() {
   );
   $handler->display->display_options['arguments']['nid']['validate']['fail'] = 'ignore';
   $handler->display->display_options['arguments']['nid']['not'] = TRUE;
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -139,10 +139,10 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['style_plugin'] = 'default';
   $handler->display->display_options['row_plugin'] = 'fields';
   /* Relationship: Entity Reference: Referencing entity */
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['id'] = 'reverse_field_related_dh_items_node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['table'] = 'node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['field'] = 'reverse_field_related_dh_items_node';
-  $handler->display->display_options['relationships']['reverse_field_related_dh_items_node']['required'] = TRUE;
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['id'] = 'reverse_field_related_content_node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['table'] = 'node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['field'] = 'reverse_field_related_content_node';
+  $handler->display->display_options['relationships']['reverse_field_related_content_node']['required'] = TRUE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -167,13 +167,13 @@ function ma_digitalheritage_views_default_views() {
   $handler->display->display_options['arguments']['nid']['id'] = 'nid';
   $handler->display->display_options['arguments']['nid']['table'] = 'node';
   $handler->display->display_options['arguments']['nid']['field'] = 'nid';
-  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_related_dh_items_node';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_related_content_node';
   $handler->display->display_options['arguments']['nid']['default_action'] = 'default';
   $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'node';
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -206,7 +206,7 @@ function ma_digitalheritage_views_default_views() {
     t('‹ previous'),
     t('next ›'),
     t('last »'),
-    t('Content referencing Content from field_related_dh_items'),
+    t('Content referencing Content from field_related_content'),
     t('All'),
     t('Block'),
   );
@@ -480,10 +480,15 @@ return FALSE;';
   $handler->display->display_options['style_options']['columns'] = array(
     'views_bulk_operations' => 'views_bulk_operations',
     'title' => 'title',
-    'field_dictionary_word_language' => 'field_dictionary_word_language',
-    'field_tags' => 'field_tags',
+    'field_media_asset' => 'field_media_asset',
     'changed' => 'changed',
+    'field_summary' => 'field_summary',
+    'field_community_ref' => 'field_community_ref',
+    'field_category' => 'field_category',
+    'field_creator' => 'field_creator',
+    'field_contributor' => 'field_contributor',
     'field_date' => 'field_date',
+    'field_collection' => 'field_collection',
   );
   $handler->display->display_options['style_options']['default'] = 'changed';
   $handler->display->display_options['style_options']['info'] = array(
@@ -499,24 +504,44 @@ return FALSE;';
       'separator' => '',
       'empty_column' => 0,
     ),
-    'field_dictionary_word_language' => array(
-      'sortable' => 1,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-    'field_tags' => array(
+    'field_media_asset' => array(
       'align' => '',
       'separator' => '',
       'empty_column' => 0,
     ),
     'changed' => array(
       'sortable' => 1,
-      'default_sort_order' => 'asc',
+      'default_sort_order' => 'desc',
       'align' => '',
       'separator' => '',
       'empty_column' => 1,
+    ),
+    'field_summary' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_community_ref' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_category' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_creator' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_contributor' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
     ),
     'field_date' => array(
       'sortable' => 1,
@@ -524,6 +549,11 @@ return FALSE;';
       'align' => '',
       'separator' => '',
       'empty_column' => 1,
+    ),
+    'field_collection' => array(
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
     ),
   );
   /* Field: Bulk operations: Content */
@@ -613,12 +643,7 @@ return FALSE;';
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_collection']['delta_offset'] = '0';
-  /* Sort criterion: Content: Post date */
-  $handler->display->display_options['sorts']['created']['id'] = 'created';
-  $handler->display->display_options['sorts']['created']['table'] = 'node';
-  $handler->display->display_options['sorts']['created']['field'] = 'created';
-  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -838,7 +863,7 @@ return FALSE;';
   $handler->display->display_options['fields']['field_date']['field'] = 'field_date';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';

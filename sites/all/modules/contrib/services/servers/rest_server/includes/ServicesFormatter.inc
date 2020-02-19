@@ -18,7 +18,7 @@ class ServicesJSONFormatter implements ServicesFormatterInterface {
     if (is_scalar($data)) {
       $data = array($data);
     }
-    return str_replace('\\/', '/', json_encode($data));
+    return str_replace('\\/', '/', json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR));
   }
 }
 

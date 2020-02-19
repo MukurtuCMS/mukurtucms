@@ -58,6 +58,7 @@ function ma_digitalheritage_field_group_info() {
       7 => 'field_language',
       8 => 'field_source',
       9 => 'field_subject',
+      10 => 'field_external_links',
     ),
     'format_type' => 'htab',
     'format_settings' => array(
@@ -310,15 +311,14 @@ function ma_digitalheritage_field_group_info() {
   $field_group->parent_name = 'group_tabs';
   $field_group->data = array(
     'label' => 'Relations',
-    'weight' => '12',
+    'weight' => '13',
     'children' => array(
       0 => 'field_book_children',
       1 => 'field_book_parent',
       2 => 'field_collection',
       3 => 'field_community_record_children',
       4 => 'field_personal_collections',
-      5 => 'field_related_dh_items',
-      6 => 'field_related_dictionary_words',
+      5 => 'field_related_content',
     ),
     'format_type' => 'htab',
     'format_settings' => array(

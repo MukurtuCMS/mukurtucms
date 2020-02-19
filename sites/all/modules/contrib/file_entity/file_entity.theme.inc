@@ -187,6 +187,8 @@ function theme_file_entity_file_audio($variables) {
  *   - muted: Boolean indicating whether or not the sound should be muted.
  *   - width: Width, in pixels, of the video player.
  *   - height: Height, in pixels, of the video player.
+ *   - playsinline: Boolean indicating if video should automatically play on
+ *     mobile (iOS).
  *
  * @ingroup themeable
  */
@@ -235,6 +237,9 @@ function theme_file_entity_file_video($variables) {
   }
   if (!empty($variables['preload'])) {
     $video_attributes['preload'] = $variables['preload'];
+  }
+  if ($variables['playsinline']) {
+    $video_attributes['playsinline'] = 'playsinline';
   }
 
   $output .= '<video' . drupal_attributes($video_attributes) . '>';

@@ -13,11 +13,14 @@ abstract class ServicesViewsApiTestCase extends ServicesWebTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(array $modules = array()) {
     parent::setUp(
-      'services_views',
-      'services_views_test',
-      'views'
+      array(
+        'services_views',
+        'services_views_test',
+        'views',
+        'services'
+      )
     );
   }
 

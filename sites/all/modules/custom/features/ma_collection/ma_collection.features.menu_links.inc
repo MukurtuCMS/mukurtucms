@@ -50,7 +50,7 @@ function ma_collection_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -44,
+    'weight' => -42,
     'customized' => 1,
     'parent_identifier' => 'main-menu_add-content:node/add',
   );

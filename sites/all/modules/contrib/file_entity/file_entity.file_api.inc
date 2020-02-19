@@ -77,6 +77,10 @@ function file_info_cache_clear() {
 function file_view_multiple($files, $view_mode = 'full', $weight = 0, $langcode = NULL) {
   $build = array();
 
+  if (empty($files)) {
+    return $build;
+  }
+
   $entities_by_view_mode = entity_view_mode_prepare('file', $files, $view_mode, $langcode);
   foreach ($entities_by_view_mode as $entity_view_mode => $entities) {
     field_attach_prepare_view('file', $entities, $entity_view_mode, $langcode);

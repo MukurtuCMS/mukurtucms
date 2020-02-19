@@ -15,7 +15,9 @@
  */
 class media_views_plugin_style_media_browser extends views_plugin_style_list {
 
-  // Stores the files loaded with pre_render.
+  /**
+   * Stores the files loaded with pre_render.
+   */
   public $files = array();
 
   /**

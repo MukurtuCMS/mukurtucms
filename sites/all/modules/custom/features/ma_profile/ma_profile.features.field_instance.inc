@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_profile.features.field_instance.inc
@@ -32,6 +33,8 @@ function ma_profile_field_default_field_instances() {
     'required' => FALSE,
     'settings' => array(
       'context' => '',
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
       'text_processing' => 0,
@@ -44,6 +47,41 @@ function ma_profile_field_default_field_instances() {
       ),
       'type' => 'text_textarea',
       'weight' => 0,
+    ),
+  );
+
+  // Exported field_instance: 'user-user-field_dhan_frequency'.
+  $field_instances['user-user-field_dhan_frequency'] = array(
+    'bundle' => 'user',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 3,
+      ),
+    ),
+    'display_label' => '',
+    'ds_extras_field_template' => '',
+    'entity_type' => 'user',
+    'field_name' => 'field_dhan_frequency',
+    'label' => 'DHAN Frequency',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => 0,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'treeable' => 0,
+      ),
+      'type' => 'options_buttons',
+      'weight' => 9,
     ),
   );
 
@@ -72,6 +110,8 @@ function ma_profile_field_default_field_instances() {
     'label' => 'Notifications Email Frequency Default',
     'required' => 0,
     'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => 0,
     ),
     'widget' => array(
@@ -116,6 +156,8 @@ function ma_profile_field_default_field_instances() {
           'status' => 0,
         ),
       ),
+      'custom_add_another' => '',
+      'custom_remove' => '',
       'user_register_form' => 1,
     ),
     'view modes' => array(
@@ -144,6 +186,7 @@ function ma_profile_field_default_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Communities');
+  t('DHAN Frequency');
   t('Notifications Email Frequency Default');
   t('Request message');
   t('This can be overridden per content.');

@@ -167,10 +167,14 @@ function mukurtu_importer_generator_get_default_documentation($field_mapping, $e
         break;
 
       case 'partial_date_range':
-        $value_type = "Values must be dates formatted as YYYY-mm-dd.";
+        $value_type = "Values must be dates formatted as YYYY-mm-dd, YYYY-mm, or YYYY.";
         break;
 
       case 'geofield':
+        break;
+
+      case 'link_field':
+        $value_type = "Values must be formatted as URL||Title||Attributes.";
         break;
 
       case 'audio':

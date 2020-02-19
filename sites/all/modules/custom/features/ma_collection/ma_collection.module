@@ -104,7 +104,7 @@ function ma_collection_form_views_exposed_form_alter(&$form, &$form_state) {
  * Implements hook_node_presave().
  */
 function ma_collection_node_presave($node) {
-  // Set the Digital Heritage Count.
+  // Set the Collection Item Count.
   // Cases when we need to update the count:
   // - New Collection created -> This hook triggers.
   // - Collection edited -> This hook triggers.
@@ -145,24 +145,21 @@ function ma_collection_node_postupdate($node) {
   if (in_array($node->type, ma_collection_get_valid_node_types_for_collection())) {
     // Did it have a status change?
     // All other recount cases handled by ma_collection_node_presave.
-    // Check all potential collection fields for collections we should trigger updates for.
-    foreach (array('field_collection', 'field_personal_collections') as $collection_field) {
-      if (!empty($node->{$collection_field}[LANGUAGE_NONE])) {
-        foreach ($node->{$collection_field}[LANGUAGE_NONE] as $collection_ref) {
-          // Load and save the collection node. We don't need to change the count here.
-          // We only need to trigger ma_collection_node_presave, which will do the recount.
-          $collection = node_load($collection_ref['target_id']);
-          $collection_emw = entity_metadata_wrapper('node', $collection);
-          $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_digital_heritage_items->value());
-          $old_item_count = (int) $collection_emw->field_digital_heritage_count->value();
-          // Only save if the counts are different.
-          if ($old_item_count != $contained_item_count) {
-            node_save($collection);
-          }
-        }
+    // Check all Related Content values for collections we should trigger updates for.
+    foreach ($node->field_digital_heritage_items[LANGUAGE_NONE] as $collection_ref) {
+      // Load and save the collection node. We don't need to change the count here.
+      // We only need to trigger ma_collection_node_presave, which will do the recount.
+      $collection = node_load($collection_ref['target_id']);
+      $collection_emw = entity_metadata_wrapper('node', $collection);
+      $contained_item_count = ma_collection_get_published_node_count($collection_emw->field_digital_heritage_items->value());
+      $old_item_count = (int) $collection_emw->field_digital_heritage_items->value();
+      // Only save if the counts are different.
+      if ($old_item_count != $contained_item_count) {
+        node_save($collection);
       }
     }
   }
+
 }
 
 
@@ -260,14 +257,13 @@ function ma_collection_form_alter(&$form, $form_state, $form_id) {
     // Creating a new Collection or Personal Collection
     if (!isset($node->nid)) {
 
-      // Prepopulate any "Add To Collection" / "Add to Personal Collectin" nodes in the entity refs.
+      // Prepopulate any "Add To Collection" / "Add to Personal Collection" nodes in the entity refs.
       $query = drupal_get_query_parameters();
       if (isset($query['add'])) {
         $add = explode('-', $query['add']);
-        $entity_ref_field = array_search($add[0], ma_collection_get_valid_node_types_for_collection());
-        if (isset($entity_ref_field) && is_numeric($add[1])) {
+        if (is_numeric($add[1])) {
           $node_to_add = node_load($add[1]);
-          $form[$entity_ref_field][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
+          $form['field_digital_heritage_items'][LANGUAGE_NONE][0]['target_id']['#default_value'] = $node_to_add->title . ' (' . $node_to_add->nid . ')';
         }
       }
 
@@ -488,27 +484,31 @@ function ma_collection_contextual_links_view_alter(&$element, $items) {
 }
 
 /**
- * "Add to Collection" form.
+ * "Add to Collection" and "Add to Personal Collection" forms.
  */
-function ma_collection_add_to_collection_form($form, $form_state) {
+function ma_collection_add_to_collection_form($form, $form_state, $type = 'collection') {
 
   $nid_to_add = $form_state['nid_to_add'];
 
   // Build an array of collections.
 
   // First option is to create a new collection.
+  $type_name = [
+    'collection' => 'Collection',
+    'personal_collection' => 'Personal Collection',
+  ];
   $colls = [
-    'create_new_collection' => 'Create a new Collection'
+    'create_new_collection' => 'Create a new ' . $type_name[$type]
   ];
 
   // First get collections that already have this node in it, so we can exclude them later.
   $colls_to_exclude = array();
   $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
-  foreach ($valid_collection_types as $entity_reference_field => $node_type) {
+  foreach ($valid_collection_types as $node_type) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'collection')
-      ->fieldCondition($entity_reference_field, 'target_id', $nid_to_add);
+      ->entityCondition('bundle', $type)
+      ->fieldCondition('field_digital_heritage_items', 'target_id', $nid_to_add);
     $result = $query->execute();
     if (isset($result['node'])) {
       $colls_to_exclude = array_keys($result['node']);
@@ -518,7 +518,7 @@ function ma_collection_add_to_collection_form($form, $form_state) {
   // Get the collections.
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'collection')
+    ->entityCondition('bundle', $type)
     ->propertyCondition('status', NODE_PUBLISHED);
   $result = $query->execute();
   if (isset($result['node'])) {
@@ -539,7 +539,7 @@ function ma_collection_add_to_collection_form($form, $form_state) {
 
   // Build the form.
   $form['collection'] = [
-    '#title' => t('Add Item to Collection'),
+    '#title' => t('Add Item to ' . $type_name[$type]),
     '#type' => 'select',
     '#options' => $colls,
     '#chosen' => TRUE,
@@ -563,74 +563,11 @@ function ma_collection_add_to_collection_form($form, $form_state) {
  * "Add to Personal Collection" form.
  */
 function ma_collection_add_to_personal_collection_form($form, $form_state) {
-
-  $nid_to_add = $form_state['nid_to_add'];
-
-  // Build an array of personal collections.
-
-  // First option is to create a new collection.
-  $personal_colls = [
-    'create_new_collection' => 'Create a new Personal Collection'
-  ];
-
-  // First get collections that already have this node in it, so we can exclude them later.
-  $colls_to_exclude = array();
-  $valid_collection_types = ma_collection_get_valid_node_types_for_collection();
-  foreach ($valid_collection_types as $entity_reference_field => $node_type) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'personal_collection')
-      ->fieldCondition($entity_reference_field, 'target_id', $nid_to_add);
-    $result = $query->execute();
-    if (isset($result['node'])) {
-      $colls_to_exclude = array_keys($result['node']);
-    }
-  }
-
-  // Get the collections.
-  global $user;
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'personal_collection')
-    ->propertyCondition('status', NODE_PUBLISHED)
-    ->propertyCondition('uid', $user->uid);
-
-  $result = $query->execute();
-  if (isset($result['node'])) {
-    $coll_nids = array_keys($result['node']);
-    foreach ($coll_nids as $coll_nid) {
-      if (in_array($coll_nid, $colls_to_exclude)) {
-        continue;
-      }
-      $coll_node = node_load($coll_nid);
-      $personal_colls[$coll_nid] = $coll_node->title;
-    }
-  }
-
-  // Build the form.
-
-  $form['collection'] = [
-    '#title' => t('Add Item to Personal Collection'),
-    '#type' => 'select',
-    '#options' => $personal_colls,
-    '#chosen' => TRUE,
-  ];
-  $form['actions'] = [
-    'submit' => [
-      '#type' => 'submit',
-      '#value' => t('Add'),
-    ],
-    'cancel' => [
-      '#type' => 'submit',
-      '#value' => t('Cancel'),
-    ],
-  ];
-
-  return $form;
+  return ma_collection_add_to_collection_form ($form, $form_state, 'personal_collection');
 }
 
 /**
- * Add to Collection form submit handler.
+ * Add to Collection / Personal Collection form submit handler.
  */
 function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $personal = 0) {
 
@@ -648,7 +585,7 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $pers
     $nid_to_add = $form_state['nid_to_add'];
     $node_to_add = node_load ($nid_to_add);
 
-    if ($entity_ref_field = array_search($node_to_add->type, ma_collection_get_valid_node_types_for_collection())) {
+    if (in_array($node_to_add->type, ma_collection_get_valid_node_types_for_collection())) {
 
       // Create a new Collection
       if ($coll_nid == 'create_new_collection') {
@@ -675,21 +612,26 @@ function ma_collection_add_to_collection_form_submit(&$form, &$form_state, $pers
 
         // Add the item to the Collection node.
         $cw = entity_metadata_wrapper('node', $coll_node);
-        $cw->{$entity_ref_field}[] = $nid_to_add;
+        $cw->field_digital_heritage_items[] = $nid_to_add;
         $cw->save(); // comment this line while debugging.
 
         // Display confirmation message.
         // EntityDrupalWrapper::save throws an exception if it fails, so if we get here, we know it worked.
-        $collection_type = "Collection";
         if ($personal) {
-          $collection_type = "Personal Collection";
+          $output = '<p><i>' . $node_to_add->title . '</i> has been added to Personal Collection <i>' . $coll_node->title . '</i>.</p>';
+          $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
+          $ctools_output[] = ajax_command_invoke("#star-{$nid_to_add}", 'mukurtuToggleStarOn');
+          $ctools_output[] = ctools_modal_command_display('Success', $output);
+          print ajax_render($ctools_output);
+          exit;
         }
-        $output = '<p><i>' . $node_to_add->title . '</i> has been added to ' . $collection_type . ' <i>' . $coll_node->title . '</i>.</p>';
-        $output .= '<div><button type="submit" class="btn btn-success ctools-close-modal">OK</button></div>';
-        $ctools_output[] = ajax_command_invoke("#star-{$nid_to_add}", 'mukurtuToggleStarOn');
-        $ctools_output[] = ctools_modal_command_display('Success', $output);
-        print ajax_render($ctools_output);
-        exit;
+        else {
+          // For nodes added to a Collection, we reload the whole node because the Collections field will have a new entry in it and we want the node view to reflect that.
+          drupal_set_message('<i>' . $node_to_add->title . '</i> has been added to Collection <i>' . $coll_node->title . '</i>.');
+          $commands[] = ctools_ajax_command_redirect('/node/' . $nid_to_add);
+          print ajax_render($commands);
+          exit;
+        }
 
       }
     }
@@ -751,14 +693,11 @@ function ma_collection_add_node_to_personal_collection_access($node) {
 }
 
 /**
- * Helper function to return types of content that can be added to a collection, and the collection entity reference field for that type.
- *
- * Currently just DH, but more will be added here later.
+ * Helper function to return types of content that can be added to a collection.
  */
 function ma_collection_get_valid_node_types_for_collection() {
-  return [
-    'field_digital_heritage_items' => 'digital_heritage',
-  ];
+  $collection_field_info = field_info_field('field_digital_heritage_items');
+  return $collection_field_info["settings"]["handler_settings"]["target_bundles"];
 }
 
 /**
@@ -1008,21 +947,16 @@ function ma_collection_find_node_in_personal_collection($nid, $account = NULL) {
     $account = $user;
   }
 
-  $collections = array();
-  $collection_fields = ma_collection_get_valid_node_types_for_collection();
-  foreach ($collection_fields as $entity_reference_field => $node_type) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'personal_collection')
-      ->fieldCondition($entity_reference_field, 'target_id', $nid)
-      ->propertyCondition('uid', $account->uid);
-    $result = $query->execute();
-    if (isset($result['node'])) {
-      $collections = array_keys($result['node']);
-    }
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'personal_collection')
+    ->fieldCondition('field_digital_heritage_items', 'target_id', $nid)
+    ->propertyCondition('uid', $account->uid);
+  $result = $query->execute();
+  if (isset($result['node'])) {
+    return array_keys($result['node']);
   }
-
-  return $collections;
+  return [];
 }
 
 /**
@@ -1045,5 +979,31 @@ function ma_collection_add_to_personal_collection_icon_ds_field($entity) {
       }
       print "<a href={$link} title=\"{$title}\" class=\"{$classes}\"><span id=\"star-{$entity->nid}\" class=\"glyphicon glyphicon-star\" aria-hidden=\"true\"></span></a>";
     }
+  }
+}
+
+
+/**
+ * Implements hook_field_widget_form_alter().
+ *
+ * Items in Collection field. Do the same as we are doing with field_related_content:
+ * 1) Flatten the options (select2 widget works with nested options but not when it is a hidden select field,
+ *    which is how we are setting the entity ref field in order for it to be sortable)
+ * 2) Prefix each option with the content type so that the already-selected options show which content type it is.
+ *    This also means that we see the content type for the non-selected options, despite the content type top-level having been flattened out.
+ * 3) Remove the node the user is already on, so that the node cannot self-reference. Aside from being better UI, self-referencing actually causes a fatal error somewhere in mukurtu_related_items_formatter_field_formatter_view().
+ */
+function ma_collection_field_widget_form_alter(&$element, &$form_state, $context) {
+  if ($context["field"]["field_name"] == 'field_digital_heritage_items') {
+    $new_options = [];
+    unset($element['#options']['_none']);
+    foreach ($element['#options'] as $content_type => $nodes) {
+      foreach ($nodes as $nid => $node_title) {
+        if ($nid <> $context["form"]["nid"]["#value"]) {
+          $new_options[$nid] = $content_type . ': ' . $node_title;
+        }
+      }
+    }
+    $element['#options'] = $new_options;
   }
 }

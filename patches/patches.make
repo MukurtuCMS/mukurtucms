@@ -77,6 +77,7 @@ projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.p
 ;;; Entity Reference
 ; Forbid to use duplicate entities in entityreference field
 projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid-duplicate-entities-in-entityreference-field_0.patch
+projects[entityreference][patch][] = contrib/0001-Fix-for-related-content-field-for-single-type.patch
 
 ;;; Feeds
 ; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
@@ -176,6 +177,10 @@ projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-reg
 ;;; Search API Glossary
 ; 1. Index display and sort ALL characters. 2. Option to skip padding
 projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_characters_and_option_to_skip_padding.patch
+
+;;; Select2
+; Allow drag and drop reordering on select2 fields even if they do not have "add terms on fly"
+projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even-if-no-add-terms-on-fly.patch
 
 ;;; Services
 ; Fix services issue with multivals

@@ -48,9 +48,16 @@ function ma_scald_scald_atom_access($atom, $action, $account = NULL) {
     // DENY if groups are set but they have access to none of them.
     case 'view':
       $group_wrapper = entity_metadata_wrapper('scald_atom', $atom);
-      if (!isset($group_wrapper->field_scald_protocol) || empty($group_wrapper->field_scald_protocol->value())) {
+      if (!isset($group_wrapper->field_scald_protocol)) {
         return SCALD_ATOM_ACCESS_ALLOW;
+      } else {
+        // Check for set but empty.
+        $scald_protocols = $group_wrapper->field_scald_protocol->value();
+        if (empty($scald_protocols)) {
+          return SCALD_ATOM_ACCESS_ALLOW;
+        }
       }
+
       if ($groups = $group_wrapper->field_scald_protocol->value()) {
         foreach ($groups as $group) {
           if (node_access('view', $group, $account)) {
@@ -289,7 +296,13 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
     // Order the fields according to their weight
     $ordered_fields = array();
     foreach ($element as $field_name => $field) {
-      $ordered_fields[$field['#weight']] = $field_name;
+      if (is_null($field)) {
+        continue;
+      }
+
+      if (isset($field['#weight'])) {
+        $ordered_fields[$field['#weight']] = $field_name;
+      }
     }
     ksort ($ordered_fields);
 
@@ -905,4 +918,24 @@ function _ma_scald_guess_provider_from_media_source($type, $media_source) {
     return current($type_providers);
   }
   return NULL;
+}
+
+/**
+ * Implementation of hook_node_view().
+ */
+function ma_scald_node_view($node, $view_mode) {
+  if ($view_mode == 'search_result') {
+
+    // If no media items at all for an item the search results, put a placeholder.
+    if (!$node->field_media_asset) {
+      $node->content['field_media_asset'][0]['#markup'] = '
+      <div class="field field-name-field-media-asset field-type-atom-reference field-label-hidden">
+        <div class="field-items">
+            <a class = "tooltips image-placeholder" href=" ' . url("node/" . $node->nid) . '"><img class="img-responsive" src = "/' . drupal_get_path('module', 'ma_scald') . '/images/no_media_available.jpg"></a>
+        </div>
+      </div>';
+    }
+
+  }
+
 }

@@ -345,6 +345,15 @@
         }
     }
 
+    // Left column and botttom only
+    .col-sm-8, .col-sm-12 {
+        .field {
+            .label-above {
+                .metadata-primary-field-label;
+            }
+        }
+    }
+
     // Collection Items
     .field-name-field-digital-heritage-items {
         .label-above {
@@ -381,7 +390,14 @@
             margin-left: auto;
             margin-right: auto;
         }
+        margin-bottom: 2em;
     }
+
+    // Need to clear the Related Content field below Digital Heritage items
+    .field-name-field-related-content {
+        clear: both;
+    }
+
 
     // Subcollection tree
     .field-name-collections-tree {

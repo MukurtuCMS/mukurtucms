@@ -22,7 +22,7 @@ function ma_core_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'chosen_minimum_width';
-  $strongarm->value = '200';
+  $strongarm->value = '0';
   $export['chosen_minimum_width'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -94,7 +94,11 @@ right-col-block';
   $strongarm->api_version = 1;
   $strongarm->name = 'ds_classes_regions';
   $strongarm->value = 'col-md-8 col-md-pull-4
-col-md-4 col-md-push-8';
+col-md-4 col-md-push-8
+lesson-body
+unit-plan-body
+unit-plan-sidebar
+unit-plan-bottom';
   $export['ds_classes_regions'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -164,7 +168,7 @@ col-md-4 col-md-push-8';
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'ds_extras_switch_field';
-  $strongarm->value = 0;
+  $strongarm->value = 1;
   $export['ds_extras_switch_field'] = $strongarm;
 
   $strongarm = new stdClass();
@@ -622,6 +626,13 @@ col-md-4 col-md-push-8';
   $strongarm->name = 'pathauto_node_pattern';
   $strongarm->value = '[node:title]';
   $export['pathauto_node_pattern'] = $strongarm;
+
+  $strongarm = new stdClass();
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'select2_update_settings_by_ajax';
+  $strongarm->value = 0;
+  $export['select2_update_settings_by_ajax'] = $strongarm;
 
   $strongarm = new stdClass();
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */

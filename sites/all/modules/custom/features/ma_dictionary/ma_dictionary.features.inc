@@ -10,15 +10,6 @@
  */
 function ma_dictionary_default_cer() {
   $items = array();
-  $items['node:dictionary_word:field_related_dictionary_words*node:dictionary_word:field_related_dictionary_words'] = entity_import('cer', '{
-    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
-    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:dictionary_word:field_related_dictionary_words" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:dictionary_word:field_related_dictionary_words" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "identifier" : "node:dictionary_word:field_related_dictionary_words*node:dictionary_word:field_related_dictionary_words",
-    "rdf_mapping" : []
-  }');
   $items['node:dictionary_word:field_word_list*node:word_list:field_words'] = entity_import('cer', '{
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },
@@ -26,15 +17,6 @@ function ma_dictionary_default_cer() {
     "cer_right" : { "und" : [ { "path" : "node:word_list:field_words" } ] },
     "cer_weight" : { "und" : [ { "value" : "0" } ] },
     "identifier" : "node:dictionary_word:field_word_list*node:word_list:field_words",
-    "rdf_mapping" : []
-  }');
-  $items['node:digital_heritage:field_related_dictionary_words*node:dictionary_word:field_dictionary_word_related_dh'] = entity_import('cer', '{
-    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
-    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
-    "cer_left" : { "und" : [ { "path" : "node:digital_heritage:field_related_dictionary_words" } ] },
-    "cer_right" : { "und" : [ { "path" : "node:dictionary_word:field_dictionary_word_related_dh" } ] },
-    "cer_weight" : { "und" : [ { "value" : "0" } ] },
-    "identifier" : "node:digital_heritage:field_related_dictionary_words*node:dictionary_word:field_dictionary_word_related_dh",
     "rdf_mapping" : []
   }');
   return $items;

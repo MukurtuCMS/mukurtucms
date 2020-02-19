@@ -633,38 +633,39 @@ function ma_importexport_dc_action_info() {
     'ma_importexport_dc_action_xml_export' => [
       'type' => 'entity',
       'label' => t('Mukurtu XML Export'),
-      'configurable' => TRUE,
+      'configurable' => FALSE,
       'aggregate' => TRUE,
       'behavior' => ['ma_importexport_dc_export_xml'],
     ],
   ];
 }
 
-/**
- * XML export action form to select XML type.
- */
-function ma_importexport_dc_action_xml_export_form($options, $entity_type, $settings_dom_id) {
-  $form = array();
-  $form['xml_type'] = array(
-    '#type' => 'radios',
-    '#title' => t('Select XML Type'),
-    '#options' => array(
-      'dc_xml' => t('Dublin Core'),
-      'mods_xml' => t('MODS'),
-    ),
-    '#required' => TRUE,
-  );
-  return $form;
-}
-
-/**
- * XML export action set the view dispay ID according to the XML type form selection.
- */
-function ma_importexport_dc_action_xml_export_submit($form, &$form_state) {
-  return array(
-    'display_id' => $form_state['values']['xml_type'],
-  );
-}
+// tw26032281 - Disable MODS export. DC only.
+///**
+// * XML export action form to select XML type.
+// */
+//function ma_importexport_dc_action_xml_export_form() {
+//  $form = array();
+//  $form['xml_type'] = array(
+//    '#type' => 'radios',
+//    '#title' => t('Select XML Type'),
+//    '#options' => array(
+//      'dc_xml' => t('Dublin Core'),
+//      'mods_xml' => t('MODS'),
+//    ),
+//    '#required' => TRUE,
+//  );
+//  return $form;
+//}
+//
+///**
+// * XML export action set the view dispay ID according to the XML type form selection.
+// */
+//function ma_importexport_dc_action_xml_export_submit($form, &$form_state) {
+//  return array(
+//    'display_id' => $form_state['values']['xml_type'],
+//  );
+//}
 
 /**
  * XML export action callback.
@@ -685,7 +686,7 @@ function ma_importexport_dc_action_xml_export($entity, &$context) {
     $args['entity_ids'] = $entity_ids;
   }
   $view = views_get_view('dh_xml_export');
-  $view->execute_display($context['display_id'], $args);
+  $view->execute_display('dc_xml', $args);
   drupal_exit();
 
 }

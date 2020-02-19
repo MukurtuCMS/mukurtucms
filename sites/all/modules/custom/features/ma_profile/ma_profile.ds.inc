@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_profile.ds.inc
@@ -128,8 +129,9 @@ function ma_profile_ds_layout_settings_info() {
       ),
       'hidden' => array(
         8 => 'field_notifications_freq_def',
-        9 => 'ckeditor',
-        10 => '_add_existing_field',
+        9 => 'field_dhan_frequency',
+        10 => 'ckeditor',
+        11 => '_add_existing_field',
       ),
     ),
     'fields' => array(
@@ -142,6 +144,7 @@ function ma_profile_ds_layout_settings_info() {
       'og_user_node' => 'ds_content',
       'redirect' => 'ds_content',
       'field_notifications_freq_def' => 'hidden',
+      'field_dhan_frequency' => 'hidden',
       'ckeditor' => 'hidden',
       '_add_existing_field' => 'hidden',
     ),

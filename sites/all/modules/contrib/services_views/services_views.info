@@ -9,9 +9,8 @@ files[] = includes/views/views_plugin_display_services.inc
 files[] = tests/services_views.test
 files[] = tests/services_views_upgrade_path.test
 
-; Information added by Drupal.org packaging script on 2017-12-01
-version = "7.x-1.3"
+; Information added by Drupal.org packaging script on 2019-11-14
+version = "7.x-1.4"
 core = "7.x"
 project = "services_views"
-datestamp = "1512141196"
-
+datestamp = "1573747401"

@@ -178,7 +178,7 @@ function services_views_execute_view($view_info, $view = NULL, $display_id = NUL
         // Create helper variables.
         $output[$index]->$target_key = array();
         if ($field->field_info['cardinality'] == 1) {
-          $output[$index]->$target_key = '';
+          $output[$index]->$target_key = array('');
         }
         $obj = &$output[$index]->$target_key;
         $format = ($field->options['type'] == 'services') ? 'raw' : 'rendered';
@@ -245,17 +245,17 @@ function services_views_execute_view($view_info, $view = NULL, $display_id = NUL
               $obj[$idx] = array('error' => t('Access denied or format unknown on field.'));
             }
           }
-        }
 
-        // Check html_strip property.
-        if ($field->options['alter']['strip_tags'] == 1) {
-          // Strip the tags which aren't allowed.
-          $obj[$idx] = strip_tags($obj[$idx], $field->options['alter']['preserve_tags']);
-        }
+          // Check html_strip property.
+          if ($field->options['alter']['strip_tags'] == 1) {
+            // Strip the tags which aren't allowed.
+            $obj[$idx] = strip_tags($obj[$idx], $field->options['alter']['preserve_tags']);
+          }
 
-        // Check cardinality of the field.
-        if ($field->field_info['cardinality'] == 1 && count($obj) == 1) {
-          $obj = $obj[$idx];
+          // Check cardinality of the field.
+          if ($field->field_info['cardinality'] == 1 && is_array($obj) && count($obj) == 1) {
+            $obj = $obj[$idx];
+          }
         }
       }
     }
