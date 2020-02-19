@@ -120,7 +120,7 @@ function ma_collaboration_tools_default_search_api_index() {
     "item_type" : "node",
     "options" : {
       "datasource" : { "bundles" : [ "document_page" ] },
-      "index_directly" : 0,
+      "index_directly" : 1,
       "cron_limit" : "50",
       "fields" : {
         "author" : { "type" : "integer", "entity_type" : "user" },
