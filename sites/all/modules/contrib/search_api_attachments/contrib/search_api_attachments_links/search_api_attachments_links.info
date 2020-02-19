@@ -1,0 +1,14 @@
+name = Search API Attachments Links
+description = "Extends the attachments indexing to link fields in the indexed entity"
+core = 7.x
+package = Search
+
+dependencies[] = search_api_attachments
+dependencies[] = link
+
+files[] = includes/callback_attachments_links_settings.inc
+; Information added by Drupal.org packaging script on 2018-11-28
+version = "7.x-1.18"
+core = "7.x"
+project = "search_api_attachments"
+datestamp = "1543400287"

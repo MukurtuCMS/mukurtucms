@@ -1149,6 +1149,16 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_document_pages_text_1",
             "type" : "text",
             "boost" : "5.0"
+          },
+          "attachments_field_basic_file_file" : {
+            "table" : "search_api_db_document_pages_text_1",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "attachments_field_oa_media" : {
+            "table" : "search_api_db_document_pages_text_1",
+            "type" : "text",
+            "boost" : "1.0"
           }
         }
       }

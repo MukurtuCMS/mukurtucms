@@ -1,0 +1,17 @@
+<?php
+/**
+ * @file
+ * Drupal hooks
+ */
+
+/**
+ * Implements hook_search_api_alter_callback_info().
+ */
+function search_api_attachments_multiple_entities_search_api_alter_callback_info() {
+  $callbacks['search_api_attachments_multiple_entities_alter_settings'] = array(
+    'name' => t('File attachments Multiple Entities'),
+    'description' => t('Extract the content of attached files of multiple entities in the index and index it.'),
+    'class' => 'SearchApiAttachmentsMultipleEntitiesAlterSettings',
+  );
+  return $callbacks;
+}

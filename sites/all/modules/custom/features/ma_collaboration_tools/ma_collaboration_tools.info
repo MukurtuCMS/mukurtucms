@@ -44,6 +44,7 @@ dependencies[] = og_comments_access
 dependencies[] = og_ui
 dependencies[] = options
 dependencies[] = search_api
+dependencies[] = search_api_attachments
 dependencies[] = strongarm
 dependencies[] = text
 dependencies[] = views

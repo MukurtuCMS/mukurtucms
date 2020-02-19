@@ -1,0 +1,137 @@
+<?php
+
+/**
+ * @file
+ * Drupal hooks.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function search_api_attachments_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#search_api_attachments':
+
+      $filepath = dirname(__FILE__) . '/README.md';
+      if (file_exists($filepath)) {
+        $readme = file_get_contents($filepath);
+      }
+      else {
+        $filepath = dirname(__FILE__) . '/README.txt';
+        if (file_exists($filepath)) {
+          $readme = file_get_contents($filepath);
+        }
+      }
+      if (!isset($readme)) {
+        return NULL;
+      }
+      if (module_exists('markdown')) {
+        $filters = module_invoke('markdown', 'filter_info');
+        $info = $filters['filter_markdown'];
+
+        if (function_exists($info['process callback'])) {
+          $output = $info['process callback']($readme, NULL);
+        }
+        else {
+          $output = '<pre>' . $readme . '</pre>';
+        }
+      }
+      else {
+        $output = '<pre>' . $readme . '</pre>';
+      }
+
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function search_api_attachments_menu() {
+  $items['admin/config/search/search_api/attachments'] = array(
+    'title' => 'Search API attachments',
+    'description' => 'Search through file content',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('search_api_attachments_settings_form'),
+    'access arguments' => array('administer search_api'),
+    'file' => 'search_api_attachments.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function search_api_attachments_views_api() {
+  return array(
+    'api' => '3.0',
+  );
+}
+
+/**
+ * Implements hook_search_api_alter_callback_info().
+ */
+function search_api_attachments_search_api_alter_callback_info() {
+  $callbacks['search_api_attachments_alter_settings'] = array(
+    'name' => t('File attachments'),
+    'description' => t('Extract the content out of attached files and index it.'),
+    'class' => 'SearchApiAttachmentsAlterSettings',
+  );
+  return $callbacks;
+}
+
+/**
+ * Default excluded file extensions.
+ */
+function search_api_attachments_default_excluded() {
+  $default = array(
+    'aif',
+    'art',
+    'avi',
+    'bmp',
+    'gif',
+    'ico',
+    'mov',
+    'oga',
+    'ogv',
+    'png',
+    'psd',
+    'ra',
+    'ram',
+    'rgb',
+    'flv',
+  );
+  return $default;
+}
+
+/**
+ * Implements hook_file_update().
+ */
+function search_api_attachments_file_update($file) {
+  // If there is cached extracted data for this file, delete it so it can be
+  // re-extracted.
+  $file = (array) $file;
+  $cid = 'cached_extraction_:' . $file['fid'];
+  cache_clear_all($cid, 'cache_search_api_attachments');
+}
+
+/**
+ * Implements hook_file_delete().
+ */
+function search_api_attachments_file_delete($file) {
+  // If there is cached extracted data for this file, delete it.
+  // We don't need it anymore.
+  $file = (array) $file;
+  $cid = 'cached_extraction_:' . $file['fid'];
+  cache_clear_all($cid, 'cache_search_api_attachments');
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function search_api_attachments_flush_caches() {
+  if (!variable_get('search_api_attachments_preserve_cache', FALSE)) {
+    return array('cache_search_api_attachments');
+  }
+}

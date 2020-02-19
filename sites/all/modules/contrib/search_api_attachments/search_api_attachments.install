@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @file
+ * Module install file.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function search_api_attachments_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+  if ($phase == 'runtime') {
+    // We only need to test Java if we're using a local tika extractor.
+    if (variable_get('search_api_attachments_extract_using', 'tika') == 'tika') {
+      $temp = tempnam(file_directory_temp(), 'asa');
+      $cmd = variable_get('search_api_attachments_java', 'java') . ' -version > ' . $temp . ' 2>&1';
+      if (strpos(ini_get('extension_dir'), 'MAMP/')) {
+        $cmd = 'export DYLD_LIBRARY_PATH=""; ' . $cmd;
+      }
+      exec($cmd);
+      $stderror = file_get_contents($temp);
+      $found = preg_match('/Runtime Environment/', $stderror);
+
+      if (!$found) {
+        $requirements['search_api_attachments_java'] = array(
+          'title' => $t('Java'),
+          'value' => $t('Java executable not found'),
+          'description' => $t('Could not execute a java command.  You may need to set the path of the correct java executable as the variable \'search_api_attachments_java\' in settings.php.'),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+    }
+
+    // Test if php-iconv is enabled on the server.
+    $requirements['search_api_attachments_iconv'] = array(
+      'title' => $t('iconv php function'),
+      'description' => $t('Test if iconv php function is known. You will have an error when trying to index .txt files with search API attachments if this function is not present.'),
+    );
+
+    if (function_exists('iconv')) {
+      $requirements['search_api_attachments_iconv']['value'] = $t('Found');
+      $requirements['search_api_attachments_iconv']['severity'] = REQUIREMENT_OK;
+    }
+    else {
+      $requirements['search_api_attachments_iconv']['value'] = $t('Not found');
+      $requirements['search_api_attachments_iconv']['severity'] = REQUIREMENT_ERROR;
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function search_api_attachments_uninstall() {
+  variable_del('search_api_attachments_tika_path');
+  variable_del('search_api_attachments_tika_jar');
+  variable_del('search_api_attachments_extracting_servlet_path');
+}
+
+/**
+ * Implements hook_schema().
+ */
+function search_api_attachments_schema() {
+  // Create a standard Drupal cache table.
+  // We'll be using this store file extractions.
+  $schema['cache_search_api_attachments'] = drupal_get_schema_unprocessed('system', 'cache');
+  return $schema;
+}
+
+/**
+ * Add a cache table to store file extractions.
+ */
+function search_api_attachments_update_7101() {
+  if (!db_table_exists('cache_search_api_attachments')) {
+    $schema = search_api_attachments_schema();
+    db_create_table('cache_search_api_attachments', $schema['cache_search_api_attachments']);
+  }
+}
+
+/**
+ * Set excluded_private to FALSE for existing websites to preserve behavior.
+ */
+function search_api_attachments_update_7102() {
+  $search_api_indexes = db_select('search_api_index')
+    ->fields('search_api_index', array('machine_name'))
+    ->execute()
+    ->fetchCol();
+
+  $indexes = search_api_index_load_multiple($search_api_indexes);
+
+  if (!empty($indexes)) {
+    foreach ($indexes as $index) {
+      if (isset($index->options['data_alter_callbacks']['search_api_attachments_alter_settings']) && isset($index->options['data_alter_callbacks']['search_api_attachments_alter_settings']['settings'])) {
+        $index->options['data_alter_callbacks']['search_api_attachments_alter_settings']['settings']['excluded_private'] = 0;
+
+        entity_save('search_api_index', $index);
+      }
+    }
+  }
+}

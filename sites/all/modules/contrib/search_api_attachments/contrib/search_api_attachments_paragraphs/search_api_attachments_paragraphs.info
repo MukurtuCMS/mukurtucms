@@ -1,0 +1,14 @@
+name = Search API Attachments Paragraphs
+description = "Extends the attachments indexing to file fields in the referenced Paragraph"
+dependencies[] = paragraphs
+dependencies[] = search_api_attachments
+core = 7.x
+package = Search
+
+files[] = includes/callback_attachments_paragraphs_settings.inc
+
+; Information added by Drupal.org packaging script on 2018-11-28
+version = "7.x-1.18"
+core = "7.x"
+project = "search_api_attachments"
+datestamp = "1543400287"

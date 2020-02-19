@@ -126,6 +126,8 @@ function ma_collaboration_tools_default_search_api_index() {
       "index_directly" : 1,
       "cron_limit" : "50",
       "fields" : {
+        "attachments_field_basic_file_file" : { "type" : "text" },
+        "attachments_field_oa_media" : { "type" : "text" },
         "author" : { "type" : "integer", "entity_type" : "user" },
         "body:value" : { "type" : "text" },
         "changed" : { "type" : "date" },
@@ -164,7 +166,18 @@ function ma_collaboration_tools_default_search_api_index() {
         "search_api_alter_add_viewed_entity" : { "status" : 0, "weight" : "0", "settings" : { "mode" : "full" } },
         "search_api_alter_add_hierarchy" : { "status" : 0, "weight" : "0", "settings" : { "fields" : [] } },
         "search_api_alter_node_access" : { "status" : 1, "weight" : "0", "settings" : [] },
-        "search_api_alter_node_status" : { "status" : 0, "weight" : "0", "settings" : [] }
+        "search_api_alter_node_status" : { "status" : 0, "weight" : "0", "settings" : [] },
+        "search_api_attachments_alter_settings" : {
+          "status" : 1,
+          "weight" : "0",
+          "settings" : {
+            "excluded_extensions" : "aif art avi bmp gif ico mov oga ogv png psd ra ram rgb flv",
+            "number_indexed" : "0",
+            "max_file_size" : "0",
+            "excluded_private" : 0,
+            "excluded_file_entity_bundles" : []
+          }
+        }
       },
       "processors" : {
         "search_api_case_ignore" : {

@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @file
+ * Drupal hooks.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function search_api_attachments_comment_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#search_api_attachments_comment':
+
+      $filepath = dirname(__FILE__) . '/README.md';
+      if (file_exists($filepath)) {
+        $readme = file_get_contents($filepath);
+      }
+      else {
+        $filepath = dirname(__FILE__) . '/README.txt';
+        if (file_exists($filepath)) {
+          $readme = file_get_contents($filepath);
+        }
+      }
+      if (!isset($readme)) {
+        return NULL;
+      }
+      if (module_exists('markdown')) {
+        $filters = module_invoke('markdown', 'filter_info');
+        $info = $filters['filter_markdown'];
+
+        if (function_exists($info['process callback'])) {
+          $output = $info['process callback']($readme, NULL);
+        }
+        else {
+          $output = '<pre>' . $readme . '</pre>';
+        }
+      }
+      else {
+        $output = '<pre>' . $readme . '</pre>';
+      }
+
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_search_api_alter_callback_info().
+ */
+function search_api_attachments_comment_search_api_alter_callback_info() {
+  $callbacks['search_api_attachments_comment_alter_settings'] = array(
+    'name' => t('File attachments Comment'),
+    'description' => t('Extract the content of attached files of the comments and index it.'),
+    'class' => 'SearchApiAttachmentsCommentAlterSettings',
+  );
+  return $callbacks;
+}
+
+/**
+ * Implements hook_comment_insert().
+ */
+function search_api_attachments_comment_comment_insert($comment) {
+  // Mark the node of the comment to be reindexed.
+  search_api_track_item_change('node', array($comment->nid));
+}
+
+/**
+ * Implements hook_comment_update().
+ */
+function search_api_attachments_comment_comment_update($comment) {
+  // Mark the node of the comment to be reindexed.
+  search_api_track_item_change('node', array($comment->nid));
+}
+
+/**
+ * Implements hook_comment_delete().
+ */
+function search_api_attachments_comment_comment_delete($comment) {
+  // Mark the node of the comment to be reindexed.
+  search_api_track_item_change('node', array($comment->nid));
+}

@@ -171,12 +171,16 @@ projects[scald_soundcloud][patch][] = contrib/Respect-quoted-strings-in-Soundclo
 ;;; Search API
 ; Fix 'For missing images' option will always fail
 projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-fix_access_info_indexing.patch
-; Modify dictionary search results based on custom sort
-projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_based_on_custom_sort.patch
+
+;;; Search API Attachments
+; Prepend the document root to the tika path
+projects[search_api_attachments][patch][] = contrib/prepend_document_root_to_tika_path.patch
 
 ;;; Search API DB
 ; Change Seach API DB to pull regex from Search API
 projects[search_api_db][patch][] = contrib/0001-Change-Search-API-DB-to-pull-regex-from-Search-API.patch
+; Modify dictionary search results based on custom sort
+projects[search_api_db][patch][] = contrib/modify_dictionary_search_results_based_on_custom_sort.patch
 
 ;;; Search API Glossary
 ; 1. Index display and sort ALL characters. 2. Option to skip padding
