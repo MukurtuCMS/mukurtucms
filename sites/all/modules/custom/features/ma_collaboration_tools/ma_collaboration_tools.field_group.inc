@@ -276,15 +276,15 @@ function ma_collaboration_tools_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_date_created|node|document_library|full';
-  $field_group->group_name = 'group_date_created';
+  $field_group->identifier = 'group_date_added|node|document_library|full';
+  $field_group->group_name = 'group_date_added';
   $field_group->entity_type = 'node';
   $field_group->bundle = 'document_library';
   $field_group->mode = 'full';
   $field_group->parent_name = '';
   $field_group->data = array(
-    'label' => 'Date Created',
-    'weight' => '4',
+    'label' => 'Date Added',
+    'weight' => '5',
     'children' => array(
       0 => 'generic_dynamic_field_5',
     ),
@@ -293,12 +293,39 @@ function ma_collaboration_tools_field_group_info() {
       'formatter' => 'collapsible',
       'instance_settings' => array(
         'description' => '',
-        'classes' => 'group-date-created field-group-fieldset',
+        'classes' => 'group-date-added field-group-fieldset',
         'id' => '',
       ),
     ),
   );
-  $field_groups['group_date_created|node|document_library|full'] = $field_group;
+  $field_groups['group_date_added|node|document_library|full'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_date_changed|node|document_library|full';
+  $field_group->group_name = 'group_date_changed';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'document_library';
+  $field_group->mode = 'full';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Dated Changed',
+    'weight' => '4',
+    'children' => array(
+      0 => 'generic_dynamic_field_2',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-date-changed field-group-fieldset',
+        'id' => '',
+      ),
+    ),
+  );
+  $field_groups['group_date_changed|node|document_library|full'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -590,7 +617,7 @@ function ma_collaboration_tools_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Sort',
-    'weight' => '6',
+    'weight' => '7',
     'children' => array(
       0 => 'generic_dynamic_field_4',
     ),
@@ -610,7 +637,8 @@ function ma_collaboration_tools_field_group_info() {
   // Included for use with string extractors like potx.
   t('Access');
   t('Actions');
-  t('Date Created');
+  t('Date Added');
+  t('Dated Changed');
   t('Event Details');
   t('Following');
   t('Search');
