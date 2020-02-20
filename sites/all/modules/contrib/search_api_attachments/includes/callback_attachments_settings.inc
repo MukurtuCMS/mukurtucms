@@ -394,7 +394,9 @@ class SearchApiAttachmentsAlterSettings extends SearchApiAbstractAlterCallback {
    */
   protected function extractTika($file) {
     $filepath = $this->getRealpath($file);
-    $tika_path = realpath(variable_get('search_api_attachments_tika_path', ''));
+    // Mukurtu patch: prepend the drupal root to the tika path. This way tika can be installed within the libraries dir, and
+    // users will not need to specify the path to tika themselves.
+    $tika_path = realpath(DRUPAL_ROOT . variable_get('search_api_attachments_tika_path', ''));
     $tika = realpath($tika_path . '/' . variable_get('search_api_attachments_tika_jar', 'tika-app-1.6.jar'));
     if (!($tika) || !is_file($tika)) {
       throw new Exception(t('Invalid path or filename for tika application jar.'));

@@ -120,9 +120,7 @@ function search_api_attachments_settings_form_validate($form, &$form_state) {
     }
 
     // Check that the file exists.
-    // mukurtu patch: prepend the document root to the tika path. This way tika can be installed within the libraries dir, and
-    // users will not need to specify the path to tika themselves.
-    $path = realpath($_SERVER['DOCUMENT_ROOT'] . $form_state['values']['search_api_attachments_tika_path']);
+    $path = realpath($form_state['values']['search_api_attachments_tika_path']);
     $tika = $path . '/' . $form_state['values']['search_api_attachments_tika_jar'];
     if (!file_exists($tika)) {
       form_set_error('search_api_attachments_tika_path', t('Tika jar file not found at this path.'));
