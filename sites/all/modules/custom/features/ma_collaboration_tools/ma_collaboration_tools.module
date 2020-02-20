@@ -1447,15 +1447,15 @@ function ma_collaboration_tools_block_view($delta = '') {
  */
 function ma_collaboration_tools_documents_sort_form($form, &$form_state) {
   $sort_options = array(
-    'relevance' => t('Search Relevance'),
     'changed' => t('Date Changed'),
     'added' => t('Date Added'),
     'alphabetical' => t('Alphabetical'),
+    'relevance' => t('Search Relevance'),
   );
 
   $form['sort'] = array(
     '#type' => 'select',
-    '#default_value' => isset($_SESSION['documents_custom_sort_order']) ? $_SESSION['documents_custom_sort_order'] : 'relevance',
+    '#default_value' => isset($_SESSION['documents_custom_sort_order']) ? $_SESSION['documents_custom_sort_order'] : 'changed',
     '#options' => $sort_options,
     '#attributes' => array('onchange' => 'this.form.submit();'),
   );
