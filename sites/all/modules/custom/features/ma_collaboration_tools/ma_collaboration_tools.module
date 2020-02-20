@@ -116,18 +116,17 @@ function ma_collaboration_tools_get_all_child_ref_fields() {
 /**
  * Implements hook_node_view().
  */
-function ma_collaboration_tools_node_view($node, $view_mode) {
+function ma_collaboration_tools_node_view($node, $view_mode)
+{
 
   // Update the item privacy text on the parent node view, to make more sense in this context and to hide it if there is only one protocol.
   if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_parent_node_types())) {
     if (count($node->content['og_group_ref'][0]['#items']) < 2) {
       unset($node->content['field_item_privacy_setting'][0]['#markup']);
-    }
-    else {
+    } else {
       if ($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == 'any') {
         $text = 'Item is shared with members that belong to ANY of the above Protocols.';
-      }
-      else {
+      } else {
         $text = 'Item is shared with members that belong to ALL the above Protocols (membership not required for Open Protocols).';
       }
       $node->content['field_item_privacy_setting'][0]['#markup'] = $text;
@@ -159,10 +158,10 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
 
     // For events with a repeating date, add a field label "Next: " for the next event date. This provides info clarification, and makes the next date align with the repeating date description.
     if (strpos($date, '<div class="date-repeat-rule">') !== false) {
-      $closing_div_pos = strpos ($date, '</div>') + 6;
+      $closing_div_pos = strpos($date, '</div>') + 6;
       $rrdiv = substr($date, 0, $closing_div_pos);
       $rest = substr($date, $closing_div_pos);
-      $date =$rrdiv  . '<div class="label-inline">Next:&nbsp;</div>' . $rest;
+      $date = $rrdiv . '<div class="label-inline">Next:&nbsp;</div>' . $rest;
     }
 
   }
@@ -172,6 +171,18 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
 
     // Set the calendarNid to be grabbed by fullcalendar_create's nodeAdd link (when clicking on a date in the calendar).
     drupal_add_js(array('calendarNid' => $node->nid), 'setting');
+
+  }
+
+  // Document Library
+  if ($view_mode == 'full' && $node->type == 'document_library') {
+
+    // If we are viewing search results, there should be no sort option, and it should just sort by search relevance.
+    // Doing this here because we need to hide the whole field group in such cases.
+    $gets = drupal_get_query_parameters();
+    if (array_key_exists('search', $gets)) {
+      unset ($node->content["#fieldgroups"]["group_sort"]);
+    }
 
   }
 }
@@ -1446,16 +1457,18 @@ function ma_collaboration_tools_block_view($delta = '') {
  * Returns the render array for the form.
  */
 function ma_collaboration_tools_documents_sort_form($form, &$form_state) {
+
+
+
   $sort_options = array(
     'changed' => t('Date Changed'),
     'added' => t('Date Added'),
     'alphabetical' => t('Alphabetical'),
-    'relevance' => t('Search Relevance'),
   );
 
   $form['sort'] = array(
     '#type' => 'select',
-    '#default_value' => isset($_SESSION['documents_custom_sort_order']) ? $_SESSION['documents_custom_sort_order'] : 'changed',
+    '#default_value' =>  isset($_SESSION['documents_custom_sort_order']) ? $_SESSION['documents_custom_sort_order'] : 'changed',
     '#options' => $sort_options,
     '#attributes' => array('onchange' => 'this.form.submit();'),
   );
@@ -1481,36 +1494,35 @@ function ma_collaboration_tools_search_api_query_alter($sapi_query) {
   // Custom sorts
   if ($sapi_query->getIndex()->machine_name == 'document_pages') {
 
-    // Sort according to the session var, otherwise fallback to default
-    if (isset($_SESSION['documents_custom_sort_order'])) {
+    // Sort is set to search relevance if currently doing a search, otherwise to whatever the user last sorted by, and if that never happened, to last changed.
+    $gets = drupal_get_query_parameters();
+    $custom_sort = array_key_exists('search', $gets) ? 'relevance' : (isset($_SESSION['documents_custom_sort_order']) ? $_SESSION['documents_custom_sort_order'] : 'changed');
 
-      $custom_sort = $_SESSION['documents_custom_sort_order'];
+    // Unset existing sorts
+    $sort =& $sapi_query->getSort();
+    $sort = array();
 
-      // Unset existing sorts
-      $sort =& $sapi_query->getSort();
-      $sort = array();
+    // Sort map
+    $sort_map = array(
+      'alphabetical' => array(
+        'sort' => 'title',
+        'direction' => 'ASC'
+      ),
+      'changed' => array(
+        'sort' => 'changed',
+        'direction' => 'DESC'
+      ),
+      'added' => array(
+        'sort' => 'created',
+        'direction' => 'DESC'
+      ),
+      'relevance' => array(
+        'sort' => 'search_api_relevance',
+        'direction' => 'DESC'
+      ),
+    );
+    $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_map[$custom_sort]['direction']);
 
-      // Sort map
-      $sort_map = array(
-        'alphabetical' => array(
-          'sort' => 'title',
-          'direction' => 'ASC'
-        ),
-        'changed' => array(
-          'sort' => 'changed',
-          'direction' => 'DESC'
-        ),
-        'added' => array(
-          'sort' => 'created',
-          'direction' => 'DESC'
-        ),
-        'relevance' => array(
-          'sort' => 'search_api_relevance',
-          'direction' => 'DESC'
-        ),
-      );
-      $sapi_query->sort($sort_map[$custom_sort]['sort'], $sort_map[$custom_sort]['direction']);
-
-    }
   }
 }
+
