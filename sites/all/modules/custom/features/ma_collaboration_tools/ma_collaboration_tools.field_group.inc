@@ -303,33 +303,6 @@ function ma_collaboration_tools_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
-  $field_group->identifier = 'group_documents|node|document_library|full';
-  $field_group->group_name = 'group_documents';
-  $field_group->entity_type = 'node';
-  $field_group->bundle = 'document_library';
-  $field_group->mode = 'full';
-  $field_group->parent_name = '';
-  $field_group->data = array(
-    'label' => 'Documents',
-    'weight' => '7',
-    'children' => array(
-      0 => 'generic_dynamic_field_2',
-    ),
-    'format_type' => 'fieldset',
-    'format_settings' => array(
-      'formatter' => 'collapsible',
-      'instance_settings' => array(
-        'description' => '',
-        'classes' => 'group-documents field-group-fieldset',
-        'id' => '',
-      ),
-    ),
-  );
-  $field_groups['group_documents|node|document_library|full'] = $field_group;
-
-  $field_group = new stdClass();
-  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
-  $field_group->api_version = 1;
   $field_group->identifier = 'group_event_details|node|event|full';
   $field_group->group_name = 'group_event_details';
   $field_group->entity_type = 'node';
@@ -638,7 +611,6 @@ function ma_collaboration_tools_field_group_info() {
   t('Access');
   t('Actions');
   t('Date Created');
-  t('Documents');
   t('Event Details');
   t('Following');
   t('Search');
