@@ -1,0 +1,36 @@
+diff --git a/search_api_attachments.module b/search_api_attachments.module
+index b9fd617..e2c48dd 100644
+--- a/search_api_attachments.module
++++ b/search_api_attachments.module
+@@ -47,18 +47,19 @@ function search_api_attachments_help($path, $arg) {
+ /**
+  * Implements hook_menu().
+  */
+-function search_api_attachments_menu() {
+-  $items['admin/config/search/search_api/attachments'] = array(
+-    'title' => 'Search API attachments',
+-    'description' => 'Search through file content',
+-    'page callback' => 'drupal_get_form',
+-    'page arguments' => array('search_api_attachments_settings_form'),
+-    'access arguments' => array('administer search_api'),
+-    'file' => 'search_api_attachments.admin.inc',
+-    'type' => MENU_LOCAL_TASK,
+-  );
+-  return $items;
+-}
++// Mukurtu patch - disable the config form for search_api_attachments. We do not want this to be user-facing.
++//function search_api_attachments_menu() {
++//  $items['admin/config/search/search_api/attachments'] = array(
++//    'title' => 'Search API attachments',
++//    'description' => 'Search through file content',
++//    'page callback' => 'drupal_get_form',
++//    'page arguments' => array('search_api_attachments_settings_form'),
++//    'access arguments' => array('administer search_api'),
++//    'file' => 'search_api_attachments.admin.inc',
++//    'type' => MENU_LOCAL_TASK,
++//  );
++//  return $items;
++//}
+ 
+ /**
+  * Implements hook_views_api().

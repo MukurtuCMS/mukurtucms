@@ -175,6 +175,8 @@ projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-f
 ;;; Search API Attachments
 ; Prepend the document root to the tika path
 projects[search_api_attachments][patch][] = contrib/prepend_document_root_to_tika_path.patch
+; Disable the config form for Search API Attachments
+projects[search_api_attachments][patch][] = contrib/disable_config_form.patch
 
 ;;; Search API DB
 ; Change Seach API DB to pull regex from Search API
