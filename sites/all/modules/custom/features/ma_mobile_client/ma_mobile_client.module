@@ -1189,12 +1189,17 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_
   $ds_fields = ds_get_field_settings('node', $content_type, 'mukurtu_mobile');
   foreach ($ds_fields as $ds_field => $ds_field_properties) {
     if (substr($ds_field, 0, 10) == 'extracted_') {
+      $ct_abb_type_map = [
+        'dh' => 'digital_heritage',
+        'dw' => 'dictionary_word',
+        'wl' => 'word_list'
+      ];
       $formatted_properties = [
         'type' => 'field',
         'label' => $ds_field_properties["formatter_settings"]["ft"]["lb"],
         'weight' => $ds_field_properties['weight'],
         'custom_ds_field' => TRUE,
-        'extracted' => TRUE, // this would change if we add non extracted custom DS fields.
+        'extracted_type' => $ct_abb_type_map[substr($ds_field, 10, 2)], // this would be ommitted if we add non extracted custom DS fields.
       ];
       $field_info[$ds_field] = $formatted_properties;
     }
