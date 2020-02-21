@@ -1,0 +1,31 @@
+diff --git a/includes/callback_attachments_settings.inc b/includes/callback_attachments_settings.inc
+index 16077c1..f354eec 100644
+--- a/includes/callback_attachments_settings.inc
++++ b/includes/callback_attachments_settings.inc
+@@ -287,9 +287,9 @@ class SearchApiAttachmentsAlterSettings extends SearchApiAbstractAlterCallback {
+       if (in_array($file['filemime'], $this->textMimetypes())) {
+         $extraction = $this->extractSimple($file);
+       }
+-      elseif (in_array($file['filemime'], $this->imageMimetypes())) {
+-        $extraction = $this->extractExif($file);
+-      }
++      // Mukurtu patch - OCR.
++      // Run image files through tika for OCR (since tesseract is installed and called by tika),
++      // Once that's done, also run them through the image exif extractor and prepend the exif data (if any) to the OCR extraction.
+       else {
+         $extraction_method = variable_get('search_api_attachments_extract_using', 'tika');
+         // Send the extraction request to the right place depending on the
+@@ -319,6 +319,13 @@ class SearchApiAttachmentsAlterSettings extends SearchApiAbstractAlterCallback {
+         else {
+           $extraction = $this->extractSolr($file);
+         }
++        // Mukurtu patch - OCR (cont).
++        // This is where we prepend the image exif extraction (was formerly mutually exclusive from the tika extraction)
++        if (in_array($file['filemime'], $this->imageMimetypes())) {
++          if ($image_exif_data = $this->extractExif($file)) {
++            $extraction = $extraction . "\n\n" . $this->extractExif($file);
++          }
++        }
+       }
+     }
+     else {
