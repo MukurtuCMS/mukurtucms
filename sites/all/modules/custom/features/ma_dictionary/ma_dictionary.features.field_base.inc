@@ -119,7 +119,7 @@ function ma_dictionary_field_default_field_bases() {
     'settings' => array(
       'allowed_values' => array(),
       'allowed_values_function' => 'ma_dictionary_collation_locale_options',
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'list_text',
@@ -348,7 +348,7 @@ function ma_dictionary_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'translatable' => 0,
     'type' => 'taxonomy_term_reference',
@@ -497,9 +497,6 @@ function ma_dictionary_field_default_field_bases() {
       'handler' => 'views',
       'handler_settings' => array(
         'behaviors' => array(
-          'treeable_behavior' => array(
-            'status' => 0,
-          ),
           'views-select-list' => array(
             'status' => 0,
           ),
