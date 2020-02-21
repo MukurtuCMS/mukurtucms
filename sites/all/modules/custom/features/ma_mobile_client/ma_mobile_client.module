@@ -1178,88 +1178,119 @@ function _ma_mobile_client_get_node_view_fields ($fn, $content_type, $skip_type_
     }
   }
 
+  /////////////////////////////////////
   // Add fields to the structured view.
+  /////////////////////////////////////
+
   $field_info = field_info_instances('node', $content_type);
+
+  // Special adding of custom DS fields (these do not get picked up by field_info_instances().
+  // So far just using this for the extracted_??_from_relationships fields.
+  $ds_fields = ds_get_field_settings('node', $content_type, 'mukurtu_mobile');
+  foreach ($ds_fields as $ds_field => $ds_field_properties) {
+    if (substr($ds_field, 0, 10) == 'extracted_') {
+      $formatted_properties = [
+        'type' => 'field',
+        'label' => $ds_field_properties["formatter_settings"]["ft"]["lb"],
+        'weight' => $ds_field_properties['weight'],
+        'custom_ds_field' => TRUE,
+        'extracted' => TRUE, // this would change if we add non extracted custom DS fields.
+      ];
+      $field_info[$ds_field] = $formatted_properties;
+    }
+  }
+
   foreach ($field_info as $field => $field_properties) {
-    $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties);
-    if (!$field_array) {
-      continue;
+
+    if ($field_properties['custom_ds_field']) {
+      $field_array = $field_properties;
     }
+    else {
+      $field_array = _ma_mobile_client_build_field_arrays_from_field_properties($field_properties);
 
-    switch ($field_array["view_mode_properties"]["type"]) {
-
-      // For rendered entity fields (eg. Lesson nodes with Unit Plan),
-      // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
-      case 'entityreference_entity_view':
-
-        $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
-        if (count($target_bundles) > 1) {
-          return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
-        }
-        $field_array['fields'] = _ma_mobile_client_get_node_view_fields('retrieve', reset($target_bundles), TRUE);
-        break;
-
-      // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
-      case 'paragraphs_view':
-        $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
-        $select_bundles = [];
-        foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
-          if ($allowed_bundle_key === $allowed_bundle_value) {
-            $select_bundles[] = $allowed_bundle_value;
-          }
-        }
-        if (count($select_bundles) > 1) {
-          return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
-        }
-        $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
-        foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
-          $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
-          if (!$paragraph_field_array) {
-            continue;
-          }
-          $field_array['fields'][$paragraph_field] = $paragraph_field_array;
-        }
-        break;
-
-      // For field collections, loop through its fields and add them as fields on the field collection field.
-      case 'field_collection_view':
-        $fc_fields = field_info_instances('field_collection_item', $field);
-        foreach ($fc_fields as $fc_field => $fc_field_properties) {
-          $fc_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($fc_field_properties);
-          if (!$fc_field_array) {
-            continue;
-          }
-          $field_array['fields'][$fc_field] = $fc_field_array;
-        }
-        break;
-
-    }
-
-    // For scald fields, add its metadata fields, keyed by scald type.
-    if ($field_array["view_mode_properties"]["module"] == 'atom_reference') {
-      $referencable_types = $field_array["other_properties"]["settings"]["referencable_types"];
-      $referenced_types = [];
-      foreach ($referencable_types as $referencable_type_key => $referencable_type_value) {
-        if ($referencable_type_key === $referencable_type_value) {
-          $referenced_types[] = $referencable_type_value;
-        }
+      if (!$field_array) {
+        continue;
       }
-      if (count($referenced_types == 0)) {
-        $referenced_types = array_keys($referencable_types); // If none are selected in the field formatter, it actually means all are options.
-      }
-      foreach ($referenced_types as $referenced_type) {
-        $referenced_type_field_groups = field_group_info_groups('scald_atom', $referenced_type, $field_array["view_mode_properties"]["type"]);
-        if (!$scald_metadata_fields = $referenced_type_field_groups["group_scald_atom_metadata"]->children) {
-          return 'Error: the content type has a scald field with a scald view mode that needs a "Metadata" fieldgroup.';
-        }
-        $atom_fields_per_type = field_info_instances('scald_atom', $referenced_type);
-        foreach ($atom_fields_per_type as $atom_field => $atom_field_properties) {
-          if (in_array($atom_field, $scald_metadata_fields)) {
-            $atom_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($atom_field_properties, $field_array["view_mode_properties"]["type"], 'scald_atom');
-            if (!$atom_field_array) {
+
+      switch ($field_array["view_mode_properties"]["type"]) {
+
+        // For rendered entity fields (eg. Lesson nodes with Unit Plan),
+        // self-call this function to build fields for the referenced type, and append them as fields to the rendered entity field.
+        case 'entityreference_entity_view':
+
+          $target_bundles = $field_array["base_field_properties"]["settings"]["handler_settings"]["target_bundles"];
+          if (count($target_bundles) > 1) {
+            return "Error: need to add handling for multiple target bundles for rendered entity field " . $field;
+          }
+          $field_array['fields'] = _ma_mobile_client_get_node_view_fields('retrieve', reset($target_bundles), TRUE);
+          break;
+
+        // For paragraphs, loop through its bundle fields and add them as fields within the paragraph.
+        case 'paragraphs_view':
+          $allowed_bundles = $field_properties["settings"]["allowed_bundles"];
+          $select_bundles = [];
+          foreach ($allowed_bundles as $allowed_bundle_key => $allowed_bundle_value) {
+            if ($allowed_bundle_key === $allowed_bundle_value) {
+              $select_bundles[] = $allowed_bundle_value;
+            }
+          }
+          if (count($select_bundles) > 1) {
+            return 'Error: ' . $field . ' has more than 1 selected bundle. _ma_mobile_client_get_node_view_fields() needs to be updated for this.';
+          }
+          $paragraph_fields = field_info_instances('paragraphs_item', $select_bundles[0]);
+          foreach ($paragraph_fields as $paragraph_field => $paragraph_field_properties) {
+            $paragraph_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($paragraph_field_properties);
+            if (!$paragraph_field_array) {
               continue;
             }
-            $field_array['atom_metadata_fields'][$referenced_type][$atom_field] = $atom_field_array;
+            $field_array['fields'][$paragraph_field] = $paragraph_field_array;
+          }
+          break;
+
+        // For field collections, loop through its fields and add them as fields on the field collection field.
+        case 'field_collection_view':
+          $fc_fields = field_info_instances('field_collection_item', $field);
+          foreach ($fc_fields as $fc_field => $fc_field_properties) {
+            $fc_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($fc_field_properties);
+            if (!$fc_field_array) {
+              continue;
+            }
+            $field_array['fields'][$fc_field] = $fc_field_array;
+          }
+          break;
+
+        default:
+          // Don't do anything with these for now.
+          break;
+
+      }
+
+      // For scald fields, add its metadata fields, keyed by scald type.
+      if ($field_array["view_mode_properties"]["module"] == 'atom_reference') {
+        $referencable_types = $field_array["other_properties"]["settings"]["referencable_types"];
+        $referenced_types = [];
+        foreach ($referencable_types as $referencable_type_key => $referencable_type_value) {
+          if ($referencable_type_key === $referencable_type_value) {
+            $referenced_types[] = $referencable_type_value;
+          }
+        }
+        if (count($referenced_types == 0)) {
+          $referenced_types = array_keys($referencable_types); // If none are selected in the field formatter, it actually means all are options.
+        }
+        foreach ($referenced_types as $referenced_type) {
+          $referenced_type_field_groups = field_group_info_groups('scald_atom', $referenced_type, $field_array["view_mode_properties"]["type"]);
+          if (!$scald_metadata_fields = $referenced_type_field_groups["group_scald_atom_metadata"]->children) {
+            return 'Error: the content type has a scald field with a scald view mode that needs a "Metadata" fieldgroup.';
+          }
+          $atom_fields_per_type = field_info_instances('scald_atom', $referenced_type);
+          foreach ($atom_fields_per_type as $atom_field => $atom_field_properties) {
+            if (in_array($atom_field, $scald_metadata_fields)) {
+              $atom_field_array = _ma_mobile_client_build_field_arrays_from_field_properties($atom_field_properties, $field_array["view_mode_properties"]["type"], 'scald_atom');
+              if (!$atom_field_array) {
+                continue;
+              }
+              $field_array['atom_metadata_fields'][$referenced_type][$atom_field] = $atom_field_array;
+            }
           }
         }
       }
