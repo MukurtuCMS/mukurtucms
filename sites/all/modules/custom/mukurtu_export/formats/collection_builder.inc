@@ -129,12 +129,13 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
       'title' => 'title',
       'creator' => 'field_creator',
       'description' => 'field_description',
-      'subject' => 'field_category',
       'location' => 'field_coverage_description',
       'source' => 'field_source',
       'original_identifier' => 'field_identifier',
       'rights' => 'field_rights',
       'rightsstatement' => 'field_licence_std_cc',
+      'type' => 'field_dh_type',
+      'language' => 'field_language',
     );
 
     // Process all fields that are basically one-to-one mappings.
@@ -152,6 +153,24 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
       // date.
       if (!empty($encoded_content['node']['digital_heritage']["field_original_date"][$dh_key])) {
         $encoded_content['node']['digital_heritage']["{$prefix}date"][$dh_key] = $encoded_content['node']['digital_heritage']["field_original_date"][$dh_key][0];
+      }
+
+      // Combine category and keywords into subject.
+      $category = array();
+      $keywords = array();
+
+      if (!empty($encoded_content['node']['digital_heritage']["field_category"][$dh_key])) {
+        $category = $encoded_content['node']['digital_heritage']["field_category"][$dh_key];
+      }
+
+      if (!empty($encoded_content['node']['digital_heritage']["field_tags"][$dh_key])) {
+        $keywords = $encoded_content['node']['digital_heritage']["field_tags"][$dh_key];
+      }
+
+      $subject = array_merge($category, $keywords);
+
+      if (!empty($subject)) {
+        $encoded_content['node']['digital_heritage']["{$prefix}subject"][$dh_key] = $subject;
       }
 
       // Media.
