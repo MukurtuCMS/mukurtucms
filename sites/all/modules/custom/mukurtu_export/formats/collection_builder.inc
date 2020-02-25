@@ -11,8 +11,7 @@ function mukurtu_export_collection_builder_settings($form, $form_state) {
     '#type' => 'fieldset',
     '#title' => t('Mukurtu CollectionBuilder Export Settings'),
     '#description' => t(
-     'Select how your csv output will be formatted.
-     By default this is configured to output files compatible with the Mukurtu importers.
+     'This is a placeholder for a future CollectionBuilder config form.
      '
     ),
     '#collapsible' => TRUE,
