@@ -134,6 +134,7 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
       'source' => 'field_source',
       'original_identifier' => 'field_identifier',
       'rights' => 'field_rights',
+      'rightsstatement' => 'field_licence_std_cc',
     );
 
     // Process all fields that are basically one-to-one mappings.
