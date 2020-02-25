@@ -263,7 +263,7 @@ function mukurtu_export_extract_value($entity_type, $field_name, $value, $option
  * Defines the VBO for Mukurtu Export
  */
 function mukurtu_export_action_info() {
-  return [
+  $vbo_actions = [
     'mukurtu_export_action' => [
       'type' => 'entity',
       'label' => t('Mukurtu CSV Export'),
@@ -273,6 +273,17 @@ function mukurtu_export_action_info() {
       'triggers' => ['any'],
     ],
   ];
+
+  $vbo_actions['mukurtu_export_collection_builder_action'] = array(
+    'type' => 'entity',
+    'label' => t('Mukurtu CSV Export for CollectionBuilder'),
+    'behavior' => ['views_property'],
+    'configurable' => FALSE,
+    'vbo_configurable' => TRUE,
+    'triggers' => ['any'],
+  );
+
+  return $vbo_actions;
 }
 
 /**
@@ -318,6 +329,60 @@ function mukurtu_export_action(&$entity, $context) {
   $entity_wrapper = entity_metadata_wrapper($entity_type, $entity);
   $entities = [$entity_type => [$entity->type => [$entity_wrapper->getIdentifier() => $entity]]];
   $_SESSION['mukurtu_export_csv_vbo'] = mukurtu_export_csv_export($entities, $context['export_fields'], $context['csv']['settings']);
+
+  // Batch run complete, show link to download the file
+  if ($context['progress']['current'] == $context['progress']['total']) {
+    $zip_file = $_SESSION['mukurtu_export_csv_vbo'];
+    $download_link = file_create_url($zip_file->uri);
+    $message = t('Download your exported items: <div class="btn btn-default form-submit"><a href="@downloadlink">Download</a></div>', ['@downloadlink' => $download_link]);
+    unset($_SESSION['mukurtu_export_csv_vbo']);
+    drupal_set_message($message);
+  }
+}
+
+/**
+ * VBO form function for CollectionBuilder export.
+ */
+function mukurtu_export_collection_builder_action_form($settings, &$form_state) {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
+
+  $form_state['mukurtu_export']['is_batch'] = TRUE;
+  $form_state['mukurtu_export']['formatter'] = 'collection_builder';
+  return drupal_retrieve_form('mukurtu_export_form', $form_state);
+}
+
+/**
+ * VBO form submit function for CollectionBuilder export.
+ */
+function mukurtu_export_collection_builder_action_submit($form, $form_state) {
+  $settings = [];
+  $settings['export_fields'] = $form_state['input']['export_fields'];
+  $settings['csv']['settings'] = $form_state['input']['csv'];
+  return $settings;
+}
+
+/**
+ * VBO action for CollectionBuilder export.
+ */
+function mukurtu_export_collection_builder_action(&$entity, $context) {
+  module_load_include('inc', 'mukurtu_export', 'mukurtu_export.pages');
+  module_load_include('inc', 'mukurtu_export', 'formats/collection_builder');
+
+  // Start of batch run, start with an empty result set
+  if ($context['progress']['current'] == 1) {
+    $_SESSION['mukurtu_export_csv_vbo'] = [];
+  }
+
+  // Batch settings to pass to CSV exporter
+  $context['csv']['settings']['batch_current'] = $context['progress']['current'];
+  $context['csv']['settings']['batch_total'] = $context['progress']['total'];
+  $context['csv']['settings']['batch_previous'] = $_SESSION['mukurtu_export_csv_vbo'];
+
+  // Export current entity
+  $entity_type = _mukurtu_export_entity_type($entity);
+  $entity_wrapper = entity_metadata_wrapper($entity_type, $entity);
+  $entities = [$entity_type => [$entity->type => [$entity_wrapper->getIdentifier() => $entity]]];
+  $_SESSION['mukurtu_export_csv_vbo'] = mukurtu_export_collection_builder_export($entities, $context['export_fields'], $context['csv']['settings']);
 
   // Batch run complete, show link to download the file
   if ($context['progress']['current'] == $context['progress']['total']) {

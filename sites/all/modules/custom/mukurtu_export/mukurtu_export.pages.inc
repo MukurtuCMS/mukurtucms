@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Form for export
+ * Form for export.
  */
 function mukurtu_export_form($form, &$form_state) {
   $export_ids = isset($form_state['mukurtu_export']['export_ids']) ? $form_state['mukurtu_export']['export_ids'] : NULL;
@@ -9,50 +9,49 @@ function mukurtu_export_form($form, &$form_state) {
   $formatter_settings = isset($form_state['mukurtu_export']['formatter_settings']) ? $form_state['mukurtu_export']['formatter_settings'] : NULL;
   $field_list = isset($form_state['mukurtu_export']['export_fields']) ? $form_state['mukurtu_export']['export_fields'] : NULL;
   $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
-  //$is_batch = (isset($form_state['input']['op']) && $form_state['input']['op'] == 'Execute') ? TRUE : FALSE;
 
-  if(!$is_batch && is_null($export_ids)){
-      $current_node = menu_get_object();
-      if($current_node) {
-          $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
-      } else {
-          $args = arg();
-          if($args[0] == 'taxonomy') {
-              $item = menu_get_object('taxonomy_term', 2);
-              $export_ids = array('taxonomy_term' => array($item->vocabulary_machine_name => array($item->tid => $item)));
-          }
-
-          if($args[0] == 'atom') {
-              $item = menu_get_object('scald_atom', 1);
-              $export_ids = array('scald_atom' => array($item->type => array($item->sid => $item)));
-          }
+  if (!$is_batch && is_null($export_ids)) {
+    $current_node = menu_get_object();
+    if ($current_node) {
+      $export_ids = array('node' => array($current_node->type => array($current_node->nid => $current_node)));
+    } else {
+      $args = arg();
+      if ($args[0] == 'taxonomy') {
+        $item = menu_get_object('taxonomy_term', 2);
+        $export_ids = array('taxonomy_term' => array($item->vocabulary_machine_name => array($item->tid => $item)));
       }
+
+      if ($args[0] == 'atom') {
+        $item = menu_get_object('scald_atom', 1);
+        $export_ids = array('scald_atom' => array($item->type => array($item->sid => $item)));
+      }
+    }
   }
 
-  // No format selected
+  // No format selected.
   $format_handlers = mukurtu_export_format_handlers();
-  // Format not specified or specified format isn't available
-  if(is_null($formatter) || !in_array($formatter, array_keys($format_handlers))) {
-      // Only one available format, default to that
-      if(count($format_handlers) == 1) {
-        $formatter = array_keys($format_handlers)[0];
-        $form_state['mukurtu_export']['formatter'] = $formatter;
-      } else {
-        // Multiple formats, show selection form
-        return mukurtu_export_format_selection_form($form, $form_state, $format_handlers);
-      }
+  // Format not specified or specified format isn't available.
+  if (is_null($formatter) || !in_array($formatter, array_keys($format_handlers))) {
+    // Only one available format, default to that.
+    if (count($format_handlers) == 1) {
+      $formatter = array_keys($format_handlers)[0];
+      $form_state['mukurtu_export']['formatter'] = $formatter;
+    } else {
+      // Multiple formats, show selection form.
+      return mukurtu_export_format_selection_form($form, $form_state, $format_handlers);
+    }
   }
 
-  // Load formatter code
+  // Load formatter code.
   include_once $format_handlers[$formatter]['#file'];
 
-  // Format selected, need formatter settings
-  if(is_null($formatter_settings)) {
-    // Get settings form for formatter
-    if(isset($format_handlers[$formatter]['#settings_callback']) && function_exists($format_handlers[$formatter]['#settings_callback'])) {
+  // Format selected, need formatter settings.
+  if (is_null($formatter_settings)) {
+    // Get settings form for formatter.
+    if (isset($format_handlers[$formatter]['#settings_callback']) && function_exists($format_handlers[$formatter]['#settings_callback'])) {
       $form['export']['settings'] = call_user_func($format_handlers[$formatter]['#settings_callback'], $form, $form_state);
     }
-    if(!$is_batch) {
+    if (!$is_batch) {
       $form['export_next_step'] = array(
         '#type' => 'submit',
         '#value' => t('Next'),
@@ -61,9 +60,9 @@ function mukurtu_export_form($form, &$form_state) {
     }
   }
 
-  if(is_null($field_list)) {
+  if (is_null($field_list)) {
 
-    if(!$is_batch) {
+    if (!$is_batch) {
       $form['download_file_top'] = array(
         '#type' => 'submit',
         '#value' => t('Download'),
@@ -72,7 +71,7 @@ function mukurtu_export_form($form, &$form_state) {
 
     $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids);
 
-    if(!$is_batch) {
+    if (!$is_batch) {
       $form['download_file_bottom'] = array(
         '#type' => 'submit',
         '#value' => t('Download'),
@@ -81,12 +80,12 @@ function mukurtu_export_form($form, &$form_state) {
     return $form;
   }
 
-  // Batch run, wait to assemble export file
-  if($is_batch) {
+  // Batch run, wait to assemble export file.
+  if ($is_batch) {
     return $form;
   }
 
-  // Non-batch run, export and download exported file
+  // Non-batch run, export and download exported file.
   $download_file = call_user_func($format_handlers[$formatter]['#export_callback'], $export_ids, $field_list, $formatter_settings);
   return mukurtu_export_get_file($download_file);
 }
@@ -102,30 +101,30 @@ function mukurtu_export_get_file($file) {
 
 
 /**
- * Form submit for export
+ * Form submit for export.
  */
 function mukurtu_export_form_submit($form, &$form_state) {
-  // Content to export
+  // Content to export.
   $form_state["rebuild"] = TRUE;
-  if(isset($form_state['values']['export_ids'])) {
+  if (isset($form_state['values']['export_ids'])) {
     $form_state['mukurtu_export']['export_ids'] = $form_state['values']['export_ids'];
   }
 
-  // Formatter
-  if(isset($form_state['values']['export_format'])) {
+  // Formatter.
+  if (isset($form_state['values']['export_format'])) {
     $form_state['mukurtu_export']['formatter'] = $form_state['values']['export_format'];
   }
 
-  // Formatter Settings
-  if(isset($form_state['mukurtu_export']['formatter'])) {
+  // Formatter Settings.
+  if (isset($form_state['mukurtu_export']['formatter'])) {
     $format = $form_state['mukurtu_export']['formatter'];
-    if(isset($form_state['values'][$format])) {
+    if (isset($form_state['values'][$format])) {
       $form_state['mukurtu_export']['formatter_settings'] = $form_state['values'][$format];
     }
   }
 
-  // Field List
-  if(isset($form_state['values']['export_fields'])) {
+  // Field List.
+  if (isset($form_state['values']['export_fields'])) {
     $form_state['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
     $_SESSION['mukurtu_export']['export_fields'] = $form_state['values']['export_fields'];
   }

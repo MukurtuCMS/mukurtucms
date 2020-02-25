@@ -214,7 +214,7 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
 }
 
 /**
- * Packages a CSV array into a Zip archive containing exported CSV files and media
+ * Packages a CSV array into a Zip archive containing exported CSV files and media.
  */
 function mukurtu_export_csv_export_to_zip($encoded_export) {
   $csv_files = array();
@@ -223,17 +223,17 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
   $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
 
-  // These are raw files that we want to include in the Zip
-  if(isset($encoded_export['__files'])) {
-    foreach($encoded_export['__files'] as $binary_file) {
+  // These are raw files that we want to include in the Zip.
+  if (isset($encoded_export['__files'])) {
+    foreach ($encoded_export['__files'] as $binary_file) {
       $zip->addFile(drupal_realpath($binary_file['uri']), $binary_file['filename']);
     }
 
-    // Unset this, so we don't try to further process them
+    // Unset this, so we don't try to further process them.
     unset($encoded_export['__files']);
   }
 
-  // Write all the CSV files and add them to the Zip archive
+  // Write all the CSV files and add them to the Zip archive.
   foreach ($encoded_export as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
       $temp = file_save_data($encoded_export[$entity_type][$bundle_name]);
@@ -251,8 +251,8 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   $zip_handle = fopen($tempfile, 'r');
   $download_file = file_save_data($zip_handle, $destination . $filename, FILE_EXISTS_RENAME);
 
-  // Delete temp files
-  foreach($csv_files as $csv_file) {
+  // Delete temp files.
+  foreach ($csv_files as $csv_file) {
     file_delete($csv_file);
   }
 
@@ -324,29 +324,29 @@ function mukurtu_export_csv_post_encode_entity(&$encoded_content, $entity_key, $
 }
 
 /**
- * Converts the encoded entity array into an array that resembles CSV format
+ * Converts the encoded entity array into an array that resembles CSV format.
  */
 function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $delimiter, $enclosure, $separator, $escape_eol, $multivalue_delimiter) {
   $csv_lines = array();
   $csv_output = array();
 
-  // Remove bookkeeping info
+  // Remove bookkeeping info.
   $encoded_list = $encoded_content['__exported_key_list'];
   unset($encoded_content['__exported_key_list']);
 
-  // Binary files to be handled
-  if(isset($encoded_content['__files'])) {
+  // Binary files to be handled.
+  if (isset($encoded_content['__files'])) {
     $csv_output['__files'] = $encoded_content['__files'];
     unset($encoded_content['__files']);
   }
 
-  foreach(array_keys($encoded_content) as $encoded_entity_type) {
-    foreach(array_keys($encoded_content[$encoded_entity_type]) as $encoded_bundle_name) {
+  foreach (array_keys($encoded_content) as $encoded_entity_type) {
+    foreach (array_keys($encoded_content[$encoded_entity_type]) as $encoded_bundle_name) {
       $csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'] = array_keys($encoded_content[$encoded_entity_type][$encoded_bundle_name]);
 
-      // Convert header field names to friendly labels
-      foreach($csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'] as $k => $v) {
-          $csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'][$k] = _mukurtu_export_csv_get_header_label($encoded_entity_type, $encoded_bundle_name, $v);
+      // Convert header field names to friendly labels.
+      foreach ($csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'] as $k => $v) {
+        $csv_lines[$encoded_entity_type][$encoded_bundle_name]['mukurtu_export_csv_header'][$k] = _mukurtu_export_csv_get_header_label($encoded_entity_type, $encoded_bundle_name, $v);
       }
 
       foreach (array_keys($encoded_content[$encoded_entity_type][$encoded_bundle_name]) as $header_value) {
@@ -364,43 +364,43 @@ function _mukurtu_export_csv_encoded_content_to_csv_array($encoded_content, $del
 
 
 /**
- * Return the header label for a field name in a particular entity/bundle
+ * Return the header label for a field name in a particular entity/bundle.
  */
 function _mukurtu_export_csv_get_header_label($entity_type, $bundle_name, $field_name) {
-    // Check for a feeds importer for this type/bundle
-    $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
-    $mapping = array();
+  // Check for a feeds importer for this type/bundle.
+  $importer = variable_get("mukurtu_export_feeds_{$entity_type}_{$bundle_name}", "mukurtu_import_{$entity_type}_{$bundle_name}");
+  $mapping = array();
 
-    if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => $importer))) {
-        $config = array_shift($config);
-        foreach($config->config['processor']['config']['mappings'] as $map) {
-            $mapping[$map['target']] = $map['source'];
-        }
+  if ($config = ctools_export_load_object('feeds_importer', 'conditions', array('id' => $importer))) {
+    $config = array_shift($config);
+    foreach ($config->config['processor']['config']['mappings'] as $map) {
+      $mapping[$map['target']] = $map['source'];
     }
+  }
 
-    // If we have a feeds importer setup, try to use the expected import headers as the export headers
-    if(!empty($mapping)) {
-        foreach($mapping as $import_field_name => $import_field_label) {
-            if(strpos($import_field_name, $field_name) !== FALSE) {
-                return $import_field_label;
-            }
-        }
+  // If we have a feeds importer setup, try to use the expected import headers as the export headers.
+  if (!empty($mapping)) {
+    foreach ($mapping as $import_field_name => $import_field_label) {
+      if (strpos($import_field_name, $field_name) !== FALSE) {
+        return $import_field_label;
+      }
     }
+  }
 
-    // Otherwise, default to using the label of the field
-    if($field_name == 'title') {
-        $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
-        $title_label = $extra_fields['title']['label'];
-        return $title_label;
-    }
+  // Otherwise, default to using the label of the field.
+  if ($field_name == 'title') {
+    $extra_fields = field_info_extra_fields($entity_type, $bundle_name, 'form');
+    $title_label = $extra_fields['title']['label'];
+    return $title_label;
+  }
 
-    $info = field_info_instance($entity_type, $field_name, $bundle_name);
-    if(!$info) {
-        return $field_name;
-    }
+  $info = field_info_instance($entity_type, $field_name, $bundle_name);
+  if (!$info) {
+    return $field_name;
+  }
 
-    $label = $info['label'];
-    return $label;
+  $label = $info['label'];
+  return $label;
 }
 
 /**
