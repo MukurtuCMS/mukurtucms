@@ -129,9 +129,8 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
       'mukurtu-id' => 'nid',
       'title' => 'title',
       'creator' => 'field_creator',
-      'date' => 'field_date',
       'description' => 'field_description',
-      'subject' => 'field_subject',
+      'subject' => 'field_category',
       'location' => 'field_coverage_description',
       'source' => 'field_source',
       'original_identifier' => 'field_identifier',
@@ -140,7 +139,9 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
 
     // Process all fields that are basically one-to-one mappings.
     foreach ($direct_mapped_fields as $cb_field => $m_field) {
-      $encoded_content['node']['digital_heritage']["{$prefix}{$cb_field}"] = $encoded_content['node']['digital_heritage'][$m_field];
+      if (!empty($encoded_content['node']['digital_heritage'][$m_field])) {
+        $encoded_content['node']['digital_heritage']["{$prefix}{$cb_field}"] = $encoded_content['node']['digital_heritage'][$m_field];
+      }
     }
 
     // Process fields that require some logic.
@@ -148,24 +149,42 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
       // objectid.
       $encoded_content['node']['digital_heritage']["{$prefix}objectid"][$dh_key] = "coll" . str_pad(strval($i++), $digits, "0", STR_PAD_LEFT);
 
+      // date.
+      if (!empty($encoded_content['node']['digital_heritage']["field_original_date"][$dh_key])) {
+        $encoded_content['node']['digital_heritage']["{$prefix}date"][$dh_key] = $encoded_content['node']['digital_heritage']["field_original_date"][$dh_key][0];
+      }
+
       // Media.
       if (!empty($encoded_content['node']['digital_heritage']["field_media_asset"][$dh_key][0])) {
         $sid = $encoded_content['node']['digital_heritage']["field_media_asset"][$dh_key][0];
         $atom = scald_atom_load($sid);
+
         if ($atom) {
           // mediasource.
           $media_source = $encoded_content['scald_atom'][$atom->type]['file_source']["scald_atom__{$atom->type}_{$sid}"][0];
           $encoded_content['node']['digital_heritage']["{$prefix}mediasource"][$dh_key] = $media_source;
 
-          // thumbnail.
-          $encoded_content['node']['digital_heritage']["{$prefix}thumbnail"][$dh_key] = image_style_url('thumbnail', $atom->file_source);
-
-          // small_image.
-          $encoded_content['node']['digital_heritage']["{$prefix}small_image"][$dh_key] = image_style_url('medium', $atom->file_source);
+          // thumbnail/small_image.
+          if ($atom->type == 'image') {
+            $encoded_content['node']['digital_heritage']["{$prefix}thumbnail"][$dh_key] = image_style_url('thumbnail', $atom->file_source);
+            $encoded_content['node']['digital_heritage']["{$prefix}small_image"][$dh_key] = image_style_url('medium', $atom->file_source);
+          } else {
+            $encoded_content['node']['digital_heritage']["{$prefix}thumbnail"][$dh_key] = image_style_url('thumbnail', $atom->thumbnail_source);
+            $encoded_content['node']['digital_heritage']["{$prefix}small_image"][$dh_key] = image_style_url('medium', $atom->thumbnail_source);
+          }
 
           // format.
           if (isset($atom->base_entity->filemime)) {
-            $encoded_content['node']['digital_heritage']["{$prefix}format"][$dh_key] = $atom->base_entity->filemime;
+            if ($atom->base_entity->filemime == 'audio/mpeg' && substr_compare(strtolower($atom->file_source), 'mp3', -3) === 0) {
+              // CollectionBuilder wants 'audio/mp3' rather than 'audio/mpeg'.
+              $encoded_content['node']['digital_heritage']["{$prefix}format"][$dh_key] = 'audio/mp3';
+            } else {
+              $encoded_content['node']['digital_heritage']["{$prefix}format"][$dh_key] = $atom->base_entity->filemime;
+            }
+          } else {
+            if ($atom->type == 'video' && substr_compare(strtolower($atom->file_source), 'mp4', -3) === 0) {
+              $encoded_content['node']['digital_heritage']["{$prefix}format"][$dh_key] = 'video/mp4';
+            }
           }
         }
       }
