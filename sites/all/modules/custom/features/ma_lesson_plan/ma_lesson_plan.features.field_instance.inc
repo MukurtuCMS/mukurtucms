@@ -838,7 +838,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea_with_summary',
-      'weight' => 2,
+      'weight' => 3,
     ),
   );
 
@@ -925,7 +925,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_embed',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -1030,7 +1030,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'field_collection_embed',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -1103,7 +1103,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -1176,7 +1176,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'text_textarea',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -1341,7 +1341,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 5,
+      'weight' => 6,
     ),
   );
 
@@ -1421,7 +1421,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 9,
+      'weight' => 10,
     ),
   );
 
@@ -1521,7 +1521,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -2186,7 +2186,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -2353,7 +2353,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -2797,7 +2797,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -2885,7 +2885,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -3053,7 +3053,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -3140,7 +3140,7 @@ function ma_lesson_plan_field_default_field_instances() {
     'bundle' => 'unit_plan',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(

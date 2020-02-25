@@ -221,13 +221,13 @@ function ma_lesson_plan_strongarm() {
     'extra_fields' => array(
       'form' => array(
         'title' => array(
-          'weight' => '1',
+          'weight' => '2',
         ),
         'path' => array(
-          'weight' => '11',
+          'weight' => '12',
         ),
         'redirect' => array(
-          'weight' => '10',
+          'weight' => '11',
         ),
       ),
       'display' => array(),
