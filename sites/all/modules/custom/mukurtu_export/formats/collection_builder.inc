@@ -146,7 +146,7 @@ function _mukurtu_export_collection_builder_encoded_content_to_csv_array($encode
     // Process fields that require some logic.
     foreach ($encoded_content['__exported_key_list']['node']['digital_heritage'] as $dh_key => $dh) {
       // objectid.
-      $encoded_content['node']['digital_heritage']["{$prefix}objectid"][$dh_key] = str_pad(strval($i++), $digits, "0", STR_PAD_LEFT);
+      $encoded_content['node']['digital_heritage']["{$prefix}objectid"][$dh_key] = "coll" . str_pad(strval($i++), $digits, "0", STR_PAD_LEFT);
 
       // Media.
       if (!empty($encoded_content['node']['digital_heritage']["field_media_asset"][$dh_key][0])) {
