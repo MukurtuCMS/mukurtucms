@@ -1,0 +1,15 @@
+diff --git a/includes/callback_attachments_settings.inc b/includes/callback_attachments_settings.inc
+index 16077c1..90f64ef 100644
+--- a/includes/callback_attachments_settings.inc
++++ b/includes/callback_attachments_settings.inc
+@@ -413,6 +413,10 @@ class SearchApiAttachmentsAlterSettings extends SearchApiAbstractAlterCallback {
+     // Force running the Tika jar headless.
+     $param = ' -Djava.awt.headless=true ' . $param;
+ 
++    // Mukurtu patch - Tika calls Tesseract without specifying a path, so we need to let the server know where it can find Tesseract.
++    // Otherwise tessaract will not run when called from the web server, only from the command line (via drush sapi-i).
++    set_include_path(variable_get('tesseract_path', '/usr/local/bin/'));
++
+     $cmd = variable_get('search_api_attachments_java', 'java') . $param . ' -jar ' . escapeshellarg($tika) . ' -t ' . escapeshellarg($filepath);
+     if (strpos(ini_get('extension_dir'), 'MAMP/')) {
+       $cmd = 'export DYLD_LIBRARY_PATH=""; ' . $cmd;

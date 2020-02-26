@@ -108,6 +108,21 @@ function ma_splash_manage_collaboration_tools($form, &$form_state) {
     '#title' => t('<h4>Enable Collaboration Tools</h4><p>You are free to check or uncheck this without content loss -- collaboration content created while Collaboration Tools is enabled is not deleted if Collaboration Tools is subsequently disabled. Instead it just becomes hidden/inaccessible. Re-enabling Collaboration Tools will reinstate the content.</p>'),
     '#default_value' => variable_get('collab_tools_enabled'),
   ];
+
+  $form['gmaps_api_key'] = [
+    '#type' => 'textfield',
+    '#title' => t('Google Maps API Key (optional)'),
+    '#description' => t('For the map to show on events, obtain a Google Maps Javascript API key at <a href="@link">@link</a> and paste it here.', [
+      '@link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key',
+    ]),
+    '#default_value' => variable_get('geofield_map_google_apikey', ''),
+    '#states' => [
+      'visible' => [
+        ':input[name="collab_tools_enabled"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+
   $form['configure'] = [
     '#type' => 'fieldset',
     '#title' => t('Configure Email Notifications'),
@@ -154,18 +169,28 @@ function ma_splash_manage_collaboration_tools($form, &$form_state) {
     '#markup' => t('3. For replying via email to comments to work, and for daily and weekly email notification digests to work, a cron job needs to be set up to run on the site. Drupal\'s "automatic cron" method is not sufficient for this. Instead, have your system administrator set up a cron job (or use a cron service) as explained as the "second way" at ' . l('drupal.org', 'https://www.drupal.org/docs/7/setting-up-cron/overview') . '. Comments are imported from email replies on every cron run, so a frequency of at least every 5 minutes is recommended. There is no need to disable automatic cron.'),
   ];
 
-  $form['gmaps_api_key'] = [
-    '#type' => 'textfield',
-    '#title' => t('Google Maps API Key (optional)'),
-    '#description' => t('For the map to show on events, obtain a Google Maps Javascript API key at <a href="@link">@link</a> and paste it here.', [
-      '@link' => 'https://developers.google.com/maps/documentation/javascript/get-api-key',
-    ]),
-    '#default_value' => variable_get('geofield_map_google_apikey', ''),
+  $form['attachments'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Searching Document Page Attachments'),
     '#states' => [
       'visible' => [
         ':input[name="collab_tools_enabled"]' => ['checked' => TRUE],
       ],
     ],
+  ];
+  $form['attachments']['1'] = [
+    '#type' => 'item',
+    '#markup' => t('1. Document Page attachments of text-based PDFs are searchable, as long as the server has Java installed. If you are not getting expected search results for text-based PDFs attached to a Document Page, contact your system administrator and/or webhost to ensure that Java is installed.'),
+  ];
+  $form['attachments']['2'] = [
+    '#type' => 'item',
+    '#markup' => t("2. Document Page attachments of scanned text documents in image-based PDFs or image files are also searchable, once your server administrator / webhost installs Tesseract, an optical character recognition program. Instructions for doing so are " . l ('here', 'https://tesseract-ocr.github.io/tessdoc/Home.html') . ". English is already included in the default install, and the Tesseract binary is available in common repositories, so this would normally be as easy as running one command to add the repository, and another to install it. A typical installation will result in its executable being in the '/usr/local/bin/' path. If however, tesseract is not located in that path, specify its path here. Include the directory, but exclude the executable itself. Include both preceeding and trailing slashes:"),
+  ];
+  $form['attachments']['tesseract_path'] = [
+    '#type' => 'textfield',
+    '#title' => t('Tesseract Path'),
+    '#description' => t('A typical Tesseract'),
+    '#default_value' => variable_get('tesseract_path', '/usr/local/bin/')
   ];
 
   $form['submit_button'] = [

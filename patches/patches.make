@@ -177,6 +177,8 @@ projects[search_api][patch][] = https://www.drupal.org/files/issues/search_api-f
 projects[search_api_attachments][patch][] = contrib/prepend_document_root_to_tika_path.patch
 ; Disable the config form for Search API Attachments
 projects[search_api_attachments][patch][] = contrib/disable_config_form.patch
+; Set tesseract path before calling tika.
+projects[search_api_attachments][patch][] = contrib/set_tesseract_path_before_calling_tika.patch
 ; Run images through tika and tesseract for OCR extraction.
 projects[search_api_attachments][patch][] = contrib/run_images_through_tika_tesseract_for_ocr.patch
 ; Extract images out of PDFs so that they get run through OCR.

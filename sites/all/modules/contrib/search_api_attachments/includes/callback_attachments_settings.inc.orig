@@ -426,9 +426,7 @@ class SearchApiAttachmentsAlterSettings extends SearchApiAbstractAlterCallback {
     // Otherwise tessaract will not run when called from the web server, only from the command line (via drush sapi-i).
     set_include_path(variable_get('tesseract_path', '/usr/local/bin/'));
 
-    // Mukurtu patch - specify our own tika-config.xml when calling tika. It is the same as the default config except extractInlineImages=TRUE for the PDFParser,
-    // which is necessary to run OCR on PDFs (OCR works on non-PDF image files regardless)
-    $cmd = variable_get('search_api_attachments_java', 'java') . $param . ' -jar ' . escapeshellarg($tika) . ' -t ' . '--config=' . escapeshellarg($tika_path . '/tika-config.xml') . ' ' . escapeshellarg($filepath);
+    $cmd = variable_get('search_api_attachments_java', 'java') . $param . ' -jar ' . escapeshellarg($tika) . ' -t ' . escapeshellarg($filepath);
     if (strpos(ini_get('extension_dir'), 'MAMP/')) {
       $cmd = 'export DYLD_LIBRARY_PATH=""; ' . $cmd;
     }
