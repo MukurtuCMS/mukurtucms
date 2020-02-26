@@ -52,7 +52,7 @@ function ma_search_api_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'search_api_attachments_tika_path';
-  $strongarm->value = '/sites/all/libraries/tika/';
+  $strongarm->value = '/sites/all/libraries/tika';
   $export['search_api_attachments_tika_path'] = $strongarm;
 
   return $export;
