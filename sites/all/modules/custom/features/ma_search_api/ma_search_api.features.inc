@@ -1104,12 +1104,6 @@ function ma_search_api_default_search_api_server() {
             "type" : "string",
             "boost" : "1.0"
           },
-          "field_document_doc_lib_section" : {
-            "table" : "search_api_db_document_pages",
-            "column" : "field_document_doc_lib_section_1",
-            "type" : "integer",
-            "boost" : "1.0"
-          },
           "search_api_language" : {
             "table" : "search_api_db_document_pages",
             "column" : "search_api_language_1",
@@ -1129,12 +1123,33 @@ function ma_search_api_default_search_api_server() {
             "boost" : "1.0"
           },
           "body:value" : {
-            "table" : "search_api_db_document_pages_text_1",
+            "table" : "search_api_db_document_pages_text",
             "type" : "text",
             "boost" : "1.0"
           },
+          "search_api_aggregation_1" : {
+            "table" : "search_api_db_document_pages_text",
+            "type" : "text",
+            "boost" : "5.0"
+          },
+          "attachments_field_basic_file_file" : {
+            "table" : "search_api_db_document_pages_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "attachments_field_oa_media" : {
+            "table" : "search_api_db_document_pages_text",
+            "type" : "text",
+            "boost" : "1.0"
+          },
+          "field_document_doc_lib_section" : {
+            "table" : "search_api_db_document_pages",
+            "column" : "field_document_doc_lib_section",
+            "type" : "integer",
+            "boost" : "1.0"
+          },
           "field_oa_media:file" : {
-            "table" : "search_api_db_document_pages_field_oa_media_file_1",
+            "table" : "search_api_db_document_pages_field_oa_media_file",
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
@@ -1143,21 +1158,6 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_document_pages",
             "column" : "field_document_doc_lib_section_nid",
             "type" : "integer",
-            "boost" : "1.0"
-          },
-          "search_api_aggregation_1" : {
-            "table" : "search_api_db_document_pages_text_1",
-            "type" : "text",
-            "boost" : "5.0"
-          },
-          "attachments_field_basic_file_file" : {
-            "table" : "search_api_db_document_pages_text_1",
-            "type" : "text",
-            "boost" : "1.0"
-          },
-          "attachments_field_oa_media" : {
-            "table" : "search_api_db_document_pages_text_1",
-            "type" : "text",
             "boost" : "1.0"
           }
         }

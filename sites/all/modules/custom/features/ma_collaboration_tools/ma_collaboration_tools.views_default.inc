@@ -124,7 +124,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['id'] = 'field_document_doc_lib_section';
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['table'] = 'search_api_index_document_pages';
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['field'] = 'field_document_doc_lib_section';
-  $handler->display->display_options['arguments']['field_document_doc_lib_section']['default_action'] = 'empty';
+  $handler->display->display_options['arguments']['field_document_doc_lib_section']['default_action'] = 'default';
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['default_argument_type'] = 'node';
   $handler->display->display_options['arguments']['field_document_doc_lib_section']['summary']['format'] = 'default_summary';
   /* Filter criterion: Search: Fulltext search */
