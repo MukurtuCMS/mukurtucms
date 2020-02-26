@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<properties>
+  <!--for example: <mimeTypeRepository resource="/org/apache/tika/mime/tika-mimetypes.xml"/>-->
+  <service-loader dynamic="true" loadErrorHandler="IGNORE"/>
+  <encodingDetectors>
+    <encodingDetector class="org.apache.tika.detect.DefaultEncodingDetector"/>
+  </encodingDetectors>
+  <translator class="org.apache.tika.language.translate.DefaultTranslator"/>
+  <detectors>
+    <detector class="org.apache.tika.detect.DefaultDetector"/>
+  </detectors>
+  <parsers>
+    <parser class="org.apache.tika.parser.DefaultParser"/>
+    <parser class="org.apache.tika.parser.pdf.PDFParser">
+      <params>
+        <param name="extractInlineImages" type="bool">true</param>
+      </params>
+    </parser>
+  </parsers>
+</properties>
+

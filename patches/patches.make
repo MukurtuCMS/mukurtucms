@@ -179,6 +179,8 @@ projects[search_api_attachments][patch][] = contrib/prepend_document_root_to_tik
 projects[search_api_attachments][patch][] = contrib/disable_config_form.patch
 ; Run images through tika and tesseract for OCR extraction.
 projects[search_api_attachments][patch][] = contrib/run_images_through_tika_tesseract_for_ocr.patch
+; Extract images out of PDFs so that they get run through OCR.
+projects[search_api_attachments][patch][] = contrib/extract_images_from_pdfs_for_ocr.patch
 
 ;;; Search API DB
 ; Change Seach API DB to pull regex from Search API

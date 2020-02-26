@@ -422,7 +422,9 @@ class SearchApiAttachmentsAlterSettings extends SearchApiAbstractAlterCallback {
     // Force running the Tika jar headless.
     $param = ' -Djava.awt.headless=true ' . $param;
 
-    $cmd = variable_get('search_api_attachments_java', 'java') . $param . ' -jar ' . escapeshellarg($tika) . ' -t ' . escapeshellarg($filepath);
+    // Mukurtu patch - specify our own tika-config.xml when calling tika. It is the same as the default config except extractInlineImages=TRUE for the PDFParser,
+    // which is necessary to run OCR on PDFs (OCR works on non-PDF image files regardless)
+    $cmd = variable_get('search_api_attachments_java', 'java') . $param . ' -jar ' . escapeshellarg($tika) . ' -t ' . '--config=' . escapeshellarg($tika_path . '/tika-config.xml') . ' ' . escapeshellarg($filepath);
     if (strpos(ini_get('extension_dir'), 'MAMP/')) {
       $cmd = 'export DYLD_LIBRARY_PATH=""; ' . $cmd;
     }
