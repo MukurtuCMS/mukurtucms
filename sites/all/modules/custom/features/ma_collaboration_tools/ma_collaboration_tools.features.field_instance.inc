@@ -2354,6 +2354,8 @@ function ma_collaboration_tools_field_default_field_instances() {
   // Exported field_instance: 'node-document_page-field_oa_media'.
   $field_instances['node-document_page-field_oa_media'] = array(
     'bundle' => 'document_page',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => array(),
     'deleted' => 0,
     'description' => '',
@@ -2403,7 +2405,7 @@ function ma_collaboration_tools_field_default_field_instances() {
       'custom_remove' => '',
       'description_field' => 0,
       'file_directory' => '',
-      'file_extensions' => 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm zip tgz gz key dotx',
+      'file_extensions' => 'jpg jpeg gif png tiff tif txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm zip tgz gz key dotx',
       'max_filesize' => '',
       'user_register_form' => FALSE,
     ),
