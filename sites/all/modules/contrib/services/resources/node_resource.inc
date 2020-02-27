@@ -343,6 +343,13 @@ function _node_resource_create($node) {
 
   drupal_form_submit($node_type . '_node_form', $form_state, $node);
 
+  // Mukurtu patch - check for our custom paragraph validation errors.
+  if (count($_SESSION['paragraph validation errors'])) {
+    $paragraph_validation_errors = $_SESSION['paragraph validation errors'];
+    unset ($_SESSION['paragraph validation errors']);
+    return services_error(implode(" ", $paragraph_validation_errors), 406, array('form_errors' => $paragraph_validation_errors));
+  }
+
   if ($errors = form_get_errors()) {
     return services_error(implode(" ", $errors), 406, array('form_errors' => $errors));
   }

@@ -1850,14 +1850,15 @@ function ma_mobile_client_set_default_types() {
 
 
 /**
- * Implements hook_node_postsave().
+ * Implements hook_node_presave().
  *
  * Services does not work with multival paragraphs (even with the multival patch),
- * so we set paragraphs in the JSON with a custom key "paragraphs" and this postsave hook
+ * so we set paragraphs in the JSON with a custom key "paragraphs" and this presave hook
  * takes care of creating the paragraphs and attaching it to the parent node.
  */
-function ma_mobile_client_node_postsave($node, $op) {
+function ma_mobile_client_node_presave($node) {
   if (isset($node->paragraphs)) {
+    $_SESSION['paragraph validation errors'] = [];
     $fields = field_info_instances('node', $node->type);
     foreach ($node->paragraphs as $parent_field_name => $parent_instances) {
       if (!$field_info = field_info_field($parent_field_name)) {
@@ -1872,6 +1873,15 @@ function ma_mobile_client_node_postsave($node, $op) {
           $paragraph_bundle = $allowed_bundle;
         }
       }
+
+      // Build the required fields for a paragraph.
+      $paragraph_fields =  field_info_instances('paragraphs_item', $paragraph_bundle);
+      $required_paragraph_fields = [];
+      foreach ($paragraph_fields as $paragraph_field_name => $paragraph_field_properties) {
+        if ($paragraph_field_properties['required']) {
+          $required_paragraph_fields[$paragraph_field_name] = $paragraph_field_properties;
+        }
+      }
       foreach ($parent_instances[LANGUAGE_NONE] as $parent_instance_index => $parent_instance) {
         $paragraph = new ParagraphsItemEntity([
           'field_name' => $parent_field_name,
@@ -1882,19 +1892,26 @@ function ma_mobile_client_node_postsave($node, $op) {
         foreach ($parent_instance as $paragraph_field => $paragraph_field_values) {
           $paragraph->{$paragraph_field} = $paragraph_field_values;
         }
-        if ($paragraph->save(TRUE)) {
-          $node->{$parent_field_name}[LANGUAGE_NONE][$parent_instance_index] = [
-            'value' => $paragraph->item_id,
-            'revision_id' => $paragraph->revision_id
-          ];
+        // Validate against the required paragraph fields before saving.
+        foreach ($required_paragraph_fields as $required_paragraph_field_name => $required_paragraph_field_properties) {
+          if (!$paragraph->{$required_paragraph_field_name}) {
+            $_SESSION['paragraph validation errors'][$required_paragraph_field_name] = $required_paragraph_field_properties['label'] . ' in ' . $parent_field_name . ' paragraph field is required.' ;
+          }
         }
-        else {
-          // TODO: add error message
+        if (count($_SESSION['paragraph validation errors']) == 0) {
+          if ($paragraph->save(TRUE)) {
+            $node->{$parent_field_name}[LANGUAGE_NONE][$parent_instance_index] = [
+              'value' => $paragraph->item_id,
+              'revision_id' => $paragraph->revision_id
+            ];
+          }
+          else {
+            // TODO: add error message
+          }
         }
       }
     }
     unset ($node->paragraphs);
-    node_save($node);
   }
 }
 
