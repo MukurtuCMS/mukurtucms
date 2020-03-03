@@ -18,7 +18,7 @@ function ma_collaboration_tools_facetapi_default_facet_settings() {
   $facet->searcher = 'search_api@document_pages';
   $facet->realm = '';
   $facet->facet = 'changed';
-  $facet->enabled = FALSE;
+  $facet->enabled = TRUE;
   $facet->hash = 'TqDHVYk1sB6Kb3xC6o0y9qcMQivNxut9';
   $facet->settings = array(
     'operator' => 'and',
@@ -49,7 +49,7 @@ function ma_collaboration_tools_facetapi_default_facet_settings() {
   $facet->searcher = 'search_api@document_pages';
   $facet->realm = '';
   $facet->facet = 'created';
-  $facet->enabled = FALSE;
+  $facet->enabled = TRUE;
   $facet->hash = 'vithFmMOTUF1HKBdW0RjfGr3rzWGMVcG';
   $facet->settings = array(
     'operator' => 'and',
