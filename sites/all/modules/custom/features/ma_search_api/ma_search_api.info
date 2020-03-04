@@ -2,6 +2,7 @@ name = Mukurtu Search API
 description = Search API and FacetAPI index and other configs, but not the views/facets themselves
 core = 7.x
 package = Features
+dependencies[] = ma_collaboration_tools
 dependencies[] = ctools
 dependencies[] = entity
 dependencies[] = facetapi

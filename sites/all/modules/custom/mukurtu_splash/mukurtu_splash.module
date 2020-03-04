@@ -204,21 +204,18 @@ function ma_splash_manage_collaboration_tools($form, &$form_state) {
  * Manage Collaboration Tools form submit handler
  */
 function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
-  variable_set('collab_tools_enabled', $form_state['values']['collab_tools_enabled']);
-  if ($form_state['values']['collab_tools_enabled']) {
 
-    // Enable the feature
-    module_enable(['ma_collaboration_tools']);
+  $now_enabled = $form_state['values']['collab_tools_enabled'];
 
-    // Clear cache
-    drupal_flush_all_caches();
+  if ($now_enabled) {
+
+    variable_set('geofield_map_google_apikey', $form_state['values']['gmaps_api_key']);
 
     // Set the mailhandler mailbox
     variable_set('mailcomment_mailbox', $form_state['values']['address']);
     variable_set('collab_tools_email_domain', $form_state['values']['domain']);
     variable_set('collab_tools_email_username', $form_state['values']['name']);
     variable_set('collab_tools_email_password', $form_state['values']['pass']);
-    variable_set('geofield_map_google_apikey', $form_state['values']['gmaps_api_key']);
 
     $mailbox = [
       'mail' => 'collaboration_tools',
@@ -248,20 +245,17 @@ function ma_splash_manage_collaboration_tools_submit($form, &$form_state) {
       ->fields($mailbox)
       ->execute();
 
-    // Show message
-    drupal_set_message('Collaboration Tools settings saved.');
-
   }
 
-  else {
-
-    // Disable the feature
-    module_disable(['ma_collaboration_tools']);
-
-    // Sow message
-    drupal_set_message('Collaboration Tools settings saved.');
-
+  // Update the collab_tools_enabled var if state changed, and then clear cache.
+  $previously_enabled = variable_get('collab_tools_enabled');
+  if ($previously_enabled != $now_enabled) {
+    variable_set('collab_tools_enabled', $now_enabled);
+    drupal_flush_all_caches();
   }
+
+  // Show message
+  drupal_set_message('Collaboration Tools settings saved.');
 }
 
 /**

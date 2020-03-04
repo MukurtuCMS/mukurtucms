@@ -13,71 +13,74 @@ include_once 'ma_collaboration_tools.features.inc';
  */
 function ma_collaboration_tools_page_alter(&$data) {
 
-  if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
+  if (variable_get('collab_tools_enabled')) {
 
-    $array_keys = array_keys($data['content']['system_main']['nodes']);
-    $cp_node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
-    if ($cp_node && $cp_node->type == 'cultural_protocol_group') {
-      $nids = element_children($data['content']['system_main']['nodes']);
-      $nid = $nids[0];
+    if (isset($data['content']['system_main']['nodes']) && !isset($data['content']['system_main']['term_heading']['term'])) {
 
-      // Get all section pages referencing that are in this CP.
-      $query = new EntityFieldQuery();
-      $result = $query
-        ->addMetaData('account', user_load(1))
-        ->entityCondition('entity_type', 'node')
-        ->entityCondition('bundle', ma_culturalprotocol_collab_parent_node_types(), 'IN')
-        ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
-        ->fieldCondition('og_group_ref', 'target_id', $nid)
-        ->execute();
+      $array_keys = array_keys($data['content']['system_main']['nodes']);
+      $cp_node = $data['content']['system_main']['nodes'][array_shift($array_keys)]["#node"];
+      if ($cp_node && $cp_node->type == 'cultural_protocol_group') {
+        $nids = element_children($data['content']['system_main']['nodes']);
+        $nid = $nids[0];
 
-      if (isset($result['node']) && count($result['node'])) {
-        $tabs = [];
-        $section_nodes = node_load_multiple(array_keys($result['node']));
-        foreach ($section_nodes as $section_node) {
-          if (node_access('view', $section_node)) { // Ensure user has view perms to this section page.
+        // Get all section pages referencing that are in this CP.
+        $query = new EntityFieldQuery();
+        $result = $query
+          ->addMetaData('account', user_load(1))
+          ->entityCondition('entity_type', 'node')
+          ->entityCondition('bundle', ma_culturalprotocol_collab_parent_node_types(), 'IN')
+          ->propertyCondition('status', NODE_PUBLISHED) // or else it will retrieve node references for deleted DH items
+          ->fieldCondition('og_group_ref', 'target_id', $nid)
+          ->execute();
+
+        if (isset($result['node']) && count($result['node'])) {
+          $tabs = [];
+          $section_nodes = node_load_multiple(array_keys($result['node']));
+          foreach ($section_nodes as $section_node) {
+            if (node_access('view', $section_node)) { // Ensure user has view perms to this section page.
+              $tabs[] = [
+                'type' => 'node',
+                'nid' => $section_node->nid,
+                'view_mode' => 'full',
+                'title' => $section_node->title,
+                'hide_title' => 0,
+              ];
+            }
+          }
+          if (count($tabs)) {
+
+            // If we need to be on the last (newly created) tab (as linked from ma_core_create_content_block(), then set the active tab cookie to the last tab and reload (without last_tab).
+            if (arg(2) == 'last_tab') {
+              setcookie('Drupal-quicktabs-active-tab-id-quicktabs-protocol-tabs-' . arg(1), 'quicktabs-tab-protocol-tabs-' . arg(1) . '-' . count($tabs), 0, '/');
+              drupal_goto(drupal_get_path_alias('node/' . arg(1)));
+            }
+
+            // Main CP tab
+            $contents = '';
+
+            // Add the CP node content to the first tab contents, and then build the first tab.
             $tabs[] = [
               'type' => 'node',
-              'nid' => $section_node->nid,
+              'nid' => $cp_node->nid,
               'view_mode' => 'full',
-              'title' => $section_node->title,
-              'hide_title' => 0,
+              'title' => 'Protocol',
+              'hide_title' => 1,
+              'weight' => -1,
             ];
+
+            // Build the tabs object and render it as the output.
+            $tab_settings = [
+              'ajax' => 0,
+              'default_tab' => 0,
+              'title' => 'CP Tabs',
+              'renderer' => 'quicktabs',
+              'style' => 'Excel',
+              'hide_empty_tabs' => 1,
+            ];
+            $built_tabs = quicktabs_build_quicktabs("protocol-tabs-" . arg(1), $tab_settings, $tabs);
+            $data['content']['system_main']['#markup'] = drupal_render($built_tabs);
+
           }
-        }
-        if (count($tabs)) {
-
-          // If we need to be on the last (newly created) tab (as linked from ma_core_create_content_block(), then set the active tab cookie to the last tab and reload (without last_tab).
-          if (arg(2) == 'last_tab') {
-            setcookie('Drupal-quicktabs-active-tab-id-quicktabs-protocol-tabs-' . arg(1), 'quicktabs-tab-protocol-tabs-' . arg(1) . '-' . count($tabs), 0, '/');
-            drupal_goto(drupal_get_path_alias('node/' . arg(1)));
-          }
-
-          // Main CP tab
-          $contents = '';
-
-          // Add the CP node content to the first tab contents, and then build the first tab.
-          $tabs[] = [
-            'type' => 'node',
-            'nid' => $cp_node->nid,
-            'view_mode' => 'full',
-            'title' => 'Protocol',
-            'hide_title' => 1,
-            'weight' => -1,
-          ];
-
-          // Build the tabs object and render it as the output.
-          $tab_settings = [
-            'ajax' => 0,
-            'default_tab' => 0,
-            'title' => 'CP Tabs',
-            'renderer' => 'quicktabs',
-            'style' => 'Excel',
-            'hide_empty_tabs' => 1,
-          ];
-          $built_tabs = quicktabs_build_quicktabs("protocol-tabs-" . arg(1), $tab_settings, $tabs);
-          $data['content']['system_main']['#markup'] = drupal_render($built_tabs);
-
         }
       }
     }
@@ -209,17 +212,19 @@ function ma_collaboration_tools_node_load ($nodes, $types)  {
  * Add content to collab parent link.
  */
 function ma_collaboration_tools_add_content_to_section_link($entity) {
-  $child_type = ma_collaboration_tools_get_child_from_parent($entity->type);
-  $node_disp_name = node_type_get_names()[$child_type];
-  $pronoun = 'a';
-  if (in_array(strtolower($node_disp_name{0}), ['a','e','i','o','u'])) {
-    $pronoun = 'an';
-  }
-  $child_type_path = str_replace('_', '-', $child_type);
-  if (og_user_access_entity('create ' . $child_type . ' content', 'node', $entity)) {
-    return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $child_type_path . '/' . $entity->nid, [
-      'query' => ['destination' => 'node/' . arg(1)],
-    ]);
+  if (variable_get('collab_tools_enabled')) {
+    $child_type = ma_collaboration_tools_get_child_from_parent($entity->type);
+    $node_disp_name = node_type_get_names()[$child_type];
+    $pronoun = 'a';
+    if (in_array(strtolower($node_disp_name{0}), ['a', 'e', 'i', 'o', 'u'])) {
+      $pronoun = 'an';
+    }
+    $child_type_path = str_replace('_', '-', $child_type);
+    if (og_user_access_entity('create ' . $child_type . ' content', 'node', $entity)) {
+      return l('Add ' . $pronoun . ' ' . $node_disp_name, 'node/add/' . $child_type_path . '/' . $entity->nid, [
+        'query' => ['destination' => 'node/' . arg(1)],
+      ]);
+    }
   }
 }
 
@@ -229,11 +234,13 @@ function ma_collaboration_tools_add_content_to_section_link($entity) {
  * Edit collab section link.
  */
 function ma_collaboration_tools_edit_collab_section_link($entity) {
-  if (node_access('update', $entity)) {
-    $node_disp_name = node_type_get_names()[$entity->type];
-    return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit', [
-      'query' => ['destination' => 'node/' . arg(1)],
-    ]);
+  if (variable_get('collab_tools_enabled')) {
+    if (node_access('update', $entity)) {
+      $node_disp_name = node_type_get_names()[$entity->type];
+      return l('Edit ' . $node_disp_name, 'node/' . $entity->nid . '/edit', [
+        'query' => ['destination' => 'node/' . arg(1)],
+      ]);
+    }
   }
 }
 

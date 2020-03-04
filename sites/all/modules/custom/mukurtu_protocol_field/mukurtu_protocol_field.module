@@ -414,7 +414,7 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
 
   // If collaboration tools feature is disabled, then disable view and edit access to all collaboration nodes.
   if (in_array($node->type, ma_culturalprotocol_all_collab_node_types())) {
-    if (!module_exists('ma_collaboration_tools')) {
+    if (!variable_get('collab_tools_enabled')) {
       return NODE_ACCESS_DENY;
     }
   }

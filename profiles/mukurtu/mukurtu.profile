@@ -98,6 +98,9 @@ function mukurtu_revert_features () {
   drupal_get_messages();
   features_revert(); // Revert all features a second time, for any straggling components
   drupal_get_messages();
+  features_revert_module('ma_collaboration_tools'); // This needs a final revert.
+  drupal_get_messages();
+
 }
 
 function mukurtu_rebuild_permissions () {

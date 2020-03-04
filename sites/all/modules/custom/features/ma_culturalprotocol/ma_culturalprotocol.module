@@ -571,7 +571,7 @@ function ma_cultural_protocol_node_type_must_have_cp($node_type) {
  * Need this to avoid error if ma_collaboration_tools is disabled.
  */
 function ma_culturalprotocol_follow_unfollow($entity) {
-  if (module_exists('ma_collaboration_tools')) {
+  if (variable_get('collab_tools_enabled')) {
     return ma_collaboration_tools_follow_unfollow($entity);
   }
 }

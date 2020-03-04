@@ -480,7 +480,7 @@ function ma_core_create_content_block() {
         $link_sources = [
           'digital_heritage' => '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id']. '/' . $nid,
         ];
-        if (module_exists('ma_collaboration_tools')) {
+        if (variable_get('collab_tools_enabled')) {
           foreach (ma_culturalprotocol_collab_parent_node_types() as $parent_type) {
             $link_sources[$parent_type] = '/' . $node->og_group_ref[LANGUAGE_NONE][0]['target_id'] . '/' . $nid . '?destination=node/' . arg(1) . '/last_tab';
           }
