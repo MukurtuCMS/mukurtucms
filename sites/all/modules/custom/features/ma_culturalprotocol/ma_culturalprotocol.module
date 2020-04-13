@@ -577,9 +577,9 @@ function ma_culturalprotocol_follow_unfollow($entity) {
 }
 
 /**
- * Helper function to determine if, for a given node, the current user is a protocol steward of it or not.
+ * Helper function to determine if, for a given node's protocol(s), the current user is a protocol steward of at least one of them.
  */
-function ma_cultural_protocol_is_ps_of_node($node) {
+function ma_cultural_protocol_is_ps_of_node_protocols($node) {
   $groups_on_node = og_get_entity_groups('node', $node);
   $groups_on_node = array_values($groups_on_node['node']);
   foreach ($groups_on_node as $group) {
