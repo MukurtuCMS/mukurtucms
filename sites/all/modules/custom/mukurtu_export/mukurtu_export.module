@@ -128,6 +128,15 @@ function mukurtu_export_access_export($entity, $entity_type = 'node') {
         || in_array('Mukurtu Administrator', $user->roles)
         || in_array('Community Administrator', $user->roles));
 
+    // For Document Pages only, allow Protocol Stewards of that Document to export it as well.
+    if (!$access) {
+      if ($entity->type == 'document_page') {
+        if (ma_cultural_protocol_is_ps_of_node_protocols($entity)) {
+          $access = TRUE;
+        }
+      }
+    }
+
     // Make sure the user can view the original content.
     $access = $access && entity_access('view', $entity_type, $entity);
   }
