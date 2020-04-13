@@ -137,17 +137,7 @@ function ma_collaboration_tools_node_view($node, $view_mode) {
 
   // On child collab pages, hide the "Following Users" and "Unfollowing Users" fields except to users that are Protocols Stewards of any of the child's CPs.
   if ($view_mode == 'full' && in_array($node->type, ma_culturalprotocol_collab_child_node_types())) {
-    $hide_following_users = 1;
-    $groups_on_node = og_get_entity_groups('node', $node);
-    $groups_on_node = array_values($groups_on_node['node']);
-    foreach ($groups_on_node as $group) {
-      $user_roles = og_get_user_roles('node', $group);
-      if (in_array('protocol steward', $user_roles)) {
-        $hide_following_users = 0;
-        break;
-      }
-    }
-    if ($hide_following_users) {
+    if (!ma_cultural_protocol_is_ps_of_node($node)) {
       unset($node->content['field_following_users']);
       unset($node->content['field_un_following_users']);
     }
