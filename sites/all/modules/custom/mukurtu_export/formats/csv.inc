@@ -220,9 +220,11 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
   $csv_files = array();
 
   $zip = new ZipArchive();
-  $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
-  $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
-
+  $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP') . 'zip';
+  $opened = $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
+  if ($opened !== true){
+    die("Cannot open " . drupal_realpath($tempfile) . " for writing.");
+  }
   // These are raw files that we want to include in the Zip
   if(isset($encoded_export['__files'])) {
     foreach($encoded_export['__files'] as $binary_file) {
