@@ -221,6 +221,7 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
 
   $zip = new ZipArchive();
   $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
+  $tempfile .= ".zip";
   $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
 
   // These are raw files that we want to include in the Zip
