@@ -10,6 +10,11 @@ function mukurtu_export_mukurtu_export_field_handlers() {
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
             '#callback' => 'mukurtu_export_field_handler_image'
         ),
+        'file' => array(
+          '#module' => 'mukurtu_export',
+          '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
+          '#callback' => 'mukurtu_export_field_handler_file'
+        ),
         'taxonomy_term_reference' => array(
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
@@ -107,6 +112,15 @@ function mukurtu_export_field_handler_image($value, $field_info, $options = arra
 //    $return_value = MUKURTU_EXPORT_IMPORT_DIR . DIRECTORY_SEPARATOR . $saved_file[$value['fid']]['filename'];
 
     return array($exported_file_value, $referenced_entities, $saved_file);
+}
+
+/**
+ * Handle files (not Scald Atoms; could be images but is a field of type file not image)
+ */
+function mukurtu_export_field_handler_file($value, $field_info, $options = array()) {
+  // This is currently exactly the same as the field_handler_image, so just use that.
+  // But leave as a separate handler in case of future changes.
+  return mukurtu_export_field_handler_image($value, $field_info, $options);
 }
 
 // /**
