@@ -1,8 +1,16 @@
 <?php
+
 /**
  * @file
  * ma_dashboard.features.inc
  */
+
+/**
+ * Implements hook_views_api().
+ */
+function ma_dashboard_views_api($module = NULL, $api = NULL) {
+  return array("api" => "3.0");
+}
 
 /**
  * Implements hook_homebox().
@@ -57,8 +65,8 @@ function ma_dashboard_homebox() {
         'weight' => -38,
       ),
       'node_recent' => array(
-        'module' => 'node',
-        'delta' => 'recent',
+        'module' => 'views',
+        'delta' => 'mukurtu_recent_content-block',
         'region' => 3,
         'movable' => 1,
         'status' => 1,
@@ -132,17 +140,6 @@ function ma_dashboard_homebox() {
         'closable' => 1,
         'title' => '',
         'weight' => -39,
-      ),
-      'mukurtu_splash_manage_taxonomy' => array(
-        'module' => 'mukurtu_splash',
-        'delta' => 'manage_taxonomy',
-        'region' => 2,
-        'movable' => 1,
-        'status' => 1,
-        'open' => 1,
-        'closable' => 1,
-        'title' => '',
-        'weight' => -40,
       ),
       'mukurtu_splash_manage_taxonomy' => array(
         'module' => 'mukurtu_splash',
