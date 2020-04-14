@@ -92,8 +92,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
     });
     $("#input-formats :checkbox:eq(0)").trigger('change');
 
-    $(".cke_load_toolbar").click(function() {
-      var buttons = eval('Drupal.settings.'+$(this).attr("id"));
+    $(".cke_load_toolbar", "#ckeditor-admin-profile-form").click(function() {
+      var id = $(this).attr("id").replace(/[^\w]/g, '');
+      if (typeof(Drupal.settings[id]) == 'undefined') {
+        return false;
+      }
+      var buttons = Drupal.settings[id];
       var text = "[\n";
       for(i in buttons) {
         if (typeof buttons[i] == 'string'){

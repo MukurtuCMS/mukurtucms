@@ -121,6 +121,9 @@ function ckeditor_user_customize_form_validate(&$form, &$form_state) {
   }
 }
 
+/**
+ * Implements hook_user_presave().
+ */
 function ckeditor_user_presave(&$edit, $account, $category) {
   if (user_access('customize ckeditor')) {
     module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');

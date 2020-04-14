@@ -1,6 +1,50 @@
 7.x-1.x-dev
 Development snapshot
 
+2020-03-17
+New stable release: 7.x-1.19
+
+[#2349885] by hass, Dieter Geiling: Add config.smiley_path for relative image urls
+[#2993053] by stefan.korn: DocBlock missing for hook_user_presave()
+[#2211217] by bwaindwain, gifad: Using "theme css", CKEditor fails to translate URI to valid URL
+[#172229] by vokiel: Update CKEditor to 4.14.0
+[#169464] by vokiel: Fix (remove) the eval() usage inside JavaScript files.
+[#2679179] by Dave Reid, ron_s: CKEditor uses separate cache-busting query string from Drupal's
+[#2795603] by hgoto: drush ckeditor-download command raises warning with undefined offset
+[#2947109] by jstoller: New default CKEditor skin not recognized
+[#2898012] bump CKEditor to 4.9.2
+[#2790539] by Johnny vd Laar: prepare callback is optional, ckeditor_filter_xss causes notices
+
+2017-06-26
+New stable release: 7.x-1.18
+
+[#2463187] by Devin Carlson: Allow plugins to specify custom paths for button icons
+[#2299617] by ben.kyriakou: IMCE browser in CKEditor plugin doesn't respect current language
+[#1330794] by m4olivei, bwaindwain, ConfuciusDa1st, fearlsgroove: Use theme css in sub-theme does not include base theme
+[#2886073] by anrikun: Mistake in feature dependencies
+[#2644124] by drclaw: Some CKEditor plugins buttons don't appear in the Drag & Drop toolbar wizard
+[#2540528] by neerajsingh: In filemanager.config.php, Building $baseDir
+[#2705773] by japerry: ckeditor missing the 'prepare callback' from input filters
+[#2745809] by alvar0hurtad0: Add some tests to avoid failed testing of all patches
+
+2015-11-30
+New stable release: 7.x-1.17
+
+[#2550535] by jcisio, donquixote: $plugin_settings['active'] is messing with features
+[#2574253] by karenann: User specific "Default state" setting is not obeyed
+[#2514938] by themic8, jcisio: Use the latest version from CDN
+[#2542566] by jcisio: remove leftover icon.gif
+[#2542566] by bneil, srjosh, jcisio: Remove Media integration
+[#2437749] by Perignon, david.gil, jcisio: Infinity bucle in some cases in ckeditor_file_download
+[#2463461] by Luukyb: Cleanup .gitignore file from git
+[#1154730] by Sutharsan: CKEditor not following body rows setting Drupal 7
+[#2292575] by Hai-Nam Nguyen: mistakenly added a new line
+[#2292575] by Angry Dan: Naming of mediaembed plugin is confusing
+[#2323149] by kaare: ckeditor.admin.css: url() for tick.png and delete.png must point to ../images/
+[#2159403] by das-peter, aDarkling, Devin Carlson, wwalc, Angry Dan, brantwynn, agoradesign, micbar, joelpittet, brockfanning, iKb: Make CKEditor plugin system modular and clean
+[#2324383] by eugene.ilyin: Toolbar in Ckeditor profile is not saved: incompatibility with jQuery 1.10
+[#2367913] by yched: Fixed ckeditor_help() issues one uncached locale query on each page.
+
 2014-10-14
 New stable release: 7.x-1.16
 
