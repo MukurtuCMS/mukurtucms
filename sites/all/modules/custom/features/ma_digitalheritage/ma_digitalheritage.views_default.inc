@@ -846,7 +846,7 @@ return FALSE;';
   $handler->display->display_options['fields']['field_dictionary_word_language']['id'] = 'field_dictionary_word_language';
   $handler->display->display_options['fields']['field_dictionary_word_language']['table'] = 'field_data_field_dictionary_word_language';
   $handler->display->display_options['fields']['field_dictionary_word_language']['field'] = 'field_dictionary_word_language';
-  /* Field: Field: Keywords */
+  /* Field: Field: Tags */
   $handler->display->display_options['fields']['field_tags']['id'] = 'field_tags';
   $handler->display->display_options['fields']['field_tags']['table'] = 'field_data_field_tags';
   $handler->display->display_options['fields']['field_tags']['field'] = 'field_tags';
@@ -916,6 +916,96 @@ return FALSE;';
   $handler->display->display_options['filters']['field_dictionary_word_language_tid']['type'] = 'select';
   $handler->display->display_options['filters']['field_dictionary_word_language_tid']['vocabulary'] = 'language';
   $handler->display->display_options['path'] = 'manage/dictionary-words';
+
+  /* Display: Document Library */
+  $handler = $view->new_display('page', 'Document Library', 'doc_lib');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Export Document Library';
+  $handler->display->display_options['defaults']['access'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'php';
+  $handler->display->display_options['access']['php_access'] = 'if (is_numeric(arg(2))) {
+  $doc_lib=node_load(arg(2));
+  return ma_collaboration_tools_export_document_library_pages_check($doc_lib);
+}';
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['defaults']['relationships'] = FALSE;
+  /* Relationship: Entity Reference: Referenced Entity */
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['id'] = 'field_document_doc_lib_section_target_id';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['table'] = 'field_data_field_document_doc_lib_section';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['field'] = 'field_document_doc_lib_section_target_id';
+  $handler->display->display_options['relationships']['field_document_doc_lib_section_target_id']['required'] = TRUE;
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Bulk operations: Content */
+  $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['views_bulk_operations']['field'] = 'views_bulk_operations';
+  $handler->display->display_options['fields']['views_bulk_operations']['label'] = 'Select All';
+  $handler->display->display_options['fields']['views_bulk_operations']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['display_type'] = '1';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['enable_select_all_pages'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['row_clickable'] = 1;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
+  $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
+    'action::mukurtu_export_action' => array(
+      'selected' => 1,
+      'postpone_processing' => 0,
+      'skip_confirmation' => 1,
+      'skip_permission_check' => 0,
+      'override_label' => 1,
+      'label' => 'Export Document Library Pages',
+    ),
+  );
+  /* Field: Content: Title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'node';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
+  /* Field: Content: Updated date */
+  $handler->display->display_options['fields']['changed']['id'] = 'changed';
+  $handler->display->display_options['fields']['changed']['table'] = 'node';
+  $handler->display->display_options['fields']['changed']['field'] = 'changed';
+  $handler->display->display_options['fields']['changed']['date_format'] = 'short';
+  $handler->display->display_options['fields']['changed']['second_date_format'] = 'exif';
+  $handler->display->display_options['defaults']['sorts'] = FALSE;
+  /* Sort criterion: Content: Updated date */
+  $handler->display->display_options['sorts']['changed']['id'] = 'changed';
+  $handler->display->display_options['sorts']['changed']['table'] = 'node';
+  $handler->display->display_options['sorts']['changed']['field'] = 'changed';
+  $handler->display->display_options['sorts']['changed']['order'] = 'DESC';
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Content: Nid */
+  $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['table'] = 'node';
+  $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'field_document_doc_lib_section_target_id';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'access denied';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['defaults']['filter_groups'] = FALSE;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Content: Published status */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = 1;
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: Content: Type */
+  $handler->display->display_options['filters']['type']['id'] = 'type';
+  $handler->display->display_options['filters']['type']['table'] = 'node';
+  $handler->display->display_options['filters']['type']['field'] = 'type';
+  $handler->display->display_options['filters']['type']['value'] = array(
+    'document_page' => 'document_page',
+  );
+  $handler->display->display_options['filters']['type']['group'] = 1;
+  $handler->display->display_options['path'] = 'export/document-library/%';
   $translatables['export_digital_heritage'] = array(
     t('Master'),
     t('Export Digital Heritage'),
@@ -953,7 +1043,12 @@ return FALSE;';
     t('Dictionary'),
     t('Export Dictionary Words'),
     t('Language'),
-    t('Keywords'),
+    t('Tags'),
+    t('Document Library'),
+    t('Export Document Library'),
+    t('Content entity referenced from field_document_doc_lib_section'),
+    t('Export Document Library Pages'),
+    t('All'),
   );
   $export['export_digital_heritage'] = $view;
 

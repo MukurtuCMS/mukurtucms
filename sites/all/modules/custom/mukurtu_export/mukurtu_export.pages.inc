@@ -11,6 +11,25 @@ function mukurtu_export_form($form, &$form_state) {
   $is_batch = isset($form_state['mukurtu_export']['is_batch']) ? $form_state['mukurtu_export']['is_batch'] : FALSE;
   //$is_batch = (isset($form_state['input']['op']) && $form_state['input']['op'] == 'Execute') ? TRUE : FALSE;
 
+  // Custom handling for doc pages and doc libraries. TW26044341
+  $is_doc_page = $is_doc_lib = FALSE;
+  if (is_numeric(arg(1))) {
+    if ($node = node_load(arg(1))) {
+      if ($node->type == 'document_page') {
+        $is_doc_page = TRUE;
+      }
+    }
+  }
+  else {
+    if (is_numeric(arg(2))) {
+      if ($node = node_load(arg(2))) {
+         if ($node->type == 'document_library') {
+           $is_doc_lib = TRUE;
+         }
+      }
+    }
+  }
+
   if(!$is_batch && is_null($export_ids)){
       $current_node = menu_get_object();
       if($current_node) {
@@ -57,6 +76,12 @@ function mukurtu_export_form($form, &$form_state) {
         '#type' => 'submit',
         '#value' => t('Next'),
       );
+
+      if ($is_doc_page) {
+        $form["export"]["settings"]["csv"]["mukurtu_export_csv_id_format"]['#access'] = FALSE;
+        $form["export"]["settings"]["csv"]["mukurtu_export_csv_referenced_content"]['#access'] = FALSE;
+      }
+
       return $form;
     }
   }
@@ -70,7 +95,7 @@ function mukurtu_export_form($form, &$form_state) {
       );
     }
 
-    $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids);
+    $form = mukurtu_export_fields_selection_form($form, $form_state, $export_ids, FALSE, $is_doc_page, $is_doc_lib);
 
     if(!$is_batch) {
       $form['download_file_bottom'] = array(
@@ -168,7 +193,7 @@ function mukurtu_export_format_selection_form_submit($form, &$form_state) {
 /**
  * Form for selecting which fields to export
  */
-function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE) {
+function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids = NULL, $reset = FALSE, $is_doc_page = NULL, $is_doc_lib = NULL) {
   // Blacklist any Mukurtu specific book-keeping fields that definitely don't need to be exported
   $field_blacklist = array(
       'all' => array(
@@ -331,6 +356,19 @@ function mukurtu_export_fields_selection_form($form, &$form_state, $export_ids =
       }
     }
   }
+
+  if ($is_doc_lib) {
+    // Hide some fields
+    $form["export"]["settings"]["csv"]["mukurtu_export_csv_id_format"]['#access'] = FALSE;
+    $form["export"]["settings"]["csv"]["mukurtu_export_csv_referenced_content"]['#access'] = FALSE;
+
+    // Put Document Pages expanded at the top of the export fields, as happens for individual node exports, but not normal bulk exports.
+    $form['export_fields']['#collapsed'] = FALSE;
+    $form['export_fields']['node']['#weight'] = -1000;
+    $form['export_fields']['node']['document_page']['#weight'] = -1000;
+    $form['export_fields']['node']['document_page']['#collapsed'] = FALSE;
+  }
+
   return $form;
 }
 

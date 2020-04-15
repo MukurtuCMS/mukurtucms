@@ -988,8 +988,20 @@ function ma_collaboration_tools_menu() {
     'type' => MENU_LOCAL_TASK,
   );
 
+  // Export a whole document library's document pages, from the Item Menu
+  $items['node/%node/export-document-library-pages'] = [
+    'title' => 'Export Document Library Pages',
+    'page callback' => 'ma_collaboration_tools_export_document_library_pages',
+    'page arguments' => [1],
+    'access callback' => 'ma_collaboration_tools_export_document_library_pages_check',
+    'access arguments' => [1],
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 100,
+  ];
+
   return $items;
 }
+
 
 /**
  * Callback to process the user clicking the follow or unfollow button.
@@ -1071,6 +1083,33 @@ function ma_collaboration_tools_views_post_execute(&$view) {
     }
   }
 }
+
+
+/**
+ * Export the Document Pages for the current Document Library.
+ * Uses a VBO view since the exporter is already built for that.
+ */
+function ma_collaboration_tools_export_document_library_pages($node) {
+  drupal_goto('/export/document-library/' . $node->nid);
+}
+
+/**
+ * Access check for exporting the Document Pages for the current Document Library
+ * User must be a protocol steward of at least one of the Document Library's protocols
+ */
+function ma_collaboration_tools_export_document_library_pages_check($node) {
+  if ($node->type == 'document_library') {
+    $dlw = entity_metadata_wrapper('node', $node);
+    $protocols_for_doc_lib = $dlw->og_group_ref->value();
+    foreach ($protocols_for_doc_lib as $protocol) {
+      $user_roles = og_get_user_roles('node', $protocol->nid);
+      if (in_array('protocol steward', $user_roles)) {
+        return TRUE;
+      }
+    }
+  }
+}
+
 
 /**
  * Notification default frequency form (header of the Following view).
