@@ -4383,7 +4383,6 @@ function ma_scald_field_default_field_instances() {
   t('Identifier');
   t('Image');
   t('Invitation');
-  t('Tags');
   t('Location');
   t('Original DNG');
   t('People');
