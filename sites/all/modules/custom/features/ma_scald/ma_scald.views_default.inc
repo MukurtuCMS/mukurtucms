@@ -59,6 +59,10 @@ return FALSE;';
       'empty_column' => 1,
     ),
     'sid' => array(
+      'alter' => array(
+        'make_link' => TRUE,
+        'path' => '/atom/[sid]',
+      ),
       'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
@@ -127,6 +131,8 @@ return FALSE;';
   $handler->display->display_options['fields']['sid']['id'] = 'sid';
   $handler->display->display_options['fields']['sid']['table'] = 'scald_atoms';
   $handler->display->display_options['fields']['sid']['field'] = 'sid';
+  $handler->display->display_options['fields']['sid']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['sid']['alter']['path'] = '/atom/[sid]';
   /* Field: Atoms: Thumbnail */
   $handler->display->display_options['fields']['scald_thumbnail']['id'] = 'scald_thumbnail';
   $handler->display->display_options['fields']['scald_thumbnail']['table'] = 'field_data_scald_thumbnail';
