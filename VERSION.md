@@ -1,3 +1,18 @@
+## Mukurtu 2.1.4
+- Updated to Drupal 7.70
+- Added a media export page
+- Fixed a bug where in some cases when exporting only media, the binary file would not export
+- The recent content list in the dashboard now includes edit links
+- Fixed a bug where exports may result in an empty zip file on some systems
+- Made the "tags" field name consistent across all media types
+- Mukurtu admins can now administer content warnings
+- Fixed some color inconsistencies on the red & bone color scheme
+- Improved the display of the small hero image with welcome message
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+- revert features: `drush fr ma_scald`
+
 ## Mukurtu 2.1.3
 - Content type specific related fields (e.g., “Related Digital Heritage Items”) have been generalized and consolidated into a single “Related Content” field
 - The [TK Clan](https://localcontexts.org/tk/cl/1.0) label has been added
