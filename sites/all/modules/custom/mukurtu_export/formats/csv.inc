@@ -194,6 +194,17 @@ function mukurtu_export_csv_export($entities, $field_list, $settings) {
     }
   }
 
+  // If any scald atoms initiated the export, we need to load them with scald_atom_load
+  // because Drupal used entity_load which doesn't pull in some of the special scald fields
+  // like base_entity which we need for the binary file info.
+  if (!empty($entities['scald_atom'])) {
+    foreach ($entities['scald_atom'] as $scald_type) {
+      foreach ($scald_type as &$atom) {
+        $atom = scald_atom_load($atom->sid);
+      }
+    }
+  }
+
   $encoded_export = ($is_batch == TRUE) ? $batch_previous : array();
   foreach ($entities as $entity_type => $bundle) {
     foreach ($bundle as $bundle_name => $bundle_entities) {
@@ -221,6 +232,7 @@ function mukurtu_export_csv_export_to_zip($encoded_export) {
 
   $zip = new ZipArchive();
   $tempfile = drupal_tempnam('temporary://', 'MUKURTUZIP');
+  $tempfile .= ".zip";
   $zip->open(drupal_realpath($tempfile), ZipArchive::CREATE);
 
   // These are raw files that we want to include in the Zip

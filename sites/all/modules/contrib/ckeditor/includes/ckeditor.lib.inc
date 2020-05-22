@@ -177,12 +177,16 @@ function ckeditor_load_skin_options() {
       closedir($dh);
     }
   }
-  //oops, we have no information about skins, let's use only default
-  if (empty($arr)) {
-    $arr = array(
-      'moono' => 'Moono',
-      'kama' => 'Kama'
-    );
+
+  // If we have no information about skins, use the default for this version.
+  if (!$arr) {
+    $version = explode('.', ckeditor_get_version());
+    if ($version[0] == 3) {
+      $arr = array('kama' => 'Kama');
+    }
+    elseif ($version[0] == 4) {
+      $arr = ($version[1] <= 5) ? array('moono' => 'Moono') : array('moono-lisa' => 'Moono-lisa');
+    }
   }
   asort($arr);
 
@@ -195,15 +199,25 @@ function ckeditor_load_skin_options() {
  * @return string
  */
 function ckeditor_default_skin() {
-  $skin_options = ckeditor_load_skin_options();
-  if (array_key_exists('moono', $skin_options)) {
-    return 'moono';
+  // If there is no available list then bail.
+  if (!$skin_options = ckeditor_load_skin_options()) {
+    return '';
   }
-  if (array_key_exists('kama', $skin_options)) {
-    return 'kama';
+
+  // Default skins in descending order
+  $defaults = array(
+    'moono-lisa' => 'Moono-lisa',
+    'moono' => 'Moono',
+    'kama' => 'Kama'
+  );
+
+  // If there is more than one skin to choose from, use the most current
+  // default.
+  if ($skin_options && ($default = array_intersect_key($defaults, $skin_options))) {
+    return key($default);
   }
-  reset($skin_options);
-  //if any default theme not exists select first from the list
+
+  // If there are no defaults, or only one skin, select the first from the list.
   return key($skin_options);
 }
 
@@ -1084,11 +1098,21 @@ function _ckeditor_add_css_from_theme($current_theme, &$css_files) {
     $color_paths = variable_get('color_' . $current_theme . '_stylesheets', array());
     if (defined('LANGUAGE_RTL') && $language->direction == LANGUAGE_RTL) {
       if (!empty($color_paths[1])) {
-        $css_files[] = $host . $color_paths[1] . $query_string;
+        if (substr($color_paths[0], 0, 9) == 'public://') {
+          $css_files[] = file_create_url($color_paths[1]) . $query_string;
+        }
+        else {
+          $css_files[] = $host . $color_paths[1] . $query_string;
+        }
       }
     }
     elseif (!empty($color_paths[0])) {
-      $css_files[] = $host . $color_paths[0] . $query_string;
+      if (substr($color_paths[0], 0, 9) == 'public://') {
+        $css_files[] = file_create_url($color_paths[0]) . $query_string;
+      }
+      else {
+        $css_files[] = $host . $color_paths[0] . $query_string;
+      }
     }
   }
   else {
@@ -1302,6 +1326,9 @@ function ckeditor_load_by_field($field, $format, $show_toggle = TRUE, $add_field
     elseif (!empty($field["#language"]) && $field["#language"] != LANGUAGE_NONE) {
       drupal_add_js(array('ckeditor' => array('scayt_language' => ckeditor_scayt_langcode($field["#language"]))), 'setting');
     }
+
+    // Pass Drupal's JS cache-busting string via settings along to CKEditor.
+    drupal_add_js(array('ckeditor' => array('timestamp' => variable_get('css_js_query_string', '0'))), 'setting');
 
     // Remember extra information and reuse it during "Preview"
     $processed_ids[$field['#id']]['suffix'] = $suffix;
