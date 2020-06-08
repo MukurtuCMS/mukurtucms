@@ -814,9 +814,15 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
  *
  * * except for entity refs that are in $go_one_level_deeper. For these, the children get their own entity refs synced too.
  */
-function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node') {
+function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_synced_entities, $synced_entity_type = 'node', $non_node_refs_only = FALSE) {
 
-  $ref_fields = field_read_fields(array('type' => ['node_reference', 'entityreference', 'taxonomy_term_reference', 'atom_reference', 'field_collection', 'paragraphs']));
+  // Build list of fields to loop through
+  $ref_types = ['taxonomy_term_reference', 'atom_reference', 'field_collection', 'paragraphs'];
+  if (!$non_node_refs_only) {
+    $ref_types = array_merge($ref_types, ['node_reference', 'entityreference']);
+  }
+  $ref_fields = field_read_fields(['type' => $ref_types]);
+
   foreach ($ref_fields as $ref_field => $ref_field_properties) {
 
     // Define entity reference term fields (where a view is used to populate the values in the form) as tax term references, for the purpose of this function.
@@ -901,15 +907,19 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
           default:
           if (node_access('view', $reffed_entity)) { // Check to make sure the user can view the reffed node.
             if ($ref_field_properties["settings"]["target_type"] != 'user') { // skip when the referring field is field_dhan_notified_users, or any other entity ref fields to users
+              $go_deeper_for_this_entity = !array_key_exists($reffed_entity->nid, $all_synced_entities['nodes'][$reffed_entity->type]);
               $all_synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
                 'last_updated' => $reffed_entity->changed,
                 'editable' => node_access('update', $reffed_entity) ? TRUE : FALSE,
               ];
-
               // Go deeper for certain entity refs.
               $go_one_level_deeper = ['field_unit_lessons'];
               if (in_array($ref_field, $go_one_level_deeper)) {
                 $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities);
+              }
+              // Otherwise still need to get the entity's refs other than other nodes (if it hasn't already been done for this node)
+              elseif ($go_deeper_for_this_entity) {
+                $all_synced_entities = _ma_mobile_client_add_ref_fields_to_sync_nodes($reffed_entity, $all_synced_entities, 'node', TRUE);
               }
             }
           }
