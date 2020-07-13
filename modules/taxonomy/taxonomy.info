@@ -8,7 +8,7 @@ files[] = taxonomy.module
 files[] = taxonomy.test
 configure = admin/structure/taxonomy
 
-; Information added by Drupal.org packaging script on 2020-05-20
-version = "7.70"
+; Information added by Drupal.org packaging script on 2020-06-17
+version = "7.72"
 project = "drupal"
-datestamp = "1589989726"
+datestamp = "1592419104"
