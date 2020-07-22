@@ -11,11 +11,18 @@ include_once('ma_base_theme.features.inc');
  */
 function ma_base_theme_form_alter(&$form, &$form_state, $form_id) {
   switch ($form_id) {
+    case 'user_login':
+      // Users didn't want to see &amp; in their tooltips.
+      if (isset($form['name']['#description'])) {
+        $form['name']['#description'] = html_entity_decode($form['name']['#description']);
+      }
+      break;
 
     case 'user_login_block':
       $form['name']['#attributes']['placeholder'] = t('Username');
       $form['pass']['#attributes']['placeholder'] = t('Password');
       break;
+
     case 'comment_node_digital_heritage_form':
       $form['subject']['#size'] = '10';
       break;
