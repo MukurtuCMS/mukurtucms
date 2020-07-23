@@ -30,7 +30,7 @@ jQuery(document).ready(function($){
             }
         }
     }
-    
+
     function mukurtuDestroyGrid() {
         if(window.mukurtuGridActive && window.mukurtuGrid) {
             window.mukurtuGrid.masonry('destroy');
@@ -54,4 +54,9 @@ jQuery(document).ready(function($){
         jQuery(this).parent().attr('title', jQuery(this).attr('data-original-title'));
     });
     $('[data-toggle="ckeditor-tooltip"]').tooltip(options);
+
+    // Hide the add new comment block title if the user can't see the form.
+    if ($('#comments form.comment-form').length == 0) {
+        $('#comments .title.comment-form').hide();
+    }
 });
