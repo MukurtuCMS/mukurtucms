@@ -295,12 +295,10 @@ function ma_search_api_default_search_api_index() {
         "field_lesson_days:field_evaluate" : { "type" : "list\\u003Ctext\\u003E" },
         "field_lesson_days:field_explain" : { "type" : "list\\u003Ctext\\u003E" },
         "field_lesson_days:field_explore_environment" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_micro_tasks:field_key_student_outcomes" : { "type" : "list\\u003Ctext\\u003E" },
         "field_lesson_micro_tasks:field_related_dh_items" : {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
           "entity_type" : "node"
         },
-        "field_lesson_micro_tasks:field_task" : { "type" : "list\\u003Ctext\\u003E" },
         "field_lesson_micro_tasks:field_word_list" : {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
           "entity_type" : "node"
@@ -1006,16 +1004,6 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_lesson_micro_tasks_fi_1",
             "column" : "value",
             "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_micro_tasks:field_task" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_micro_tasks:field_key_student_outcomes" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
           },
           "field_lesson_days:field_day" : {

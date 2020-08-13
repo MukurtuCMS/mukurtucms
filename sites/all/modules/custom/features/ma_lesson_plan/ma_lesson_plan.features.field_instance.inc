@@ -414,6 +414,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_micro_tasks-field_key_student_outcomes'.
   $field_instances['field_collection_item-field_lesson_micro_tasks-field_key_student_outcomes'] = array(
     'bundle' => 'field_lesson_micro_tasks',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -439,6 +441,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 1,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_key_student_outcomes',
@@ -451,7 +454,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -590,6 +593,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_micro_tasks-field_task'.
   $field_instances['field_collection_item-field_lesson_micro_tasks-field_task'] = array(
     'bundle' => 'field_lesson_micro_tasks',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -616,6 +621,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_task',
@@ -628,7 +634,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
