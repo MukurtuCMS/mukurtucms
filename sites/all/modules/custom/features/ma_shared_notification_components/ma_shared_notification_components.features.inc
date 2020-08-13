@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_shared_notification_components.features.inc
