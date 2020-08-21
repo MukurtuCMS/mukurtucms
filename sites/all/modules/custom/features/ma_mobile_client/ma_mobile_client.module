@@ -1101,6 +1101,8 @@ function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
             }
             $value[LANGUAGE_NONE]["#options"] = $options;
             $value[LANGUAGE_NONE]["#required"] = ma_cultural_protocol_node_type_must_have_cp($bundle);
+            $value[LANGUAGE_NONE]['#title'] = "Communities and Protocols"; //tw26327856
+            $value[LANGUAGE_NONE]['#description'] = "Communities represent groups of contributors. Communities can be large or small. Contributions could be media assets, complete Digital Heritage Items, knowledge, metadata, or other contributions. Cultural Protocols are how Communities provide users specific types of access to Digital heritage Items. Each Cultural Protocol is created by and managed within a Community. Digital Heritage Items must belong to at least one Community and one Cultural Protocol within that Community."; //tw26327856
             break;
 
         }
