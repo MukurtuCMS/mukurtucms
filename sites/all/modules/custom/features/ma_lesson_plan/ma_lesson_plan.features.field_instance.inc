@@ -72,6 +72,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_days-field_elaborate'.
   $field_instances['field_collection_item-field_lesson_days-field_elaborate'] = array(
     'bundle' => 'field_lesson_days',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -98,6 +100,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 5,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_elaborate',
@@ -110,7 +113,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -129,6 +132,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_days-field_elders'.
   $field_instances['field_collection_item-field_lesson_days-field_elders'] = array(
     'bundle' => 'field_lesson_days',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -155,6 +160,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 3,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_elders',
@@ -167,7 +173,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -186,6 +192,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_days-field_engage'.
   $field_instances['field_collection_item-field_lesson_days-field_engage'] = array(
     'bundle' => 'field_lesson_days',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -212,6 +220,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 1,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_engage',
@@ -224,7 +233,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -243,6 +252,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_days-field_evaluate'.
   $field_instances['field_collection_item-field_lesson_days-field_evaluate'] = array(
     'bundle' => 'field_lesson_days',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -269,6 +280,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 6,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_evaluate',
@@ -281,7 +293,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -300,6 +312,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_days-field_explain'.
   $field_instances['field_collection_item-field_lesson_days-field_explain'] = array(
     'bundle' => 'field_lesson_days',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -326,6 +340,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 4,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_explain',
@@ -338,7 +353,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -357,6 +372,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // 'field_collection_item-field_lesson_days-field_explore_environment'.
   $field_instances['field_collection_item-field_lesson_days-field_explore_environment'] = array(
     'bundle' => 'field_lesson_days',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -383,6 +400,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 2,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'field_collection_item',
     'field_name' => 'field_explore_environment',
@@ -395,7 +413,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -716,6 +734,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-lesson-body'.
   $field_instances['node-lesson-body'] = array(
     'bundle' => 'lesson',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -758,6 +778,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'body',
@@ -771,7 +792,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'display_summary' => 1,
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
@@ -962,6 +983,8 @@ function ma_lesson_plan_field_default_field_instances() {
   // Exported field_instance: 'node-lesson-field_lesson_resources'.
   $field_instances['node-lesson-field_lesson_resources'] = array(
     'bundle' => 'lesson',
+    'custom_add_another' => '',
+    'custom_remove' => '',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => 'Archival, PPWP, manipulative',
@@ -999,6 +1022,7 @@ function ma_lesson_plan_field_default_field_instances() {
         'weight' => 0,
       ),
     ),
+    'display_label' => '',
     'ds_extras_field_template' => '',
     'entity_type' => 'node',
     'field_name' => 'field_lesson_resources',
@@ -1011,7 +1035,7 @@ function ma_lesson_plan_field_default_field_instances() {
       'custom_remove' => '',
       'dnd_enabled' => 0,
       'mee_enabled' => 0,
-      'text_processing' => 0,
+      'text_processing' => 1,
       'user_register_form' => FALSE,
     ),
     'widget' => array(
