@@ -794,6 +794,7 @@ function _ma_mobile_client_get_user_synced_entities ($fn) {
       $all_synced_entities['nodes'][$synced_node->type][$synced_node->nid] = [
         'last_updated' => $synced_node->changed,
         'editable' => node_access('update', $synced_node) ? TRUE: FALSE,
+        'skip_in_browse_view' => !empty($synced_node->field_community_record_parent[LANGUAGE_NONE]) ? TRUE: FALSE,
       ];
     }
 
@@ -910,7 +911,8 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
               $go_deeper_for_this_entity = !array_key_exists($reffed_entity->nid, $all_synced_entities['nodes'][$reffed_entity->type]);
               $all_synced_entities['nodes'][$reffed_entity->type][$reffed_entity->nid] = [
                 'last_updated' => $reffed_entity->changed,
-                'editable' => node_access('update', $reffed_entity) ? TRUE : FALSE,
+                'editable' => node_access('update', $reffed_entity) ? TRUE: FALSE,
+                'skip_in_browse_view' => !empty($reffed_entity->field_community_record_parent[LANGUAGE_NONE]) ? TRUE: FALSE,
               ];
               // Go deeper for certain entity refs.
               $go_one_level_deeper = ['field_unit_lessons'];
