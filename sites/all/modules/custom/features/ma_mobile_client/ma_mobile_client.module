@@ -846,8 +846,11 @@ function _ma_mobile_client_add_ref_fields_to_sync_nodes($synced_entity, $all_syn
           if (isset($ref_field_value['tid'])) {
             $ref_field_values[] = taxonomy_term_load($ref_field_value['tid']);
           }
+          elseif (isset($ref_field_value['target_id'])) {
+            $ref_field_values[] = node_load($ref_field_value['target_id']);
+          }
           else {
-            // Currently, term refs are the only kind of refs in atoms, but if there are others in the future, we'll need to add handling for them here.
+            // Currently, term refs and entity refs are the only kind of refs in atoms, but if there are others in the future, we'll need to add handling for them here.
             drupal_set_message ("Error in _ma_mobile_client_add_ref_fields_to_sync_nodes() (atoms). Contact developer.", 'error');
           }
         }
