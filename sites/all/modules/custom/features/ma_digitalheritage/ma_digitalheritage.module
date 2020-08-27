@@ -115,20 +115,16 @@ function ma_digitalheritage_node_update($node) {
             $community_record_title = implode(' / ', $community_record_parent_communities) . ' Record';
             $community_record_title = $cr_inner->nid == $cr_outer->nid ? $community_record_title . ' (currently viewing)' : $community_record_title; // append "(currently viewing)" to the link text for the current node. This is why we need the double inner and outer CR loop.
             // Save the link to our link array
-            $linked_crs[] = l($community_record_title, 'node/' . $cr_inner->nid, ['attributes' => ['class' => ['muk-app']]]);
+            $linked_crs[] = [
+              'title' => $community_record_title,
+              'url' => 'node/' . $cr_inner->nid,
+              'attributes' => ['muk-app' => TRUE],
+            ];
           }
 
-          // Save the field value as a list of the links.
+          // Save the links to the field.
           // Use a session var to avoid infinite loop for the parent node.
-          $cr_outer->field_comm_records_constructed[LANGUAGE_NONE][0] = [
-            'format' => 'filtered_html',
-            'value' => theme_item_list([
-              'items' => $linked_crs,
-              'title' => '',
-              'type' => 'ul',
-              'attributes' => []
-            ]),
-          ];
+          $cr_outer->field_comm_records_mm[LANGUAGE_NONE] = $linked_crs;
           $_SESSION['updating_mm_cr_field'] = TRUE;
           node_save($cr_outer);
           $_SESSION['updating_mm_cr_field'] = FALSE;

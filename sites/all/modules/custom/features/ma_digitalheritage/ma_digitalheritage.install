@@ -26,7 +26,7 @@ function ma_digitalheritage_update_7101() {
  *
  * Populate the Mukurtu Mobile Community Records field.
  */
-function ma_digitalheritage_update_7102() {
+function ma_digitalheritage_update_7103() {
 
   features_revert_module ('ma_digitalheritage');
   include_once('one_time_updates/populate_mm_cr_field.php');
