@@ -1068,7 +1068,7 @@ function services_field_permissions_clean($op, $entity_type, $entity) {
       $key = $entity_type;
   }
   //Allow someone to alter the field lookup key in the case they used their own entity.
-  drupal_alter('services_field_permissions_field_lookup_key', $key);
+  drupal_alter('services_field_permissions_field_lookup_key', $key, $entity);
 
   //load the fields info
   $fields_info = field_info_instances($entity_type);

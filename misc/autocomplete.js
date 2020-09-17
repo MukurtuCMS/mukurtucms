@@ -277,7 +277,7 @@ Drupal.ACDB.prototype.search = function (searchString) {
   // Skip empty search strings, or search strings ending with a comma, since
   // that is the separator between search terms.
   if (searchString.length <= 0 ||
-    searchString.charAt(searchString.length - 1) == ';') {
+    searchString.charAt(searchString.length - 1) == ',') {
     return;
   }
 
@@ -297,8 +297,9 @@ Drupal.ACDB.prototype.search = function (searchString) {
     // encodeURIComponent to allow autocomplete search terms to contain slashes.
     $.ajax({
       type: 'GET',
-      url: db.uri + '/' + Drupal.encodePath(searchString),
+      url: Drupal.sanitizeAjaxUrl(db.uri + '/' + Drupal.encodePath(searchString)),
       dataType: 'json',
+      jsonp: false,
       success: function (matches) {
         if (typeof matches.status == 'undefined' || matches.status != 0) {
           db.cache[searchString] = matches;
