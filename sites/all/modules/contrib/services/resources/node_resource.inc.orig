@@ -325,7 +325,7 @@ function _node_resource_create($node) {
   // but always make the node author default to the current user (if the user
   // has permission to change it, $form_state['values'] will override this
   // default when the form is submitted).
-  $stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language')));
+  $stub_node = (object) array_intersect_key($node, array_flip(array('type', 'language', 'tnid')));
   $stub_node->name = $user->name;
 
   // Contributed modules may check the triggering element in the form state.

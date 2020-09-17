@@ -5,8 +5,8 @@ dependencies[] = services
 dependencies[] = oauth_common
 core = 7.x
 php = 5.2
-; Information added by Drupal.org packaging script on 2019-05-23
-version = "7.x-3.25"
+; Information added by Drupal.org packaging script on 2020-06-03
+version = "7.x-3.27"
 core = "7.x"
 project = "services"
-datestamp = "1558645091"
+datestamp = "1591213031"
