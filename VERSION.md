@@ -1,3 +1,11 @@
+## Mukurtu 2.1.5
+- Updated to Drupal 7.73
+- Fixed a bug where new content would not be correctly added to collections/related content fields
+- Fixed a bug where the 'View published content' permission could be incorrectly overridden
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.1.4
 - Updated to Drupal 7.70
 - Added a media export page
