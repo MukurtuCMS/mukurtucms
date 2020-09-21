@@ -129,6 +129,12 @@ function ma_search_api_node_update($node) {;
           $old_refs = ma_core_get_nids_from_array_of_nodes($wrapper_old->{$relationship}->value());
         }
 
+        // This update hook is manually called from ma_search_api_node_insert,
+        // we need to make sure brand new references are added as well.
+        if (isset($node->is_new) && $node->is_new) {
+          $refs_added = $new_refs;
+        }
+
         // A trigger field was changed, so reindex all related values, both new and old.
         if ($reindex_all_relations) {
           $items_to_reindex = array_merge($items_to_reindex, $new_refs, $old_refs);

@@ -18,7 +18,9 @@ class ServicesJSONFormatter implements ServicesFormatterInterface {
     if (is_scalar($data)) {
       $data = array($data);
     }
-    return str_replace('\\/', '/', json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR));
+    return defined('JSON_PARTIAL_OUTPUT_ON_ERROR') ?
+      str_replace('\\/', '/', json_encode($data, JSON_PARTIAL_OUTPUT_ON_ERROR)) :
+      str_replace('\\/', '/', json_encode($data));
   }
 }
 
@@ -62,7 +64,10 @@ class ServicesXMLFormatter implements ServicesFormatterInterface {
       foreach ($data as $key => $value) {
         if (is_numeric($key)) {
           $key = 'item';
-        }
+	}
+	else if (empty($key)) {
+          continue;
+	}
         else {
           $assoc = TRUE;
           $key = preg_replace('/[^A-Za-z0-9_]/', '_', $key);

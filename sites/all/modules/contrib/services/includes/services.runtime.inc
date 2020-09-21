@@ -249,6 +249,8 @@ function services_authentication_info($module) {
  *
  */
 function services_auth_invoke($module, $method, &$arg1 = NULL, &$arg2 = NULL, &$arg3 = NULL) {
+  $args = func_get_args();
+
   // Get information about the auth module
   $info = services_authentication_info($module);
   drupal_alter('services_authentication_info', $info, $module);
@@ -262,7 +264,6 @@ function services_auth_invoke($module, $method, &$arg1 = NULL, &$arg2 = NULL, &$
   }
 
   if (is_callable($func)) {
-    $args = func_get_args();
     // Replace module and method name and arg1 with reference to $arg1 and $arg2.
     array_splice($args, 0, 5, array(&$arg1, &$arg2, &$arg3));
     return call_user_func_array($func, $args);

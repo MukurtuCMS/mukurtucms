@@ -19,6 +19,7 @@ function ma_search_api_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'type';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',

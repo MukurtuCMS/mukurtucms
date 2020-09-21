@@ -289,23 +289,27 @@ function ma_search_api_default_search_api_index() {
         "field_identifier" : { "type" : "text" },
         "field_language:name" : { "type" : "list\\u003Ctext\\u003E" },
         "field_lesson_days:field_day" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_days:field_elaborate" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_days:field_elders" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_days:field_engage" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_days:field_evaluate" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_days:field_explain" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_days:field_explore_environment" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_micro_tasks:field_key_student_outcomes" : { "type" : "list\\u003Ctext\\u003E" },
-        "field_lesson_micro_tasks:field_related_dh_items" : {
+        "field_lesson_days:field_elaborate:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_elders:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_engage:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_explain:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_explore_environment:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_days:field_related_content" : {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
           "entity_type" : "node"
         },
-        "field_lesson_micro_tasks:field_task" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_micro_tasks:field_day" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_micro_tasks:field_key_student_outcomes:value" : { "type" : "list\\u003Ctext\\u003E" },
+        "field_lesson_micro_tasks:field_related_content" : {
+          "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+          "entity_type" : "node"
+        },
+        "field_lesson_micro_tasks:field_task:value" : { "type" : "list\\u003Ctext\\u003E" },
         "field_lesson_micro_tasks:field_word_list" : {
           "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
           "entity_type" : "node"
         },
-        "field_lesson_resources" : { "type" : "text" },
+        "field_lesson_resources:value" : { "type" : "text" },
         "field_lesson_tech_integration:value" : { "type" : "text" },
         "field_media_asset:type" : { "type" : "list\\u003Cstring\\u003E" },
         "field_mukurtu_terms" : { "type" : "list\\u003Cinteger\\u003E", "entity_type" : "taxonomy_term" },
@@ -991,64 +995,13 @@ function ma_search_api_default_search_api_server() {
             "type" : "list\\u003Cinteger\\u003E",
             "boost" : "1.0"
           },
-          "field_lesson_resources" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "text",
-            "boost" : "1.0"
-          },
-          "field_lesson_micro_tasks:field_related_dh_items" : {
-            "table" : "search_api_db_default_node_index_field_lesson_micro_tasks_fiel",
-            "column" : "value",
-            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
-            "boost" : "1.0"
-          },
           "field_lesson_micro_tasks:field_word_list" : {
             "table" : "search_api_db_default_node_index_field_lesson_micro_tasks_fi_1",
             "column" : "value",
             "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
             "boost" : "1.0"
           },
-          "field_lesson_micro_tasks:field_task" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_micro_tasks:field_key_student_outcomes" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
           "field_lesson_days:field_day" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_days:field_engage" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_days:field_explore_environment" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_days:field_elders" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_days:field_explain" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_days:field_elaborate" : {
-            "table" : "search_api_db_default_node_index_text",
-            "type" : "list\\u003Ctext\\u003E",
-            "boost" : "1.0"
-          },
-          "field_lesson_days:field_evaluate" : {
             "table" : "search_api_db_default_node_index_text",
             "type" : "list\\u003Ctext\\u003E",
             "boost" : "1.0"
@@ -1062,6 +1015,63 @@ function ma_search_api_default_search_api_server() {
             "table" : "search_api_db_default_node_index_field_related_content",
             "column" : "value",
             "type" : "list\\u003Cinteger\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_related_content" : {
+            "table" : "search_api_db_default_node_index_field_lesson_days_field_relat",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_related_content" : {
+            "table" : "search_api_db_default_node_index_field_lesson_micro_tasks_fiel",
+            "column" : "value",
+            "type" : "list\\u003Clist\\u003Cinteger\\u003E\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_day" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_elaborate:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_elders:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_engage:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_explain:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_days:field_explore_environment:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_key_student_outcomes:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_micro_tasks:field_task:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "list\\u003Ctext\\u003E",
+            "boost" : "1.0"
+          },
+          "field_lesson_resources:value" : {
+            "table" : "search_api_db_default_node_index_text",
+            "type" : "text",
             "boost" : "1.0"
           }
         }

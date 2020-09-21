@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_shared_notification_components.features.field_base.inc
@@ -129,7 +130,7 @@ function ma_shared_notification_components_field_default_field_bases() {
             'status' => 0,
           ),
           'views-select-list' => array(
-            'status' => 1,
+            'status' => 0,
           ),
         ),
         'sort' => array(
