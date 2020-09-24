@@ -931,6 +931,13 @@ function mukurtu_splash_block_batch_import() {
     ];
 
     $items[] = [
+      'title' => 'Export Media (Scald Atoms)',
+      'href' => 'manage/scald-atoms',
+      'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],
+      'description' => t('Select media for exporting to a CSV file.'),
+    ];
+
+    $items[] = [
       'title' => 'Export Dictionary Words',
       'href' => 'manage/dictionary-words',
       'localized_options' => ['attributes' => ['class' => ['opic-dashboard-content']]],

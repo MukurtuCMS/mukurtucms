@@ -1476,7 +1476,7 @@ function search_api_server_tasks_check(SearchApiServer $server = NULL) {
 
       default:
         // This should never happen.
-        continue;
+        continue 2;
     }
     $executed_tasks[] = $task->id;
   }

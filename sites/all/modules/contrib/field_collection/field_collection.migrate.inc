@@ -83,10 +83,10 @@ class MigrateDestinationFieldCollection extends MigrateDestinationEntity {
   /**
    * Import a single field collection item.
    *
-   * @param $collection
+   * @param \stdClass $collection
    *   Collection object to build. Pre-filled with any fields mapped in the
    *   migration.
-   * @param $row
+   * @param \stdClass $row
    *   Raw source data object - passed through to prepare/complete handlers.
    *
    * @return array|bool
@@ -139,7 +139,8 @@ class MigrateDestinationFieldCollection extends MigrateDestinationEntity {
         if ('field_' != substr($field, 0, 6)) {
           continue;
         }
-        elseif (property_exists($entity_old, $field) && !property_exists($collection, $field)) {
+
+        if (property_exists($entity_old, $field) && !property_exists($collection, $field)) {
           $entity->$field = $entity_old->$field;
         }
       }
@@ -149,7 +150,7 @@ class MigrateDestinationFieldCollection extends MigrateDestinationEntity {
     $status = entity_save('field_collection_item', $entity);
     migrate_instrument_stop('field_collection_save');
 
-    if (in_array($this->hostEntityType, array('node', 'field_collection_item')) || ($status !== FALSE)) {
+    if ($status !== FALSE || in_array($this->hostEntityType, array('node', 'field_collection_item'))) {
       $this->complete($entity, $row);
       if ($updating) {
         $this->numUpdated++;
@@ -159,9 +160,8 @@ class MigrateDestinationFieldCollection extends MigrateDestinationEntity {
       }
       return array($entity->item_id);
     }
-    else {
-      return FALSE;
-    }
+
+    return FALSE;
   }
 
   /**

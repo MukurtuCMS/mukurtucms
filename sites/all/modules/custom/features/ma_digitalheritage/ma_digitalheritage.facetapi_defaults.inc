@@ -19,6 +19,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_category';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -50,6 +51,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_collection';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -79,6 +81,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_community_ref';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -108,6 +111,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_media_asset:type';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -137,6 +141,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = '';
   $facet->facet = 'field_tags';
   $facet->enabled = FALSE;
+  $facet->hash = '0';
   $facet->settings = array(
     'operator' => 'and',
     'hard_limit' => '-1',
@@ -168,6 +173,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_category';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -211,6 +217,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_collection';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -254,6 +261,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_community_ref';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -297,6 +305,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_media_asset:type';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',
@@ -340,6 +349,7 @@ function ma_digitalheritage_facetapi_default_facet_settings() {
   $facet->realm = 'block';
   $facet->facet = 'field_tags';
   $facet->enabled = TRUE;
+  $facet->hash = '0';
   $facet->settings = array(
     'weight' => 0,
     'widget' => 'facetapi_checkbox_links',

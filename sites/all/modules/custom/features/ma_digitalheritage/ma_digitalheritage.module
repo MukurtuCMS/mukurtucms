@@ -750,6 +750,16 @@ function ma_digitalheritage_form_digital_heritage_node_form_alter(&$form, &$form
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function ma_digitalheritage_form_comment_node_digital_heritage_form_alter(&$form, &$form_state) {
+  // Change text of DH comment submit button.
+  if (isset($form['actions']['submit'])) {
+    $form['actions']['submit']['#value'] = t('Save Comment');
+  }
+}
+
+/**
  * After-build changes to the DH node form.
  */
 function ma_digitalheritage_dh_form_after_build($form, &$form_state) {
@@ -849,7 +859,7 @@ function ma_digitalheritage_node_insert($node) {
 
     // If this is a Book Child, reindex the parent
     $book_parent = $dh_emw->field_book_parent->value();
-    if (count($book_parent)) {
+    if (!empty($book_parent) && count($book_parent)) {
       search_api_index_specific_items_delayed(search_api_index_load('default_node_index'), [$book_parent->nid]);
     }
 

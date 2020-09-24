@@ -11,6 +11,11 @@
 function ma_culturalprotocol_og_features_default_permissions() {
   $permissions = array();
 
+  // Exported og permission: 'node:community:administer comments'
+  $permissions['node:community:administer comments'] = array(
+    'roles' => array(),
+  );
+
   // Exported og permission: 'node:community:create collection content'
   $permissions['node:community:create collection content'] = array(
     'roles' => array(),
@@ -24,6 +29,25 @@ function ma_culturalprotocol_og_features_default_permissions() {
   // Exported og permission: 'node:community:delete own collection content'
   $permissions['node:community:delete own collection content'] = array(
     'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:delete own comments'
+  $permissions['node:community:delete own comments'] = array(
+    'roles' => array(
+      'member' => 'member',
+    ),
+  );
+
+  // Exported og permission: 'node:community:modify any comments'
+  $permissions['node:community:modify any comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:community:post comments'
+  $permissions['node:community:post comments'] = array(
+    'roles' => array(
+      'member' => 'member',
+    ),
   );
 
   // Exported og permission: 'node:community:update any collection content'
@@ -41,6 +65,11 @@ function ma_culturalprotocol_og_features_default_permissions() {
     'roles' => array(
       'protocol steward' => 'protocol steward',
     ),
+  );
+
+  // Exported og permission: 'node:cultural_protocol_group:administer comments'
+  $permissions['node:cultural_protocol_group:administer comments'] = array(
+    'roles' => array(),
   );
 
   // Exported og permission: 'node:cultural_protocol_group:administer group'
@@ -91,6 +120,13 @@ function ma_culturalprotocol_og_features_default_permissions() {
     'roles' => array(),
   );
 
+  // Exported og permission: 'node:cultural_protocol_group:delete own comments'
+  $permissions['node:cultural_protocol_group:delete own comments'] = array(
+    'roles' => array(
+      'member' => 'member',
+    ),
+  );
+
   // Exported og permission: 'node:cultural_protocol_group:delete own community content'
   $permissions['node:cultural_protocol_group:delete own community content'] = array(
     'roles' => array(),
@@ -134,6 +170,18 @@ function ma_culturalprotocol_og_features_default_permissions() {
   // Exported og permission: 'node:cultural_protocol_group:manage roles'
   $permissions['node:cultural_protocol_group:manage roles'] = array(
     'roles' => array(),
+  );
+
+  // Exported og permission: 'node:cultural_protocol_group:modify any comments'
+  $permissions['node:cultural_protocol_group:modify any comments'] = array(
+    'roles' => array(),
+  );
+
+  // Exported og permission: 'node:cultural_protocol_group:post comments'
+  $permissions['node:cultural_protocol_group:post comments'] = array(
+    'roles' => array(
+      'member' => 'member',
+    ),
   );
 
   // Exported og permission: 'node:cultural_protocol_group:subscribe'

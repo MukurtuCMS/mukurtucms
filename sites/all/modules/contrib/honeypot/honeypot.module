@@ -290,7 +290,7 @@ function _honeypot_honeypot_validate($element, &$form_state) {
   $honeypot_value = $element['#value'];
 
   // Make sure it's empty.
-  if (!empty($honeypot_value)) {
+  if (!empty($honeypot_value) || $honeypot_value == '0') {
     _honeypot_log($form_state['values']['form_id'], 'honeypot');
     form_set_error('', t('There was a problem with your form submission. Please refresh the page and try again.'));
   }
@@ -440,8 +440,8 @@ function honeypot_get_time_limit($form_values = array()) {
     }
     $number = $query->countQuery()->execute()->fetchField();
 
-    // Don't add more than 30 days' worth of extra time.
-    $honeypot_time_limit = (int) min($honeypot_time_limit + exp($number) - 1, 2592000);
+    // Don't add more time than the expiration window.
+    $honeypot_time_limit = (int) min($honeypot_time_limit + exp($number) - 1, $expire_time);
     $additions = module_invoke_all('honeypot_time_limit', $honeypot_time_limit, $form_values, $number);
     if (count($additions)) {
       $honeypot_time_limit += array_sum($additions);

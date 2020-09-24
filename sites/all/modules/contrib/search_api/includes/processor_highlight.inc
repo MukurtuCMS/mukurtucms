@@ -315,99 +315,140 @@ class SearchApiHighlight extends SearchApiAbstractProcessor {
    * @param array $keys
    *   Search keywords entered by the user.
    *
-   * @return string
-   *   A string containing HTML for the excerpt.
+   * @return string|null
+   *   A string containing HTML for the excerpt, or NULL if none could be
+   *   created.
    */
   protected function createExcerpt($text, array $keys) {
     // Prepare text by stripping HTML tags and decoding HTML entities.
     $text = strip_tags(str_replace(array('<', '>'), array(' <', '> '), $text));
-    $text = ' ' . decode_entities($text);
+    $text = decode_entities($text);
+    $text = preg_replace('/\s+/', ' ', $text);
+    $text = trim($text, ' ');
+    $text_length = strlen($text);
 
-    // Extract fragments around keywords.
-    // First we collect ranges of text around each keyword, starting/ending
-    // at spaces, trying to get to the requested length.
-    // If the sum of all fragments is too short, we look for second occurrences.
+    // Try to reach the requested excerpt length with about two fragments (each
+    // with a keyword and some context).
     $ranges = array();
-    $included = array();
     $length = 0;
-    $work_keys = $keys;
-    while ($length < $this->options['excerpt_length'] && $work_keys) {
-      foreach ($work_keys as $k => $key) {
-        if ($length >= $this->options['excerpt_length']) {
+    $look_start = array();
+    $remaining_keys = $keys;
+
+    // Get the set excerpt length from the configuration. If the length is too
+    // small, only use one fragment.
+    $excerpt_length = $this->options['excerpt_length'];
+    $context_length = round($excerpt_length / 4) - 3;
+    if ($context_length < 32) {
+      $context_length = round($excerpt_length / 2) - 1;
+    }
+
+    while ($length < $excerpt_length && !empty($remaining_keys)) {
+      $found_keys = array();
+      foreach ($remaining_keys as $key) {
+        if ($length >= $excerpt_length) {
           break;
         }
-        // Remember occurrence of key so we can skip over it if more occurrences
-        // are desired.
-        if (!isset($included[$key])) {
-          $included[$key] = 0;
+
+        // Remember where we last found $key, in case we are coming through a
+        // second time.
+        if (!isset($look_start[$key])) {
+          $look_start[$key] = 0;
         }
-        // Locate a keyword (position $p, always >0 because $text starts with a
-        // space).
-        $p = 0;
-        if (empty($this->options['highlight_partial'])) {
-          $regex = '/' . self::$boundary . preg_quote($key, '/') . self::$boundary . '/iu';
-          if (preg_match($regex, $text, $match, PREG_OFFSET_CAPTURE, $included[$key])) {
-            $p = $match[0][1];
+
+        // See if we can find $key after where we found it the last time. Since
+        // we are requiring a match on a word boundary, make sure $text starts
+        // and ends with a space.
+        $matches = array();
+
+        if (!$this->options['highlight_partial']) {
+          $found_position = FALSE;
+          $regex = '/' . static::$boundary . preg_quote($key, '/') . static::$boundary . '/iu';
+          if (preg_match($regex, ' ' . $text . ' ', $matches, PREG_OFFSET_CAPTURE, $look_start[$key])) {
+            $found_position = $matches[0][1];
           }
         }
         else {
-          $function = function_exists('mb_stripos') ? 'mb_stripos' : 'stripos';
-          $p = $function($text, $key, $included[$key]);
+          $found_position = stripos($text, $key, $look_start[$key]);
         }
-        // Now locate a space in front (position $q) and behind it (position $s),
-        // leaving about 60 characters extra before and after for context.
-        // Note that a space was added to the front and end of $text above.
-        if ($p) {
-          if (($q = strpos(' ' . $text, ' ', max(0, $p - 61))) !== FALSE) {
-            $end = substr($text . ' ', $p, 80);
-            if (($s = strrpos($end, ' ')) !== FALSE) {
-              // Account for the added spaces.
-              $q = max($q - 1, 0);
-              $s = min($s, strlen($end) - 1);
-              $ranges[$q] = $p + $s;
-              $length += $p + $s - $q;
-              $included[$key] = $p + 1;
-              continue;
+        if ($found_position !== FALSE) {
+          $look_start[$key] = $found_position + 1;
+          // Keep track of which keys we found this time, in case we need to
+          // pass through again to find more text.
+          $found_keys[] = $key;
+
+          // Locate a space before and after this match, leaving some context on
+          // each end.
+          if ($found_position > $context_length) {
+            $before = strpos($text, ' ', $found_position - $context_length);
+            if ($before !== FALSE) {
+              ++$before;
+            }
+          }
+          else {
+            $before = 0;
+          }
+          if ($before !== FALSE && $before <= $found_position) {
+            if ($text_length > $found_position + $context_length) {
+              $after = strrpos(substr($text, 0, $found_position + $context_length), ' ', $found_position);
+            }
+            else {
+              $after = $text_length;
+            }
+            if ($after !== FALSE && $after > $found_position) {
+              if ($before < $after) {
+                // Save this range.
+                $ranges[$before] = $after;
+                $length += $after - $before;
+              }
             }
           }
         }
-        // Unless we got a match above, we don't need to look for this key any
-        // more.
-        unset($work_keys[$k]);
       }
+      // Next time through this loop, only look for keys we found this time,
+      // if any.
+      $remaining_keys = $found_keys;
     }
 
-    if (count($ranges) == 0) {
-      // We didn't find any keyword matches, so just return NULL.
+    if (!$ranges) {
+      // We didn't find any keyword matches, return NULL.
       return NULL;
     }
 
     // Sort the text ranges by starting position.
     ksort($ranges);
 
-    // Now we collapse overlapping text ranges into one. The sorting makes it O(n).
+    // Collapse overlapping text ranges into one. The sorting makes it O(n).
     $newranges = array();
+    $from1 = $to1 = NULL;
     foreach ($ranges as $from2 => $to2) {
-      if (!isset($from1)) {
+      if ($from1 === NULL) {
+        // This is the first time through this loop: initialize.
         $from1 = $from2;
         $to1 = $to2;
         continue;
       }
       if ($from2 <= $to1) {
+        // The ranges overlap: combine them.
         $to1 = max($to1, $to2);
       }
       else {
+        // The ranges do not overlap: save the working range and start a new
+        // one.
         $newranges[$from1] = $to1;
         $from1 = $from2;
         $to1 = $to2;
       }
     }
+    // Save the remaining working range.
     $newranges[$from1] = $to1;
 
-    // Fetch text
+    // Fetch text within the combined ranges we found.
     $out = array();
     foreach ($newranges as $from => $to) {
       $out[] = substr($text, $from, $to - $from);
+    }
+    if (!$out) {
+      return NULL;
     }
 
     // Let translators have the ... separator text as one chunk.

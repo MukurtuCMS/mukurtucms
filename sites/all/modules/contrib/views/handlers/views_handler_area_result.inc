@@ -101,7 +101,7 @@ class views_handler_area_result extends views_handler_area {
       $replacements["@$item"] = ${$item};
     }
     // Send the output.
-    if (!empty($total)) {
+    if (!empty($total) || !empty($this->options['empty'])) {
       $output .= filter_xss_admin(str_replace(array_keys($replacements), array_values($replacements), $format));
     }
     return $output;

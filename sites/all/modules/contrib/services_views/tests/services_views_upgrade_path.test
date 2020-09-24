@@ -37,8 +37,8 @@ class ServicesViewsSecurityUpgradePathTest extends ServicesViewsApiTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
-    parent::setUp();
+  public function setUp(array $modules = array()) {
+    parent::setUp($modules);
     $this->endpoint = $this->saveNewEndpoint();
     $this->priviledgedUser = $this->drupalCreateUser(array(
       'administer services',
@@ -80,7 +80,7 @@ class ServicesViewsSecurityUpgradePathTest extends ServicesViewsApiTestCase {
     $new_display_name = services_views_clone_display($view, 'page');
     $new_display = $view->display[$new_display_name];
     $this->verbose('<pre>' . print_r($new_display, TRUE) . '</pre>');
-    $this->assertTrue($new_display->display_options['path'] == 'page');
+    $this->assertTrue($new_display->display_options['path'] == 'services_views_sorted_nodes/page');
     $this->assertTrue($new_display->display_options['access']['type'] == 'perm' && $new_display->display_options['access']['perm'] == 'view own unpublished content');
     $this->executeView($view, $new_display_name);
     $this->assertIdenticalResultset(
@@ -130,7 +130,7 @@ class ServicesViewsSecurityUpgradePathTest extends ServicesViewsApiTestCase {
     variable_set($prefix . '_white_list', 0);
     variable_set($prefix . "_view_displays", array());
     services_views_convert_white_list_to_clones();
-    $this->assertEqual($_SESSION['messages']['warning'][0], 'Cowardly refusing to make a clone of all view displays. Please configure the specific views you would like to have cloned in the ' . $this->endpoint->name . '. There will be no new views cloned over to a Services display. If all displays need to be cloned, restore to the latest backup, and update your settings white list them all and try again.');
+    $this->assertEqual($_SESSION['messages']['warning'][0], 'Cowardly refusing to make a clone of all view displays. Please configure the specific views you would like to have cloned in the ' . $this->endpoint->name . ' endpoint. There will be no new views cloned over to a Services display. If all displays need to be cloned, restore to the latest backup, and update your settings white list them all and try again.');
   }
 
   /**

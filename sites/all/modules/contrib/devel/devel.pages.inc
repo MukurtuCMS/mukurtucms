@@ -35,6 +35,10 @@ function devel_function_reference() {
  * Page callback: Clears all caches, then redirects to the previous page.
  */
 function devel_cache_clear() {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], 'devel-cache-clear')) {
+    return MENU_ACCESS_DENIED;
+  }
+
   drupal_flush_all_caches();
 
   drupal_set_message('Cache cleared.');

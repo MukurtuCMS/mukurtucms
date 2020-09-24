@@ -19,7 +19,7 @@
   display: none;
 }
 
-/* Workaround for Modal dialog underneith the Ctools modal dialog with jQuery 1.10. 
+/* Workaround for Modal dialog underneith the Ctools modal dialog with jQuery 1.10.
    @TODO Remove this if ever ctools issue #1397370 ever gets fixed. */
 .ui-front.media-wrapper {
   z-index: 10001 !important;
@@ -69,7 +69,7 @@
 
 .media-item {
   background: #eee;
-  border: 1px solid #CCCCCC;
+  border: 1px solid #cccccc;
   box-shadow: inset 0 0 15px rgba(0,0,0,.1), inset 0 0 0 1px rgba(0,0,0,.05);
   display: inline-block;
   padding: 5px;
@@ -116,17 +116,17 @@
 }
 
 .media-list-thumbnails .media-item.selected {
-  background: #F4ECC7;
-  border-color: #058AC5;
+  background: #f4ecc7;
+  border-color: #058ac5;
 }
 
 .media-list-thumbnails .media-item:hover {
-  border-color: #058AC5;
+  border-color: #058ac5;
   cursor: pointer;
 }
 
 .media-list-thumbnails .media-item .label-wrapper label {
-  color: #058AC5;
+  color: #058ac5;
 }
 
 .media-list-thumbnails .media-item .label-wrapper label:hover {
@@ -152,5 +152,5 @@
 /* Exposed filter field */
 /* Use similar look and feel of a disabled field */
 .media-ajaxing-disabled {
-  background-color: #EBEBE4;
+  background-color: #ebebe4;
 }

@@ -28,6 +28,9 @@ CKEDITOR.editorConfig = function(config) {
   // config.protectedSource.push(/<code>[\s\S]*?<\/code>/gi);
   config.extraPlugins = '';
 
+  // Insert all Smiley image paths as relative or they may fail on SSL pages.
+  config.smiley_path = window.CKEDITOR_BASEPATH + 'plugins/smiley/images/';
+
   /*
     * Append here extra CSS rules that should be applied into the editing area.
     * Example:

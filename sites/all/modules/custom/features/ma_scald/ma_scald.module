@@ -296,7 +296,13 @@ function ma_scald_field_group_pre_render (&$element, $group, &$form) {
     // Order the fields according to their weight
     $ordered_fields = array();
     foreach ($element as $field_name => $field) {
-      $ordered_fields[$field['#weight']] = $field_name;
+      if (is_null($field)) {
+        continue;
+      }
+
+      if (isset($field['#weight'])) {
+        $ordered_fields[$field['#weight']] = $field_name;
+      }
     }
     ksort ($ordered_fields);
 
@@ -341,7 +347,7 @@ function ma_scald_form_alter(&$form, &$form_state, $form_id) {
       }
 
       // Provide a description that's NOT a popup for the protocol field
-      $form['atom' . $atom_index]['field_scald_protocol']['#suffix'] = '<div class = "atom-protocol-desc">' . t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general it is best to leave this open. If you select multiple Protocols, users with access to ANY of the Protocols will be able to see this item.") . '</div>';
+      $form['atom' . $atom_index]['field_scald_protocol']['#suffix'] = '<div class = "atom-protocol-desc">' . t("Atoms are open by default. The Protocol field lets you restrict who sees the atom, and who can re-use the atom in their own Digital Heritage items. This permission is independent of the Digital Heritage's Cultural Protocol. In general, it is best to apply the same protocol to each media asset that will be applied to the digital heritage item, dictionary word, or other content where that media asset will be used. See <a href=\"@scald-protocols\">this document</a> for more information. If you select multiple Protocols, users with access to ANY of the Protocols will be able to see this item.", array('@scald-protocols' => 'https://mukurtu.org/support/media-asset-metadata')) . '</div>';
       // Hide the old protocol field
       $form['atom' . $atom_index]['og_group_ref']['#access'] = FALSE;
 

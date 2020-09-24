@@ -78,6 +78,15 @@ function field_collection_field_collection_from_field_context($context, $conf) {
   if (isset($entity->{$plugin_info['field_name']})) {
 
     $items = field_get_items($plugin_info['entity_type'], $entity, $plugin_info['field_name']);
+
+    // Use negative delta to get item from the end.
+    if ($delta < 0) {
+      // Add negative pseudo-delta to total amount of items to get the real
+      // delta. Example (field_collection with 5 elements): count() == 5:
+      // 5 + -1 = 4, which would be the last element in this example.
+      $delta = count($items) + $delta;
+    }
+
     if (!empty($items) && isset($items[$delta]['value'])) {
       $field_collection_item = field_collection_item_load($items[$delta]['value']);
     }
@@ -98,7 +107,7 @@ function field_collection_field_collection_from_field_edit_form($form, &$form_st
     '#type' => 'textfield',
     '#title' => t('Delta'),
     '#size' => 3,
-    '#description' => t('The relationship can only create one context, but multiple items can be related. Please type in the number you want. The first one will be 0.'),
+    '#description' => t('The relationship can only create one context, but multiple items can be related. Please type in the number you want. The first one will be 0. Use negative delta to get items from the end. The last item will be -1'),
     '#default_value' => empty($conf['delta']) ? 0 : $conf['delta'],
   );
 

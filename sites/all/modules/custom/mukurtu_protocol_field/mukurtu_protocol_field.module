@@ -428,7 +428,7 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
         if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
           return NODE_ACCESS_DENY;  // Safeguard. This should never happen as the CP is a required field for these cases.
         }
-        return NODE_ACCESS_ALLOW;
+        return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE;
       }
 
       $groups_on_node = array_values($groups_on_node['node']);
@@ -437,11 +437,11 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
       if ($node->field_item_privacy_setting['und'][0]['value'] == 'any') {
         foreach ($groups_on_node as $group) {
           if (og_is_member('node', $group)) {
-            return NODE_ACCESS_ALLOW; // Pass if user is a member of the group
+            return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if user is a member of the group
           }
           $group_emw = entity_metadata_wrapper('node', $group);
           if ($group_emw->group_access->value() == 0) {
-            return NODE_ACCESS_ALLOW; // Pass if it's an open group
+            return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE; // Pass if it's an open group
           }
         }
         return NODE_ACCESS_DENY;
@@ -459,7 +459,7 @@ function mukurtu_protocol_field_node_access($node, $op, $account) {
             }
           }
         }
-        return NODE_ACCESS_ALLOW;
+        return $node->status ? NODE_ACCESS_ALLOW : NODE_ACCESS_IGNORE;
       }
     }
   }

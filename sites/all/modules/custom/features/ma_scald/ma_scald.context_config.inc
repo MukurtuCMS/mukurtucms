@@ -645,7 +645,7 @@ function ma_scald_default_scald_context_config() {
   );
   $context_config->player = array(
     'audio' => array(
-      '*' => 'mukurtu_default',
+      '*' => 'html5_player',
       'settings' => array(),
     ),
     'file' => array(

@@ -35,6 +35,11 @@ function mukurtu_export_mukurtu_export_field_handlers() {
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
             '#callback' => 'mukurtu_export_field_handler_geofield'
         ),
+        'link_field' => array(
+            '#module' => 'mukurtu_export',
+            '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
+            '#callback' => 'mukurtu_export_field_handler_link_field',
+        ),
         'paragraphs' => array(
             '#module' => 'mukurtu_export',
             '#file' => drupal_get_path('module', 'mukurtu_export') . DIRECTORY_SEPARATOR . 'mukurtu_export.field_handlers.inc',
@@ -232,6 +237,21 @@ function mukurtu_export_field_handler_geofield($value, $field_info, $options = a
         return array($value['geom'], $referenced_entities, $files);
     }
     return array(NULL, $referenced_entities, $files);
+}
+
+/**
+ * Link field export handler.
+ */
+function mukurtu_export_field_handler_link_field($value, $field_info, $options = array())
+{
+  $referenced_entities = array();
+  $files = array();
+
+  $url = isset($value['url']) ? $value['url'] : "";
+  $title = isset($value['title']) ? $value['title'] : "";
+  $attributes = isset($value['attributes']) ? implode(',', $value['attributes']) : "";
+
+  return array("$url||$title||$attributes", $referenced_entities, $files);
 }
 
 function mukurtu_export_field_handler_scald_thumbnail($value, $field_info, $options = array()) {

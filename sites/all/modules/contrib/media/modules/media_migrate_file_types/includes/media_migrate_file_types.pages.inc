@@ -61,7 +61,7 @@ function media_migrate_file_types_upgrade_file_types($form, &$form_state) {
   foreach ($migratable_types as $machine_name) {
     $type = file_type_load($machine_name);
     if (!$type) {
-      $type = new stdClass;
+      $type = new stdClass();
       $type->label = $type->type = $machine_name;
     }
     $form['upgradable_types'][$machine_name] = array(
@@ -137,7 +137,7 @@ function media_migrate_file_types_upgrade_file_types_confirm_submit($form, &$for
       // Old bundle might be deleted so let's fake some values.
       $bundle_old = file_type_load($type);
       if (empty($bundle_old)) {
-        $bundle_old = new stdClass;
+        $bundle_old = new stdClass();
         $bundle_old->type = $type;
         $bundle_old->mimetypes = array();
         $bundle_old->export_type = 2;
@@ -145,15 +145,15 @@ function media_migrate_file_types_upgrade_file_types_confirm_submit($form, &$for
 
       // Migrate fields to new bundle.
       if ($_GET['migrate_fields']) {
-        $old_fields = db_select('field_config_instance', 'fc')->fields('fc', array('field_name'))->condition('entity_type',  'file')->condition('bundle', $bundle_old->type)->execute()->fetchCol();
-        $new_fields = db_select('field_config_instance', 'fc')->fields('fc', array('field_name'))->condition('entity_type',  'file')->condition('bundle', $bundle_new->type)->execute()->fetchCol();
+        $old_fields = db_select('field_config_instance', 'fc')->fields('fc', array('field_name'))->condition('entity_type', 'file')->condition('bundle', $bundle_old->type)->execute()->fetchCol();
+        $new_fields = db_select('field_config_instance', 'fc')->fields('fc', array('field_name'))->condition('entity_type', 'file')->condition('bundle', $bundle_new->type)->execute()->fetchCol();
         $fields_to_move = array_diff($old_fields, $new_fields);
         $fields_to_drop = array_diff($old_fields, $fields_to_move);
 
         if (!empty($fields_to_move)) {
           db_update('field_config_instance')
             ->fields(array('bundle' => $bundle_new->type))
-            ->condition('entity_type',  'file')
+            ->condition('entity_type', 'file')
             ->condition('bundle', $bundle_old->type)
             ->condition('field_name', $fields_to_move, 'IN')
             ->execute();
@@ -161,7 +161,7 @@ function media_migrate_file_types_upgrade_file_types_confirm_submit($form, &$for
 
         if (!empty($fields_to_drop)) {
           db_delete('field_config_instance')
-            ->condition('entity_type',  'file')
+            ->condition('entity_type', 'file')
             ->condition('bundle', $bundle_old->type)
             ->condition('field_name', $fields_to_drop, 'IN')
             ->execute();

@@ -9,10 +9,21 @@
         if (event.editor.mode === 'wysiwyg') {
           var iframe = getIframe(event.editor);
           var iframe_document = iframe.contentWindow.document;
+
+          // We need to define a function to call the initialization of the videos because
+          // the inline script is directly executed when it is injected dynamically inside the page
+          // and the network call for loading the library is too slow compared to an inline script.
           var script_element = iframe_document.createElement('script');
           script_element.type = 'text/javascript';
-          script_element.src = Drupal.settings.defer_youtube_video_js;
+          var script_content = 'function loadYoutubeWysiwyg() {initializeYoutubeVideos(document);}';
+          var text_node = document.createTextNode(script_content);
+          script_element.appendChild(text_node);
           iframe_document.head.appendChild(script_element);
+
+          var script_element_library = iframe_document.createElement('script');
+          script_element_library.type = 'text/javascript';
+          script_element_library.src = Drupal.settings.defer_youtube_video_js_library;
+          iframe_document.head.appendChild(script_element_library);
         }
       });
 

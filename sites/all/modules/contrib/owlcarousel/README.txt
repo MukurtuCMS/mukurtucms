@@ -16,7 +16,7 @@ Install
 Before starting the installation please make sure you have all of the required modules. Ensure
 you have the correct jQuery version loaded by using the jQuery Update configuration page.
 
-Download the Owl Carousel library from https://github.com/smashingboxes/OwlCarousel2#quick-start
+Download the Owl Carousel library from https://owlcarousel2.github.io/OwlCarousel2/
 
 Library location
 sites\all\libraries\owlcarousel

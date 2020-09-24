@@ -3771,7 +3771,7 @@ function ma_scald_field_default_field_instances() {
     'ds_extras_field_template' => '',
     'entity_type' => 'scald_atom',
     'field_name' => 'scald_tags',
-    'label' => 'Keywords',
+    'label' => 'Tags',
     'required' => 0,
     'settings' => array(
       'custom_add_another' => '',
@@ -4621,7 +4621,6 @@ function ma_scald_field_default_field_instances() {
   t('Identifier');
   t('Image');
   t('Invitation');
-  t('Keywords');
   t('Location');
   t('Original DNG');
   t('People');

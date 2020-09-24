@@ -1,5 +1,47 @@
-Drupal 7.xx, xxxx-xx-xx (development version)
+Drupal 7.73, 2020-09-16
 -----------------------
+- Fixed security issues:
+   - SA-CORE-2020-007
+
+Drupal 7.72, 2020-06-17
+-----------------------
+- Fixed security issues:
+   - SA-CORE-2020-004
+
+Drupal 7.71, 2020-06-03
+-----------------------
+- Fix for jQuery Form bug in Chromium-based browsers
+- Full support for PHP 7.4
+
+Drupal 7.70, 2020-05-19
+-----------------------
+- Fixed security issues:
+   - SA-CORE-2020-002
+   - SA-CORE-2020-003
+
+Drupal 7.69, 2019-12-18
+-----------------------
+- Fixed security issues:
+   - SA-CORE-2019-012
+
+Drupal 7.68, 2019-12-04
+-----------------------
+- Fixed: Hide toolbar when printing
+- Fixed: Settings returned via ajax are not run through hook_js_alter()
+- Fixed: Use drupal_http_build_query() in drupal_http_request()
+- Fixed: DrupalRequestSanitizer not found fatal error when bootstrap phase order is changed
+- Fixed: Block web.config in .htaccess (and vice-versa)
+- Fixed: Create "scripts" element to align rendering workflow to how "styles" are handled
+- PHP 7.3: Fixed 'Cannot change session id when session is active'
+- PHP 7.1: Fixed 'A non-numeric value encountered in theme_pager()'
+- PHP 7.x: Fixed file.inc generated .htaccess does not cover PHP 7
+- PHP 5.3: Fixed check_plain() 'Invalid multibyte sequence in argument' test failures
+- Fixed: Allow passing data as array to drupal_http_request()
+- Fixed: Skip module_invoke/module_hook in calling hook_watchdog (excessive function_exist)
+- Fixed: HTTP status 200 returned for 'Additional uncaught exception thrown while handling exception'
+- Fixed: theme_table() should take an optional footer variable and produce <tfoot>
+- Fixed: 'uasort() expects parameter 1 to be array, null given in node_view_multiple()'
+- [regression] Fix default.settings.php permission
 
 Drupal 7.67, 2019-05-08
 -----------------------
@@ -136,7 +178,7 @@ Drupal 7.51, 2016-10-05
 - Numerous API documentation improvements.
 - Additional automated test coverage.
 
-Drupal 7.50, 2016-07-07 
+Drupal 7.50, 2016-07-07
 -----------------------
 - Added a new "administer fields" permission for trusted users, which is
   required in addition to other permissions to use the field UI
@@ -1084,7 +1126,7 @@ Drupal 7.1, 2011-05-25
 ----------------------
 - Fixed security issues (Cross site scripting, File access bypass), see SA-CORE-2011-001.
 
-Drupal 7.0, 2011-01-05 
+Drupal 7.0, 2011-01-05
 ----------------------
 - Database:
     * Fully rewritten database layer utilizing PHP 5's PDO abstraction layer.
@@ -1583,7 +1625,7 @@ Drupal 5.20, 2009-09-16
 Drupal 5.19, 2009-07-01
 -----------------------
 - Fixed security issues (Cross site scripting and Password leakage in URL), see
-  SA-CORE-2009-007.          
+  SA-CORE-2009-007.
 - Fixed a variety of small bugs.
 
 Drupal 5.18, 2009-05-13

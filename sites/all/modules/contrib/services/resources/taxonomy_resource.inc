@@ -654,6 +654,7 @@ function _taxonomy_resource_delete_access($tid) {
  **/
 function _taxonomy_term_resource_index($page, $fields, $parameters, $page_size, $options = array()) {
   $taxonomy_select = db_select('taxonomy_term_data', 't');
+  $taxonomy_select->addTag('taxonomy_term_access');
   $taxonomy_select->join('taxonomy_term_hierarchy', 'tth', 't.tid = tth.tid');
   $taxonomy_select->fields('tth');
 

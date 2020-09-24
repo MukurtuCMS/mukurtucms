@@ -270,7 +270,7 @@ function facetapi_get_next_date_increment($date, $gap) {
         break;
     }
 
-    // Gets the next incremenet.
+    // Gets the next increment.
     return facetapi_isodate(
       gmmktime($match[4], $match[5], $match[6], $match[2], $match[3], $match[1])
     );

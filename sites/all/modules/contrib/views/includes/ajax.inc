@@ -18,8 +18,8 @@ function views_ajax() {
   if (isset($_REQUEST['view_name']) && isset($_REQUEST['view_display_id'])) {
     $name = $_REQUEST['view_name'];
     $display_id = $_REQUEST['view_display_id'];
-    $args = isset($_REQUEST['view_args']) && $_REQUEST['view_args'] !== '' ? explode('/', $_REQUEST['view_args']) : array();
-    $path = isset($_REQUEST['view_path']) ? rawurldecode($_REQUEST['view_path']) : NULL;
+    $args = isset($_REQUEST['view_args']) && $_REQUEST['view_args'] !== '' ? explode('/', htmlspecialchars_decode($_REQUEST['view_args'], ENT_QUOTES)) : array();
+    $path = isset($_REQUEST['view_path']) ? htmlspecialchars_decode($_REQUEST['view_path'], ENT_QUOTES) : NULL;
     $dom_id = isset($_REQUEST['view_dom_id']) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $_REQUEST['view_dom_id']) : NULL;
     $pager_element = isset($_REQUEST['pager_element']) ? intval($_REQUEST['pager_element']) : NULL;
 
@@ -72,7 +72,8 @@ function views_ajax() {
       // Reuse the same DOM id so it matches that in Drupal.settings.
       $view->dom_id = $dom_id;
 
-      $commands[] = ajax_command_replace('.view-dom-id-' . $dom_id, $view->preview($display_id, $args));
+      // Always return HTML with the same DOM ID that was sent by the browser.
+      $commands[] = ajax_command_replace('.view-dom-id-' . $dom_id, preg_replace('/view-dom-id-[a-zA-Z0-9_-]+/', 'view-dom-id-' . $view->dom_id, $view->preview($display_id, $args), 1));
     }
     drupal_alter('views_ajax_data', $commands, $view);
     return array('#type' => 'ajax', '#commands' => $commands);

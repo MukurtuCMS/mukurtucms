@@ -181,7 +181,7 @@ class views_plugin_cache extends views_plugin {
   }
 
   /**
-   * Start caching javascript, css and other out of band info.
+   * Start caching JavaScript, css and other out of band info.
    *
    * This takes a snapshot of the current system state so that we don't
    * duplicate it. Later on, when gather_headers() is run, this information
@@ -214,10 +214,10 @@ class views_plugin_cache extends views_plugin {
     $css_start = isset($this->storage['css']) ? $this->storage['css'] : array();
     $this->storage['css'] = $this->assetDiff($css, $css_start, $array_mapping_func);
 
-    // Get javascript after/before views renders.
+    // Get JavaScript after/before views renders.
     $js = drupal_add_js();
     $js_start = isset($this->storage['js']) ? $this->storage['js'] : array();
-    // If there are any differences between the old and the new javascript then
+    // If there are any differences between the old and the new JavaScript then
     // store them to be added later.
     $this->storage['js'] = $this->assetDiff($js, $js_start, $array_mapping_func);
 
@@ -353,8 +353,15 @@ class views_plugin_cache extends views_plugin {
         // If the default query back-end is used generate SQL query strings from
         // the query objects.
         if ($build_info[$index] instanceof SelectQueryInterface) {
-          $query = clone $build_info[$index];
-          $query->preExecute();
+          $query = $build_info[$index];
+
+          // If the query was not yet prepared, work on a clone and run
+          // preExecute().
+          if (!$query->isPrepared()) {
+            $query = clone $build_info[$index];
+            $query->preExecute();
+          }
+
           $key_data['build_info'][$index] = array(
             'sql' => (string) $query,
             'arguments' => $query->getArguments(),

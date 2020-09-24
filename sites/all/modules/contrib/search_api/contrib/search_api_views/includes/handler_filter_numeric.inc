@@ -13,6 +13,15 @@ class SearchApiViewsHandlerFilterNumeric extends SearchApiViewsHandlerFilter {
   /**
    * {@inheritdoc}
    */
+  public function init(&$view, &$options) {
+    parent::init($view, $options);
+
+    $this->normalizeValue();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function option_definition() {
     $options = parent::option_definition();
     $options['value'] = array(
@@ -172,31 +181,30 @@ class SearchApiViewsHandlerFilterNumeric extends SearchApiViewsHandlerFilter {
       return t('is not empty');
     }
 
-    $value = isset($this->value[0]) ? $this->value[0] : $this->value;
-
     if (in_array($this->operator, array('between', 'not between'), TRUE)) {
       // This is of course wrong for translation purposes, but copied from
       // views_handler_filter_numeric::admin_summary() so probably still better
       // to re-use this than to do it correctly.
       $operator = $this->operator === 'between' ? t('between') : t('not between');
       $vars = array(
-        '@min' => (string) $value['min'],
-        '@max' => (string) $value['max'],
+        '@min' => (string) $this->value['min'],
+        '@max' => (string) $this->value['max'],
       );
       return $operator . ' ' . t('@min and @max', $vars);
     }
 
-    return check_plain((string) $this->operator) . ' ' . check_plain((string) $value['value']);
-
+    return check_plain((string) $this->operator) . ' ' . check_plain((string) $this->value['value']);
   }
 
   /**
    * {@inheritdoc}
    */
   public function query() {
+    $this->normalizeValue();
+
     if (in_array($this->operator, array('between', 'not between'), TRUE)) {
-      $min = isset($this->value[0]['min']) ? $this->value[0]['min'] : '';
-      $max = isset($this->value[0]['max']) ? $this->value[0]['max'] : '';
+      $min = $this->value['min'];
+      $max = $this->value['max'];
       if ($min !== '' && $max !== '') {
         $this->query->condition($this->real_field, array($min, $max), strtoupper($this->operator), $this->options['group']);
       }
@@ -210,8 +218,31 @@ class SearchApiViewsHandlerFilterNumeric extends SearchApiViewsHandlerFilter {
       }
     }
     else {
+      // The parent handler doesn't expect our value structure, just pass the
+      // scalar value instead.
+      $this->value = $this->value['value'];
       parent::query();
     }
+  }
+
+  /**
+   * Sets $this->value to an array of options as defined by the filter.
+   *
+   * @see SearchApiViewsHandlerFilterNumeric::option_definition()
+   */
+  protected function normalizeValue() {
+    $value = $this->value;
+    if (is_array($value) && isset($value[0])) {
+      $value = $value[0];
+    }
+    if (!is_array($value)) {
+      $value = array('value' => $value);
+    }
+    $this->value = array(
+      'value' => isset($value['value']) ? $value['value'] : '',
+      'min' => isset($value['min']) ? $value['min'] : '',
+      'max' => isset($value['max']) ? $value['max'] : '',
+    );
   }
 
 }

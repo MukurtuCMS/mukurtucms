@@ -142,15 +142,21 @@ function _og_invite_form_submit($form, &$form_state) {
   $invitees = explode(',', str_replace(', ', ',', $form_state['values']['invitee']));
 
   $entity = entity_load_single($group_type, $gid);
+  list(,, $group_bundle) = entity_extract_ids($group_type, $entity);
   $label = entity_label($group_type, $entity);
-  $field_name = key(og_get_group_audience_fields());
+
   foreach ($invitees as $invitee) {
     if (empty($invitee)) {
       continue;
     }
+    $result = NULL;
     list($name, $uid) = explode('||', preg_replace('#^(.*)\s\[([0-9]+)\]$#', '$1||$2', $invitee));
-
-    $result = og_invite_invite($group_type, $gid, $field_name, $uid, $message);
+    if ($account = user_load($uid)) {
+      $field_name = og_get_best_group_audience_field('user', $account, $group_type, $group_bundle, TRUE);
+      if ($field_name) {
+        $result = og_invite_invite($group_type, $gid, $field_name, $uid, $message);
+      }
+    }
 
     if (!empty($result)) {
       drupal_set_message(t('<em>@user</em> has been invited to the group <em>@label</em>.', array('@user' => $name, '@label' => $label)));
@@ -206,9 +212,8 @@ function _og_invite_autocomplete($group_type, $gid, $string) {
     }
 
     // Restrict to users not already in the group.
-    $join = "%alias.etid = u.uid AND %alias.entity_type = 'user' AND %alias.group_type = '@gtype' AND %alias.gid = @gid";
-    $join = format_string($join, array('@gtype' => $group_type, '@gid' => $gid));
-    $query->leftJoin('og_membership', 'ogm', $join);
+    $join = "%alias.etid = u.uid AND %alias.entity_type = 'user' AND %alias.group_type = :gtype AND %alias.gid = :gid";
+    $query->leftJoin('og_membership', 'ogm', $join, array(':gtype' => $group_type, ':gid' => $gid));
     $restrict_conditions->condition('ogm.state', NULL);
 
     $query->condition($search_conditions)
@@ -381,7 +386,7 @@ function _og_invite_answer_handle($group_type, $gid, $hash, $op = 'decline') {
       break;
     case 'always-decline':
       $wrapper = entity_metadata_wrapper('og_membership', $ogm);
-      $wrapper->state->set(OG_INVITE_STATE_BLOCKED);
+      $wrapper->state->set(OG_STATE_BLOCKED);
       $wrapper->{OG_MEMBERSHIP_REQUEST_FIELD}->set(t('Invitation declined'));
       og_membership_save($ogm);
       drupal_set_message(t('Your invitation has been permanently declined. If you want to become a member of this group you will have to join on your own.'), 'warning');
