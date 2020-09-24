@@ -717,7 +717,9 @@ function ma_digitalheritage_field_default_field_instances() {
       'default' => array(
         'label' => 'above',
         'module' => 'link',
-        'settings' => array(),
+        'settings' => array(
+          'custom_title' => '',
+        ),
         'type' => 'link_default',
         'weight' => 50,
       ),
@@ -742,7 +744,9 @@ function ma_digitalheritage_field_default_field_instances() {
       'mukurtu_mobile' => array(
         'label' => 'above',
         'module' => 'link',
-        'settings' => array(),
+        'settings' => array(
+          'custom_title' => '',
+        ),
         'type' => 'link_default',
         'weight' => 4,
       ),
@@ -2281,6 +2285,12 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'type' => 'hidden',
         'weight' => 0,
       ),
+      'mukurtu_mobile' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
       'search_index' => array(
         'label' => 'above',
         'settings' => array(),
@@ -3593,9 +3603,11 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
         'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -4647,9 +4659,11 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'taxonomy',
       'settings' => array(
         'apply_chosen' => '',
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
         'treeable' => 0,
         'use_select2' => FALSE,
       ),

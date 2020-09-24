@@ -49,7 +49,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'audio',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -154,7 +154,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'audio',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -499,7 +499,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'audio',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -609,7 +609,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'audio',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -859,7 +859,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'file',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1155,7 +1155,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'file',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1326,7 +1326,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'file',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -1662,7 +1662,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'image',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -2164,7 +2164,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'image',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -3527,7 +3527,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'image',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -4003,7 +4003,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'video',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -4276,7 +4276,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'video',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -4361,7 +4361,7 @@ function ma_scald_field_default_field_instances() {
     'bundle' => 'video',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(

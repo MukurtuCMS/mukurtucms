@@ -104,7 +104,6 @@ function ma_scald_field_default_field_bases() {
         'second' => 0,
         'year' => 'year',
       ),
-      'repeat' => 0,
       'timezone_db' => 'UTC',
       'todate' => '',
       'treeable' => FALSE,
@@ -293,9 +292,6 @@ function ma_scald_field_default_field_bases() {
       'handler' => 'base',
       'handler_settings' => array(
         'behaviors' => array(
-          'treeable_behavior' => array(
-            'status' => 0,
-          ),
           'views-select-list' => array(
             'status' => 0,
           ),
@@ -386,7 +382,7 @@ function ma_scald_field_default_field_bases() {
           'parent' => 0,
         ),
       ),
-      'treeable' => 0,
+      'treeable' => FALSE,
     ),
     'title' => 'Authors',
     'translatable' => 0,
