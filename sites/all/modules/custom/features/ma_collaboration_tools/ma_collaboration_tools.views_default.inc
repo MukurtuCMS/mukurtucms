@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collaboration_tools.views_default.inc
@@ -50,7 +51,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['empty']['area']['empty'] = TRUE;
   $handler->display->display_options['empty']['area']['content'] = 'There are no documents in this library yet.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
-  /* Relationship: Content: Author */
+  /* Relationship: Content: Content author */
   $handler->display->display_options['relationships']['uid']['id'] = 'uid';
   $handler->display->display_options['relationships']['uid']['table'] = 'node';
   $handler->display->display_options['relationships']['uid']['field'] = 'uid';
@@ -96,7 +97,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -359,7 +360,7 @@ function ma_collaboration_tools_views_default_views() {
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -659,7 +660,7 @@ print ma_collaboration_tools_generate_notication_frequency_form($view, $data);
   $handler->display->display_options['sorts']['changed']['table'] = 'node';
   $handler->display->display_options['sorts']['changed']['field'] = 'changed';
   $handler->display->display_options['sorts']['changed']['order'] = 'DESC';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';
@@ -777,7 +778,7 @@ print ma_collaboration_tools_generate_notication_frequency_form($view, $data);
   $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
-  /* Filter criterion: Content: Published */
+  /* Filter criterion: Content: Published status */
   $handler->display->display_options['filters']['status']['id'] = 'status';
   $handler->display->display_options['filters']['status']['table'] = 'node';
   $handler->display->display_options['filters']['status']['field'] = 'status';

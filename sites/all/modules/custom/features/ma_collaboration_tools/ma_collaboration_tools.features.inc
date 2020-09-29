@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_collaboration_tools.features.inc
