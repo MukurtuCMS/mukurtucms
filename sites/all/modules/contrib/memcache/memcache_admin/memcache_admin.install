@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ * Update functions for memcache_admin.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function memcache_admin_requirements($phase) {
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  $requirements = array();
+
+  if ($phase == 'install') {
+    if (!function_exists('dmemcache_object_cluster')) {
+      $requirements['memcache_admin'] = array(
+        'title' => $t('Memcache admin'),
+        'value' => $t('cache_backends not properly configured in settings.php, failed to load required file memcache.inc.'),
+        'description' => $t('You must properly configure cache_backends in %settings before enabling the memcache_admin module. Please review %readme for more information.', array('%settings' => 'settings.php', '%readme' => 'README.txt')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  else if ($phase == 'runtime') {
+    if (!function_exists('dmemcache_object_cluster') && module_exists('memcache_admin')) {
+      $requirements['memcache_admin'] = array(
+        'title' => $t('Memcache admin'),
+        'value' => $t('cache_backends not properly configured in settings.php, failed to load required file memcache.inc.'),
+        'description' => $t('You have enabled the memcache_admin module without properly configuring cache_backends in %settings. Please review %readme for more information.', array('%settings' => 'settings.php', '%readme' => 'README.txt')),
+        'severity' => REQUIREMENT_WARNING,
+      );
+    }
+  }
+  return $requirements;
+}
+
+/**
+ * Flush caches and rebuild menu to allow new stats pages to appear.
+ */
+function memcache_admin_update_7001() {
+  drupal_flush_all_caches();
+  menu_rebuild();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function memcache_admin_uninstall() {
+  variable_del('show_memcache_statistics');
+}
