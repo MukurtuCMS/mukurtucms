@@ -178,7 +178,7 @@ Drupal 7.51, 2016-10-05
 - Numerous API documentation improvements.
 - Additional automated test coverage.
 
-Drupal 7.50, 2016-07-07
+Drupal 7.50, 2016-07-07 
 -----------------------
 - Added a new "administer fields" permission for trusted users, which is
   required in addition to other permissions to use the field UI
@@ -1126,7 +1126,7 @@ Drupal 7.1, 2011-05-25
 ----------------------
 - Fixed security issues (Cross site scripting, File access bypass), see SA-CORE-2011-001.
 
-Drupal 7.0, 2011-01-05
+Drupal 7.0, 2011-01-05 
 ----------------------
 - Database:
     * Fully rewritten database layer utilizing PHP 5's PDO abstraction layer.
@@ -1625,7 +1625,7 @@ Drupal 5.20, 2009-09-16
 Drupal 5.19, 2009-07-01
 -----------------------
 - Fixed security issues (Cross site scripting and Password leakage in URL), see
-  SA-CORE-2009-007.
+  SA-CORE-2009-007.          
 - Fixed a variety of small bugs.
 
 Drupal 5.18, 2009-05-13
