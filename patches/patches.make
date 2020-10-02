@@ -78,6 +78,7 @@ projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.p
 ; Forbid to use duplicate entities in entityreference field
 projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid-duplicate-entities-in-entityreference-field_0.patch
 projects[entityreference][patch][] = contrib/0001-Fix-for-related-content-field-for-single-type.patch
+projects[entityreference][patch][] = contrib/Add-quicker-method-to-load-titles-for-nodes.patch
 
 ;;; Feeds
 ; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
