@@ -559,7 +559,7 @@ function ma_digitalheritage_field_default_field_instances() {
         'treeable' => 0,
       ),
       'type' => 'options_buttons',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -1862,7 +1862,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'use_select2' => FALSE,
       ),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 7,
     ),
   );
 
