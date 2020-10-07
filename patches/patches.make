@@ -134,6 +134,8 @@ projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds
 ;;; Partial Date
 ; Add property info callback
 projects[partial_date][patch][] = https://www.drupal.org/files/issues/add_property_info-2781135-2.patch
+; PHP 7.3 patch
+projects[partial_date][patch][] = https://www.drupal.org/files/issues/2020-01-16/partial_date-php_73_compat.patch
 
 ;;; Owl Carousel
 ; Add ID to handle multiple carousels
