@@ -11,6 +11,8 @@
 function features_schema() {
   $schema['cache_features'] = drupal_get_schema_unprocessed('system', 'cache');
   $schema['cache_features']['description'] = 'Cache table for features to store module info.';
+  $schema['cache_featurestate'] = drupal_get_schema_unprocessed('system', 'cache');
+  $schema['cache_featurestate']['description'] = 'Table for features to store persistent state info.';
   return $schema;
 }
 
@@ -20,7 +22,7 @@ function features_schema() {
 function features_install() {
   _features_install_menu();
   db_update('system')
-    ->fields(array('weight' =>  20))
+    ->fields(array('weight' => 20))
     ->condition('name', 'features')
     ->condition('type', 'module')
     ->execute();
@@ -87,8 +89,8 @@ function features_update_6100() {
     if (module_exists($feature->name) && $types = module_invoke($feature->name, 'node_info')) {
       foreach ($types as $type => $type_data) {
         $sql = "SELECT COUNT(*) FROM {node_type} WHERE module = 'node' AND type = '%s'";
-        // Only update if the hook_node_info type's module is 'features' and the db type's
-        // module is 'node'.
+        // Only update if the hook_node_info() type's module is 'features' and
+        // the db type's module is 'node'.
         if (($type_data['module'] == 'features') && db_query($sql, $type)->fetchField()) {
           $ret[] = update_sql("UPDATE {node_type} SET module = 'features' WHERE type = '$type'");
         }
@@ -107,7 +109,7 @@ function features_update_6100() {
  * that have been overridden.
  */
 function features_update_6101() {
-  // Ensure all of our own API functions still exist in in this version
+  // Ensure all of our own API functions still exist in this version
   // of Features. It's possible that the "future me" will not have these
   // functions, so I should check.
   module_load_include('inc', 'features', "features.export");
@@ -147,5 +149,16 @@ function features_update_7200() {
   if (!db_table_exists('cache_features')) {
     $schema = drupal_get_schema_unprocessed('system', 'cache');
     db_create_table('cache_features', $schema);
+  }
+}
+
+/**
+ * Add {cache_featurestate} table.
+ */
+function features_update_7201() {
+  if (!db_table_exists('cache_featurestate')) {
+    variable_del('features_codecache');
+    $schema = drupal_get_schema_unprocessed('system', 'cache');
+    db_create_table('cache_featurestate', $schema);
   }
 }

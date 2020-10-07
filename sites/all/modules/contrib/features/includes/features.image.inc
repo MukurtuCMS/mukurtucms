@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Features integration for 'image' module.
+ */
+
+/**
  * Implements hook_features_api().
  */
 function image_features_api() {
@@ -8,9 +13,11 @@ function image_features_api() {
     'image' => array(
       'name' => t('Image styles'),
       'feature_source' => TRUE,
+      /* @see \hook_image_default_styles() */
       'default_hook' => 'image_default_styles',
+      /* @see \hook_image_styles_alter() */
       'alter_hook' => 'image_styles',
-    )
+    ),
   );
 }
 
@@ -33,12 +40,12 @@ function image_features_export($data, &$export, $module_name = '') {
   $map = features_get_default_map('image');
   foreach ($data as $style) {
     $export['dependencies']['image'] = 'image';
-    // If another module provides this style, add it as a dependency
+    // If another module provides this style, add it as a dependency.
     if (isset($map[$style]) && $map[$style] != $module_name) {
       $module = $map[$style];
       $export['dependencies'][$module] = $module;
     }
-    // Otherwise, export the style
+    // Otherwise, export the style.
     elseif (image_style_load($style)) {
       $export['features']['image'][$style] = $style;
     }
@@ -90,7 +97,10 @@ function image_features_revert($module) {
 }
 
 /**
- * Remove unnecessary keys for export.
+ * Removes unnecessary keys from an image style for export.
+ *
+ * @param array $style
+ *   Image style definition.
  */
 function _image_features_style_sanitize(array &$style) {
   // Sanitize style: Don't export numeric IDs and things which get overwritten
