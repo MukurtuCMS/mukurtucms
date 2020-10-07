@@ -79,6 +79,10 @@ projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.p
 projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid-duplicate-entities-in-entityreference-field_0.patch
 projects[entityreference][patch][] = contrib/0001-Fix-for-related-content-field-for-single-type.patch
 
+;;; Entity Reference Prepopulate
+; Entity Reference Prepopulate PHP 7.4 patch
+projects[entityreference_prepopulate][patch][] = https://www.drupal.org/files/issues/2020-06-10/3115641-unparenthesized-ternary-deprecated.patch
+
 ;;; Feeds
 ; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
 ; Keep track of which fields were given by the feeds source
