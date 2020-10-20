@@ -590,15 +590,19 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
     }
   }
 
-  // Replace embedded Scald atom GUIDs with local SIDs
-  if(isset($scald_dnd_enabled_fields[$entity->type])) {
-      foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
-          if(!empty($entity->{$field})) {
-              foreach($entity->{$field}[LANGUAGE_NONE] as $key => $field_value) {
-                  $entity->{$field}[LANGUAGE_NONE][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
-              }
+  // Replace embedded Scald atom GUIDs with local SIDs.
+  if (isset($scald_dnd_enabled_fields[$entity->type])) {
+    foreach ($scald_dnd_enabled_fields[$entity->type] as $field) {
+      if (!empty($entity->{$field})) {
+        foreach ($entity->{$field} as $language => $values) {
+          if (!empty($values)) {
+            foreach ($values as $key => $field_value) {
+              $entity->{$field}[$language][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
+            }
           }
+        }
       }
+    }
   }
 
   if($entity->feeds_item->entity_type == 'scald_atom') {
