@@ -455,6 +455,20 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
   // If the ID is NULL, we are creating a new entity, check creation permission.
   $action = $entity_id ? 'update' : 'create';
 
+  // Language Handling.
+  // This is very Mukurtu specific and basically makes it impossible to use feeds
+  // to import 'language' (not to be confused with 'field_language'). So much of
+  // import is already so Mukurtu specific that I think this is fine for v2.
+  if (isset($entity->feeds_item)) {
+    // Use the default language for new content.
+    if ($entity->feeds_item->is_new) {
+      $entity->language = language_default('language');
+    } else {
+      // For updates, use the previous language.
+      unset($entity->language);
+    }
+  }
+
   // If this is existing node content, put the nid back in.
   // Not doing this will cause the upcoming entity_access call to fail.
   if (isset($entity_id) && $entity_type == 'node') {
