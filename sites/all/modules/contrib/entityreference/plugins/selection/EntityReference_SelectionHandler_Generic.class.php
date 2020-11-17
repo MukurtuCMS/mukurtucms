@@ -167,10 +167,22 @@ class EntityReference_SelectionHandler_Generic implements EntityReference_Select
     $results = $query->execute();
 
     if (!empty($results[$entity_type])) {
-      $entities = entity_load($entity_type, array_keys($results[$entity_type]));
-      foreach ($entities as $entity_id => $entity) {
-        list(,, $bundle) = entity_extract_ids($entity_type, $entity);
-        $options[$bundle][$entity_id] = check_plain($this->getLabel($entity));
+      // Mukurtu Patch. For larger sites (10,000+ nodes), loading every node just to grab the title is
+      // prohibitively slow. At this point, the entity reference selection view has already been filtered
+      // for access, so for nodes we'll grab the titles via a db_query. This limits a lot of the
+      // configurability of entity reference fields, but most Mukurtu users aren't looking to change
+      // those fields and would rather have the speed increase.
+      if ($entity_type == 'node' && variable_get('mukurtu_entity_reference_quick_node_title_lookup', TRUE)) {
+        $titles = db_query("SELECT nid, title FROM {node} WHERE nid IN (:nids)", array(':nids' => array_keys($results[$entity_type])))->fetchAllKeyed(0, 1);
+        foreach ($titles as $nid => $title) {
+          $options[$results[$entity_type][$nid]->type][$nid] = check_plain($title);
+        }
+      } else {
+        $entities = entity_load($entity_type, array_keys($results[$entity_type]));
+        foreach ($entities as $entity_id => $entity) {
+          list(,, $bundle) = entity_extract_ids($entity_type, $entity);
+          $options[$bundle][$entity_id] = check_plain($this->getLabel($entity));
+        }
       }
     }
 
