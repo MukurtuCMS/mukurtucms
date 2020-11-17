@@ -53,7 +53,11 @@ jQuery(document).ready(function($){
         jQuery(this).parent().attr('data-toggle', 'ckeditor-tooltip');
         jQuery(this).parent().attr('title', jQuery(this).attr('data-original-title'));
     });
-    $('[data-toggle="ckeditor-tooltip"]').tooltip(options);
+    try {
+        $('[data-toggle="ckeditor-tooltip"]').tooltip(options);
+    } catch (err) {
+
+    }
 
     // Hide the add new comment block title if the user can't see the form.
     if ($('#comments form.comment-form').length == 0) {
