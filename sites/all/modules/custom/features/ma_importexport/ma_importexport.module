@@ -31,6 +31,17 @@ function ma_importexport_menu() {
                         );
    */
 
+   $items['admin/reports/mukurtu/run-multiple-language-report'] = [
+    'title' => 'Run Fields with Multiple Languages Report',
+    'page callback' => 'ma_import_export_multiple_language_bug_report',
+    'access arguments' => array('administer content'),
+  ];
+  $items['admin/reports/mukurtu/multiple-language-report'] = [
+    'title' => 'Fields with Multiple Languages Report',
+    'page callback' => 'ma_import_export_multiple_language_bug_report_form',
+    'access arguments' => array('administer content'),
+  ];
+
   return $items;
 }
 
@@ -455,6 +466,20 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
   // If the ID is NULL, we are creating a new entity, check creation permission.
   $action = $entity_id ? 'update' : 'create';
 
+  // Language Handling.
+  // This is very Mukurtu specific and basically makes it impossible to use feeds
+  // to import 'language' (not to be confused with 'field_language'). So much of
+  // import is already so Mukurtu specific that I think this is fine for v2.
+  if (isset($entity->feeds_item)) {
+    // Use the default language for new content.
+    if ($entity->feeds_item->is_new) {
+      $entity->language = language_default('language');
+    } else {
+      // For updates, use the previous language.
+      unset($entity->language);
+    }
+  }
+
   // If this is existing node content, put the nid back in.
   // Not doing this will cause the upcoming entity_access call to fail.
   if (isset($entity_id) && $entity_type == 'node') {
@@ -590,15 +615,19 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
     }
   }
 
-  // Replace embedded Scald atom GUIDs with local SIDs
-  if(isset($scald_dnd_enabled_fields[$entity->type])) {
-      foreach($scald_dnd_enabled_fields[$entity->type] as $field) {
-          if(!empty($entity->{$field})) {
-              foreach($entity->{$field}[LANGUAGE_NONE] as $key => $field_value) {
-                  $entity->{$field}[LANGUAGE_NONE][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
-              }
+  // Replace embedded Scald atom GUIDs with local SIDs.
+  if (isset($scald_dnd_enabled_fields[$entity->type])) {
+    foreach ($scald_dnd_enabled_fields[$entity->type] as $field) {
+      if (!empty($entity->{$field})) {
+        foreach ($entity->{$field} as $language => $values) {
+          if (!empty($values)) {
+            foreach ($values as $key => $field_value) {
+              $entity->{$field}[$language][$key]['value'] = ma_importexport_scald_dnd_decode($field_value['value']);
+            }
           }
+        }
       }
+    }
   }
 
   if($entity->feeds_item->entity_type == 'scald_atom') {
@@ -2360,4 +2389,46 @@ function _ma_import_export_cleanup_guids() {
   db_delete('feeds_item')
     ->condition('guid', '')
     ->execute();
+}
+
+function ma_import_export_check_node_for_multiple_language_bug($node) {
+  $bugged_fields = [];
+  foreach ($node as $fieldname => $value) {
+    if (is_array($value)) {
+      $langs = array_keys($value);
+      if (in_array(LANGUAGE_NONE, $langs) && count($langs) > 1) {
+        $bugged_fields[$fieldname] = $value;
+      }
+    }
+  }
+
+  return !empty($bugged_fields) ? [$bugged_fields] : NULL;
+}
+
+function ma_import_export_multiple_language_bug_report() {
+  $batch = array(
+    'operations' => array(
+      array('ma_import_export_multiple_language_bug_batch_run', [[]]),
+    ),
+    'finished' => 'ma_import_export_multiple_language_bug_batch_run_finished',
+    'title' => t('Checking content for fields with multiple languages'),
+    'init_message' => t('Gathering list of content.'),
+    'progress_message' => t('Processed @current out of @total.'),
+    'file' => drupal_get_path('module', 'ma_importexport') . '/ma_importexport.field_bug_report_batch.inc',
+  );
+  batch_set($batch);
+  batch_process('admin/reports/mukurtu/multiple-language-report');
+
+  return '';
+}
+
+function ma_import_export_multiple_language_bug_report_form() {
+  $table = $_SESSION['ma_importexport_multiple_language_field_form_table'];
+  $form['description']['#markup'] = '<h2>Items found that have fields with multiple languages</h2>';
+  $form['text']['#markup'] = '<p>There was a bug with import were it was possible for fields to be stored using multiple language tags. ';
+  $form['text']['#markup'] .= 'For some fields this created a situation where a field would be edited in one language but displayed in another, making them appear impossible to change.</p>';
+  $form['text']['#markup'] .= '<p>If any items appear in the table below and you are experiencing this problem with editing, contact Mukurtu Support (support@mukurtu.org) for assistance.</p>';
+  $form['table']['#markup'] = drupal_render($table);
+  $form['rerun']['#markup'] = l("Run the Report Again", 'admin/reports/mukurtu/run-multiple-language-report');
+  return $form;
 }
