@@ -1,16 +1,36 @@
 <?php
 
 /**
- * @param $info - feature info array
- * @param $module_name
- * @return fully populated export array
+ * @file
+ * Contains functions that export configuration into feature modules.
+ */
+
+/**
+ * Populates an export array with additional keys.
+ *
+ * @param array $info
+ *   Feature info array
+ *   Format:
+ *     $['features'][$component][$name] = $name
+ *     $['dependencies'][$dependency] = $dependency.
+ * @param string $module_name
+ *   Module name of the feature being generated.
+ *
+ * @return array
+ *   Fully populated export array.
+ *   Format:
+ *     $['features']['features_api']['api:' . FEATURES_API] = TRUE
+ *     $['features'][$component][$name] = $name
+ *     $['dependencies'][$dependency] = $dependency
+ *     $['conflicts'] = [..]
+ *     $['features_exclude'][$component][$name] = $name
  */
 function features_populate($info, $module_name) {
   // Sanitize items.
   $items = !empty($info['features']) ? array_filter($info['features']) : array();
   $items['dependencies'] = !empty($info['dependencies']) ? drupal_map_assoc(array_filter($info['dependencies'])) : array();
 
-  // Populate stub
+  // Populate stub.
   $stub = array('features' => array(), 'dependencies' => array(), 'conflicts' => array()) + $info + array('features_exclude' => array());
   $export = _features_populate($items, $stub, $module_name, TRUE);
 
@@ -18,9 +38,10 @@ function features_populate($info, $module_name) {
   // will be treated as a Feature and included in the admin/build/features UI.
   $export['features']['features_api']['api:' . FEATURES_API] = TRUE;
   // Allow other modules to alter the export.
+  /* @see \hook_features_export_alter() */
   drupal_alter('features_export', $export, $module_name);
 
-  // Clean up and standardize order
+  // Clean up and standardize order.
   foreach (array_keys($export['features']) as $k) {
     ksort($export['features'][$k]);
   }
@@ -32,17 +53,44 @@ function features_populate($info, $module_name) {
 }
 
 /**
- * Iterate and descend into a feature definition to extract module
- * dependencies and feature definition. Calls hook_features_export for modules
- * that implement it.
+ * Populates an export array with additional components from the "pipe".
  *
- * @param $pipe
- *  Associative of array of module => info-for-module
- * @param $export
- *  Associative array of items, and module dependencies which define a feature.
- *  Passed by reference.
+ * The mechanism allows each component to add objects from other components as
+ * dependencies, using hook_features_export().
  *
- * @return fully populated $export array.
+ * @param string[][] $pipe
+ *   Format: $[$component][] = $name
+ *   Original list of components.
+ * @param array $export
+ *   Associative array of items, and module dependencies which define a feature.
+ *   Passed by reference.
+ *   Format:
+ *     $['features'][$component][$name] = $name
+ *     $['dependencies'][$dependency] = $dependency
+ *     $['conflicts'] = [..]
+ *     $['features_exclude'][$component][$name] = $name.
+ *   During the recursive calls to this function, the export array will be
+ *   filled up with additional components and module dependencies.
+ * @param string $module_name
+ *   Module name of the feature being generated.
+ * @param bool $reset
+ *   TRUE, to reset the static cache for this function.
+ *
+ * @return array
+ *   Fully populated $export array.
+ *   Format:
+ *     $['features'][$component][$name] = $name
+ *     $['dependencies'][$dependency] = $dependency
+ *     $['conflicts'] = [..]
+ *     $['features_exclude'][$component][$name] = $name
+ *   The return value is the same as the value of the by-reference $export
+ *   parameter after the function was executed.
+ *
+ * @see \hook_features_export()
+ * @see \hook_features_pipe_alter()
+ * @see \hook_features_pipe_COMPONENT_alter()
+ *
+ * @todo The return value is pointless, see #3074424.
  */
 function _features_populate($pipe, &$export, $module_name = '', $reset = FALSE) {
   // Ensure that the export will be created in the english language.
@@ -65,12 +113,14 @@ function _features_populate($pipe, &$export, $module_name = '', $reset = FALSE) 
     }
     if (!empty($data) && $function = features_hook($component, 'features_export')) {
       // Pass module-specific data and export array.
-      // We don't use features_invoke() here since we need to pass $export by reference.
+      // We don't use features_invoke() here since we need to pass $export by
+      // reference.
       $more = $function($data, $export, $module_name, $component);
       // Add the context information.
       $export['component'] = $component;
       $export['module_name'] = $module_name;
-      // Allow other modules to manipulate the pipe to add in additional modules.
+      // Allow other modules to manipulate the pipe to add in additional
+      // modules.
       drupal_alter(array('features_pipe', 'features_pipe_' . $component), $more, $data, $export);
       // Remove the component information.
       unset($export['component']);
@@ -98,11 +148,21 @@ function _features_populate($pipe, &$export, $module_name = '', $reset = FALSE) 
 
 /**
  * Iterates over data and convert to dependencies if already defined elsewhere.
+ *
+ * @param string[] $data
+ *   Names of component items/objects, e.g. "node-article-body".
+ * @param array $export
+ *   Export array.
+ * @param string $module_name
+ *   Module name.
+ * @param string $component
+ *   E.g. "field_instance".
  */
 function _features_resolve_dependencies(&$data, &$export, $module_name, $component) {
   if ($map = features_get_default_map($component)) {
     foreach ($data as $key => $item) {
-      // If this node type is provided by a different module, add it as a dependency
+      // If this node type is provided by a different module, add it as a
+      // dependency.
       if (isset($map[$item]) && $map[$item] != $module_name) {
         $export['dependencies'][$map[$item]] = $map[$item];
         unset($data[$key]);
@@ -112,11 +172,22 @@ function _features_resolve_dependencies(&$data, &$export, $module_name, $compone
 }
 
 /**
+ * Minimizes a list of dependencies.
+ *
  * Iterates over a list of dependencies and kills modules that are
  * captured by other modules 'higher up'.
+ *
+ * @param string[] $dependencies
+ *   List of module names required by the given module.
+ *   Format: $[$dependency] = $dependency.
+ * @param string $module_name
+ *   Module name whose dependencies are being processed.
+ *
+ * @return string[]
+ *   Format: $[$dependency] = $dependency
  */
 function _features_export_minimize_dependencies($dependencies, $module_name = '') {
-  // Ensure that the module doesn't depend upon itself
+  // Ensure that the module doesn't depend upon itself.
   if (!empty($module_name) && !empty($dependencies[$module_name])) {
     unset($dependencies[$module_name]);
   }
@@ -133,13 +204,14 @@ function _features_export_minimize_dependencies($dependencies, $module_name = ''
     else {
       $module = features_get_modules($v);
       if ($module && !empty($module->info['dependencies'])) {
-        // If this dependency depends on the module itself, we have a circular dependency.
+        // If this dependency depends on the module itself, we have a circular
+        // dependency.
         // Don't let it happen. Only you can prevent forest fires.
         if (in_array($module_name, $module->info['dependencies'])) {
           unset($dependencies[$k]);
         }
-        // Iterate through the dependency's dependencies and remove any dependencies
-        // that are captured by it.
+        // Iterate through the dependency's dependencies and remove any
+        // dependencies that are captured by it.
         else {
           foreach ($module->info['dependencies'] as $j => $dependency) {
             if (array_search($dependency, $dependencies) !== FALSE) {
@@ -155,7 +227,32 @@ function _features_export_minimize_dependencies($dependencies, $module_name = ''
 }
 
 /**
- * Iterates over a list of dependencies and maximize the list of modules.
+ * Completes a list of dependencies by adding all indirect dependencies as well.
+ *
+ * Mathematically this would be called a 'transitive closure'.
+ *
+ * This function is recursive, some of its parameters are only meant to be used
+ * in recursive calls.
+ *
+ * @param string[] $dependencies
+ *   Original list of dependencies.
+ *   Format: $[*] = $module
+ *   The array keys will be ignored, which means this has the same result for
+ *   serial or associative arrays.
+ * @param string $module_name
+ *   (obsolete) Name of the module whose dependencies are being processed.
+ *   This has no effect whatsoever, so it can be safely omitted.
+ * @param string[] $maximized
+ *   (recursive) List of modules that were already processed in previous
+ *   recursion levels. Omit in non-recursive call.
+ * @param bool $first
+ *   (recursive) TRUE, if this is not a recursive call.
+ *
+ * @return string[]
+ *   Complete list of direct and indirect dependencies.
+ *   Format: $[] = $module
+ *
+ * @see _module_build_dependencies()
  */
 function _features_export_maximize_dependencies($dependencies, $module_name = '', $maximized = array(), $first = TRUE) {
   foreach ($dependencies as $k => $v) {
@@ -173,34 +270,42 @@ function _features_export_maximize_dependencies($dependencies, $module_name = ''
 }
 
 /**
- * Prepare a feature export array into a finalized info array.
- * @param $export
- *  An exported feature definition.
- * @param $module_name
- *  The name of the module to be exported.
- * @param $reset
- *  Boolean flag for resetting the module cache. Only set to true when
- *  doing a final export for delivery.
+ * Prepares a feature export array into a finalized info array.
+ *
+ * @param array $export
+ *   An exported feature definition.
+ *   This has the same structure as a module *.info array, but it may be missing
+ *   some keys, or have the keys in the wrong order.
+ * @param string $module_name
+ *   The name of the module to be exported.
+ * @param bool $reset
+ *   TRUE to reset the module cache. Only set to true when
+ *   doing a final export for delivery.
+ * @param bool $add_deprecated
+ *   TRUE to also add deprecated components.
+ *
+ * @return array
+ *   Complete *.info array with all required keys added and standardized order.
  */
 function features_export_prepare($export, $module_name, $reset = FALSE, $add_deprecated = TRUE) {
   $existing = features_get_modules($module_name, $reset);
 
-  // copy certain exports directly into info
+  // Copy certain exports directly into info.
   $copy_list = array('scripts', 'stylesheets');
   foreach ($copy_list as $item) {
-    if(isset($export[$item])) {
+    if (isset($export[$item])) {
       $existing->info[$item] = $export[$item];
     }
   }
 
-  // Prepare info string -- if module exists, merge into its existing info file
+  // Prepare info string -- if module exists, merge into its existing info file.
   $defaults = !empty($existing->info) ? $existing->info : array('core' => '7.x', 'package' => 'Features');
   $export = array_merge($defaults, $export);
 
   $deprecated = features_get_deprecated();
-  // Cleanup info array
+  // Cleanup info array.
   foreach ($export['features'] as $component => $data) {
-    // if performing the final export, do not export deprecated components
+    // If performing the final export, do not export deprecated components.
     if (($reset || !$add_deprecated) && !empty($deprecated[$component])) {
       unset($export['features'][$component]);
     }
@@ -234,18 +339,31 @@ function features_export_prepare($export, $module_name, $reset = FALSE, $add_dep
 
 /**
  * Generate an array of hooks and their raw code.
+ *
+ * @param array $export
+ *   Export array.
+ * @param string $module_name
+ *   Feature module name.
+ * @param bool $reset
+ *   TRUE to reset the cache.
+ *
+ * @return string[][]
+ *   Format: $[$component][$hook_name] = $function_body_php
+ *   E.g. $['node']['node_info'] = '$items = array(..); [..] return $items;'
  */
 function features_export_render_hooks($export, $module_name, $reset = FALSE) {
   features_include();
   $code = array();
 
-  // Sort components to keep exported code consistent
+  // Sort components to keep exported code consistent.
   ksort($export['features']);
 
   foreach ($export['features'] as $component => $data) {
     if (!empty($data)) {
-      // Sort the items so that we don't generate different exports based on order
+      // Sort the items so that we don't generate different exports based on
+      // order.
       asort($data);
+      /* @see \hook_features_export_render() */
       if (features_hook($component, 'features_export_render')) {
         $hooks = features_invoke($component, 'features_export_render', $module_name, $data, $export);
         $code[$component] = $hooks;
@@ -258,28 +376,29 @@ function features_export_render_hooks($export, $module_name, $reset = FALSE) {
 /**
  * Render feature export into an array representing its files.
  *
- * @param $export
- *  An exported feature definition.
- * @param $module_name
- *  The name of the module to be exported.
- * @param $reset
- *  Boolean flag for resetting the module cache. Only set to true when
- *  doing a final export for delivery.
+ * @param array $export
+ *   An exported feature definition.
+ * @param string $module_name
+ *   The name of the module to be exported.
+ * @param bool $reset
+ *   Boolean flag for resetting the module cache. Only set to true when
+ *   doing a final export for delivery.
  *
- * @return array of info file and module file contents.
+ * @return array
+ *   Array of info file and module file contents.
  */
 function features_export_render($export, $module_name, $reset = FALSE) {
   $code = array();
 
-  // Generate hook code
+  // Generate hook code.
   $component_hooks = features_export_render_hooks($export, $module_name, $reset);
   $components = features_get_components();
   $deprecated = features_get_deprecated($components);
 
-  // Group component code into their respective files
+  // Group component code into their respective files.
   foreach ($component_hooks as $component => $hooks) {
     if ($reset && !empty($deprecated[$component])) {
-      // skip deprecated components on final export
+      // Skip deprecated components on final export.
       continue;
     }
     $file = array('name' => 'features');
@@ -288,6 +407,7 @@ function features_export_render($export, $module_name, $reset = FALSE) {
         case FEATURES_DEFAULTS_INCLUDED:
           $file['name'] = "features.$component";
           break;
+
         case FEATURES_DEFAULTS_CUSTOM:
           $file['name'] = $components[$component]['default_filename'];
           break;
@@ -311,23 +431,23 @@ function features_export_render($export, $module_name, $reset = FALSE) {
     }
   }
 
-  // Finalize strings to be written to files
+  // Finalize strings to be written to files.
   $code = array_filter($code);
   foreach ($code as $filename => $contents) {
     if ($filename != '_files') {
-      $code[$filename] = "<?php\n\n/**\n * @file\n * {$module_name}.{$filename}.inc\n */\n\n". implode("\n\n", $contents) ."\n";
+      $code[$filename] = "<?php\n\n/**\n * @file\n * {$module_name}.{$filename}.inc\n */\n\n" . implode("\n\n", $contents) . "\n";
     }
   }
 
-  // Allow extra files be added to feature.
-  if ($files =  module_invoke_all('features_export_files', $module_name, $export)) {
+  // Allow extra files to be added to the feature via ['_files'].
+  if ($files = module_invoke_all('features_export_files', $module_name, $export)) {
     $code['_files'] = !empty($code['_files']) ? $code['_files'] + $files : $files;
   }
   if (!empty($code['_files'])) {
     drupal_alter('features_export_files', $code['_files'], $module_name, $export);
   }
 
-  // Generate info file output
+  // Generate info file output.
   $export = features_export_prepare($export, $module_name, $reset);
   $code['info'] = features_export_info($export);
 
@@ -335,12 +455,12 @@ function features_export_render($export, $module_name, $reset = FALSE) {
   $modulefile_features_inc = "<?php\n\n/**\n * @file\n * Code for the {$export['name']} feature.\n */\n\ninclude_once '{$module_name}.features.inc';\n";
   $modulefile_blank = "<?php\n\n/**\n * @file\n * Drupal needs this blank file.\n */\n";
 
-  // Prepare the module
-  // If module exists, let it be and include it in the files
+  // Prepare the module.
+  // If module exists, let it be and include it in the files.
   if ($existing = features_get_modules($module_name, TRUE)) {
     $code['module'] = file_get_contents($existing->filename);
 
-    // If the current module file does not reference the features.inc include,
+    // If the current module file does not reference the features.inc include,.
     // @TODO this way of checking does not account for the possibility of inclusion instruction being commented out.
     if (isset($code['features']) && strpos($code['module'], "{$module_name}.features.inc") === FALSE) {
       // If .module does not begin with <?php\n, just add a warning.
@@ -348,23 +468,22 @@ function features_export_render($export, $module_name, $reset = FALSE) {
         features_log(t('@module does not appear to include the @include file.', array('@module' => "{$module_name}.module", '@include' => "{$module_name}.features.inc")), 'warning');
       }
       else {
-        // Remove the old message if it exists, else just remove the <?php
+        // Remove the old message if it exists, else just remove the <?php.
         $length = strpos($code['module'], $modulefile_blank) === 0 ? strlen($modulefile_blank) : 6;
         $code['module'] = $modulefile_features_inc . substr($code['module'], $length);
       }
     }
 
     if ($reset) {
-      // only check for deprecated files on final export
-
+      // Only check for deprecated files on final export
       // Deprecated files. Display a message for any of these files letting the
       // user know that they may be removed.
       $deprecated_files = array(
         "{$module_name}.defaults",
         "{$module_name}.features.views",
-        "{$module_name}.features.node"
+        "{$module_name}.features.node",
       );
-      // add deprecated components
+      // Add deprecated components.
       foreach ($deprecated as $component) {
         $info = features_get_components($component);
         $filename = isset($info['default_file']) && $info['default_file'] == FEATURES_DEFAULTS_CUSTOM ? $info['default_filename'] : "features.{$component}";
@@ -375,23 +494,30 @@ function features_export_render($export, $module_name, $reset = FALSE) {
           features_log(t('The file @filename has been deprecated and can be removed.', array('@filename' => $file->filename)), 'status');
         }
         elseif ($file->name === "{$module_name}.features" && empty($code['features'])) {
-          // Try and remove features.inc include.
+          // Attempt to remove the "include_once '*.features.inc';" statement in
+          // the *.module file.
           if (strpos($code['module'], "{$module_name}.features.inc")) {
             $code['module'] = str_replace($modulefile_features_inc, $modulefile_blank, $code['module']);
           }
-          // If unable to remove the include, add a message to remove.
+          // Check if the removal was successful.
           if (strpos($code['module'], "{$module_name}.features.inc")) {
+            // The removal of the "include_once" was not successful, perhaps due
+            // to custom modifications in the *.module file.
+            // Leave a comment in *.features.inc to clean this up manually.
             $code['features'] = "<?php\n\n// This file is deprecated and can be removed.\n// Please remove include_once('{$module_name}.features.inc') in {$module_name}.module as well.\n";
           }
           else {
+            // The "include_once" was removed successfully.
+            // However, the *.features.inc file still needs to be removed
+            // manually.
             $code['features'] = "<?php\n\n// This file is deprecated and can be removed.\n";
           }
         }
       }
     }
   }
-  // Add a stub module to include the defaults
-  else if (!empty($code['features'])) {
+  // Add a stub module to include the defaults.
+  elseif (!empty($code['features'])) {
     $code['module'] = $modulefile_features_inc;
   }
   else {
@@ -402,17 +528,24 @@ function features_export_render($export, $module_name, $reset = FALSE) {
 
 /**
  * Detect differences between DB and code components of a feature.
+ *
+ * @param \stdClass $module
+ *   A module info object.
+ *
+ * @return string[][]
+ *   Format: $[$component] = ['normal' => '..', 'default' => '..']
  */
 function features_detect_overrides($module) {
   $cache = &drupal_static(__FUNCTION__, array());
   if (!isset($cache[$module->name])) {
-    // Rebuild feature from .info file description and prepare an export from current DB state.
+    // Rebuild feature from .info file description and prepare an export from
+    // current DB state.
     $export = features_populate($module->info, $module->name);
     $export = features_export_prepare($export, $module->name, FALSE, FALSE);
 
     $overridden = array();
 
-    // Compare feature info
+    // Compare feature info.
     features_sanitize($module->info);
     features_sanitize($export);
 
@@ -421,7 +554,7 @@ function features_detect_overrides($module) {
       $overridden['info'] = $compare;
     }
 
-    // Collect differences at a per-component level
+    // Collect differences at a per-component level.
     $states = features_get_component_states(array($module->name), FALSE);
     foreach ($states[$module->name] as $component => $state) {
       if ($state != FEATURES_DEFAULT) {
@@ -443,6 +576,19 @@ function features_detect_overrides($module) {
 
 /**
  * Gets the available default hooks keyed by components.
+ *
+ * @param string|null $component
+ *   A component name, e.g. 'field_instance', or NULL to list all components.
+ * @param bool $reset
+ *   (optional) If TRUE, the components cache will be cleared.
+ *
+ * @return string[]|string|null
+ *   Return value depending on parameters:
+ *   - If $component is NULL:
+ *     The default hook for each component.
+ *     Format: $[$component] = $default_hook
+ *   - If $component is provided:
+ *     The default hook (string), or NULL.
  */
 function features_get_default_hooks($component = NULL, $reset = FALSE) {
   return features_get_components($component, 'default_hook', $reset);
@@ -450,6 +596,12 @@ function features_get_default_hooks($component = NULL, $reset = FALSE) {
 
 /**
  * Gets the available default hooks keyed by components.
+ *
+ * @param string $component
+ *   Component name.
+ *
+ * @return string|false
+ *   The alter hook name, or FALSE if no altering should happen.
  */
 function features_get_default_alter_hook($component) {
   $default_hook = features_get_components($component, 'default_hook');
@@ -460,6 +612,18 @@ function features_get_default_alter_hook($component) {
 
 /**
  * Return a code string representing an implementation of a defaults module hook.
+ *
+ * @param string $module
+ *   The module name or component name.
+ * @param string $hook
+ *   The hook name.
+ * @param string $code
+ *   Function body.
+ * @param string $args
+ *   (optional) A parameter list.
+ *
+ * @return string
+ *   The PHP code for a function declaration with doc comment.
  */
 function features_export_render_defaults($module, $hook, $code, $args = '') {
   $output = array();
@@ -475,13 +639,15 @@ function features_export_render_defaults($module, $hook, $code, $args = '') {
 /**
  * Generate code friendly to the Drupal .info format from a structured array.
  *
- * @param $info
+ * @param mixed $info
  *   An array or single value to put in a module's .info file.
- * @param $parents
+ * @param string[] $parents
  *   Array of parent keys (internal use only).
  *
- * @return
+ * @return string
  *   A code string ready to be written to a module's .info file.
+ *
+ * @todo It would be faster to pass a string for $parents.
  */
 function features_export_info($info, $parents = array()) {
   $output = '';
@@ -492,12 +658,12 @@ function features_export_info($info, $parents = array()) {
       $output .= features_export_info($v, $child);
     }
   }
-  else if (!empty($info) && count($parents)) {
+  elseif (!empty($info) && count($parents)) {
     $line = array_shift($parents);
     foreach ($parents as $key) {
       $line .= is_numeric($key) ? "[]" : "[{$key}]";
     }
-    $line .=  " = {$info}\n";
+    $line .= " = {$info}\n";
     return $line;
   }
   return $output;
@@ -506,13 +672,13 @@ function features_export_info($info, $parents = array()) {
 /**
  * Tar creation function. Written by dmitrig01.
  *
- * @param $name
+ * @param string $name
  *   Filename of the file to be tarred.
- * @param $contents
- *   String contents of the file.
+ * @param string $contents
+ *   File contents to be written as tar.
  *
- * @return
- *   A string of the tar file contents.
+ * @return string
+ *   The raw tar file contents.
  */
 function features_tar_create($name, $contents) {
   /* http://www.mkssoftware.com/docs/man4/tar.4.asp */
@@ -532,9 +698,9 @@ function features_tar_create($name, $contents) {
     for ($i = 0; $i < 512; $i++) {
       $checksum += ord(substr($bigheader, $i, 1));
     }
-    $bigheader = substr_replace($bigheader, sprintf("%06o", $checksum)."\0 ", 148, 8);
+    $bigheader = substr_replace($bigheader, sprintf("%06o", $checksum) . "\0 ", 148, 8);
   }
- $header = pack("a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12", // book the memorie area
+  $header = pack("a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12", // Book the memorie area.
     substr($name,0,100),  //  0     100     File name
     '100644 ',            // File permissions
     '   765 ',            // UID,
@@ -557,8 +723,8 @@ function features_tar_create($name, $contents) {
   for ($i = 0; $i < 512; $i++) {
     $checksum += ord(substr($header, $i, 1));
   }
-  $header = substr_replace($header, sprintf("%06o", $checksum)."\0 ", 148, 8);
-  $tar = $bigheader.$header;
+  $header = substr_replace($header, sprintf("%06o", $checksum) . "\0 ", 148, 8);
+  $tar = $bigheader . $header;
 
   $buffer = str_split($contents, 512);
   foreach ($buffer as $item) {
@@ -568,7 +734,27 @@ function features_tar_create($name, $contents) {
 }
 
 /**
- * Export var function -- from Views.
+ * Alternative to var_export(), with a more pleasant output format.
+ *
+ * The function is recursive, some parameters should only be provided on
+ * recursive calls.
+ *
+ * The function is inspired/adapted from views_var_export().
+ *
+ * @param mixed $var
+ *   The value to export.
+ * @param string $prefix
+ *   (recursive) Prefix for indentation.
+ * @param bool $init
+ *   (recursive) TRUE, if this is the first level of recursion.
+ * @param int $count
+ *   (recursive) The recursion depth. Starts with 0.
+ *
+ * @return string
+ *   A php statement whose return value is $var.
+ *
+ * @see \views_var_export()
+ * @see \var_export()
  */
 function features_var_export($var, $prefix = '', $init = TRUE, $count = 0) {
   if ($count > 50) {
@@ -577,43 +763,41 @@ function features_var_export($var, $prefix = '', $init = TRUE, $count = 0) {
   }
 
   if (is_object($var)) {
-    $output = method_exists($var, 'export') ? $var->export() : features_var_export((array) $var, '', FALSE, $count+1);
+    $output = method_exists($var, 'export') ? $var->export() : features_var_export((array) $var, '', FALSE, $count + 1);
   }
-  else if (is_array($var)) {
+  elseif (is_array($var)) {
     if (empty($var)) {
       $output = 'array()';
     }
     else {
       $output = "array(\n";
       foreach ($var as $key => $value) {
-        // Using normal var_export on the key to ensure correct quoting.
-        $output .= "  " . var_export($key, TRUE) . " => " . features_var_export($value, '  ', FALSE, $count+1) . ",\n";
+        // Using normal var_export() on the key, to ensure correct quoting.
+        $output .= "  " . var_export($key, TRUE) . " => " . features_var_export($value, '  ', FALSE, $count + 1) . ",\n";
       }
       $output .= ')';
     }
   }
-  else if (is_bool($var)) {
+  elseif (is_bool($var)) {
     $output = $var ? 'TRUE' : 'FALSE';
   }
-  else if (is_int($var)) {
+  elseif (is_int($var)) {
     $output = intval($var);
   }
-  else if (is_numeric($var)) {
+  elseif (is_numeric($var)) {
     $floatval = floatval($var);
     if (is_string($var) && ((string) $floatval !== $var)) {
-      // Do not convert a string to a number if the string
-      // representation of that number is not identical to the
-      // original value.
+      // Do not convert a string to a number, if the string representation of
+      // that number is not identical to the original value.
       $output = var_export($var, TRUE);
     }
     else {
       $output = $floatval;
     }
   }
-  else if (is_string($var) && strpos($var, "\n") !== FALSE) {
-    // Replace line breaks in strings with a token for replacement
-    // at the very end. This protects whitespace in strings from
-    // unintentional indentation.
+  elseif (is_string($var) && strpos($var, "\n") !== FALSE) {
+    // Replace line breaks in strings with a token for replacement at the very
+    // end. This protects whitespace in strings from unintentional indentation.
     $var = str_replace("\n", "***BREAK***", $var);
     $output = var_export($var, TRUE);
   }
@@ -633,9 +817,21 @@ function features_var_export($var, $prefix = '', $init = TRUE, $count = 0) {
 }
 
 /**
- * Helper function to return an array of t()'d translatables strings.
- * Useful for providing a separate array of translatables with your
- * export so that string extractors like potx can detect them.
+ * Creates PHP code with t() statements for given translatable strings.
+ *
+ * This PHP code can be added to generated code, to allow string extractors like
+ * potx to extract a list of translatables from the exported module.
+ *
+ * This is typically called from hook_features_export_render() implementations.
+ *
+ * @param string[] $translatables
+ *   List of translatable strings.
+ *   Format: $[] = $string.
+ * @param string $indent
+ *   Indentation to prepend to each line of code.
+ *
+ * @return string
+ *   PHP code with t() statements for each translatable string.
  */
 function features_translatables_export($translatables, $indent = '') {
   $output = '';
@@ -652,7 +848,21 @@ function features_translatables_export($translatables, $indent = '') {
 }
 
 /**
- * Get a summary storage state for a feature.
+ * Gets a summary storage state for a feature.
+ *
+ * @param string $module_name
+ *   Module name.
+ *
+ * @return int
+ *   Value of one of the component state constants listed below.
+ *   The number is the maximum of all individual component states for the given
+ *   module, or FEATURES_DEFAULT if no component states found in the module.
+ *
+ * @see FEATURES_REBUILDABLE
+ * @see FEATURES_DEFAULT
+ * @see FEATURES_OVERRIDDEN
+ * @see FEATURES_NEEDS_REVIEW
+ * @see FEATURES_REBUILDING
  */
 function features_get_storage($module_name) {
   // Get component states, and array_diff against array(FEATURES_DEFAULT).
@@ -665,18 +875,38 @@ function features_get_storage($module_name) {
 }
 
 /**
- * Wrapper around features_get_[storage] to return an md5hash of a normalized
+ * Gets an md5 signature for a the state of an object in code or database.
+ *
+ * Wrapper around features_get_[storage]() to return an md5 hash of a normalized
  * defaults/normal object array. Can be used to compare normal/default states
  * of a module's component.
+ *
+ * @param string $state
+ *   One of 'cache', 'default' or 'normal'.
+ * @param string $module_name
+ *   A module name.
+ * @param string $component
+ *   A component name, e.g. 'field_instance'.
+ * @param bool $reset
+ *   If TRUE, the static cache for features_get_default() or
+ *   features_get_normal() will be reset.
+ *
+ * @return string|false
+ *   An md5 signature, or FALSE if not found.
  */
 function features_get_signature($state = 'default', $module_name, $component, $reset = FALSE) {
   switch ($state) {
     case 'cache':
-      $codecache = variable_get('features_codecache', array());
+      $cache = cache_get('features_codecache', 'cache_featurestate');
+      if (!empty($cache->data)) {
+        $codecache = $cache->data;
+      }
       return isset($codecache[$module_name][$component]) ? $codecache[$module_name][$component] : FALSE;
+
     case 'default':
       $objects = features_get_default($component, $module_name, TRUE, $reset);
       break;
+
     case 'normal':
       $objects = features_get_normal($component, $module_name, $reset);
       break;
@@ -690,16 +920,35 @@ function features_get_signature($state = 'default', $module_name, $component, $r
 
 /**
  * Set the signature of a module/component pair in the codecache.
+ *
+ * @param string $module
+ *   A module name.
+ * @param string $component
+ *   A component name, e.g. 'field_instance'.
+ * @param string|null $signature
+ *   An md5 signature, or NULL to auto-generate one.
  */
 function features_set_signature($module, $component, $signature = NULL) {
-  $var_codecache = variable_get('features_codecache', array());
+  $cache = cache_get('features_codecache', 'cache_featurestate');
+  if (!empty($cache->data)) {
+    $codecache = $cache->data;
+  }
   $signature = isset($signature) ? $signature : features_get_signature('default', $module, $component, TRUE);
-  $var_codecache[$module][$component] = $signature;
-  variable_set('features_codecache', $var_codecache);
+  $codecache[$module][$component] = $signature;
+  cache_set('features_codecache', $codecache, 'cache_featurestate');
 }
 
 /**
- * Processing semaphore operations.
+ * Gets, sets or deletes a semaphore for a given component.
+ *
+ * @param string $op
+ *   One of 'get', 'set' or 'del'.
+ * @param string $component
+ *   A component name, e.g. 'field_instance'.
+ *
+ * @return int|false|void
+ *   If $op is 'get', the semaphore, or FALSE if none found for the component.
+ *   If $op is 'set' or 'del', nothing is returned.
  */
 function features_semaphore($op, $component) {
   // Note: we don't use variable_get() here as the inited variable
@@ -711,10 +960,12 @@ function features_semaphore($op, $component) {
   switch ($op) {
     case 'get':
       return isset($semaphore[$component]) ? $semaphore[$component] : FALSE;
+
     case 'set':
       $semaphore[$component] = REQUEST_TIME;
       variable_set('features_semaphore', $semaphore);
       break;
+
     case 'del':
       if (isset($semaphore[$component])) {
         unset($semaphore[$component]);
@@ -726,6 +977,16 @@ function features_semaphore($op, $component) {
 
 /**
  * Get normal objects for a given module/component pair.
+ *
+ * @param string $component
+ *   The component name, e.g. 'field_instance'.
+ * @param string $module_name
+ *   The name of the exported module.
+ * @param bool $reset
+ *   If TRUE, the static cache will be reset.
+ *
+ * @return mixed|false
+ *   The normal objects that would be written into the feature on update.
  */
 function features_get_normal($component, $module_name, $reset = FALSE) {
   if ($reset) {
@@ -758,9 +1019,13 @@ function features_get_normal($component, $module_name, $reset = FALSE) {
 }
 
 /**
- * Helper function to determine if a module is enabled
- * @param $module
+ * Helper function to determine if a module is enabled.
+ *
+ * @param string $module
  *   This module name comes from the .info file and can have version info in it.
+ *
+ * @return bool
+ *   TRUE, if the module is enabled.
  */
 function _features_module_exists($module) {
   $parsed_dependency = drupal_parse_dependency($module);
@@ -770,10 +1035,27 @@ function _features_module_exists($module) {
 
 /**
  * Get defaults for a given module/component pair.
+ *
+ * @param string $component
+ *   A component name, e.g. 'field_instance'.
+ * @param string|null $module_name
+ *   (optional) If specified, only return defaults for this module.
+ * @param bool $alter
+ *   (optional) If TRUE, the defaults will be passed through an alter hook.
+ * @param bool $reset
+ *   If TRUE, the static cache will be reset.
+ *
+ * @return array[]|object[]|mixed[]|false
+ *   Format: $[$name] = $item_export_data
+ *   Object data as defined in code. For most components, this is the data
+ *   returned from the component hook implementation(s).
+ *   For some components these are actual objects, for others they are arrays or
+ *   perhaps just strings.
  */
 function features_get_default($component, $module_name = NULL, $alter = TRUE, $reset = FALSE) {
   $cache = &drupal_static(__FUNCTION__, array());
-  $alter = !empty($alter); // ensure $alter is a true/false boolean
+  // Ensure $alter is a true/false boolean.
+  $alter = !empty($alter);
   features_include();
   features_include_defaults($component);
   $default_hook = features_get_default_hooks($component);
@@ -805,7 +1087,7 @@ function features_get_default($component, $module_name = NULL, $alter = TRUE, $r
         $cache[$component][$alter][$m] = isset($module->info['dependencies']) ? $module->info['dependencies'] : array();
         unset($module);
       }
-      // All other components
+      // All other components.
       else {
         if ($default_hook && module_hook($m, $default_hook)) {
           $cache[$component][$alter][$m] = call_user_func("{$m}_{$default_hook}");
@@ -843,14 +1125,28 @@ function features_get_default($component, $module_name = NULL, $alter = TRUE, $r
 }
 
 /**
- * Get a map of components to their providing modules.
+ * Gets a map of components to their providing modules.
+ *
+ * This function only cares what is returned from the (generated) default hooks,
+ * not what is in the info file.
  *
  * @param string $component
- * @param string $attribute
- * @param callable $callback
+ *   The component name, e.g. 'field_instance'.
+ * @param string|null $attribute
+ *   Object property name or array key to get the id from exported object data.
+ *   These ids will be used as array keys in the return value.
+ * @param callable|null $callback
+ *   Callback to get the object id from exported object data. These ids will be
+ *   used as array keys in the return value.
  * @param bool $reset
+ *   If TRUE, the static cache entry for this specific component is reset.
  *
- * @return array|bool
+ * @return string[]|false
+ *   Format: $[$name] = $module
+ *   E.g. $['node-article-field_body'] = 'mysite_ct_article'
+ *   The module where each item is exported.
+ *   If the $GLOBALS['features_ignore_conflicts'] is TRUE(-ish), this function
+ *   will return FALSE.
  */
 function features_get_default_map($component, $attribute = NULL, $callback = NULL, $reset = FALSE) {
   $map = &drupal_static(__FUNCTION__, array());
@@ -897,6 +1193,25 @@ function features_get_default_map($component, $attribute = NULL, $callback = NUL
 
 /**
  * Retrieve an array of features/components and their current states.
+ *
+ * @param string[] $features
+ *   (optional) Machine names of feature modules.
+ *   If empty, states for all features will be returned.
+ * @param bool $rebuild_only
+ *   (optional) If TRUE, only rebuildable components are returned.
+ * @param bool $reset
+ *   (optional) If TRUE, relevant caches will be reset before fetching.
+ *
+ * @return int[][]
+ *   Component states by module and component.
+ *   Format: $[$module][$component] = $state
+ *   where $state will be one of the states listed below.
+ *
+ * @see FEATURES_REBUILDABLE
+ * @see FEATURES_DEFAULT
+ * @see FEATURES_OVERRIDDEN
+ * @see FEATURES_NEEDS_REVIEW
+ * @see FEATURES_REBUILDING
  */
 function features_get_component_states($features = array(), $rebuild_only = TRUE, $reset = FALSE) {
   // Ensure that the export will be created in the English language.
@@ -938,34 +1253,38 @@ function features_get_component_states($features = array(), $rebuild_only = TRUE
             // Stale semaphores can be deleted.
             features_semaphore('del', $component);
 
-            // Update code cache if it is stale, clear out semaphore if it stale.
+            // Update code cache if it is stale, clear out semaphore if it is
+            // stale.
             if ($default != $codecache) {
               features_set_signature($feature, $component, $default);
             }
           }
           // Component properly implements exportables.
-          else if (!features_hook($component, 'features_rebuild')) {
+          elseif (!features_hook($component, 'features_rebuild')) {
             $cache[$feature][$component] = FEATURES_OVERRIDDEN;
           }
           // Component does not implement exportables.
           else {
             if (empty($semaphore)) {
-              // Exception for dependencies. Dependencies are always rebuildable.
+              // Exception for dependencies. Dependencies are always
+              // rebuildable.
               if ($component === 'dependencies') {
                 $cache[$feature][$component] = FEATURES_REBUILDABLE;
               }
               // All other rebuildable components require comparison.
               else {
-                // Code has not changed, but DB does not match. User has DB overrides.
+                // Code has not changed, but DB does not match. User has DB
+                // overrides.
                 if ($codecache == $default) {
                   $cache[$feature][$component] = FEATURES_OVERRIDDEN;
                 }
-                // DB has no modifications to prior code state (or this is initial install).
-                else if (empty($codecache) || $codecache == $normal) {
+                // DB has no modifications to prior code state (or this is
+                // initial install).
+                elseif (empty($codecache) || $codecache == $normal) {
                   $cache[$feature][$component] = FEATURES_REBUILDABLE;
                 }
                 // None of the states match. Requires user intervention.
-                else if ($codecache != $default) {
+                elseif ($codecache != $default) {
                   $cache[$feature][$component] = FEATURES_NEEDS_REVIEW;
                 }
               }
@@ -975,7 +1294,8 @@ function features_get_component_states($features = array(), $rebuild_only = TRUE
               if ((REQUEST_TIME - $semaphore) < FEATURES_SEMAPHORE_TIMEOUT) {
                 $cache[$feature][$component] = FEATURES_REBUILDING;
               }
-              // A stale semaphore means a previous rebuild attempt did not complete.
+              // A stale semaphore means a previous rebuild attempt did not
+              // complete.
               // Attempt to complete the rebuild.
               else {
                 $cache[$feature][$component] = FEATURES_REBUILDABLE;
@@ -1003,6 +1323,12 @@ function features_get_component_states($features = array(), $rebuild_only = TRUE
 
 /**
  * Helper function to eliminate whitespace differences in code.
+ *
+ * @param string $code
+ *   Original (multi-line) piece of code.
+ *
+ * @return string
+ *   Modified piece of code with no leading or trailing whitespace per line.
  */
 function _features_linetrim($code) {
   $code = explode("\n", $code);
@@ -1014,16 +1340,25 @@ function _features_linetrim($code) {
 
 /**
  * Helper function to "sanitize" an array or object.
+ *
  * Converts everything to an array, sorts the keys, removes recursion.
- * @param $array
- * @param $component string name of component
- * @param bool $remove_empty if set, remove null or empty values for assoc arrays.
+ *
+ * @param array|object $array
+ *   The object or array to "sanitize".
+ *   After this call, this variable will be an array.
+ * @param string $component
+ *   (optional) Name of a component type, e.g. "field_instance".
+ * @param bool $remove_empty
+ *   (optional) If TRUE, remove null or empty values for assoc arrays.
+ *
+ * @todo Needs unit tests.
+ * @todo A better name might be "normalize", not "sanitize".
  */
 function features_sanitize(&$array, $component = NULL, $remove_empty = TRUE) {
   $array = features_remove_recursion($array);
   if (isset($component)) {
     $ignore_keys = _features_get_ignore_keys($component);
-    // remove keys to be ignored
+    // Remove keys to be ignored.
     if (count($ignore_keys)) {
       _features_remove_ignores($array, $ignore_keys);
     }
@@ -1032,9 +1367,28 @@ function features_sanitize(&$array, $component = NULL, $remove_empty = TRUE) {
 }
 
 /**
- * "Sanitizes" an array recursively, performing two key operations:
- * - Sort an array by its keys (assoc) or values (non-assoc)
- * @param bool $remove_empty if set, remove null or empty values for assoc arrays.
+ * Internal. "Sanitizes" a (nested) array (or object) recursively.
+ *
+ * The following operations are performed on every recursion level:
+ * - Objects are converted to array via get_object_vars().
+ * - "Associative" arrays are sorted by key.
+ * - Non-associative/serial arrays are sorted by value.
+ * - Empty values and empty sub-trees are removed if $remove_empty is TRUE.
+ *
+ * @param array|object|mixed $array
+ *   Array or object to be sanitized.
+ *   If $array is an object, it will be converted to array via get_object_vars().
+ *   Any nested objects will be converted to array in the same way.
+ *   If $array is not an array or object, it will be left as-is.
+ * @param bool $remove_empty
+ *   If TRUE, remove null or empty values for assoc arrays.
+ *   This will also remove empty arrays or objects nested in the hierarchy.
+ *
+ * @internal
+ * This function is designed for internal use within @see features_sanitize().
+ *
+ * @todo Needs unit tests.
+ * @todo A better name might be "normalize", not "sanitize".
  */
 function _features_sanitize(&$array, $remove_empty = TRUE) {
   if (is_object($array)) {
@@ -1063,29 +1417,52 @@ function _features_sanitize(&$array, $remove_empty = TRUE) {
 }
 
 /**
- * Is the given array an associative array. This basically extracts the keys twice to get the
- * numerically ordered keys. It then does a diff with the original array and if there is no
- * key diff then the original array is not associative.
+ * Internal. Checks whether the array is "associative".
  *
- * NOTE: If you have non-sequential numerical keys, this will identify the array as assoc.
+ * An array is considered "associative" by this function, if:
+ * - it is empty (no values), or
+ * - it has any non-integer keys, or
+ * - some numeric indices are missing, e,g, [0 => $v, 1 => $v, 3 => $v].
+ *
+ * Note: The order of numeric indices is irrelevant.
+ * E.g. [1 => $v, 0 => $v] is considered NOT associative.
  *
  * Borrowed from: http://www.php.net/manual/en/function.is-array.php#96724
  *
- * @return True is the array is an associative array, false otherwise
+ * @param array $array
+ *   The array to be tested.
+ *
+ * @return bool
+ *   TRUE if the array is considered "associative".
+ *
+ * @internal
+ * This function is designed for internal use within @see _features_sanitize().
+ *
+ * @todo Needs unit tests.
  */
 function _features_is_assoc($array) {
-  return (is_array($array) && (0 !== count(array_diff_key($array, array_keys(array_keys($array)))) || count($array)==0));
+  return (is_array($array) && (0 !== count(array_diff_key($array, array_keys(array_keys($array)))) || count($array) == 0));
 }
 
 /**
- * Removes recursion from an object or array.
+ * Returns a deep copy of the object or array without recursion.
  *
- * Taken from https://code.google.com/p/formaldehyde/source/browse/trunk/formaldehyde.php
- * Also used in node_export module
+ * Properties or array values with recursive references are replaced with dummy
+ * string values.
  *
- * @param $o mixed
- * @return mixed
- *   returns a copy of the object or array with recursion removed
+ * The algorithm operates on a serialized version of the data. It was introduced
+ * in features in #2543306, mainly for performance reasons. It is taken from
+ * https://code.google.com/p/formaldehyde/source/browse/trunk/formaldehyde.php.
+ * The algorithm is also used in the node_export module.
+ *
+ * @param object|array|mixed $o
+ *   Original object or array, or an arbitrary value.
+ *
+ * @return object|array|mixed
+ *   A copy of the object or array with recursion removed.
+ *   If the original value was not an object or array, it is returned unaltered.
+ *
+ * @todo Needs unit tests.
  */
 function features_remove_recursion($o) {
   if (is_array($o) || is_object($o)) {
@@ -1093,7 +1470,7 @@ function features_remove_recursion($o) {
     $serialize = serialize($o);
     if (preg_match($re, $serialize)) {
       $last = $pos = 0;
-      while (false !== ($pos = strpos($serialize, 's:', $pos))) {
+      while (FALSE !== ($pos = strpos($serialize, 's:', $pos))) {
         $chunk = substr($serialize, $last, $pos - $last);
         if (preg_match($re, $chunk)) {
           $length = strlen($chunk);
@@ -1116,6 +1493,24 @@ function features_remove_recursion($o) {
 
 /**
  * Callback function for preg_replace_callback() to remove recursion.
+ *
+ * The regular expression in calling code is '#(r|R):([0-9]+);#'. The source
+ * string is a serialized array or object. The modified source string will be
+ * sent back to unserialize(), so all replacements must be compatible with that.
+ *
+ * @param string[] $m
+ *   Match parts from preg_replace_callback().
+ *   $m[0] contains the complete matching fragment for "(r|R):([0-9]+);".
+ *   $m[1] contains the sub-fragment for "(r|R)".
+ *   $m[2] contains the sub-fragment for "([0-9]+)".
+ *
+ * @return string
+ *   Replacement string fragment.
+ *
+ * @internal
+ * Designed for internal use within @see features_remove_recursion().
+ *
+ * @see preg_replace_callback()
  */
 function _features_remove_recursion($m) {
   $r = "\x00{$m[1]}ecursion_features";
@@ -1125,13 +1520,17 @@ function _features_remove_recursion($m) {
 /**
  * Helper to removes a set of keys an object/array.
  *
- * @param $item
+ * @param object|array $item
  *   An object or array passed by reference.
- * @param $ignore_keys
+ * @param int[] $ignore_keys
  *   Array of keys to be ignored. Values are the level of the key.
- * @param $level
- *   Level of key to remove.  Up to 2 levels deep because $item can still be
- *   recursive
+ *   Format: $[$key] = $level.
+ * @param int $level
+ *   Level of key to remove. Up to 2 levels deep because $item can still be
+ *   recursive.
+ *
+ * @internal
+ * Designed for internal use within @see features_sanitize().
  */
 function _features_remove_ignores(&$item, $ignore_keys, $level = -1) {
   $is_object = is_object($item);
@@ -1148,16 +1547,28 @@ function _features_remove_ignores(&$item, $ignore_keys, $level = -1) {
       }
     }
     elseif (($level < 2) && (is_array($value) || is_object($value))) {
-      _features_remove_ignores($value, $ignore_keys, $level+1);
+      _features_remove_ignores($value, $ignore_keys, $level + 1);
     }
   }
   unset($value);
 }
 
 /**
- * Returns an array of keys to be ignored for various exportables
- * @param $component
- *   The component to retrieve ignore_keys from.
+ * Returns an array of keys to be ignored for various exportables.
+ *
+ * @param string $component
+ *   Name of a component type, e.g. "field_instance".
+ *
+ * @return int[]
+ *   Map of keys to ignore at specific recursion levels.
+ *   Format: $[$key] = $level
+ *
+ * @internal
+ * Designed for use within @see features_sanitize().
+ *
+ * @see features_features_ignore()
+ *
+ * @todo Add hook_features_ignore() in features.api.php.
  */
 function _features_get_ignore_keys($component) {
   static $cache;

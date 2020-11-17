@@ -13,6 +13,8 @@ function contact_features_api() {
     'contact_categories' => array(
       'name' => t('Contact categories'),
       'feature_source' => TRUE,
+      /* @see \hook_contact_categories_defaults() */
+      /* @see \hook_contact_categories_defaults_alter() */
       'default_hook' => 'contact_categories_defaults',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
