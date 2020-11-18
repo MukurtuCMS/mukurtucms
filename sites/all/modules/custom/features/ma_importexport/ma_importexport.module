@@ -31,15 +31,15 @@ function ma_importexport_menu() {
                         );
    */
 
-   $items['admin/reports/mukurtu/run-multiple-language-report'] = [
+  $items['admin/reports/mukurtu/run-multiple-language-report'] = [
     'title' => 'Run Fields with Multiple Languages Report',
     'page callback' => 'ma_import_export_multiple_language_bug_report',
-    'access arguments' => array('administer content'),
+    'access arguments' => array('administer nodes'),
   ];
   $items['admin/reports/mukurtu/multiple-language-report'] = [
     'title' => 'Fields with Multiple Languages Report',
     'page callback' => 'ma_import_export_multiple_language_bug_report_form',
-    'access arguments' => array('administer content'),
+    'access arguments' => array('administer nodes'),
   ];
 
   return $items;
