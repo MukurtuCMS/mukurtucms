@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Contains FeedsHTTPCache class.
+ */
+
+/**
  * Cache implementation for the Feeds HTTP cache.
  */
 class FeedsHTTPCache extends DrupalDatabaseCache {

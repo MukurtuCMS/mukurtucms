@@ -6,6 +6,27 @@
  */
 
 /**
+ * Implements hook_feeds_prevalidate().
+ *
+ * @see FeedsHooksTestCase::testPrevalidateHook()
+ */
+function feeds_tests_feeds_prevalidate(FeedsSource $source, $entity, $item, $entity_id) {
+  if (!variable_get('feeds_tests_hook_feeds_prevalidate', FALSE)) {
+    return;
+  }
+
+  // Keep track of results so far.
+  $results = variable_get('feeds_tests_hook_feeds_prevalidate_results', array());
+  $results[] = array(
+    'importer_id' => $source->importer->id,
+    'title' => $entity->title,
+    'item_guid' => $item['guid'],
+    'entity_id' => $entity_id,
+  );
+  variable_set('feeds_tests_hook_feeds_prevalidate_results', $results);
+}
+
+/**
  * Implements hook_feeds_config_defaults().
  *
  * @see feeds_tests_form_feedsimporter_feeds_form_alter()

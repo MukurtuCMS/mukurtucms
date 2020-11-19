@@ -17,6 +17,7 @@ namespace Unish;
  * @group commands
  */
 class feedsDrushTest extends CommandUnishTestCase {
+
   /**
    * {@inheritdoc}
    */
@@ -55,14 +56,14 @@ class feedsDrushTest extends CommandUnishTestCase {
       new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
       \RecursiveIteratorIterator::SELF_FIRST) as $item
     ) {
-        if ($item->isDir()) {
-          mkdir($dest . "/" . $iterator->getSubPathName());
-        }
-        else {
-          copy($item, $dest . "/" . $iterator->getSubPathName());
-        }
+      if ($item->isDir()) {
+        mkdir($dest . "/" . $iterator->getSubPathName());
+      }
+      else {
+        copy($item, $dest . "/" . $iterator->getSubPathName());
       }
     }
+  }
 
   /**
    * Wrapper around drush to always add the site options.

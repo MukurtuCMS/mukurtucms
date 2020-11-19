@@ -6,6 +6,18 @@
  */
 
 /**
+ * Implements hook_rules_event_info().
+ */
+function feeds_tests_rules_event_info() {
+  return array(
+    'feeds_tests_rules_event' => array(
+      'label' => t('Test event'),
+      'group' => t('Feeds'),
+    ),
+  );
+}
+
+/**
  * Implements hook_rules_action_info().
  */
 function feeds_tests_rules_action_info() {

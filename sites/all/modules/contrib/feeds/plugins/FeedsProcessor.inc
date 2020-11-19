@@ -50,14 +50,14 @@ abstract class FeedsProcessor extends FeedsPlugin {
   /**
    * Entity type this processor operates on.
    */
-  public abstract function entityType();
+  abstract public function entityType();
 
   /**
    * Bundle type this processor operates on.
    *
    * Defaults to the entity type for entities that do not define bundles.
    *
-   * @return string|NULL
+   * @return string|null
    *   The bundle type this processor operates on, or NULL if it is undefined.
    */
   public function bundle() {
@@ -87,7 +87,8 @@ abstract class FeedsProcessor extends FeedsPlugin {
    * Provides a list of languages available on the site.
    *
    * @return array
-   *   A keyed array of language_key => language_name (example: 'en' => 'English').
+   *   A keyed array of language_key => language_name. For example:
+   *   'en' => 'English'.
    */
   public function languageOptions() {
     $languages = array(
@@ -123,14 +124,14 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Load an existing entity.
+   * Loads an existing entity.
    *
-   * @param $source
+   * @param FeedsSource $source
    *   The feeds source that spawns this entity.
-   * @param $entity_id
-   *   The unique id of the entity that should be loaded.
+   * @param mixed $entity_id
+   *   The id of the entity to load.
    *
-   * @return
+   * @return object
    *   A new entity object.
    *
    * @todo We should be able to batch load these, if we found all of the
@@ -160,10 +161,15 @@ abstract class FeedsProcessor extends FeedsPlugin {
   /**
    * Validates an entity.
    *
+   * @param object $entity
+   *   The entity to validate.
+   * @param FeedsSource $source
+   *   (optional) The source to import from.
+   *
    * @throws FeedsValidationException $e
    *   Thrown if validation fails.
    */
-  protected function entityValidate($entity) {
+  protected function entityValidate($entity, FeedsSource $source = NULL) {
     $info = $this->entityInfo();
 
     if (!empty($info['entity keys']['language'])) {
@@ -179,16 +185,14 @@ abstract class FeedsProcessor extends FeedsPlugin {
     // Perform field validation if entity is fieldable.
     if (!empty($info['fieldable'])) {
       try {
-        field_attach_validate($this->entityType(), $entity);
+        $this->validateFields($entity);
       }
       catch (FieldValidationException $e) {
         $errors = array();
 
         // Unravel the errors inside the FieldValidationException.
-        foreach ($e->errors as $field_name => $field_errors) {
-          foreach ($field_errors as $langcode => $field_item_errors) {
-            $errors = array_merge($errors, $this->unravelFieldValidationExceptionErrors($field_item_errors));
-          }
+        foreach ($e->errors as $field_errors) {
+          $errors = array_merge($errors, $this->unravelFieldValidationExceptionErrors($field_errors));
         }
 
         // Compose error message. If available, use the entity label to indicate
@@ -212,7 +216,68 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Helper function to unravel error messages hidden in a FieldValidationException.
+   * Validates fields of an entity.
+   *
+   * This is mostly a copy of the field_attach_validate() function. The
+   * difference is that field_attach_validate() validates *all* fields on an
+   * entity, while Feeds only validates the fields where the user mapped to.
+   *
+   * @param object $entity
+   *   The entity for which the field to validate.
+   *
+   * @throws FieldValidationException
+   *   If validation errors are found, a FieldValidationException is thrown. The
+   *   'errors' property contains the array of errors, keyed by field name,
+   *   language and delta.
+   */
+  protected function validateFields($entity) {
+    $entity_type = $this->entityType();
+
+    // Get fields for the entity type we are mapping to.
+    $fields = field_info_instances($entity_type, $this->bundle());
+
+    // Get targets.
+    $targets = $this->getCachedTargets();
+
+    $errors = array();
+    $null = NULL;
+
+    // Validate all fields that we are mapping to.
+    foreach ($this->getMappings() as $mapping) {
+      // Get real target name.
+      if (isset($targets[$mapping['target']]['real_target'])) {
+        $target_name = $targets[$mapping['target']]['real_target'];
+      }
+      else {
+        $target_name = $mapping['target'];
+      }
+
+      if (isset($fields[$target_name])) {
+        // Validate this field.
+        _field_invoke_default('validate', $entity_type, $entity, $errors, $null, array(
+          'field_name' => $target_name,
+        ));
+        _field_invoke('validate', $entity_type, $entity, $errors, $null, array(
+          'field_name' => $target_name,
+        ));
+      }
+    }
+
+    // Let other modules validate the entity.
+    // Avoid module_invoke_all() to let $errors be taken by reference.
+    foreach (module_implements('field_attach_validate') as $module) {
+      $function = $module . '_field_attach_validate';
+      $function($entity_type, $entity, $errors);
+    }
+
+    if ($errors) {
+      throw new FieldValidationException($errors);
+    }
+  }
+
+  /**
+   * Helper function to unravel error messages hidden in a
+   * FieldValidationException.
    *
    * @param array $field_item_errors
    *   The errors for a single field item.
@@ -220,7 +285,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
    * @return array
    *   The unraveled error messages.
    */
-  protected function unravelFieldValidationExceptionErrors($field_item_errors) {
+  protected function unravelFieldValidationExceptionErrors(array $field_item_errors) {
     $errors = array();
 
     foreach ($field_item_errors as $field_item_error) {
@@ -238,10 +303,10 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Access check for saving an enity.
+   * Access check for saving an entity.
    *
-   * @param $entity
-   *   Entity to be saved.
+   * @param object $entity
+   *   The entity to be saved.
    *
    * @throws FeedsAccessException $e
    *   If the access check fails.
@@ -249,26 +314,30 @@ abstract class FeedsProcessor extends FeedsPlugin {
   protected function entitySaveAccess($entity) {}
 
   /**
-   * Save an entity.
+   * Saves an entity.
    *
-   * @param $entity
-   *   Entity to be saved.
+   * @param object $entity
+   *   The entity to be saved.
    */
-  protected abstract function entitySave($entity);
+  abstract protected function entitySave($entity);
 
   /**
-   * Delete a series of entities.
+   * Deletes a series of entities.
    *
-   * @param $entity_ids
+   * @param array $entity_ids
    *   Array of unique identity ids to be deleted.
    */
-  protected abstract function entityDeleteMultiple($entity_ids);
+  abstract protected function entityDeleteMultiple($entity_ids);
 
   /**
-   * Wrap entity_get_info() into a method so that extending classes can override
-   * it and more entity information. Allowed additional keys:
+   * Wrapper around entity_get_info().
    *
-   * 'label plural' ... the plural label of an entity type.
+   * The entity_get_info() function is wrapped so that extending classes can
+   * override it and add more entity information.
+   *
+   * Allowed additional keys:
+   * - label plural
+   *   the plural label of an entity type.
    */
   protected function entityInfo() {
     $info = entity_get_info($this->entityType());
@@ -384,12 +453,14 @@ abstract class FeedsProcessor extends FeedsPlugin {
           }
         }
 
-        $this->entityValidate($entity);
+        // Allow modules to alter the entity before validating.
+        module_invoke_all('feeds_prevalidate', $source, $entity, $item, $entity_id);
+        $this->entityValidate($entity, $source);
 
         // Allow modules to alter the entity before saving.
         module_invoke_all('feeds_presave', $source, $entity, $item, $entity_id);
         if (module_exists('rules')) {
-          rules_invoke_event('feeds_import_'. $source->importer()->id, $entity);
+          rules_invoke_event('feeds_import_' . $source->importer()->id, $entity);
         }
 
         // Enable modules to skip saving at all.
@@ -439,7 +510,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     $messages = array();
     if ($state->created) {
       $messages[] = array(
-       'message' => format_plural(
+        'message' => format_plural(
           $state->created,
           'Created @number @entity.',
           'Created @number @entities.',
@@ -449,7 +520,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     }
     if ($state->updated) {
       $messages[] = array(
-       'message' => format_plural(
+        'message' => format_plural(
           $state->updated,
           'Updated @number @entity.',
           'Updated @number @entities.',
@@ -479,7 +550,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     }
     if ($state->deleted) {
       $messages[] = array(
-       'message' => format_plural(
+        'message' => format_plural(
           $state->deleted,
           'Removed @number @entity.',
           'Removed @number @entities.',
@@ -489,7 +560,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     }
     if ($state->failed) {
       $messages[] = array(
-       'message' => format_plural(
+        'message' => format_plural(
           $state->failed,
           'Failed importing @number @entity.',
           'Failed importing @number @entities.',
@@ -566,8 +637,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Remove all stored results or stored results up to a certain time for a
-   * source.
+   * Removes all imported items for a source.
    *
    * @param FeedsSource $source
    *   Source information for this expiry. Implementers should only delete items
@@ -629,7 +699,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
     }
   }
 
-  /*
+  /**
    * Report number of items that can be processed per call.
    *
    * 0 means 'unlimited'.
@@ -652,15 +722,14 @@ abstract class FeedsProcessor extends FeedsPlugin {
    *
    * @param FeedsSource $source
    *   The source to expire entities for.
-   *
-   * @param $time
+   * @param int|null $time
    *   (optional) All items produced by this configuration that are older than
    *   REQUEST_TIME - $time should be deleted. If NULL, processor should use
    *   internal configuration. Defaults to NULL.
    *
-   * @return float
-   *   FEEDS_BATCH_COMPLETE if all items have been processed, a float between 0
-   *   and 0.99* indicating progress otherwise.
+   * @return float|null
+   *   FEEDS_BATCH_COMPLETE if all items have been processed, null if expiring
+   *   is disabled, a float between 0 and 0.99* indicating progress otherwise.
    *
    * @see FeedsSource::expire()
    */
@@ -726,9 +795,16 @@ abstract class FeedsProcessor extends FeedsPlugin {
 
   /**
    * Counts the number of items imported by this processor.
+   *
+   * @return int
+   *   The number of items imported by this processor.
    */
   public function itemCount(FeedsSource $source) {
-    return db_query("SELECT count(*) FROM {feeds_item} WHERE id = :id AND entity_type = :entity_type AND feed_nid = :feed_nid", array(':id' => $this->id, ':entity_type' => $this->entityType(), ':feed_nid' => $source->feed_nid))->fetchField();
+    return db_query("SELECT count(*) FROM {feeds_item} WHERE id = :id AND entity_type = :entity_type AND feed_nid = :feed_nid", array(
+      ':id' => $this->id,
+      ':entity_type' => $this->entityType(),
+      ':feed_nid' => $source->feed_nid,
+    ))->fetchField();
   }
 
   /**
@@ -900,15 +976,22 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Per default, don't support expiry. If processor supports expiry of imported
-   * items, return the time after which items should be removed.
+   * Returns the time in seconds after which items should be removed.
+   *
+   * If expiry of items isn't supported, FEEDS_EXPIRE_NEVER is returned.
+   *
+   * By default, expiring items isn't supported. Processors that want to support
+   * this feature, should override this method.
+   *
+   * @return int
+   *   The expiry time or FEEDS_EXPIRE_NEVER if expiry isn't supported.
    */
   public function expiryTime() {
     return FEEDS_EXPIRE_NEVER;
   }
 
   /**
-   * Declare default configuration.
+   * {@inheritdoc}
    */
   public function configDefaults() {
     $info = $this->entityInfo();
@@ -965,7 +1048,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
   }
 
   /**
-   * Overrides parent::configForm().
+   * {@inheritdoc}
    */
   public function configForm(&$form_state) {
     $info = $this->entityInfo();
@@ -1074,6 +1157,9 @@ abstract class FeedsProcessor extends FeedsPlugin {
 
   /**
    * Get mappings.
+   *
+   * @return array
+   *   A list of configured mappings.
    */
   public function getMappings() {
     $cache = &drupal_static('FeedsProcessor::getMappings', array());
@@ -1115,7 +1201,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
    *
    * @ingroup mappingapi
    *
-   * @return
+   * @return array
    *   An array of mapping targets. Keys are paths to targets
    *   separated by ->, values are TRUE if target can be unique,
    *   FALSE otherwise.
@@ -1182,8 +1268,6 @@ abstract class FeedsProcessor extends FeedsPlugin {
   /**
    * Retrieve the target entity's existing id if available. Otherwise return 0.
    *
-   * @ingroup mappingapi
-   *
    * @param FeedsSource $source
    *   The source information about this import.
    * @param FeedsParserResult $result
@@ -1191,6 +1275,8 @@ abstract class FeedsProcessor extends FeedsPlugin {
    *
    * @return int
    *   The serial id of an entity if found, 0 otherwise.
+   *
+   * @ingroup mappingapi
    */
   protected function existingEntityId(FeedsSource $source, FeedsParserResult $result) {
     $targets = $this->getCachedTargets();
@@ -1233,15 +1319,15 @@ abstract class FeedsProcessor extends FeedsPlugin {
     return $entity_id;
   }
 
-
   /**
-   * Utility function that iterates over a target array and retrieves all
-   * sources that are unique.
+   * Returns all mapping targets that are marked as unique.
    *
-   * @param $batch
-   *   A FeedsImportBatch.
+   * @param FeedsSource $source
+   *   The source information about this import.
+   * @param FeedsParserResult $result
+   *   A FeedsParserResult object.
    *
-   * @return
+   * @return array
    *   An array where the keys are target field names and the values are the
    *   elements from the source item mapped to these targets.
    */
@@ -1261,11 +1347,11 @@ abstract class FeedsProcessor extends FeedsPlugin {
   /**
    * Adds Feeds specific information on $entity->feeds_item.
    *
-   * @param $entity
+   * @param object $entity
    *   The entity object to be populated with new item info.
-   * @param $feed_nid
+   * @param int $feed_nid
    *   The feed nid of the source that produces this entity.
-   * @param $hash
+   * @param string $hash
    *   The fingerprint of the source item.
    */
   protected function newItemInfo($entity, $feed_nid, $hash = '') {
@@ -1284,10 +1370,10 @@ abstract class FeedsProcessor extends FeedsPlugin {
   /**
    * Loads existing entity information and places it on $entity->feeds_item.
    *
-   * @param $entity
+   * @param object $entity
    *   The entity object to load item info for. Id key must be present.
    *
-   * @return
+   * @return bool
    *   TRUE if item info could be loaded, false if not.
    */
   protected function loadItemInfo($entity) {
@@ -1339,9 +1425,9 @@ abstract class FeedsProcessor extends FeedsPlugin {
    *
    * @param Exception $e
    *   The exception that was throwned during processing the item.
-   * @param $entity
+   * @param object $entity
    *   The entity object.
-   * @param $item
+   * @param object $item
    *   The parser result for this entity.
    *
    * @return string
@@ -1440,15 +1526,13 @@ abstract class FeedsProcessor extends FeedsPlugin {
 
 }
 
-class FeedsProcessorBundleNotDefined extends Exception {}
-
 /**
  * Form after build callback for the field "update_existing".
  *
  * Adds descriptions to options of this field.
  */
 function feeds_processor_config_form_update_existing_after_build($field) {
-  $field[FEEDS_REPLACE_EXISTING]['#description'] =  t('Loads records directly from the database, bypassing the Entity API. Faster, but use with caution.');
-  $field[FEEDS_UPDATE_EXISTING]['#description'] =  t('Loads complete @entities using the Entity API for full integration with other modules. Slower, but most reliable.', $field['#tokens']);
+  $field[FEEDS_REPLACE_EXISTING]['#description'] = t('Loads records directly from the database, bypassing the Entity API. Faster, but use with caution.');
+  $field[FEEDS_UPDATE_EXISTING]['#description'] = t('Loads complete @entities using the Entity API for full integration with other modules. Slower, but most reliable.', $field['#tokens']);
   return $field;
 }

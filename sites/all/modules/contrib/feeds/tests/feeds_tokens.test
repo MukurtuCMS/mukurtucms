@@ -5,6 +5,9 @@
  */
 class FeedsTokenTest extends FeedsWebTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Feeds token tests',
@@ -13,6 +16,9 @@ class FeedsTokenTest extends FeedsWebTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -91,4 +97,5 @@ class FeedsTokenTest extends FeedsWebTestCase {
       '@actual' => var_export($loaded_nodes, TRUE),
     )));
   }
+
 }

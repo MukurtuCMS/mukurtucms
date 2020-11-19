@@ -15,6 +15,9 @@
 class FeedsDateTimeTest extends FeedsWebTestCase {
   protected $profile = 'testing';
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'FeedsDateTime unit tests',
@@ -23,9 +26,12 @@ class FeedsDateTimeTest extends FeedsWebTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
-    module_load_include('inc', 'feeds' , 'plugins/FeedsParser');
+    module_load_include('inc', 'feeds', 'plugins/FeedsParser');
   }
 
   /**

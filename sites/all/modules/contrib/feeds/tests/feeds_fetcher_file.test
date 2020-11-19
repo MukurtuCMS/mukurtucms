@@ -9,6 +9,10 @@
  * File fetcher test class.
  */
 class FeedsFileFetcherTestCase extends FeedsWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'File fetcher',

@@ -11,7 +11,7 @@ diff --git a/plugins/FeedsProcessor.inc b/plugins/FeedsProcessor.inc
 index 582de3aa..16750f60 100644
 --- a/plugins/FeedsProcessor.inc
 +++ b/plugins/FeedsProcessor.inc
-@@ -372,6 +372,18 @@ abstract class FeedsProcessor extends FeedsPlugin {
+@@ -442,6 +442,18 @@ abstract class FeedsProcessor extends FeedsPlugin {
 
          // Set property and field values.
          $this->map($source, $parser_result, $entity);
@@ -27,7 +27,9 @@ index 582de3aa..16750f60 100644
 +          }
 +        }
 +
-         $this->entityValidate($entity);
+         // Allow modules to alter the entity before validating.
+        module_invoke_all('feeds_prevalidate', $source, $entity, $item, $entity_id);
+        $this->entityValidate($entity, $source);
 
          // Allow modules to alter the entity before saving.
 --

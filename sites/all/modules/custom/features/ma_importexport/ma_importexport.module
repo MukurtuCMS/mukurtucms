@@ -54,6 +54,8 @@ function ma_importexport_feeds_after_parse(FeedsSource $source, FeedsParserResul
   // a missing guid will always return the first nid/sid that was
   // used with an empty guid. We'll lookup existing or provide
   // sane GUID values in the case that it is empty.
+  $result->language = 'en';
+  dpm($result);
   if (!empty($result->items)) {
     foreach ($result->items as &$item) {
       if (isset($item['guid']) && $item['guid'] == "") {
@@ -476,7 +478,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
       $entity->language = language_default('language');
     } else {
       // For updates, use the previous language.
-      unset($entity->language);
+      //unset($entity->language);
     }
   }
 
@@ -2397,7 +2399,30 @@ function ma_import_export_check_node_for_multiple_language_bug($node) {
     if (is_array($value)) {
       $langs = array_keys($value);
       if (in_array(LANGUAGE_NONE, $langs) && count($langs) > 1) {
-        $bugged_fields[$fieldname] = $value;
+        $bugged_fields[$fieldname]['value'] = $value;
+        $bugged_fields[$fieldname]['classes'] = [];
+
+        // Field values have multiple languages, check if they have the same value.
+        if (count($langs) == 2) {
+          $key_diff = array_diff_assoc($value[$langs[0]], $value[$langs[1]]);
+          $field_diff = [];
+          // Same number of fields for both languages.
+          if (empty($key_diff)) {
+            // Compare each language field value.
+            foreach ($value[$langs[0]] as $delta => $fv) {
+              $local_diff = array_diff_assoc($value[$langs[0]][$delta], $value[$langs[1]][$delta]);
+              if (!empty($local_diff)) {
+                $field_diff[] = $local_diff;
+              }
+            }
+          }
+
+          if (empty($key_diff) & empty($field_diff)) {
+            $bugged_fields[$fieldname]['classes'][] = 'same';
+          } else {
+            $bugged_fields[$fieldname]['classes'][] = 'different';
+          }
+        }
       }
     }
   }
@@ -2428,6 +2453,7 @@ function ma_import_export_multiple_language_bug_report_form() {
   $form['text']['#markup'] = '<p>There was a bug with import were it was possible for fields to be stored using multiple language tags. ';
   $form['text']['#markup'] .= 'For some fields this created a situation where a field would be edited in one language but displayed in another, making them appear impossible to change.</p>';
   $form['text']['#markup'] .= '<p>If any items appear in the table below and you are experiencing this problem with editing, contact Mukurtu Support (support@mukurtu.org) for assistance.</p>';
+  $form['text']['#markup'] .= '<p>Items appearing in <span style="color:green">green</span> have the same field values, items in <span style="color:red">red</span> have differing field values</p>';
   $form['table']['#markup'] = drupal_render($table);
   $form['rerun']['#markup'] = l("Run the Report Again", 'admin/reports/mukurtu/run-multiple-language-report');
   return $form;

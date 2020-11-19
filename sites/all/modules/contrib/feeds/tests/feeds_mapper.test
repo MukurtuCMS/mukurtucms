@@ -10,7 +10,9 @@
  */
 class FeedsMapperTestCase extends FeedsWebTestCase {
 
-  // A lookup map to select the widget for each field type.
+  /**
+   * A lookup map to select the widget for each field type.
+   */
   private static $field_widgets = array(
     'date' => 'date_text',
     'datestamp' => 'date_text',
@@ -33,7 +35,7 @@ class FeedsMapperTestCase extends FeedsWebTestCase {
     'text_long' => 'text_textarea',
     'text_with_summary' => 'text_textarea_with_summary',
     'userreference' => 'userreference_select',
-   );
+  );
 
   /**
    * Assert that a form field for the given field with the given value
@@ -106,10 +108,11 @@ class FeedsMapperTestCase extends FeedsWebTestCase {
    *   The name of the CCK field.
    * @param $value
    *   The (raw) value expected for the CCK field.
+   *
    * @return An array of form field values.
    */
   protected function getFormFieldsValues($field_name, $value) {
-    return array((string)$value);
+    return array((string) $value);
   }
 
   /**
@@ -134,7 +137,7 @@ class FeedsMapperTestCase extends FeedsWebTestCase {
 
     $admin_type_url = 'admin/structure/types/manage/' . str_replace('_', '-', $typename);
 
-    // Create the fields
+    // Create the fields.
     foreach ($fields as $field_name => $options) {
       if (is_string($options)) {
         $options = array('type' => $options);

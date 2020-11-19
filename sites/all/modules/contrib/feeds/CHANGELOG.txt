@@ -573,7 +573,7 @@ Feeds 7.x 2.0 Alpha 6, 2012-10-10
 - Issue #1739704 by axel.rutz: Fixed Node lookup by title in Nodeprocessor does
   not respect nodetype.
 - Issue #1690434 by twistor | jzornig: Fixed Notice: Undefined variable: job in
-  FeedsSource->scheduleClear()
+  FeedsSource->scheduleClear().
 - Issue #1703074 by theduke: Added Include parser result in
   hook_feeds_presave().
 - Issue #1070604 by Bobík: Added Feed's nid in mappings.
@@ -760,7 +760,8 @@ Feeds 7.x 2.0 Alpha 4, 2011-06-28
   feed is updated.
 - Issue #1048642 by greg.harvey: Check for remove_flags in Feeds UI before using 
   that variable.
-- #967018 jcarlson34, David Goode, alex_b: Mapping to String lists not supported
+- #967018 jcarlson34, David Goode, alex_b: Mapping to String lists not
+  supported.
 
 Feeds 7.x 2.0 Alpha 3, 2011-01-14
 ---------------------------------
