@@ -86,8 +86,23 @@ function taxonomy_feeds_processor_targets($entity_type, $bundle_name) {
  */
 function taxonomy_feeds_set_target(FeedsSource $source, $entity, $target, array $terms, array $mapping) {
   $language = $mapping['language'];
-  dpm($mapping);
-  dpm($language);
+
+  // Mukurtu patch for Mukurtu specific importers.
+  // We want to use the node's language for the field language.
+  // Mukurtu does not support field translation.
+  if (stripos($source->id, 'mukurtu_import') !== FALSE) {
+    // The $entity coming from feeds doesn't necessarily have
+    // the correct langauge for the original node.
+    if (isset($entity->is_new) && $entity->is_new) {
+      // The node is new, use the default system language.
+      $language = language_default('language');
+    }
+    else {
+      // The node exists, grab it from the database.
+      $entity_language = db_query('SELECT language FROM {node} WHERE nid = :nid', array(':nid' => $entity->nid))->fetchField();
+      $language = $entity_language ? $entity_language : LANGUAGE_NONE;
+    }
+  }
 
   // Add in default values.
   $mapping += array(
@@ -125,6 +140,15 @@ function taxonomy_feeds_set_target(FeedsSource $source, $entity, $target, array 
     ->range(0, 1);
 
   $field = isset($entity->$target) ? $entity->$target : array($language => array());
+
+  // Mukurtu Patch.
+  // For our importers, we are completely replacing taxonomy values.
+  // Start from empty for all languages, we are not supporting field translation.
+  if (stripos($source->id, 'mukurtu_import') !== FALSE) {
+    foreach ($field as $field_lang => $values) {
+      $field[$field_lang] = array();
+    }
+  }
 
   if (!isset($field[$language])) {
     $field[$language] = array();

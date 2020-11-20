@@ -55,7 +55,7 @@ function ma_importexport_feeds_after_parse(FeedsSource $source, FeedsParserResul
   // used with an empty guid. We'll lookup existing or provide
   // sane GUID values in the case that it is empty.
   $result->language = 'en';
-  dpm($result);
+
   if (!empty($result->items)) {
     foreach ($result->items as &$item) {
       if (isset($item['guid']) && $item['guid'] == "") {
@@ -478,7 +478,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
       $entity->language = language_default('language');
     } else {
       // For updates, use the previous language.
-      //unset($entity->language);
+      unset($entity->language);
     }
   }
 
