@@ -91,6 +91,8 @@ projects[feeds][patch][] = contrib/0001-Change-the-FeedsCSVParser-class-to-use-t
 projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scald-atoms.patch
 ; Skip OG field validation for admins
 projects[feeds][patch][] = contrib/0001-Skip-protocol-field-OG-validation-during-import-for-.patch
+; Change language handling for taxonomy import
+projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-import.patch
 
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value.
