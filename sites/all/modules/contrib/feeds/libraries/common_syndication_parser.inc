@@ -2,8 +2,8 @@
 
 /**
  * @file
- *   Downloading and parsing functions for Common Syndication Parser.
- *   Pillaged from FeedAPI common syndication parser.
+ * Downloading and parsing functions for Common Syndication Parser.
+ * Pillaged from FeedAPI common syndication parser.
  *
  * @todo Restructure. OO could work wonders here.
  * @todo Write unit tests.
@@ -31,7 +31,7 @@ function common_syndication_parser_parse($string) {
     return FALSE;
   }
   $feed_type = _parser_common_syndication_feed_format_detect($xml);
-  if ($feed_type ==  "atom1.0") {
+  if ($feed_type == "atom1.0") {
     return _parser_common_syndication_atom10_parse($xml);
   }
   if ($feed_type == "RSS2.0" || $feed_type == "RSS0.91" || $feed_type == "RSS0.92") {
@@ -88,9 +88,9 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
 
   $base = _parser_common_syndication_atom10_parse_base_url($feed_XML);
 
-  // Detect the title
+  // Detect the title.
   $parsed_source['title'] = isset($feed_XML->title) ? _parser_common_syndication_title("{$feed_XML->title}") : "";
-  // Detect the description
+  // Detect the description.
   $parsed_source['description'] = isset($feed_XML->subtitle) ? "{$feed_XML->subtitle}" : "";
 
   $parsed_source['link'] = _parser_common_syndication_link($feed_XML->link);
@@ -101,7 +101,7 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
   $parsed_source['items'] = array();
 
   foreach ($feed_XML->entry as $news) {
-    $georss = (array)$news->children($ns["georss"]);
+    $georss = (array) $news->children($ns["georss"]);
     $geoname = '';
     if (isset($georss['featureName'])) {
       $geoname = "{$georss['featureName']}";
@@ -127,10 +127,10 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
         if (isset($category['scheme'])) {
           $domain = "{$category['scheme']}";
           if (!empty($domain)) {
-              if (!isset($additional_taxonomies['ATOM Domains'][$domain])) {
-                $additional_taxonomies['ATOM Domains'][$domain] = array();
-              }
-              $additional_taxonomies['ATOM Domains'][$domain][] = count($additional_taxonomies['ATOM Categories']) - 1;
+            if (!isset($additional_taxonomies['ATOM Domains'][$domain])) {
+              $additional_taxonomies['ATOM Domains'][$domain] = array();
+            }
+            $additional_taxonomies['ATOM Domains'][$domain][] = count($additional_taxonomies['ATOM Categories']) - 1;
           }
         }
         $additional_taxonomies['ATOM Categories'][] = "{$category['term']}";
@@ -141,13 +141,13 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
 
     $body = '';
     if (!empty($news->content)) {
-      foreach ($news->content->children() as $child)  {
+      foreach ($news->content->children() as $child) {
         $body .= $child->asXML();
       }
       $body .= "{$news->content}";
     }
     elseif (!empty($news->summary)) {
-      foreach ($news->summary->children() as $child)  {
+      foreach ($news->summary->children() as $child) {
         $body .= $child->asXML();
       }
       $body .= "{$news->summary}";
@@ -175,7 +175,7 @@ function _parser_common_syndication_atom10_parse($feed_XML) {
       $item['timestamp'] = _parser_common_syndication_parse_date("{$news->published}");
     }
     elseif (isset($news->issued)) {
-       $item['timestamp'] = _parser_common_syndication_parse_date("{$news->issued}");
+      $item['timestamp'] = _parser_common_syndication_parse_date("{$news->issued}");
     }
     elseif (isset($news->updated)) {
       $item['timestamp'] = _parser_common_syndication_parse_date("{$news->updated}");
@@ -340,7 +340,7 @@ function _parser_common_syndication_RDF10_parse($feed_XML) {
       'author_name' => array('dc:creator', 'dc:publisher'),
       'guid'        => 'rdf:about',
       'timestamp'   => 'dc:date',
-      'tags'        => 'dc:subject'
+      'tags'        => 'dc:subject',
     ));
 
     // Special handling for the title:
@@ -357,7 +357,7 @@ function _parser_common_syndication_RDF10_parse($feed_XML) {
     // Add every found RDF property to the feed item.
     $item['rdf'] = array();
     foreach ($rdf_data as $rdf_property => $rdf_value) {
-      // looks nicer in the mapper UI
+      // Looks nicer in the mapper UI.
       // @todo Revisit, not used with feedapi mapper anymore.
       $rdf_property = str_replace(':', '_', $rdf_property);
       $item['rdf'][$rdf_property] = $rdf_value;
@@ -369,16 +369,22 @@ function _parser_common_syndication_RDF10_parse($feed_XML) {
   return $parsed_source;
 }
 
+/**
+ *
+ */
 function _parser_common_syndication_RDF10_property($rdf_data, $rdf_properties = array()) {
   $rdf_properties = is_array($rdf_properties) ? $rdf_properties : array_slice(func_get_args(), 1);
   foreach ($rdf_properties as $rdf_property) {
     if ($rdf_property && !empty($rdf_data[$rdf_property])) {
-      // remove empty strings
+      // Remove empty strings.
       return array_filter($rdf_data[$rdf_property], 'strlen');
     }
   }
 }
 
+/**
+ *
+ */
 function _parser_common_syndication_RDF10_item($rdf_data, $mappings) {
   foreach ($mappings as $k => $v) {
     $values = _parser_common_syndication_RDF10_property($rdf_data, $v);
@@ -394,8 +400,8 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
 
   $ns = array(
     "content" => "http://purl.org/rss/1.0/modules/content/",
-     "dc" => "http://purl.org/dc/elements/1.1/",
-     "georss" => "http://www.georss.org/georss",
+    "dc" => "http://purl.org/dc/elements/1.1/",
+    "georss" => "http://www.georss.org/georss",
   );
 
   $parsed_source = array();
@@ -415,9 +421,9 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
 
     $category = $news->xpath('category');
     // Get children for current namespace.
-    $content = (array)$news->children($ns["content"]);
-    $dc      = (array)$news->children($ns["dc"]);
-    $georss  = (array)$news->children($ns["georss"]);
+    $content = (array) $news->children($ns["content"]);
+    $dc      = (array) $news->children($ns["dc"]);
+    $georss  = (array) $news->children($ns["georss"]);
     $news = (array) $news;
     $news['category'] = $category;
 
@@ -430,12 +436,14 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
     }
     // Some sources use content:encoded as description i.e.
     // PostNuke PageSetter module.
-    if (isset($news['encoded'])) {  // content:encoded for PHP < 5.1.2.
+    // content:encoded for PHP < 5.1.2.
+    if (isset($news['encoded'])) {
       if (strlen($body) < strlen("{$news['encoded']}")) {
         $body = "{$news['encoded']}";
       }
     }
-    if (isset($content['encoded'])) { // content:encoded for PHP >= 5.1.2.
+    // content:encoded for PHP >= 5.1.2.
+    if (isset($content['encoded'])) {
       if (strlen($body) < strlen("{$content['encoded']}")) {
         $body = "{$content['encoded']}";
       }
@@ -448,7 +456,7 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
       $original_author = "{$news['author']}";
     }
     elseif (!empty($dc["creator"])) {
-      $original_author = (string)$dc["creator"];
+      $original_author = (string) $dc["creator"];
     }
 
     if (!empty($news['link'])) {
@@ -486,10 +494,10 @@ function _parser_common_syndication_RSS20_parse($feed_XML) {
         if (isset($category['domain'])) {
           $domain = "{$category['domain']}";
           if (!empty($domain)) {
-              if (!isset($additional_taxonomies['RSS Domains'][$domain])) {
-                $additional_taxonomies['RSS Domains'][$domain] = array();
-              }
-              $additional_taxonomies['RSS Domains'][$domain][] = count($additional_taxonomies['RSS Categories']) - 1;
+            if (!isset($additional_taxonomies['RSS Domains'][$domain])) {
+              $additional_taxonomies['RSS Domains'][$domain] = array();
+            }
+            $additional_taxonomies['RSS Domains'][$domain][] = count($additional_taxonomies['RSS Categories']) - 1;
           }
         }
       }
@@ -587,7 +595,8 @@ function _parser_common_syndication_parse_w3cdtf($date_str) {
     list($year, $month, $day, $hours, $minutes, $seconds) = array($match[1], $match[2], $match[3], $match[4], $match[5], $match[6]);
     // Calculate the epoch for current date assuming GMT.
     $epoch = gmmktime($hours, $minutes, $seconds, $month, $day, $year);
-    if ($match[10] != 'Z') { // Z is zulu time, aka GMT
+    // Z is zulu time, aka GMT.
+    if ($match[10] != 'Z') {
       list($tz_mod, $tz_hour, $tz_min) = array($match[8], $match[9], $match[10]);
       // Zero out the variables.
       if (!$tz_hour) {
@@ -615,7 +624,7 @@ function _parser_common_syndication_parse_w3cdtf($date_str) {
  * original article)
  *
  * @param array $links
- *   Array of SimpleXML objects
+ *   Array of SimpleXML objects.
  *
  * @return string
  *   An URL if found. An empty string otherwise.
@@ -637,7 +646,7 @@ function _parser_common_syndication_link($links) {
 }
 
 /**
- * Prepare raw data to be a title
+ * Prepare raw data to be a title.
  */
 function _parser_common_syndication_title($title, $body = FALSE) {
   if (empty($title) && !empty($body)) {

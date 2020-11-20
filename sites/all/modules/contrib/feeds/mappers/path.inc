@@ -46,7 +46,7 @@ function path_feeds_set_target(FeedsSource $source, $entity, $target, array $val
 
   $entity_type = $source->importer->processor->entityType();
 
-  list($id, , ) = entity_extract_ids($entity_type, $entity);
+  list($id, ,) = entity_extract_ids($entity_type, $entity);
 
   if ($id) {
     $uri = entity_uri($entity_type, $entity);

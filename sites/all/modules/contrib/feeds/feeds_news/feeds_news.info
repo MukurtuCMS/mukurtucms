@@ -16,12 +16,10 @@ features[field_instance][] = node-feed_item-field_feed_item_description
 features[node][] = feed
 features[node][] = feed_item
 features[views_view][] = feeds_defaults_feed_items
-files[] = feeds_news.module
 files[] = feeds_news.test
 
-; Information added by Drupal.org packaging script on 2017-09-24
-version = "7.x-2.0-beta4"
+; Information added by Drupal.org packaging script on 2020-08-13
+version = "7.x-2.0-beta5"
 core = "7.x"
 project = "feeds"
-datestamp = "1506257048"
-
+datestamp = "1597331284"

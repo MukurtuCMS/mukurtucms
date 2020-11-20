@@ -60,9 +60,11 @@ function ma_import_export_multiple_language_bug_batch_run_finished($success, $re
       $row = [l("node/$nid", "node/$nid")];
 
       foreach ($result as $field_name => $field_values) {
-        $langs = array_keys($field_values);
+        $langs = array_keys($field_values['value']);
         $lang_string = implode(', ', $langs);
-        $row[] = "$field_name ($lang_string)";
+        $class = isset($field_values['classes'][0]) ? $field_values['classes'][0] : '';
+        $color = $class == 'different' ? 'red' : 'green';
+        $row[] = "<span style=\"color:$color\">$field_name ($lang_string)</span>";
       }
 
       // Pad the row with blanks.

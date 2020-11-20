@@ -10,6 +10,9 @@
  */
 class FeedsSyndicationParserTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Syndication parsers',
@@ -130,4 +133,5 @@ class FeedsSyndicationParserTestCase extends FeedsMapperTestCase {
       $this->assertTrue(!isset($node->{$field_name}[LANGUAGE_NONE][0]['value']), format_string('The field %field does not contain a value (actual: @actual).', array('%field' => $field_name, '@actual' => $value['actual'])));
     }
   }
+
 }

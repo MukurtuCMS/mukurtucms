@@ -106,10 +106,10 @@ function http_request_get_common_syndication($url, $options = array()) {
  *   If the URL uses authentication, supply the password.
  * @param bool $accept_invalid_cert
  *   Whether to accept invalid certificates.
- * @param integer $timeout
+ * @param int $timeout
  *   Timeout in seconds to wait for an HTTP get request to finish.
  *
- * @return stdClass
+ * @return object
  *   An object that describes the data downloaded from $url.
  */
 function http_request_get($url, $username = NULL, $password = NULL, $accept_invalid_cert = FALSE, $timeout = NULL) {
@@ -137,7 +137,7 @@ function http_request_get($url, $username = NULL, $password = NULL, $accept_inva
  *   - cache_http_result: (bool) Whether to cache the HTTP result. Defaults to
  *     TRUE.
  *
- * @return stdClass
+ * @return object
  *   An object that describes the data downloaded from $url.
  */
 function feeds_http_request($url, array $options = array()) {
@@ -212,7 +212,7 @@ function feeds_http_request($url, array $options = array()) {
 
     // Parse the URL and make sure we can handle the schema.
     // cURL can only support either http:// or https://.
-    // CURLOPT_PROTOCOLS is only supported with cURL 7.19.4
+    // CURLOPT_PROTOCOLS is only supported with cURL 7.19.4.
     $uri = parse_url($url);
     if ($uri === FALSE) {
       $result->error = 'unable to parse URL';
@@ -241,7 +241,7 @@ function feeds_http_request($url, array $options = array()) {
       $download = curl_init($url);
       curl_setopt($download, CURLOPT_FOLLOWLOCATION, TRUE);
       if (!empty($options['username'])) {
-        curl_setopt($download, CURLOPT_USERPWD, '{' . $options['username'] . '}:{' . $options['password'] . '}');
+        curl_setopt($download, CURLOPT_USERPWD, $options['username'] . ':' . $options['password']);
         curl_setopt($download, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
       }
       curl_setopt($download, CURLOPT_HTTPHEADER, $headers);
@@ -429,6 +429,7 @@ function http_request_use_curl() {
 
   // cURL below PHP 5.6.0 must not have open_basedir or safe_mode enabled.
   if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+    // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.safe_modeDeprecatedRemoved
     return !ini_get('safe_mode') && !ini_get('open_basedir');
   }
 
@@ -465,7 +466,7 @@ function http_request_get_cache($url) {
  *
  * @param string $url
  *   The URL to cache.
- * @param stdClass $result
+ * @param object $result
  *   The result of the HTTP request.
  */
 function http_request_set_cache($url, $result) {
@@ -582,7 +583,7 @@ function http_request_create_absolute_url($url, $base_url) {
 
     // Adding to the existing path.
     $cparts = array();
-    if ($url{0} == '/') {
+    if ($url[0] == '/') {
       $cparts = array_filter(explode("/", $url));
     }
     else {

@@ -22,6 +22,9 @@ class FeedsMapperMultilingualFieldsTestCase extends FeedsMapperTestCase {
    */
   protected $fields = array();
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Multilingual fields',
@@ -31,6 +34,9 @@ class FeedsMapperMultilingualFieldsTestCase extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $modules = array(
       'locale',
@@ -1055,4 +1061,5 @@ class FeedsMapperMultilingualFieldsTestCase extends FeedsMapperTestCase {
       ),
     );
   }
+
 }

@@ -17,13 +17,19 @@ class ParserCSVIterator implements Iterator {
   private $currentLine;
   private $currentPos;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct($filepath) {
     $this->handle = fopen($filepath, 'r');
     $this->currentLine = NULL;
     $this->currentPos = NULL;
   }
 
-  function __destruct() {
+  /**
+   * {@inheritdoc}
+   */
+  public function __destruct() {
     if ($this->handle) {
       fclose($this->handle);
     }
@@ -39,6 +45,9 @@ class ParserCSVIterator implements Iterator {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function rewind($pos = 0) {
     if ($this->handle) {
       fseek($this->handle, $pos);
@@ -46,6 +55,9 @@ class ParserCSVIterator implements Iterator {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function next() {
     if ($this->handle) {
       $this->currentLine = feof($this->handle) ? NULL : fgets($this->handle);
@@ -54,21 +66,34 @@ class ParserCSVIterator implements Iterator {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function valid() {
     return isset($this->currentLine);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function current() {
     return $this->currentLine;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function currentPos() {
     return $this->currentPos;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function key() {
     return 'line';
   }
+
 }
 
 /**
@@ -87,6 +112,9 @@ class ParserCSV {
   private $lastLinePos;
   private $useMbString;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct() {
     $this->delimiter = ',';
     $this->fromEncoding = 'UTF-8';
@@ -182,11 +210,11 @@ class ParserCSV {
    * Get the byte number where the parser left off after last parse() call.
    *
    * @return int
-   *  0 if all lines or no line has been parsed, the byte position of where a
-   *  timeout or the line limit has been reached otherwise. This position can be
-   *  used to set the start byte for the next iteration after parse() has
-   *  reached the timeout set with setTimeout() or the line limit set with
-   *  setLineLimit().
+   *   0 if all lines or no line has been parsed, the byte position of where a
+   *   timeout or the line limit has been reached otherwise. This position can be
+   *   used to set the start byte for the next iteration after parse() has
+   *   reached the timeout set with setTimeout() or the line limit set with
+   *   setLineLimit().
    *
    * @see ParserCSV::setStartByte()
    */
@@ -285,7 +313,8 @@ class ParserCSV {
             $currentIndex = $nextQuoteIndex + 1;
           }
         }
-        else { // $quoted == FALSE
+        // $quoted == FALSE.
+        else {
           // First, let's find out where the next character of interest is.
           $nextQuoteIndex = strpos($line, '"', $currentIndex);
           $nextDelimiterIndex = strpos($line, $this->delimiter, $currentIndex);
@@ -314,7 +343,8 @@ class ParserCSV {
             $currentIndex += $length + 1;
             // Continue with the next field.
           }
-          else { // $line[$nextIndex] == '"'
+          // $line[$nextIndex] == '"'.
+          else {
             $quoted = TRUE;
             $currentField .= substr($line, $currentIndex, $nextIndex - $currentIndex);
             $currentIndex = $nextIndex + 1;
@@ -324,7 +354,6 @@ class ParserCSV {
       }
       // End of CSV parser. We've now got all the fields of the line as strings
       // in the $fields array.
-
       if (empty($this->columnNames)) {
         $row = $fields;
       }
@@ -381,6 +410,7 @@ class ParserCSV {
 
     return $data;
   }
+
 }
 
 /**
