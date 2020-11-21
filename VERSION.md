@@ -1,3 +1,13 @@
+## Mukurtu 2.1.6
+- Updated to Drupal 7.74
+- Fixed a bug where new imported content would not use the default site language
+- Fixed a bug where taxonomy terms may be imported with the incorrect language
+- Changed the method used to populate some entity reference fields. Item edit forms on sites with a large number of items may load faster now
+- Updated contrib modules to add support for PHP 7.3+
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.1.5
 - Updated to Drupal 7.73
 - Fixed a bug where new content would not be correctly added to collections/related content fields
