@@ -39,11 +39,11 @@ settings[bootstrap_forms_smart_descriptions_allowed_tags] = 'b, br, code, em, i,
 settings[bootstrap_tooltip_placement] => auto bottom
 settings[mukurtu_theme_color_scheme] = 'blue-gold'
 settings[mukurtu_theme_email_us_message] = 'Email us at'
-settings[mukurtu_theme_contact_email] = 'support@mukurtu.org'
-settings[mukurtu_theme_twitter_message] = 'Follow us'
-settings[mukurtu_theme_twitter1] = 'mukurtu'
-settings[mukurtu_theme_twitter2] = 'mukurtusupport'
-settings[mukurtu_theme_copyright] = '© [year] Mukurtu CMS'
+settings[mukurtu_theme_contact_email] = ''
+settings[mukurtu_theme_twitter_message] = ''
+settings[mukurtu_theme_twitter1] = ''
+settings[mukurtu_theme_twitter2] = ''
+settings[mukurtu_theme_copyright] = ''
 settings[mukurtu_theme_frontpage_layout] = 'large-hero'
 settings[mukurtu_theme_frontpage_hero_image] = ''
 
