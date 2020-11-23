@@ -190,7 +190,6 @@ function file_feeds_set_target(FeedsSource $source, $entity, $target, array $val
           }
           catch (Exception $e) {
             watchdog('feeds', check_plain($e->getMessage()));
-            continue;
           }
         }
         break;

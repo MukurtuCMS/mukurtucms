@@ -7,7 +7,7 @@
  */
 
 /**
- * Introductory help for admin/structure/feeds/%feeds_importer page
+ * Introductory help for admin/structure/feeds/%feeds_importer page.
  */
 function feeds_ui_edit_help() {
   return t('
@@ -95,10 +95,10 @@ function feeds_ui_overview_form($form, array &$form_state) {
     );
     $importer_form['operations'] = array(
       '#markup' =>
-        l($edit, 'admin/structure/feeds/' . $importer->id) . ' | ' .
-        l(t('Export'), 'admin/structure/feeds/' . $importer->id . '/export') . ' | ' .
-        l(t('Clone'), 'admin/structure/feeds/' . $importer->id . '/clone') .
-        (empty($delete) ? '' :  ' | ' . l($delete, 'admin/structure/feeds/' . $importer->id . '/delete')),
+      l($edit, 'admin/structure/feeds/' . $importer->id) . ' | ' .
+      l(t('Export'), 'admin/structure/feeds/' . $importer->id . '/export') . ' | ' .
+      l(t('Clone'), 'admin/structure/feeds/' . $importer->id . '/clone') .
+      (empty($delete) ? '' : ' | ' . l($delete, 'admin/structure/feeds/' . $importer->id . '/delete')),
     );
 
     $importer_form[$importer->id] = array(
@@ -137,7 +137,7 @@ function feeds_ui_overview_form_submit($form, &$form_state) {
  * Create a new configuration.
  *
  * @param $form_state
- *  Form API form state array.
+ *   Form API form state array.
  * @param $from_importer
  *   FeedsImporter object. If given, form will create a new importer as a copy
  *   of $from_importer.
@@ -378,7 +378,7 @@ function feeds_ui_edit_page(FeedsImporter $importer, $active = 'help', $plugin_k
       'title' => $parser['name'],
       'body' => $parser['description'],
       'actions' => $actions,
-    )
+    ),
   );
   $info['actions'] = array(l(t('Change'), $path . '/parser'));
   $config_info[] = $info;
@@ -396,7 +396,7 @@ function feeds_ui_edit_page(FeedsImporter $importer, $active = 'help', $plugin_k
       'title' => $processor['name'],
       'body' => $processor['description'],
       'actions' => $actions,
-    )
+    ),
   );
   $info['actions'] = array(l(t('Change'), $path . '/processor'));
   $config_info[] = $info;
@@ -582,7 +582,7 @@ function feeds_ui_mapping_form($form, &$form_state, $importer) {
         '#delta' => $delta,
         '#attributes' => array(
           'class' => array(
-            'feeds-ui-mapping-weight'
+            'feeds-ui-mapping-weight',
           ),
         ),
       );
@@ -703,7 +703,7 @@ function feeds_ui_mapping_settings_form($form, $form_state, $i, $mapping, $targe
           '#markup' => $summary,
           '#suffix' => '</div>',
         ),
-       'edit_settings' => $base_button + array(
+        'edit_settings' => $base_button + array(
           '#type' => 'image_button',
           '#name' => 'mapping_settings_edit_' . $i,
           '#src' => 'misc/configure.png',
@@ -972,7 +972,8 @@ function theme_feeds_ui_edit_page($variables) {
   $output .= '</div>';
   $output .= '</div>';
 
-  $output .= '</div>'; // ''<div class="feeds-settings">';
+  // Close the outer wrapper.
+  $output .= '</div>';
 
   return $output;
 }
@@ -998,7 +999,7 @@ function theme_feeds_ui_container($variables) {
   $container = $variables['container'];
 
   $class = array_merge(array('feeds-container'), empty($container['class']) ? array('plain') : $container['class']);
-  $id = empty($container['id']) ? '': ' id="' . $container['id'] . '"';
+  $id = empty($container['id']) ? '' : ' id="' . $container['id'] . '"';
   $output = '<div class="' . implode(' ', $class) . '"' . $id . '>';
 
   if (isset($container['actions']) && count($container['actions'])) {
@@ -1201,7 +1202,8 @@ function feeds_ui_importer_import_validate($form, &$form_state) {
   elseif (version_compare($feeds_importer->api_version, feeds_api_version(), '>')) {
     form_error($form['importer'], t('That importer is created for the version %import_version of Feeds, but you only have version %api_version.', array(
       '%import_version' => $feeds_importer->api_version,
-      '%api_version' => feeds_api_version())));
+      '%api_version' => feeds_api_version(),
+    )));
   }
 
   // Change to user-supplied id.

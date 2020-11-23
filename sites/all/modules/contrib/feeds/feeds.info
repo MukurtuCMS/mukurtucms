@@ -5,14 +5,19 @@ core = 7.x
 dependencies[] = ctools
 dependencies[] = job_scheduler
 
+test_dependencies[] = ctools:ctools (<= 7.x-1.12)
 test_dependencies[] = date:date
 test_dependencies[] = entity_translation:entity_translation
 test_dependencies[] = feeds_xpathparser:feeds_xpathparser
 test_dependencies[] = i18n:i18n_taxonomy
 test_dependencies[] = link:link
+test_dependencies[] = og:og
 test_dependencies[] = rules:rules
 test_dependencies[] = variable:variable
 
+files[] = includes/FeedsAccountSwitcher.inc
+files[] = includes/FeedsAccountSwitcherException.inc
+files[] = includes/FeedsAccountSwitcherInterface.inc
 files[] = includes/FeedsConfigurable.inc
 files[] = includes/FeedsHTTPCache.inc
 files[] = includes/FeedsHTTPCacheItem.inc
@@ -65,6 +70,7 @@ files[] = tests/feeds_i18n.test
 files[] = tests/feeds_i18n_node.test
 files[] = tests/feeds_i18n_taxonomy.test
 files[] = tests/feeds_install.test
+files[] = tests/feeds_og.test
 files[] = tests/feeds_parser_csv.test
 files[] = tests/feeds_parser_sitemap.test
 files[] = tests/feeds_parser_syndication.test
@@ -78,6 +84,7 @@ files[] = tests/feeds_mapper_link.test
 files[] = tests/feeds_mapper_summary.test
 files[] = tests/feeds_mapper_taxonomy.test
 files[] = tests/feeds_tokens.test
+files[] = tests/FeedsAccountSwitcherTest.test
 files[] = tests/FeedsEnclosureTest.test
 files[] = tests/FeedsFetcherResultTest.test
 files[] = tests/FeedsHTTPCacheTest.test
@@ -94,9 +101,8 @@ files[] = views/feeds_views_handler_field_source.inc
 files[] = views/feeds_views_handler_filter_severity.inc
 files[] = views/feeds_views_plugin_argument_validate_feed_nid.inc
 
-; Information added by Drupal.org packaging script on 2017-09-24
-version = "7.x-2.0-beta4"
+; Information added by Drupal.org packaging script on 2020-08-13
+version = "7.x-2.0-beta5"
 core = "7.x"
 project = "feeds"
-datestamp = "1506257048"
-
+datestamp = "1597331284"

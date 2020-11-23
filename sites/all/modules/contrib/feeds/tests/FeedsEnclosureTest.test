@@ -5,6 +5,7 @@
  * @group feeds
  */
 class FeedsEnclosureTest extends FeedsWebTestCase {
+
   /**
    * {@inheritdoc}
    */

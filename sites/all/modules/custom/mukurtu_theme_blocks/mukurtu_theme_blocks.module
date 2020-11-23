@@ -121,6 +121,9 @@ function _mukurtu_theme_blocks_footer() {
     // Email contact
     $email_us_text = t(theme_get_setting('mukurtu_theme_email_us_message'));
     $email_contact_address = theme_get_setting('mukurtu_theme_contact_email');
+    if ($email_contact_address == '') {
+        $email_contact_address = variable_get('site_mail', '');
+    }
     if($email_contact_address != '') {
         $email_contact_address = l($email_contact_address, 'mailto:' . $email_contact_address);
         if($email_us_text != '') {
@@ -151,6 +154,11 @@ function _mukurtu_theme_blocks_footer() {
         }
     }
 
+    // If not using twitter, keep the div structure so we don't need different CSS.
+    if ($twitter1 == '' && $twitter2 == '') {
+        $block['content'] .= '<div class="twitter-wrapper col-md-4 col-md-push-4 col-sm-6 col-xs-12"></div>';
+    }
+
     // Close twitter div
     if(!$first_twitter) {
         $block['content'] .= '</div>';
@@ -161,7 +169,12 @@ function _mukurtu_theme_blocks_footer() {
 
     // Copyright
     $year = date("Y");
-    $copyright = str_replace('[year]', $year, theme_get_setting('mukurtu_theme_copyright'));
+    $copyright = theme_get_setting('mukurtu_theme_copyright');
+    if ($copyright == '') {
+        $copyright = '© [year] ' . variable_get('site_name', '');
+    }
+    $copyright = str_replace('[year]', $year, $copyright);
+
     if($copyright != '') {
         $block['content'] .= "<div class='copyright col-md-pull-8 col-md-4 col-xs-12'>$copyright</div>";
     }

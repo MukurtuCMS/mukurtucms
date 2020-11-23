@@ -45,4 +45,5 @@ class FeedsOPMLParser extends FeedsParser {
   public function providesSourceTitle() {
     return TRUE;
   }
+
 }

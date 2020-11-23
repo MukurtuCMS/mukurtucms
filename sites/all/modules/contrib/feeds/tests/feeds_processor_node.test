@@ -10,6 +10,9 @@
  */
 class FeedsRSStoNodesTest extends FeedsWebTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Processor: Node',
@@ -212,7 +215,6 @@ class FeedsRSStoNodesTest extends FeedsWebTestCase {
 
     // Now create a second feed configuration that is not attached to a content
     // type and run tests on importing/purging.
-
     // Login with sufficient permissions.
     $this->drupalLogin($this->admin_user);
     // Remove all items again so that next test can check for them.
@@ -648,6 +650,57 @@ class FeedsRSStoNodesTest extends FeedsWebTestCase {
 
     // Assert that there are no more clear tasks in the queue.
     $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {queue} WHERE name = 'feeds_source_clear'")->fetchField());
+  }
+
+  /**
+   * Tests unlocking a feed.
+   */
+  public function testUnlock() {
+    // Just remove the mappings rather than creating a new importer.
+    $this->removeMappings('syndication', $this->getCurrentMappings('syndication'));
+
+    $this->setPlugin('syndication', 'FeedsFileFetcher');
+    $this->setPlugin('syndication', 'FeedsCSVParser');
+
+    $this->setSettings('syndication', NULL, array(
+      'content_type' => '',
+      'process_in_background' => TRUE,
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+
+    $this->addMappings('syndication', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'GUID',
+        'target' => 'guid',
+        'unique' => TRUE,
+      ),
+    ));
+
+    $this->importFile('syndication', $this->absolutePath() . '/tests/feeds/many_nodes_ordered.csv', 'Schedule import');
+    $this->assertEqual(0, db_query("SELECT COUNT(*) FROM {node}")->fetchField());
+
+    // Assert that the import button is disabled.
+    $this->assertFieldDisabled('op');
+
+    // Assert that there is one import task in the queue.
+    $this->assertEqual(1, db_query("SELECT COUNT(*) FROM {queue} WHERE name = 'feeds_source_import'")->fetchField());
+
+    // Now unlock the feed.
+    $this->drupalPost('import/syndication/unlock', array(), 'Unlock');
+    $this->assertText('Importer unlocked.');
+
+    // Assert that the unlock button is now disabled.
+    $this->drupalGet('import/syndication/unlock');
+    $this->assertFieldDisabled('op');
+    $this->assertText('This importer is not locked, therefore it cannot be unlocked.');
+
+    // And assert that the import button is no longer disabled.
+    $this->drupalGet('import/syndication');
+    $this->assertFieldEnabled('op');
   }
 
   /**

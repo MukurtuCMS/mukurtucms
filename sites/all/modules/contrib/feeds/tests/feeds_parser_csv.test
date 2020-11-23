@@ -9,6 +9,10 @@
  * Tests the CSV parser using the UI.
  */
 class FeedsCSVParserTestCase extends FeedsWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'CSV parser functional tests',

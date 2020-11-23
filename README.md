@@ -1,4 +1,4 @@
-# Mukurtu CMS 2.1.5
+# Mukurtu CMS 2.1.6
 ### [Release Notes](VERSION.md)
 
 ## Contents
@@ -45,7 +45,7 @@ To install on your own server, please find system requirements and installation 
 
 ##### <a name="system-requirements"></a>System Requirements
 * A web server that supports PHP, such as Apache
-* [PHP](http://www.php.net/) version 7.1 or 7.2. Mukurtu currently does not support PHP 7.3.
+* [PHP](http://www.php.net/) version 7.2+
 * A database server such as [MySQL 5.0.15 (or higher)](http://www.mysql.com/) or [MariaDb 5.1.44 (or higher)](https://mariadb.org/)
 
 ##### <a name="installation"></a>Installation

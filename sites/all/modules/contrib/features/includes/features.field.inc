@@ -1,20 +1,29 @@
 <?php
 
 /**
+ * @file
+ * Features integration on behalf of 'field' module.
+ */
+
+/**
  * Implements hook_features_api().
  */
 function field_features_api() {
   return array(
     'field' => array(
-      // this is deprecated by field_base and field_instance
-      // but retained for compatibility with older exports
+      // This is deprecated by field_base and field_instance
+      // but retained for compatibility with older exports.
       'name' => t('Fields'),
+      /* @see \hook_field_default_fields() */
+      /* @see \hook_field_default_fields_alter() */
       'default_hook' => 'field_default_fields',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
       'feature_source' => FALSE,
     ),
     'field_base' => array(
       'name' => t('Field Bases'),
+      /* @see \hook_field_default_field_bases() */
+      /* @see \hook_field_default_field_bases_alter() */
       'default_hook' => 'field_default_field_bases',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
       'feature_source' => TRUE,
@@ -22,11 +31,13 @@ function field_features_api() {
     ),
     'field_instance' => array(
       'name' => t('Field Instances'),
+      /* @see \hook_field_default_field_instances() */
+      /* @see \hook_field_default_field_instances_alter() */
       'default_hook' => 'field_default_field_instances',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
       'feature_source' => TRUE,
       'supersedes' => 'field',
-    )
+    ),
   );
 }
 
@@ -81,14 +92,14 @@ function field_base_features_export($data, &$export, $module_name = '') {
         $module = $map[$identifier];
         $export['dependencies'][$module] = $module;
       }
-      // If the field has not yet been exported, add it
+      // If the field has not yet been exported, add it.
       else {
         $export['features']['field_base'][$identifier] = $identifier;
         $export['dependencies'][$base['module']] = $base['module'];
         if ($base['storage']['type'] != variable_get('field_storage_default', 'field_sql_storage')) {
           $export['dependencies'][$base['storage']['module']] = $base['storage']['module'];
         }
-        // If taxonomy field, add in the vocabulary
+        // If taxonomy field, add in the vocabulary.
         if ($base['type'] == 'taxonomy_term_reference' && !empty($base['settings']['allowed_values'])) {
           foreach ($base['settings']['allowed_values'] as $allowed_values) {
             if (!empty($allowed_values['vocabulary'])) {
@@ -124,7 +135,7 @@ function field_instance_features_export($data, &$export, $module_name = '') {
         $module = $map[$identifier];
         $export['dependencies'][$module] = $module;
       }
-      // If the field has not yet been exported, add it
+      // If the field has not yet been exported, add it.
       else {
         $export['features']['field_instance'][$identifier] = $identifier;
         $export['dependencies'][$instance['widget']['module']] = $instance['widget']['module'];
@@ -225,13 +236,24 @@ function field_instance_features_export_render($module, $data, $export = NULL) {
   return array('field_default_field_instances' => $code);
 }
 
-// Helper to enforce consistency in field export arrays.
+/**
+ * Normalizes and sorts a field or field instance definition, recursively.
+ *
+ * Some layers of the nested structure are exempt from sorting, but their
+ * children might again be sorted.
+ *
+ * @param array $field
+ *   Field or field instance definition.
+ *   In recursive calls, this is a nested element within that structure.
+ * @param bool $sort
+ *   TRUE, if this (nested) element should be sorted.
+ */
 function _field_instance_features_export_sort(&$field, $sort = TRUE) {
 
   // Some arrays are not sorted to preserve order (for example allowed_values).
   static $sort_blacklist = array(
-      'allowed_values',
-      'format_handlers',
+    'allowed_values',
+    'format_handlers',
   );
 
   if ($sort) {
@@ -346,7 +368,16 @@ function field_instance_features_rebuild($module) {
 }
 
 /**
- * Load a field base configuration by a field_name identifier.
+ * Loads a field base configuration by a field_name identifier.
+ *
+ * @param string $field_name
+ *   Field name to load.
+ *
+ * @return array|false
+ *   The field base definition array as from field_info_field().
+ *   The auto-increment keys 'id' and 'field_id' are removed, to reduce noise
+ *   in the export.
+ *   If the field base is not found, FALSE is returned.
  */
 function features_field_base_load($field_name) {
   if ($field_info = field_info_field($field_name)) {
@@ -358,8 +389,16 @@ function features_field_base_load($field_name) {
 }
 
 /**
- * Load a field's instance configuration by an entity_type-bundle-field_name
- * identifier.
+ * Loads a field instance definition array suitable for export.
+ *
+ * @param string $identifier
+ *   Format: "$entity_type-$bundle-$field_name".
+ *
+ * @return array|false
+ *   Field instance definition array as from field_info_instance().
+ *   The auto-increment keys 'id' and 'field_id' are removed, to reduce noise
+ *   in the export.
+ *   If the field instance is not found, FALSE is returned.
  */
 function features_field_instance_load($identifier) {
   list($entity_type, $bundle, $field_name) = explode('-', $identifier);
@@ -450,7 +489,17 @@ function field_features_export_render($module, $data, $export = NULL) {
   return array('field_default_fields' => $code);
 }
 
-// Helper to enforce consistency in field export arrays.
+/**
+ * Helper to enforce consistency in field export arrays.
+ *
+ * @param array $field
+ *   Nested array containing field base and field instance configuration.
+ *   In recursive calls, this is a nested element within that structure.
+ * @param bool $sort
+ *   TRUE, if this (nested) element should be sorted.
+ *
+ * @see \_field_instance_features_export_sort()
+ */
 function _field_features_export_sort(&$field, $sort = TRUE) {
 
   // Some arrays are not sorted to preserve order (for example allowed_values).
@@ -535,8 +584,13 @@ function field_features_rebuild($module) {
 }
 
 /**
- * Load a field's configuration and instance configuration by an
- * entity_type-bundle-field_name identifier.
+ * Loads a combined array with field base and field instance definition.
+ *
+ * @param string $identifier
+ *   Format: "$entity_type-$bundle-$field_name".
+ *
+ * @return array|false
+ *   Array with information about the field base and the field instance.
  */
 function features_field_load($identifier) {
   list($entity_type, $bundle, $field_name) = explode('-', $identifier);
@@ -566,7 +620,7 @@ function features_field_load($identifier) {
  * @param string $identifier
  *   The field identifier.
  *
- * @return BOOL
+ * @return bool
  *   TRUE if the line should be wrapped after the prefix, else FALSE.
  *
  * @see https://www.drupal.org/node/1354

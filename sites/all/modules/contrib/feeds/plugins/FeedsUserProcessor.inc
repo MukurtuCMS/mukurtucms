@@ -99,7 +99,7 @@ class FeedsUserProcessor extends FeedsProcessor {
   /**
    * Validates a user account.
    */
-  protected function entityValidate($account) {
+  protected function entityValidate($account, FeedsSource $source = NULL) {
     parent::entityValidate($account);
 
     if (empty($account->name) || empty($account->mail) || !valid_email_address($account->mail)) {
@@ -544,7 +544,7 @@ class FeedsUserProcessor extends FeedsProcessor {
         '#title' => t('Allowed roles'),
         '#options' => $allowed_roles_options,
         '#default_value' => $mapping['allowed_roles'],
-        '#description' => t('Select the roles to accept from the feed.<br />Any other roles will be ignored.')
+        '#description' => t('Select the roles to accept from the feed.<br />Any other roles will be ignored.'),
       ),
       'autocreate' => array(
         '#type' => 'checkbox',
@@ -642,7 +642,7 @@ class FeedsUserProcessor extends FeedsProcessor {
    * Used by ::passSummaryCallback().
    *
    * @return array
-   *    An array of password encryption option titles.
+   *   An array of password encryption option titles.
    *
    * @see passSummaryCallback()
    */
@@ -674,7 +674,7 @@ class FeedsUserProcessor extends FeedsProcessor {
    * Used by ::passFormCallback().
    *
    * @return array
-   *    An array of password encryption option titles.
+   *   An array of password encryption option titles.
    *
    * @see passFormCallback()
    */
@@ -719,4 +719,5 @@ class FeedsUserProcessor extends FeedsProcessor {
         break;
     }
   }
+
 }

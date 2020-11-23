@@ -54,6 +54,7 @@ class FeedsParserResult extends FeedsResult {
   public function currentItem() {
     return empty($this->current_item) ? NULL : $this->current_item;
   }
+
 }
 
 /**
@@ -78,7 +79,7 @@ abstract class FeedsParser extends FeedsPlugin {
    * @param $fetcher_result
    *   FeedsFetcherResult returned by fetcher.
    */
-  public abstract function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result);
+  abstract public function parse(FeedsSource $source, FeedsFetcherResult $fetcher_result);
 
   /**
    * Clear all caches for results for given source.
@@ -97,8 +98,6 @@ abstract class FeedsParser extends FeedsPlugin {
    * @return
    *   An array of mapping sources, or FALSE if the sources can be defined by
    *   typing a value in a text field.
-   *
-   *   Example:
    *   @code
    *   array(
    *     'title' => t('Title'),
@@ -172,6 +171,7 @@ abstract class FeedsParser extends FeedsPlugin {
           return $node->uid;
         }
         break;
+
       case 'parent:nid':
         return $source->feed_nid;
     }
@@ -193,6 +193,7 @@ abstract class FeedsParser extends FeedsPlugin {
   public function providesSourceTitle() {
     return FALSE;
   }
+
 }
 
 /**
@@ -202,8 +203,11 @@ abstract class FeedsParser extends FeedsPlugin {
  * @see FeedsEnclosure
  */
 class FeedsElement {
-  // The standard value of this element. This value can contain be a simple type,
-  // a FeedsElement or an array of either.
+
+  /**
+   * The standard value of this element. This value can contain be a simple
+   * type, a FeedsElement or an array of either.
+   */
   protected $value;
 
   /**
@@ -239,6 +243,7 @@ class FeedsElement {
     }
     return (string) $this->getValue();
   }
+
 }
 
 /**
@@ -280,6 +285,7 @@ class FeedsTermElement extends FeedsElement {
   public function getValue() {
     return $this->name;
   }
+
 }
 
 /**
@@ -287,6 +293,7 @@ class FeedsTermElement extends FeedsElement {
  */
 class FeedsGeoTermElement extends FeedsTermElement {
   public $lat, $lon, $bound_top, $bound_right, $bound_bottom, $bound_left, $geometry;
+
   /**
    * @param $term
    *   An array or a stdClass object that is a Drupal taxonomy term. Can include
@@ -295,6 +302,7 @@ class FeedsGeoTermElement extends FeedsTermElement {
   public function __construct($term) {
     parent::__construct($term);
   }
+
 }
 
 /**
@@ -457,9 +465,10 @@ class FeedsEnclosure extends FeedsElement {
    *   expected. Don't use trailing slashes unless it's a streamwrapper scheme.
    * @param int $replace
    *   Replace behavior when the destination file already exists.
-   *   @see file_save_data()
    *
-   * @return stdClass|FALSE
+   * @see file_save_data()
+   *
+   * @return object|false
    *   A Drupal temporary file object of the enclosed resource or FALSE if the
    *   value is empty.
    *
@@ -525,6 +534,7 @@ class FeedsEnclosure extends FeedsElement {
       return $file;
     }
   }
+
 }
 
 /**
@@ -534,7 +544,9 @@ class FeedsEnclosure extends FeedsElement {
  */
 class FeedsDateTimeElement extends FeedsElement {
 
-  // Start date and end date.
+  /**
+   * Start date and end date.
+   */
   public $start;
   public $end;
 
@@ -617,7 +629,7 @@ class FeedsDateTimeElement extends FeedsElement {
    *
    * @param object $entity
    *   The entity to build the date field on.
-   * @param str $field_name
+   * @param string $field_name
    *   The name of the field to build.
    * @param int $delta
    *   The delta in the field.
@@ -631,7 +643,7 @@ class FeedsDateTimeElement extends FeedsElement {
     $use_start = $oldfield->start;
     $use_end = $oldfield->end;
 
-    // Set timezone if not already in the FeedsDateTime object
+    // Set timezone if not already in the FeedsDateTime object.
     $to_tz = date_get_timezone($info['settings']['tz_handling'], date_default_timezone());
     $temp = new FeedsDateTime(NULL, new DateTimeZone($to_tz));
 
@@ -681,6 +693,7 @@ class FeedsDateTimeElement extends FeedsElement {
       $entity->{$field_name}[$language][$delta]['value2'] = $use_end->format(date_type_format($info['type']));
     }
   }
+
 }
 
 /**
@@ -837,8 +850,8 @@ class FeedsDateTime extends DateTime {
     }
 
     if (!$this->hasTime() || !$this->hasGranularity('zone') || $force) {
-      // this has no time or timezone granularity, so timezone doesn't mean much
-      // We set the timezone using the method, which will change the day/hour, but then we switch back
+      // This has no time or timezone granularity, so timezone doesn't mean much
+      // We set the timezone using the method, which will change the day/hour, but then we switch back.
       $arr = $this->toArray();
       parent::setTimezone($tz);
       $this->setDate($arr['year'], $arr['month'], $arr['day']);
@@ -891,7 +904,7 @@ class FeedsDateTime extends DateTime {
     $temp = date_parse($time);
     // This PHP method currently doesn't have resolution down to seconds, so if
     // there is some time, all will be set.
-    foreach (self::$allgranularity AS $g) {
+    foreach (self::$allgranularity as $g) {
       if ((isset($temp[$g]) && is_numeric($temp[$g])) || ($g == 'zone' && (isset($temp['zone_type']) && $temp['zone_type'] > 0))) {
         $this->granularity[] = $g;
       }

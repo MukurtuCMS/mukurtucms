@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Tests for plugins/FeedsTermProcessor.inc
+ * Tests for plugins/FeedsTermProcessor.inc.
  */
 
 /**
  * Test aggregating a feed as data records.
  */
 class FeedsCSVtoTermsTest extends FeedsWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Processor: Taxonomy',

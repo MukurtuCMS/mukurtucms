@@ -10,6 +10,9 @@
  */
 class FeedsMapperFileTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: File field',
@@ -18,6 +21,9 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('dblog'));
 
@@ -50,7 +56,6 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     ));
 
     // 1) Test mapping remote resources to file field.
-
     // Create importer configuration.
     $this->createImporterConfiguration();
     $this->setPlugin('syndication', 'FeedsSimplePieParser');
@@ -83,7 +88,6 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     }
 
     // 2) Test mapping local resources to file field.
-
     // Copy directory of files, CSV file expects them in public://images, point
     // file field to a 'resources' directory. Feeds should copy files from
     // images/ to resources/ on import.
@@ -695,6 +699,9 @@ class FeedsMapperFileTestCase extends FeedsMapperTestCase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function testInvalidFileExtension() {
     variable_set('feeds_never_use_curl', TRUE);
 

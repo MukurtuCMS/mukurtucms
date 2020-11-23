@@ -1,25 +1,36 @@
 <?php
 
 /**
+ * @file
+ * Features integration for 'menu' module.
+ */
+
+/**
  * Implements hook_features_api().
  */
 function menu_features_api() {
   return array(
     'menu_custom' => array(
       'name' => t('Menus'),
+      /* @see \hook_menu_default_menu_custom() */
+      /* @see \hook_menu_default_menu_custom_alter() */
       'default_hook' => 'menu_default_menu_custom',
       'feature_source' => TRUE,
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
     'menu_links' => array(
       'name' => t('Menu links'),
+      /* @see \hook_menu_default_menu_links() */
+      /* @see \hook_menu_default_menu_links_alter() */
       'default_hook' => 'menu_default_menu_links',
       'feature_source' => TRUE,
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
-    // DEPRECATED
+    // DEPRECATED.
     'menu' => array(
       'name' => t('Menu items'),
+      /* @see \hook_menu_default_items() */
+      /* @see \hook_menu_default_items_alter() */
       'default_hook' => 'menu_default_items',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
       'feature_source' => FALSE,
@@ -29,6 +40,7 @@ function menu_features_api() {
 
 /**
  * Implements hook_features_export().
+ *
  * DEPRECATED: This implementation simply migrates deprecated `menu` items
  * to the `menu_links` type.
  */
@@ -61,7 +73,7 @@ function menu_custom_features_export($data, &$export, $module_name = '') {
   $export['dependencies']['features'] = 'features';
   $export['dependencies']['menu'] = 'menu';
 
-  // Collect a menu to module map
+  // Collect a menu to module map.
   $pipe = array();
   $map = features_get_default_map('menu_custom', 'menu_name');
   foreach ($data as $menu_name) {
@@ -77,7 +89,7 @@ function menu_custom_features_export($data, &$export, $module_name = '') {
 }
 
 /**
- * Implements hook_features_export_render()
+ * Implements hook_features_export_render().
  */
 function menu_custom_features_export_render($module, $data) {
   $code = array();
@@ -105,6 +117,7 @@ function menu_custom_features_export_render($module, $data) {
 
   $code[] = '  return $menus;';
   $code = implode("\n", $code);
+  /* @see \hook_menu_default_menu_custom() */
   return array('menu_default_menu_custom' => $code);
 }
 
@@ -132,7 +145,7 @@ function menu_custom_features_rebuild($module) {
 function menu_links_features_export_options() {
   global $menu_admin;
   // Need to set this to TRUE in order to get menu links that the
-  // current user may not have access to (i.e. user/login)
+  // current user may not have access to (i.e. user/login).
   $menu_admin = TRUE;
   $use_menus = array_intersect_key(menu_get_menus(), array_flip(array_filter(variable_get('features_admin_menu_links_menus', array_keys(menu_get_menus())))));
   $menu_links = menu_parent_options($use_menus, array('mlid' => 0));
@@ -141,6 +154,13 @@ function menu_links_features_export_options() {
     list($menu_name, $mlid) = explode(':', $key, 2);
     if ($mlid != 0) {
       $link = menu_link_load($mlid);
+
+      // UUID URL handling.
+      if (module_exists('uuid')) {
+        _features_set_menu_link_uuid_path($link);
+      }
+
+      // @todo Explain why TRUE is passed as second parameter. See #3075693.
       $identifier = menu_links_features_identifier($link, TRUE);
       $options[$identifier] = "{$menu_name}: {$name}";
     }
@@ -151,23 +171,51 @@ function menu_links_features_export_options() {
 
 /**
  * Callback for generating the menu link exportable identifier.
+ *
+ * Long ago, the identifier used to be "{$menu_name}:{$link_path}".
+ * Nowadays, it is "{$menu_name}_{$clean_title}:{$link_path}", reducing the
+ * chance that two menu links would have the same identifier.
+ *
+ * @param array $link
+ *   A menu link, e.g. from menu_link_load().
+ * @param bool $old
+ *   See below in "return" section.
+ *
+ * @return string|false
+ *   The identifier, or FALSE if an identifier cannot be built for the link.
+ *   If $old is TRUE:
+ *     - If $link['options']['identifier'] already contains a value (that was
+ *       added there in the past), this stored identifier is returned.
+ *     - If the old-style identifier "{$menu_name}:{$link_path}" does not clash
+ *       with other menu links, this old-style identifier will be returned.
+ *     - Otherwise, a new-style identifier
+ *       "{$menu_name}_{$clean_title}:{$link_path}" will be returned.
+ *   If $old is FALSE:
+ *     - A new-style identifier "{$menu_name}_{$clean_title}:{$link_path}" will
+ *       be returned.
+ *
+ * @see \features_menu_link_load()
+ *
+ * @todo Verify this exact behavior. See #3075693.
  */
 function menu_links_features_identifier($link, $old = FALSE) {
-  // Add some uniqueness to these identifiers, allowing multiple links with the same path, but different titles.
+  // Add some uniqueness to these identifiers, allowing multiple links with the
+  // same path, but different titles.
   $clean_title = features_clean_title(isset($link['title']) ? $link['title'] : $link['link_title']);
 
   // The old identifier is requested.
   if ($old) {
-    // if identifier already exists
+    // If identifier already exists.
     if (isset($link['options']['identifier'])) {
       return $link['options']['identifier'];
     }
-    // providing backward compatibility and allowing/enabling multiple links with same paths
+    // Providing backward compatibility and allowing/enabling multiple links
+    // with same paths.
     else {
       $identifier = isset($link['menu_name'], $link['link_path']) ? "{$link['menu_name']}:{$link['link_path']}" : FALSE;
-      // Checking if there are multiples of this identifier
+      // Checking if there are multiples of this identifier.
       if (features_menu_link_load($identifier) !== FALSE) {
-        // this is where we return the upgrade posibility for links.
+        // This is where we return the upgrade posibility for links.
         return $identifier;
       }
     }
@@ -185,12 +233,19 @@ function menu_links_features_export($data, &$export, $module_name = '') {
   $export['dependencies']['features'] = 'features';
   $export['dependencies']['menu'] = 'menu';
 
-  // Collect a link to module map
+  // Collect a link to module map.
   $pipe = array();
   $map = features_get_default_map('menu_links', 'menu_links_features_identifier');
   foreach ($data as $key => $identifier) {
     if ($link = features_menu_link_load($identifier)) {
+      // UUID URL handling.
+      // Without this, features info file will lose UUID for menu links.
+      if (module_exists('uuid')) {
+        _features_set_menu_link_uuid_path($link);
+      }
       // If this link is provided by a different module, add it as a dependency.
+      // @todo Explain why empty($export) is passed as second parameter. See #3075693.
+      // @todo $export is never empty, see initialization above. See #3075693.
       $new_identifier = menu_links_features_identifier($link, empty($export));
       if (isset($map[$identifier]) && $map[$identifier] != $module_name) {
         $export['dependencies'][$map[$identifier]] = $map[$identifier];
@@ -201,7 +256,14 @@ function menu_links_features_export($data, &$export, $module_name = '') {
       // For now, exclude a variety of common menus from automatic export.
       // They may still be explicitly included in a Feature if the builder
       // chooses to do so.
-      if (!in_array($link['menu_name'], array('features', 'primary-links', 'secondary-links', 'navigation', 'admin', 'devel'))) {
+      if (!in_array($link['menu_name'], array(
+        'features',
+        'primary-links',
+        'secondary-links',
+        'navigation',
+        'admin',
+        'devel',
+      ))) {
         $pipe['menu_custom'][] = $link['menu_name'];
       }
     }
@@ -210,7 +272,71 @@ function menu_links_features_export($data, &$export, $module_name = '') {
 }
 
 /**
- * Implements hook_features_export_render()
+ * Helper function to set UUID data for menu items.
+ *
+ * @param array $link
+ *   Configuration of a specific menu link.
+ */
+function _features_set_menu_link_uuid_path(&$link) {
+  // UUID URL handling.
+  if (module_exists('uuid') &&
+    in_array(
+      $link['router_path'],
+      array('node/%', 'taxonomy/term/%', 'user/%', 'uuid'))
+  ) {
+    $entity_type = 'node';
+    switch ($link['router_path']) {
+      case 'taxonomy/term/%':
+        $entity_type = 'taxonomy_term';
+        break;
+
+      case 'user/%':
+        $entity_type = 'user';
+        break;
+
+      case 'uuid':
+        // Restore the internal path instead of the UUID path.
+        $uri = explode('/', $link['link_path']);
+        if (count($uri) == 3 && $uri[0] == 'uuid') {
+          $entity_data = uuid_uri_array_to_data($uri);
+          $entities = entity_uuid_load($entity_data['entity_type'], array($entity_data['uuid']));
+          if (!empty($entities)) {
+            $entity_type = $entity_data['entity_type'];
+            $entity = reset($entities);
+            $internal_uri = entity_uri($entity_data['entity_type'], $entity);
+            $link['link_path'] = $internal_uri['path'];
+          }
+        }
+        // The router path is set to 'uuid', but the link path is not a UUID
+        // path.
+        else {
+          switch ($uri[0]) {
+            case 'taxonomy':
+              $entity_type = 'taxonomy_term';
+              break;
+
+            case 'user':
+              $entity_type = 'user';
+              break;
+          }
+        }
+        break;
+    }
+    $path_position = substr_count($link['link_path'], '/');
+    $entity = menu_get_object($entity_type, $path_position, $link['link_path']);
+    if ($entity && isset($entity->uuid)) {
+      $link['uuid'] = $entity->uuid;
+      $link['link_path'] = 'uuid/' . $entity_type . '/' . $entity->uuid;
+      $link['router_path'] = 'uuid';
+    }
+    if ($entity && isset($entity->vuuid)) {
+      $link['vuuid'] = $entity->vuuid;
+    }
+  }
+}
+
+/**
+ * Implements hook_features_export_render().
  */
 function menu_links_features_export_render($module, $data, $export = NULL) {
   $code = array();
@@ -221,10 +347,21 @@ function menu_links_features_export_render($module, $data, $export = NULL) {
   foreach ($data as $identifier) {
 
     if ($link = features_menu_link_load($identifier)) {
+
+      // UUID URL handling.
+      if (module_exists('uuid')) {
+        _features_set_menu_link_uuid_path($link);
+      }
+
+      // @todo Explain why empty($export) is passed as second parameter. See #3075693.
       $new_identifier = menu_links_features_identifier($link, empty($export));
 
       // Replace plid with a parent path.
       if (!empty($link['plid']) && $parent = menu_link_load($link['plid'])) {
+        // UUID URL handling.
+        if (module_exists('uuid')) {
+          _features_set_menu_link_uuid_path($parent);
+        }
         // If the new identifier is different than the old, maintain
         // 'parent_path' for backwards compatibility.
         if ($new_identifier != menu_links_features_identifier($link)) {
@@ -236,19 +373,35 @@ function menu_links_features_export_render($module, $data, $export = NULL) {
         }
       }
 
-      if (isset($export)) {
-        // Don't show new identifier unless we are actually exporting.
+      if (!isset($link['options']['identifier'])) {
+        // Create the identifier only if it doesn't exist.
         $link['options']['identifier'] = $new_identifier;
-        // identifiers are renewed, => that means we need to update them in the db
-        $temp = $link;
-        menu_link_save($temp);
+        if (!empty($export)) {
+          // Identifiers are renewed. We need to update them in the DB.
+          $temp = $link;
+          // Start uuid handling.
+          if (module_exists('uuid')) {
+            // Restore the internal path instead of the UUID path.
+            $uri = explode('/', $temp['link_path']);
+            if ($uri[0] == 'uuid' && count($uri) == 3) {
+              $entity_data = uuid_uri_array_to_data($uri);
+              $entities = entity_uuid_load($entity_data['entity_type'], array($entity_data['uuid']));
+              if (!empty($entities)) {
+                $entity = reset($entities);
+                $internal_uri = entity_uri($entity_data['entity_type'], $entity);
+                $temp['link_path'] = $internal_uri['path'];
+              }
+            }
+          } // End of uuid handling.
+          menu_link_save($temp);
+        }
       }
 
-       unset($link['plid']);
-       unset($link['mlid']);
+      unset($link['plid']);
+      unset($link['mlid']);
 
       $code[] = "  // Exported menu link: {$new_identifier}.";
-      $code[] = "  \$menu_links['{$new_identifier}'] = ". features_var_export($link, '  ') .";";
+      $code[] = "  \$menu_links['{$new_identifier}'] = " . features_var_export($link, '  ') . ";";
       $translatables[] = $link['link_title'];
     }
   }
@@ -259,6 +412,7 @@ function menu_links_features_export_render($module, $data, $export = NULL) {
 
   $code[] = '  return $menu_links;';
   $code = implode("\n", $code);
+  /* @see \hook_menu_default_menu_links() */
   return array('menu_default_menu_links' => $code);
 }
 
@@ -280,6 +434,11 @@ function menu_links_features_rebuild($module) {
 
 /**
  * Generate a depth tree of all menu links.
+ *
+ * @param array[] $menu_links
+ *   Array of menu links.
+ * @param bool $reset
+ *   If TRUE, the static cache will be reset.
  */
 function menu_links_features_rebuild_ordered($menu_links, $reset = FALSE) {
   static $ordered;
@@ -308,7 +467,7 @@ function menu_links_features_rebuild_ordered($menu_links, $reset = FALSE) {
           $all_links[$identifier] = $link;
           unset($unordered[$key]);
         }
-      // Exit out when the above does no changes this loop.
+        // Exit out when the above does no changes this loop.
       } while (count($unordered) < $current);
     }
     // Add all remaining unordered items to the ordered list.
@@ -326,6 +485,23 @@ function menu_links_features_rebuild_ordered($menu_links, $reset = FALSE) {
 
     $existing = features_menu_link_load($identifier);
     if (!$existing || in_array($link, $menu_links)) {
+      // Restore the internal path instead of the UUID path.
+      $internal_path = '';
+      $uri = explode('/', $link['link_path']);
+      if (module_exists('uuid') && $uri[0] == 'uuid' && count($uri) == 3) {
+        $entity_data = uuid_uri_array_to_data($uri);
+        $entities = entity_uuid_load($entity_data['entity_type'], array($entity_data['uuid']));
+        if (!empty($entities)) {
+          $entity = reset($entities);
+          $internal_uri = entity_uri($entity_data['entity_type'], $entity);
+          $internal_path = $internal_uri['path'];
+        }
+      }
+      $link_paths = array($link['link_path']);
+      if (!empty($internal_path)) {
+        $link['link_path'] = $internal_path;
+      }
+
       // Retrieve the mlid if this is an existing item.
       if ($existing) {
         $link['mlid'] = $existing['mlid'];
@@ -336,8 +512,8 @@ function menu_links_features_rebuild_ordered($menu_links, $reset = FALSE) {
       }
       // This if for backwards compatibility.
       elseif (!empty($link['parent_path']) && $parent = features_menu_link_load("{$link['menu_name']}:{$link['parent_path']}")) {
-         $link['plid'] = $parent['mlid'];
-       }
+        $link['plid'] = $parent['mlid'];
+      }
       else {
         $link['plid'] = 0;
       }
@@ -347,8 +523,19 @@ function menu_links_features_rebuild_ordered($menu_links, $reset = FALSE) {
 }
 
 /**
- * Load a menu link by its menu_name_cleantitle:link_path identifier.
- * Also matches links with unique menu_name:link_path
+ * Loads a menu link by its (features-specific) identifier.
+ *
+ * @param string $identifier
+ *   Format: One of:
+ *   - "{$menu_name}_{$clean_title}:{$link_path}" (new format)
+ *   - "{$menu_name}:{$link_path}" (old format)
+ *
+ * @return array|false
+ *   The menu link, or FALSE if not found.
+ *
+ * @see \menu_links_features_identifier()
+ *
+ * @todo Describe behavior for old vs new identifier format. See #3075693.
  */
 function features_menu_link_load($identifier) {
   $menu_name = '';
@@ -357,29 +544,62 @@ function features_menu_link_load($identifier) {
   if (strstr($identifier, "_")) {
     $link_path = substr($identifier, strpos($identifier, ":") + 1);
     list($menu_name) = explode('_', $identifier, 2);
-    $clean_title = substr($identifier, strpos($identifier, "_")  + 1, strpos($identifier, ":") - strpos($identifier, "_") - 1);
+    $clean_title = substr($identifier, strpos($identifier, "_") + 1, strpos($identifier, ":") - strpos($identifier, "_") - 1);
   }
   // This gets variables for traditional identifier format.
   else {
     $clean_title = '';
     list($menu_name, $link_path) = explode(':', $identifier, 2);
   }
+
+  // Menu item can link either to internal URL or UUID URL.
+  $internal_path = '';
+  $uri = explode('/', $link_path);
+  if (module_exists('uuid') && $uri[0] == 'uuid' && count($uri) == 3) {
+    $entity_data = uuid_uri_array_to_data($uri);
+    $entities = entity_uuid_load($entity_data['entity_type'], array($entity_data['uuid']));
+    if (!empty($entities)) {
+      $entity = reset($entities);
+      $internal_uri = entity_uri($entity_data['entity_type'], $entity);
+      $internal_path = $internal_uri['path'];
+    }
+  }
+  $link_paths = array($link_path);
+  if (!empty($internal_path)) {
+    $link_paths = array($internal_path);
+  }
+
   $links = db_select('menu_links')
-    ->fields('menu_links', array('menu_name', 'mlid', 'plid', 'link_path', 'router_path', 'link_title', 'options', 'module', 'hidden', 'external', 'has_children', 'expanded', 'weight', 'customized'))
+    ->fields('menu_links', array(
+      'menu_name',
+      'mlid',
+      'plid',
+      'link_path',
+      'router_path',
+      'link_title',
+      'options',
+      'module',
+      'hidden',
+      'external',
+      'has_children',
+      'expanded',
+      'weight',
+      'customized',
+    ))
     ->condition('menu_name', $menu_name)
-    ->condition('link_path', $link_path)
+    ->condition('link_path', $link_paths, 'IN')
     ->addTag('features_menu_link')
     ->execute()
     ->fetchAllAssoc('mlid');
 
-  foreach($links as $link) {
+  foreach ($links as $link) {
     $link->options = unserialize($link->options);
 
     // Title or previous identifier matches.
     if ((isset($link->options['identifier']) && strcmp($link->options['identifier'], $identifier) == 0)
-        || (isset($clean_title) && strcmp(features_clean_title($link->link_title), $clean_title) == 0)) {
-
-      return (array)$link;
+      // @todo $clean_title is never NULL. See #3075693.
+      || (isset($clean_title) && strcmp(features_clean_title($link->link_title), $clean_title) == 0)) {
+      return (array) $link;
     }
   }
 
@@ -387,29 +607,45 @@ function features_menu_link_load($identifier) {
   // -- providing an upgrade possibility for links saved in a feature before the
   // new identifier-pattern was added.
   if (count($links) == 1 && empty($clean_title)) {
-    $link = reset($links); // get the first item
-    return (array)$link;
+    // Get the first item.
+    $link = reset($links);
+    return (array) $link;
   }
   // If link_path was changed on an existing link, we need to find it by
   // searching for link_title.
-  else if (isset($clean_title)) {
+  // @todo $clean_title is never NULL. See #3075693.
+  elseif (isset($clean_title)) {
     $links = db_select('menu_links')
-    ->fields('menu_links', array('menu_name', 'mlid', 'plid', 'link_path', 'router_path', 'link_title', 'options', 'module', 'hidden', 'external', 'has_children', 'expanded', 'weight'))
-    ->condition('menu_name', $menu_name)
-    ->execute()
-    ->fetchAllAssoc('mlid');
+      ->fields('menu_links', array(
+        'menu_name',
+        'mlid',
+        'plid',
+        'link_path',
+        'router_path',
+        'link_title',
+        'options',
+        'module',
+        'hidden',
+        'external',
+        'has_children',
+        'expanded',
+        'weight',
+      ))
+      ->condition('menu_name', $menu_name)
+      ->execute()
+      ->fetchAllAssoc('mlid');
 
-    foreach($links as $link) {
+    foreach ($links as $link) {
       $link->options = unserialize($link->options);
       // Links with a stored identifier must only be matched on that identifier,
       // to prevent cross over assumptions.
       if (isset($link->options['identifier'])) {
         if (strcmp($link->options['identifier'], $identifier) == 0) {
-          return (array)$link;
+          return (array) $link;
         }
       }
       elseif ((strcmp(features_clean_title($link->link_title), $clean_title) == 0)) {
-        return (array)$link;
+        return (array) $link;
       }
     }
   }
@@ -417,7 +653,13 @@ function features_menu_link_load($identifier) {
 }
 
 /**
- * Returns a lowercase clean string with only letters, numbers and dashes
+ * Returns a lowercase clean string with only letters, numbers and dashes.
+ *
+ * @param string $str
+ *   Menu link title to be cleaned.
+ *
+ * @return string
+ *   Sanitized menu link title.
  */
 function features_clean_title($str) {
   return strtolower(preg_replace_callback('/(\s)|([^a-zA-Z\-0-9])/i', '_features_clean_title', $str));
@@ -425,6 +667,12 @@ function features_clean_title($str) {
 
 /**
  * Callback function for preg_replace_callback() to clean a string.
+ *
+ * @param string[] $matches
+ *   Matches array from preg_replace_callback().
+ *
+ * @return string
+ *   Replacement for the given matches.
  */
 function _features_clean_title($matches) {
   return $matches[1] ? '-' : '';
