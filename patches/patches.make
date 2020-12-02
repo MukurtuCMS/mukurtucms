@@ -78,6 +78,11 @@ projects[entity][patch][] = contrib/entity_undefined_entity_get_info-2289693-2.p
 ; Forbid to use duplicate entities in entityreference field
 projects[entityreference][patch][] = https://www.drupal.org/files/2010488-forbid-duplicate-entities-in-entityreference-field_0.patch
 projects[entityreference][patch][] = contrib/0001-Fix-for-related-content-field-for-single-type.patch
+projects[entityreference][patch][] = contrib/Add-quicker-method-to-load-titles-for-nodes.patch
+
+;;; Entity Reference Prepopulate
+; Entity Reference Prepopulate PHP 7.4 patch
+projects[entityreference_prepopulate][patch][] = https://www.drupal.org/files/issues/2020-06-10/3115641-unparenthesized-ternary-deprecated.patch
 
 ;;; Feeds
 ; These four patches all support feeds import using a subset of fields (not touching existing data for missing fields)
@@ -91,6 +96,8 @@ projects[feeds][patch][] = contrib/0001-Change-the-FeedsCSVParser-class-to-use-t
 projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scald-atoms.patch
 ; Skip OG field validation for admins
 projects[feeds][patch][] = contrib/0001-Skip-protocol-field-OG-validation-during-import-for-.patch
+; Change language handling for taxonomy import
+projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-import.patch
 
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value.
@@ -130,6 +137,8 @@ projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds
 ;;; Partial Date
 ; Add property info callback
 projects[partial_date][patch][] = https://www.drupal.org/files/issues/add_property_info-2781135-2.patch
+; PHP 7.3 patch
+projects[partial_date][patch][] = https://www.drupal.org/files/issues/2020-01-16/partial_date-php_73_compat.patch
 
 ;;; Owl Carousel
 ; Add ID to handle multiple carousels

@@ -9,6 +9,10 @@
  * Test basic Feeds UI functionality.
  */
 class FeedsUIUserInterfaceTestCase extends FeedsWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Feeds UI user interface',
@@ -17,6 +21,9 @@ class FeedsUIUserInterfaceTestCase extends FeedsWebTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('php', 'locale'), array('use PHP for settings', 'administer languages'));
   }
@@ -113,7 +120,7 @@ class FeedsUIUserInterfaceTestCase extends FeedsWebTestCase {
     $edit = array(
       'title' => 'Development Seed',
       'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/developmentseed.rss2',
-      );
+    );
     $this->drupalPost('node/add/page', $edit, 'Save');
     $this->assertText('Basic page Development Seed has been created.');
 
@@ -272,6 +279,9 @@ class FeedsUIUserInterfaceTestCase extends FeedsWebTestCase {
     $this->assertText('The importer is attached to the same content type as the content type selected on the node processor. Unless you have a very advanced use case, these two should never be the same.');
   }
 
+  /**
+   * Test the importer settings.
+   */
   public function testImporterImport() {
     $name = $this->randomString();
     $id = drupal_strtolower($this->randomName());
@@ -391,7 +401,7 @@ class FeedsUIUserInterfaceTestCase extends FeedsWebTestCase {
    */
   protected function doEditFeedsConfiguration($name = 'Syndication', $id = 'syndication') {
     // Assert UI elements.
-    $this->drupalGet('admin/structure/feeds/'. $id);
+    $this->drupalGet('admin/structure/feeds/' . $id);
     $this->assertText($name);
     $this->assertText('Basic settings');
     $this->assertText('Fetcher');
@@ -401,11 +411,11 @@ class FeedsUIUserInterfaceTestCase extends FeedsWebTestCase {
     $this->assertText('Processor');
     $this->assertText('Node processor');
     $this->assertText('Getting started');
-    $this->assertRaw('admin/structure/feeds/'. $id .'/settings');
-    $this->assertRaw('admin/structure/feeds/'. $id .'/settings/FeedsNodeProcessor');
-    $this->assertRaw('admin/structure/feeds/'. $id .'/fetcher');
-    $this->assertRaw('admin/structure/feeds/'. $id .'/parser');
-    $this->assertRaw('admin/structure/feeds/'. $id .'/processor');
+    $this->assertRaw('admin/structure/feeds/' . $id . '/settings');
+    $this->assertRaw('admin/structure/feeds/' . $id . '/settings/FeedsNodeProcessor');
+    $this->assertRaw('admin/structure/feeds/' . $id . '/fetcher');
+    $this->assertRaw('admin/structure/feeds/' . $id . '/parser');
+    $this->assertRaw('admin/structure/feeds/' . $id . '/processor');
   }
 
 }

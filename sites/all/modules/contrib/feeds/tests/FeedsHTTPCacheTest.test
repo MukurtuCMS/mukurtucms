@@ -534,7 +534,8 @@ class FeedsHTTPCacheTest extends FeedsWebTestCase {
     try {
       $this->cache->saveFile($cid, $response);
     }
-    catch (Exception $e) {}
+    catch (Exception $e) {
+    }
     $this->assertTrue(isset($e), 'An exception is thrown.');
 
     $this->assertNoCacheFileExists($cid);

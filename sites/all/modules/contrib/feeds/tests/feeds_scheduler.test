@@ -10,6 +10,9 @@
  */
 class FeedsSchedulerTestCase extends FeedsWebTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Scheduler',
@@ -314,7 +317,7 @@ class FeedsSchedulerTestCase extends FeedsWebTestCase {
   /**
    * Test batching on cron.
    */
-  function testBatching() {
+  public function testBatching() {
     // Set up an importer.
     $this->createImporterConfiguration('Node import', 'node');
     // Set and configure plugins and mappings.
@@ -463,7 +466,7 @@ class FeedsSchedulerTestCase extends FeedsWebTestCase {
     $this->drupalLogout();
     $this->cronRun();
     $count = db_query("SELECT COUNT(*) FROM {job_schedule} WHERE last > :time", array(':time' => $time))->fetchField();
-    $this->assertEqual($count, 0, '0 feeds refreshed on cron.'. $count);
+    $this->assertEqual($count, 0, '0 feeds refreshed on cron.' . $count);
 
     // Set next time to 0 to simulate updates.
     db_query("UPDATE {job_schedule} SET next = 0");

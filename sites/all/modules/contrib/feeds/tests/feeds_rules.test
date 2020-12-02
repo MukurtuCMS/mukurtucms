@@ -1,10 +1,18 @@
 <?php
 
 /**
+ * @file
+ * Contains FeedsRulesTest.
+ */
+
+/**
  * Tests for Rules integration.
  */
 class FeedsRulesTest extends FeedsWebTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Rules integration',
@@ -182,4 +190,106 @@ class FeedsRulesTest extends FeedsWebTestCase {
     $node = node_load(1);
     $this->assertEqual('Ut wisi enim ad minim veniam', $node->title);
   }
+
+  /**
+   * Tests the Rules action 'feeds_import_feed'.
+   */
+  public function testFeedsImportAction() {
+    // Attach importer to content type and set to not import on submission.
+    $this->setSettings('node', NULL, array(
+      'content_type' => 'page',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+      'import_on_create' => FALSE,
+    ));
+
+    // Create a feed node.
+    $source_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/content.csv';
+    $this->createFeedNode('node', $source_url, 'Feed node 1', 'page');
+
+    // Assert that nothing has been imported yet.
+    $this->assertNodeCount(1);
+
+    // Create rule with import action.
+    $rule = $this->createTestRule('cron', FALSE);
+    $rule->action('feeds_import_feed', array(
+      'importer' => 'node',
+      'feed_nid' => 1,
+    ));
+    $rule->integrityCheck()->save();
+
+    // Trigger rules event.
+    $this->cronRun();
+
+    // Assert that 2 items have been imported (three nodes exist in total).
+    $this->assertNodeCount(3);
+  }
+
+  /**
+   * Tests the Rules action 'feeds_import_feed' with standalone form.
+   */
+  public function testFeedsImportActionUsingStandaloneForm() {
+    $this->setSettings('node', NULL, array(
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+      'import_on_create' => FALSE,
+    ));
+
+    // Save data on import form.
+    $edit = array(
+      'feeds[FeedsHTTPFetcher][source]' => $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/content.csv',
+    );
+    $this->drupalPost('import/node', $edit, 'Save');
+
+    // Create rule with import action.
+    $rule = $this->createTestRule('cron', FALSE);
+    $rule->action('feeds_import_feed', array(
+      'importer' => 'node',
+      'feed_nid' => 0,
+    ));
+    $rule->integrityCheck()->save();
+
+    // Trigger rules event.
+    $this->cronRun();
+
+    // Assert that 2 items have been imported.
+    $this->assertNodeCount(2);
+  }
+
+  /**
+   * Tests the Rules action 'feeds_import_feed' with process in background.
+   */
+  public function testFeedsImportActionWithProcessInBackgroundOption() {
+    // Attach importer to content type, set to not import on submission and set
+    // to run in background.
+    $this->setSettings('node', NULL, array(
+      'content_type' => 'page',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+      'import_on_create' => FALSE,
+      'process_in_background' => TRUE,
+    ));
+
+    // Create a feed node.
+    $source_url = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/content.csv';
+    $this->createFeedNode('node', $source_url, 'Feed node 1', 'page');
+
+    // Assert that nothing has been imported yet.
+    $this->assertNodeCount(1);
+
+    // Create rule with import action.
+    $rule = $this->createTestRule('feeds_tests_rules_event', FALSE);
+    $rule->action('feeds_import_feed', array(
+      'importer' => 'node',
+      'feed_nid' => 1,
+    ));
+    $rule->integrityCheck()->save();
+
+    // Trigger rules event.
+    $this->drupalGet('testing/feeds/trigger-rules-event');
+
+    // Run cron to run background task.
+    $this->cronRun();
+
+    // Assert that 2 items have been imported (three nodes exist in total).
+    $this->assertNodeCount(3);
+  }
+
 }

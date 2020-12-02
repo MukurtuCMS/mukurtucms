@@ -11,6 +11,9 @@
 class FeedsWebTestCase extends DrupalWebTestCase {
   protected $profile = 'testing';
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $args = func_get_args();
 
@@ -96,6 +99,8 @@ class FeedsWebTestCase extends DrupalWebTestCase {
     $this->admin_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->admin_user);
 
+    // Create two content types if they don't exist yet.
+    $existing_node_types = node_type_get_names();
     $types = array(
       array(
         'type' => 'page',
@@ -111,6 +116,14 @@ class FeedsWebTestCase extends DrupalWebTestCase {
       ),
     );
     foreach ($types as $type) {
+      // Check if the content type to add already exists. Other tests which
+      // inherit from FeedsWebTestCase might already have added one of the
+      // content types in one of the modules they have enabled in their startup.
+      if (isset($existing_node_types[$type['type']])) {
+        // Content type already exists. Continue to the next one.
+        continue;
+      }
+
       $this->drupalPost('admin/structure/types/add', $type, 'Save content type');
       $this->assertText("The content type " . $type['name'] . " has been added.");
     }
@@ -127,7 +140,7 @@ class FeedsWebTestCase extends DrupalWebTestCase {
    * Get the absolute directory path of the feeds module.
    */
   public function absolutePath() {
-    return  $this->absolute() . '/' . drupal_get_path('module', 'feeds');
+    return $this->absolute() . '/' . drupal_get_path('module', 'feeds');
   }
 
   /**
@@ -139,8 +152,8 @@ class FeedsWebTestCase extends DrupalWebTestCase {
   public function generateOPML() {
     $path = $GLOBALS['base_url'] . '/' . drupal_get_path('module', 'feeds') . '/tests/feeds/';
 
-  $output =
-'<?xml version="1.0" encoding="utf-8"?>
+    $output =
+    '<?xml version="1.0" encoding="utf-8"?>
 <opml version="1.1">
 <head>
     <title>Feeds test OPML</title>
@@ -156,7 +169,7 @@ class FeedsWebTestCase extends DrupalWebTestCase {
 </body>
 </opml>';
 
-    // UTF 8 encode output string and write it to disk
+    // UTF 8 encode output string and write it to disk.
     $output = utf8_encode($output);
     $filename = file_default_scheme() . '://test-opml-' . $this->randomName() . '.opml';
 
@@ -232,10 +245,10 @@ class FeedsWebTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Create a test feed node. Test user has to have sufficient permissions:
+   * Create a test feed node. Test user has to have sufficient permissions:.
    *
    * * create [type] content
-   * * use feeds
+   * * use feeds.
    *
    * Assumes that page content type has been configured with
    * createImporterConfiguration() as a feed content type.
@@ -250,7 +263,7 @@ class FeedsWebTestCase extends DrupalWebTestCase {
 
     // If content type not given, retrieve it.
     if (!$content_type) {
-      $result= db_select('feeds_importer', 'f')
+      $result = db_select('feeds_importer', 'f')
         ->condition('f.id', $id, '=')
         ->fields('f', array('config'))
         ->execute();
@@ -342,7 +355,7 @@ class FeedsWebTestCase extends DrupalWebTestCase {
 
     // Check whether feed got recorded in feeds_source table.
     $this->assertEqual(1, db_query("SELECT COUNT(*) FROM {feeds_source} WHERE id = :id AND feed_nid = 0", array(':id' => $id))->fetchField());
-    $source = db_query("SELECT * FROM {feeds_source} WHERE id = :id AND feed_nid = 0",  array(':id' => $id))->fetchObject();
+    $source = db_query("SELECT * FROM {feeds_source} WHERE id = :id AND feed_nid = 0", array(':id' => $id))->fetchObject();
     $config = unserialize($source->config);
     $this->assertEqual($config['FeedsHTTPFetcher']['source'], $feed_url, t('URL in DB correct.'));
 
@@ -616,14 +629,14 @@ class FeedsWebTestCase extends DrupalWebTestCase {
    *
    * @param string $id
    *   ID of the importer.
-   * @param integer $i
+   * @param int $i
    *   The key of the mapping.
    * @param string $source
    *   The source field.
    * @param string $target
    *   The target field.
    *
-   * @return integer
+   * @return int
    *   -1 if the mapping doesn't exist, the key of the mapping otherwise.
    */
   public function mappingExists($id, $i, $source, $target) {
@@ -656,6 +669,23 @@ class FeedsWebTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Changes the author of a node and asserts the change in the UI.
+   *
+   * @param int $nid
+   *   The ID of the node to change author.
+   * @param object $account
+   *   The new author.
+   */
+  protected function changeNodeAuthor($nid, $account) {
+    $node = node_load($nid);
+    $node->uid = $account->uid;
+    node_save($node);
+    // Assert that author was in fact changed.
+    $this->drupalGet('node/' . $nid);
+    $this->assertText($account->name);
+  }
+
+  /**
    * Copies a directory.
    *
    * @param string $source
@@ -684,11 +714,10 @@ class FeedsWebTestCase extends DrupalWebTestCase {
    * Sets the 'feeds_simplepie_library_dir' variable to the directory where
    * SimplePie is downloaded.
    */
-  function downloadExtractSimplePie($version) {
-    $url = "http://simplepie.org/downloads/simplepie_$version.mini.php";
-    $filename = 'simplepie.mini.php';
+  public function downloadExtractSimplePie($version) {
+    $url = "https://codeload.github.com/simplepie/simplepie/zip/$version";
 
-    // Avoid downloading the file dozens of times
+    // Avoid downloading the file dozens of times.
     $library_dir = DRUPAL_ROOT . '/' . $this->originalFileDirectory . '/simpletest/feeds';
     $simplepie_library_dir = $library_dir . '/simplepie';
 
@@ -696,12 +725,9 @@ class FeedsWebTestCase extends DrupalWebTestCase {
       drupal_mkdir($library_dir);
     }
 
-    if (!file_exists($simplepie_library_dir)) {
-      drupal_mkdir($simplepie_library_dir);
-    }
-
     // Local file name.
-    $local_file = $simplepie_library_dir . '/' . $filename;
+    $local_file = $library_dir . '/simplepie/library/SimplePie.php';
+    $zip_file = $library_dir . '/simplepie.zip';
 
     // Begin single threaded code.
     if (function_exists('sem_get')) {
@@ -709,28 +735,44 @@ class FeedsWebTestCase extends DrupalWebTestCase {
       sem_acquire($semaphore);
     }
 
-    // Download and extact the archive, but only in one thread.
+    // Download the archive, but only in one thread.
     if (!file_exists($local_file)) {
-      $local_file = system_retrieve_file($url, $local_file, FALSE, FILE_EXISTS_REPLACE);
+      if (!file_exists($zip_file)) {
+        $zip_file = system_retrieve_file($url, $zip_file, FALSE, FILE_EXISTS_REPLACE);
+      }
+
+      // Extract the archive.
+      $zip = new ZipArchive();
+      if ($zip->open($zip_file) === TRUE) {
+        $zip->extractTo($library_dir);
+        $zip->close();
+      }
+
+      // Rename directory.
+      rename($library_dir . '/simplepie-' . $version, $simplepie_library_dir);
     }
 
     if (function_exists('sem_get')) {
       sem_release($semaphore);
     }
     // End single threaded code.
-
     // Verify that files were successfully extracted.
     $this->assertTrue(file_exists($local_file), t('@file found.', array('@file' => $local_file)));
 
     // Set the simpletest library directory.
     variable_set('feeds_library_dir', $library_dir);
   }
+
 }
 
 /**
  * Provides a wrapper for DrupalUnitTestCase for Feeds unit testing.
  */
 class FeedsUnitTestHelper extends DrupalUnitTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -738,9 +780,16 @@ class FeedsUnitTestHelper extends DrupalUnitTestCase {
     // @todo Allow an array of modules from the child class.
     drupal_load('module', 'feeds');
   }
-}
 
+}
+/**
+ *
+ */
 class FeedsUnitTestCase extends FeedsUnitTestHelper {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Unit tests',
@@ -756,7 +805,7 @@ class FeedsUnitTestCase extends FeedsUnitTestHelper {
    *
    * @todo Remove when http://drupal.org/node/1191252 is fixed.
    */
-  function testFeedsValidURL() {
+  public function testFeedsValidURL() {
     $url_schemes = array('http', 'https', 'ftp', 'feed', 'webcal');
     $valid_absolute_urls = array(
       'example.com',
@@ -802,4 +851,5 @@ class FeedsUnitTestCase extends FeedsUnitTestHelper {
       }
     }
   }
+
 }

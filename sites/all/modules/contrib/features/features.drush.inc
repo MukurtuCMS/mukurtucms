@@ -25,6 +25,7 @@ function features_drush_command() {
     $path = 'sites/all/modules';
   }
 
+  /* @see \drush_features_list() */
   $items['features-list'] = array(
     'description' => "List all the available features for your site.",
     'options' => array(
@@ -39,11 +40,13 @@ function features_drush_command() {
       'output-data-type' => 'format-table',
     ),
   );
+
+  /* @see \drush_features_export() */
   $items['features-export'] = array(
     'description' => "Export a feature from your site into a module.",
     'arguments' => array(
       'feature' => 'Feature name to export.',
-      'components' => 'Patterns of components to include, see features-components for the format of patterns.'
+      'components' => 'Patterns of components to include, see features-components for the format of patterns.',
     ),
     'options' => array(
       'destination' => "Destination path (from Drupal root) of the exported feature. Defaults to '" . $path . "'.",
@@ -54,6 +57,8 @@ function features_drush_command() {
     'drupal dependencies' => array('features'),
     'aliases' => array('fe'),
   );
+
+  /* @see \drush_features_add() */
   $items['features-add'] = array(
     'description' => "Add a component to a feature module. (DEPRECATED: use features-export)",
     'arguments' => array(
@@ -67,6 +72,8 @@ function features_drush_command() {
     'drupal dependencies' => array('features'),
     'aliases' => array('fa'),
   );
+
+  /* @see \drush_features_components() */
   $items['features-components'] = array(
     'description' => 'List features components.',
     'arguments' => array(
@@ -85,6 +92,8 @@ function features_drush_command() {
     ),
     'aliases' => array('fc'),
   );
+
+  /* @see \drush_features_update() */
   $items['features-update'] = array(
     'description' => "Update a feature module on your site.",
     'arguments' => array(
@@ -97,6 +106,8 @@ function features_drush_command() {
     'drupal dependencies' => array('features'),
     'aliases' => array('fu'),
   );
+
+  /* @see \drush_features_update_all() */
   $items['features-update-all'] = array(
     'description' => "Update all feature modules on your site.",
     'arguments' => array(
@@ -105,6 +116,8 @@ function features_drush_command() {
     'drupal dependencies' => array('features'),
     'aliases' => array('fu-all', 'fua'),
   );
+
+  /* @see \drush_features_revert() */
   $items['features-revert'] = array(
     'description' => "Revert a feature module on your site.",
     'arguments' => array(
@@ -120,6 +133,8 @@ function features_drush_command() {
     'drupal dependencies' => array('features'),
     'aliases' => array('fr'),
   );
+
+  /* @see \drush_features_revert_all() */
   $items['features-revert-all'] = array(
     'description' => "Revert all enabled feature module on your site.",
     'arguments' => array(
@@ -131,6 +146,8 @@ function features_drush_command() {
     'drupal dependencies' => array('features'),
     'aliases' => array('fr-all', 'fra'),
   );
+
+  /* @see \drush_features_diff() */
   $items['features-diff'] = array(
     'description' => "Show the difference between the default and overridden state of a feature.",
     'arguments' => array(
@@ -144,6 +161,7 @@ function features_drush_command() {
     'aliases' => array('fd'),
   );
 
+  /* @see \drush_features_diff_all() */
   $items['features-diff-all'] = array(
     'description' => "Show the code difference for all enabled features not in their default state.",
     'arguments' => array(
@@ -175,8 +193,10 @@ function features_drush_help($section) {
   switch ($section) {
     case 'drush:features':
       return dt("List all the available features for your site.");
+
     case 'drush:features-export':
       return dt("Export a feature from your site into a module. If called with no arguments, display a list of available components. If called with a single argument, attempt to create a feature including the given component with the same name. The option '--destination=foo' may be used to specify the path (from Drupal root) where the feature should be created. The default destination is '@path'. The option '--version-set=foo' may be used to specify a version number for the feature or the option '--version-increment' may also to increment the feature's version number.", array('@path' => $path));
+
     case 'drush:features-components':
       return dt("List feature components matching patterns. The listing may be limited to exported/not-exported components.
 
@@ -188,23 +208,40 @@ Patterns uses * or % for matching multiple sources/components. Unlike shorthands
 
 Lastly, a pattern without a colon is interpreted as having \":%\" appended, for easy listing of all components of a source.
 ");
+
     case 'drush:features-update':
       return dt("Update a feature module on your site. The option '--version-set=foo' may be used to specify a version number for the feature or the option '--version-increment' may also to increment the feature's version number.");
+
     case 'drush:features-update-all':
       return dt("Update all feature modules on your site.");
+
     case 'drush:features-revert':
       return dt("Revert a feature module on your site.");
+
     case 'drush:features-revert-all':
       return dt("Revert all enabled feature module on your site.");
+
     case 'drush:features-diff':
       return dt("Show a diff of a feature module.");
+
     case 'drush:features-add':
       return dt("Add a component to a feature module. The option '--version-set=foo' may be used to specify a version number for the feature or the option '--version-increment' may also to increment the feature's version number.");
   }
 }
 
 /**
- * Get a list of all feature modules.
+ * Drush command callback for 'features-list'.
+ *
+ * Returns table rows for a list of all feature modules.
+ *
+ * This is a drush command, but can also be called as a regular function.
+ * The drush command definition has an 'outputformat' key, which means that the
+ * result from this function will be further processed before it is printed.
+ *
+ * @return string[][]|false
+ *   Format: $[$row_name][column_name] = $cell_contents
+ *   Table rows, or FALSE on failure. When used as a drush command, the table
+ *   rows will be formatted according to the info in 'outputformat'.
  */
 function drush_features_list() {
   $status = drush_get_option('status') ? drush_get_option('status') : 'all';
@@ -225,9 +262,11 @@ function drush_features_list() {
       case FEATURES_REBUILDABLE:
         $storage = '';
         break;
+
       case FEATURES_OVERRIDDEN:
         $storage = dt('Overridden');
         break;
+
       case FEATURES_NEEDS_REVIEW:
         $storage = dt('Needs review');
         break;
@@ -241,7 +280,7 @@ function drush_features_list() {
         'feature' => $m->name,
         'status' => $m->status ? dt('Enabled') : dt('Disabled'),
         'version' => $m->info['version'],
-        'state' => $storage
+        'state' => $storage,
       );
     }
   }
@@ -252,7 +291,11 @@ function drush_features_list() {
 }
 
 /**
- * List components, with pattern matching.
+ * Drush command callback for 'features-components'.
+ *
+ * Shows a list of exportable items, filtered by component or by pattern.
+ * If the item is already exported to a feature, that feature name is shown
+ * along with it.
  */
 function drush_features_components() {
   $args = func_get_args();
@@ -283,13 +326,17 @@ function drush_features_components() {
   }
 
   $filtered_components = _drush_features_component_filter($components, $args, $options);
-  if ($filtered_components){
+  if ($filtered_components) {
     _drush_features_component_print($filtered_components, $options);
   }
 }
 
 /**
- * Returns a listing of all known components, indexed by source.
+ * Returns all component item labels, grouped by component type.
+ *
+ * @return string[][]
+ *   Format: $[$component][$name] = $title
+ *   E.g. $['node']['article'] = 'Article'.
  */
 function _drush_features_component_list() {
   $components = array();
@@ -305,6 +352,23 @@ function _drush_features_component_list() {
 
 /**
  * Filters components by patterns.
+ *
+ * @param string[][] $all_components
+ *   Format: $[$component][$name] = $title.
+ * @param string[] $patterns
+ *   Format: $[] = $pattern.
+ * @param bool[] $options
+ *   Options to control what is returned, and which components are included.
+ *   Exported items (defined in at least one enabled are included if $options['exported'] is TRUE(-ish) or not
+ *   provided. Non-exported items
+ *   If $options['exported'] is TRUE(-ish) or not provided, "exported" features
+ *   are
+ *   Possible array keys: 'exported', 'not exported', 'provided by'.
+ *
+ * @return array[]|false
+ *   Format: Contains two sub-arrays:
+ *     $['components'][$component][$name] = $title
+ *     $['sources'][$component . ':' . $name] = implode(', ', $providing_modules)
  */
 function _drush_features_component_filter($all_components, $patterns = array(), $options = array()) {
   $options += array(
@@ -363,11 +427,9 @@ function _drush_features_component_filter($all_components, $patterns = array(), 
 
     $preg_source_pattern = strtr(preg_quote($source_pattern, '/'), array('%' => '.*'));
     $preg_component_pattern = strtr(preg_quote($component_pattern, '/'), array('%' => '.*'));
-    /*
-     * If it isn't a pattern, but a simple string, we don't anchor the
-     * pattern, this allows for abbreviating. Else, we do, as this seems more
-     * natural for patterns.
-     */
+    // If it isn't a pattern, but a simple string, we don't anchor the pattern,
+    // this allows for abbreviating. Else, we do, as this seems more natural for
+    // patterns.
     if (strpos($source_pattern, '%') !== FALSE) {
       $preg_source_pattern = '^' . $preg_source_pattern . '$';
     }
@@ -398,7 +460,6 @@ function _drush_features_component_filter($all_components, $patterns = array(), 
       return drush_set_error('', dt('No !state sources match "!source"', array('!state' => $state_string, '!source' => $source_pattern)));
     }
 
-
     // Now find the components.
     foreach ($sources as $source) {
       // Find the components.
@@ -424,7 +485,7 @@ function _drush_features_component_filter($all_components, $patterns = array(), 
       }
       else {
         // No matches. If the source was a pattern, just carry on, else
-        // error out. Allows for patterns like :*field*
+        // error out. Allows for patterns like :*field*.
         if ($preg_source_pattern[0] != '^') {
           return drush_set_error('', dt('No !state !source components match "!component"', array('!state' => $state_string, '!component' => $component_pattern, '!source' => $source)));
         }
@@ -435,7 +496,7 @@ function _drush_features_component_filter($all_components, $patterns = array(), 
   // Lastly, provide feature module information on the selected components, if
   // requested.
   $provided_by = array();
-  if ($options['provided by'] && $options['exported'] ) {
+  if ($options['provided by'] && $options['exported']) {
     foreach ($selected as $source => $components) {
       foreach ($components as $name => $title) {
         $exported = !empty($components_map[$source][$name]);
@@ -454,6 +515,18 @@ function _drush_features_component_filter($all_components, $patterns = array(), 
 
 /**
  * Prints a list of filtered components.
+ *
+ * @param array $filtered_components
+ *   Array as returned from _drush_features_component_filter().
+ *   Format: Contains two sub-arrays:
+ *     $['components'][$component][$name] = $title
+ *     $['sources'][$component . ':' . $name] = implode(', ', $providing_modules).
+ * @param bool[] $options
+ *   If $options['info style'] is TRUE(-ish), the list will be printed in the
+ *   format of a feature module's *.info file.
+ *   Other option keys have no effect on this function.
+ *
+ * @see \_drush_features_component_filter()
  */
 function _drush_features_component_print($filtered_components, $options = array()) {
   $rows = array(array(dt('Available sources')));
@@ -464,10 +537,10 @@ function _drush_features_component_print($filtered_components, $options = array(
         $row = array('features[' . $source . '][] = "' . $name . '"');
       }
       else {
-        $row = array($source .':'. $name);
+        $row = array($source . ':' . $name);
       }
-      if (isset($filtered_components['sources'][$source .':'. $name])) {
-        $row[] = dt('Provided by') . ': ' . $filtered_components['sources'][$source .':'. $name];
+      if (isset($filtered_components['sources'][$source . ':' . $name])) {
+        $row[] = dt('Provided by') . ': ' . $filtered_components['sources'][$source . ':' . $name];
       }
       $rows[] = $row;
     }
@@ -477,8 +550,14 @@ function _drush_features_component_print($filtered_components, $options = array(
 }
 
 /**
- * Add a component to a features module, or create a new module with
- * the selected components.
+ * Drush command callback for 'features-export'.
+ *
+ * Adds components to a new or existing feature module.
+ *
+ * If the module does not exist yet, it will be created.
+ *
+ * @return false|void
+ *   FALSE on failure, no explicit return value otherwise.
  */
 function drush_features_export() {
   if ($args = func_get_args()) {
@@ -529,20 +608,25 @@ function drush_features_export() {
 }
 
 /**
- * Add a component to a features module
- * the selected components.
+ * Drush command callback for 'features-add'.
  *
- * This is DEPRECATED, but keeping it around for a bit longer for user migration
+ * Used to add a component to a features module.
+ * Now it does nothing.
+ *
+ * @deprecated
+ * This is deprecated, but preserved for user migration.
  */
 function drush_features_add() {
   drush_print(dt('features-add is DEPRECATED.'));
   drush_print(dt('Calling features-export instead.'));
+  // @todo This won't work, because the parameters are not passed along.
   drush_features_export();
 }
 
-
 /**
- * Update an existing feature module.
+ * Drush command callback for 'features-update'.
+ *
+ * Updates an existing feature module.
  */
 function drush_features_update() {
   if ($args = func_get_args()) {
@@ -569,8 +653,13 @@ function drush_features_update() {
 }
 
 /**
- * Update all enabled features. Optionally pass in a list of features to
- * exclude from being updated.
+ * Drush command callback for 'features-update-all'.
+ *
+ * Updates all enabled features.
+ * Optionally a list of features can be passed in, to be excluded from update.
+ *
+ * @return false|void
+ *   FALSE on error, NULL/void otherwise.
  */
 function drush_features_update_all() {
   $features_to_update = array();
@@ -599,10 +688,12 @@ function drush_features_update_all() {
 /**
  * Write a module to the site dir.
  *
- * @param $info
+ * @param array $info
  *   The feature info associative array.
- * @param $module_name
- *  Optional. The name for the exported module.
+ * @param string|null $module_name
+ *   (optional) The name for the exported module.
+ * @param string|null $directory
+ *   (optional) Destination directory for newly created module.
  */
 function _drush_features_export($info, $module_name = NULL, $directory = NULL) {
   $root = drush_get_option(array('r', 'root'), drush_locate_root());
@@ -630,7 +721,7 @@ function _drush_features_export($info, $module_name = NULL, $directory = NULL) {
       $export = _drush_features_generate_export($info, $module_name);
       $files = features_export_render($export, $module_name, TRUE);
 
-      // Restore the language
+      // Restore the language.
       _features_export_language($language);
 
       // Copy any files if _files key is there.
@@ -675,10 +766,13 @@ function _drush_features_export($info, $module_name = NULL, $directory = NULL) {
 /**
  * Helper function for _drush_feature_export.
  *
- * @param $info
+ * @param array $info
  *   The feature info associative array.
- * @param $module_name
- *  Optional. The name for the exported module.
+ * @param string $module_name
+ *   Optional. The name for the exported module.
+ *
+ * @return array
+ *   Export array.
  */
 function _drush_features_generate_export(&$info, &$module_name) {
   module_load_include('inc', 'features', 'features.export');
@@ -686,7 +780,8 @@ function _drush_features_generate_export(&$info, &$module_name) {
   if (!features_load_feature($module_name)) {
     $export['name'] = $module_name;
   }
-  // Set the feature version if the --version-set or --version-increment option is passed.
+  // Set the feature version, if the --version-set or --version-increment option
+  // is passed.
   if ($version = drush_get_option(array('version-set'))) {
     preg_match('/^(?P<core>\d+\.x)-(?P<major>\d+)\.(?P<patch>\d+)-?(?P<extra>\w+)?$/', $version, $matches);
     if (!isset($matches['core'], $matches['major'])) {
@@ -726,8 +821,10 @@ function _drush_features_generate_export(&$info, &$module_name) {
 }
 
 /**
- * Revert a feature to it's code definition.
- * Optionally accept a list of components to revert.
+ * Drush command callback for 'features-revert'.
+ *
+ * Reverts a feature to its code definition.
+ * Optionally accepts a list of components to revert.
  */
 function drush_features_revert() {
   if ($args = func_get_args()) {
@@ -749,7 +846,8 @@ function drush_features_revert() {
 
       if (isset($module)) {
         if (empty($component)) {
-          // If we received just a feature name, this means that we need all of it's components.
+          // If we received just a feature name, this means that we need all of
+          // its components.
           $modules[$module] = TRUE;
         }
         elseif ($modules[$module] !== TRUE) {
@@ -767,16 +865,17 @@ function drush_features_revert() {
       if (($feature = features_load_feature($module, TRUE)) && module_exists($module)) {
 
         $components = array();
-        // Forcefully revert all components of a feature.
         if ($force) {
+          // Forcefully revert all components of a feature.
           foreach (array_keys($feature->info['features']) as $component) {
             if (features_hook($component, 'features_revert')) {
               $components[] = $component;
             }
           }
         }
-        // Only revert components that are detected to be Overridden/Needs review/rebuildable.
         else {
+          // Only revert components where the status is detected to be one of
+          // "Overridden", "Needs review" or "rebuildable".
           $states = features_get_component_states(array($feature->name), FALSE);
           foreach ($states[$feature->name] as $component => $state) {
             $revertable_states = array(FEATURES_OVERRIDDEN, FEATURES_NEEDS_REVIEW, FEATURES_REBUILDABLE);
@@ -826,10 +925,15 @@ function drush_features_revert() {
 }
 
 /**
- * Revert all enabled features to their definitions in code.
+ * Drush command callback for 'features-revert-all'.
+ *
+ * Reverts all enabled features to their definitions in code.
  *
  * @param ...
  *   (Optional) A list of features to exclude from being reverted.
+ *
+ * @return void|false
+ *   FALSE on failure, no explicit return value otherwise.
  */
 function drush_features_revert_all() {
   module_load_include('inc', 'features', 'features.export');
@@ -839,7 +943,7 @@ function drush_features_revert_all() {
   $features_to_revert = array();
   foreach (features_get_features(NULL, TRUE) as $module) {
     if ($module->status && !in_array($module->name, $features_to_exclude)) {
-      // If forced, add module regardless of status.
+      // If forced, add the module regardless of its status.
       if ($force) {
         $features_to_revert[] = $module->name;
       }
@@ -871,6 +975,9 @@ function drush_features_revert_all() {
 
 /**
  * Show the diff of a feature module.
+ *
+ * @return false|void
+ *   FALSE on failure, no explicit return value otherwise.
  */
 function drush_features_diff() {
   if (!$args = func_get_args()) {
@@ -931,9 +1038,9 @@ function drush_features_diff() {
     $green = "\033[0;32;40m\033[1m%s\033[0m";
   }
 
-  // Print key for colors
+  // Print key for colors.
   drush_print(dt('Legend: '));
-  drush_print(sprintf($red,   dt('Code:       drush features-revert will remove the overrides.')));
+  drush_print(sprintf($red, dt('Code:       drush features-revert will remove the overrides.')));
   drush_print(sprintf($green, dt('Overrides:  drush features-update will update the exported feature with the displayed overrides')));
   drush_print();
 
@@ -964,6 +1071,9 @@ function drush_features_diff() {
  *
  * @param ...
  *   (Optional) A list of features to exclude from being reverted.
+ *
+ * @return void|false
+ *   FALSE on failure, no explicit return value otherwise.
  */
 function drush_features_diff_all() {
   module_load_include('inc', 'features', 'features.export');
@@ -987,7 +1097,7 @@ function drush_features_diff_all() {
     // Check if the user wants to apply the force option.
     $force = drush_get_option('force');
 
-    if($force) {
+    if ($force) {
       foreach ($features_to_diff as $module) {
 
         drush_print(dt('Diff for !module:', array('!module' => $module)));
@@ -1018,12 +1128,13 @@ function drush_features_diff_all() {
 /**
  * Helper function to call drush_set_error().
  *
- * @param $feature
+ * @param string $feature
  *   The string name of the feature.
- * @param $error
+ * @param string $error
  *   A text string identifying the type of error.
- * @return
- *   FALSE.  See drush_set_error().
+ *
+ * @return false
+ *   See drush_set_error().
  */
 function _features_drush_set_error($feature, $error = '') {
   $args = array('!feature' => $feature);
@@ -1032,9 +1143,11 @@ function _features_drush_set_error($feature, $error = '') {
     case 'FEATURES_FEATURE_NOT_ENABLED':
       $message = 'The feature !feature is not enabled.';
       break;
+
     case 'FEATURES_COMPONENT_NOT_FOUND':
       $message = 'The given component !feature could not be found.';
       break;
+
     default:
       $error = 'FEATURES_FEATURE_NOT_FOUND';
       $message = 'The feature !feature could not be found.';

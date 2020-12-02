@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * feeds_news.views_default.inc
@@ -77,6 +78,27 @@ function feeds_news_views_default_views() {
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'View items';
   $handler->display->display_options['menu']['weight'] = '-9';
+  $translatables['feeds_defaults_feed_items'] = array(
+    t('Defaults'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('« first'),
+    t('‹ previous'),
+    t('next ›'),
+    t('last »'),
+    t('There are no items for this feed at the moment.'),
+    t('Owner feed'),
+    t('All'),
+    t('Articles from %1'),
+    t('Page'),
+  );
   $export['feeds_defaults_feed_items'] = $view;
 
   return $export;

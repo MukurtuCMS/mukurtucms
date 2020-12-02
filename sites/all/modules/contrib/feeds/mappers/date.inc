@@ -78,7 +78,13 @@ function date_feeds_set_target(FeedsSource $source, $entity, $target, array $val
     }
     else {
       if (!isset($field[$language][$delta]['timezone'])) {
-        $field[$language][$delta]['timezone'] = $value->getTimezone()->getName();
+        $timezone = $value->getTimezone()->getName();
+        if ($timezone == 'Z') {
+          // PHP < 5.5.10 doesn't know about the Zulu time zone (which equals
+          // the UTC time zone). Set timezone to "UTC".
+          $timezone = 'UTC';
+        }
+        $field[$language][$delta]['timezone'] = $timezone;
       }
 
       $value->setTimezone($db_tz);

@@ -10,6 +10,9 @@
  */
 class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Mapper: Fields',
@@ -18,6 +21,9 @@ class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp(array('number'));
   }
@@ -274,6 +280,49 @@ class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
   }
 
   /**
+   * Tests integer field validation.
+   */
+  public function testIntegerFieldValidation() {
+    // Create content type with a field with settings to validate.
+    $typename = $this->createContentType(array(), array(
+      'beta' => array(
+        'type' => 'number_integer',
+        'instance_settings' => array(
+          'instance[settings][min]' => 30,
+          'instance[settings][max]' => 40,
+        ),
+      ),
+    ));
+
+    // Create and configure importer.
+    $this->createImporterConfiguration('CSV', 'csv');
+    $this->setSettings('csv', NULL, array(
+      'content_type' => '',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+    $this->setPlugin('csv', 'FeedsFileFetcher');
+    $this->setPlugin('csv', 'FeedsCSVParser');
+    $this->setSettings('csv', 'FeedsNodeProcessor', array(
+      'bundle' => $typename,
+    ));
+    $this->addMappings('csv', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+      ),
+      1 => array(
+        'source' => 'beta',
+        'target' => 'field_beta',
+      ),
+    ));
+    $this->importFile('csv', $this->absolutePath() . '/tests/feeds/content.csv');
+    $this->assertText('Created 1 node');
+    $this->assertText('Failed importing 1 node.');
+    $this->assertText("Field validation errors in item 'Lorem ipsum'");
+    $this->assertText('beta_number_integer_label: the value may be no greater than 40.');
+  }
+
+  /**
    * Tests text field validation for nodes without a title.
    *
    * The error message should refer the GUID of an item if the entity has no
@@ -344,7 +393,7 @@ class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
       'label' => 'alpha_text_label',
       'bundle' => 'addams',
       'widget' => array(
-        'type' => 'textfield',
+        'type' => 'text_textfield',
       ),
     ));
 
@@ -395,7 +444,7 @@ class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
       'label' => 'alpha_text_label',
       'bundle' => 'user',
       'widget' => array(
-        'type' => 'textfield',
+        'type' => 'text_textfield',
       ),
     ));
 
@@ -477,6 +526,66 @@ class FeedsMapperFieldTestCase extends FeedsMapperTestCase {
     $this->assertText("Field validation errors in item 'Mapping Innovation at the World Bank with Open Atrium'");
     $this->assertText("Field validation errors in item 'Open Data for Microfinance: The New MIXMarket.org'");
     $this->assertText('alpha_text_label: this field cannot hold more than 6 values.');
+  }
+
+  /**
+   * Tests that Feeds ignores validation of fields not mapped to.
+   */
+  public function testIgnoreUnmappedFieldsValidation() {
+    // Include FeedsProcessor.inc so processor related constants are available.
+    module_load_include('inc', 'feeds', 'plugins/FeedsProcessor');
+
+    // Create content type with a field with settings to validate.
+    $typename = $this->createContentType(array(), array(
+      'alpha' => 'text',
+      'beta' => array(
+        'type' => 'number_integer',
+        'instance_settings' => array(
+          'instance[settings][min]' => 30,
+          'instance[settings][max]' => 50,
+        ),
+      ),
+    ));
+
+    // Create a node of this type with an out of range integer value.
+    $this->drupalCreateNode(array(
+      'type' => $typename,
+      'title' => 'Lorem ipsum',
+      'field_beta' => array(
+        LANGUAGE_NONE => array(
+          0 => array(
+            'value' => 25,
+          ),
+        ),
+      ),
+    ));
+
+    // Create and configure importer.
+    $this->createImporterConfiguration('CSV', 'csv');
+    $this->setSettings('csv', NULL, array(
+      'content_type' => '',
+      'import_period' => FEEDS_SCHEDULE_NEVER,
+    ));
+    $this->setPlugin('csv', 'FeedsFileFetcher');
+    $this->setPlugin('csv', 'FeedsCSVParser');
+    $this->setSettings('csv', 'FeedsNodeProcessor', array(
+      'bundle' => $typename,
+      'update_existing' => FEEDS_UPDATE_EXISTING,
+    ));
+    $this->addMappings('csv', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+        'unique' => TRUE,
+      ),
+      1 => array(
+        'source' => 'alpha',
+        'target' => 'field_alpha',
+      ),
+    ));
+    $this->importFile('csv', $this->absolutePath() . '/tests/feeds/content.csv');
+    $this->assertText('Updated 1 node');
+    $this->assertNoText('Field validation errors');
   }
 
 }

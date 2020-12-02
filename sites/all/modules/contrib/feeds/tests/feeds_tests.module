@@ -39,6 +39,13 @@ function feeds_tests_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  if (module_exists('rules')) {
+    $items['testing/feeds/trigger-rules-event'] = array(
+      'page callback' => 'feeds_tests_trigger_rules_event',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    );
+  }
   return $items;
 }
 
@@ -310,6 +317,54 @@ function feeds_tests_nodes() {
 }
 
 /**
+ * Implements hook_query_TAG_alter() for tag 'term_access'.
+ */
+function feeds_tests_query_term_access_alter(QueryAlterableInterface $query) {
+  global $user;
+
+  $allowed_user = variable_get('feeds_tests_term_reference_allowed_user', NULL);
+  if (is_null($allowed_user)) {
+    // No allowed user set. Abort.
+    return;
+  }
+
+  // Read meta-data from query, if provided.
+  if (!$account = $query->getMetaData('account')) {
+    $account = $user;
+  }
+
+  // If the current active user is the set user, abort.
+  if ($account->uid == $allowed_user) {
+    return;
+  }
+
+  // If $account can bypass node access, or there are no node access
+  // modules, we don't need to alter the query.
+  if (user_access('bypass node access', $account)) {
+    return;
+  }
+
+  // Disallow any terms.
+  $tables = $query->getTables();
+  foreach ($tables as $talias => $tableinfo) {
+    $table = $tableinfo['table'];
+    if (!($table instanceof SelectQueryInterface) && $table == 'taxonomy_term_data') {
+      $query->condition("$talias.tid", 0);
+    }
+  }
+}
+
+/**
+ * Page callback. Triggers the rules event 'feeds_tests_rules_event'.
+ */
+function feeds_tests_trigger_rules_event() {
+  rules_invoke_event('feeds_tests_rules_event');
+  return array(
+    '#markup' => 'Rules event "feeds_tests_rules_event" triggered.',
+  );
+}
+
+/**
  * Implements hook_feeds_processor_targets().
  */
 function feeds_tests_feeds_processor_targets($entity_type, $bundle) {
@@ -513,7 +568,7 @@ function feeds_tests_feeds_after_parse(FeedsSource $source, FeedsParserResult $r
   // items in there with encoding issues. These items can not be processed
   // during tests without having a test failure because in < PHP 5.4 that would
   // produce the following warning:
-  //   htmlspecialchars(): Invalid multibyte sequence in argument
+  // > htmlspecialchars(): Invalid multibyte sequence in argument.
   // @see FeedsCSVParserTestCase::testMbstringExtensionDisabled()
   if (variable_get('feeds_tests_feeds_after_parse_empty_items', FALSE)) {
     // Remove all items. No items will be processed.
@@ -545,6 +600,20 @@ function feeds_tests_feeds_after_parse(FeedsSource $source, FeedsParserResult $r
       $item['uid'] = (float) $item['uid'];
     }
   }
+
+  // Conditionally set the 'uid' value to the current user.
+  // @see FeedsAccountSwitcherTest
+  if (variable_get('feeds_tests_set_uid_current_user', FALSE)) {
+    foreach ($result->items as &$item) {
+      $item['uid'] = $GLOBALS['user']->uid;
+    }
+  }
+
+  // Conditionally abort the import abruptly.
+  // @see FeedsAccountSwitcherTest
+  if (variable_get('feeds_tests_trigger_import_disruption', FALSE)) {
+    die();
+  }
 }
 
 /**
@@ -565,11 +634,11 @@ function feeds_tests_feeds_after_save() {
  */
 class FeedsTestsPreprocess {
 
-/**
- * Preprocess callback for test_target.
- *
- * @see feeds_tests_feeds_processor_targets()
- */
+  /**
+   * Preprocess callback for test_target.
+   *
+   * @see feeds_tests_feeds_processor_targets()
+   */
   public static function callback(array $target, array &$mapping) {
     $mapping['required_value'] = TRUE;
   }

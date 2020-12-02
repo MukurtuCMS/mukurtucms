@@ -2,13 +2,17 @@
 
 /**
  * @file
- * Tests for plugins/FeedsUserProcessor.inc
+ * Tests for plugins/FeedsUserProcessor.inc.
  */
 
 /**
  * Test aggregating a feed as data records.
  */
 class FeedsCSVtoUsersTest extends FeedsWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'CSV import to users',
@@ -1064,4 +1068,5 @@ class FeedsCSVtoUsersTest extends FeedsWebTestCase {
     $account->pass_raw = $password;
     $this->drupalLogin($account);
   }
+
 }

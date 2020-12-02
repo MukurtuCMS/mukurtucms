@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Contains FeedsHooksTestCase.
+ */
+
+/**
  * Tests for hooks invoked by Feeds not related to mapping.
  */
 class FeedsHooksTestCase extends FeedsWebTestCase {
@@ -14,6 +19,66 @@ class FeedsHooksTestCase extends FeedsWebTestCase {
       'description' => 'Tests for hooks invoked by Feeds not related to mapping.',
       'group' => 'Feeds',
     );
+  }
+
+  /**
+   * Ensure that the prevalidate hook is invoked.
+   *
+   * @see feeds_tests_feeds_prevalidate()
+   */
+  public function testPrevalidateHook() {
+    // Include FeedsProcessor.inc to make its constants available.
+    module_load_include('inc', 'feeds', 'plugins/FeedsProcessor');
+
+    // Set flag to test prevalidate hook.
+    variable_set('feeds_tests_hook_feeds_prevalidate', TRUE);
+
+    // Create CSV importer.
+    $this->createImporterConfiguration('Content CSV', 'csv');
+    $this->setSettings('csv', NULL, array('content_type' => '', 'import_period' => FEEDS_SCHEDULE_NEVER));
+    $this->setPlugin('csv', 'FeedsFileFetcher');
+    $this->setPlugin('csv', 'FeedsCSVParser');
+    $this->setSettings('csv', 'FeedsNodeProcessor', array(
+      'bundle' => 'article',
+      'update_existing' => FEEDS_UPDATE_EXISTING,
+    ));
+    $this->addMappings('csv', array(
+      0 => array(
+        'source' => 'title',
+        'target' => 'title',
+        'unique' => TRUE,
+      ),
+    ));
+
+    // Create an article node that gets updated.
+    $node = $this->drupalCreateNode(array(
+      'type' => 'article',
+      'title' => 'Lorem ipsum',
+    ));
+
+    // Import CSV file.
+    $this->importFile('csv', $this->absolutePath() . '/tests/feeds/content.csv');
+    $this->assertText('Created 1 node');
+    $this->assertText('Updated 1 node');
+
+    $expected_result = array(
+      array(
+        'importer_id' => 'csv',
+        'title' => 'Lorem ipsum',
+        'item_guid' => 1,
+        'entity_id' => $node->nid,
+      ),
+      array(
+        'importer_id' => 'csv',
+        'title' => 'Ut wisi enim ad minim veniam',
+        'item_guid' => 2,
+        'entity_id' => NULL,
+      ),
+    );
+
+    // Assert that the hook was invoked. The variable should have been set in
+    // feeds_tests_feeds_prevalidate().
+    $this->assertEqual($expected_result, variable_get('feeds_tests_hook_feeds_prevalidate_results'));
   }
 
   /**
