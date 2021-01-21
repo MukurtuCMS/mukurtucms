@@ -132,7 +132,7 @@ projects[og_invite][patch][] = contrib/0001-Go-back-to-using-default-view-but-re
 
 ;;; Geofield & Geofield Gmap
 ; Feeds Import Not Saving Geofield
-projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
+; projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
 
 ;;; Partial Date
 ; Add property info callback
