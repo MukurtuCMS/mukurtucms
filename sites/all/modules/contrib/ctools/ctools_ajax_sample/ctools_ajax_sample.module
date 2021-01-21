@@ -187,7 +187,7 @@ function ctools_ajax_sample_page() {
     );
   }
 
-  $output .= theme('table', array('header' => $header, 'rows' => $rows, array('class' => array('ajax-sample-table'))));
+  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => array('ajax-sample-table'))));
 
   // Show examples of ctools javascript widgets.
   $output .= '<h2>' . t('CTools Javascript Widgets') . '</h2>';

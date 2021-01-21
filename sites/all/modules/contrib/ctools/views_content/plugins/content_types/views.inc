@@ -173,7 +173,7 @@ function views_content_views_content_type_render($subtype, $conf, $panel_args, $
       if ($conf['use_pager'] && ($pager['type'] == 'none' || $pager['type'] == 'some')) {
         $pager['type'] = 'full';
       }
-      elseif (!$conf['use_pager'] && $pager['type'] != 'none' && $pager['type'] != 'some') {
+      elseif (!$conf['use_pager']) {
         $pager['type'] = $view->get_items_per_page() ? 'some' : 'none';
       }
 

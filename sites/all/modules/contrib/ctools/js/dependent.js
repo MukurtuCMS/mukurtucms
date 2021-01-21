@@ -39,7 +39,7 @@
 
   Drupal.CTools.dependent.autoAttach = function() {
     // Clear active bindings and triggers.
-    for (i in Drupal.CTools.dependent.activeTriggers) {
+    for (var i in Drupal.CTools.dependent.activeTriggers) {
       $(Drupal.CTools.dependent.activeTriggers[i]).unbind('change.ctools-dependent');
     }
     Drupal.CTools.dependent.activeTriggers = [];
@@ -51,7 +51,7 @@
     }
 
     // Iterate through all relationships
-    for (id in Drupal.settings.CTools.dependent) {
+    for (var id in Drupal.settings.CTools.dependent) {
       // Test to make sure the id even exists; this helps clean up multiple
       // AJAX calls with multiple forms.
 
@@ -59,7 +59,7 @@
       // whether the binding is active or not.  Defaults to no.
       Drupal.CTools.dependent.activeBindings[id] = 0;
       // Iterate through all possible values
-      for(bind_id in Drupal.settings.CTools.dependent[id].values) {
+      for (var bind_id in Drupal.settings.CTools.dependent[id].values) {
         // This creates a backward relationship.  The bind_id is the ID
         // of the element which needs to change in order for the id to hide or become shown.
         // The id is the ID of the item which will be conditionally hidden or shown.
@@ -87,7 +87,7 @@
         }
 
         var getValue = function(item, trigger) {
-          if ($(trigger).size() == 0) {
+          if ($(trigger).length == 0) {
             return null;
           }
 
@@ -129,7 +129,7 @@
               return;
             }
 
-            for (i in Drupal.CTools.dependent.bindings[bind_id]) {
+            for (var i in Drupal.CTools.dependent.bindings[bind_id]) {
               var id = Drupal.CTools.dependent.bindings[bind_id][i];
               // Fix numerous errors
               if (typeof id != 'string') {
@@ -150,7 +150,7 @@
               }
 
               var len = 0;
-              for (i in Drupal.CTools.dependent.activeBindings[id]) {
+              for (var i in Drupal.CTools.dependent.activeBindings[id]) {
                 len++;
               }
 

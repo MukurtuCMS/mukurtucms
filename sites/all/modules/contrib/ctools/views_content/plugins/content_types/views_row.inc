@@ -228,8 +228,9 @@ function views_content_views_row_content_type_admin_info($subtype, $conf, $conte
 
 function views_content_views_row_content_type_admin_title($subtype, $conf, $context) {
   $rows = array_filter($conf['rows']);
+  $row_count = count($rows);
   $rows = empty($rows) ? t('Show all') : implode(', ', $rows);
-  return format_plural(count($rows),
+  return format_plural($row_count,
     '"@context" row @rows',
     '"@context" rows @rows',
     array('@context' => $context->identifier, '@rows' => $rows)
