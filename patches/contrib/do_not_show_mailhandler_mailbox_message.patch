@@ -8,5 +8,5 @@ index 7ab71a8..7a5cff6 100644
    cache_clear_all('plugins:feeds:plugins', 'cache');
 -  drupal_set_message(t("Now that you've enabled Mailhandler, you need to <a href='@mailbox-add'>add a mailbox</a> corresponding to an IMAP/POP3/mbox mailbox.", array('@mailbox-add' => url('admin/structure/mailhandler/add'))));
  }
- 
+
  /**

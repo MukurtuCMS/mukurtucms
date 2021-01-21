@@ -13,13 +13,13 @@ index 3553b17..18ba851 100644
 +++ b/scald_soundcloud.module
 @@ -183,7 +183,7 @@ function scald_soundcloud_audio($id) {
    }
- 
+
    // Tags
 -  $info->tags = explode(" ", $data->tag_list);
 +  $info->tags = str_getcsv($data->tag_list, ' ');
    // License
    $info->license = 'SC';
- 
--- 
+
+--
 2.1.4
 

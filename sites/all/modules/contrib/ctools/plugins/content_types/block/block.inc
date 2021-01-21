@@ -352,7 +352,7 @@ function block_ctools_block_info($module, $delta, &$info) {
   // The title of custom blocks from the block module is stored in the
   // {block} table. Look for it in the default theme as a reasonable
   // default value for the title.
-  $block_info_cache = drupal_static(__FUNCTION__);
+  $block_info_cache = &drupal_static(__FUNCTION__);
   if (!isset($block_info_cache)) {
     $block_info_cache = db_select('block', 'b')
       ->fields('b')

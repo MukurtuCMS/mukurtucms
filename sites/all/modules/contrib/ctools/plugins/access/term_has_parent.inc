@@ -38,7 +38,7 @@ function ctools_term_has_parent_ctools_access_settings($form, &$form_state, $con
     '#title' => t('Vocabulary'),
     '#type' => 'select',
     '#options' => array(),
-    '#description' => t('Select the vocabulary for this form.'),
+    '#description' => t('Select the vocabulary your parent term belongs to.'),
     '#id' => 'ctools-select-vid',
     '#default_value' => $conf['vid'],
     '#required' => TRUE,
@@ -57,7 +57,7 @@ function ctools_term_has_parent_ctools_access_settings($form, &$form_state, $con
     $options[$vid] = $vocabulary->name;
     $form['settings']['vid_' . $vid] = array(
       '#title' => t('Terms'),
-      '#description' => t('Select a term or terms from @vocabulary.', array('@vocabulary' => $vocabulary->name)),
+      '#description' => t('Select a parent term (or terms) from the @vocabulary vocabulary.', array('@vocabulary' => $vocabulary->name)),
       '#dependency' => array('ctools-select-vid' => array($vocabulary->vid)),
       '#default_value' => !empty($conf['vid_' . $vid]) ? $conf['vid_' . $vid] : '',
       '#size' => 10,
@@ -77,8 +77,8 @@ function ctools_term_has_parent_ctools_access_settings($form, &$form_state, $con
   }
   $form['settings']['vid']['#options'] = $options;
   $form['settings']['include_self'] = array(
-    '#title' => t('Include these term(s) as candidates?'),
-    '#description' => t('When this rule is evaluated, should the term(s) you select be included as candidates for access?'),
+    '#title' => t('Include these parent term(s)?'),
+    '#description' => t('Should the term(s) you selected above be included in addition to their children?'),
     '#default_value' => !empty($conf['include_self']) ? $conf['include_self'] : FALSE,
     '#type' => 'checkbox',
   );

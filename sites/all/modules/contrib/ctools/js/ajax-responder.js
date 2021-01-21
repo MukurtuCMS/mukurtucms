@@ -98,29 +98,30 @@
   };
 
   // Hide these in a ready to ensure that Drupal.ajax is set up first.
-  $(function() {
-    Drupal.ajax.prototype.commands.attr = function(ajax, data, status) {
-      $(data.selector).attr(data.name, data.value);
-    };
+  Drupal.behaviors.ctools_add_ajax_responder_commands = {
+    attach: function () {
+      Drupal.ajax.prototype.commands.attr = function (ajax, data, status) {
+        $(data.selector).attr(data.name, data.value);
+      };
 
-
-    Drupal.ajax.prototype.commands.redirect = function(ajax, data, status) {
-      if (data.delay > 0) {
-        setTimeout(function () {
+      Drupal.ajax.prototype.commands.redirect = function (ajax, data, status) {
+        if (data.delay > 0) {
+          setTimeout(function () {
+            location.href = data.url;
+          }, data.delay);
+        }
+        else {
           location.href = data.url;
-        }, data.delay);
-      }
-      else {
-        location.href = data.url;
-      }
-    };
+        }
+      };
 
-    Drupal.ajax.prototype.commands.reload = function(ajax, data, status) {
-      location.reload();
-    };
+      Drupal.ajax.prototype.commands.reload = function (ajax, data, status) {
+        location.reload();
+      };
 
-    Drupal.ajax.prototype.commands.submit = function(ajax, data, status) {
-      $(data.selector).submit();
+      Drupal.ajax.prototype.commands.submit = function (ajax, data, status) {
+        $(data.selector).submit();
+      }
     }
-  });
+  };
 })(jQuery);

@@ -479,7 +479,7 @@ function ctools_uuid_generate() {
   if (!module_exists('uuid')) {
     ctools_include('uuid');
 
-    $callback = drupal_static(__FUNCTION__);
+    $callback = &drupal_static(__FUNCTION__);
 
     if (empty($callback)) {
       if (function_exists('uuid_create') && !function_exists('uuid_make')) {
@@ -903,13 +903,14 @@ function ctools_process(&$variables, $hook) {
  */
 
 function ctools_access_menu($access) {
+  $func_args = func_get_args();
   // Short circuit everything if there are no access tests.
   if (empty($access['plugins'])) {
     return TRUE;
   }
 
   $contexts = array();
-  foreach (func_get_args() as $arg) {
+  foreach ($func_args as $arg) {
     if (is_object($arg) && get_class($arg) == 'ctools_context') {
       $contexts[$arg->id] = $arg;
     }
