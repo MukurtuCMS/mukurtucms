@@ -5,7 +5,7 @@ index 5311bd0..f86cb61 100644
 @@ -1445,6 +1445,9 @@ function scald_render($sid, $context, $options = array(), $rebuild = FALSE) {
      $content['#suffix'] .= '<!-- END scald=' . $atom->sid . ' -->';
    }
- 
+
 +  // Mukurtu added hook for content warnings
 +  drupal_alter('scald_display', $content, $atom, $context);
 +

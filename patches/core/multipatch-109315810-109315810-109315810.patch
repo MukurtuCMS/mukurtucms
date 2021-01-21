@@ -3,13 +3,13 @@ index a32930a5..0c7fb889 100644
 --- a/includes/common.inc
 +++ b/includes/common.inc
 @@ -7638,7 +7638,7 @@ function drupal_implode_tags($tags) {
- 
+
      $encoded_tags[] = $tag;
    }
 -  return implode(', ', $encoded_tags);
 +  return implode('; ', $encoded_tags);
  }
- 
+
  /**
 diff --git a/misc/autocomplete.js b/misc/autocomplete.js
 index af090713..b2cc5253 100644
@@ -23,7 +23,7 @@ index af090713..b2cc5253 100644
 +    searchString.charAt(searchString.length - 1) == ';') {
      return;
    }
- 
+
 diff --git a/modules/taxonomy/taxonomy.module b/modules/taxonomy/taxonomy.module
 index 981649d2..489a8a3b 100644
 --- a/modules/taxonomy/taxonomy.module
@@ -48,12 +48,12 @@ index 981649d2..489a8a3b 100644
 -}
 +  // Mukurtu patch -- delimit by the semicolon instead of comma
 +  return implode('; ', $typed_tags);}
- 
+
  /**
   * Implements hook_field_info().
 @@ -1765,7 +1760,7 @@ function taxonomy_autocomplete_validate($element, &$form_state) {
      }
- 
+
      // Translate term names into actual terms.
 -    $typed_terms = drupal_explode_tags($tags);
 +    $typed_terms = ma_core_taxonomy_explode_tags($tags); // mukurtu patch
@@ -66,20 +66,20 @@ index 38b24b3b..fd64a86c 100644
 +++ b/modules/taxonomy/taxonomy.pages.inc
 @@ -135,7 +135,7 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
    }
- 
+
    // The user enters a comma-separated list of tags. We only autocomplete the last tag.
 -  $tags_typed = drupal_explode_tags($tags_typed);
 +  $tags_typed = ma_core_taxonomy_explode_tags($tags_typed); // mukurtu patch
    $tag_last = drupal_strtolower(array_pop($tags_typed));
- 
+
    $term_matches = array();
 @@ -165,14 +165,15 @@ function taxonomy_autocomplete($field_name = '', $tags_typed = '') {
        ->execute()
        ->fetchAllKeyed();
- 
+
 -    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . ', ' : '';
 +    $prefix = count($tags_typed) ? drupal_implode_tags($tags_typed) . '; ' : '';
- 
+
      foreach ($tags_return as $tid => $name) {
        $n = $name;
        // Term names containing commas or quotes must be wrapped in quotes.

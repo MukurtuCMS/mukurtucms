@@ -22,8 +22,8 @@ index 27cffed..69b6621 100644
 +    return ma_dictionary_glossary_sort($a_value, $b_value);
 +  }
  }
- 
- 
+
+
 @@ -293,8 +299,15 @@ class SearchApiGlossaryRewriteItems extends FacetapiFilter {
     */
    public function padListItems(&$build) {
@@ -39,14 +39,14 @@ index 27cffed..69b6621 100644
 +      return $build;
 +    }
 +    // end Mukurtu patch
- 
+
      foreach ($glossary_array as $key) {
        if (!array_key_exists($key, $build)) {
 @@ -412,7 +425,7 @@ class SearchApiGlossaryWidget extends FacetapiWidgetLinks {
- 
+
      foreach ($build as $value => $item) {
        $row = array('class' => array());
--      
+-
 +
        if(!isset($item['#active'])){
          $item['#active'] = FALSE;

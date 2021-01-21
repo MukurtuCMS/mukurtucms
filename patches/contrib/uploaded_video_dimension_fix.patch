@@ -4,7 +4,7 @@ index 6a5f86b..7e17c34 100644
 +++ b/modules/providers/scald_video/scald_video.module
 @@ -123,13 +123,24 @@ function scald_video_scald_prerender($atom, $context, $options, $mode) {
    }
- 
+
    if ($mode == 'atom') {
 +    //load context configuration to retrieve dimension data if present
 +    $context_config = scald_context_config_load($context);
@@ -33,7 +33,7 @@ index 6a5f86b..7e17c34 100644
    else {
      $atoms = $form_state['scald']['atoms'];
    }
-- 
+-
 +
    // Set one atom's form options. This can be called multiple times in case
    // a multifile field is used.
@@ -42,7 +42,7 @@ index 6a5f86b..7e17c34 100644
   * Returns a video file form element compatible with plupload.
   * This function avoid repetitions over the multiple places
   * a file upload field is needed in scald_video.
-- * 
+- *
 + *
   * @param $form_element
   *   The form element we want to set to video file field.

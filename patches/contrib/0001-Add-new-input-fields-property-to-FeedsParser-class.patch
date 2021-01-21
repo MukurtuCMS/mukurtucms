@@ -16,7 +16,7 @@ index e4fb66c..c3a9490 100644
 @@ -15,14 +15,22 @@ class FeedsParserResult extends FeedsResult {
    public $items;
    public $current_item;
- 
+
 +  // Mukurtu specific change. We want to keep track of which
 +  // fields were actually provided in the input. We'll use
 +  // this information in the processor later to allow
@@ -35,8 +35,8 @@ index e4fb66c..c3a9490 100644
      $this->items = $items;
 +    $this->input_fields = $input_fields;
    }
- 
+
    /**
--- 
+--
 2.7.4
 

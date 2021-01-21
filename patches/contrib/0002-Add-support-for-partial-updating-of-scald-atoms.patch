@@ -9,10 +9,10 @@ index 284439f..582de3a 100644
 -      $value = $this->getSourceValue($source, $result, $mapping['source']);
 +      if (ma_importexport_dc_is_xml_importer($source->id) OR in_array(strtolower($mapping['source']), $result->input_fields)) {
 +        $value = $this->getSourceValue($source, $result, $mapping['source']);
- 
+
 -      $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
 +        $this->mapToTarget($source, $mapping['target'], $target_item, $value, $mapping);
 +      }
      }
- 
+
      return $target_item;
