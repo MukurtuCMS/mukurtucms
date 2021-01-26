@@ -98,6 +98,8 @@ projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scal
 projects[feeds][patch][] = contrib/0001-Skip-protocol-field-OG-validation-during-import-for-.patch
 ; Change language handling for taxonomy import
 projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-import.patch
+; Change language handling for text import
+projects[feeds][patch][] = contrib/0001-Use-new-field-language-handling-in-feeds.patch
 
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value.
