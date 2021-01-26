@@ -54,7 +54,7 @@ function ma_importexport_feeds_after_parse(FeedsSource $source, FeedsParserResul
   // a missing guid will always return the first nid/sid that was
   // used with an empty guid. We'll lookup existing or provide
   // sane GUID values in the case that it is empty.
-  $result->language = 'en';
+  $result->language = language_default('language');
 
   if (!empty($result->items)) {
     foreach ($result->items as &$item) {
@@ -2457,4 +2457,36 @@ function ma_import_export_multiple_language_bug_report_form() {
   $form['table']['#markup'] = drupal_render($table);
   $form['rerun']['#markup'] = l("Run the Report Again", 'admin/reports/mukurtu/run-multiple-language-report');
   return $form;
+}
+
+/**
+ * Return the field language for a given entity/fieldname.
+ */
+function ma_importexport_get_field_language($entity_type, $entity, $fieldname) {
+  $field_language = field_language($entity_type, $entity, $fieldname);
+
+  // Load the entity again fresh, no cache.
+  // This is hugely inefficient, but is the only reliable way
+  // we can find. This might not be necessary for sites that
+  // didn't have the community_tags bug.
+  $fresh_entity_id = entity_extract_ids($entity_type, $entity)[0] ?? NULL;
+  if (!$fresh_entity_id) {
+    return $field_language;
+  }
+  $fresh_entity = entity_load($entity_type, array($fresh_entity_id), array(), TRUE)[$fresh_entity_id];
+
+  // Get the edit form for the entity.
+  $edit_form = entity_form($entity_type, $fresh_entity);
+
+  // Get the language for the field from the edit form.
+  if (isset($edit_form[$fieldname]['#language'])) {
+    $edit_language = $edit_form[$fieldname]['#language'];
+  }
+
+  // Use the edit form language if set, failover to field_language.
+  if ($edit_language) {
+    return $edit_language;
+  }
+
+  return $field_language;
 }
