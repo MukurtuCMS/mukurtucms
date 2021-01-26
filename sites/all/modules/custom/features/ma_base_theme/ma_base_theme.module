@@ -426,7 +426,7 @@ function ma_base_theme_copy_related_content() {
  * Custom DS field used to replicate the Related Content field as a content type-specific field as comma-separate list, with links to target nodes.
  */
 function ma_base_theme_extracted_relationship_custom_ds_field($entity, $type) {
-  if (count($entity->field_related_content[LANGUAGE_NONE])) {
+  if (isset($entity->field_related_content[LANGUAGE_NONE]) && count($entity->field_related_content[LANGUAGE_NONE])) {
     $links = [];
     foreach ($entity->field_related_content[LANGUAGE_NONE] as $related_content) {
       $related_node = node_load($related_content['target_id']);

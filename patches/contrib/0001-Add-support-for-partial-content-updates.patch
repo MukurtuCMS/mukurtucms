@@ -15,11 +15,11 @@ diff --git a/sites/all/modules/contrib/feeds/plugins/FeedsProcessor.inc b/sites/
 index ead72acb..0c116c15 100644
 --- a/plugins/FeedsProcessor.inc
 +++ b/plugins/FeedsProcessor.inc
-@@ -723,6 +723,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
+@@ -889,6 +889,7 @@ abstract class FeedsProcessor extends FeedsPlugin {
          $target_name = $mapping['target'];
        }
 
-+      if(!isset($result->input_fields) || in_array(strtolower($mapping['source']), $result->input_fields)) {
++      if (isset($result->input_fields) && in_array(strtolower($mapping['source']), $result->input_fields)) {
        // If the target is a field empty the value for the targeted language
        // only.
        // In all other cases, just empty the target completely.
