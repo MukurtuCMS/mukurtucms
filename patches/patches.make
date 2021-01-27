@@ -101,6 +101,10 @@ projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-i
 ; Change language handling for text import
 projects[feeds][patch][] = contrib/0001-Use-new-field-language-handling-in-feeds.patch
 
+;;; Feeds Files
+; Change entityValidate definition
+projects[feeds_file][patch][] = contrib/0001-Add-parameter-to-entityValidate-to-stop-warning.patch
+
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value.
 ; Mukurtu Export change to support feed imports using a subset of fields. Treat single element arrays containing
