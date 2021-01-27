@@ -73,7 +73,7 @@ function mukurtu_importer_generator_get_default_documentation($field_mapping, $e
 
     // Type description.
     if ($modifier == 'guid_or_target_id') {
-      $target_id_name = array_shift($field_info['foreign keys'])['columns']['target_id'];
+      $target_id_name = array_shift($field_info['foreign keys'])['columns']['target_id'] ?? NULL;
       switch ($target_id_name) {
         case 'nid':
           $target_id_desc = "node ID (nid)";

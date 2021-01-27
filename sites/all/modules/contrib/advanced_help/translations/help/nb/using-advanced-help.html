@@ -89,8 +89,14 @@ $output .= '&nbsp;' . t('Click the help icon.');
 <p>Inne i en hjelpe-fil kan du lenke til andre hjelpe-emner ved å
 bruke dette formatet:</p>
 <pre>
-&lt;a href="&amp;topic:module/topic&amp;"&gt;topic&lt;/a&gt;
+&lt;a href="&amp;topic:moduleshortname/moduletopic&amp;"&gt;anchortext&lt;/a&gt;
+&lt;a href="&amp;topic:help_example/lorem&amp;"&gt;Lorem ipsum&lt;/a&gt;
 </pre>
+
+<p>Den andre linja viser hvordan du lenker til en hjelpeside
+tilhørende modulen med det korte navnet <code>help_example</code>, der
+hjelpe-emne er <code>lorem</code>.</p>
+
 <p>Ved å bruke dette formatet i stedet for standard-lenker vil sprettopp-status være konsistent når man trykker på lenker.</p>
 
 <p>For å referere til andre elementer som befinner seg i

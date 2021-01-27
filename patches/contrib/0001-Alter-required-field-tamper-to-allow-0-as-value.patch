@@ -12,17 +12,17 @@ index a18d540..aa37d21 100644
 --- a/plugins/required.inc
 +++ b/plugins/required.inc
 @@ -39,15 +39,21 @@ function feeds_tamper_required_form($importer, $element_key, $settings) {
- 
+
  function feeds_tamper_required_callback($result, $item_key, $element_key, &$field, $settings, $source) {
    if (!empty($settings['invert'])) {
 -    if (!empty($field)) {
 +    if (!empty($field) || $field == '0') {
        unset($result->items[$item_key]);
      }
- 
+
      return;
    }
- 
+
 -  if (!empty($field)) {
 -    return;
 +  if (!empty($field) || $field == '0') {
@@ -34,8 +34,8 @@ index a18d540..aa37d21 100644
 +      return;
 +    }
    }
- 
+
    unset($result->items[$item_key]);
--- 
+--
 2.1.4
 

@@ -5,7 +5,7 @@ index cd4a237..4dfcb54 100644
 @@ -186,6 +186,13 @@ function theme_colorbox_imagefield($variables) {
      $image = theme('image', $variables['image']);
    }
- 
+
 +  // Add Zoom Library
 +  $zoom_path = libraries_get_path('zoom');
 +  $js = $zoom_path . "/jquery.zoom.min.js";
@@ -21,7 +21,7 @@ index 567ad38..2d403aa 100644
 --- a/js/colorbox.js
 +++ b/js/colorbox.js
 @@ -21,6 +21,7 @@ Drupal.behaviors.initColorbox = {
- 
+
      // Use "data-colorbox-gallery" if set otherwise use "rel".
      settings.colorbox.rel = function () {
 +
@@ -40,4 +40,4 @@ index 567ad38..2d403aa 100644
 +
    }
  };
- 
+

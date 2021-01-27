@@ -17,9 +17,9 @@ index 3835f01..8ba5fb8 100644
      // @see https://www.drupal.org/node/2478339
 -    || $type === 'text_format'
 +    //    || $type === 'text_format'
- 
+
      // Ignore if the actual element has no #description set.
      || empty($element['#description'])
--- 
+--
 2.7.4
 

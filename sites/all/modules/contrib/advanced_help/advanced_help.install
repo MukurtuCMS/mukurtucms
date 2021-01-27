@@ -9,6 +9,11 @@
  */
 function advanced_help_uninstall() {
   variable_del('advanced_help_last_cron');
+  $sam = variable_get('search_active_modules', NULL);
+  if (!empty($sam)) {
+    unset($sam['advanced_help']);
+    variable_set('search_active_modules', $sam);
+  }
 }
 
 /**

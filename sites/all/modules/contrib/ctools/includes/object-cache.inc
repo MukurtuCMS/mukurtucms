@@ -21,12 +21,11 @@
  * @param $name
  *   The name of the object being stored.
  * @param $skip_cache
+ *   Deprecated in favor of drupal_static*
  *   Skip the memory cache, meaning this must be read from the db again.
  * @param $sid
  *   The session id, allowing someone to use Session API or their own solution;
  *   defaults to session_id().
- *
- * @deprecated $skip_cache is deprecated in favor of drupal_static*
  *
  * @return
  *   The data that was cached.

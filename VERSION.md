@@ -1,3 +1,10 @@
+## Mukurtu 2.1.7
+- Updated to Drupal 7.78
+- Fixed a bug where imported content would not use the correct field language
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.1.6
 - Updated to Drupal 7.74
 - Fixed a bug where new imported content would not use the default site language

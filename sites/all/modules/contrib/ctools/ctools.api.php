@@ -30,6 +30,8 @@ function hook_ctools_plugin_type() {
 }
 
 /**
+ * Tells CTools where to find module-defined plugins.
+ *
  * This hook is used to inform the CTools plugin system about the location of a
  * directory that should be searched for files containing plugins of a
  * particular type. CTools invokes this same hook for all plugins, using the
@@ -104,12 +106,12 @@ function hook_ctools_plugin_directory($owner, $plugin_type) {
  * This hook is useful for altering flags or other information that will be
  * used or possibly overriden by the process hook if defined.
  *
- * @param $plugin
+ * @param array $plugin
  *   An associative array defining a plugin.
- * @param $info
+ * @param array $info
  *   An associative array of plugin type info.
  */
-function hook_ctools_plugin_pre_alter(&$plugin, &$info) {
+function hook_ctools_plugin_pre_alter(array &$plugin, array &$info) {
   // Override a function defined by the plugin.
   if ($info['type'] == 'my_type') {
     $plugin['my_flag'] = 'new_value';
@@ -122,12 +124,12 @@ function hook_ctools_plugin_pre_alter(&$plugin, &$info) {
  * This hook is useful for overriding the final values for a plugin after it
  * has been processed.
  *
- * @param $plugin
+ * @param array $plugin
  *   An associative array defining a plugin.
- * @param $info
+ * @param array $info
  *   An associative array of plugin type info.
  */
-function hook_ctools_plugin_post_alter(&$plugin, &$info) {
+function hook_ctools_plugin_post_alter(array &$plugin, array &$info) {
   // Override a function defined by the plugin.
   if ($info['type'] == 'my_type') {
     $plugin['my_function'] = 'new_function';
@@ -144,9 +146,33 @@ function hook_ctools_plugin_post_alter(&$plugin, &$info) {
  *   An array of informations about the implementors of a certain api.
  *   The key of this array are the module names/theme names.
  */
-function hook_ctools_api_hook_alter(&$list) {
+function hook_ctools_api_hook_alter(array &$list) {
   // Alter the path of the node implementation.
   $list['node']['path'] = drupal_get_path('module', 'node');
+}
+
+/**
+ * Alter the available functions to be used in ctools math expression api.
+ *
+ * One use case would be to create your own function in your module and
+ * allow to use it in the math expression api.
+ *
+ * @param array $functions
+ *   An array which has the functions as value.
+ * @param array $context
+ *   An array containing an item 'final' whose value is a reference to the
+ *   definitions for multiple-arg functions. Use this to add in functions that
+ *   require more than one arg.
+ */
+function hook_ctools_math_expression_functions_alter(array &$functions, array $context) {
+  // Allow to convert from degrees to radians.
+  $functions[] = 'deg2rad';
+
+  $multiarg = $context['final'];
+  $multiarg['pow'] = array(
+    'function' => 'pow',
+    'arguments' => 2,
+  );
 }
 
 /**
@@ -155,27 +181,28 @@ function hook_ctools_api_hook_alter(&$list) {
  * One usecase would be to create your own function in your module and
  * allow to use it in the math expression api.
  *
- * @param $functions
- *   An array which has the functions as value.
+ * @param array $constants
+ *   An array of name:value pairs, one for each named constant. Values added
+ *   to this array become read-only variables with the value assigned here.
  */
-function hook_ctools_math_expression_functions_alter(&$functions) {
-  // Allow to convert from degrees to radiant.
-  $functions[] = 'deg2rad';
+function hook_ctools_math_expression_constants_alter(array &$constants) {
+  // Add the speed of light as constant 'c':
+  $constants['c'] = 299792458;
 }
 
 /**
  * Alter everything.
  *
- * @param $info
+ * @param array $info
  *   An associative array containing the following keys:
  *   - content: The rendered content.
  *   - title: The content's title.
  *   - no_blocks: A boolean to decide if blocks should be displayed.
- * @param $page
+ * @param bool $page
  *   If TRUE then this renderer owns the page and can use theme('page')
  *   for no blocks; if false, output is returned regardless of any no
  *   blocks settings.
- * @param $context
+ * @param array $context
  *   An associative array containing the following keys:
  *   - args: The raw arguments behind the contexts.
  *   - contexts: The context objects in use.
@@ -183,7 +210,7 @@ function hook_ctools_math_expression_functions_alter(&$functions) {
  *   - subtask: The subtask object in use.
  *   - handler: The handler object in use.
  */
-function hook_ctools_render_alter(&$info, &$page, &$context) {
+function hook_ctools_render_alter(array &$info, &$page, array &$context) {
   if ($context['handler']->name == 'my_handler') {
     ctools_add_css('my_module.theme', 'my_module');
   }
@@ -219,7 +246,7 @@ function hook_ctools_content_subtype_alter($subtype, $plugin) {
  * @param string $plugin_id
  *   The plugin ID, in the format NAME:KEY.
  */
-function hook_ctools_entity_context_alter(&$plugin, &$entity, $plugin_id) {
+function hook_ctools_entity_context_alter(array &$plugin, array &$entity, $plugin_id) {
   ctools_include('context');
   switch ($plugin_id) {
     case 'entity_id:taxonomy_term':
@@ -242,13 +269,13 @@ function hook_ctools_entity_context_alter(&$plugin, &$entity, $plugin_id) {
  *   A string associated with the plugin type, identifying the operation.
  * @param string $value
  *   The value being converted; this is the only return from the function.
- * @param $converter_options
+ * @param array $converter_options
  *   Array of key-value pairs to pass to a converter function from higher
  *   levels.
  *
  * @see ctools_context_convert_context()
  */
-function hook_ctools_context_converter_alter($context, $converter, &$value, $converter_options) {
+function hook_ctools_context_converter_alter(ctools_context $context, $converter, &$value, array $converter_options) {
   if ($converter === 'mystring') {
     $value = 'fixed';
   }
@@ -262,7 +289,7 @@ function hook_ctools_context_converter_alter($context, $converter, &$value, $con
  *
  * @see hook_ctools_entity_context_alter()
  */
-function hook_ctools_entity_contexts_alter(&$plugins) {
+function hook_ctools_entity_contexts_alter(array &$plugins) {
   $plugins['entity_id:taxonomy_term']['no ui'] = TRUE;
 }
 
@@ -274,7 +301,7 @@ function hook_ctools_entity_contexts_alter(&$plugins) {
  *
  * @see ctools_cleanstring()
  */
-function hook_ctools_cleanstring_alter(&$settings) {
+function hook_ctools_cleanstring_alter(array &$settings) {
   // Convert all strings to lower case.
   $settings['lower case'] = TRUE;
 }
@@ -287,7 +314,7 @@ function hook_ctools_cleanstring_alter(&$settings) {
  *
  * @see ctools_cleanstring()
  */
-function hook_ctools_cleanstring_CLEAN_ID_alter(&$settings) {
+function hook_ctools_cleanstring_CLEAN_ID_alter(array &$settings) {
   // Convert all strings to lower case.
   $settings['lower case'] = TRUE;
 }
@@ -304,7 +331,7 @@ function hook_ctools_cleanstring_CLEAN_ID_alter(&$settings) {
  *
  * @see ctools_context_handler_pre_render()
  */
-function ctools_context_handler_pre_render($handler, $contexts, $args) {
+function ctools_context_handler_pre_render($handler, array $contexts, array $args) {
   $handler->conf['css_id'] = 'my-id';
 }
 
