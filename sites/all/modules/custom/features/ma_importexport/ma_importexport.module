@@ -285,43 +285,44 @@ function ma_importexport_set_external_links_target($source, $entity, $target, $v
 }
 
 /**
- * Callback for ma_importexport_feeds_processor_targets_alter
+ * Callback for ma_importexport_feeds_processor_targets_alter.
  */
 function ma_importexport_set_target($source, $entity, $target, $value, $mapping) {
-    preg_match('/:guid_or_(.+)/', $target, $matches);
-    $new_target = str_replace($matches[0], '', $target);
-    $target_id_index = $matches[1];
+  preg_match('/:guid_or_(.+)/', $target, $matches);
+  $new_target = str_replace($matches[0], '', $target);
+  $field_info = field_info_field($new_target);
+  $target_id_name = array_keys($field_info['indexes'])[0];
 
-    $field_info = field_info_field($new_target);
-    $target_id_name = array_keys($field_info['indexes'])[0];
-
-    switch($field_info['type']) {
+  switch ($field_info['type']) {
     case 'entityreference':
-        $entity_type = $field_info['settings']['target_type'];
-        break;
-    case 'node_reference':
-        $entity_type = 'node';
-        break;
-    case 'atom_reference':
-        $entity_type = 'scald_atom';
-        break;
-    case 'paragraphs':
-        $entity_type = 'paragraphs_item';
-        break;
-    }
+      $entity_type = $field_info['settings']['target_type'];
+      break;
 
-    foreach($value as $id) {
-        if($id) {
-            // Check if ID is a valid GUID.  If so, we use that.
-            $guid = ma_importexport_feeds_lookup_entity_by_guid($entity_type, $id);
-            if(!$guid) {
-                // Otherwise we assume ID is a NID
-                $guid = $id;
-            }
-            $language = isset($entity->language) ? $entity->language : LANGUAGE_NONE;
-            $entity->{$new_target}[$language][][$target_id_name] = $guid;
-        }
+    case 'node_reference':
+      $entity_type = 'node';
+      break;
+
+    case 'atom_reference':
+      $entity_type = 'scald_atom';
+      break;
+
+    case 'paragraphs':
+      $entity_type = 'paragraphs_item';
+      break;
+  }
+
+  foreach ($value as $id) {
+    if ($id) {
+      // Check if ID is a valid GUID. If so, we use that.
+      $guid = ma_importexport_feeds_lookup_entity_by_guid($entity_type, $id);
+      if (!$guid) {
+        // Otherwise we assume ID is a NID.
+        $guid = $id;
+      }
+      $language = LANGUAGE_NONE;
+      $entity->{$new_target}[$language][][$target_id_name] = $guid;
     }
+  }
 }
 
 
