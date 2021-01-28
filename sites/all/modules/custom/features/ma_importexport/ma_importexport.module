@@ -291,7 +291,9 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
   preg_match('/:guid_or_(.+)/', $target, $matches);
   $new_target = str_replace($matches[0], '', $target);
   $field_info = field_info_field($new_target);
-  $target_id_name = array_keys($field_info['indexes'])[0];
+  $target_id_name = array_keys($field_info['indexes'])[0] ?? NULL;
+  $revision_target_name = NULL;
+  $target_entity = NULL;
 
   switch ($field_info['type']) {
     case 'entityreference':
@@ -308,6 +310,8 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
 
     case 'paragraphs':
       $entity_type = 'paragraphs_item';
+      $target_id_name = 'value';
+      $revision_target_name = 'revision_id';
       break;
   }
 
@@ -320,7 +324,20 @@ function ma_importexport_set_target($source, $entity, $target, $value, $mapping)
         $guid = $id;
       }
       $language = LANGUAGE_NONE;
-      $entity->{$new_target}[$language][][$target_id_name] = $guid;
+
+      // Build the reference array.
+      $field_value = array($target_id_name => $guid);
+
+      // Paragraphs require a revision ID as well.
+      if ($revision_target_name) {
+        $target_entity = entity_load($entity_type, array($guid))[$guid] ?? NULL;
+        if ($target_entity) {
+          $field_value[$revision_target_name] = $target_entity->revision_id;
+        }
+      }
+
+      // Attach the reference array to the field.
+      $entity->{$new_target}[$language][] = $field_value;
     }
   }
 }
