@@ -14,7 +14,7 @@ function ma_digitalheritage_taxonomy_default_vocabularies() {
       'name' => 'Category',
       'machine_name' => 'category',
       'description' => 'The cultural categories to which digital content refers. Associating content with one or more categories facilitates browsing.',
-      'hierarchy' => 0,
+      'hierarchy' => 1,
       'module' => 'taxonomy',
       'weight' => -10,
       'rdf_mapping' => array(

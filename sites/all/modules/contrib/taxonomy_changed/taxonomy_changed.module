@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * taxonomy_changed module file.
+ */
+
+/**
+ * Save last changed time when taxonomy presave.
+ *
+ * @see hook_taxonomy_term_presave()
+ */
+function taxonomy_changed_taxonomy_term_presave($term) {
+  $term->changed = REQUEST_TIME;
+}
+
+/**
+ * Allow modules to alter metadata about entity properties.
+ *
+ * @see hook_entity_property_info_alter()
+ */
+function taxonomy_changed_entity_property_info_alter(&$info) {
+  $properties = &$info['taxonomy_term']['properties'];
+
+  $properties['changed'] = array(
+    'label' => t("Date changed"),
+    'type' => 'date',
+    'schema field' => 'changed',
+    'description' => t("The date the taxonomy was most recently updated."),
+  );
+}
+
+/**
+ * Alter table structure.
+ *
+ * @see hook_views_data()
+ */
+function taxonomy_changed_views_data() {
+  $data['taxonomy_term_data']['changed'] = array(
+
+    // The item it appears as on the UI
+    'title' => t('Updated date'),
+
+    // The help that appears on the UI,
+    'help' => t('The date the term was last updated.'),
+    'field' => array(
+      'handler' => 'views_handler_field_date',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort_date',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_date',
+    ),
+  );
+
+  return $data;
+}
+
+/**
+ * Define taxonomy term display.
+ *
+ * @see hook_taxonomy_term_view()
+ */
+function taxonomy_changed_taxonomy_term_view($term, $view_mode, $langcode) {
+  $term->content['changed'] = array(
+    '#markup' => '<div class="meta changed"><span>Last changed on  ' . format_date($term->changed, $type = 'medium') . '</span></div>',
+    '#weight' => -1,
+    // @TODO
+    //'#theme' => 'taxonomy_changed_field',
+  );
+}

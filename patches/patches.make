@@ -198,9 +198,14 @@ projects[search_api_glossary][patch][] = contrib/index_display_and_sort_ALL_char
 projects[select2][patch][] = contrib/allow-drag-and-dropg-on-select2-fields-even-if-no-add-terms-on-fly.patch
 
 ;;; Services
-; Fix services issue with multivals
-; see https://www.drupal.org/project/services/issues/2224803
-projects[services][patch][] = contrib/fix_services_multivals-2224803-comment-8844431
+; Fix for submitting multi-value fields.
+projects[services][patch][] = https://www.drupal.org/files/issues/2019-05-09/services-multivalue_fields_fix-2224803-78.patch
+; Custom validation on paragraph fields.
+projects[services][patch][] = contrib/custom_validation_on_paragraph_fields.patch
+
+;;; Services Field Collection
+; Fix the sandbox project services_field_collection so that field collections can be created.
+projects[services_field_collection][patch][] = contrib/fix_services_field_collection_create.patch
 
 ;;; Tree (treeable)
 ; Skip treeable field formatter patch

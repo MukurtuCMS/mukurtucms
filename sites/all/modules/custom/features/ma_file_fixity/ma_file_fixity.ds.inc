@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * ma_file_fixity.ds.inc

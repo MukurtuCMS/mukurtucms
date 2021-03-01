@@ -10,6 +10,24 @@
  */
 function ma_community_default_cer() {
   $items = array();
+  $items['node:community:field_comm_dh_items*node:digital_heritage:field_community_ref'] = entity_import('cer', '{
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:community:field_comm_dh_items" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:digital_heritage:field_community_ref" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:community:field_comm_dh_items*node:digital_heritage:field_community_ref",
+    "rdf_mapping" : []
+  }');
+  $items['node:community:field_comm_protocols*node:cultural_protocol_group:og_group_ref'] = entity_import('cer', '{
+    "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
+    "cer_enabled" : { "und" : [ { "value" : "1" } ] },
+    "cer_left" : { "und" : [ { "path" : "node:community:field_comm_protocols" } ] },
+    "cer_right" : { "und" : [ { "path" : "node:cultural_protocol_group:og_group_ref" } ] },
+    "cer_weight" : { "und" : [ { "value" : "0" } ] },
+    "identifier" : "node:community:field_comm_protocols*node:cultural_protocol_group:og_group_ref",
+    "rdf_mapping" : []
+  }');
   $items['node:community:field_parent_community*node:community:field_child_communities'] = entity_import('cer', '{
     "cer_bidirectional" : { "und" : [ { "value" : "1" } ] },
     "cer_enabled" : { "und" : [ { "value" : "1" } ] },

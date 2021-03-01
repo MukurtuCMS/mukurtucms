@@ -81,7 +81,7 @@ function ma_dhan_node_insert($node) {
  * Implements hook_node_update().
  */
 function ma_dhan_node_update($node) {
-  
+
   ////
   // Update a DHAN when a DH node is updated.
   ////
@@ -666,11 +666,12 @@ function ma_dhan_get_dhan_nid($dh_nid) {
     ->propertyCondition('status', NODE_PUBLISHED)// or else it will retrieve node references for deleted DH items
     ->fieldCondition('field_following_content', 'target_id', $dh_nid)
     ->execute();
-  if (!count($result['node'])) {
-    watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $dh_nid), WATCHDOG_ERROR);
-    return;
+  if (isset($result['node'])) {
+    return reset($result['node'])->nid;
   }
-  return reset($result['node'])->nid;
+  else {
+    // This gets noisy, so leaving out: watchdog('ma_dhan', 'There is no DHAN for DH %nid', array('%nid' => $dh_nid), WATCHDOG_WARNING);
+  }
 }
 
 /**
