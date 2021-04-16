@@ -4,9 +4,8 @@ package = "Input filters"
 core = 7.x
 php = 5.3
 
-; Information added by Drupal.org packaging script on 2016-11-04
-version = "7.x-1.5"
+; Information added by Drupal.org packaging script on 2020-11-14
+version = "7.x-1.6"
 core = "7.x"
 project = "markdown"
-datestamp = "1478247850"
-
+datestamp = "1605348898"

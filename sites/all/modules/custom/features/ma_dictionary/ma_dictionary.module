@@ -212,51 +212,51 @@ function ma_dictionary_form_language_community_node_form_alter(&$form, &$form_st
   // Remove any languages that already have language communities
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'language_community')
-      ->addMetaData('account', user_load(1)); // Run the query as user 1.
+    ->entityCondition('bundle', 'language_community')
+    ->addMetaData('account', user_load(1)); // Run the query as user 1.
 
   $result = $query->execute();
 
   // Building list of language tids for existing communities
   $existing_language_tids = array();
-  if(isset($result['node'])) {
-      foreach($result['node'] as $result_node) {
-          $existing_language_community = node_load($result_node->nid);
-          if($existing_language_community && !empty($existing_language_community->field_community_language[LANGUAGE_NONE])) {
-              // Language communities only have one language association
-              $existing_language_tids[] = $existing_language_community->field_community_language[LANGUAGE_NONE][0]['tid'];
-          }
+  if (isset($result['node'])) {
+    foreach ($result['node'] as $result_node) {
+      $existing_language_community = node_load($result_node->nid);
+      if ($existing_language_community && !empty($existing_language_community->field_community_language[LANGUAGE_NONE])) {
+        // Language communities only have one language association
+        $existing_language_tids[] = $existing_language_community->field_community_language[LANGUAGE_NONE][0]['tid'];
       }
+    }
   }
 
   // If this is a pre-existing language community, don't remove its own language tid from the list
-  if(!empty($form['#node']->field_community_language)) {
-      $existing_key = array_search($form['#node']->field_community_language[LANGUAGE_NONE][0]['tid'], $existing_language_tids);
-      if($existing_key >= 0) {
-          unset($existing_language_tids[$existing_key]);
+  if (!empty($form['#node']->field_community_language)) {
+    foreach ($existing_language_tids as $key => $existing_tid) {
+      if ($existing_tid == $form['#node']->field_community_language[LANGUAGE_NONE][0]['tid']) {
+        unset($existing_language_tids[$key]);
       }
+    }
   }
 
   // Remove those tids from the form options
-  foreach($existing_language_tids as $language_tid) {
-      if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
-          unset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid]);
-      }
+  foreach ($existing_language_tids as $language_tid) {
+    if (isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid])) {
+      unset($form['field_community_language'][LANGUAGE_NONE]['#options'][$language_tid]);
+    }
   }
 
   // If a tid is passed as an argument, try and pre-populate fields
   $args = arg();
   $passed_tid = $args[count($args) - 1];
-  if(is_numeric($passed_tid) && $passed_tid > 0) {
-      $passed_term = taxonomy_term_load($passed_tid);
-      if(!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
-          if(isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
-              $form['field_community_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
-              $form['title']['#default_value'] = $passed_term->name . ' '. t('Language Community');
-          }
+  if (is_numeric($passed_tid) && $passed_tid > 0) {
+    $passed_term = taxonomy_term_load($passed_tid);
+    if (!empty($passed_term) && $passed_term->vocabulary_machine_name == 'language') {
+      if (isset($form['field_community_language'][LANGUAGE_NONE]['#options'][$passed_term->tid])) {
+        $form['field_community_language'][LANGUAGE_NONE]['#default_value'] = $passed_term->tid;
+        $form['title']['#default_value'] = $passed_term->name . ' ' . t('Language Community');
       }
+    }
   }
-
 }
 
 /**

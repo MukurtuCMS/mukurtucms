@@ -123,7 +123,7 @@
       var cookie = '';
 
       // Get a list of IDs, saparated by comma
-      for (i in this.state) {
+      for (var i in this.state) {
         if (cookie != '') {
           cookie += ',';
         }
@@ -190,7 +190,7 @@
 
       var afterToggle = function () {
         if (Drupal.CTools.CollapsibleCallbacksAfterToggle) {
-          for (i in Drupal.CTools.CollapsibleCallbacksAfterToggle) {
+          for (var i in Drupal.CTools.CollapsibleCallbacksAfterToggle) {
             Drupal.CTools.CollapsibleCallbacksAfterToggle[i]($container, handle, content, toggle);
           }
         }
@@ -198,7 +198,7 @@
 
       var clickMe = function () {
         if (Drupal.CTools.CollapsibleCallbacks) {
-          for (i in Drupal.CTools.CollapsibleCallbacks) {
+          for (var i in Drupal.CTools.CollapsibleCallbacks) {
             Drupal.CTools.CollapsibleCallbacks[i]($container, handle, content, toggle);
           }
         }

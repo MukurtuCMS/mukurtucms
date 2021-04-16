@@ -97,9 +97,9 @@ function page_manager_search_menu_alter(&$items, $task) {
  * Entry point for our overridden search page.
  */
 function page_manager_search_page($type) {
-  ctools_include('menu');
   // Get the arguments and construct a keys string out of them.
   $args = func_get_args();
+  ctools_include('menu');
 
   // We have to remove the $type.
   array_shift($args);

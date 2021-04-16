@@ -8,7 +8,7 @@ index 13f1780..c90ce7d 100644
    }
 -
  }
- 
+
  /**
 @@ -40,16 +39,22 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
    if (!is_array($value)) {
@@ -42,7 +42,7 @@ index 13f1780..c90ce7d 100644
 @@ -65,90 +70,276 @@ function scald_feeds_set_target($source, $entity, $target, $value) {
      $data[$entity_type] = $entity;
    }
- 
+
 -  $destination = 'public://';
    // Populate entity.
 -  $i = 0;
@@ -103,7 +103,7 @@ index 13f1780..c90ce7d 100644
 +
    $entity->{$target} = $field;
  }
- 
+
 +function _scald_feeds_copy_fields($form, &$atom) {
 +  $basic_fields = array(
 +			'field_scald_description',
@@ -184,7 +184,7 @@ index 13f1780..c90ce7d 100644
 +  if($temp_file === FALSE) {
      return FALSE;
    }
- 
+
 -  $file_array = (array) $file;
 -  if (!isset($file_array['filename'])) {
 -    $file = file_load($file_array['fid']);
@@ -220,7 +220,7 @@ index 13f1780..c90ce7d 100644
 -    case 'file':
 -      $target = 'scald_file';
 -      break;
- 
+
 -    case 'image':
 -    case 'video':
 -      $target = 'scald_thumbnail';
@@ -231,7 +231,7 @@ index 13f1780..c90ce7d 100644
 +  } else {
 +    return FALSE;
    }
- 
+
 -  $atom->{$target} = array(
 -    LANGUAGE_NONE => array(
 -      0 => $file_array,
@@ -247,7 +247,7 @@ index 13f1780..c90ce7d 100644
 +
 +  return scald_atom_save($atoms[0]);
  }
- 
+
 +
  /**
   * Suggests a Scald provider for the given file.
@@ -258,7 +258,7 @@ index 13f1780..c90ce7d 100644
 -function _scald_feeds_get_provider_by_file($file) {
 +function _scald_feeds_get_provider_by_mime_type($mime_type) {
    $type = 'file';
- 
+
 -  $fi = new finfo(FILEINFO_MIME);
 -  $mime = $fi->buffer(file_get_contents($file['uri']));
 -
@@ -273,7 +273,7 @@ index 13f1780..c90ce7d 100644
 +  elseif (strpos($mime_type, 'video/') === 0) {
      $type = 'video';
    }
- 
+
    return $type;
  }
 +

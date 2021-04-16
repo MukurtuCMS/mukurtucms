@@ -5,7 +5,7 @@ index fa90ec0..7eef5af 100644
 @@ -16,6 +16,49 @@ Drupal.behaviors.quicktabs = {
    }
  }
- 
+
 +// Enable tab memory.
 +// Relies on the jQuery Cookie plugin.
 +// @see http://plugins.jquery.com/cookie

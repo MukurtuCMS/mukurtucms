@@ -98,6 +98,12 @@ projects[feeds][patch][] = contrib/0002-Add-support-for-partial-updating-of-scal
 projects[feeds][patch][] = contrib/0001-Skip-protocol-field-OG-validation-during-import-for-.patch
 ; Change language handling for taxonomy import
 projects[feeds][patch][] = contrib/0001-Mukurtu-language-handling-for-taxonomy-import.patch
+; Change language handling for text import
+projects[feeds][patch][] = contrib/0001-Use-new-field-language-handling-in-feeds.patch
+
+;;; Feeds Files
+; Change entityValidate definition
+projects[feeds_file][patch][] = contrib/0001-Add-parameter-to-entityValidate-to-stop-warning.patch
 
 ;;; Feeds Tamper
 ; Alter required field tamper to allow 0 as value.
@@ -132,7 +138,7 @@ projects[og_invite][patch][] = contrib/0001-Go-back-to-using-default-view-but-re
 
 ;;; Geofield & Geofield Gmap
 ; Feeds Import Not Saving Geofield
-projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
+; projects[geofield][patch][] = https://www.drupal.org/files/issues/geofield-feeds_import_not_saving-2534822-17.patch
 
 ;;; Partial Date
 ; Add property info callback

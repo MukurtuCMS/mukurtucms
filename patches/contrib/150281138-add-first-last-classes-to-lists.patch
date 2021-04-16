@@ -20,7 +20,7 @@ index 7a10d70..b527bb6 100644
      foreach ($items as $key => $item) {
        $attributes = array();
 +      $i++;
- 
+
        if (is_array($item)) {
          $value = '';
 @@ -104,7 +107,12 @@ function bootstrap_item_list($variables) {
@@ -37,6 +37,6 @@ index 7a10d70..b527bb6 100644
        $output .= '<li' . drupal_attributes($attributes) . '>' . $value . "</li>\n";
      }
      $output .= "</$type>";
--- 
+--
 2.7.4
 

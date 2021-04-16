@@ -88,3 +88,12 @@ function ma_core_update_7107() {
     variable_set('site_403', 'mukurtu/access-denied');
   }
 }
+
+/**
+ * Disable and uninstall the Community Tags module.
+ */
+function ma_core_update_7108() {
+  if (module_exists('community_tags')) {
+    module_disable(array('community_tags'));
+  }
+}
