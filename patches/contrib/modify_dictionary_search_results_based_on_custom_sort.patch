@@ -13,5 +13,5 @@ index 314915f..ebad611 100644
 +      ma_dictionary_resort_search_results($results, $sorts['search_api_aggregation_2']);
 +    }
    }
- 
+
    /**

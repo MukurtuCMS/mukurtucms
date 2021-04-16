@@ -91,17 +91,7 @@ function taxonomy_feeds_set_target(FeedsSource $source, $entity, $target, array 
   // We want to use the node's language for the field language.
   // Mukurtu does not support field translation.
   if (stripos($source->id, 'mukurtu_import') !== FALSE) {
-    // The $entity coming from feeds doesn't necessarily have
-    // the correct langauge for the original node.
-    if (isset($entity->is_new) && $entity->is_new) {
-      // The node is new, use the default system language.
-      $language = language_default('language');
-    }
-    else {
-      // The node exists, grab it from the database.
-      $entity_language = db_query('SELECT language FROM {node} WHERE nid = :nid', array(':nid' => $entity->nid))->fetchField();
-      $language = $entity_language ? $entity_language : LANGUAGE_NONE;
-    }
+    $language = ma_importexport_get_field_language($entity->feeds_item->entity_type, $entity, $target);
   }
 
   // Add in default values.

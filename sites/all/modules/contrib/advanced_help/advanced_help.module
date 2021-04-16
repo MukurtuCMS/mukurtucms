@@ -113,9 +113,13 @@ function advanced_help_menu() {
  * Implements hook_menu_alter().
  */
 function advanced_help_menu_alter(&$callbacks) {
-  // We need to fix the menu item provided by search module to restrict access.
-  $callbacks['search/advanced_help/%menu_tail']['access callback'] = 'user_access';
-  $callbacks['search/advanced_help/%menu_tail']['access arguments'] = array('view advanced help index');
+  // Check if it advanced_help is registered.
+  $sam = variable_get('search_active_modules', NULL);
+  if (!empty($sam['advanced_help']) && 'advanced_help' == $sam['advanced_help']) {
+    // We need to fix the menu item provided by search module to restrict access.
+    $callbacks['search/advanced_help/%menu_tail']['access callback'] = 'user_access';
+    $callbacks['search/advanced_help/%menu_tail']['access arguments'] = array('view advanced help index');
+  }
 }
 
 /**
@@ -714,7 +718,7 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
             '<p>' .
             t('If you install the !module module, the text below will be filtered by the module, producing rich text.',
               array(
-                '!module' => l(t('Markdown filter'),
+                '!module' => l(t('Markdown'),
                   'https://www.drupal.org/project/markdown',
                   array('attributes' => array('title' => t('Link to project.'))))
               )) . '</p>';

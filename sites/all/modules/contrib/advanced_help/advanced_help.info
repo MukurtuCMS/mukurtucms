@@ -1,10 +1,9 @@
-name = Advanced help
+name = Advanced Help
 description = Provide extended help and documentation.
 core = 7.x
 
-
-; Information added by Drupal.org packaging script on 2018-10-25
-version = "7.x-1.5"
+; Information added by Drupal.org packaging script on 2020-04-29
+version = "7.x-1.6"
 core = "7.x"
 project = "advanced_help"
-datestamp = "1540469884"
+datestamp = "1588145925"

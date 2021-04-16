@@ -297,7 +297,7 @@ function page_manager_theme() {
  * Get the cached changes to a given task handler.
  */
 function page_manager_get_page_cache($task_name) {
-  $caches = drupal_static(__FUNCTION__, array());
+  $caches = &drupal_static(__FUNCTION__, array());
   if (!isset($caches[$task_name])) {
     ctools_include('object-cache');
     $cache = ctools_object_cache_get('page_manager_page', $task_name);

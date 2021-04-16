@@ -21,6 +21,6 @@ index 16d9a5c..956a746 100755
        this.attachOwlCarousel(element, settings[carousel].settings);
      },
 
--- 
+--
 1.9.1
 

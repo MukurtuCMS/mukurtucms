@@ -6,8 +6,8 @@ package = Chaos tool suite
 
 files[] = tests/head_links.test
 
-; Information added by Drupal.org packaging script on 2019-02-08
-version = "7.x-1.15"
+; Information added by Drupal.org packaging script on 2020-10-23
+version = "7.x-1.17"
 core = "7.x"
 project = "ctools"
-datestamp = "1549603691"
+datestamp = "1603490551"

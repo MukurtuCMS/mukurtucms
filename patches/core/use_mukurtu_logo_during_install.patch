@@ -3,7 +3,7 @@ index a158dde..07b49a2 100644
 --- a/maintenance-page.tpl.php
 +++ b/maintenance-page.tpl.php
 @@ -19,7 +19,13 @@
- 
+
      <?php if ($sidebar_first): ?>
        <div id="sidebar-first" class="sidebar">
 -        <?php if ($logo): ?>
