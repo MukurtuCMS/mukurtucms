@@ -54,7 +54,7 @@ function ma_importexport_feeds_after_parse(FeedsSource $source, FeedsParserResul
   // a missing guid will always return the first nid/sid that was
   // used with an empty guid. We'll lookup existing or provide
   // sane GUID values in the case that it is empty.
-  $result->language = 'en';
+  $result->language = language_default('language');
 
   if (!empty($result->items)) {
     foreach ($result->items as &$item) {
@@ -285,43 +285,61 @@ function ma_importexport_set_external_links_target($source, $entity, $target, $v
 }
 
 /**
- * Callback for ma_importexport_feeds_processor_targets_alter
+ * Callback for ma_importexport_feeds_processor_targets_alter.
  */
 function ma_importexport_set_target($source, $entity, $target, $value, $mapping) {
-    preg_match('/:guid_or_(.+)/', $target, $matches);
-    $new_target = str_replace($matches[0], '', $target);
-    $target_id_index = $matches[1];
+  preg_match('/:guid_or_(.+)/', $target, $matches);
+  $new_target = str_replace($matches[0], '', $target);
+  $field_info = field_info_field($new_target);
+  $target_id_name = array_keys($field_info['indexes'])[0] ?? NULL;
+  $revision_target_name = NULL;
+  $target_entity = NULL;
 
-    $field_info = field_info_field($new_target);
-    $target_id_name = array_keys($field_info['indexes'])[0];
-
-    switch($field_info['type']) {
+  switch ($field_info['type']) {
     case 'entityreference':
-        $entity_type = $field_info['settings']['target_type'];
-        break;
-    case 'node_reference':
-        $entity_type = 'node';
-        break;
-    case 'atom_reference':
-        $entity_type = 'scald_atom';
-        break;
-    case 'paragraphs':
-        $entity_type = 'paragraphs_item';
-        break;
-    }
+      $entity_type = $field_info['settings']['target_type'];
+      break;
 
-    foreach($value as $id) {
-        if($id) {
-            // Check if ID is a valid GUID.  If so, we use that.
-            $guid = ma_importexport_feeds_lookup_entity_by_guid($entity_type, $id);
-            if(!$guid) {
-                // Otherwise we assume ID is a NID
-                $guid = $id;
-            }
-            $language = isset($entity->language) ? $entity->language : LANGUAGE_NONE;
-            $entity->{$new_target}[$language][][$target_id_name] = $guid;
+    case 'node_reference':
+      $entity_type = 'node';
+      break;
+
+    case 'atom_reference':
+      $entity_type = 'scald_atom';
+      break;
+
+    case 'paragraphs':
+      $entity_type = 'paragraphs_item';
+      $target_id_name = 'value';
+      $revision_target_name = 'revision_id';
+      break;
+  }
+
+  foreach ($value as $id) {
+    if ($id) {
+      // Check if ID is a valid GUID. If so, we use that.
+      $guid = ma_importexport_feeds_lookup_entity_by_guid($entity_type, $id);
+      if (!$guid) {
+        // Otherwise we assume ID is a NID.
+        $guid = $id;
+      }
+      $language = LANGUAGE_NONE;
+
+      // Build the reference array.
+      $field_value = array($target_id_name => $guid);
+
+      // Paragraphs require a revision ID as well.
+      if ($revision_target_name) {
+        $target_entity = entity_load($entity_type, array($guid))[$guid] ?? NULL;
+        if ($target_entity) {
+          $field_value[$revision_target_name] = $target_entity->revision_id;
         }
+      }
+
+      // Attach the reference array to the field.
+      $entity->{$new_target}[$language][] = $field_value;
     }
+  }
 }
 
 
@@ -498,7 +516,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
   // Custom handling of Youtube and Vimeo URLs
   // This code is adapted from _ma_services_create_atom, which itself is adapted from scald provider code as commented there
 
-  if ($entity->type == 'digital_heritage') {
+  if (isset($entity->type) && $entity->type == 'digital_heritage') {
 
     foreach ($item['media assets'] as $media_asset_index => $media_asset) { // There can be multiple media assets in a single cell, separated by comma (feeds tamper explode), so loop through each
 
@@ -618,7 +636,7 @@ function ma_importexport_feeds_presave(FeedsSource $source, $entity, $item, $ent
   }
 
   // Replace embedded Scald atom GUIDs with local SIDs.
-  if (isset($scald_dnd_enabled_fields[$entity->type])) {
+  if (isset($entity->type) && isset($scald_dnd_enabled_fields[$entity->type])) {
     foreach ($scald_dnd_enabled_fields[$entity->type] as $field) {
       if (!empty($entity->{$field})) {
         foreach ($entity->{$field} as $language => $values) {
@@ -2457,4 +2475,41 @@ function ma_import_export_multiple_language_bug_report_form() {
   $form['table']['#markup'] = drupal_render($table);
   $form['rerun']['#markup'] = l("Run the Report Again", 'admin/reports/mukurtu/run-multiple-language-report');
   return $form;
+}
+
+/**
+ * Return the field language for a given entity/fieldname.
+ */
+function ma_importexport_get_field_language($entity_type, $entity, $fieldname) {
+  $field_language = field_language($entity_type, $entity, $fieldname);
+  if ($entity_type != 'node') {
+    return $field_language;
+  }
+
+  // Load the entity again fresh, no cache.
+  // This is hugely inefficient, but is the only reliable way
+  // we can find. This might not be necessary for sites that
+  // didn't have the community_tags bug.
+  if (isset($entity->is_new) && !$entity->is_new) {
+    $fresh_entity_id = entity_extract_ids($entity_type, $entity)[0] ?? NULL;
+    if (!$fresh_entity_id) {
+      return $field_language;
+    }
+    $fresh_entity = entity_load($entity_type, array($fresh_entity_id), array(), TRUE)[$fresh_entity_id];
+  } else {
+    if ($entity->language == LANGUAGE_NONE) {
+     $entity->language = language_default('language');
+    }
+    $fresh_entity = $entity;
+  }
+
+  // Get the edit form for the entity.
+  $edit_form = entity_form($entity_type, $fresh_entity);
+
+  // Get the language for the field from the edit form.
+  if (isset($edit_form[$fieldname]['#language'])) {
+    $field_language = $edit_form[$fieldname]['#language'];
+  }
+
+  return $field_language;
 }

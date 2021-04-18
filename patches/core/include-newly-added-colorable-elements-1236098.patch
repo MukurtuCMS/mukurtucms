@@ -4,10 +4,10 @@ index 7665631..0a3ca47 100644
 +++ b/color.module
 @@ -139,7 +139,7 @@ function color_get_palette($theme, $default = FALSE) {
    $palette = $info['schemes']['default']['colors'];
- 
+
    // Load variable.
 -  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette);
 +  return $default ? $palette : variable_get('color_' . $theme . '_palette', $palette) + $palette;
  }
- 
+
  /**
