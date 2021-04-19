@@ -383,6 +383,19 @@ function ma_culturalprotocol_form_cultural_protocol_group_node_form_alter(&$form
  * Implements hook_node_validate().
  */
 function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
+  // Confirm that the user has access to the selected protocols.
+  if (isset($node->og_group_ref[LANGUAGE_NONE])) {
+    $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+    foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+      if (!isset($value['target_id'])) {
+        continue;
+      }
+      if (!isset($allowed_protocols[$value['target_id']])) {
+        form_set_error('og_group_ref', 'Invalid protocol selected.');
+      }
+    }
+  }
+
   if ($node->type == 'cultural_protocol_group') {
 
     // Do not allow unsetting Parent Community for Communities that the user is not a Community Manager of
