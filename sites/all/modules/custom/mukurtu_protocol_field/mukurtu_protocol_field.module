@@ -46,10 +46,42 @@ function mukurtu_protocol_field_node_insert($node) {
  */
 function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
+  $disable_field = FALSE;
   $node_type = str_replace('_node_form', '', $form_id, $count);
   if ($count && ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type)) {
     // Hide the original Protocol field.
     $form['og_group_ref']['#access'] = FALSE;
+
+    if (isset($form['#node_edit_form']) and $form['#node_edit_form']) {
+      if (!isset($form['#node'])) {
+        return;
+      }
+      $node = $form['#node'];
+      $allowed_protocols = ma_cultural_protocol_get_cps_user_can_post_to();
+      $privacy_setting = $node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] ?? 'all';
+      if ($privacy_setting == 'all') {
+        foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+          if (!isset($allowed_protocols[$value['target_id']])) {
+            $disable_field = TRUE;
+            $form['og_group_ref']['#access'] = FALSE;
+            $form['field_item_privacy_setting']['#access'] = FALSE;
+          }
+        }
+      }
+
+      if ($privacy_setting == 'any') {
+        $form['og_group_ref']['#access'] = FALSE;
+        $form['field_item_privacy_setting']['#access'] = FALSE;
+        $disable_field = TRUE;
+        foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
+          if (isset($allowed_protocols[$value['target_id']])) {
+            $disable_field = FALSE;
+            $form['og_group_ref']['#access'] = TRUE;
+            $form['field_item_privacy_setting']['#access'] = TRUE;
+          }
+        }
+      }
+    }
 
     // Do not create this custom field for Book Pages
     if(isset($form_state['mukurtu_book_parent'])) {
@@ -66,7 +98,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
     }
 
     // Build the custom protocol field.
-    list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, $node_type);
+    list ($form, $form_state) = mukurtu_protocol_field_custom_field($form, $form_state, $node_type, FALSE, $disable_field);
 
   }
 }
@@ -75,7 +107,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
  * Build a custom protocol field. This is called both by the mukurtu_protocol_field module on node forms,
  * and by the Dublin Core XML importer form.
  */
-function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $import_form = FALSE) {
+function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $import_form = FALSE, $disabled = FALSE) {
   // Gather group field info
   if (isset($form['#group_children']['og_group_ref'])) {
     $form['#group_children']['oggroup_fieldset'] = $form['#group_children']['og_group_ref'];
@@ -255,6 +287,16 @@ function mukurtu_protocol_field_custom_field($form, $form_state, $node_type, $im
   // Validate the custom field.
   if (!$import_form) {
     array_unshift($form['#validate'], 'mukurtu_protocol_field_form_validate');
+  }
+
+  if ($disabled) {
+    $form['oggroup_fieldset']['#access'] = FALSE;
+    foreach ($form['oggroup_fieldset'] as $delta => $value) {
+      if (is_numeric($delta)) {
+        $form['oggroup_fieldset'][$delta]['dropdown_first']['#access'] = FALSE;
+        $form['oggroup_fieldset'][$delta]['dropdown_second']['#access'] = FALSE;
+      }
+    }
   }
 
   // Return the form and form_sate
