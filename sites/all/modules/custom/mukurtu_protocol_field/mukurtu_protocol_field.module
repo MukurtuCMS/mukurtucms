@@ -51,6 +51,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
   if ($count && ma_cultural_protocol_node_type_can_have_cp_except_hidden($node_type)) {
     // Hide the original Protocol field.
     $form['og_group_ref']['#access'] = FALSE;
+    $form['og_group_ref']['#mukurtu_mobile_access'] = TRUE;
 
     if (isset($form['#node_edit_form']) and $form['#node_edit_form']) {
       if (!isset($form['#node'])) {
@@ -64,6 +65,7 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
           if (!isset($allowed_protocols[$value['target_id']])) {
             $disable_field = TRUE;
             $form['og_group_ref']['#access'] = FALSE;
+            $form['og_group_ref']['#mukurtu_mobile_access'] = FALSE;
             $form['field_item_privacy_setting']['#access'] = FALSE;
           }
         }
@@ -71,12 +73,14 @@ function mukurtu_protocol_field_form_alter(&$form, &$form_state, $form_id) {
 
       if ($privacy_setting == 'any') {
         $form['og_group_ref']['#access'] = FALSE;
+        $form['og_group_ref']['#mukurtu_mobile_access'] = FALSE;
         $form['field_item_privacy_setting']['#access'] = FALSE;
         $disable_field = TRUE;
         foreach ($node->og_group_ref[LANGUAGE_NONE] as $delta => $value) {
           if (isset($allowed_protocols[$value['target_id']])) {
             $disable_field = FALSE;
             $form['og_group_ref']['#access'] = TRUE;
+            $form['og_group_ref']['#mukurtu_mobile_access'] = TRUE;
             $form['field_item_privacy_setting']['#access'] = TRUE;
           }
         }
