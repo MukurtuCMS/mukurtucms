@@ -253,7 +253,13 @@ function ma_importexport_set_partial_date_target($source, $entity, $target, $val
     $day = TRUE;
   }
 
-  $import_date = new DateTime($value[0]);
+  // If we just have the year, we need to specify the format.
+  // Otherwise, years in the 2000s get used as military time.
+  if (!$month && !$day) {
+    $import_date = DateTime::createFromFormat('Y', $value[0]);
+  } else {
+    $import_date = new DateTime($value[0]);
+  }
 
   if ($import_date) {
     $entity->{$target}[LANGUAGE_NONE][0]['from']['year'] = $import_date->format('Y');
