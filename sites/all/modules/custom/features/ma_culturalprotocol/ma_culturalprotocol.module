@@ -384,9 +384,22 @@ function ma_culturalprotocol_form_cultural_protocol_group_node_form_alter(&$form
  */
 function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
   if (ma_cultural_protocol_node_type_must_have_cp($node->type)) {
+    $missing = FALSE;
     // Don't allow empty protocol fields for items that require protocols.
-    if (ma_cultural_protocol_node_type_must_have_cp($node->type) && empty($node->og_group_ref[LANGUAGE_NONE])) {
+    if (empty($node->og_group_ref[LANGUAGE_NONE])) {
       form_set_error('og_group_ref', 'You must specify a protocol for this item.');
+      $missing = TRUE;
+    }
+
+    // Don't allow empty privacy setting for items that require protocols.
+    if (empty($node->field_item_privacy_setting[LANGUAGE_NONE])) {
+      form_set_error('field_item_privacy_setting', 'You must specify an item sharing setting.');
+      $missing = TRUE;
+    }
+
+    // If we have missing field values we don't need to do any more validation.
+    if ($missing) {
+      return;
     }
 
     // Validate protocols. This is primarily to handle users with bypass
