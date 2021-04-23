@@ -1189,14 +1189,6 @@ function variable_initialize($conf = array()) {
     $variables = $cached->data;
   }
   else {
-    // The variable cache was not available. It might mean that we are running
-    // on an empty database. In that case, just redirect the user to install.php,
-    // unless we've already been there.
-    if (!db_table_exists('variable') && !drupal_installation_attempted()) {
-      include_once DRUPAL_ROOT . '/includes/install.inc';
-      install_goto('install.php');
-    }
-
     // Cache miss. Avoid a stampede by acquiring a lock. If the lock fails to
     // acquire, optionally just continue with uncached processing.
     $name = 'variable_init';
