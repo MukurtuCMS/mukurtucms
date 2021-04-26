@@ -98,7 +98,7 @@ function ma_digitalheritage_node_update($node) {
 
     // Populate Community Records MM Field -- TW26327861
     // We work only by the parent record's children field because it always gets updated since the parent<>child records are a CER.
-    if (!$_SESSION['updating_mm_cr_field']) {
+    if (isset($_SESSION['force_update_cr_mm_field']) && !$_SESSION['updating_mm_cr_field']) {
       $new_crs = $dh_emw->field_community_record_children->value();
       $old_crs = $dh_emw_old->field_community_record_children->value();
       if ($new_crs <> $old_crs OR $_SESSION['force_update_mm_cr_field']) {
