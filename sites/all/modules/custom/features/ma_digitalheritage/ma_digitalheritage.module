@@ -144,7 +144,7 @@ function ma_digitalheritage_node_update($node) {
  */
 function ma_digitalheritage_node_postupdate($node) {
   if ($node->type == 'digital_heritage') {
-    if (!$_SESSION['force_update_cr_mm_field']) {
+    if (isset($_SESSION['force_update_cr_mm_field']) && !$_SESSION['force_update_cr_mm_field']) {
       $dh_emw = entity_metadata_wrapper('node', $node);
       $dh_emw_old = entity_metadata_wrapper('node', $node->original);
       if ($dh_emw->field_community_ref->value() <> $dh_emw_old->field_community_ref->value()) {
