@@ -392,7 +392,9 @@ function ma_culturalprotocol_node_validate($node, $form, &$form_state) {
     }
 
     // Don't allow empty privacy setting for items that require protocols.
-    if (empty($node->field_item_privacy_setting[LANGUAGE_NONE])) {
+    if (empty($node->field_item_privacy_setting[LANGUAGE_NONE])
+    || !isset($node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'])
+    || $node->field_item_privacy_setting[LANGUAGE_NONE][0]['value'] == NULL) {
       form_set_error('field_item_privacy_setting', 'You must specify an item sharing setting.');
       $missing = TRUE;
     }
