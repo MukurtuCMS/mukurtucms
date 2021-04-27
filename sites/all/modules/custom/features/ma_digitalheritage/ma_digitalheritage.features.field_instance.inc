@@ -3603,7 +3603,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'taxonomy',
+      'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
         'autocomplete_path' => 'taxonomy/autocomplete',
@@ -3611,7 +3611,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 32,
     ),
   );
@@ -4659,7 +4659,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'taxonomy',
+      'module' => 'options',
       'settings' => array(
         'apply_chosen' => '',
         'autocomplete_path' => 'taxonomy/autocomplete',
@@ -4667,7 +4667,7 @@ Longitude is a geographic coordinate used in conjunction with Latitude to precis
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
-      'type' => 'taxonomy_autocomplete',
+      'type' => 'options_select',
       'weight' => 31,
     ),
   );
