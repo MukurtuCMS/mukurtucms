@@ -370,7 +370,10 @@ function _ajax_get_community_dropdown_options($community_defaults_with_titles, $
   foreach ($group_ids as $group_id) {
     $group_node = node_load($group_id);
     if ($group_node->type == 'community') {
-      $postable_communities[$group_id] = $group_node->title;
+      $postable_protocols_for_community =_ajax_get_protocol_by_community_dropdown_options($group_id, [], FALSE);
+      if (count($postable_protocols_for_community)) {
+        $postable_communities[$group_id] = $group_node->title;
+      }
     }
   }
   $referenceable_communities = array(0 => 'Select a community') + $community_defaults_with_titles + $postable_communities;
