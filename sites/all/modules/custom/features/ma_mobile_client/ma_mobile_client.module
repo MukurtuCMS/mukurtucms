@@ -1062,14 +1062,6 @@ function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
 
   // Build $fields_and_fieldgroups out of the node form fields (skipping the ones we don't want), body, title, and the field groups.
   $fields_and_fieldgroups = [];
-  $skip_fields = [
-//    'field_book_children',
-//    'field_book_parent',
-    'field_pre_actions',
-    'oggroup_fieldset',
-    'field_community_record_parent',
-    'field_community_record_children',
-  ];
   $special_fields = [
     'title',
     'body',
@@ -1081,7 +1073,7 @@ function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
     'og_group_ref',
   ];
   foreach ($form as $key => $value) {
-    if (!in_array($key, $skip_fields) AND (in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
+    if ((in_array($key, $special_fields) OR substr($key, 0, 6) == 'field_')) {
 
       $field_info = field_info_field($key);
 
@@ -1115,6 +1107,18 @@ function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
         }
       }
 
+      // Specify skip fields for the app to handle.
+      $skip_fields = [
+        'field_book_children',
+        'field_pre_actions',
+        'oggroup_fieldset',
+        'field_community_record_children',
+      ];
+      foreach ($skip_fields as $skip_field) {
+        if (isset($fields_and_fieldgroups[$skip_field])) {
+          $fields_and_fieldgroups[$skip_field]['#skip_on_mobile'] = TRUE;
+        }
+      }
 
       // Set the field.
       $fields_and_fieldgroups[$key] = $value;
