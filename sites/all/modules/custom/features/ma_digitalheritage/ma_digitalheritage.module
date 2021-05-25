@@ -776,6 +776,7 @@ function ma_digitalheritage_dh_form_after_build($form, &$form_state) {
  * Implements hook_node_submit().
  */
 function ma_digitalheritage_node_submit($node, $form, &$form_state) {
+  return;
   // Restore saved book parent info
   if (!empty($form_state['mukurtu_book_parent'])) {
     $book_parent = node_load($form_state['mukurtu_book_parent']);
@@ -790,6 +791,7 @@ function ma_digitalheritage_node_submit($node, $form, &$form_state) {
  * Implements hook_node_validate().
  */
 function ma_digitalheritage_node_validate($node, $form, &$form_state) {
+  return;
   if ($node->type == 'digital_heritage') {
     $original_node = node_load($node->nid);
 
@@ -800,7 +802,6 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
         $original_community_records[] = $original_child['target_id'];
       }
     }
-
     $new_community_records = [];
     if (isset($node->field_community_record_children)) {
       foreach ($node->field_community_record_children[LANGUAGE_NONE] as $new_child) {
@@ -812,7 +813,6 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
         }
       }
     }
-
     foreach ($original_community_records as $original_child) {
       if (!in_array($original_child, $new_community_records)) {
         form_set_error('field_community_record_children', t('Do not remove Community Records here. Instead, edit the Community Record, then press "Delete". Note, only the creator of the Community Record can delete it.'));
@@ -826,7 +826,6 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
         $original_book_pages[] = $original_child['target_id'];
       }
     }
-
     $new_book_pages = [];
     if (isset($node->field_book_children)) {
       foreach ($node->field_book_children[LANGUAGE_NONE] as $new_child) {
@@ -838,7 +837,6 @@ function ma_digitalheritage_node_validate($node, $form, &$form_state) {
         }
       }
     }
-
     foreach ($original_book_pages as $original_child) {
       if (!in_array($original_child, $new_book_pages)) {
         form_set_error('field_book_children', t('Do not remove Book Pages here. Instead, edit the Book Page, then press "Delete".'));
