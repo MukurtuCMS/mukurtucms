@@ -1113,6 +1113,7 @@ function _ma_mobile_client_get_node_form_fields ($fn, $bundle, $fc = FALSE) {
         'field_pre_actions',
         'oggroup_fieldset',
         'field_community_record_children',
+        'field_community_record_parent',
       ];
       foreach ($skip_fields as $skip_field) {
         if (isset($fields_and_fieldgroups[$skip_field])) {
