@@ -1,3 +1,11 @@
+## Mukurtu 2.1.8
+- Updated to Drupal 7.80
+- Updated handling of Soundcloud API
+- Fixed a date format bug for original date field import
+
+#### Manual Upgrade Steps
+- database update: `drush updb`
+
 ## Mukurtu 2.1.7
 - Updated to Drupal 7.78
 - Fixed a bug where imported content would not use the correct field language
