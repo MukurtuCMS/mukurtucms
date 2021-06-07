@@ -160,7 +160,8 @@ function ma_digitalheritage_field_group_info() {
       3 => 'digital_heritage_page_number',
       4 => 'featured_content_type',
       5 => 'mukurtu_icon_actions',
-      6 => 'title',
+      6 => 'mukurtu_mobile_sync',
+      7 => 'title',
     ),
     'format_type' => 'div',
     'format_settings' => array(

@@ -222,7 +222,7 @@ function ma_digitalheritage_ds_field_settings_info() {
   $ds_fieldsetting->view_mode = 'search_result';
   $ds_fieldsetting->settings = array(
     'digital_heritage_page_number' => array(
-      'weight' => '4',
+      'weight' => '5',
       'label' => 'hidden',
       'format' => 'default',
     ),
@@ -232,6 +232,11 @@ function ma_digitalheritage_ds_field_settings_info() {
       'format' => 'default',
     ),
     'mukurtu_icon_actions' => array(
+      'weight' => '4',
+      'label' => 'hidden',
+      'format' => 'default',
+    ),
+    'mukurtu_mobile_sync' => array(
       'weight' => '3',
       'label' => 'hidden',
       'format' => 'default',
