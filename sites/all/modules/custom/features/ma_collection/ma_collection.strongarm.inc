@@ -156,11 +156,55 @@ function ma_collection_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__collection';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '2',
+        ),
+        'redirect' => array(
+          'weight' => '3',
+        ),
+        'title' => array(
+          'weight' => '3',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
+      'collections_browse' => array(
+        'custom_settings' => TRUE,
+      ),
+      'community_record' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
         'custom_settings' => TRUE,
       ),
       'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'revision' => array(
         'custom_settings' => FALSE,
       ),
       'rss' => array(
@@ -172,65 +216,21 @@ function ma_collection_strongarm() {
       'search_result' => array(
         'custom_settings' => TRUE,
       ),
-      'diff_standard' => array(
+      'taxonomy_record_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teacher_view' => array(
+        'custom_settings' => FALSE,
+      ),
+      'teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'thumbed' => array(
         'custom_settings' => FALSE,
       ),
       'token' => array(
         'custom_settings' => FALSE,
       ),
-      'revision' => array(
-        'custom_settings' => FALSE,
-      ),
-      'thumbed' => array(
-        'custom_settings' => FALSE,
-      ),
-      'community_record' => array(
-        'custom_settings' => FALSE,
-      ),
-      'map_popup' => array(
-        'custom_settings' => FALSE,
-      ),
-      'taxonomy_record_teaser' => array(
-        'custom_settings' => FALSE,
-      ),
-      'person_teaser' => array(
-        'custom_settings' => FALSE,
-      ),
-      'collections_browse' => array(
-        'custom_settings' => TRUE,
-      ),
-      'featured_content' => array(
-        'custom_settings' => TRUE,
-      ),
-      'dictionary_word_summary' => array(
-        'custom_settings' => FALSE,
-      ),
-      'related_person_teaser' => array(
-        'custom_settings' => FALSE,
-      ),
-      'ical' => array(
-        'custom_settings' => FALSE,
-      ),
-      'mukurtu_mobile' => array(
-        'custom_settings' => TRUE,
-      ),
-      'teacher_view' => array(
-        'custom_settings' => FALSE,
-      ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '3',
-        ),
-        'path' => array(
-          'weight' => '2',
-        ),
-        'redirect' => array(
-          'weight' => '3',
-        ),
-      ),
-      'display' => array(),
     ),
   );
   $export['field_bundle_settings_node__collection'] = $strongarm;
@@ -240,11 +240,55 @@ function ma_collection_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__personal_collection';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '3',
+        ),
+        'redirect' => array(
+          'weight' => '2',
+        ),
+        'title' => array(
+          'weight' => '0',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
-        'custom_settings' => TRUE,
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'community_record' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
+        'custom_settings' => FALSE,
       ),
       'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => FALSE,
+      ),
+      'revision' => array(
         'custom_settings' => FALSE,
       ),
       'rss' => array(
@@ -256,65 +300,21 @@ function ma_collection_strongarm() {
       'search_result' => array(
         'custom_settings' => TRUE,
       ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
-      'thumbed' => array(
-        'custom_settings' => FALSE,
-      ),
-      'community_record' => array(
-        'custom_settings' => FALSE,
-      ),
-      'map_popup' => array(
-        'custom_settings' => FALSE,
-      ),
       'taxonomy_record_teaser' => array(
-        'custom_settings' => FALSE,
-      ),
-      'person_teaser' => array(
-        'custom_settings' => FALSE,
-      ),
-      'revision' => array(
-        'custom_settings' => FALSE,
-      ),
-      'collections_browse' => array(
-        'custom_settings' => FALSE,
-      ),
-      'dictionary_word_summary' => array(
-        'custom_settings' => FALSE,
-      ),
-      'featured_content' => array(
-        'custom_settings' => FALSE,
-      ),
-      'related_person_teaser' => array(
-        'custom_settings' => FALSE,
-      ),
-      'mukurtu_mobile' => array(
-        'custom_settings' => TRUE,
-      ),
-      'ical' => array(
         'custom_settings' => FALSE,
       ),
       'teacher_view' => array(
         'custom_settings' => FALSE,
       ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '0',
-        ),
-        'path' => array(
-          'weight' => '3',
-        ),
-        'redirect' => array(
-          'weight' => '2',
-        ),
+      'teaser' => array(
+        'custom_settings' => TRUE,
       ),
-      'display' => array(),
+      'thumbed' => array(
+        'custom_settings' => FALSE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
   );
   $export['field_bundle_settings_node__personal_collection'] = $strongarm;

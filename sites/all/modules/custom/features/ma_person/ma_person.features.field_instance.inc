@@ -131,6 +131,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -151,6 +152,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -166,6 +168,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -198,6 +201,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -261,6 +265,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -281,6 +286,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -296,6 +302,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'exif',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -328,6 +335,7 @@ function ma_person_field_default_field_instances() {
         'label' => 'above',
         'module' => 'date',
         'settings' => array(
+          'custom_date_format' => '',
           'format_type' => 'long',
           'fromto' => 'both',
           'multiple_from' => '',
@@ -1381,7 +1389,7 @@ function ma_person_field_default_field_instances() {
     'bundle' => 'person',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
     'display' => array(
@@ -1611,7 +1619,7 @@ function ma_person_field_default_field_instances() {
     'bundle' => 'person_relationship_bundle',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'default_value_function' => '',
     'deleted' => 0,
     'description' => '',

@@ -339,6 +339,16 @@ function ma_dictionary_ds_field_settings_info() {
         'ft' => array(),
       ),
       'label' => 'hidden',
+      'weight' => '4',
+    ),
+    'mukurtu_icon_actions' => array(
+      'format' => 'default',
+      'label' => 'hidden',
+      'weight' => '3',
+    ),
+    'mukurtu_mobile_sync' => array(
+      'format' => 'default',
+      'label' => 'hidden',
       'weight' => '2',
     ),
     'title' => array(
@@ -355,7 +365,7 @@ function ma_dictionary_ds_field_settings_info() {
     'word_list_count' => array(
       'format' => 'default',
       'label' => 'hidden',
-      'weight' => '3',
+      'weight' => '5',
     ),
   );
   $export['node|word_list|search_result'] = $ds_fieldsetting;
@@ -1114,6 +1124,8 @@ function ma_dictionary_ds_layout_settings_info() {
       'featured_content_type' => 'right',
       'field_collection_image' => 'left',
       'field_collection_summary' => 'right',
+      'mukurtu_icon_actions' => 'right',
+      'mukurtu_mobile_sync' => 'right',
       'title' => 'right',
       'word_list_count' => 'right',
     ),
@@ -1129,9 +1141,11 @@ function ma_dictionary_ds_layout_settings_info() {
       ),
       'right' => array(
         1 => 'title',
-        2 => 'featured_content_type',
-        3 => 'word_list_count',
-        4 => 'field_collection_summary',
+        2 => 'mukurtu_mobile_sync',
+        3 => 'mukurtu_icon_actions',
+        4 => 'featured_content_type',
+        5 => 'word_list_count',
+        6 => 'field_collection_summary',
       ),
     ),
     'wrappers' => array(

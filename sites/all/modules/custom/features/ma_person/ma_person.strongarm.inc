@@ -93,11 +93,52 @@ function ma_person_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_node__person';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(
+        'path' => array(
+          'weight' => '5',
+        ),
+        'redirect' => array(
+          'weight' => '4',
+        ),
+        'title' => array(
+          'weight' => '1',
+        ),
+      ),
+    ),
     'view_modes' => array(
-      'teaser' => array(
+      'collections_browse' => array(
+        'custom_settings' => FALSE,
+      ),
+      'community_record' => array(
+        'custom_settings' => FALSE,
+      ),
+      'dictionary_word_summary' => array(
+        'custom_settings' => FALSE,
+      ),
+      'diff_standard' => array(
+        'custom_settings' => FALSE,
+      ),
+      'featured_content' => array(
         'custom_settings' => TRUE,
       ),
       'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'ical' => array(
+        'custom_settings' => FALSE,
+      ),
+      'map_popup' => array(
+        'custom_settings' => FALSE,
+      ),
+      'person_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'related_person_teaser' => array(
+        'custom_settings' => TRUE,
+      ),
+      'revision' => array(
         'custom_settings' => FALSE,
       ),
       'rss' => array(
@@ -109,65 +150,21 @@ function ma_person_strongarm() {
       'search_result' => array(
         'custom_settings' => TRUE,
       ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
-      'thumbed' => array(
-        'custom_settings' => FALSE,
-      ),
-      'community_record' => array(
-        'custom_settings' => FALSE,
-      ),
-      'map_popup' => array(
-        'custom_settings' => FALSE,
-      ),
-      'revision' => array(
-        'custom_settings' => FALSE,
-      ),
-      'person_teaser' => array(
-        'custom_settings' => TRUE,
-      ),
       'taxonomy_record_teaser' => array(
-        'custom_settings' => TRUE,
-      ),
-      'collections_browse' => array(
-        'custom_settings' => FALSE,
-      ),
-      'dictionary_word_summary' => array(
-        'custom_settings' => FALSE,
-      ),
-      'featured_content' => array(
-        'custom_settings' => TRUE,
-      ),
-      'related_person_teaser' => array(
-        'custom_settings' => TRUE,
-      ),
-      'ical' => array(
-        'custom_settings' => FALSE,
-      ),
-      'mukurtu_mobile' => array(
         'custom_settings' => TRUE,
       ),
       'teacher_view' => array(
         'custom_settings' => FALSE,
       ),
-    ),
-    'extra_fields' => array(
-      'form' => array(
-        'title' => array(
-          'weight' => '15',
-        ),
-        'path' => array(
-          'weight' => '5',
-        ),
-        'redirect' => array(
-          'weight' => '4',
-        ),
+      'teaser' => array(
+        'custom_settings' => TRUE,
       ),
-      'display' => array(),
+      'thumbed' => array(
+        'custom_settings' => FALSE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
   );
   $export['field_bundle_settings_node__person'] = $strongarm;
@@ -177,38 +174,38 @@ function ma_person_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_paragraphs_item__person_relationship_bundle';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(),
+    ),
     'view_modes' => array(
-      'paragraphs_editor_preview' => array(
-        'custom_settings' => TRUE,
-      ),
-      'mukurtu_mobile' => array(
-        'custom_settings' => TRUE,
-      ),
-      'full' => array(
-        'custom_settings' => FALSE,
-      ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
       'dictionary_teaser' => array(
         'custom_settings' => FALSE,
       ),
       'dictionary_word_summary' => array(
         'custom_settings' => FALSE,
       ),
-      'word_entry_search_results' => array(
+      'diff_standard' => array(
         'custom_settings' => FALSE,
       ),
       'featured_content' => array(
         'custom_settings' => FALSE,
       ),
-    ),
-    'extra_fields' => array(
-      'form' => array(),
-      'display' => array(),
+      'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'paragraphs_editor_preview' => array(
+        'custom_settings' => TRUE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'word_entry_search_results' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
   );
   $export['field_bundle_settings_paragraphs_item__person_relationship_bundle'] = $strongarm;
@@ -218,38 +215,38 @@ function ma_person_strongarm() {
   $strongarm->api_version = 1;
   $strongarm->name = 'field_bundle_settings_paragraphs_item__text_section';
   $strongarm->value = array(
+    'extra_fields' => array(
+      'display' => array(),
+      'form' => array(),
+    ),
     'view_modes' => array(
-      'paragraphs_editor_preview' => array(
-        'custom_settings' => TRUE,
-      ),
-      'mukurtu_mobile' => array(
-        'custom_settings' => TRUE,
-      ),
-      'full' => array(
-        'custom_settings' => FALSE,
-      ),
-      'diff_standard' => array(
-        'custom_settings' => FALSE,
-      ),
-      'token' => array(
-        'custom_settings' => FALSE,
-      ),
       'dictionary_teaser' => array(
         'custom_settings' => FALSE,
       ),
       'dictionary_word_summary' => array(
         'custom_settings' => FALSE,
       ),
-      'word_entry_search_results' => array(
+      'diff_standard' => array(
         'custom_settings' => FALSE,
       ),
       'featured_content' => array(
         'custom_settings' => FALSE,
       ),
-    ),
-    'extra_fields' => array(
-      'form' => array(),
-      'display' => array(),
+      'full' => array(
+        'custom_settings' => FALSE,
+      ),
+      'mukurtu_mobile' => array(
+        'custom_settings' => TRUE,
+      ),
+      'paragraphs_editor_preview' => array(
+        'custom_settings' => TRUE,
+      ),
+      'token' => array(
+        'custom_settings' => FALSE,
+      ),
+      'word_entry_search_results' => array(
+        'custom_settings' => FALSE,
+      ),
     ),
   );
   $export['field_bundle_settings_paragraphs_item__text_section'] = $strongarm;

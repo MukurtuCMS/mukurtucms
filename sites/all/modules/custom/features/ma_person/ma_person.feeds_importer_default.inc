@@ -16,77 +16,85 @@ function ma_person_feeds_importer_default() {
   $feeds_importer->api_version = 1;
   $feeds_importer->id = 'import_people';
   $feeds_importer->config = array(
-    'name' => 'Import People',
+    'content_type' => '',
     'description' => 'Import content of the \'Person\' type',
+    'expire_period' => 3600,
     'fetcher' => array(
-      'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
         'allowed_extensions' => 'csv',
+        'allowed_schemes' => array(
+          'private' => 'private',
+          'public' => 'public',
+        ),
         'delete_uploaded_file' => 0,
         'direct' => 0,
         'directory' => 'private://feeds',
-        'allowed_schemes' => array(
-          'public' => 'public',
-          'private' => 'private',
-        ),
       ),
+      'plugin_key' => 'FeedsFileFetcher',
     ),
+    'import_on_create' => 1,
+    'import_period' => '-1',
+    'name' => 'Import People',
     'parser' => array(
-      'plugin_key' => 'FeedsCSVParser',
       'config' => array(
         'delimiter' => ',',
         'encoding' => 'UTF-8',
         'no_headers' => 0,
       ),
+      'plugin_key' => 'FeedsCSVParser',
     ),
+    'process_in_background' => 0,
     'processor' => array(
-      'plugin_key' => 'FeedsNodeProcessor',
       'config' => array(
-        'expire' => '-1',
         'author' => 0,
         'authorize' => 1,
+        'bundle' => 'person',
+        'expire' => '-1',
+        'input_format' => 'full_html',
+        'insert_new' => '1',
+        'language' => 'und',
         'mappings' => array(
           0 => array(
+            'language' => 'und',
             'source' => 'guid',
             'target' => 'guid',
             'unique' => 1,
-            'language' => 'und',
           ),
           1 => array(
+            'language' => 'und',
             'source' => 'nid',
             'target' => 'nid',
             'unique' => 1,
-            'language' => 'und',
           ),
           2 => array(
+            'language' => 'und',
             'source' => 'Name',
             'target' => 'title',
             'unique' => FALSE,
-            'language' => 'und',
           ),
           3 => array(
+            'language' => 'und',
             'source' => 'Media Assets',
             'target' => 'field_media_asset',
             'unique' => FALSE,
-            'language' => 'und',
           ),
           4 => array(
+            'language' => 'und',
             'source' => 'Date Born',
             'target' => 'field_date_born:start',
             'unique' => FALSE,
-            'language' => 'und',
           ),
           5 => array(
+            'language' => 'und',
             'source' => 'Date Died',
             'target' => 'field_date_died:start',
             'unique' => FALSE,
-            'language' => 'und',
           ),
           6 => array(
+            'language' => 'und',
             'source' => 'Deceased',
             'target' => 'field_deceased',
             'unique' => FALSE,
-            'language' => 'und',
           ),
           7 => array(
             'source' => 'Term Attachments',
@@ -94,21 +102,13 @@ function ma_person_feeds_importer_default() {
             'unique' => FALSE,
           ),
         ),
-        'insert_new' => '1',
+        'skip_hash_check' => 0,
         'update_existing' => '2',
         'update_non_existent' => 'skip',
-        'input_format' => 'full_html',
-        'skip_hash_check' => 0,
-        'bundle' => 'person',
-        'language' => 'und',
       ),
+      'plugin_key' => 'FeedsNodeProcessor',
     ),
-    'content_type' => '',
     'update' => 0,
-    'import_period' => '-1',
-    'expire_period' => 3600,
-    'import_on_create' => 1,
-    'process_in_background' => 0,
   );
   $export['import_people'] = $feeds_importer;
 
@@ -117,68 +117,68 @@ function ma_person_feeds_importer_default() {
   $feeds_importer->api_version = 1;
   $feeds_importer->id = 'import_people_taxonomy_terms';
   $feeds_importer->config = array(
-    'name' => 'Import People Taxonomy Terms',
+    'content_type' => '',
     'description' => '',
+    'expire_period' => 3600,
     'fetcher' => array(
-      'plugin_key' => 'FeedsFileFetcher',
       'config' => array(
         'allowed_extensions' => 'txt csv tsv xml opml',
-        'direct' => FALSE,
-        'delete_uploaded_file' => FALSE,
-        'directory' => 'private://feeds',
         'allowed_schemes' => array(
           0 => 'public',
           1 => 'private',
         ),
+        'delete_uploaded_file' => FALSE,
+        'direct' => FALSE,
+        'directory' => 'private://feeds',
       ),
+      'plugin_key' => 'FeedsFileFetcher',
     ),
+    'import_on_create' => 1,
+    'import_period' => '-1',
+    'name' => 'Import People Taxonomy Terms',
     'parser' => array(
-      'plugin_key' => 'FeedsCSVParser',
       'config' => array(
         'delimiter' => ',',
-        'no_headers' => 0,
         'encoding' => 'UTF-8',
+        'no_headers' => 0,
       ),
+      'plugin_key' => 'FeedsCSVParser',
     ),
+    'process_in_background' => 0,
     'processor' => array(
-      'plugin_key' => 'FeedsTermProcessor',
       'config' => array(
-        'vocabulary' => 'category',
+        'bundle' => 'people',
+        'input_format' => 'full_html',
+        'insert_new' => '1',
+        'language' => 'und',
         'mappings' => array(
           0 => array(
+            'language' => 'und',
             'source' => 'guid',
             'target' => 'guid',
             'unique' => 1,
-            'language' => 'und',
           ),
           1 => array(
+            'language' => 'und',
             'source' => 'Term name',
             'target' => 'name',
             'unique' => 1,
-            'language' => 'und',
           ),
           2 => array(
+            'language' => 'und',
             'source' => 'Term description',
             'target' => 'description',
             'unique' => FALSE,
-            'language' => 'und',
           ),
         ),
-        'update_existing' => '2',
-        'input_format' => 'full_html',
-        'insert_new' => '1',
-        'update_non_existent' => 'skip',
         'skip_hash_check' => 0,
-        'bundle' => 'people',
-        'language' => 'und',
+        'update_existing' => '2',
+        'update_non_existent' => 'skip',
+        'vocabulary' => 'category',
       ),
+      'plugin_key' => 'FeedsTermProcessor',
     ),
-    'content_type' => '',
     'update' => 0,
-    'import_period' => '-1',
-    'expire_period' => 3600,
-    'import_on_create' => 1,
-    'process_in_background' => 0,
   );
   $export['import_people_taxonomy_terms'] = $feeds_importer;
 

@@ -87,7 +87,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 4,
+        'weight' => 5,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -257,7 +257,7 @@ function ma_collection_field_default_field_instances() {
         'module' => 'text',
         'settings' => array(),
         'type' => 'text_default',
-        'weight' => 3,
+        'weight' => 4,
       ),
       'teaser' => array(
         'label' => 'inline',
@@ -461,7 +461,7 @@ function ma_collection_field_default_field_instances() {
     'bundle' => 'collection',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -524,6 +524,7 @@ function ma_collection_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -753,6 +754,7 @@ function ma_collection_field_default_field_instances() {
       'active' => 1,
       'module' => 'options',
       'settings' => array(
+        'apply_chosen' => '',
         'treeable' => 0,
         'use_select2' => FALSE,
       ),
@@ -989,7 +991,7 @@ function ma_collection_field_default_field_instances() {
     'bundle' => 'collection',
     'custom_add_another' => '',
     'custom_remove' => '',
-    'default_value' => NULL,
+    'default_value' => array(),
     'deleted' => 0,
     'description' => 'Keywords provide added ways to group your content. They make it easier for users to search and retrieve content.',
     'display' => array(
